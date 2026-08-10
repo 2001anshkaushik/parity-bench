@@ -1,0 +1,13 @@
+{
+	"components": [
+		{ "id": "input",  "provider": "webhook", "config": {}, "ui": {} },
+		{ "id": "work",   "provider": "pdf_probe", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "input" }] },
+		{ "id": "output", "provider": "response_text", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "work" }] }
+	],
+	"source": "input",
+	"project_id": "0a555967-4fb2-51ab-8599-1f75a41df31c",
+	"viewport": { "x": 0, "y": 0, "zoom": 1 },
+	"version": 1
+}

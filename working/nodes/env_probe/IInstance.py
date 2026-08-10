@@ -1,0 +1,50 @@
+# Benchmark-only node (NOT part of RocketRide). Safe to delete.
+#
+# DECLARED vs MEASURED, for thread pinning.
+#
+# `OMP_NUM_THREADS=1 bash start_engine.sh` exports a variable into the ENGINE process. It does not
+# prove the variable survives into the task process that actually runs node code, and it does not
+# prove torch read it — torch caches its thread count at import, so a variable set after import has
+# no effect. This node reports what is TRUE INSIDE THE TASK PROCESS at request time.
+#
+# Every anchor measured with a "pinned" engine is void unless this node reports 1.
+import json
+import os
+import threading
+
+from rocketlib import IInstanceBase
+
+KEYS = ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS", "TORCH_NUM_THREADS")
+
+
+class IInstance(IInstanceBase):
+    buf: str = ""
+
+    def open(self, obj):
+        self.buf = ""
+
+    def writeText(self, text: str):
+        self.buf = self.buf + text
+        self.preventDefault()
+
+    def closing(self):
+        info = {
+            "pid": os.getpid(),
+            "env": {k: os.environ.get(k) for k in KEYS},
+            "os_cpu_count": os.cpu_count(),
+            "threads_alive": threading.active_count(),
+        }
+        # torch is the one that actually matters: it decides intra-op parallelism for the
+        # embedding forward pass. Import it the same way the embedding node does.
+        try:
+            import torch
+            info["torch_num_threads"] = torch.get_num_threads()
+            info["torch_num_interop_threads"] = torch.get_num_interop_threads()
+            info["torch_version"] = torch.__version__
+        except Exception as e:
+            info["torch_error"] = f"{type(e).__name__}: {e}"
+        self.instance.writeText(json.dumps(info))
+
+    def close(self):
+        self.buf = ""

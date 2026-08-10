@@ -1,0 +1,13 @@
+{
+	"title": "Env Probe",
+	"protocol": "env_probe://",
+	"classType": ["preprocessor"],
+	"capabilities": [],
+	"register": "filter",
+	"node": "python",
+	"path": "nodes.env_probe",
+	"prefix": "EnvProbe",
+	"description": ["Benchmark-only node (NOT part of RocketRide; safe to delete). Reports the thread configuration ACTUALLY IN EFFECT inside the task process: torch's thread counts, the BLAS environment variables as the node sees them, and the visible CPU count. Exists because exporting a variable at engine start is a DECLARED value, not a measured one."],
+	"lanes": { "text": ["text"] },
+	"shape": [ { "section": "Pipe", "title": "Env Probe", "properties": [] } ]
+}

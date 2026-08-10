@@ -1,0 +1,21 @@
+{
+	"title": "Fault Probe",
+	"protocol": "fault_probe://",
+	"classType": ["preprocessor"],
+	"capabilities": [],
+	"register": "filter",
+	"node": "python",
+	"path": "nodes.fault_probe",
+	"prefix": "FaultProbe",
+	"description": ["Benchmark-only node (NOT part of RocketRide; safe to delete). Per item, executes a fault directive encoded in the text payload: ok | raise | hang | alloc | malformed. Used to give RocketRide and the Python baselines identical fault-injection hooks."],
+	"lanes": {
+		"text": ["text"]
+	},
+	"shape": [
+		{
+			"section": "Pipe",
+			"title": "Fault Probe",
+			"properties": []
+		}
+	]
+}

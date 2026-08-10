@@ -1,0 +1,17 @@
+{
+	"title": "Split Embed",
+	"protocol": "split_embed://",
+	"classType": ["preprocessor"],
+	"capabilities": [],
+	"register": "filter",
+	"node": "python",
+	"path": "nodes.split_embed",
+	"prefix": "SplitEmbed",
+	"description": ["Benchmark-only node (NOT part of RocketRide; safe to delete). Collapses split+embed into a single node so the 4-node pipeline's inter-node hop cost can be separated from the engine's per-request cost."],
+	"lanes": {
+		"text": ["text"]
+	},
+	"shape": [
+		{ "section": "Pipe", "title": "Split Embed", "properties": [] }
+	]
+}

@@ -1,0 +1,30 @@
+{
+  "components": [
+    {
+      "id": "input",
+      "provider": "webhook",
+      "config": {},
+      "ui": {}
+    },
+    {
+      "id": "output",
+      "provider": "response_text",
+      "config": {},
+      "ui": {},
+      "input": [
+        {
+          "lane": "text",
+          "from": "input"
+        }
+      ]
+    }
+  ],
+  "source": "input",
+  "project_id": "539f049e-53f1-4e45-bb77-a9a0b2bd8f39",
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1
+  },
+  "version": 1
+}

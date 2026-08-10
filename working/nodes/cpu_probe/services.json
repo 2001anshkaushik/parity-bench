@@ -1,0 +1,13 @@
+{
+	"title": "CPU Probe",
+	"protocol": "cpu_probe://",
+	"classType": ["preprocessor"],
+	"capabilities": [],
+	"register": "filter",
+	"node": "python",
+	"path": "nodes.cpu_probe",
+	"prefix": "CpuProbe",
+	"description": ["Benchmark-only node (NOT part of RocketRide; safe to delete). Burns a fixed, calibrated amount of pure-Python CPU with no model and no native library. Distinguishes engine request-path serialization from serialization caused by the embedding model."],
+	"lanes": { "text": ["text"] },
+	"shape": [ { "section": "Pipe", "title": "CPU Probe", "properties": [] } ]
+}

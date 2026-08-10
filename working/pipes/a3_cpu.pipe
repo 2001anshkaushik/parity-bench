@@ -1,0 +1,13 @@
+{
+	"components": [
+		{ "id": "input",  "provider": "webhook", "config": {}, "ui": {} },
+		{ "id": "work",   "provider": "cpu_probe", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "input" }] },
+		{ "id": "output", "provider": "response_text", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "work" }] }
+	],
+	"source": "input",
+	"project_id": "a302cb7b-170a-56b7-a4e2-c280d90998ca",
+	"viewport": { "x": 0, "y": 0, "zoom": 1 },
+	"version": 1
+}

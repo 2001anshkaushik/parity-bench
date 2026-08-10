@@ -1,0 +1,13 @@
+{
+	"components": [
+		{ "id": "input",  "provider": "webhook", "config": {}, "ui": {} },
+		{ "id": "fault",  "provider": "fault_probe", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "input" }] },
+		{ "id": "output", "provider": "response_text", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "fault" }] }
+	],
+	"source": "input",
+	"project_id": "c8e14b7a-2f36-4d91-8b05-6ea9d3f71c22",
+	"viewport": { "x": 0, "y": 0, "zoom": 1 },
+	"version": 1
+}

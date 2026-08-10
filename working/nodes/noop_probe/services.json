@@ -1,0 +1,13 @@
+{
+	"title": "Noop Probe",
+	"protocol": "noop_probe://",
+	"classType": ["preprocessor"],
+	"capabilities": [],
+	"register": "filter",
+	"node": "python",
+	"path": "nodes.noop_probe",
+	"prefix": "NoopProbe",
+	"description": ["Benchmark-only node (NOT part of RocketRide; safe to delete). Consumes the text lane and emits a constant. Isolates the cost of dispatching into a Python node from the work the node does."],
+	"lanes": { "text": ["text"] },
+	"shape": [ { "section": "Pipe", "title": "Noop Probe", "properties": [] } ]
+}

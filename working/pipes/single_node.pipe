@@ -1,0 +1,13 @@
+{
+	"components": [
+		{ "id": "input",  "provider": "webhook", "config": {}, "ui": {} },
+		{ "id": "se",     "provider": "split_embed", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "input" }] },
+		{ "id": "output", "provider": "response_text", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "se" }] }
+	],
+	"source": "input",
+	"project_id": "a3f81d55-4c27-4e6b-9d10-72b5e8c4a091",
+	"viewport": { "x": 0, "y": 0, "zoom": 1 },
+	"version": 1
+}

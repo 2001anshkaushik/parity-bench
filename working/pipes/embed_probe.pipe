@@ -1,0 +1,15 @@
+{
+	"components": [
+		{ "id": "input", "provider": "webhook", "config": {}, "ui": {} },
+		{ "id": "prep", "provider": "preprocessor_langchain", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "input" }] },
+		{ "id": "embed", "provider": "embedding_transformer", "config": { "profile": "miniLM" }, "ui": {},
+		  "input": [{ "lane": "documents", "from": "prep" }] },
+		{ "id": "output", "provider": "response_documents", "config": {}, "ui": {},
+		  "input": [{ "lane": "documents", "from": "embed" }] }
+	],
+	"source": "input",
+	"project_id": "f2a71c93-8d64-4e05-b1a7-9c3e6d820f14",
+	"viewport": { "x": 0, "y": 0, "zoom": 1 },
+	"version": 1
+}

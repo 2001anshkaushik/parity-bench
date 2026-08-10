@@ -1,0 +1,13 @@
+{
+	"title": "PDF Probe",
+	"protocol": "pdf_probe://",
+	"classType": ["text"],
+	"capabilities": [],
+	"register": "filter",
+	"node": "python",
+	"path": "nodes.pdf_probe",
+	"prefix": "PdfProbe",
+	"description": ["Benchmark-only node (NOT part of RocketRide; safe to delete). Parses a PDF with a PYTHON library instead of the engine's built-in Tika/JNI path. Exists to test one premise: whether Tika is architecturally forced on the RocketRide side, or merely the default."],
+	"lanes": { "text": ["text"] },
+	"shape": [ { "section": "Pipe", "title": "PDF Probe", "properties": [] } ]
+}
