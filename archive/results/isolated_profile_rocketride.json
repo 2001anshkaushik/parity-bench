@@ -1,0 +1,578 @@
+{
+ "service": "rocketride-engine",
+ "pipeline": "embed_probe.pipe (4-node)",
+ "profiles": {
+  "tuned|400": {
+   "rows": [
+    {
+     "conc": 1,
+     "throughput": 25.52,
+     "rates": [
+      25.58,
+      25.4,
+      25.52,
+      25.62,
+      25.34
+     ],
+     "spread": 0.0108,
+     "gate": true,
+     "p50": 36.17,
+     "p95": 56.44,
+     "p99": 69.48,
+     "p999": 71.51,
+     "peak_rss_mb": 838.7,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 2,
+     "throughput": 50.24,
+     "rates": [
+      50.65,
+      50.43,
+      49.7,
+      50.24,
+      49.8
+     ],
+     "spread": 0.0187,
+     "gate": true,
+     "p50": 36.55,
+     "p95": 56.34,
+     "p99": 63.62,
+     "p999": 72.81,
+     "peak_rss_mb": 1472.0,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 4,
+     "throughput": 56.01,
+     "rates": [
+      56.01,
+      54.1,
+      56.22,
+      55.19,
+      57.18
+     ],
+     "spread": 0.0539,
+     "gate": true,
+     "p50": 56.55,
+     "p95": 148.94,
+     "p99": 201.43,
+     "p999": 242.8,
+     "peak_rss_mb": 2758.0,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 8,
+     "throughput": 64.35,
+     "rates": [
+      62.31,
+      63.36,
+      64.35,
+      64.87,
+      65.22
+     ],
+     "spread": 0.0447,
+     "gate": true,
+     "p50": 104.49,
+     "p95": 250.95,
+     "p99": 284.44,
+     "p999": 309.58,
+     "peak_rss_mb": 2876.9,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 16,
+     "throughput": 50.77,
+     "rates": [
+      56.91,
+      47.19,
+      50.77,
+      54.6,
+      47.12
+     ],
+     "spread": 0.172,
+     "gate": false,
+     "p50": 311.16,
+     "p95": 563.71,
+     "p99": 669.88,
+     "p999": 726.2,
+     "peak_rss_mb": 2988.4,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 32,
+     "throughput": 54.98,
+     "rates": [
+      54.56,
+      54.98,
+      56.72,
+      60.34,
+      50.71
+     ],
+     "spread": 0.1596,
+     "gate": false,
+     "p50": 563.7,
+     "p95": 653.99,
+     "p99": 817.41,
+     "p999": 994.06,
+     "peak_rss_mb": 3107.7,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 64,
+     "throughput": 60.02,
+     "rates": [
+      60.09,
+      57.86,
+      60.24,
+      56.29,
+      60.02
+     ],
+     "spread": 0.0655,
+     "gate": true,
+     "p50": 1081.02,
+     "p95": 1206.48,
+     "p99": 1263.6,
+     "p999": 1314.84,
+     "peak_rss_mb": 3339.2,
+     "error_rate": 0.0
+    }
+   ],
+   "derived": {
+    "saturation": 8,
+    "peak_throughput": 64.35,
+    "peak_at_conc": 8,
+    "rule": "lowest concurrency reaching 95% of peak throughput"
+   }
+  },
+  "tuned|1600": {
+   "rows": [
+    {
+     "conc": 1,
+     "throughput": 10.85,
+     "rates": [
+      10.85,
+      10.87,
+      10.79,
+      10.82,
+      10.89
+     ],
+     "spread": 0.0092,
+     "gate": true,
+     "p50": 91.61,
+     "p95": 97.75,
+     "p99": 101.99,
+     "p999": 103.41,
+     "peak_rss_mb": 864.2,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 2,
+     "throughput": 19.28,
+     "rates": [
+      20.23,
+      18.74,
+      19.28,
+      19.47,
+      19.26
+     ],
+     "spread": 0.0733,
+     "gate": true,
+     "p50": 96.39,
+     "p95": 130.06,
+     "p99": 182.74,
+     "p999": 336.52,
+     "peak_rss_mb": 1520.7,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 4,
+     "throughput": 19.31,
+     "rates": [
+      18.96,
+      20.18,
+      17.37,
+      19.31,
+      19.31
+     ],
+     "spread": 0.1391,
+     "gate": false,
+     "p50": 188.23,
+     "p95": 328.11,
+     "p99": 513.82,
+     "p999": 534.57,
+     "peak_rss_mb": 2886.8,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 8,
+     "throughput": 20.76,
+     "rates": [
+      21.57,
+      20.95,
+      20.65,
+      20.76,
+      19.5
+     ],
+     "spread": 0.096,
+     "gate": true,
+     "p50": 389.89,
+     "p95": 561.05,
+     "p99": 648.77,
+     "p999": 716.61,
+     "peak_rss_mb": 3095.9,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 16,
+     "throughput": 20.84,
+     "rates": [
+      23.35,
+      20.84,
+      22.96,
+      17.8,
+      19.48
+     ],
+     "spread": 0.2374,
+     "gate": false,
+     "p50": 727.39,
+     "p95": 999.93,
+     "p99": 1062.5,
+     "p999": 1065.53,
+     "peak_rss_mb": 3377.7,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 32,
+     "throughput": 24.57,
+     "rates": [
+      24.86,
+      24.57,
+      24.43,
+      24.93,
+      23.6
+     ],
+     "spread": 0.0534,
+     "gate": true,
+     "p50": 1301.81,
+     "p95": 1358.18,
+     "p99": 1370.76,
+     "p999": 1414.07,
+     "peak_rss_mb": 3745.1,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 64,
+     "throughput": 25.51,
+     "rates": [
+      26.73,
+      25.51,
+      24.88,
+      25.18,
+      25.51
+     ],
+     "spread": 0.0693,
+     "gate": true,
+     "p50": 2500.87,
+     "p95": 2601.24,
+     "p99": 2632.86,
+     "p999": 2637.31,
+     "peak_rss_mb": 4389.2,
+     "error_rate": 0.0
+    }
+   ],
+   "derived": {
+    "saturation": 32,
+    "peak_throughput": 25.51,
+    "peak_at_conc": 64,
+    "rule": "lowest concurrency reaching 95% of peak throughput"
+   }
+  },
+  "untuned|400": {
+   "rows": [
+    {
+     "conc": 1,
+     "throughput": 42.66,
+     "rates": [
+      42.92,
+      42.31,
+      42.8,
+      42.66,
+      40.46
+     ],
+     "spread": 0.0573,
+     "gate": true,
+     "p50": 21.79,
+     "p95": 39.74,
+     "p99": 57.08,
+     "p999": 72.52,
+     "peak_rss_mb": 840.5,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 2,
+     "throughput": 58.88,
+     "rates": [
+      57.98,
+      58.88,
+      60.91,
+      61.06,
+      58.82
+     ],
+     "spread": 0.0504,
+     "gate": true,
+     "p50": 28.78,
+     "p95": 60.82,
+     "p99": 113.16,
+     "p999": 141.21,
+     "peak_rss_mb": 1489.5,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 4,
+     "throughput": 59.46,
+     "rates": [
+      59.46,
+      58.93,
+      53.05,
+      60.7,
+      61.61
+     ],
+     "spread": 0.1389,
+     "gate": false,
+     "p50": 51.0,
+     "p95": 165.5,
+     "p99": 209.94,
+     "p999": 220.23,
+     "peak_rss_mb": 2787.0,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 8,
+     "throughput": 59.54,
+     "rates": [
+      51.73,
+      54.83,
+      63.44,
+      60.97,
+      59.54
+     ],
+     "spread": 0.1847,
+     "gate": false,
+     "p50": 109.34,
+     "p95": 279.4,
+     "p99": 373.11,
+     "p999": 432.01,
+     "peak_rss_mb": 2910.3,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 16,
+     "throughput": 64.16,
+     "rates": [
+      64.7,
+      65.68,
+      61.26,
+      57.12,
+      64.16
+     ],
+     "spread": 0.1303,
+     "gate": false,
+     "p50": 242.46,
+     "p95": 403.94,
+     "p99": 466.74,
+     "p999": 495.48,
+     "peak_rss_mb": 2998.0,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 32,
+     "throughput": 63.42,
+     "rates": [
+      63.42,
+      61.76,
+      60.57,
+      65.22,
+      63.99
+     ],
+     "spread": 0.0712,
+     "gate": true,
+     "p50": 510.97,
+     "p95": 568.23,
+     "p99": 578.43,
+     "p999": 582.17,
+     "peak_rss_mb": 3119.4,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 64,
+     "throughput": 66.22,
+     "rates": [
+      61.01,
+      67.57,
+      66.22,
+      63.04,
+      71.37
+     ],
+     "spread": 0.1451,
+     "gate": false,
+     "p50": 935.57,
+     "p95": 1104.75,
+     "p99": 1162.06,
+     "p999": 1174.01,
+     "peak_rss_mb": 3373.4,
+     "error_rate": 0.0
+    }
+   ],
+   "derived": {
+    "saturation": 16,
+    "peak_throughput": 66.22,
+    "peak_at_conc": 64,
+    "rule": "lowest concurrency reaching 95% of peak throughput"
+   }
+  },
+  "untuned|1600": {
+   "rows": [
+    {
+     "conc": 1,
+     "throughput": 18.86,
+     "rates": [
+      19.12,
+      18.86,
+      18.14,
+      19.5,
+      17.23
+     ],
+     "spread": 0.1164,
+     "gate": false,
+     "p50": 47.23,
+     "p95": 95.29,
+     "p99": 154.2,
+     "p999": 330.53,
+     "peak_rss_mb": 880.6,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 2,
+     "throughput": 27.21,
+     "rates": [
+      27.21,
+      26.46,
+      28.66,
+      24.66,
+      28.12
+     ],
+     "spread": 0.1396,
+     "gate": false,
+     "p50": 64.09,
+     "p95": 144.02,
+     "p99": 176.91,
+     "p999": 306.39,
+     "peak_rss_mb": 1554.3,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 4,
+     "throughput": 28.55,
+     "rates": [
+      25.83,
+      28.7,
+      28.39,
+      28.55,
+      28.8
+     ],
+     "spread": 0.1034,
+     "gate": false,
+     "p50": 128.36,
+     "p95": 243.11,
+     "p99": 277.22,
+     "p999": 418.52,
+     "peak_rss_mb": 2920.3,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 8,
+     "throughput": 27.2,
+     "rates": [
+      25.66,
+      26.69,
+      28.59,
+      27.2,
+      28.52
+     ],
+     "spread": 0.1022,
+     "gate": false,
+     "p50": 291.51,
+     "p95": 438.37,
+     "p99": 505.88,
+     "p999": 515.57,
+     "peak_rss_mb": 3106.2,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 16,
+     "throughput": 28.89,
+     "rates": [
+      29.18,
+      28.09,
+      28.89,
+      28.67,
+      29.35
+     ],
+     "spread": 0.0426,
+     "gate": true,
+     "p50": 563.18,
+     "p95": 607.86,
+     "p99": 656.95,
+     "p999": 664.29,
+     "peak_rss_mb": 3379.8,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 32,
+     "throughput": 26.11,
+     "rates": [
+      28.48,
+      26.11,
+      31.09,
+      25.72,
+      20.6
+     ],
+     "spread": 0.3373,
+     "gate": false,
+     "p50": 1162.34,
+     "p95": 1724.33,
+     "p99": 1754.07,
+     "p999": 1762.9,
+     "peak_rss_mb": 3728.3,
+     "error_rate": 0.0
+    },
+    {
+     "conc": 64,
+     "throughput": 30.67,
+     "rates": [
+      30.67,
+      33.23,
+      30.69,
+      28.03,
+      19.21
+     ],
+     "spread": 0.422,
+     "gate": false,
+     "p50": 1998.31,
+     "p95": 3609.29,
+     "p99": 3645.99,
+     "p999": 3651.09,
+     "peak_rss_mb": 4303.6,
+     "error_rate": 0.0
+    }
+   ],
+   "derived": {
+    "saturation": 64,
+    "peak_throughput": 30.67,
+    "peak_at_conc": 64,
+    "rule": "lowest concurrency reaching 95% of peak throughput"
+   }
+  }
+ }
+}

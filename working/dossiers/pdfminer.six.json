@@ -1,0 +1,39 @@
+{
+  "candidate": "pdfminer.six",
+  "resolved_name": "pdfminer.six",
+  "exists_on_pypi": true,
+  "version": "20260107",
+  "author": "Yusuke Shinyama, Pieter Marsman",
+  "last_release_date": "2026-01-07T13:29:12",
+  "days_since_last_release": 211,
+  "release_count": 37,
+  "maintenance_status": "STALE",
+  "requires_python": ">=3.10",
+  "license": "MIT",
+  "license_permissive": "YES",
+  "summary": "PDF parser and analyzer",
+  "source_repo": "https://github.com/pdfminer/pdfminer.six",
+  "homepage": null,
+  "dependencies": [
+    "charset-normalizer>=2.0.0",
+    "cryptography>=36.0.0",
+    "Pillow"
+  ],
+  "depends_on_frameworks_under_test": [],
+  "install_ok": "NOT_ATTEMPTED",
+  "install_error": null,
+  "import_ok": "NOT_ATTEMPTED",
+  "installed_version": null,
+  "execution_locality": "UNVERIFIED",
+  "hosted_evidence": [],
+  "telemetry_endpoints": [],
+  "concurrency_primitives": [],
+  "track_a_eligible": "UNVERIFIED \u2014 run with --install",
+  "track_b_eligible": "UNVERIFIED \u2014 run with --install",
+  "notes": [
+    "No release in 211 days \u2014 confirm this is still the vendor's current SDK."
+  ],
+  "tried_names": [
+    "pdfminer.six"
+  ]
+}

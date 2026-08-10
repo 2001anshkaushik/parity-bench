@@ -1,0 +1,121 @@
+[
+  {
+    "device": "mps",
+    "reps": 5,
+    "cooldown_s": 0,
+    "discard_first": 0,
+    "values": [
+      75.1,
+      66.6,
+      78.4,
+      80.2,
+      78.3
+    ],
+    "median": 78.3,
+    "spread_frac": 0.169,
+    "load_avg_at_end": 3.21,
+    "condition": "mps  baseline (no cooldown)"
+  },
+  {
+    "device": "cpu",
+    "reps": 5,
+    "cooldown_s": 0,
+    "discard_first": 0,
+    "values": [
+      31.6,
+      26.5,
+      31.8,
+      31.4,
+      32.2
+    ],
+    "median": 31.6,
+    "spread_frac": 0.177,
+    "load_avg_at_end": 3.19,
+    "condition": "cpu  baseline (no cooldown)"
+  },
+  {
+    "device": "mps",
+    "reps": 5,
+    "cooldown_s": 5,
+    "discard_first": 0,
+    "values": [
+      83.5,
+      81.5,
+      74.7,
+      71.5,
+      81.8
+    ],
+    "median": 81.5,
+    "spread_frac": 0.145,
+    "load_avg_at_end": 3.34,
+    "condition": "mps  + 5s cooldown"
+  },
+  {
+    "device": "cpu",
+    "reps": 5,
+    "cooldown_s": 5,
+    "discard_first": 0,
+    "values": [
+      32.3,
+      32.4,
+      31.1,
+      32.5,
+      32.5
+    ],
+    "median": 32.4,
+    "spread_frac": 0.044,
+    "load_avg_at_end": 3.08,
+    "condition": "cpu  + 5s cooldown"
+  },
+  {
+    "device": "mps",
+    "reps": 5,
+    "cooldown_s": 0,
+    "discard_first": 2,
+    "values": [
+      90.3,
+      109.4,
+      88.5,
+      104.3,
+      118.5
+    ],
+    "median": 104.3,
+    "spread_frac": 0.253,
+    "load_avg_at_end": 3.16,
+    "condition": "mps  + discard first 2 warmups"
+  },
+  {
+    "device": "cpu",
+    "reps": 5,
+    "cooldown_s": 0,
+    "discard_first": 2,
+    "values": [
+      32.4,
+      32.6,
+      32.9,
+      32.9,
+      32.4
+    ],
+    "median": 32.6,
+    "spread_frac": 0.017,
+    "load_avg_at_end": 3.47,
+    "condition": "cpu  + discard first 2 warmups"
+  },
+  {
+    "device": "cpu",
+    "reps": 5,
+    "cooldown_s": 0,
+    "discard_first": 0,
+    "values": [
+      33.0,
+      33.0,
+      33.0,
+      33.0,
+      33.2
+    ],
+    "median": 33.0,
+    "spread_frac": 0.007,
+    "load_avg_at_end": 6.34,
+    "condition": "cpu  immediately after heavy load (no cooldown)"
+  }
+]

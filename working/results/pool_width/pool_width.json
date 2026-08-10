@@ -1,0 +1,29 @@
+[
+  {
+    "hold_s": 0.25,
+    "n": 600,
+    "client_concurrency": 512,
+    "completed": 600,
+    "wall_s": 8.753,
+    "throughput_per_s": 68.55,
+    "implied_width": 17.1
+  },
+  {
+    "hold_s": 0.5,
+    "n": 400,
+    "client_concurrency": 512,
+    "completed": 400,
+    "wall_s": 11.603,
+    "throughput_per_s": 34.47,
+    "implied_width": 17.2
+  },
+  {
+    "hold_s": 1.0,
+    "n": 200,
+    "client_concurrency": 512,
+    "completed": 200,
+    "wall_s": 12.065,
+    "throughput_per_s": 16.58,
+    "implied_width": 16.6
+  }
+]

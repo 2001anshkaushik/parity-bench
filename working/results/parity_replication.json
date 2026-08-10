@@ -1,0 +1,58 @@
+{
+  "summary": {
+    "rocketride": {
+      "median_rate": 227.83,
+      "rates": [
+        234.43,
+        222.63,
+        227.79,
+        232.24,
+        227.83
+      ],
+      "spread_frac": 0.0503,
+      "ci95": [
+        225.584,
+        232.664
+      ],
+      "p50_ms": 35.65,
+      "response_bytes": 10288,
+      "n_chunks": 1,
+      "dim": 384,
+      "first_request_ms": 45.26,
+      "passes_variance_gate": true
+    },
+    "llamaindex": {
+      "median_rate": 381.08,
+      "rates": [
+        351.91,
+        381.08,
+        396.76,
+        347.87,
+        403.2
+      ],
+      "spread_frac": 0.1372,
+      "ci95": [
+        356.128,
+        396.2
+      ],
+      "p50_ms": 19.26,
+      "response_bytes": 10368,
+      "n_chunks": 1,
+      "dim": 384,
+      "first_request_ms": 21.94,
+      "passes_variance_gate": false
+    }
+  },
+  "ratio": {
+    "point": 0.6087,
+    "ci95": [
+      0.5768,
+      0.6434
+    ]
+  },
+  "verdict": "LlamaIndex faster by 1.64x [CI 1.55-1.73]",
+  "pinned_concurrency": 8,
+  "drivers": 2,
+  "reps": 5,
+  "warmup_requests_discarded": 20
+}

@@ -1,0 +1,194 @@
+{
+ "A_intra1_inter1": {
+  "threads": {
+   "intra_before": 1,
+   "inter_before": 14,
+   "interop_set": "ok",
+   "intra_after": 1,
+   "inter_after": 1,
+   "pid": 97950
+  },
+  "cells": {
+   "8|rocketride": {
+    "median": 32.0,
+    "rates": [
+     35.07,
+     30.53,
+     30.86,
+     32.0,
+     32.94
+    ],
+    "spread": 0.1295,
+    "gate": false,
+    "fails": 0
+   },
+   "8|llamaindex": {
+    "median": 39.94,
+    "rates": [
+     40.55,
+     38.22,
+     39.3,
+     40.48,
+     39.94
+    ],
+    "spread": 0.0575,
+    "gate": true,
+    "fails": 0
+   },
+   "2|llamaindex": {
+    "median": 24.09,
+    "rates": [
+     24.11,
+     23.9,
+     24.11,
+     24.09,
+     23.93
+    ],
+    "spread": 0.0087,
+    "gate": true,
+    "fails": 0
+   },
+   "2|rocketride": {
+    "median": 21.99,
+    "rates": [
+     22.05,
+     21.99,
+     22.01,
+     21.98,
+     21.88
+    ],
+    "spread": 0.0077,
+    "gate": true,
+    "fails": 0
+   }
+  }
+ },
+ "B_intra1_inter14": {
+  "threads": {
+   "intra_before": 1,
+   "inter_before": 14,
+   "interop_set": "not_requested",
+   "intra_after": 1,
+   "inter_after": 14,
+   "pid": 98460
+  },
+  "cells": {
+   "2|llamaindex": {
+    "median": 23.92,
+    "rates": [
+     23.64,
+     23.92,
+     24.02,
+     23.88,
+     24.0
+    ],
+    "spread": 0.0158,
+    "gate": true,
+    "fails": 0
+   },
+   "8|rocketride": {
+    "median": 37.34,
+    "rates": [
+     36.52,
+     37.85,
+     36.26,
+     37.34,
+     38.25
+    ],
+    "spread": 0.052,
+    "gate": true,
+    "fails": 0
+   },
+   "2|rocketride": {
+    "median": 22.01,
+    "rates": [
+     21.75,
+     22.03,
+     22.01,
+     21.84,
+     22.2
+    ],
+    "spread": 0.0203,
+    "gate": true,
+    "fails": 0
+   },
+   "8|llamaindex": {
+    "median": 40.65,
+    "rates": [
+     38.22,
+     39.86,
+     40.65,
+     41.49,
+     40.84
+    ],
+    "spread": 0.0788,
+    "gate": true,
+    "fails": 0
+   }
+  }
+ },
+ "C_untuned": {
+  "threads": {
+   "intra_before": 10,
+   "inter_before": 14,
+   "interop_set": "not_requested",
+   "intra_after": 10,
+   "inter_after": 14,
+   "pid": 98977
+  },
+  "cells": {
+   "2|rocketride": {
+    "median": 32.45,
+    "rates": [
+     32.66,
+     32.38,
+     32.27,
+     32.45,
+     32.7
+    ],
+    "spread": 0.0131,
+    "gate": true,
+    "fails": 0
+   },
+   "8|llamaindex": {
+    "median": 41.94,
+    "rates": [
+     41.55,
+     41.94,
+     42.22,
+     41.51,
+     42.01
+    ],
+    "spread": 0.0168,
+    "gate": true,
+    "fails": 0
+   },
+   "2|llamaindex": {
+    "median": 24.06,
+    "rates": [
+     24.22,
+     24.0,
+     24.11,
+     24.06,
+     23.78
+    ],
+    "spread": 0.0182,
+    "gate": true,
+    "fails": 0
+   },
+   "8|rocketride": {
+    "median": 31.31,
+    "rates": [
+     32.06,
+     31.31,
+     30.89,
+     32.84,
+     28.34
+    ],
+    "spread": 0.137,
+    "gate": false,
+    "fails": 0
+   }
+  }
+ }
+}

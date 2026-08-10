@@ -1,0 +1,167 @@
+{
+ "_meta": {
+  "name": "a13_ordering_reconstructed",
+  "written_utc": "20260808T023802Z",
+  "payload_sha256_12": "39bb5e10c4ab",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 49705,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "finding": "A13 \u2014 ascending concurrency sweeps under-measure. Identical harness, ~400-token documents, LlamaIndex; only the cell ORDER differs. Pre-warming an ascending sweep reproduces the descending run, so the variable is the machine's power state when measurement begins \u2014 not concurrency, harness, or service.",
+  "label": "VERIFIED (3 orderings, one harness)",
+  "provenance_warning": "MIXED PROVENANCE \u2014 read before quoting. The original JSON for the descending and pre-warm runs was destroyed: three scripts claimed results/isolated_profile_llamaindex.json and the pre-warm run overwrote the descending one. Additionally those two runs were piped to grep, so their stdout was never written to a log either.",
+  "blocks": [
+   {
+    "label": "ascending_cold",
+    "provenance": "LOG-PARSED from logs/isolated_li_rerun.out",
+    "confidence": "raw instrument output",
+    "tokens": 400,
+    "rows": [
+     {
+      "conc": 1,
+      "throughput": 30.54,
+      "spread": 0.095,
+      "gate": true,
+      "p50": 31.8,
+      "p99": 50.79,
+      "peak_rss_mb": 4646.1
+     },
+     {
+      "conc": 2,
+      "throughput": 63.47,
+      "spread": 0.033,
+      "gate": true,
+      "p50": 31.47,
+      "p99": 36.13,
+      "peak_rss_mb": 4670.1
+     },
+     {
+      "conc": 4,
+      "throughput": 89.01,
+      "spread": 0.021,
+      "gate": true,
+      "p50": 42.52,
+      "p99": 68.63,
+      "peak_rss_mb": 4734.0
+     },
+     {
+      "conc": 8,
+      "throughput": 106.47,
+      "spread": 0.016,
+      "gate": true,
+      "p50": 73.7,
+      "p99": 105.49,
+      "peak_rss_mb": 4819.5
+     },
+     {
+      "conc": 16,
+      "throughput": 102.73,
+      "spread": 0.031,
+      "gate": true,
+      "p50": 152.6,
+      "p99": 242.61,
+      "peak_rss_mb": 4936.9
+     },
+     {
+      "conc": 32,
+      "throughput": 101.66,
+      "spread": 0.028999999999999998,
+      "gate": true,
+      "p50": 308.24,
+      "p99": 471.38,
+      "peak_rss_mb": 5170.1
+     },
+     {
+      "conc": 64,
+      "throughput": 101.51,
+      "spread": 0.026000000000000002,
+      "gate": true,
+      "p50": 611.91,
+      "p99": 924.75,
+      "peak_rss_mb": 5444.7
+     }
+    ]
+   },
+   {
+    "label": "descending",
+    "provenance": "TRANSCRIBED from the session-11 report table in publishable/STATE.md section 4b",
+    "confidence": "reported values, NOT raw output \u2014 no spreads, gates or latencies recoverable",
+    "tokens": 400,
+    "rows": [
+     {
+      "conc": 1,
+      "throughput": 39.8
+     },
+     {
+      "conc": 2,
+      "throughput": 84.0
+     },
+     {
+      "conc": 4,
+      "throughput": 124.1
+     },
+     {
+      "conc": 8,
+      "throughput": 204.8
+     },
+     {
+      "conc": 16,
+      "throughput": 248.7
+     },
+     {
+      "conc": 32,
+      "throughput": 228.1
+     },
+     {
+      "conc": 64,
+      "throughput": 240.6
+     }
+    ]
+   },
+   {
+    "label": "ascending_prewarmed",
+    "provenance": "TRANSCRIBED from the session-11 report table in publishable/STATE.md section 4b",
+    "confidence": "reported values, NOT raw output",
+    "tokens": 400,
+    "rows": [
+     {
+      "conc": 1,
+      "throughput": 39.2
+     },
+     {
+      "conc": 2,
+      "throughput": 82.7
+     },
+     {
+      "conc": 4,
+      "throughput": 106.8
+     },
+     {
+      "conc": 8,
+      "throughput": 183.7
+     },
+     {
+      "conc": 16,
+      "throughput": 225.7
+     },
+     {
+      "conc": 32,
+      "throughput": 223.6
+     },
+     {
+      "conc": 64,
+      "throughput": 225.0
+     }
+    ]
+   }
+  ],
+  "what_cannot_be_recovered": [
+   "per-repetition rate lists (so CIs cannot be recomputed)",
+   "spreads/gates/latency percentiles for the two transcribed blocks",
+   "peak RSS for the two transcribed blocks"
+  ],
+  "reproduce": "working/scripts/isolated_profile_reversed.py and isolated_profile_prewarm.py re-run both orderings; they now write through harness.resultio, which cannot collide."
+ }
+}

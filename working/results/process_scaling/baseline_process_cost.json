@@ -1,0 +1,77 @@
+{
+  "baseline": 714,
+  "rows": [
+    {
+      "adapter": "asyncio",
+      "concurrency": 100,
+      "peak": 714,
+      "delta": 0,
+      "procs_per_unit": 0.0
+    },
+    {
+      "adapter": "asyncio",
+      "concurrency": 1000,
+      "peak": 714,
+      "delta": 0,
+      "procs_per_unit": 0.0
+    },
+    {
+      "adapter": "asyncio",
+      "concurrency": 10000,
+      "peak": 714,
+      "delta": 0,
+      "procs_per_unit": 0.0
+    },
+    {
+      "adapter": "threadpool",
+      "concurrency": 100,
+      "workers": 100,
+      "peak": 714,
+      "delta": 0,
+      "procs_per_unit": 0.0
+    },
+    {
+      "adapter": "threadpool",
+      "concurrency": 1000,
+      "workers": 512,
+      "peak": 714,
+      "delta": 0,
+      "procs_per_unit": 0.0
+    },
+    {
+      "adapter": "processpool",
+      "workers": 4,
+      "peak": 719,
+      "delta": 5,
+      "procs_per_worker": 1.25
+    },
+    {
+      "adapter": "processpool",
+      "workers": 10,
+      "peak": 725,
+      "delta": 11,
+      "procs_per_worker": 1.1
+    },
+    {
+      "adapter": "processpool",
+      "workers": 14,
+      "peak": 729,
+      "delta": 15,
+      "procs_per_worker": 1.071
+    },
+    {
+      "adapter": "processpool",
+      "workers": 28,
+      "peak": 743,
+      "delta": 29,
+      "procs_per_worker": 1.036
+    },
+    {
+      "adapter": "processpool",
+      "workers": 56,
+      "peak": 771,
+      "delta": 57,
+      "procs_per_worker": 1.018
+    }
+  ]
+}

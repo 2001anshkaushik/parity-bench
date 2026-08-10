@@ -1,0 +1,57 @@
+{
+  "rows": [
+    {
+      "framework": "langgraph",
+      "packages": [
+        "langgraph"
+      ],
+      "install_wall_s": 0.49,
+      "install_ok": true,
+      "dependency_count": 35,
+      "venv_size_mb": 75.0,
+      "install_size_mb": 23.4,
+      "import_cold_start_ms": "0.1"
+    },
+    {
+      "framework": "crewai",
+      "packages": [
+        "crewai"
+      ],
+      "install_wall_s": 0.6,
+      "install_ok": true,
+      "dependency_count": 135,
+      "venv_size_mb": 643.6,
+      "install_size_mb": 592.0,
+      "import_cold_start_ms": "4531.8"
+    },
+    {
+      "framework": "rocketride_sdk",
+      "packages": [
+        "rocketride"
+      ],
+      "install_wall_s": 0.17,
+      "install_ok": true,
+      "dependency_count": 8,
+      "venv_size_mb": 59.5,
+      "install_size_mb": 7.9,
+      "import_cold_start_ms": "467.7"
+    },
+    {
+      "framework": "fastapi_stack",
+      "packages": [
+        "fastapi",
+        "uvicorn[standard]"
+      ],
+      "install_wall_s": 0.13,
+      "install_ok": true,
+      "dependency_count": 19,
+      "venv_size_mb": 67.5,
+      "install_size_mb": 15.9,
+      "import_cold_start_ms": "458.0"
+    }
+  ],
+  "downscaled_out_of_this_pass": [
+    "deepagents (built on langgraph, not independent)",
+    "omnigent (Track A locality still PENDING)"
+  ]
+}

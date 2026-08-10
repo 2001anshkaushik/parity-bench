@@ -1,0 +1,43 @@
+{
+ "trials": [
+  {
+   "kind": "cold",
+   "rate": 92.41,
+   "workers_warm_at_start": 8,
+   "workers_warm_at_end": 8
+  },
+  {
+   "kind": "warm",
+   "rate": 88.2,
+   "workers_warm_at_start": 8,
+   "workers_warm_at_end": 8
+  },
+  {
+   "kind": "cold",
+   "rate": 90.35,
+   "workers_warm_at_start": 8,
+   "workers_warm_at_end": 8
+  },
+  {
+   "kind": "warm",
+   "rate": 88.03,
+   "workers_warm_at_start": 8,
+   "workers_warm_at_end": 8
+  },
+  {
+   "kind": "cold",
+   "rate": 89.89,
+   "workers_warm_at_start": 8,
+   "workers_warm_at_end": 8
+  },
+  {
+   "kind": "warm",
+   "rate": 91.23,
+   "workers_warm_at_start": 8,
+   "workers_warm_at_end": 8
+  }
+ ],
+ "median_cold": 90.35,
+ "median_warm": 88.2,
+ "verdict": "REFUTED \u2014 the gate is not the cause; A13 remains open"
+}

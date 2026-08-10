@@ -1,0 +1,53 @@
+{
+  "candidate": "deepagents",
+  "resolved_name": "deepagents",
+  "exists_on_pypi": true,
+  "version": "0.7.4",
+  "author": null,
+  "last_release_date": "2026-08-04T16:11:33",
+  "days_since_last_release": -1,
+  "release_count": 116,
+  "maintenance_status": "ACTIVE",
+  "requires_python": "<4.0,>=3.11",
+  "license": "MIT",
+  "license_permissive": "YES",
+  "summary": "General purpose 'deep agent' with sub-agent spawning, todo list capabilities, and mock file system. Built on LangGraph.",
+  "source_repo": "https://github.com/langchain-ai/deepagents",
+  "homepage": null,
+  "dependencies": [
+    "langchain<2.0.0,>=1.3.14",
+    "langchain-core<2.0.0,>=1.5.0",
+    "langchain-anthropic<2.0.0,>=1.5.3",
+    "langchain-google-genai<5.0.0,>=4.3.1",
+    "langsmith>=0.10.9",
+    "packaging>=23.2",
+    "wcmatch>=11.0",
+    "langchain-aws<2.0.0,>=1.6.2",
+    "langchain-quickjs>=0.3.3",
+    "av<19.0.0,>=18.0.0",
+    "pillow<13.0.0,>=12.3.0"
+  ],
+  "depends_on_frameworks_under_test": [
+    "langchain"
+  ],
+  "install_ok": "OK",
+  "install_error": null,
+  "import_ok": "OK",
+  "installed_version": "0.7.4",
+  "execution_locality": "LIKELY_LOCAL",
+  "hosted_evidence": [],
+  "telemetry_endpoints": [],
+  "concurrency_primitives": [
+    "asyncio",
+    "thread_pool",
+    "threading"
+  ],
+  "track_a_eligible": "LIKELY \u2014 confirm with offline behavioural probe",
+  "track_b_eligible": "LIKELY \u2014 confirm with offline behavioural probe",
+  "notes": [
+    "Shares a substrate with another framework under test (langchain) \u2014 results are NOT independent and must be disclosed as such."
+  ],
+  "tried_names": [
+    "deepagents"
+  ]
+}

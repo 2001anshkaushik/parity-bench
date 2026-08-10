@@ -1,0 +1,122 @@
+[
+  {
+    "device": "cpu",
+    "concurrency": 1,
+    "reps": 3,
+    "throughput_median_per_s": 30.7,
+    "throughput_runs": [
+      30.7,
+      30.8,
+      30.7
+    ],
+    "spread_frac": 0.003,
+    "p50_ms_median": 32.34,
+    "workers_hit": 1,
+    "errors": 0
+  },
+  {
+    "device": "cpu",
+    "concurrency": 8,
+    "reps": 3,
+    "throughput_median_per_s": 101.8,
+    "throughput_runs": [
+      99.4,
+      101.8,
+      102.8
+    ],
+    "spread_frac": 0.033,
+    "p50_ms_median": 76.89,
+    "workers_hit": 5,
+    "errors": 0
+  },
+  {
+    "device": "cpu",
+    "concurrency": 14,
+    "reps": 3,
+    "throughput_median_per_s": 100.9,
+    "throughput_runs": [
+      102.4,
+      98.2,
+      100.9
+    ],
+    "spread_frac": 0.041,
+    "p50_ms_median": 136.61,
+    "workers_hit": 7,
+    "errors": 0
+  },
+  {
+    "device": "cpu",
+    "concurrency": 4,
+    "reps": 3,
+    "throughput_median_per_s": 86.5,
+    "throughput_runs": [
+      88.3,
+      86.5,
+      74.2
+    ],
+    "spread_frac": 0.16,
+    "p50_ms_median": 43.86,
+    "workers_hit": 4,
+    "errors": 0
+  },
+  {
+    "device": "mps",
+    "concurrency": 4,
+    "reps": 3,
+    "throughput_median_per_s": 164.5,
+    "throughput_runs": [
+      164.5,
+      152.1,
+      298.3
+    ],
+    "spread_frac": 0.49,
+    "p50_ms_median": 20.87,
+    "workers_hit": 4,
+    "errors": 0
+  },
+  {
+    "device": "mps",
+    "concurrency": 8,
+    "reps": 3,
+    "throughput_median_per_s": 192.1,
+    "throughput_runs": [
+      174.2,
+      192.1,
+      369.3
+    ],
+    "spread_frac": 0.528,
+    "p50_ms_median": 33.88,
+    "workers_hit": 6,
+    "errors": 0
+  },
+  {
+    "device": "mps",
+    "concurrency": 14,
+    "reps": 3,
+    "throughput_median_per_s": 167.5,
+    "throughput_runs": [
+      111.9,
+      198.0,
+      167.5
+    ],
+    "spread_frac": 0.435,
+    "p50_ms_median": 50.09,
+    "workers_hit": 8,
+    "errors": 0
+  },
+  {
+    "device": "mps",
+    "concurrency": 1,
+    "reps": 3,
+    "throughput_median_per_s": 83.3,
+    "throughput_runs": [
+      96.5,
+      83.3,
+      74.2
+    ],
+    "spread_frac": 0.231,
+    "p50_ms_median": 11.17,
+    "workers_hit": 1,
+    "errors": 0
+  }
+]

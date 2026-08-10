@@ -1,0 +1,100 @@
+{
+ "_meta": {
+  "name": "nul_characterization",
+  "written_utc": "20260810T023701Z",
+  "payload_sha256_12": "5cced3ee5969",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 27227,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "minimal": {
+   "sent": "'AAAA\\x00BBBB'",
+   "returned": "'AAAA'",
+   "truncated": true
+  },
+  "scope_plain_text": {
+   "sent_len": 1851,
+   "nul_at": 1050,
+   "returned_len": 1050
+  },
+  "control_chars": {
+   "truncating": [
+    "0x00"
+   ],
+   "n_surviving": 32
+  },
+  "fields": {
+   "doc_keys": [
+    "embedding",
+    "embedding_model",
+    "metadata",
+    "page_content",
+    "type"
+   ],
+   "top_keys": [
+    "documents",
+    "name",
+    "path",
+    "result_types",
+    "objectId"
+   ]
+  },
+  "boundary": {
+   "leading": {
+    "sent": "'\\x00ABCDEFGH'",
+    "returned": "''",
+    "sent_len": 9,
+    "returned_len": 0,
+    "first_nul": 0,
+    "cut_at_first_nul": true
+   },
+   "mid": {
+    "sent": "'ABCD\\x00EFGH'",
+    "returned": "'ABCD'",
+    "sent_len": 9,
+    "returned_len": 4,
+    "first_nul": 4,
+    "cut_at_first_nul": true
+   },
+   "trailing": {
+    "sent": "'ABCDEFGH\\x00'",
+    "returned": "'ABCDEFGH'",
+    "sent_len": 9,
+    "returned_len": 8,
+    "first_nul": 8,
+    "cut_at_first_nul": true
+   },
+   "multiple": {
+    "sent": "'AB\\x00CD\\x00EF\\x00GH'",
+    "returned": "'AB'",
+    "sent_len": 11,
+    "returned_len": 2,
+    "first_nul": 2,
+    "cut_at_first_nul": true
+   },
+   "only_nul": {
+    "sent": "'\\x00'",
+    "returned": "''",
+    "sent_len": 1,
+    "returned_len": 0,
+    "first_nul": 0,
+    "cut_at_first_nul": true
+   },
+   "nul_run": {
+    "sent": "'AB\\x00\\x00\\x00CD'",
+    "returned": "'AB'",
+    "sent_len": 7,
+    "returned_len": 2,
+    "first_nul": 2,
+    "cut_at_first_nul": true
+   }
+  },
+  "direction": {
+   "cos_full": 1.0,
+   "cos_truncated": 0.7698,
+   "verdict": "OUTBOUND \u2014 the engine embedded the FULL text; only the response text is lost"
+  }
+ }
+}

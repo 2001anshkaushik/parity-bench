@@ -1,0 +1,68 @@
+{
+ "idle": {
+  "rocketride": 204.3,
+  "llamaindex": 4641.8
+ },
+ "cells": {
+  "400|8|rocketride": {
+   "peak_rss_mb": 927.6,
+   "rate": 85.27,
+   "samples": 55
+  },
+  "400|8|llamaindex": {
+   "peak_rss_mb": 4767.2,
+   "rate": 102.55,
+   "samples": 29
+  },
+  "400|32|rocketride": {
+   "peak_rss_mb": 992.1,
+   "rate": 89.038,
+   "samples": 53
+  },
+  "400|32|llamaindex": {
+   "peak_rss_mb": 4997.9,
+   "rate": 98.376,
+   "samples": 23
+  },
+  "1600|8|rocketride": {
+   "peak_rss_mb": 925.6,
+   "rate": 85.772,
+   "samples": 54
+  },
+  "1600|8|llamaindex": {
+   "peak_rss_mb": 5129.5,
+   "rate": 38.477,
+   "samples": 28
+  },
+  "1600|32|rocketride": {
+   "peak_rss_mb": 993.8,
+   "rate": 88.29,
+   "samples": 54
+  },
+  "1600|32|llamaindex": {
+   "peak_rss_mb": 5724.3,
+   "rate": 37.827,
+   "samples": 21
+  },
+  "6400|8|rocketride": {
+   "peak_rss_mb": 931.6,
+   "rate": 86.033,
+   "samples": 55
+  },
+  "6400|8|llamaindex": {
+   "peak_rss_mb": 6354.0,
+   "rate": 8.611,
+   "samples": 29
+  },
+  "6400|32|rocketride": {
+   "peak_rss_mb": 995.4,
+   "rate": 87.004,
+   "samples": 55
+  },
+  "6400|32|llamaindex": {
+   "peak_rss_mb": 7949.5,
+   "rate": 8.045,
+   "samples": 26
+  }
+ }
+}

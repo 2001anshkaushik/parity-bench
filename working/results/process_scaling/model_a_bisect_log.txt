@@ -1,0 +1,17 @@
+========================================================================
+Model A bisect — where does N concurrent pipelines break the engine?
+========================================================================
+
+[level n=25 rep=0]
+  tasks=25/25 use_err=0 setup=21.022s procs/task=1.56 node_procs=25
+  after: healthy=True engine_cpu=0.2 uid_procs=725 orphaned_node=0
+
+[level n=50 rep=0]
+  tasks=50/50 use_err=0 setup=23.397s procs/task=1.06 node_procs=51
+  after: healthy=True engine_cpu=0.2 uid_procs=724 orphaned_node=1
+
+[level n=100 rep=0]
+  tasks=100/100 use_err=0 setup=49.102s procs/task=0.94 node_procs=101
+  after: healthy=True engine_cpu=0.2 uid_procs=722 orphaned_node=1
+
+[level n=150 rep=0]

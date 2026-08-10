@@ -1,0 +1,183 @@
+{
+  "levels": [
+    100,
+    500,
+    1000,
+    2000,
+    5000,
+    10000,
+    20000
+  ],
+  "rows": [
+    {
+      "concurrency": 100,
+      "wall_s": 0.042,
+      "ok": 100,
+      "errors": 0,
+      "error_sample": null,
+      "throughput_per_s": 2385.2,
+      "lat_p50_ms": 30.85,
+      "lat_p95_ms": 39.47,
+      "lat_p99_ms": 39.67,
+      "lat_max_ms": 39.67,
+      "before": {
+        "uid_procs": 718,
+        "node_procs": 1,
+        "engine_rss_mb": 91.1,
+        "engine_threads": 24
+      },
+      "after": {
+        "uid_procs": 718,
+        "node_procs": 1,
+        "engine_rss_mb": 91.6,
+        "engine_threads": 24
+      }
+    },
+    {
+      "concurrency": 500,
+      "wall_s": 0.191,
+      "ok": 500,
+      "errors": 0,
+      "error_sample": null,
+      "throughput_per_s": 2614.3,
+      "lat_p50_ms": 115.64,
+      "lat_p95_ms": 178.29,
+      "lat_p99_ms": 180.2,
+      "lat_max_ms": 180.35,
+      "before": {
+        "uid_procs": 718,
+        "node_procs": 1,
+        "engine_rss_mb": 91.6,
+        "engine_threads": 24
+      },
+      "after": {
+        "uid_procs": 718,
+        "node_procs": 1,
+        "engine_rss_mb": 93.8,
+        "engine_threads": 24
+      }
+    },
+    {
+      "concurrency": 1000,
+      "wall_s": 0.379,
+      "ok": 1000,
+      "errors": 0,
+      "error_sample": null,
+      "throughput_per_s": 2639.9,
+      "lat_p50_ms": 207.16,
+      "lat_p95_ms": 351.56,
+      "lat_p99_ms": 358.37,
+      "lat_max_ms": 358.66,
+      "before": {
+        "uid_procs": 718,
+        "node_procs": 1,
+        "engine_rss_mb": 93.8,
+        "engine_threads": 24
+      },
+      "after": {
+        "uid_procs": 718,
+        "node_procs": 1,
+        "engine_rss_mb": 96.8,
+        "engine_threads": 24
+      }
+    },
+    {
+      "concurrency": 2000,
+      "wall_s": 0.766,
+      "ok": 2000,
+      "errors": 0,
+      "error_sample": null,
+      "throughput_per_s": 2612.0,
+      "lat_p50_ms": 423.0,
+      "lat_p95_ms": 700.91,
+      "lat_p99_ms": 718.05,
+      "lat_max_ms": 719.82,
+      "before": {
+        "uid_procs": 718,
+        "node_procs": 1,
+        "engine_rss_mb": 96.8,
+        "engine_threads": 24
+      },
+      "after": {
+        "uid_procs": 720,
+        "node_procs": 1,
+        "engine_rss_mb": 102.0,
+        "engine_threads": 24
+      }
+    },
+    {
+      "concurrency": 5000,
+      "wall_s": 1.941,
+      "ok": 5000,
+      "errors": 0,
+      "error_sample": null,
+      "throughput_per_s": 2576.3,
+      "lat_p50_ms": 1021.55,
+      "lat_p95_ms": 1757.02,
+      "lat_p99_ms": 1829.04,
+      "lat_max_ms": 1837.52,
+      "before": {
+        "uid_procs": 720,
+        "node_procs": 1,
+        "engine_rss_mb": 102.0,
+        "engine_threads": 24
+      },
+      "after": {
+        "uid_procs": 720,
+        "node_procs": 1,
+        "engine_rss_mb": 118.4,
+        "engine_threads": 24
+      }
+    },
+    {
+      "concurrency": 10000,
+      "wall_s": 3.822,
+      "ok": 10000,
+      "errors": 0,
+      "error_sample": null,
+      "throughput_per_s": 2616.6,
+      "lat_p50_ms": 2071.22,
+      "lat_p95_ms": 3379.1,
+      "lat_p99_ms": 3497.74,
+      "lat_max_ms": 3516.06,
+      "before": {
+        "uid_procs": 720,
+        "node_procs": 1,
+        "engine_rss_mb": 117.4,
+        "engine_threads": 24
+      },
+      "after": {
+        "uid_procs": 719,
+        "node_procs": 1,
+        "engine_rss_mb": 134.2,
+        "engine_threads": 24
+      }
+    },
+    {
+      "concurrency": 20000,
+      "wall_s": 7.907,
+      "ok": 20000,
+      "errors": 0,
+      "error_sample": null,
+      "throughput_per_s": 2529.4,
+      "lat_p50_ms": 4308.08,
+      "lat_p95_ms": 6876.84,
+      "lat_p99_ms": 7078.36,
+      "lat_max_ms": 7131.85,
+      "before": {
+        "uid_procs": 719,
+        "node_procs": 1,
+        "engine_rss_mb": 133.2,
+        "engine_threads": 24
+      },
+      "after": {
+        "uid_procs": 718,
+        "node_procs": 1,
+        "engine_rss_mb": 163.1,
+        "engine_threads": 24
+      }
+    }
+  ],
+  "broke_at": null,
+  "engine_healthy_at_end": true
+}

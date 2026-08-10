@@ -1,0 +1,59 @@
+{
+ "rocketride": {
+  "width": 17.24,
+  "hold_s": 0.5,
+  "reps": 3,
+  "confidence": "VERIFIED (escaped tracking regime, confirmed by doubling)",
+  "offered_at_measurement": 32,
+  "escalation": [
+   {
+    "offered": 8,
+    "estimates": [
+     7.85,
+     7.86,
+     7.81
+    ],
+    "median_estimate": 7.85,
+    "spread_frac": 0.006,
+    "tracking_offered": true
+   },
+   {
+    "offered": 16,
+    "estimates": [
+     15.61,
+     15.19,
+     15.23
+    ],
+    "median_estimate": 15.23,
+    "spread_frac": 0.027,
+    "tracking_offered": true
+   },
+   {
+    "offered": 32,
+    "estimates": [
+     17.12,
+     17.02,
+     17.19
+    ],
+    "median_estimate": 17.12,
+    "spread_frac": 0.01,
+    "tracking_offered": false
+   },
+   {
+    "offered": 64,
+    "estimates": [
+     17.45,
+     17.06,
+     17.36
+    ],
+    "median_estimate": 17.36,
+    "confirmation": true,
+    "drift_vs_previous": 0.014
+   }
+  ],
+  "spread_frac": 0.01
+ },
+ "llamaindex": {
+  "error": "Estimate tracked offered concurrency all the way to 96 without plateauing. Either the true width exceeds 96, or the system under test has no fixed width (e.g. it spawns unbounded workers). Refusing to report a number: the value would be the offered concurrency, not the width. Trace: [{'offered': 16, 'estimates': [15.31, 14.84, 15.15], 'median_estimate': 15.15, 'spread_frac': 0.03, 'tracking_offered': True}, {'offered': 32, 'estimates': [28.65, 28.09, 29.61], 'median_estimate': 28.65, 'spread_frac': 0.051, 'tracking_offered': True}, {'offered': 64, 'estimates': [55.32, 54.48, 51.5], 'median_estimate': 54.48, 'spread_frac': 0.069, 'tracking_offered': True}]"
+ }
+}

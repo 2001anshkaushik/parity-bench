@@ -1,0 +1,102 @@
+{
+  "seed_namespace": "benchmark-A/v1",
+  "checks": [
+    {
+      "fault": "raise",
+      "rate": 0.001,
+      "seed": 1674290575,
+      "injected": 1,
+      "identical_plan": true,
+      "plan_fingerprint": "cd3da8b24f9bf31e"
+    },
+    {
+      "fault": "raise",
+      "rate": 0.01,
+      "seed": 22122803,
+      "injected": 5,
+      "identical_plan": true,
+      "plan_fingerprint": "16e794832d7d537d"
+    },
+    {
+      "fault": "raise",
+      "rate": 0.05,
+      "seed": 3937655774,
+      "injected": 32,
+      "identical_plan": true,
+      "plan_fingerprint": "9bac0f8e77495611"
+    },
+    {
+      "fault": "hang",
+      "rate": 0.001,
+      "seed": 640200545,
+      "injected": 0,
+      "identical_plan": true,
+      "plan_fingerprint": "e9df16d4a7da3fcc"
+    },
+    {
+      "fault": "hang",
+      "rate": 0.01,
+      "seed": 1366202134,
+      "injected": 16,
+      "identical_plan": true,
+      "plan_fingerprint": "78741f82378ccf77"
+    },
+    {
+      "fault": "hang",
+      "rate": 0.05,
+      "seed": 1992595549,
+      "injected": 53,
+      "identical_plan": true,
+      "plan_fingerprint": "db30eb6bc55fc1fb"
+    },
+    {
+      "fault": "alloc",
+      "rate": 0.001,
+      "seed": 3602482071,
+      "injected": 1,
+      "identical_plan": true,
+      "plan_fingerprint": "fc60a6c11ab1f4e1"
+    },
+    {
+      "fault": "alloc",
+      "rate": 0.01,
+      "seed": 3809301572,
+      "injected": 12,
+      "identical_plan": true,
+      "plan_fingerprint": "7044c2cba4654a7d"
+    },
+    {
+      "fault": "alloc",
+      "rate": 0.05,
+      "seed": 2574789566,
+      "injected": 54,
+      "identical_plan": true,
+      "plan_fingerprint": "7d891ef2b035a8fe"
+    },
+    {
+      "fault": "malformed",
+      "rate": 0.001,
+      "seed": 1897539202,
+      "injected": 0,
+      "identical_plan": true,
+      "plan_fingerprint": "e9df16d4a7da3fcc"
+    },
+    {
+      "fault": "malformed",
+      "rate": 0.01,
+      "seed": 2883700929,
+      "injected": 7,
+      "identical_plan": true,
+      "plan_fingerprint": "ee513592657edbc6"
+    },
+    {
+      "fault": "malformed",
+      "rate": 0.05,
+      "seed": 2507053001,
+      "injected": 46,
+      "identical_plan": true,
+      "plan_fingerprint": "b379aecb8cb78307"
+    }
+  ],
+  "in_process_identical": true
+}

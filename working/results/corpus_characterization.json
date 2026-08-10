@@ -1,0 +1,42 @@
+{
+  "corpus_verified_against_leela_manifest": true,
+  "sha256_matches": 10000,
+  "sha256_mismatches": 0,
+  "n_docs": 10000,
+  "n_empty_in_manifest": 0,
+  "bytes": {
+    "min": 125,
+    "p10": 499,
+    "p25": 756,
+    "median": 1186,
+    "p75": 1886,
+    "p90": 3164,
+    "p99": 13848,
+    "max": 75154,
+    "mean": 1935.7
+  },
+  "manifest_bytes_median": 1186,
+  "chunks": {
+    "min": 1,
+    "p25": 1,
+    "median": 1,
+    "p75": 1,
+    "p90": 1,
+    "p99": 5,
+    "max": 22,
+    "mean": 1.179
+  },
+  "chunk_count_histogram": {
+    "1": 9321,
+    "6-10": 43,
+    "2": 406,
+    "11-20": 41,
+    "5": 24,
+    "4": 58,
+    "3": 106,
+    "21+": 1
+  },
+  "pct_single_chunk": 93.21,
+  "pct_zero_chunk": 0.0,
+  "pct_multi_chunk": 6.79
+}

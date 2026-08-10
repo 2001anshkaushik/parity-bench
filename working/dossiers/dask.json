@@ -1,0 +1,57 @@
+{
+  "candidate": "dask",
+  "resolved_name": "dask",
+  "exists_on_pypi": true,
+  "version": "2026.7.1",
+  "requires_python": ">=3.10",
+  "license": "BSD-3-Clause",
+  "license_permissive": "YES",
+  "summary": "Parallel PyData with Task Scheduling",
+  "source_repo": "https://github.com/dask/dask/",
+  "homepage": null,
+  "dependencies": [
+    "click>=8.1",
+    "cloudpickle>=3.0.0",
+    "fsspec>=2021.09.0",
+    "packaging>=20.0",
+    "partd>=1.4.0",
+    "pyyaml>=5.4.1",
+    "toolz>=0.12.0",
+    "importlib_metadata>=4.13.0",
+    "numpy>=1.24",
+    "dask[array]",
+    "pandas>=2.0",
+    "pyarrow>=16.0",
+    "distributed<2026.7.2,>=2026.7.1",
+    "bokeh>=3.1.0",
+    "jinja2>=2.10.3",
+    "dask[array,dataframe,diagnostics,distributed]",
+    "lz4>=4.3.2",
+    "pandas[test]",
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-rerunfailures",
+    "pytest-timeout",
+    "pytest-xdist",
+    "pre-commit"
+  ],
+  "depends_on_frameworks_under_test": [
+    "ray"
+  ],
+  "install_ok": "NOT_ATTEMPTED",
+  "install_error": null,
+  "import_ok": "NOT_ATTEMPTED",
+  "installed_version": null,
+  "execution_locality": "UNVERIFIED",
+  "hosted_evidence": [],
+  "concurrency_primitives": [],
+  "track_a_eligible": "UNVERIFIED \u2014 run with --install",
+  "track_b_eligible": "UNVERIFIED \u2014 run with --install",
+  "notes": [
+    "Shares a substrate with another framework under test (ray) \u2014 results are NOT independent and must be disclosed as such."
+  ],
+  "tried_names": [
+    "dask"
+  ]
+}

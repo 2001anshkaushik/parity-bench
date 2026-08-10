@@ -1,0 +1,96 @@
+[
+  {
+    "processes": 1,
+    "pinned": true,
+    "device": "cpu",
+    "aggregate_throughput_per_s": 32.6,
+    "per_proc_throughput": [
+      32.6
+    ],
+    "total_cpu_seconds": 3.67,
+    "max_worker_wall_s": 3.68,
+    "cores_busy": 1.0,
+    "outer_wall_s": 9.65,
+    "torch_threads_per_worker": 1
+  },
+  {
+    "processes": 2,
+    "pinned": true,
+    "device": "cpu",
+    "aggregate_throughput_per_s": 62.1,
+    "per_proc_throughput": [
+      31.6,
+      30.5
+    ],
+    "total_cpu_seconds": 7.58,
+    "max_worker_wall_s": 3.93,
+    "cores_busy": 1.93,
+    "outer_wall_s": 9.99,
+    "torch_threads_per_worker": 1
+  },
+  {
+    "processes": 4,
+    "pinned": true,
+    "device": "cpu",
+    "aggregate_throughput_per_s": 97.5,
+    "per_proc_throughput": [
+      22.0,
+      23.5,
+      22.1,
+      29.9
+    ],
+    "total_cpu_seconds": 19.84,
+    "max_worker_wall_s": 5.46,
+    "cores_busy": 3.63,
+    "outer_wall_s": 11.61,
+    "torch_threads_per_worker": 1
+  },
+  {
+    "processes": 8,
+    "pinned": true,
+    "device": "cpu",
+    "aggregate_throughput_per_s": 110.7,
+    "per_proc_throughput": [
+      13.8,
+      13.9,
+      13.9,
+      13.8,
+      14.2,
+      13.7,
+      13.6,
+      13.9
+    ],
+    "total_cpu_seconds": 61.23,
+    "max_worker_wall_s": 8.81,
+    "cores_busy": 6.95,
+    "outer_wall_s": 17.13,
+    "torch_threads_per_worker": 1
+  },
+  {
+    "processes": 14,
+    "pinned": true,
+    "device": "cpu",
+    "aggregate_throughput_per_s": 112.8,
+    "per_proc_throughput": [
+      7.9,
+      8.1,
+      7.9,
+      7.9,
+      7.9,
+      8.2,
+      8.0,
+      8.9,
+      8.2,
+      8.3,
+      8.0,
+      7.9,
+      7.8,
+      7.9
+    ],
+    "total_cpu_seconds": 123.93,
+    "max_worker_wall_s": 15.31,
+    "cores_busy": 8.09,
+    "outer_wall_s": 25.92,
+    "torch_threads_per_worker": 1
+  }
+]

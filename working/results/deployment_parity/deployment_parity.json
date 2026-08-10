@@ -1,0 +1,55 @@
+{
+  "tier1_in_process": {
+    "n": 2000,
+    "concurrency": 200,
+    "ok": 2000,
+    "errors": 0,
+    "wall_s": 0.031,
+    "throughput_per_s": 64714.4,
+    "p50_ms": 2.096,
+    "p95_ms": 3.043,
+    "p99_ms": 3.334
+  },
+  "tier2_workers_1": {
+    "n": 2000,
+    "concurrency": 200,
+    "ok": 2000,
+    "errors": 0,
+    "wall_s": 0.155,
+    "throughput_per_s": 12862.0,
+    "p50_ms": 11.796,
+    "p95_ms": 23.313,
+    "p99_ms": 24.725,
+    "wrapper_processes": 1,
+    "wrapper_rss_mb": 61.3,
+    "workers": 1
+  },
+  "tier2_workers_4": {
+    "n": 2000,
+    "concurrency": 200,
+    "ok": 2000,
+    "errors": 0,
+    "wall_s": 0.123,
+    "throughput_per_s": 16315.9,
+    "p50_ms": 11.64,
+    "p95_ms": 25.779,
+    "p99_ms": 28.066,
+    "wrapper_processes": 1,
+    "wrapper_rss_mb": 30.3,
+    "workers": 4
+  },
+  "tier2_workers_14": {
+    "n": 2000,
+    "concurrency": 200,
+    "ok": 2000,
+    "errors": 0,
+    "wall_s": 0.119,
+    "throughput_per_s": 16826.6,
+    "p50_ms": 7.444,
+    "p95_ms": 18.752,
+    "p99_ms": 30.237,
+    "wrapper_processes": 1,
+    "wrapper_rss_mb": 30.4,
+    "workers": 14
+  }
+}

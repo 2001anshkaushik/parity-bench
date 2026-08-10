@@ -1,0 +1,128 @@
+{
+ "_meta": {
+  "name": "matched_replication",
+  "written_utc": "20260810T083158Z",
+  "payload_sha256_12": "0508db5c8e52",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 37475,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "threads_matched": 10,
+  "docs_per_block": 10,
+  "blocks": 2,
+  "plan": [
+   "b0_rocketride",
+   "b0_llamaindex",
+   "b1_llamaindex",
+   "b1_rocketride"
+  ],
+  "blocks_detail": [
+   {
+    "arm": "rocketride",
+    "block": "b0_rocketride",
+    "next": 10,
+    "goodput": 10,
+    "faults": {},
+    "rss": [
+     {
+      "n": 5,
+      "t": 0.4,
+      "rss_mb": 908.4
+     },
+     {
+      "n": 10,
+      "t": 0.8,
+      "rss_mb": 949.4
+     }
+    ],
+    "peak_rss_mb": 949.4364159999999,
+    "chunks": 39,
+    "elapsed_s": 5.978299856185913,
+    "content_suspect": 0,
+    "status": "completed",
+    "median_rss_post_warmup": null,
+    "docs_per_s_RUN_COST_ONLY": 1.673
+   },
+   {
+    "arm": "llamaindex",
+    "block": "b0_llamaindex",
+    "next": 10,
+    "goodput": 10,
+    "faults": {},
+    "rss": [
+     {
+      "n": 5,
+      "t": 0.3,
+      "rss_mb": 695.3
+     },
+     {
+      "n": 10,
+      "t": 0.7,
+      "rss_mb": 735.1
+     }
+    ],
+    "peak_rss_mb": 735.051776,
+    "chunks": 39,
+    "elapsed_s": 0.7206630706787109,
+    "content_suspect": 0,
+    "status": "completed",
+    "median_rss_post_warmup": null,
+    "docs_per_s_RUN_COST_ONLY": 13.876
+   },
+   {
+    "arm": "llamaindex",
+    "block": "b1_llamaindex",
+    "next": 10,
+    "goodput": 10,
+    "faults": {},
+    "rss": [
+     {
+      "n": 5,
+      "t": 0.3,
+      "rss_mb": 799.9
+     },
+     {
+      "n": 10,
+      "t": 0.6,
+      "rss_mb": 810.9
+     }
+    ],
+    "peak_rss_mb": 810.942464,
+    "chunks": 39,
+    "elapsed_s": 0.6168148517608643,
+    "content_suspect": 0,
+    "status": "completed",
+    "median_rss_post_warmup": null,
+    "docs_per_s_RUN_COST_ONLY": 16.212
+   },
+   {
+    "arm": "rocketride",
+    "block": "b1_rocketride",
+    "next": 10,
+    "goodput": 10,
+    "faults": {},
+    "rss": [
+     {
+      "n": 5,
+      "t": 0.4,
+      "rss_mb": 1641.6
+     },
+     {
+      "n": 10,
+      "t": 0.8,
+      "rss_mb": 1683.6
+     }
+    ],
+    "peak_rss_mb": 1683.6198399999998,
+    "chunks": 39,
+    "elapsed_s": 5.933813095092773,
+    "content_suspect": 0,
+    "status": "completed",
+    "median_rss_post_warmup": null,
+    "docs_per_s_RUN_COST_ONLY": 1.685
+   }
+  ]
+ }
+}

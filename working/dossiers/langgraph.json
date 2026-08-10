@@ -1,0 +1,48 @@
+{
+  "candidate": "langgraph",
+  "resolved_name": "langgraph",
+  "exists_on_pypi": true,
+  "version": "1.2.10",
+  "author": null,
+  "last_release_date": "2026-07-28T18:33:51",
+  "days_since_last_release": 6,
+  "release_count": 275,
+  "maintenance_status": "ACTIVE",
+  "requires_python": ">=3.10",
+  "license": "MIT",
+  "license_permissive": "YES",
+  "summary": "Building stateful, multi-actor applications with LLMs",
+  "source_repo": "https://github.com/langchain-ai/langgraph/tree/main/libs/langgraph",
+  "homepage": null,
+  "dependencies": [
+    "langchain-core<2,>=1.4.7",
+    "langgraph-checkpoint<5.0.0,>=4.1.0",
+    "langgraph-prebuilt<1.2.0,>=1.1.0",
+    "langgraph-sdk<0.5.0,>=0.4.2",
+    "pydantic>=2.7.4",
+    "xxhash>=3.5.0"
+  ],
+  "depends_on_frameworks_under_test": [
+    "langchain"
+  ],
+  "install_ok": "OK",
+  "install_error": null,
+  "import_ok": "OK",
+  "installed_version": "1.2.10",
+  "execution_locality": "LIKELY_LOCAL",
+  "hosted_evidence": [],
+  "telemetry_endpoints": [],
+  "concurrency_primitives": [
+    "asyncio",
+    "thread_pool",
+    "threading"
+  ],
+  "track_a_eligible": "LIKELY \u2014 confirm with offline behavioural probe",
+  "track_b_eligible": "LIKELY \u2014 confirm with offline behavioural probe",
+  "notes": [
+    "Shares a substrate with another framework under test (langchain) \u2014 results are NOT independent and must be disclosed as such."
+  ],
+  "tried_names": [
+    "langgraph"
+  ]
+}

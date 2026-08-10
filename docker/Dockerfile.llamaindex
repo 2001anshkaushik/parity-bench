@@ -1,0 +1,61 @@
+# ---------------------------------------------------------------------------------------------
+# WS-1 LlamaIndex service — linux/arm64 ONLY.
+#
+# Rosetta emulation of an x86 base would silently change every number and would look like a
+# framework difference rather than an emulation artifact, so the platform is asserted FOUR times:
+#   1. --platform on every FROM
+#   2. a build-time RUN that fails the build on the wrong arch (below, both stages)
+#   3. the service reports platform.machine() in /manifest
+#   4. the run manifest records the image digest
+#
+# Threads are pinned EXPLICITLY rather than inferred: os.cpu_count() reports the HOST's 14 inside
+# a --cpus quota, so a container that lets torch/BLAS size their own pools recreates exactly the
+# oversubscription pathology measured in A3_SERIALIZATION_FINDING.md (19% throughput, most of the
+# concurrency scaling).
+# ---------------------------------------------------------------------------------------------
+FROM --platform=$BUILDPLATFORM python:3.12-slim@sha256:229a2c5bfa27522db7815ea81f9bed70af17ccb9de9fc7ad142b1877b5830d36 AS builder
+RUN [ "$(uname -m)" = "aarch64" ] || (echo "ARCH ASSERT FAILED (builder): $(uname -m)" && exit 1)
+ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+WORKDIR /build
+COPY docker/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Bake the model into the image: a runtime fetch would land a multi-hundred-MB download inside the
+# first measured window and would cross the slow VM filesystem boundary.
+ENV HF_HOME=/opt/hf
+RUN python -c "\
+from sentence_transformers import SentenceTransformer; \
+m = SentenceTransformer('sentence-transformers/multi-qa-MiniLM-L6-cos-v1', device='cpu'); \
+print('model baked, dim =', m.get_sentence_embedding_dimension())"
+
+# ---------------------------------------------------------------------------------------------
+FROM --platform=$BUILDPLATFORM python:3.12-slim@sha256:229a2c5bfa27522db7815ea81f9bed70af17ccb9de9fc7ad142b1877b5830d36
+RUN [ "$(uname -m)" = "aarch64" ] || (echo "ARCH ASSERT FAILED (runtime): $(uname -m)" && exit 1)
+
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /opt/hf /opt/hf
+
+# offline: no network at runtime, no model fetch during a measured run
+ENV HF_HOME=/opt/hf \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    TOKENIZERS_PARALLELISM=false \
+    OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    VECLIB_MAXIMUM_THREADS=1 \
+    NUMEXPR_NUM_THREADS=1 \
+    TORCH_NUM_THREADS=1 \
+    WS1_DEVICE=cpu \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+COPY working/ws1 /app/ws1
+COPY working/harness /app/harness
+COPY docker/ladder.py /app/ladder.py
+
+RUN useradd -m -u 10001 ws1 && mkdir -p /app/out && chown -R ws1 /app
+USER ws1
+ENTRYPOINT ["python", "/app/ladder.py"]

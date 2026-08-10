@@ -1,0 +1,98 @@
+{
+ "_meta": {
+  "name": "nul_prevalence",
+  "written_utc": "20260810T024117Z",
+  "payload_sha256_12": "98c8399cce50",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 28044,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "sampled": 1000,
+  "parsed_with_text": 991,
+  "parse_failed": 2,
+  "empty_extraction": 7,
+  "docs_with_nul": 3,
+  "prevalence": 0.00303,
+  "wilson95": [
+   0.00103,
+   0.00886
+  ],
+  "examples": [
+   {
+    "name": "038_038716.pdf",
+    "chars": 37772,
+    "first_nul": 422,
+    "n_nul": 4,
+    "printable_ratio": 0.9923,
+    "lost_frac": 0.9888
+   },
+   {
+    "name": "039_039797.pdf",
+    "chars": 14154,
+    "first_nul": 12904,
+    "n_nul": 64,
+    "printable_ratio": 0.9884,
+    "lost_frac": 0.0883
+   },
+   {
+    "name": "027_027492.pdf",
+    "chars": 20674,
+    "first_nul": 0,
+    "n_nul": 93,
+    "printable_ratio": 0.6789,
+    "lost_frac": 1.0
+   }
+  ],
+  "printable_ratio_percentiles": {
+   "p0.1": 0.6789,
+   "p1": 0.9944,
+   "p5": 0.9992,
+   "p25": 1.0,
+   "p50": 1.0
+  },
+  "lowest_printable_ratio_docs": [
+   {
+    "name": "027_027492.pdf",
+    "printable_ratio": 0.6789
+   },
+   {
+    "name": "017_017996.pdf",
+    "printable_ratio": 0.9757
+   },
+   {
+    "name": "017_017170.pdf",
+    "printable_ratio": 0.9834
+   },
+   {
+    "name": "039_039797.pdf",
+    "printable_ratio": 0.9884
+   },
+   {
+    "name": "038_038716.pdf",
+    "printable_ratio": 0.9923
+   },
+   {
+    "name": "031_031650.pdf",
+    "printable_ratio": 0.9925
+   },
+   {
+    "name": "002_002201.pdf",
+    "printable_ratio": 0.9928
+   },
+   {
+    "name": "003_003705.pdf",
+    "printable_ratio": 0.9932
+   },
+   {
+    "name": "038_038462.pdf",
+    "printable_ratio": 0.9933
+   },
+   {
+    "name": "016_016123.pdf",
+    "printable_ratio": 0.9944
+   }
+  ]
+ }
+}

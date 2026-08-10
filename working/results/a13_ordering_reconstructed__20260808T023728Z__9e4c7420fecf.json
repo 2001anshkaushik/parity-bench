@@ -1,0 +1,194 @@
+{
+ "_meta": {
+  "name": "a13_ordering_reconstructed",
+  "written_utc": "20260808T023728Z",
+  "payload_sha256_12": "9e4c7420fecf",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 49610,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "RECONSTRUCTED_FROM_LOGS": true,
+  "why": "The descending-order and pre-warm runs both wrote to results/isolated_profile_llamaindex.json (three scripts claimed that name). The pre-warm run overwrote the descending run. Only the pre-warm JSON survived; these numbers are re-parsed from the run logs, which are the original stdout of those runs.",
+  "caveat": "Log-reconstructed. Fidelity is limited to what the harness PRINTED: per-cell throughput/spread/gate/latency/RSS/error-rate. The per-repetition rate lists that were in the JSON are NOT recoverable, so CIs cannot be recomputed from this file.",
+  "finding": "A13 \u2014 ascending concurrency sweeps under-measure. Identical harness, 400 tok, LlamaIndex; only the cell ORDER differs. Pre-warming an ascending sweep reproduces the descending run, so the variable is the machine's power state at measurement start, not concurrency, harness, or service.",
+  "label": "VERIFIED (3 orderings, one harness)",
+  "blocks": [
+   {
+    "label": "ascending_cold",
+    "source_log": "logs/isolated_li_rerun.out",
+    "rows": [
+     {
+      "conc": 1,
+      "throughput": 30.54,
+      "spread": 0.095,
+      "gate": true,
+      "p50": 31.8,
+      "p95": 34.73,
+      "p99": 50.79,
+      "p999": 116.98,
+      "peak_rss_mb": 4646.1,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 2,
+      "throughput": 63.47,
+      "spread": 0.033,
+      "gate": true,
+      "p50": 31.47,
+      "p95": 33.1,
+      "p99": 36.13,
+      "p999": 40.62,
+      "peak_rss_mb": 4670.1,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 4,
+      "throughput": 89.01,
+      "spread": 0.021,
+      "gate": true,
+      "p50": 42.52,
+      "p95": 60.54,
+      "p99": 68.63,
+      "p999": 75.55,
+      "peak_rss_mb": 4734.0,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 8,
+      "throughput": 106.47,
+      "spread": 0.016,
+      "gate": true,
+      "p50": 73.7,
+      "p95": 94.77,
+      "p99": 105.49,
+      "p999": 124.9,
+      "peak_rss_mb": 4819.5,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 16,
+      "throughput": 102.73,
+      "spread": 0.031,
+      "gate": true,
+      "p50": 152.6,
+      "p95": 205.49,
+      "p99": 242.61,
+      "p999": 309.29,
+      "peak_rss_mb": 4936.9,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 32,
+      "throughput": 101.66,
+      "spread": 0.028999999999999998,
+      "gate": true,
+      "p50": 308.24,
+      "p95": 412.6,
+      "p99": 471.38,
+      "p999": 530.33,
+      "peak_rss_mb": 5170.1,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 64,
+      "throughput": 101.51,
+      "spread": 0.026000000000000002,
+      "gate": true,
+      "p50": 611.91,
+      "p95": 828.22,
+      "p99": 924.75,
+      "p999": 1036.54,
+      "peak_rss_mb": 5444.7,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 1,
+      "throughput": 12.11,
+      "spread": 0.006,
+      "gate": true,
+      "p50": 82.21,
+      "p95": 85.26,
+      "p99": 87.03,
+      "p999": 87.23,
+      "peak_rss_mb": 5415.6,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 2,
+      "throughput": 23.57,
+      "spread": 0.008,
+      "gate": true,
+      "p50": 82.74,
+      "p95": 91.54,
+      "p99": 96.4,
+      "p999": 99.56,
+      "peak_rss_mb": 5424.5,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 4,
+      "throughput": 34.38,
+      "spread": 0.027999999999999997,
+      "gate": true,
+      "p50": 109.63,
+      "p95": 153.24,
+      "p99": 178.62,
+      "p999": 197.2,
+      "peak_rss_mb": 5409.2,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 8,
+      "throughput": 39.55,
+      "spread": 0.053,
+      "gate": true,
+      "p50": 199.34,
+      "p95": 238.11,
+      "p99": 254.01,
+      "p999": 314.19,
+      "peak_rss_mb": 5461.3,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 16,
+      "throughput": 39.34,
+      "spread": 0.021,
+      "gate": true,
+      "p50": 399.58,
+      "p95": 489.33,
+      "p99": 523.35,
+      "p999": 623.79,
+      "peak_rss_mb": 5552.6,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 32,
+      "throughput": 38.93,
+      "spread": 0.021,
+      "gate": true,
+      "p50": 781.6,
+      "p95": 997.46,
+      "p99": 1218.03,
+      "p999": 1384.51,
+      "peak_rss_mb": 5886.2,
+      "error_rate": 0.0
+     },
+     {
+      "conc": 64,
+      "throughput": 38.92,
+      "spread": 0.078,
+      "gate": true,
+      "p50": 1521.78,
+      "p95": 2206.35,
+      "p99": 2813.18,
+      "p999": 3291.06,
+      "peak_rss_mb": 6635.0,
+      "error_rate": 0.0
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,30 @@
+{
+  "candidate": "autogen",
+  "resolved_name": "autogen-agentchat",
+  "exists_on_pypi": true,
+  "version": "0.7.5",
+  "requires_python": ">=3.10",
+  "license": "MIT License",
+  "license_permissive": "YES",
+  "summary": "AutoGen agents and teams library",
+  "source_repo": null,
+  "homepage": null,
+  "dependencies": [
+    "autogen-core==0.7.5"
+  ],
+  "depends_on_frameworks_under_test": [],
+  "install_ok": "NOT_ATTEMPTED",
+  "install_error": null,
+  "import_ok": "NOT_ATTEMPTED",
+  "installed_version": null,
+  "execution_locality": "UNVERIFIED",
+  "hosted_evidence": [],
+  "concurrency_primitives": [],
+  "track_a_eligible": "UNVERIFIED \u2014 run with --install",
+  "track_b_eligible": "UNVERIFIED \u2014 run with --install",
+  "notes": [],
+  "tried_names": [
+    "autogen-agentchat",
+    "pyautogen"
+  ]
+}

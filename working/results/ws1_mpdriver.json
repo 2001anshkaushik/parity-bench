@@ -1,0 +1,30 @@
+[
+ {
+  "drivers": 1,
+  "aggregate_per_s": 446.4,
+  "distinct_workers": 6,
+  "mean_p50_ms": 15.1,
+  "errors": 0
+ },
+ {
+  "drivers": 2,
+  "aggregate_per_s": 222.6,
+  "distinct_workers": 8,
+  "mean_p50_ms": 50.0,
+  "errors": 0
+ },
+ {
+  "drivers": 4,
+  "aggregate_per_s": 171.4,
+  "distinct_workers": 10,
+  "mean_p50_ms": 173.7,
+  "errors": 0
+ },
+ {
+  "drivers": 8,
+  "aggregate_per_s": 199.4,
+  "distinct_workers": 13,
+  "mean_p50_ms": 304.8,
+  "errors": 0
+ }
+]

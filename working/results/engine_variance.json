@@ -1,0 +1,62 @@
+{
+  "rows": [
+    {
+      "drivers": 1,
+      "warmup_discarded": [
+        3538.6,
+        3533.6
+      ],
+      "measured": [
+        3487.8,
+        3337.7,
+        3424.6,
+        3396.2,
+        3416.8
+      ],
+      "median": 3416.8,
+      "spread_frac": 0.043,
+      "spread_frac_if_warmup_included": 0.0568,
+      "passes_gate": true
+    },
+    {
+      "drivers": 2,
+      "warmup_discarded": [
+        6554.4,
+        6190.5
+      ],
+      "measured": [
+        6730.2,
+        6921.8,
+        6985.0,
+        6465.5,
+        6694.6
+      ],
+      "median": 6730.2,
+      "spread_frac": 0.0744,
+      "spread_frac_if_warmup_included": 0.1137,
+      "passes_gate": true
+    },
+    {
+      "drivers": 4,
+      "warmup_discarded": [
+        11211.7,
+        12725.2
+      ],
+      "measured": [
+        12458.9,
+        12313.5,
+        12241.5,
+        12293.4,
+        12450.4
+      ],
+      "median": 12313.5,
+      "spread_frac": 0.0174,
+      "spread_frac_if_warmup_included": 0.1189,
+      "passes_gate": true
+    }
+  ],
+  "worst_spread": 0.0744,
+  "worst_spread_with_warmup": 0.1189,
+  "gate": 0.1,
+  "verdict": "COLLAPSED \u2014 the +/-35% was largely the same warmup artefact"
+}

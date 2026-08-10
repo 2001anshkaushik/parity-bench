@@ -1,0 +1,24 @@
+{
+ "_meta": {
+  "name": "weekend_oomtest_llamaindex_OOM",
+  "written_utc": "20260808T053418Z",
+  "payload_sha256_12": "68d4f78542e8",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 74270,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "next_index": 1,
+  "goodput": 1,
+  "faults": {},
+  "rss_series": [],
+  "peak_rss_mb": 667.877376,
+  "chunks": 7,
+  "elapsed_s": 4.781981945037842,
+  "status": "memory_limit_exceeded",
+  "oom_at_index": 1,
+  "oom_doc": "000_000009.pdf",
+  "oom_rss_mb": 667.9
+ }
+}

@@ -1,0 +1,37 @@
+# Thin layer over ws1-llamaindex:demo. Three defects fixed, each found by RUNNING the image.
+#
+# 1. pip READ TIMEOUT (not a dependency conflict) stopped llama-index-embeddings-huggingface from
+#    landing in the single-stage build; retrying re-downloads torch (427 MB). This layer adds only
+#    the missing package, so every base layer stays byte-identical to the verified aarch64 image.
+#
+# 2. "the model is baked" was true of ONE load path and false of the one actually used. The base
+#    image primed the cache via SentenceTransformer(...); the runtime loads through llama-index's
+#    HuggingFaceEmbedding, which resolves a different file set via transformers' AutoConfig.
+#
+# 3. HuggingFaceEmbedding passes its own `cache_dir` derived from the CALLING USER's home, not
+#    HF_HOME. Priming as root therefore cached the model where root would look for it, and the
+#    runtime user ws1 looked somewhere else and fell back to the network — surfacing as a
+#    misleading "couldn't connect to huggingface.co". Build-time success as root did not prove
+#    runtime success as ws1.
+#
+# So: prime AS THE RUNTIME USER, then prove the offline load AS THE RUNTIME USER. If the model is
+# not genuinely reachable offline by the user that runs it, the build fails here rather than the
+# demo failing later.
+FROM ws1-llamaindex:demo
+USER root
+RUN pip install --no-cache-dir --retries 10 --timeout 120 \
+      llama-index-embeddings-huggingface==0.7.0 \
+ && mkdir -p /home/ws1/.cache && chown -R ws1:ws1 /home/ws1 /opt/hf
+
+USER ws1
+# network on for priming only (the base image sets the offline flags as ENV)
+RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 python -c "\
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding; \
+e = HuggingFaceEmbedding(model_name='sentence-transformers/multi-qa-MiniLM-L6-cos-v1', device='cpu'); \
+print('primed as runtime user, dim =', len(e.get_text_embedding('warm')))"
+
+# PROOF: offline, as ws1, through the exact call the ladder makes.
+RUN python -c "\
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding; \
+e = HuggingFaceEmbedding(model_name='sentence-transformers/multi-qa-MiniLM-L6-cos-v1', device='cpu'); \
+print('OFFLINE LOAD OK AS RUNTIME USER, dim =', len(e.get_text_embedding('x')))"

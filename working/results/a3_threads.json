@@ -1,0 +1,62 @@
+{
+ "default": {
+  "embed": {
+   "1": {
+    "cpu_percent": 100.6,
+    "cores_busy": 1.01,
+    "procs": 3,
+    "rate": 47.858
+   },
+   "8": {
+    "cpu_percent": 101.3,
+    "cores_busy": 1.01,
+    "procs": 3,
+    "rate": 67.08
+   }
+  },
+  "cpu": {
+   "1": {
+    "cpu_percent": 121.4,
+    "cores_busy": 1.21,
+    "procs": 3,
+    "rate": 48.089
+   },
+   "8": {
+    "cpu_percent": 134.5,
+    "cores_busy": 1.34,
+    "procs": 3,
+    "rate": 56.272
+   }
+  }
+ },
+ "threads=1": {
+  "embed": {
+   "1": {
+    "cpu_percent": 100.5,
+    "cores_busy": 1.0,
+    "procs": 3,
+    "rate": 27.654
+   },
+   "8": {
+    "cpu_percent": 99.0,
+    "cores_busy": 0.99,
+    "procs": 3,
+    "rate": 87.558
+   }
+  },
+  "cpu": {
+   "1": {
+    "cpu_percent": 121.4,
+    "cores_busy": 1.21,
+    "procs": 3,
+    "rate": 48.124
+   },
+   "8": {
+    "cpu_percent": 134.8,
+    "cores_busy": 1.35,
+    "procs": 3,
+    "rate": 56.036
+   }
+  }
+ }
+}

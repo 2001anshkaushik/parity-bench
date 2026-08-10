@@ -1,0 +1,299 @@
+[
+ {
+  "true": 4,
+  "width": 3.97,
+  "hold_s": 0.5,
+  "reps": 3,
+  "confidence": "VERIFIED (escaped tracking regime, confirmed by doubling)",
+  "offered_at_measurement": 8,
+  "escalation": [
+   {
+    "offered": 2,
+    "estimates": [
+     1.98,
+     1.98,
+     1.98
+    ],
+    "median_estimate": 1.98,
+    "spread_frac": 0.001,
+    "tracking_offered": true
+   },
+   {
+    "offered": 4,
+    "estimates": [
+     3.96,
+     3.97,
+     3.97
+    ],
+    "median_estimate": 3.97,
+    "spread_frac": 0.003,
+    "tracking_offered": true
+   },
+   {
+    "offered": 8,
+    "estimates": [
+     3.97,
+     3.97,
+     3.97
+    ],
+    "median_estimate": 3.97,
+    "spread_frac": 0.002,
+    "tracking_offered": false
+   },
+   {
+    "offered": 16,
+    "estimates": [
+     3.97,
+     3.97,
+     3.97
+    ],
+    "median_estimate": 3.97,
+    "confirmation": true,
+    "drift_vs_previous": 0.0
+   }
+  ],
+  "spread_frac": 0.002
+ },
+ {
+  "true": 8,
+  "width": 7.93,
+  "hold_s": 0.5,
+  "reps": 3,
+  "confidence": "VERIFIED (escaped tracking regime, confirmed by doubling)",
+  "offered_at_measurement": 16,
+  "escalation": [
+   {
+    "offered": 2,
+    "estimates": [
+     1.98,
+     1.98,
+     1.98
+    ],
+    "median_estimate": 1.98,
+    "spread_frac": 0.001,
+    "tracking_offered": true
+   },
+   {
+    "offered": 4,
+    "estimates": [
+     3.96,
+     3.98,
+     3.97
+    ],
+    "median_estimate": 3.97,
+    "spread_frac": 0.004,
+    "tracking_offered": true
+   },
+   {
+    "offered": 8,
+    "estimates": [
+     7.93,
+     7.94,
+     7.93
+    ],
+    "median_estimate": 7.93,
+    "spread_frac": 0.001,
+    "tracking_offered": true
+   },
+   {
+    "offered": 16,
+    "estimates": [
+     7.93,
+     7.93,
+     7.93
+    ],
+    "median_estimate": 7.93,
+    "spread_frac": 0.0,
+    "tracking_offered": false
+   },
+   {
+    "offered": 32,
+    "estimates": [
+     7.94,
+     7.94,
+     7.93
+    ],
+    "median_estimate": 7.94,
+    "confirmation": true,
+    "drift_vs_previous": 0.0
+   }
+  ],
+  "spread_frac": 0.0
+ },
+ {
+  "true": 16,
+  "width": 15.87,
+  "hold_s": 0.5,
+  "reps": 3,
+  "confidence": "VERIFIED (escaped tracking regime, confirmed by doubling)",
+  "offered_at_measurement": 32,
+  "escalation": [
+   {
+    "offered": 2,
+    "estimates": [
+     1.98,
+     1.99,
+     1.98
+    ],
+    "median_estimate": 1.98,
+    "spread_frac": 0.001,
+    "tracking_offered": true
+   },
+   {
+    "offered": 4,
+    "estimates": [
+     3.96,
+     3.96,
+     3.97
+    ],
+    "median_estimate": 3.96,
+    "spread_frac": 0.002,
+    "tracking_offered": true
+   },
+   {
+    "offered": 8,
+    "estimates": [
+     7.94,
+     7.93,
+     7.93
+    ],
+    "median_estimate": 7.93,
+    "spread_frac": 0.001,
+    "tracking_offered": true
+   },
+   {
+    "offered": 16,
+    "estimates": [
+     15.87,
+     15.85,
+     15.86
+    ],
+    "median_estimate": 15.86,
+    "spread_frac": 0.001,
+    "tracking_offered": true
+   },
+   {
+    "offered": 32,
+    "estimates": [
+     15.86,
+     15.87,
+     15.87
+    ],
+    "median_estimate": 15.87,
+    "spread_frac": 0.001,
+    "tracking_offered": false
+   },
+   {
+    "offered": 64,
+    "estimates": [
+     15.86,
+     15.87,
+     15.87
+    ],
+    "median_estimate": 15.87,
+    "confirmation": true,
+    "drift_vs_previous": 0.0
+   }
+  ],
+  "spread_frac": 0.001
+ },
+ {
+  "true": 64,
+  "width": 63.42,
+  "hold_s": 0.5,
+  "reps": 3,
+  "confidence": "VERIFIED (escaped tracking regime, confirmed by doubling)",
+  "offered_at_measurement": 128,
+  "escalation": [
+   {
+    "offered": 2,
+    "estimates": [
+     1.98,
+     1.98,
+     1.98
+    ],
+    "median_estimate": 1.98,
+    "spread_frac": 0.002,
+    "tracking_offered": true
+   },
+   {
+    "offered": 4,
+    "estimates": [
+     3.97,
+     3.97,
+     3.97
+    ],
+    "median_estimate": 3.97,
+    "spread_frac": 0.001,
+    "tracking_offered": true
+   },
+   {
+    "offered": 8,
+    "estimates": [
+     7.93,
+     7.94,
+     7.93
+    ],
+    "median_estimate": 7.93,
+    "spread_frac": 0.0,
+    "tracking_offered": true
+   },
+   {
+    "offered": 16,
+    "estimates": [
+     15.87,
+     15.87,
+     15.87
+    ],
+    "median_estimate": 15.87,
+    "spread_frac": 0.0,
+    "tracking_offered": true
+   },
+   {
+    "offered": 32,
+    "estimates": [
+     31.72,
+     31.76,
+     31.7
+    ],
+    "median_estimate": 31.72,
+    "spread_frac": 0.002,
+    "tracking_offered": true
+   },
+   {
+    "offered": 64,
+    "estimates": [
+     63.38,
+     63.3,
+     63.37
+    ],
+    "median_estimate": 63.37,
+    "spread_frac": 0.001,
+    "tracking_offered": true
+   },
+   {
+    "offered": 128,
+    "estimates": [
+     63.46,
+     63.4,
+     63.42
+    ],
+    "median_estimate": 63.42,
+    "spread_frac": 0.001,
+    "tracking_offered": false
+   },
+   {
+    "offered": 256,
+    "estimates": [
+     63.4,
+     63.43,
+     63.42
+    ],
+    "median_estimate": 63.42,
+    "confirmation": true,
+    "drift_vs_previous": 0.0
+   }
+  ],
+  "spread_frac": 0.001
+ }
+]

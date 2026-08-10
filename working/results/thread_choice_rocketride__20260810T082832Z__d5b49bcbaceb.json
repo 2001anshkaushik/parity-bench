@@ -1,0 +1,53 @@
+{
+ "_meta": {
+  "name": "thread_choice_rocketride",
+  "written_utc": "20260810T082832Z",
+  "payload_sha256_12": "d5b49bcbaceb",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 36831,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "pinned": [
+   {
+    "docs": 30,
+    "sec": 7.591485023498535,
+    "rate": 3.9517959802513714,
+    "threads": 1
+   },
+   {
+    "docs": 30,
+    "sec": 7.618962049484253,
+    "rate": 3.9375442225796067,
+    "threads": 1
+   },
+   {
+    "docs": 30,
+    "sec": 7.604768991470337,
+    "rate": 3.9448930051193676,
+    "threads": 1
+   }
+  ],
+  "unpinned": [
+   {
+    "docs": 30,
+    "sec": 2.463655948638916,
+    "rate": 12.177024968349965,
+    "threads": 10
+   },
+   {
+    "docs": 30,
+    "sec": 2.478868007659912,
+    "rate": 12.102298269733385,
+    "threads": 10
+   },
+   {
+    "docs": 30,
+    "sec": 2.5407490730285645,
+    "rate": 11.807541452426902,
+    "threads": 10
+   }
+  ]
+ }
+}

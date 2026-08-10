@@ -1,0 +1,37 @@
+{
+ "_meta": {
+  "name": "weekend_p4_sim_rocketride",
+  "written_utc": "20260808T053305Z",
+  "payload_sha256_12": "d32a815f7195",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 74026,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "next_index": 33,
+  "goodput": 33,
+  "faults": {},
+  "rss_series": [
+   {
+    "n": 10,
+    "t": 7.5,
+    "rss_mb": 1010.7
+   },
+   {
+    "n": 20,
+    "t": 13.9,
+    "rss_mb": 1330.3
+   },
+   {
+    "n": 30,
+    "t": 22.2,
+    "rss_mb": 1851.0
+   }
+  ],
+  "peak_rss_mb": 1897.1525120000001,
+  "chunks": 400,
+  "elapsed_s": 32.1664559841156,
+  "status": "cap_reached"
+ }
+}

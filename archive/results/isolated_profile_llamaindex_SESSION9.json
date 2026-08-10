@@ -1,0 +1,211 @@
+{
+ "service": "llamaindex-fastapi",
+ "workers": 8,
+ "device": "cpu",
+ "profiles": {
+  "400": {
+   "rows": [
+    {
+     "conc": 1,
+     "throughput": 30.67,
+     "spread": 0.0391,
+     "gate": true,
+     "p50": 32.52,
+     "p95": 34.87,
+     "p99": 38.96,
+     "p999": 42.81,
+     "peak_rss_mb": 4645.3,
+     "error_rate": 0.0,
+     "samples": 612
+    },
+    {
+     "conc": 2,
+     "throughput": 60.78,
+     "spread": 0.0563,
+     "gate": true,
+     "p50": 32.2,
+     "p95": 39.09,
+     "p99": 58.21,
+     "p999": 83.73,
+     "peak_rss_mb": 4667.9,
+     "error_rate": 0.0,
+     "samples": 1207
+    },
+    {
+     "conc": 4,
+     "throughput": 74.71,
+     "spread": 0.0334,
+     "gate": true,
+     "p50": 51.1,
+     "p95": 69.57,
+     "p99": 80.96,
+     "p999": 95.78,
+     "peak_rss_mb": 4701.0,
+     "error_rate": 0.0,
+     "samples": 1513
+    },
+    {
+     "conc": 8,
+     "throughput": 61.27,
+     "spread": 0.1253,
+     "gate": false,
+     "p50": 119.38,
+     "p95": 209.32,
+     "p99": 301.94,
+     "p999": 395.37,
+     "peak_rss_mb": 4780.7,
+     "error_rate": 0.0,
+     "samples": 1258
+    },
+    {
+     "conc": 16,
+     "throughput": 70.37,
+     "spread": 0.1615,
+     "gate": false,
+     "p50": 221.53,
+     "p95": 326.15,
+     "p99": 395.08,
+     "p999": 476.84,
+     "peak_rss_mb": 4920.8,
+     "error_rate": 0.0,
+     "samples": 1444
+    },
+    {
+     "conc": 32,
+     "throughput": 64.48,
+     "spread": 0.1851,
+     "gate": false,
+     "p50": 460.47,
+     "p95": 705.15,
+     "p99": 823.32,
+     "p999": 934.07,
+     "peak_rss_mb": 5133.0,
+     "error_rate": 0.0,
+     "samples": 1401
+    },
+    {
+     "conc": 64,
+     "throughput": 58.69,
+     "spread": 0.4521,
+     "gate": false,
+     "p50": 929.78,
+     "p95": 1831.76,
+     "p99": 2296.82,
+     "p999": 2987.38,
+     "peak_rss_mb": 5420.7,
+     "error_rate": 0.0,
+     "samples": 1346
+    }
+   ],
+   "derived": {
+    "knee": 4,
+    "saturation": 4,
+    "peak_throughput": 74.71,
+    "knee_rule": "last concurrency whose doubling still bought >= 15%",
+    "saturation_rule": "lowest concurrency reaching 95% of peak throughput"
+   }
+  },
+  "1600": {
+   "rows": [
+    {
+     "conc": 1,
+     "throughput": 11.63,
+     "spread": 0.0255,
+     "gate": true,
+     "p50": 84.61,
+     "p95": 92.42,
+     "p99": 111.81,
+     "p999": 135.81,
+     "peak_rss_mb": 5433.8,
+     "error_rate": 0.0,
+     "samples": 236
+    },
+    {
+     "conc": 2,
+     "throughput": 23.63,
+     "spread": 0.0252,
+     "gate": true,
+     "p50": 83.71,
+     "p95": 88.15,
+     "p99": 99.89,
+     "p999": 119.39,
+     "peak_rss_mb": 5458.9,
+     "error_rate": 0.0,
+     "samples": 480
+    },
+    {
+     "conc": 4,
+     "throughput": 29.11,
+     "spread": 0.0694,
+     "gate": true,
+     "p50": 134.93,
+     "p95": 173.48,
+     "p99": 210.39,
+     "p999": 308.26,
+     "peak_rss_mb": 5403.5,
+     "error_rate": 0.0,
+     "samples": 587
+    },
+    {
+     "conc": 8,
+     "throughput": 23.94,
+     "spread": 0.0681,
+     "gate": true,
+     "p50": 319.92,
+     "p95": 447.73,
+     "p99": 613.93,
+     "p999": 678.02,
+     "peak_rss_mb": 5443.5,
+     "error_rate": 0.0,
+     "samples": 500
+    },
+    {
+     "conc": 16,
+     "throughput": 25.44,
+     "spread": 0.1571,
+     "gate": false,
+     "p50": 600.11,
+     "p95": 767.62,
+     "p99": 883.84,
+     "p999": 1017.19,
+     "peak_rss_mb": 5529.5,
+     "error_rate": 0.0,
+     "samples": 561
+    },
+    {
+     "conc": 32,
+     "throughput": 30.57,
+     "spread": 0.0513,
+     "gate": true,
+     "p50": 1003.06,
+     "p95": 1233.53,
+     "p99": 1423.85,
+     "p999": 1736.51,
+     "peak_rss_mb": 5918.8,
+     "error_rate": 0.0,
+     "samples": 695
+    },
+    {
+     "conc": 64,
+     "throughput": 28.95,
+     "spread": 0.1892,
+     "gate": false,
+     "p50": 1998.15,
+     "p95": 2916.32,
+     "p99": 4279.15,
+     "p999": 4604.63,
+     "peak_rss_mb": 6768.8,
+     "error_rate": 0.0,
+     "samples": 714
+    }
+   ],
+   "derived": {
+    "knee": 32,
+    "saturation": 4,
+    "peak_throughput": 30.57,
+    "knee_rule": "last concurrency whose doubling still bought >= 15%",
+    "saturation_rule": "lowest concurrency reaching 95% of peak throughput"
+   }
+  }
+ }
+}

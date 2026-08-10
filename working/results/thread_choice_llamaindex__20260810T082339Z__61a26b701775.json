@@ -1,0 +1,53 @@
+{
+ "_meta": {
+  "name": "thread_choice_llamaindex",
+  "written_utc": "20260810T082339Z",
+  "payload_sha256_12": "61a26b701775",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 36688,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "pinned": [
+   {
+    "threads": 1,
+    "docs": 39,
+    "sec": 12.630780220031738,
+    "rate": 3.0876952429389988
+   },
+   {
+    "threads": 1,
+    "docs": 39,
+    "sec": 11.908716917037964,
+    "rate": 3.2749120053565273
+   },
+   {
+    "threads": 1,
+    "docs": 39,
+    "sec": 11.90188479423523,
+    "rate": 3.2767919261737397
+   }
+  ],
+  "unpinned": [
+   {
+    "threads": 10,
+    "docs": 39,
+    "sec": 3.595872163772583,
+    "rate": 10.845769322089424
+   },
+   {
+    "threads": 10,
+    "docs": 39,
+    "sec": 3.6542410850524902,
+    "rate": 10.672530654730952
+   },
+   {
+    "threads": 10,
+    "docs": 39,
+    "sec": 3.6780431270599365,
+    "rate": 10.603464574156545
+   }
+  ]
+ }
+}

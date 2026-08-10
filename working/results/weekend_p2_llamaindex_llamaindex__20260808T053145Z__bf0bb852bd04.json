@@ -1,0 +1,84 @@
+{
+ "_meta": {
+  "name": "weekend_p2_llamaindex_llamaindex",
+  "written_utc": "20260808T053145Z",
+  "payload_sha256_12": "bf0bb852bd04",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 73814,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "next_index": 123,
+  "goodput": 121,
+  "faults": {
+   "empty_extraction": 2
+  },
+  "rss_series": [
+   {
+    "n": 10,
+    "t": 5.4,
+    "rss_mb": 725.7
+   },
+   {
+    "n": 20,
+    "t": 10.5,
+    "rss_mb": 882.7
+   },
+   {
+    "n": 30,
+    "t": 14.8,
+    "rss_mb": 912.4
+   },
+   {
+    "n": 40,
+    "t": 18.3,
+    "rss_mb": 918.2
+   },
+   {
+    "n": 50,
+    "t": 22.6,
+    "rss_mb": 934.6
+   },
+   {
+    "n": 60,
+    "t": 26.6,
+    "rss_mb": 938.2
+   },
+   {
+    "n": 70,
+    "t": 29.3,
+    "rss_mb": 939.1
+   },
+   {
+    "n": 80,
+    "t": 32.8,
+    "rss_mb": 918.8
+   },
+   {
+    "n": 90,
+    "t": 34.4,
+    "rss_mb": 925.8
+   },
+   {
+    "n": 100,
+    "t": 35.6,
+    "rss_mb": 924.8
+   },
+   {
+    "n": 110,
+    "t": 38.5,
+    "rss_mb": 929.7
+   },
+   {
+    "n": 120,
+    "t": 39.9,
+    "rss_mb": 930.3
+   }
+  ],
+  "peak_rss_mb": 940.081152,
+  "chunks": 1262,
+  "elapsed_s": 40.547659158706665,
+  "status": "cap_reached"
+ }
+}

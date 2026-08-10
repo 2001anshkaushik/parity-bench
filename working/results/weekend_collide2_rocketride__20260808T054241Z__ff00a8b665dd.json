@@ -1,0 +1,27 @@
+{
+ "_meta": {
+  "name": "weekend_collide2_rocketride",
+  "written_utc": "20260808T054241Z",
+  "payload_sha256_12": "ff00a8b665dd",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 75578,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "next_index": 5,
+  "goodput": 5,
+  "faults": {},
+  "rss_series": [
+   {
+    "n": 5,
+    "t": 7.4,
+    "rss_mb": 1677.2
+   }
+  ],
+  "peak_rss_mb": 1677.2464640000003,
+  "chunks": 21,
+  "elapsed_s": 12.53144383430481,
+  "status": "completed"
+ }
+}

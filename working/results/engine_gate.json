@@ -1,0 +1,149 @@
+{
+  "host": {
+    "macos_product_version": "26.6",
+    "macos_build": "25G72",
+    "darwin": "25.6.0",
+    "arch": "arm64",
+    "cpu_brand": "Apple M4 Pro",
+    "cpu_logical": 14,
+    "cpu_performance_cores": "10",
+    "cpu_efficiency_cores": "4",
+    "ram_total_bytes": 51539607552,
+    "ram_total_gib": 48.0,
+    "power_source": "AC",
+    "python": "3.12.13",
+    "ulimit_n_soft_in_python": 1048576,
+    "ulimit_n_hard_in_python": 9223372036854775807,
+    "ulimit_nproc": [
+      8000,
+      12000
+    ]
+  },
+  "expected_version": "3.3.1",
+  "uri": "http://127.0.0.1:5565",
+  "binary_version_raw": "Version: 3.3.1.35 hash: a0817cc6 stamp: 2026-07-07T04:45:25Z",
+  "http_version": {
+    "version": "3.3.1.35",
+    "hash": "a0817cc6",
+    "stamp": "2026-07-07T04:45:25Z"
+  },
+  "dap_probe": {
+    "version": {
+      "version": "3.3.1.35",
+      "hash": "a0817cc6",
+      "stamp": "2026-07-07T04:45:25Z"
+    },
+    "capabilities": [
+      "oss"
+    ],
+    "platform": "darwin",
+    "apps": [
+      {
+        "id": "rocketride.world",
+        "moduleId": "rocketride_world",
+        "publisher": "Aparavi Software AG",
+        "name": "Hello World",
+        "description": "A simple Hello World demo application",
+        "readme": "",
+        "icon": "",
+        "categories": [
+          "demo"
+        ],
+        "settings": [],
+        "entry": "/apps/world-ui/remoteEntry.js",
+        "mode": "free",
+        "authenticated": false
+      },
+      {
+        "id": "rocketride.hello",
+        "moduleId": "rocketride_hello",
+        "publisher": "Aparavi Software AG",
+        "name": "RocketRide",
+        "description": "Landing page and dashboard",
+        "readme": "",
+        "icon": "/apps/hello-ui/icon.svg",
+        "categories": [
+          "built-in"
+        ],
+        "settings": [],
+        "entry": "/apps/hello-ui/remoteEntry.js",
+        "mode": "free",
+        "shells": [
+          "oss"
+        ],
+        "authenticated": false
+      },
+      {
+        "id": "rocketride.monitor",
+        "moduleId": "rocketride_monitor",
+        "publisher": "Aparavi Software AG",
+        "name": "Server Monitor",
+        "description": "Real-time server dashboard showing connections, tasks, and activity",
+        "readme": "",
+        "icon": "",
+        "categories": [
+          "tools"
+        ],
+        "settings": [],
+        "entry": "/apps/monitor-ui/remoteEntry.js",
+        "mode": "free"
+      },
+      {
+        "id": "rocketride.aparavi",
+        "moduleId": "rocketride_aparavi",
+        "publisher": "Aparavi Software AG",
+        "name": "Aparavi AQL",
+        "description": "Chat with your Aparavi data using natural language",
+        "readme": "/apps/aparavi-ui/README.md",
+        "icon": "/apps/aparavi-ui/icon.svg",
+        "categories": [
+          "tools"
+        ],
+        "settings": [
+          {
+            "key": "ROCKETRIDE_APARAVI_URL",
+            "label": "Aparavi Server URL",
+            "description": "Base URL of the Aparavi platform API (e.g. https://app.aparavi.com)",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "ROCKETRIDE_APARAVI_USER",
+            "label": "Aparavi User ID",
+            "description": "User ID for authenticating with the Aparavi API",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "ROCKETRIDE_APARAVI_PASSWORD",
+            "label": "Aparavi Password",
+            "description": "Password for authenticating with the Aparavi API",
+            "type": "envkey",
+            "required": true
+          }
+        ],
+        "entry": "/apps/aparavi-ui/remoteEntry.js",
+        "mode": "free"
+      },
+      {
+        "id": "rocketride.profiler",
+        "moduleId": "rocketride_profiler",
+        "publisher": "Aparavi Software AG",
+        "name": "Profiler",
+        "description": "CPU profiling for server and pipeline processes",
+        "readme": "",
+        "icon": "",
+        "categories": [
+          "tools"
+        ],
+        "settings": [],
+        "entry": "/apps/profiler-ui/remoteEntry.js",
+        "mode": "free"
+      }
+    ]
+  },
+  "dap_probe_error": null,
+  "get_server_info": null,
+  "get_server_info_error": "AuthenticationException: No authorization provided",
+  "unverified": []
+}

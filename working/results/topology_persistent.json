@@ -1,0 +1,475 @@
+{
+  "topology": [
+    {
+      "tokens": 100,
+      "rr_4node": {
+        "median": 176.986,
+        "rates": [
+          163.268,
+          176.986,
+          184.116,
+          174.215,
+          208.826
+        ],
+        "spread": 0.2182,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 9185
+      },
+      "rr_1node": {
+        "median": 168.618,
+        "rates": [
+          158.227,
+          148.412,
+          168.618,
+          169.346,
+          201.227
+        ],
+        "spread": 0.2625,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 159
+      },
+      "llamaindex": {
+        "median": 493.686,
+        "rates": [
+          491.918,
+          494.831,
+          494.043,
+          492.414,
+          493.686
+        ],
+        "spread": 0.0059,
+        "gate": true,
+        "n_chunks": 1,
+        "bytes": 9227
+      },
+      "ratio_1node_over_li": {
+        "point": 0.3429,
+        "ci95": [
+          0.3161,
+          0.3778
+        ]
+      },
+      "ratio_4node_over_li": {
+        "point": 0.3678,
+        "ci95": [
+          0.3443,
+          0.3992
+        ]
+      },
+      "ratio_1node_over_4node": 0.9321,
+      "all_gates_pass": false
+    },
+    {
+      "tokens": 200,
+      "rr_4node": {
+        "median": 153.258,
+        "rates": [
+          151.18,
+          153.258,
+          153.004,
+          155.706,
+          192.267
+        ],
+        "spread": 0.2137,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 9618
+      },
+      "rr_1node": {
+        "median": 172.885,
+        "rates": [
+          167.22,
+          166.446,
+          172.885,
+          185.472,
+          213.9
+        ],
+        "spread": 0.2219,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 159
+      },
+      "llamaindex": {
+        "median": 310.579,
+        "rates": [
+          305.726,
+          313.041,
+          306.283,
+          310.579,
+          311.408
+        ],
+        "spread": 0.0234,
+        "gate": true,
+        "n_chunks": 1,
+        "bytes": 9652
+      },
+      "ratio_1node_over_li": {
+        "point": 0.5856,
+        "ci95": [
+          0.5432,
+          0.6416
+        ]
+      },
+      "ratio_4node_over_li": {
+        "point": 0.5206,
+        "ci95": [
+          0.4908,
+          0.5724
+        ]
+      },
+      "ratio_1node_over_4node": 1.1248,
+      "all_gates_pass": false
+    },
+    {
+      "tokens": 400,
+      "rr_4node": {
+        "median": 95.048,
+        "rates": [
+          94.814,
+          92.639,
+          95.048,
+          97.804,
+          118.038
+        ],
+        "spread": 0.2152,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 10511
+      },
+      "rr_1node": {
+        "median": 93.458,
+        "rates": [
+          90.724,
+          93.458,
+          93.138,
+          97.946,
+          124.618
+        ],
+        "spread": 0.272,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 159
+      },
+      "llamaindex": {
+        "median": 140.867,
+        "rates": [
+          132.024,
+          140.867,
+          145.889,
+          134.285,
+          144.689
+        ],
+        "spread": 0.095,
+        "gate": true,
+        "n_chunks": 1,
+        "bytes": 10548
+      },
+      "ratio_1node_over_li": {
+        "point": 0.7164,
+        "ci95": [
+          0.6522,
+          0.811
+        ]
+      },
+      "ratio_4node_over_li": {
+        "point": 0.7142,
+        "ci95": [
+          0.6623,
+          0.785
+        ]
+      },
+      "ratio_1node_over_4node": 1.0031,
+      "all_gates_pass": false
+    },
+    {
+      "tokens": 800,
+      "rr_4node": {
+        "median": 78.666,
+        "rates": [
+          77.999,
+          78.666,
+          78.681,
+          71.958,
+          99.084
+        ],
+        "spread": 0.2738,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 12294
+      },
+      "rr_1node": {
+        "median": 71.628,
+        "rates": [
+          71.628,
+          68.298,
+          71.622,
+          71.846,
+          98.968
+        ],
+        "spread": 0.3099,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 159
+      },
+      "llamaindex": {
+        "median": 103.353,
+        "rates": [
+          105.148,
+          103.353,
+          109.765,
+          97.141,
+          99.635
+        ],
+        "spread": 0.115,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 12347
+      },
+      "ratio_1node_over_li": {
+        "point": 0.7424,
+        "ci95": [
+          0.6671,
+          0.8585
+        ]
+      },
+      "ratio_4node_over_li": {
+        "point": 0.789,
+        "ci95": [
+          0.7199,
+          0.8857
+        ]
+      },
+      "ratio_1node_over_4node": 0.9409,
+      "all_gates_pass": false
+    },
+    {
+      "tokens": 1600,
+      "rr_4node": {
+        "median": 40.68,
+        "rates": [
+          40.68,
+          40.305,
+          39.485,
+          41.174,
+          66.86
+        ],
+        "spread": 0.4094,
+        "gate": false,
+        "n_chunks": 2,
+        "bytes": 24645
+      },
+      "rr_1node": {
+        "median": 35.388,
+        "rates": [
+          35.388,
+          33.552,
+          34.73,
+          36.932,
+          60.518
+        ],
+        "spread": 0.4456,
+        "gate": false,
+        "n_chunks": 2,
+        "bytes": 163
+      },
+      "llamaindex": {
+        "median": 50.124,
+        "rates": [
+          49.015,
+          47.251,
+          50.124,
+          52.167,
+          52.376
+        ],
+        "spread": 0.0979,
+        "gate": true,
+        "n_chunks": 2,
+        "bytes": 24234
+      },
+      "ratio_1node_over_li": {
+        "point": 0.8015,
+        "ci95": [
+          0.6788,
+          1.0154
+        ]
+      },
+      "ratio_4node_over_li": {
+        "point": 0.9106,
+        "ci95": [
+          0.7864,
+          1.1335
+        ]
+      },
+      "ratio_1node_over_4node": 0.8802,
+      "all_gates_pass": false
+    }
+  ],
+  "chunk_vs_token": [
+    {
+      "chunk_size": 8000,
+      "label": "1 chunk",
+      "total_tokens": 1600,
+      "rr_1node": {
+        "median": 106.868,
+        "rates": [
+          107.156,
+          95.108,
+          102.03,
+          106.868,
+          131.947
+        ],
+        "spread": 0.2792,
+        "gate": false,
+        "n_chunks": 1,
+        "bytes": 159
+      },
+      "llamaindex": {
+        "median": 115.215,
+        "rates": [
+          113.409,
+          114.73,
+          115.215,
+          119.595,
+          119.584
+        ],
+        "spread": 0.0517,
+        "gate": true,
+        "n_chunks": 1,
+        "bytes": 15947
+      },
+      "ratio": {
+        "point": 0.9323,
+        "ci95": [
+          0.8532,
+          1.0408
+        ]
+      },
+      "gates_pass": false
+    },
+    {
+      "chunk_size": 3600,
+      "label": "2 chunks",
+      "total_tokens": 1600,
+      "rr_1node": {
+        "median": 24.009,
+        "rates": [
+          25.836,
+          24.009,
+          13.009,
+          18.821,
+          24.295
+        ],
+        "spread": 0.4965,
+        "gate": false,
+        "n_chunks": 3,
+        "bytes": 167
+      },
+      "llamaindex": {
+        "median": 25.305,
+        "rates": [
+          24.946,
+          25.305,
+          26.922,
+          26.287,
+          25.199
+        ],
+        "spread": 0.0734,
+        "gate": true,
+        "n_chunks": 3,
+        "bytes": 32542
+      },
+      "ratio": {
+        "point": 0.8237,
+        "ci95": [
+          0.6442,
+          0.9617
+        ]
+      },
+      "gates_pass": false
+    },
+    {
+      "chunk_size": 1500,
+      "label": "5 chunks",
+      "total_tokens": 1600,
+      "rr_1node": {
+        "median": 22.242,
+        "rates": [
+          22.242,
+          22.098,
+          23.229,
+          21.556,
+          26.21
+        ],
+        "spread": 0.1776,
+        "gate": false,
+        "n_chunks": 6,
+        "bytes": 179
+      },
+      "llamaindex": {
+        "median": 22.745,
+        "rates": [
+          22.096,
+          22.967,
+          22.745,
+          23.021,
+          21.825
+        ],
+        "spread": 0.052,
+        "gate": true,
+        "n_chunks": 6,
+        "bytes": 57470
+      },
+      "ratio": {
+        "point": 1.0238,
+        "ci95": [
+          0.9677,
+          1.1004
+        ]
+      },
+      "gates_pass": false
+    },
+    {
+      "chunk_size": 760,
+      "label": "10 chunks",
+      "total_tokens": 1600,
+      "rr_1node": {
+        "median": 22.728,
+        "rates": [
+          22.728,
+          22.463,
+          23.24,
+          22.254,
+          23.076
+        ],
+        "spread": 0.0424,
+        "gate": true,
+        "n_chunks": 13,
+        "bytes": 208
+      },
+      "llamaindex": {
+        "median": 22.851,
+        "rates": [
+          22.906,
+          22.483,
+          22.821,
+          23.278,
+          22.851
+        ],
+        "spread": 0.0342,
+        "gate": true,
+        "n_chunks": 13,
+        "bytes": 115449
+      },
+      "ratio": {
+        "point": 0.9949,
+        "ci95": [
+          0.9781,
+          1.012
+        ]
+      },
+      "gates_pass": true
+    }
+  ]
+}

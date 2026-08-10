@@ -1,0 +1,49 @@
+{
+ "_meta": {
+  "name": "weekend_p0_insurance_rr_rocketride",
+  "written_utc": "20260808T053104Z",
+  "payload_sha256_12": "6b32b6f7ee8a",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 73693,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "next_index": 56,
+  "goodput": 55,
+  "faults": {
+   "empty_extraction": 1
+  },
+  "rss_series": [
+   {
+    "n": 10,
+    "t": 7.6,
+    "rss_mb": 983.8
+   },
+   {
+    "n": 20,
+    "t": 13.7,
+    "rss_mb": 1305.8
+   },
+   {
+    "n": 30,
+    "t": 21.4,
+    "rss_mb": 1836.0
+   },
+   {
+    "n": 40,
+    "t": 28.9,
+    "rss_mb": 1931.5
+   },
+   {
+    "n": 50,
+    "t": 36.8,
+    "rss_mb": 1832.3
+   }
+  ],
+  "peak_rss_mb": 1931.8865919999998,
+  "chunks": 674,
+  "elapsed_s": 47.19836187362671,
+  "status": "cap_reached"
+ }
+}
