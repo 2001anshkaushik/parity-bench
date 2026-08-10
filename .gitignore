@@ -1,0 +1,68 @@
+# =====================================================================================
+# What is NOT committed, and why. Everything here is large, regenerable, or
+# machine-specific. See publishable/PROVISIONING.md for how to restore each one.
+#
+# NOTE: git does NOT support trailing comments on a pattern line. A line like
+#   engine/        # 1.2 GB bundle
+# is parsed as a literal pattern including the spaces and the comment, and silently
+# matches nothing. Every comment below is on its own line for that reason.
+# =====================================================================================
+
+# ---- vendored / provisioned, never committed ----------------------------------------
+# engine/ is a ~1.2 GB bundle and additionally contains a HAND-COPIED pypdf inside its
+# embedded interpreter, which is not manifest-reproducible (PROVISIONING.md section 3).
+.venv/
+engine/
+../rocketride-server/
+
+# ---- corpora: ~5.9 GB, rebuildable --------------------------------------------------
+# GovDocs1 PDFs (public domain, digitalcorpora.org); mt10k rebuildable from the manifest.
+corpus/
+data/
+pdftest/
+
+# ---- run state and logs: per-machine, contain absolute paths ------------------------
+logs/
+weekend_logs/
+repl_logs/
+# Checkpoints ARE evidence — the RSS series behind every memory claim lives here, and the
+# meeting artifact cites two of them directly. 604 KB for both directories. Only the
+# ephemeral markers are excluded.
+weekend_state/*.tmp
+weekend_state/*.done
+repl_state/*.tmp
+repl_state/*.done
+docker/out/
+status.txt
+repl_status.txt
+weekend_run.log
+nohup.out
+
+# ---- regenerable harness output -----------------------------------------------------
+working/pipes/generated/
+working/results/selftest/
+
+# ---- model weights and caches -------------------------------------------------------
+*.safetensors
+*.bin
+*.onnx
+.cache/
+huggingface/
+
+# ---- environment files ---------------------------------------------------------------
+# The current .env holds only a local URI and the placeholder key MYAPIKEY, i.e. nothing
+# secret today. It is excluded anyway: the moment someone puts a real key in it, the habit
+# of committing it would leak. .env.example is committed instead.
+.env
+.env.*
+!.env.example
+
+# ---- python / os --------------------------------------------------------------------
+__pycache__/
+*.pyc
+.DS_Store
+
+# ---- kept deliberately --------------------------------------------------------------
+# working/results/*.json IS committed: it is the evidence behind every claim and is small.
+# *.jsonl is therefore NOT globally ignored; the one large one (the corpus manifest) is
+# already excluded by corpus/ above.
