@@ -8,17 +8,17 @@
 
 ## a) Tracked file tree
 
-**338 files, 4.16 MB.** The working tree is 7.1 GB; everything else is excluded (§e).
+**339 files, 4.17 MB.** The working tree is 7.1 GB; everything else is excluded (§e).
 
 | directory | files | size |
 | --- | ---: | ---: |
-| `./` | 8 | 53 KB |
+| `./` | 9 | 55 KB |
 | `archive/` | 1 | 4 KB |
 | `archive/docs/` | 21 | 251 KB |
 | `archive/results/` | 8 | 57 KB |
 | `archive/scripts/` | 9 | 115 KB |
 | `docker/` | 5 | 13 KB |
-| `publishable/` | 24 | 319 KB |
+| `publishable/` | 24 | 323 KB |
 | `repl_state/` | 9 | 231 KB |
 | `weekend_state/` | 7 | 347 KB |
 | `working/dossiers/` | 31 | 58 KB |
@@ -48,7 +48,7 @@
 | `working/scripts/` | 57 | 434 KB |
 | `working/wrappers/` | 1 | 4 KB |
 | `working/ws1/` | 10 | 55 KB |
-| **total** | **338** | **4.16 MB** |
+| **total** | **339** | **4.17 MB** |
 
 ### Repository root
 
@@ -56,9 +56,10 @@
 | --- | ---: |
 | `.env.example` | 0.3 KB |
 | `.gitignore` | 2.6 KB |
-| `README.md` | 5.5 KB |
+| `README.md` | 6.0 KB |
 | `REPLICATION_README.md` | 2.7 KB |
 | `matched_replication.py` | 14.9 KB |
+| `requirements.txt` | 1.7 KB |
 | `weekend_runner.sh` | 7.1 KB |
 | `weekend_summarise.py` | 3.7 KB |
 | `weekend_worker.py` | 16.4 KB |
@@ -78,11 +79,11 @@
 | `MEETING_2026-08-10.md` | 35.5 KB |
 | `PARSER_DECISION.md` | 8.0 KB |
 | `PARSER_PREMISES.md` | 7.4 KB |
-| `PROVISIONING.md` | 3.2 KB |
+| `PROVISIONING.md` | 6.1 KB |
 | `README.md` | 7.1 KB |
 | `REBASELINE_PLAN.md` | 8.5 KB |
 | `RUNBOOK_LLAMAINDEX.md` | 13.9 KB |
-| `SCHEMA_PROPOSAL.md` | 14.7 KB |
+| `SCHEMA_PROPOSAL.md` | 14.6 KB |
 | `STATE.md` | 59.0 KB |
 | `TOIL_INSTRUMENT.md` | 8.7 KB |
 | `TWO_TIER_PARSER_DESIGN.md` | 6.7 KB |
@@ -118,8 +119,12 @@ All commits carry today's date: this is an initial import of work developed with
 | 17 | `a50fa610` | docs: remove tool-authorship attribution from two archived documents | 2 | +2/-2 |
 | 18 | `4e470bc7` | docs: regenerate manifest commit table after the attribution edit | 1 | +1/-2 |
 | 19 | `a3e5711a` | docs: repair manifest commit table and section c heading | 1 | +20/-0 |
+| 20 | `eb1b033c` | docs: restore commit subjects, record the two git pitfalls that cost them | 2 | +77/-69 |
+| 21 | `7e613357` | fix(docs): make a fresh clone actually runnable | 7 | +137/-37 |
+| 22 | `ce453336` | docs: note that the manifest's quoted README uses root-relative links | 1 | +5/-0 |
+| 23 | `1d9c7118` | fix(selftest): skip the thread-match check when this tree has no engine | 1 | +4/-1 |
 
-The commit that regenerates this table cannot appear in it. It is commit **20**, `docs: restore commit subjects, record the two git pitfalls that cost them` — the change that added the two `BENCHMARK_SETUP.md` §7 rows and everything you are reading in this section.
+The commit that regenerates this table cannot appear in it. It is commit **24**, `docs: regenerate the manifest against final history` — the last commit before the first push.
 
 ## c) Root `README.md` — complete text
 
