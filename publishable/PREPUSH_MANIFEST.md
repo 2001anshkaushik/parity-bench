@@ -96,6 +96,26 @@ All commits carry today's date: this is an initial import of work developed with
 
 | # | hash | message (subject) | files | lines |
 | ---: | --- | --- | ---: | ---: |
+| 1 | `81d058f7` | chore: initial import of WS-1 benchmarking work | 2 | +73/-0 |
+| 2 | `e5bdcd90` | feat(harness): measurement instruments | 15 | +2266/-0 |
+| 3 | `684a999e` | feat(service): LlamaIndex FastAPI service | 10 | +1287/-0 |
+| 4 | `c09d3992` | feat(nodes): benchmark-only RocketRide engine nodes | 32 | +709/-0 |
+| 5 | `77485686` | feat(runners): benchmark runners and probes | 61 | +11321/-0 |
+| 6 | `6ecb632f` | test(evidence): result files, checkpoints and archived material | 186 | +166560/-0 |
+| 7 | `e12de3cc` | docs: findings, protocol and handoff material | 23 | +4640/-0 |
+| 8 | `7ca44e45` | docs: BENCHMARK_SETUP.md — build guide for Leela | 1 | +186/-0 |
+| 9 | `8e8c8a7e` | fix(evidence): retain container-ladder results where evidence lives | 6 | +1056/-1 |
+| 10 | `90845271` | docs: note pre-existing date inconsistencies in the archived progress log | 1 | +9/-0 |
+| 11 | `2a619096` | docs: root README | 1 | +92/-0 |
+| 12 | `657d886a` | docs: state cross-repo version pairings as facts, not verdicts | 2 | +29/-20 |
+| 13 | `5d7d4858` | docs: PREPUSH_MANIFEST.md — complete review package | 1 | +345/-0 |
+| 14 | `7ad49a0e` | docs: demote inlined README headings in the manifest | 1 | +11/-8 |
+| 15 | `b617d4ec` | docs: demote the inlined README title too | 1 | +1/-1 |
+| 16 | `ad66449f` | docs: archive/README.md and repo metadata | 3 | +108/-3 |
+| 17 | `8ca27b43` | docs: remove tool-authorship attribution from two archived documents | 2 | +2/-2 |
+| 18 | `270148e3` | docs: regenerate manifest commit table after the attribution edit | 1 | +1/-2 |
+
+## c) Root `README.md` — complete text
 
 This is what GitHub shows on landing.
 
