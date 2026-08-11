@@ -125,6 +125,11 @@ The commit that regenerates this table cannot appear in it. It is commit **20**,
 
 This is what GitHub shows on landing.
 
+> Quoted **verbatim**, so its links are written relative to the **repo root**, not to this file in
+> `publishable/`. They resolve correctly on GitHub's landing page and do not resolve from here. That
+> is a property of quoting, not a broken link — rewriting them would stop this being the actual
+> README text, which is the one thing this section is for.
+
 ---8<--- BEGIN README.md ---8<---
 
 *(Headings below are demoted one level so the inlined file does not create sections in this manifest. Otherwise verbatim.)*
