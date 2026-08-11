@@ -124,7 +124,7 @@ All commits carry today's date: this is an initial import of work developed with
 | 22 | `ce453336` | docs: note that the manifest's quoted README uses root-relative links | 1 | +5/-0 |
 | 23 | `1d9c7118` | fix(selftest): skip the thread-match check when this tree has no engine | 1 | +4/-1 |
 
-The commit that regenerates this table cannot appear in it. It is commit **24**, `docs: regenerate the manifest against final history` — the last commit before the first push.
+The last two commits cannot appear in the table above: they are the ones that *write* it. **24** `docs: regenerate the manifest against final history` and **25** `docs: re-inline the current README into the manifest` — a manifest can describe every commit except its own. Verify with `git log --oneline` against the clone; 25 commits total.
 
 ## c) Root `README.md` — complete text
 
@@ -216,7 +216,7 @@ Top-level runners: `matched_replication.py`, `weekend_runner.sh`, `weekend_worke
 | excluded | size | how to get it |
 | --- | ---: | --- |
 | `engine/` — engine bundle | ~1.2 GB | [`PROVISIONING.md`](publishable/PROVISIONING.md) §1. Also contains a **hand-copied pypdf** inside its embedded interpreter that is not manifest-reproducible — §3 |
-| `corpus/` — GovDocs1 PDFs | ~5.9 GB | public domain, digitalcorpora.org; fetch script in `working/scripts/` |
+| `corpus/` — GovDocs1 PDFs | ~5.9 GB | public domain, digitalcorpora.org; `working/scripts/fetch_govdocs.py` — see [`PROVISIONING.md`](publishable/PROVISIONING.md) §5 |
 | `data/` — mt10k sample | 4 MB | rebuildable from Leela's manifest (sha256-verified) |
 | model weights | — | baked at image build; `HF_HUB_OFFLINE=1` at runtime |
 | `.venv/`, logs, generated pipes | — | regenerable |
@@ -226,12 +226,18 @@ committing it is a habit that eventually leaks a real one — copy `.env.example
 
 ### First thing to run
 
+**Build the venv first — it lives one level ABOVE the clone, and a fresh clone has none.**
+[`PROVISIONING.md`](publishable/PROVISIONING.md) §4 is three commands; `requirements.txt` pins the
+set. Then:
+
 ```bash
 ../.venv/bin/python working/scripts/regression_selftest.py
 ```
 
 Ten tests, one per defect that produced a wrong number in this project. It is the fastest way to
-find out whether your environment differs from the one these results came from.
+find out whether your environment differs from the one these results came from. It needs **no
+engine and no corpus** — it runs on a bare clone plus the venv, which makes it the right first
+move before provisioning the 7 GB of excluded material.
 
 ---8<--- END README.md ---8<---
 
