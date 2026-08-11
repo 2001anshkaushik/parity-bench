@@ -1,0 +1,61 @@
+{
+ "meta": {
+  "arch": "aarch64",
+  "python": "3.12.13",
+  "env_declared": {
+   "OMP_NUM_THREADS": "1",
+   "MKL_NUM_THREADS": "1",
+   "TORCH_NUM_THREADS": "1",
+   "WS1_DEVICE": "cpu"
+  },
+  "torch_intra": 1,
+  "torch_interop": 14,
+  "os_cpu_count": 14,
+  "cgroup_mem_limit_mb": 12884.901888,
+  "image_digest": "sha256:3e8f5e9229f949737a795b6e630aafa72fdcbf7510c5b302ed8c14f1155ce776",
+  "arm": "llamaindex"
+ },
+ "distinct_pdfs": 2471,
+ "rungs": {
+  "100": {
+   "documents": 100,
+   "elapsed_s": 174.9,
+   "docs_per_s_DO_NOT_QUOTE": 0.57,
+   "goodput_docs": 98,
+   "faults": {
+    "empty_extraction": 2
+   },
+   "fault_rate": 0.02,
+   "peak_rss_mb": 1405.5,
+   "rss_end_mb": 1144.0,
+   "chunks_total": 1039
+  },
+  "500": {
+   "documents": 500,
+   "elapsed_s": 1206.3,
+   "docs_per_s_DO_NOT_QUOTE": 0.41,
+   "goodput_docs": 495,
+   "faults": {
+    "empty_extraction": 5
+   },
+   "fault_rate": 0.01,
+   "peak_rss_mb": 1405.5,
+   "rss_end_mb": 1123.9,
+   "chunks_total": 8410
+  },
+  "2000": {
+   "documents": 2000,
+   "elapsed_s": 4569.1,
+   "docs_per_s_DO_NOT_QUOTE": 0.44,
+   "goodput_docs": 1972,
+   "faults": {
+    "empty_extraction": 27,
+    "parse:PdfReadError": 1
+   },
+   "fault_rate": 0.014,
+   "peak_rss_mb": 1405.5,
+   "rss_end_mb": 1116.5,
+   "chunks_total": 36002
+  }
+ }
+}
