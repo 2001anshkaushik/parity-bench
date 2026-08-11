@@ -272,6 +272,98 @@ conservative.
 warm-up exclusion is labelled **PROVISIONAL** for that reason. The memory ratio does not depend on it
 (it passes at n=3 including block 0); only the wall-clock gate does.
 
+## 5c. THE CURVE — concurrency sweep, and the crossover [2026-08-11]
+
+Pre-registered in [`PREREGISTRATION.md`](PREREGISTRATION.md) **before this ran**. 15 cells,
+C ∈ {1,2,4,8,16} × n=3 × 500 documents, levels in randomised order, one service cold start per
+level, achieved concurrency measured (never assumed), swap and compressor state recorded at the
+start, middle and end of every cell.
+
+| C | LlamaIndex | spread | RocketRide | spread | ratio RR/LI | RR task procs | RR task tree | LI compression | verdict |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 1 | 1,131.2 MB | 5.3 % | 2,208.5 MB | 5.6 % | **1.952** | 1 | 1,598.5 | −0.0 % | **QUOTABLE** |
+| 2 | 1,902.7 MB | 9.5 % | 2,587.6 MB | 4.6 % | **1.360** | 1 | 2,027.3 | −0.1 % | **QUOTABLE** |
+| 4 | 3,405.6 MB | 4.3 % | 2,911.1 MB | 7.2 % | **0.855** | 1 | 2,319.4 | −0.0 % | **QUOTABLE** |
+| 8 | 6,589.0 MB | **17.5 %** | 3,429.1 MB | 3.6 % | 0.520 | 1 | 2,828.2 | −0.1 % | gate FAIL |
+| 16 | 7,703.6 MB | **57.0 %** | 4,043.4 MB | 3.7 % | 0.525 | 1 | 3,468.6 | **+66.2 %** | compressed |
+
+Achieved concurrency reached offered in **every cell**; no cell was VOID on that criterion.
+
+### The crossover [VERIFIED — both bracketing levels quotable]
+
+**Measured C ≈ 3.2** (log-log interpolation between C=2 at 1.360 and C=4 at 0.855). The registered
+prediction was **~C=3**. **Confirmed, and it falls inside the quotable range** — it rests on two
+gate-passing, compression-clean levels, not on the compromised top of the curve.
+
+Below C≈3 LlamaIndex is the lighter arm; above it RocketRide is, and the gap widens.
+
+### The mechanism — and the registered falsifier DID fire
+
+| | predicted | measured |
+| --- | --- | --- |
+| RocketRide **task process count** | flat | **flat at 1**, C=1 → C=16, with up to 16 documents genuinely in flight |
+| RocketRide **task-tree memory** | flat | **1,598 → 3,469 MB, +117 %** |
+
+`PREREGISTRATION.md` §5: *"FALSIFIED IF RocketRide's task-tree memory grows with C rather than
+staying flat."* **It grows. That half of the prediction is falsified.**
+
+Fitting memory ∝ C^k on the three quotable levels:
+
+* **LlamaIndex k = 0.80** — close to linear in workers, as predicted
+* **RocketRide k = 0.20** — clearly not flat (k=0), but strongly sub-linear
+
+**So the crossover is real and lands where predicted, but for the wrong reason.** It exists because
+LlamaIndex grows *faster*, not because RocketRide stays flat. Two errors in the registered arithmetic
+partly cancelled: RocketRide's baseline was higher than assumed **and** it grows, while LlamaIndex's
+per-worker cost under load (~700 MB) exceeds the 579 MB idle figure the prediction used. A correct
+prediction from a wrong model is not a vindication of the model, and the practical consequence
+differs: "flat" would have implied unlimited concurrency at fixed cost; **k=0.20 sets a real, if
+distant, ceiling.**
+
+Structurally, the Model B pooling claim **does** transfer from `probe_minimal.pipe` to the real
+embedding pipeline: one task process absorbed 16 concurrent documents. It just is not free.
+
+### Why C=8 and C=16 are not quotable — two different failures
+
+* **C=16 — compressor, not swap.** Compressed pages rose **+66.2 % (+5.50 GB)** during the first
+  cell. Compressed pages are absent from RSS exactly as swapped pages are, so the arm's measured RSS
+  understates its working set. The tell: per-process LlamaIndex memory **fell below its own idle
+  value** (453 vs 540 MB/proc) — a loaded worker cannot need less than an idle one. Swapouts were
+  zero throughout, so a swap-only gate passes this cell; the compressor gate is what catches it.
+  **This is the "LlamaIndex at 16 workers does not fit on this host" result**, arriving through the
+  compressor.
+* **C=8 — genuine drift, no compression.** LlamaIndex rose monotonically **6,432 → 6,589 → 7,584 MB
+  across successive reps against one warm service** (+18 %), with compression flat at −0.05 % to
+  −0.34 %. That is real growth, not an artifact. [**PROVISIONAL** — n=3 within a single service
+  instance; allocator high-water behaviour that would plateau is not excluded from unbounded growth.]
+
+**RocketRide passes its gate at every level** (3.6–7.2 %) and shows neither pathology.
+
+Direction survives at both levels even though magnitude does not: RocketRide is lighter in all six
+cells, and at C=16 the true LlamaIndex figure is *higher* than any measured value, so the real gap is
+larger than 0.525 rather than smaller.
+
+### Reconciliation of the two previously published numbers
+
+**The 2.01× IS explained.** It sits at **C=1** on this curve, where the matched measurement gives
+**1.952×** (sweep) and **1.795×** (primary). The topology confound was real but small; most of the
+original 2× was simply the concurrency-1 operating point.
+
+**The 22.8× is NOT explained by this curve, and that gap is itself the finding.** It compared
+LlamaIndex idle at 8 workers (**4,642 MB**, eight models eagerly loaded at startup) against
+RocketRide idle (**204 MB**, engine parent holding **no task and no model**). Those are not the same
+state. It is not a point on this curve at any C, because it never measured concurrency at all — it
+measured **eager versus lazy model residency**:
+
+* **LlamaIndex pre-loads a model per worker at startup**, so it pays for capacity before any request
+  arrives, and its floor is set by worker count.
+* **RocketRide loads on task creation**, so an idle engine holds almost nothing, and its cost tracks
+  work in flight.
+
+That is a genuine and useful architectural difference — it is the right answer to *"what does an idle
+deployment cost?"* — but it was published as though it answered *"which framework uses less memory?"*,
+which it does not. Under matched load below C≈3 the answer is the opposite.
+
 ## 6b. `run_service.sh` has been broken since the restructure [VERIFIED]
 
 **No clone of this repository could start the LlamaIndex service.** `run_service.sh` computed its
