@@ -185,5 +185,13 @@ Each line is the symptom you will actually see.
 | what a fresh clone lacks | `publishable/PROVISIONING.md` |
 | regression suite | `working/scripts/regression_selftest.py` — one test per defect that produced a wrong number |
 
-**Run the regression suite first.** It is the fastest way to find out whether your environment
-differs from ours: `../.venv/bin/python working/scripts/regression_selftest.py`
+**Run the regression suite first:** `../.venv/bin/python working/scripts/regression_selftest.py`
+— one test per defect that produced a wrong number here.
+
+**It is not an environment check**, despite the obvious temptation to use it as one. Measured
+by tracing its imports: it loads only `psutil` of the fourteen pinned packages, so it passes
+just as happily on a venv where torch or llama-index is broken. Verify the stack separately:
+
+```bash
+../.venv/bin/python -c "import torch,sentence_transformers,llama_index.core,sklearn,pypdf,fastapi;print('stack ok')"
+```

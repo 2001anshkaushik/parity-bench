@@ -92,7 +92,15 @@ set. Then:
 ../.venv/bin/python working/scripts/regression_selftest.py
 ```
 
-Ten tests, one per defect that produced a wrong number in this project. It is the fastest way to
-find out whether your environment differs from the one these results came from. It needs **no
-engine and no corpus** — it runs on a bare clone plus the venv, which makes it the right first
-move before provisioning the 7 GB of excluded material.
+Eleven tests, one per defect that produced a wrong number in this project. It needs **no engine and
+no corpus** — it runs on a bare clone plus the venv, which makes it the right first move before
+provisioning the 7 GB of excluded material.
+
+**It is not an environment check.** Measured: the suite imports only `psutil` of the fourteen
+pinned packages, so a green run says nothing about whether torch, llama-index or
+sentence-transformers installed correctly. To check that, import the stack and compare against the
+pins:
+
+```bash
+../.venv/bin/python -c "import torch,sentence_transformers,llama_index.core,sklearn,pypdf,fastapi;print('stack ok')"
+```

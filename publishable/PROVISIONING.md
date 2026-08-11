@@ -97,8 +97,11 @@ Then, from inside the clone, the documented commands work as written:
 ../.venv/bin/python working/scripts/regression_selftest.py
 ```
 
-`requirements.txt` at the clone root pins the full set. Every version in it was **read from the venv
-that produced the results**, not chosen — see the header comment for what is deliberately excluded
+`requirements.txt` at the clone root pins the full set. **Verified by clean install** — a fresh
+3.12.13 venv, `pip install -r requirements.txt` and nothing else: all 14 versions resolve
+exactly, `pip check` reports no conflicts, every package imports, torch/numpy ABI interop
+works, and the LlamaIndex arm warms in 5.3 s and returns a 384-d unit-norm vector. Every
+version in it was **read from the venv that produced the results**, not chosen — see the header comment for what is deliberately excluded
 and why. `ENVIRONMENT.md` is the same set in prose.
 
 > If you would rather keep the venv inside the clone, `.venv/` is already gitignored — but then
