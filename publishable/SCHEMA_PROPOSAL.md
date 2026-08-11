@@ -137,7 +137,7 @@ width alongside every number.
 
 **Verification, not declaration.** A service can declare anything. The width should be *measured*
 with the hold-and-divide method (`W = throughput × hold`) and the measured value compared to the
-declared one. `benchmark-A/scripts/pool_width.py` does this in ~2 minutes.
+declared one. `working/scripts/pool_width.py` does this in ~2 minutes.
 
 ## 5. Canonical processing contract
 

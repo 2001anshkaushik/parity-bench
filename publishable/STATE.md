@@ -21,8 +21,8 @@ LlamaIndex service and all measurement work lives.
 | --- | --- |
 | Host | Apple M4 Pro, 14 cores (10P + 4E), 48 GiB, macOS 26.6, arm64 |
 | Python | `$REPO/.venv` → 3.12.13 |
-| Working dir | `$REPO/benchmark-A` |
-| Engine | `server-v3.3.1`, reports `3.3.1.35` hash `a0817cc6`, installed at `benchmark-A/engine/` |
+| Working dir | the clone root (`$REPO/parity-bench`) |
+| Engine | `server-v3.3.1`, reports `3.3.1.35` hash `a0817cc6`, installed at `<clone>/engine/` |
 | Engine SHA256 | `846df27ae8b52cd3ed4975124f76462f0cac3ba2e1677a012508247efde6a836` |
 | SDK | `rocketride` 1.3.0 (co-released with server 3.3.1 — pairing verified from release manifests) |
 | Key libs | llama-index-core 0.14.23, sentence-transformers 5.6.1, torch 2.13.0, langchain-text-splitters 1.1.2 |
@@ -540,7 +540,7 @@ that touches the wire format, by design.
 
 ## 8. Exact commands
 
-All from `$REPO/benchmark-A`.
+All from the clone root.
 
 ### Engine
 
@@ -597,7 +597,7 @@ cd handoff && ../../.venv/bin/python test_collector_overhead.py
 ## 10. Layout
 
 ```
-benchmark-A/
+<clone>/
   working/ws1/            THE SERVICE — schema.py (wire contract, isolated) | pipeline.py (LlamaIndex,
                   no HTTP) | service.py (HTTP only) | run_service.sh | smoke.py | exp_*.py
   working/scripts/        engine start/stop, parity harnesses, corpus tools, variance gate, pool_width

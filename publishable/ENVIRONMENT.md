@@ -1,4 +1,4 @@
-# benchmark-A — Pinned Environment
+# parity-bench — Pinned Environment
 
 Every run manifest references this file. If anything here changes, prior results are not
 comparable and must be re-run or explicitly annotated.
@@ -20,7 +20,7 @@ Captured: 2026-08-04 · machine-readable copy: `working/results/engine_gate.json
 | Tarball URL | `https://github.com/rocketride-org/rocketride-server/releases/download/server-v3.3.1/rocketride-server-v3.3.1-darwin-arm64.tar.gz` |
 | **SHA256** | `846df27ae8b52cd3ed4975124f76462f0cac3ba2e1677a012508247efde6a836` |
 | Download size | 179,915,223 bytes (171.6 MiB) |
-| Install path | `benchmark-A/engine/` |
+| Install path | `<clone>/engine/` |
 | Binary architecture | `Mach-O 64-bit executable arm64` (verified with `file`, not assumed) |
 | Licence | MIT (Aparavi Software AG) |
 
@@ -124,8 +124,8 @@ battery is not comparable to one on mains.
 | Bind address | `127.0.0.1:5565` — loopback only, never `0.0.0.0` |
 | `ROCKETRIDE_URI` | `http://127.0.0.1:5565` |
 | `ROCKETRIDE_APIKEY` | `MYAPIKEY` (engine's built-in dev key) |
-| Log | `benchmark-A/logs/engine.log` |
-| Pidfile | `benchmark-A/logs/engine.pid` |
+| Log | `<clone>/logs/engine.log` |
+| Pidfile | `<clone>/logs/engine.pid` |
 | Cold start (first launch) | ~1 min — bootstraps the embedded Python (pip, wheel, setuptools, uv, constraint compilation) before binding |
 | Warm start | ~1 s |
 

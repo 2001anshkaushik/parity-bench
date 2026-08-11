@@ -13,26 +13,26 @@ Host: Apple M4 Pro, macOS 26.6. Python 3.12.13 at `$REPO/.venv`.
 
 | layer | absolute path | what it does |
 | --- | --- | --- |
-| **① schema** | `$REPO/benchmark-A/ws1/schema.py` | The wire contract, and **nothing else**. Request/response/manifest shapes, `error_class` values, the canonical JSON encoder. When Leela's contract lands, only this file changes. |
-| **② pipeline** | `$REPO/benchmark-A/ws1/pipeline.py` | The LlamaIndex work: split → embed. Knows nothing about HTTP. Owns the device assertion and the `text + '\n'` transform. |
-| **③ service** | `$REPO/benchmark-A/ws1/service.py` | HTTP only. Routes, lifespan/warmup, fault injection hook. **Constructs no wire dicts itself** — it calls into ①. |
+| **① schema** | `$REPO/working/ws1/schema.py` | The wire contract, and **nothing else**. Request/response/manifest shapes, `error_class` values, the canonical JSON encoder. When Leela's contract lands, only this file changes. |
+| **② pipeline** | `$REPO/working/ws1/pipeline.py` | The LlamaIndex work: split → embed. Knows nothing about HTTP. Owns the device assertion and the `text + '\n'` transform. |
+| **③ service** | `$REPO/working/ws1/service.py` | HTTP only. Routes, lifespan/warmup, fault injection hook. **Constructs no wire dicts itself** — it calls into ①. |
 
 ### Everything else
 
 | path | purpose |
 | --- | --- |
-| `benchmark-A/ws1/run_service.sh` | Launcher. Pins device, thread env, uvicorn tuning. **Use this, not a bare uvicorn command.** |
-| `benchmark-A/ws1/__init__.py` | Package marker (empty). |
-| `benchmark-A/ws1/exp_layer_isolation.py` | Experiment: model-only scaling with no HTTP. Found the GPU. |
-| `benchmark-A/ws1/exp_service_device.py` | Experiment: cpu-vs-mps at the service level, n=3 randomised. |
-| `benchmark-A/ws1/exp_variance_cause.py` | Experiment: what causes run-to-run variance. |
-| `benchmark-A/ws1/exp_fault_path.py` | Validates `error_class` contract + injected-vs-collateral accounting. |
-| `benchmark-A/scripts/parity_replication.py` | Parity harness (single synthetic doc). |
-| `benchmark-A/scripts/parity_corpus.py` | Parity on the real mt10k distribution + chunk sweep. |
-| `benchmark-A/scripts/corpus_characterize.py` | Rebuilds mt10k, verifies sha256 vs Leela's manifest. |
-| `benchmark-A/scripts/variance_gate.py` | Runnable gate; exits non-zero if spread > threshold. |
-| `benchmark-A/handoff/pool_width.py` | Guarded effective-width measurement. |
-| `benchmark-A/data/mt10k/mt10k_sample.json` | First 2,000 verified mt10k docs, for the parity runs. |
+| `working/ws1/run_service.sh` | Launcher. Pins device, thread env, uvicorn tuning. **Use this, not a bare uvicorn command.** |
+| `working/ws1/__init__.py` | Package marker (empty). |
+| `working/ws1/exp_layer_isolation.py` | Experiment: model-only scaling with no HTTP. Found the GPU. |
+| `working/ws1/exp_service_device.py` | Experiment: cpu-vs-mps at the service level, n=3 randomised. |
+| `working/ws1/exp_variance_cause.py` | Experiment: what causes run-to-run variance. |
+| `working/ws1/exp_fault_path.py` | Validates `error_class` contract + injected-vs-collateral accounting. |
+| `working/scripts/parity_replication.py` | Parity harness (single synthetic doc). |
+| `working/scripts/parity_corpus.py` | Parity on the real mt10k distribution + chunk sweep. |
+| `working/scripts/corpus_characterize.py` | Rebuilds mt10k, verifies sha256 vs Leela's manifest. |
+| `working/scripts/variance_gate.py` | Runnable gate; exits non-zero if spread > threshold. |
+| `working/handoff/pool_width.py` | Guarded effective-width measurement. |
+| `data/mt10k/mt10k_sample.json` | First 2,000 verified mt10k docs, for the parity runs. |
 
 ---
 
@@ -43,7 +43,7 @@ Host: Apple M4 Pro, macOS 26.6. Python 3.12.13 at `$REPO/.venv`.
 From a fresh terminal, copy-paste:
 
 ```bash
-cd $REPO/benchmark-A
+cd "$(git rev-parse --show-toplevel)"
 WS1_DEVICE=cpu WS1_WORKERS=8 WS1_PORT=8801 bash working/ws1/run_service.sh
 ```
 
@@ -55,7 +55,7 @@ and `OMP/MKL/OPENBLAS/VECLIB_NUM_THREADS=1`, then launches uvicorn with `--loop 
 To run it in the background instead:
 
 ```bash
-cd $REPO/benchmark-A && WS1_DEVICE=cpu WS1_WORKERS=8 WS1_PORT=8801 nohup bash working/ws1/run_service.sh > logs/ws1.out 2>&1 &
+cd "$(git rev-parse --show-toplevel)" && WS1_DEVICE=cpu WS1_WORKERS=8 WS1_PORT=8801 nohup bash working/ws1/run_service.sh > logs/ws1.out 2>&1 &
 ```
 
 **Knobs** (all optional): `WS1_DEVICE` (`cpu` default — do not use `mps` for parity runs),
@@ -69,7 +69,7 @@ service is ready.** Each worker independently imports torch (~30 s) and loads th
 Count the warm lines instead:
 
 ```bash
-cd $REPO/benchmark-A && until [ "$(grep -c 'warm in' logs/ws1.out)" -ge 8 ]; do sleep 3; done; grep -c 'warm in' logs/ws1.out
+cd "$(git rev-parse --show-toplevel)" && until [ "$(grep -c 'warm in' logs/ws1.out)" -ge 8 ]; do sleep 3; done; grep -c 'warm in' logs/ws1.out
 ```
 
 That prints `8` when all eight workers are up. Each line looks like:
@@ -163,7 +163,7 @@ already unit-normalised — the model's own `Normalize` module does it, so we ne
 ### 3.4 Script version
 
 ```bash
-cd $REPO/benchmark-A && ../.venv/bin/python working/ws1/smoke.py
+cd "$(git rev-parse --show-toplevel)" && ../.venv/bin/python working/ws1/smoke.py
 ```
 
 Checks health, manifest, a single-chunk doc, a multi-chunk doc, an empty doc, and a fault — and
