@@ -105,7 +105,7 @@ This is what GitHub shows on landing.
 *(Headings below are demoted one level so the inlined file does not create sections in this manifest. Otherwise verbatim.)*
 
 
-## RR-vs-LLAMA-Benchmarking
+### RR-vs-LLAMA-Benchmarking (README title)
 
 Measurement work for **WS-1 "Service Parity"**: two implementations of the same document pipeline —
 the **RocketRide engine** and a **LlamaIndex FastAPI service** — running PDF → text → chunks →
