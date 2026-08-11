@@ -208,7 +208,10 @@ def t_thread_settings_matched():
     assert "REFUSING TO RUN" in src, "the assertion no longer refuses to run on mismatch"
     assert "if et == 1" in src, "the both-arms-pinned guard is gone (matched but not best)"
     assert "len(med) >= 3" in src, "the gate no longer requires n>=3 (n=1 passes trivially)"
-    if not engine_up():
+    # An engine answering on :5565 is NOT the same as THIS tree being able to drive one — a bare
+    # clone has no engine/ (PROVISIONING §1) yet still sees a neighbouring engine on the port, and
+    # then fails opaquely inside probe_env. Require both, or skip.
+    if not engine_up() or not (ROOT / "engine").is_dir():
         return "skip"
     import importlib.util
     spec = importlib.util.spec_from_file_location("mr", ROOT / "matched_replication.py")
