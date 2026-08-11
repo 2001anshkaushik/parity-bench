@@ -340,6 +340,22 @@ matched re-run will shrink the gap, not erase it.
 | --- | --- | --- |
 | P1 | **The first block of a run is warm-up at BLOCK scale** — 12–38 % slower than the blocks that follow, on **both** arms (LlamaIndex-HTTP 892.9 → 794.4 → 796.3 s; RocketRide 1,119.9 → 819.8 → 805.3 s; identical goodput and faults throughout). Excluding it, wall-clock spread is **0.24 %** and **1.79 %** — the tightest in this project. Including it, both arms FAIL the 10 % gate (12.4 %, 38.4 %). The existing 50-document warm-up does not cover this. **Wall clock IS quotable here with a block-level exclusion.** This entry has been revised three times: first claimed 'nothing changed' (wrong — block position did), then '12–37 % run-to-run instability, gate unmeetable' (wrong — one contaminated point, too pessimistic). Does not affect the 2.2× sweep-order result; throughput remains unpublishable from this host | **PROVISIONAL** — n=2 after exclusion, below the project's own n≥3; adjacent blocks are the pair most likely to agree, so a thermal steady state is not excluded. Memory does not depend on it (passes at n=3) |
 
+### Matched-layer sweep — 2026-08-11 (pre-registered)
+
+Prediction registered in `PREREGISTRATION.md` **before** the sweep ran; `MATCHED_LAYERS.md` §5b–5c
+carries the full analysis.
+
+| # | finding | label |
+| --- | --- | --- |
+| S1 | **Memory crossover at C ≈ 3.2.** Matched at equal in-flight documents: C=1 → 1.95×, C=2 → 1.36×, C=4 → 0.86× (RR/LI). Below C≈3 RocketRide is heavier, above it LlamaIndex is. Both bracketing levels pass their gates and are compression-clean | **VERIFIED** (n=3/level, randomised level order, achieved concurrency measured) |
+| S2 | **The registered flatness prediction is FALSIFIED.** RocketRide task-tree memory grows **1,598 → 3,469 MB (+117 %)** from C=1 to C=16. Fitted memory ∝ C^k: RocketRide **k=0.20**, LlamaIndex **k=0.80**. The crossover is real but happens because LlamaIndex grows *faster*, not because RocketRide is flat | **VERIFIED** |
+| S3 | **Pooling confirmed structurally**: RocketRide task **process count constant at 1** from C=1 to C=16 with up to 16 documents genuinely in flight. Model B's claim transfers from `probe_minimal.pipe` to the real embedding pipeline — but it is not free (see S2) | **VERIFIED** |
+| S4 | **C=16 is unquotable — compressor, not swap.** Compressed pages +66.2 % (+5.50 GB) in one cell; swapouts zero, so a swap-only gate passes it. Tell: LlamaIndex per-process RSS fell **below its own idle value** (453 vs 540 MB/proc), which is physically impossible for a loaded worker. **LlamaIndex at 16 workers does not fit this host** | **VERIFIED** |
+| S5 | **LlamaIndex memory drifts upward across successive workloads at C=8**: 6,432 → 6,589 → 7,584 MB (+18 %) against one warm service, compression flat (−0.05 to −0.34 %), so it is real growth. Fails the 10 % gate at 17.5 % | **PROVISIONAL** — n=3 within one service instance; allocator high-water vs unbounded growth not separated |
+| S6 | **The 22.8× idle figure is NOT a point on the matched curve at any C.** It compared LlamaIndex idle at 8 workers (8 models eagerly pre-loaded) against RocketRide idle (engine parent, **no task, no model**). It measures **eager vs lazy model residency**, not memory efficiency. Correct answer to "what does an idle deployment cost"; not an answer to "which framework uses less memory" | **VERIFIED** |
+| S7 | RocketRide passes its variance gate at **every** concurrency level (3.6–7.2 %); LlamaIndex fails at C=8 and C=16 | **VERIFIED** |
+| S8 | **RocketRide task creation hung in `INITIALIZING` for 300 s** after ~14 create/terminate cycles on a 31.8 h engine. No orphans, engine responsive at 188 MB, and a manual probe then created a task in 6.8 s — transient, not degradation. Retry produced a ratio within 1 % of the other reps | **PROVISIONAL** (observed once) |
+
 ## 4. Verified findings, with labels
 
 | # | finding | label | evidence |
