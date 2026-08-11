@@ -338,7 +338,7 @@ matched re-run will shrink the gap, not erase it.
 
 | # | finding | label |
 | --- | --- | --- |
-| P1 | **12.4 % wall-clock swing on byte-identical back-to-back blocks** (892.9 s vs 794.4 s, LlamaIndex-HTTP, same 2,000 docs, same order, same warm service, nothing changed between them; goodput 1,972 and 28 faults both times). The host's run-to-run floor **exceeds the project's own 10 % variance gate**, so no wall-clock result is reportable from this machine by either arm | **VERIFIED** (same run, same log) |
+| P1 | **Run-to-run wall-clock swing of 12–37 % on identical work**: LlamaIndex-HTTP 892.9 → 794.4 s (12.4 %), RocketRide 1,119.9 → 819.8 s (36.6 %); same 2,000 docs, same order, identical goodput and fault counts in both blocks. **Both arms were slowest on their FIRST block**, so this shares the documented cold/power-state mechanism rather than being independent of it — an earlier draft claimed "nothing changed between them", which was wrong and is corrected. Consequence: the **10 % gate cannot be met for wall clock on this host**, and the first block of a run is warm-up at the BLOCK level (the 50-document warm-up does not cover it) | **VERIFIED** (same run, same log) |
 
 ## 4. Verified findings, with labels
 
