@@ -7,7 +7,7 @@ error, every judgment call where the docs were silent, with wall-clock cost.
 
 | | |
 | --- | --- |
-| Author | Ansh (via Claude, pair-working) |
+| Author | Ansh |
 | **Prior LlamaIndex experience** | **None.** Never used the library. No prior knowledge of its reader API, node parsers, embedding wrappers, or deployment guidance. |
 | Prior FastAPI/uvicorn experience | Yes — built the benchmark-A `asyncio_service` wrapper (Aug 4) |
 | Prior embedding-service experience | None with `multi-qa-MiniLM-L6-cos-v1` specifically |

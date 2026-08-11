@@ -11,7 +11,7 @@
 > Cause UNVERIFIED. Also: a cmdline-based process census undercounted the service's memory 173×
 > (19.6 MB reported vs 3,404 MB actual) — the same bug flagged as A7 in the adversarial audit.
 
-Single source of truth for state across sessions. Updated by Claude at each milestone.
+Single source of truth for state across sessions. Updated at each milestone.
 
 > **Session headings: transcription errors CORRECTED 2026-08-10.** Two headings carried the wrong
 > day or number because sessions crossed local midnight: session 12 was headed 2026-08-08 although
