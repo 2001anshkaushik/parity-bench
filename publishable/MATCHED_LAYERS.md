@@ -89,7 +89,7 @@ wall-clock difference is **+72.7 s** (883.4 s vs 810.7 s) — agreement to 1.00.
 coincidence, not corroboration.** With n=4 and 40 % spread, agreement to three digits is luck; the
 honest statement is that the observed wall-clock gap is *of the same order as* transport overhead
 alone, and the transport-only explanation cannot yet be separated from "the engine is genuinely
-slower per document". §4 gives the experiment that separates them.
+slower per document". §7 specifies the experiment that separates them.
 
 ### 2.4 Direction of bias — rule 5 applied in reverse, as instructed
 
