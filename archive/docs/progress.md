@@ -13,6 +13,15 @@
 
 Single source of truth for state across sessions. Updated by Claude at each milestone.
 
+> **Note on dates in the session headings below.** Several sessions crossed local midnight and a
+> few headings carry the wrong day — session 12 is headed 2026-08-08 but follows session 11 headed
+> 2026-08-09, and sessions 2–4 appear in reverse order. These are transcription errors made while
+> writing the log, not evidence of anything. **`STATE.md` is authoritative for what happened and in
+> what order**; this file is a narrative log. (Verified 2026-08-10: the inconsistency predates the
+> file-corruption incident of that date and is unrelated to it — a character-level insertion and
+> its removal cannot alter a digit.)
+
+
 **Host:** Apple M4 Pro, 14 cores (10P + 4E), 48 GiB RAM, macOS (darwin 25.6.0), arm64
 **Python:** `.venv` at `$REPO/../.venv` → 3.12.13
 **Cost constraint:** $0 — 100% local, no paid cloud.
