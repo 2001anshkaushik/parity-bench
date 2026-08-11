@@ -60,6 +60,15 @@ UNVERIFIED.
 > **opposite** verdict (RocketRide 2.0× worse) with LlamaIndex in-process at 1 worker.
 > Worker-count decision and re-run design: `MATCHED_LAYERS.md` §5.
 
+> **RESOLVED 2026-08-11 — [`MATCHED_LAYERS.md`](MATCHED_LAYERS.md) §5c.** This figure is **not** a
+> point on the matched concurrency curve, at any C. It compares LlamaIndex idle at 8 workers (eight
+> models **eagerly loaded at startup**) against RocketRide idle (engine parent holding **no task and
+> no model**). It is the right answer to *"what does an idle deployment cost?"* — LlamaIndex pays for
+> capacity before any request arrives; RocketRide loads on task creation — but it is **not** an
+> answer to *"which framework uses less memory?"*. Under matched load below C ≈ 3 the answer is the
+> opposite: RocketRide is the heavier arm.
+
+
 ## What was withdrawn, and why
 
 | withdrawn | why |

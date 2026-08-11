@@ -53,6 +53,25 @@ Identical to the document, every block. The arms differ by **exactly 7 documents
 > are correct as measured. The functional-equivalence headline above is **unaffected**:
 > transport does not change which bytes come back.
 
+> **RESOLVED 2026-08-11 — matched-layer sweep, [`MATCHED_LAYERS.md`](publishable/MATCHED_LAYERS.md) §5c.**
+> Memory footprint is **topology-dependent and crosses over**. Matched at equal concurrent
+> in-flight documents, LlamaIndex behind uvicorn (workers = C) vs RocketRide (1 pipeline, C
+> in-flight):
+>
+> | C | LlamaIndex | RocketRide | RR/LI |
+> | ---: | ---: | ---: | ---: |
+> | 1 | 1,131 MB | 2,209 MB | **1.95×** |
+> | 2 | 1,903 MB | 2,588 MB | **1.36×** |
+> | 4 | 3,406 MB | 2,911 MB | **0.86×** |
+>
+> **Crossover at C ≈ 3.2.** Below it RocketRide is heavier; above it LlamaIndex is, and the gap
+> widens. C=8 and C=16 are direction-only (LlamaIndex fails its variance gate at 17.5 %, and at 16
+> workers the host compressed 5.5 GB, so RSS understates it).
+>
+> **Any memory claim without a stated topology and concurrency is uninterpretable.** The 2.0× below
+> is the C=1 point; it is correct and it is not a framework property.
+
+
 **No throughput comparison is published**, and none can be from this hardware. That is the case for
 moving Phase 2 to a Linux x64 host, along with the fact that **no `linux-arm64` engine build has
 ever been released** (all 51 releases checked), so RocketRide cannot be containerised here at all.

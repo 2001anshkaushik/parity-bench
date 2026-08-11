@@ -102,6 +102,15 @@ push the working set up, not down.
 > both are correct as measured — but neither is a framework property. §5 there sets the
 > worker-count basis for a re-run.
 
+> **RESOLVED 2026-08-11 — [`MATCHED_LAYERS.md`](MATCHED_LAYERS.md) §5c.** This figure is **not** a
+> point on the matched concurrency curve, at any C. It compares LlamaIndex idle at 8 workers (eight
+> models **eagerly loaded at startup**) against RocketRide idle (engine parent holding **no task and
+> no model**). It is the right answer to *"what does an idle deployment cost?"* — LlamaIndex pays for
+> capacity before any request arrives; RocketRide loads on task creation — but it is **not** an
+> answer to *"which framework uses less memory?"*. Under matched load below C ≈ 3 the answer is the
+> opposite: RocketRide is the heavier arm.
+
+
 **Why the asymmetry is structural, not a defect:** the LlamaIndex service carries **4,642 MB before
 a single request arrives** — 8 uvicorn workers each holding a model and a torch runtime. Its
 parallelism comes from processes, so its floor scales with worker count. RocketRide's tree idles at

@@ -133,6 +133,15 @@ reason matters:
 > ⚠️ **Topology-confounded — the 8-worker floor is a configuration choice, not a framework
 > property. See [`MATCHED_LAYERS.md`](MATCHED_LAYERS.md).**
 
+> **RESOLVED 2026-08-11 — [`MATCHED_LAYERS.md`](MATCHED_LAYERS.md) §5c.** This figure is **not** a
+> point on the matched concurrency curve, at any C. It compares LlamaIndex idle at 8 workers (eight
+> models **eagerly loaded at startup**) against RocketRide idle (engine parent holding **no task and
+> no model**). It is the right answer to *"what does an idle deployment cost?"* — LlamaIndex pays for
+> capacity before any request arrives; RocketRide loads on task creation — but it is **not** an
+> answer to *"which framework uses less memory?"*. Under matched load below C ≈ 3 the answer is the
+> opposite: RocketRide is the heavier arm.
+
+
 **That is the memory-efficiency story, and it is a configuration lever rather than a framework
 property**: a service sized to its actual concurrency needs far less memory than one sized to its
 worker count. [PROVISIONAL — one run, one concurrency.]
