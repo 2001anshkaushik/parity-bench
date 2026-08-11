@@ -56,6 +56,68 @@ def beat(**kw):
         f"updated={time.strftime('%Y-%m-%dT%H:%M:%S')}\n")
 
 
+def hostmem() -> dict:
+    """Swap and compressor state. RSS does NOT count evicted pages, so under memory pressure a
+    process's RSS falls while its working set does not — we would be measuring what macOS chose to
+    keep resident, not what the arm needs. At C=16 LlamaIndex alone wants ~9.3 GB of workers, which
+    is exactly where this bites. Sampled at the START and END of every cell."""
+    import re
+    import subprocess
+    sw = psutil.swap_memory()
+    out = {"swap_used_gb": round(sw.used / 1e9, 3), "swap_sin": sw.sin, "swap_sout": sw.sout}
+    try:
+        o = subprocess.run(["vm_stat"], capture_output=True, text=True, timeout=10).stdout
+        for key, name in (("Pages occupied by compressor", "compressed_pages"),
+                          ("Swapins", "swapins"), ("Swapouts", "swapouts")):
+            m = re.search(rf"{key}:\s+(\d+)", o)
+            if m:
+                out[name] = int(m.group(1))
+    except Exception:
+        pass
+    v = psutil.virtual_memory()
+    out["available_gb"] = round(v.available / 1e9, 2)
+    return out
+
+
+def swapped(before: dict, after: dict) -> dict:
+    """Did the host evict pages during this cell? If so RSS understates the working set.
+
+    HARD gate = pages actually written to swap, or swap footprint growing by >10 MB. Those mean
+    eviction, and an evicted page is absent from RSS while still being part of what the arm needs.
+
+    Compressor growth is recorded but kept ADVISORY: macOS compresses continuously under mild
+    pressure and a tight threshold on it would mark every cell unquotable, which would discard the
+    sweep rather than gate it. Both signals are stored so the call can be re-made from the data.
+    """
+    d_out = after.get("swapouts", 0) - before.get("swapouts", 0)
+    d_used = after.get("swap_used_gb", 0) - before.get("swap_used_gb", 0)
+    d_comp = after.get("compressed_pages", 0) - before.get("compressed_pages", 0)
+    return {"swapouts_delta": d_out, "swap_used_delta_gb": round(d_used, 3),
+            "compressed_pages_delta": d_comp,
+            "compressed_delta_pct": round(100 * d_comp / max(before.get("compressed_pages", 1), 1), 2),
+            "hard": bool(d_out > 0 or d_used > 0.010)}
+
+
+def residency(engine_pid, port) -> dict:
+    """What each arm leaves resident while the OTHER arm is measured.
+
+    Measured, not reasoned: the service stays warm across the whole sweep (it is a service), while
+    the RocketRide task process is created and torn down per cell. That is asymmetric host pressure
+    and it runs AGAINST RocketRide, so it is recorded per cell rather than argued about."""
+    out = {}
+    try:
+        e = psutil.Process(engine_pid)
+        kids = e.children(recursive=True)
+        out["engine_parent_mb"] = round(e.memory_info().rss / 1e6, 1)
+        out["engine_task_procs"] = len(kids)
+        out["engine_task_mb"] = round(sum(k.memory_info().rss for k in kids) / 1e6, 1)
+    except Exception:
+        pass
+    tree, n = ws.tree_rss_mb(port)
+    out["ws1_tree_mb"], out["ws1_procs"] = round(tree, 1), n
+    return out
+
+
 def load_texts(n):
     """Parse once, outside every timed region — parsing is common-mode to both arms."""
     import pypdf
@@ -318,10 +380,17 @@ async def amain(a):
                 say(f"  resume: C={C} r{r} already done")
                 continue
             await ensure(C)
-            beat(cell=f"{n}/{len(order)}", C=C, rep=r, phase="llamaindex")
+            hm0 = hostmem()
+            res_before_li = residency(ep, a.port)
+            beat(cell=f"{n}/{len(order)}", C=C, rep=r, phase="llamaindex",
+                 swap=hm0["swap_used_gb"])
             lrows, lel, lok = await cell_llama(texts, C, a.port, a.docs)
-            beat(cell=f"{n}/{len(order)}", C=C, rep=r, phase="rocketride")
+            hm_mid = hostmem()
+            res_before_rr = residency(ep, a.port)
+            beat(cell=f"{n}/{len(order)}", C=C, rep=r, phase="rocketride",
+                 swap=hm_mid["swap_used_gb"])
             rrows, rel, rok = await cell_rocket(texts, C, ep, a.docs)
+            hm1 = hostmem()
             ls, rs = summarise(lrows), summarise(rrows)
             cell = {"concurrency": C, "rep": r, "docs": a.docs,
                     "llamaindex_http": {**ls, "workers_declared": C, "goodput": lok,
@@ -336,12 +405,22 @@ async def amain(a):
             cell["ratio_rr_over_li"] = round(rm / lm, 3) if (lm and rm) else None
             # VOID if achieved concurrency did not reach offered (PREREGISTRATION section 4)
             cell["achieved_ok"] = (ls.get("inflight_max", 0) >= C and rs.get("inflight_max", 0) >= C)
+            cell["hostmem"] = {"start": hm0, "mid": hm_mid, "end": hm1}
+            cell["swap_li"] = swapped(hm0, hm_mid)
+            cell["swap_rr"] = swapped(hm_mid, hm1)
+            cell["swapped"] = cell["swap_li"]["hard"] or cell["swap_rr"]["hard"]
+            cell["residency"] = {"before_llamaindex": res_before_li,
+                                 "before_rocketride": res_before_rr}
+            cell["quotable"] = cell["achieved_ok"] and not cell["swapped"]
             cells.append(cell)
             ck.write_text(json.dumps(cell))
             say(f"  C={C:2d} r{r}: LI {lm} MB ({ls.get('worker_count_median')}w, "
                 f"infl {ls.get('inflight_max')}) | RR {rm} MB "
                 f"({rs.get('task_procs_median')} task, infl {rs.get('inflight_max')}) | "
-                f"ratio {cell['ratio_rr_over_li']} | achieved={'OK' if cell['achieved_ok'] else 'SHORT'}")
+                f"ratio {cell['ratio_rr_over_li']} | "
+                f"{'OK' if cell['achieved_ok'] else 'SHORT'}"
+                f"{'' if not cell['swapped'] else ' SWAPPED'} | "
+                f"swap {hm0['swap_used_gb']}->{hm1['swap_used_gb']} GB")
     finally:
         if svc["h"]:
             ws.stop(svc["h"])
@@ -368,6 +447,8 @@ async def amain(a):
             "rocketride_tree_mb": round(st.median(rtree), 1) if rtree else None,
             "ratio_rr_over_li": round(st.median(rm) / st.median(lm), 3),
             "all_cells_achieved": all(c["achieved_ok"] for c in g),
+            "cells_swapped": sum(1 for c in g if c.get("swapped")),
+            "quotable": all(c.get("quotable", False) for c in g),
         })
 
     out = {"preregistration": "publishable/PREREGISTRATION.md",
