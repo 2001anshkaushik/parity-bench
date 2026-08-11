@@ -13,13 +13,14 @@
 
 Single source of truth for state across sessions. Updated by Claude at each milestone.
 
-> **Note on dates in the session headings below.** Several sessions crossed local midnight and a
-> few headings carry the wrong day — session 12 is headed 2026-08-08 but follows session 11 headed
-> 2026-08-09, and sessions 2–4 appear in reverse order. These are transcription errors made while
-> writing the log, not evidence of anything. **`STATE.md` is authoritative for what happened and in
-> what order**; this file is a narrative log. (Verified 2026-08-10: the inconsistency predates the
-> file-corruption incident of that date and is unrelated to it — a character-level insertion and
-> its removal cannot alter a digit.)
+> **Session headings: transcription errors CORRECTED 2026-08-10.** Two headings carried the wrong
+> day or number because sessions crossed local midnight: session 12 was headed 2026-08-08 although
+> it followed session 11 (2026-08-09), and the session 2 / session 4 labels were swapped. Both are
+> corrected above. The body text of each entry was not altered. **`STATE.md` remains authoritative
+> for ordering**; this file is a narrative log.
+>
+> (These were pre-existing transcription errors, not damage from the file-corruption incident of
+> 2026-08-10 — a character-level insertion and its removal cannot alter a digit.)
 
 
 **Host:** Apple M4 Pro, 14 cores (10P + 4E), 48 GiB RAM, macOS (darwin 25.6.0), arm64
@@ -161,9 +162,11 @@ constant and no handshake, so nothing enforces the pairing at runtime.
 Rejected `3.3.0-prerelease` (2026-08-04) and `3.3.0-hackathon` (2026-08-03): dated later but
 flagged prerelease and carrying a lower version than 3.3.1.
 
-**Team repo mismatches found:** Krish pins engine 3.2.1 with SDK 1.2.0 (3.2.1 ships 1.1.1; 1.2.0
-belongs with 3.2.2) — already mismatched. Leela measured a *source build* (commit `1ec7454`), not
-a release artifact, so those results are not reproducible from anything published.
+**Version pairings across team repos** (recorded so environments can be stated when numbers are
+compared, not to grade any repo): Krish pins engine 3.2.1 with SDK 1.2.0, a combination the release
+manifests do not pair (3.2.1 ships 1.1.1; 1.2.0 ships with 3.2.2). Leela measured a *source build*
+(commit `1ec7454`) rather than a release artifact, so reconstructing that environment needs the
+commit rather than a published tarball.
 
 ## Phase 1 task list — COMPLETE
 
@@ -291,7 +294,7 @@ a result, not engineered around).
 5. **Open-loop latency is batch-position latency**, not service latency (Leela limitation #3).
    Runner must label the mode explicitly and never mix the two.
 
-## 2026-08-05 session 4 — runbook, corpus-shape gate, scoped claim, handoff
+## 2026-08-05 session 2 — runbook, corpus-shape gate, scoped claim, handoff
 
 **STEP 1 RUNBOOK VERIFIED** — `RUNBOOK_LLAMAINDEX.md`; every command executed in a fresh shell,
 outputs recorded in §5. `ws1/smoke.py` added (ALL PASS, exit 0). Learned by running it: warm is
@@ -335,7 +338,7 @@ handicap (engine pinned to 8 vs its width 17) was **tested and REFUTED** — at 
 engine is *slower* (210.60/s, p50 ~70 ms). My own arm failed the 10 % gate first (13.7 %) and was
 re-run rather than reported.
 
-## 2026-08-05 session 2 — verification protocol run
+## 2026-08-05 session 4 — verification protocol run
 
 **STEP 3 pool_width CALIBRATED** [VERIFIED]: error −0.7% to −1.0% against known widths 4/8/16/64.
 Two failure modes quantified: hold <0.25 s under-reads by up to 19%; **offered concurrency below
@@ -629,7 +632,7 @@ reported in every response and manifest.
   not merely low).
 - NOTHING BUILT: no Dockerfile, no image, no daemon started.
 
-## 2026-08-08 — session 12: integrity audit, goodput gate, GovDocs1, container ladder
+## 2026-08-09 — session 12: integrity audit, goodput gate, GovDocs1, container ladder
 
 - STEP 0 INTEGRITY AUDIT (non-negotiable, done first). 51/51 result writes were HARDCODED with no
   variable component; 6 output names claimed by >1 script. TWO runs were silently destroyed:

@@ -76,13 +76,19 @@ constant, and no compatibility handshake. Nothing *enforces* the pairing at runt
 pair would fail late and unclearly rather than refusing to connect. Compatibility here is
 established by co-release evidence, not by a guarantee.
 
-### Consequence for the team's existing repos
+### Version pairings across the team's repos
 
-- Krish pins engine **3.2.1** but `rocketride==1.2.0` in `requirements.txt`. Per the table, 3.2.1
-  ships client 1.1.1 and 1.2.0 belongs with 3.2.2 — that repo is already running a mismatched
-  pair.
-- Leela measured against a **source build** (commit `1ec7454`) reporting 3.3.0, not a release
-  tarball, so those results are not reproducible from any published artifact.
+Recorded so numbers can be compared across repos with the environment stated, not to grade any
+repo. Neither pairing is wrong to use — they simply differ from the one pinned here.
+
+- **Krish's repo**: `requirements.txt` pins `rocketride==1.2.0` alongside engine **3.2.1**. Per the
+  release manifests, 3.2.1 is co-released with client 1.1.1 and 1.2.0 ships with 3.2.2, so this is
+  a combination the manifests do not pair. Worth confirming before results are compared across
+  repos.
+- **Leela's runs**: measured against a **source build** (commit `1ec7454`, reporting 3.3.0) rather
+  than a release tarball. Reconstructing that environment needs the commit rather than a published
+  artifact, which is why this project pinned a tagged release — the tarball plus its SHA256 can be
+  re-fetched by anyone later.
 
 ## Host
 
