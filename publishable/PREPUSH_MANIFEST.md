@@ -8,23 +8,23 @@
 
 ## a) Tracked file tree
 
-**339 files, 4.17 MB.** The working tree is 7.1 GB; everything else is excluded (§e).
+**339 files, 4.18 MB.** The working tree is 7.1 GB; everything else is excluded (§e).
 
 | directory | files | size |
 | --- | ---: | ---: |
-| `./` | 9 | 55 KB |
+| `./` | 9 | 56 KB |
 | `archive/` | 1 | 4 KB |
 | `archive/docs/` | 21 | 251 KB |
 | `archive/results/` | 8 | 57 KB |
 | `archive/scripts/` | 9 | 115 KB |
 | `docker/` | 5 | 13 KB |
-| `publishable/` | 24 | 323 KB |
+| `publishable/` | 24 | 326 KB |
 | `repl_state/` | 9 | 231 KB |
 | `weekend_state/` | 7 | 347 KB |
 | `working/dossiers/` | 31 | 58 KB |
 | `working/handoff/` | 7 | 71 KB |
 | `working/handoff/parity/` | 4 | 30 KB |
-| `working/harness/` | 12 | 73 KB |
+| `working/harness/` | 12 | 78 KB |
 | `working/harness/adapters/` | 3 | 17 KB |
 | `working/nodes/cpu_probe/` | 4 | 3 KB |
 | `working/nodes/env_probe/` | 4 | 3 KB |
@@ -45,10 +45,10 @@
 | `working/results/pool_width/` | 1 | 1 KB |
 | `working/results/process_scaling/` | 3 | 6 KB |
 | `working/results/tier2/` | 1 | 5 KB |
-| `working/scripts/` | 57 | 434 KB |
+| `working/scripts/` | 57 | 437 KB |
 | `working/wrappers/` | 1 | 4 KB |
 | `working/ws1/` | 10 | 55 KB |
-| **total** | **339** | **4.17 MB** |
+| **total** | **339** | **4.18 MB** |
 
 ### Repository root
 
@@ -56,7 +56,7 @@
 | --- | ---: |
 | `.env.example` | 0.3 KB |
 | `.gitignore` | 2.6 KB |
-| `README.md` | 6.0 KB |
+| `README.md` | 6.3 KB |
 | `REPLICATION_README.md` | 2.7 KB |
 | `matched_replication.py` | 14.9 KB |
 | `requirements.txt` | 1.7 KB |
@@ -69,7 +69,7 @@
 | file | size |
 | --- | ---: |
 | `A3_SERIALIZATION_FINDING.md` | 10.2 KB |
-| `BENCHMARK_SETUP.md` | 12.0 KB |
+| `BENCHMARK_SETUP.md` | 13.0 KB |
 | `BUG_NUL_TRUNCATION.md` | 8.6 KB |
 | `DOCKER_ARCHITECTURE.md` | 13.7 KB |
 | `DOCKER_DEMO_RESULTS.md` | 12.6 KB |
@@ -79,7 +79,7 @@
 | `MEETING_2026-08-10.md` | 35.5 KB |
 | `PARSER_DECISION.md` | 8.0 KB |
 | `PARSER_PREMISES.md` | 7.4 KB |
-| `PROVISIONING.md` | 6.1 KB |
+| `PROVISIONING.md` | 7.1 KB |
 | `README.md` | 7.1 KB |
 | `REBASELINE_PLAN.md` | 8.5 KB |
 | `RUNBOOK_LLAMAINDEX.md` | 13.9 KB |
@@ -123,8 +123,13 @@ All commits carry today's date: this is an initial import of work developed with
 | 21 | `7e613357` | fix(docs): make a fresh clone actually runnable | 7 | +137/-37 |
 | 22 | `ce453336` | docs: note that the manifest's quoted README uses root-relative links | 1 | +5/-0 |
 | 23 | `1d9c7118` | fix(selftest): skip the thread-match check when this tree has no engine | 1 | +4/-1 |
+| 24 | `afd0407b` | docs: regenerate the manifest against final history | 1 | +13/-8 |
+| 25 | `2f17f607` | docs: re-inline the current README into the manifest | 1 | +9/-3 |
+| 26 | `2fe608ba` | fix(harness): engine-node match fails loudly and is overridable | 8 | +217/-18 |
+| 27 | `00f4dc72` | docs: correct the claim that the regression suite checks the environment | 3 | +27/-8 |
+| 28 | `56274ab7` | docs: correct the fresh-clone size after the harness fix | 1 | +1/-1 |
 
-The last two commits cannot appear in the table above: they are the ones that *write* it. **24** `docs: regenerate the manifest against final history` and **25** `docs: re-inline the current README into the manifest` — a manifest can describe every commit except its own. Verify with `git log --oneline` against the clone; 25 commits total.
+The commit that regenerates this table cannot appear in it: it is commit **29**, `docs: regenerate the manifest for the push` — a manifest can describe every commit except its own. Verify with `git log --oneline`; 29 commits total.
 
 ## c) Root `README.md` — complete text
 
@@ -234,10 +239,18 @@ set. Then:
 ../.venv/bin/python working/scripts/regression_selftest.py
 ```
 
-Ten tests, one per defect that produced a wrong number in this project. It is the fastest way to
-find out whether your environment differs from the one these results came from. It needs **no
-engine and no corpus** — it runs on a bare clone plus the venv, which makes it the right first
-move before provisioning the 7 GB of excluded material.
+Eleven tests, one per defect that produced a wrong number in this project. It needs **no engine and
+no corpus** — it runs on a bare clone plus the venv, which makes it the right first move before
+provisioning the 7 GB of excluded material.
+
+**It is not an environment check.** Measured: the suite imports only `psutil` of the fourteen
+pinned packages, so a green run says nothing about whether torch, llama-index or
+sentence-transformers installed correctly. To check that, import the stack and compare against the
+pins:
+
+```bash
+../.venv/bin/python -c "import torch,sentence_transformers,llama_index.core,sklearn,pypdf,fastapi;print('stack ok')"
+```
 
 ---8<--- END README.md ---8<---
 
@@ -271,6 +284,7 @@ move before provisioning the 7 GB of excluded material.
 | **`str.replace("", x)` inserts between every character** | A 7 KB file became 263 KB. Guard any programmatic edit against an empty pattern. |
 | **`psutil.net_connections()` needs root on macOS** | Returns nothing without it, so a PID lookup silently falls back to matching by name — and then counts an unrelated five-day-old engine. Use `lsof`. |
 | **Matching processes by name** | `pgrep -f mything` also matches your own monitoring shell, so a finished run looks alive. Match by PID. |
+| **A match string containing the clone's directory name** | Our engine-node match embedded `benchmark-A/` in the path, so a clone named anything else matched **nothing** — `counts()` reported 0 node processes and `kill_orphans()` reported a clean teardown while leaving every orphan running. Zero is indistinguishable from a healthy idle engine, so nothing looked wrong. Any name-based match needs a way to tell *no matches* from *nothing to match*: compare the pattern against a broader detector in the same snapshot and raise when they disagree. Ours is `RR_NODE_MARK` + `NodeMarkStale`. |
 | **`grep -q` inside a `--msg-filter` eats the message** | `grep -q` exits the moment it decides, leaving the rest of stdin unread — and in a `git filter-branch --msg-filter` stdin *is* the commit message. Every commit the pattern did not match got an **empty** message, because the `cat` after it had nothing left to read. This emptied 18 of 19 messages here. Read stdin **fully into a variable first**, then decide. Test the filter standalone against one commit before pointing it at history. |
 | **`gc --prune=now` after a filter-branch destroys the only undo** | `filter-branch` leaves three recovery paths — `.git/refs/original/`, the reflog, and the old commits as dangling objects. `git reflog expire --expire=now --all && git gc --prune=now` removes all three at once, and a `rm -rf .git/refs/original` beforehand removes the fourth. That sequence is routinely recommended as "cleanup"; it is what made the above unrecoverable. **Back up the whole directory including `.git` before any history rewrite, and leave the reflog alone until the result is verified.** |
 
