@@ -1,6 +1,6 @@
 # Provisioning — what a fresh clone does NOT contain, and how to restore it
 
-**A fresh clone is ~4.2 MB (338 files). Everything below is excluded deliberately and must be
+**A fresh clone is ~4.2 MB (339 files). Everything below is excluded deliberately and must be
 provisioned.** Provisioned in full it is ~7.1 GB, almost all of it the engine bundle and the corpus.
 Each item states why it is not committed and how to get it back.
 
