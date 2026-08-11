@@ -8,7 +8,7 @@
 
 ## a) Tracked file tree
 
-**336 files, 4.13 MB.** The working tree is 7.1 GB; everything else is excluded (§e).
+**338 files, 4.16 MB.** The working tree is 7.1 GB; everything else is excluded (§e).
 
 | directory | files | size |
 | --- | ---: | ---: |
@@ -96,7 +96,6 @@ All commits carry today's date: this is an initial import of work developed with
 
 | # | hash | message (subject) | files | lines |
 | ---: | --- | --- | ---: | ---: |
-## c) Root `README.md` — complete text
 
 This is what GitHub shows on landing.
 
