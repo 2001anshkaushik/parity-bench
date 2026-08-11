@@ -226,6 +226,71 @@ def t_thread_settings_matched():
         f"(unpinned is 3.07x/3.26x better)")
 
 
+# ---------------------------------------------------------------- 11. node match fails loudly
+def t_node_mark_fails_loudly():
+    """A clone named anything but `benchmark-A` made the engine-node match string find nothing,
+    so counts() reported 0 node processes and kill_orphans() reported a clean teardown while
+    leaving every orphan running. Zero looked exactly like a healthy idle engine.
+
+    Driven against a SYNTHETIC process table, so it needs no engine and cannot be fooled by
+    whatever happens to be running on the host."""
+    import importlib, types
+    import psutil as _ps
+
+    class FakeProc:
+        def __init__(self, pid, cmd):
+            self.info = {"pid": pid, "cmdline": cmd.split(" "),
+                         "uids": types.SimpleNamespace(real=os.getuid())}
+
+    # a renamed clone: real engine nodes running, none of them under `benchmark-A/`
+    renamed = [FakeProc(1, "/x/parity-bench/engine/bin/python /x/parity-bench/engine/ai/node.py t1"),
+               FakeProc(2, "/x/parity-bench/engine/bin/python /x/parity-bench/engine/ai/node.py t2")]
+    # the tree the default pattern was written for
+    original = [FakeProc(3, "/x/benchmark-A/engine/bin/python /x/benchmark-A/engine/ai/node.py t1")]
+
+    real_iter = _ps.process_iter
+    try:
+        import harness.engine_ops as eo
+        eo = importlib.reload(eo)
+
+        # --- direction 1: pattern matches nothing while nodes exist -> must RAISE, not return 0
+        _ps.process_iter = lambda *a, **k: iter(renamed)
+        for fn, label in ((eo.counts, "counts"), (eo.kill_orphans, "kill_orphans"),
+                          (eo.check_node_mark, "check_node_mark")):
+            try:
+                fn()
+            except eo.NodeMarkStale as e:
+                msg = str(e)
+                assert "RR_NODE_MARK" in msg, f"{label} error does not name the env var override"
+                assert eo.NODE_MARK in msg, f"{label} error does not name the pattern in use"
+                assert "node.py" in msg, f"{label} error shows no example cmdline"
+            else:
+                raise AssertionError(
+                    f"{label}() returned silently while 2 engine node processes were running — "
+                    f"this is the silent-zero defect")
+
+        # --- direction 2: the override makes it resolve again
+        os.environ["RR_NODE_MARK"] = "engine/ai/node.py"
+        eo = importlib.reload(eo)
+        assert eo.counts()["node_procs"] == 2, "RR_NODE_MARK override did not take effect"
+
+        # --- direction 3 (null control): default pattern, matching tree -> no raise, correct count
+        del os.environ["RR_NODE_MARK"]
+        eo = importlib.reload(eo)
+        _ps.process_iter = lambda *a, **k: iter(original)
+        assert eo.counts()["node_procs"] == 1, "default pattern broke on the tree it was written for"
+
+        # --- direction 4 (null control): idle engine -> 0 nodes, and that must NOT raise
+        _ps.process_iter = lambda *a, **k: iter([])
+        assert eo.counts()["node_procs"] == 0, "idle engine should report 0"
+        assert eo.check_node_mark()["conclusive"] is False, "idle table cannot confirm the pattern"
+    finally:
+        _ps.process_iter = real_iter
+        os.environ.pop("RR_NODE_MARK", None)
+        import harness.engine_ops as eo2
+        importlib.reload(eo2)
+
+
 # ---------------------------------------------------------------- 10. artifact protected content
 def t_artifact_protected_content():
     """Sessions 16 and 17: an edit to MEETING_2026-08-10.md destroyed the thread-asymmetry
@@ -273,6 +338,8 @@ if __name__ == "__main__":
     check("no_setsid", "setsid never used (absent on macOS)", t_no_setsid)
     check("thread_settings_matched", "both arms same in-process thread count",
           t_thread_settings_matched)
+    check("node_mark_fails_loudly", "engine-node match errors instead of returning 0",
+          t_node_mark_fails_loudly)
     check("artifact_protected_content", "disclosure + VOID markers survive edits",
           t_artifact_protected_content)
     print("=" * 92)

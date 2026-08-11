@@ -28,15 +28,29 @@ engine, and after any change to a node:
 cp -R working/nodes/* engine/nodes/ && bash working/scripts/start_engine.sh
 ```
 
-**⚠️ Known landmine if your clone is not named `benchmark-A`.** Several harnesses find the engine's
-node processes by matching the literal string `benchmark-A/engine/ai/node.py` against process
-command lines — `working/harness/engine_ops.py` (`NODE_MARK`), `working/scripts/fault_matrix.py`,
-`model_a_bisect.py`, `model_b_ceiling.py`, `tier2_settle.py`. **In a clone named anything else those
-matches find nothing, silently** — the exact "matched by name, found nothing, reported zero" failure
-class this repo documents elsewhere. Either name your clone directory `benchmark-A`, or broaden the
-match to the directory-independent suffix `engine/ai/node.py`. This is recorded rather than patched
-because changing a measurement instrument needs a run against a provisioned engine to verify, and
-that could not be done from a bare clone.
+**If your clone is not named `benchmark-A`, set `RR_NODE_MARK`.** The harnesses find the engine's
+per-task node processes by matching a literal substring against process command lines, and the
+default contains the directory the clone sits in:
+
+```bash
+export RR_NODE_MARK='engine/ai/node.py'      # directory-independent; only needed if renamed
+```
+
+The default is `benchmark-A/engine/ai/node.py`, defined once in `working/harness/engine_ops.py` and
+used by `fault_matrix.py`, `model_a_bisect.py`, `model_b_ceiling.py` and `tier2_settle.py`.
+
+**It now fails loudly rather than silently.** It used to return zero — indistinguishable from a
+healthy idle engine, so `counts()` reported no node processes and `kill_orphans()` reported a clean
+teardown while leaving every orphan running. `counts()`, `kill_orphans()` and `check_node_mark()`
+now compare the **declared** pattern against the **measured** process table in the same snapshot,
+and raise `NodeMarkStale` — naming the pattern, an example command line, and the override — when
+the pattern matches nothing while processes ending in `engine/ai/node.py` are running. With an idle
+engine both counts are zero and there is nothing to compare, so that case reports
+`conclusive: False` rather than claiming a pass.
+
+Guarded by regression test `node_mark_fails_loudly`, which drives a synthetic process table (no
+engine needed) and covers four cases: renamed tree raises, `RR_NODE_MARK` override resolves,
+default pattern on the original tree still matches, and an idle table does not raise.
 
 Unrelated and **must not be changed**: `SEED_NAMESPACE = "benchmark-A/v1"` in
 `working/harness/seeds.py` and `working/handoff/seeds.py`. It is a seed namespace, not a path.

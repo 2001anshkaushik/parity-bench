@@ -28,6 +28,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 
+from harness import engine_ops as eo  # noqa: E402
+
 UID = os.getuid()
 URI = "http://127.0.0.1:5565"
 OUT = ROOT / "results" / "process_scaling"
@@ -50,7 +52,7 @@ def count_procs() -> tuple[int, int]:
             if not p.info["uids"] or p.info["uids"].real != UID:
                 continue
             total += 1
-            if "benchmark-A/engine/ai/node.py" in " ".join(p.info["cmdline"] or ()):
+            if eo.NODE_MARK in " ".join(p.info["cmdline"] or ()):
                 node += 1
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
@@ -88,7 +90,7 @@ def cleanup_leaked() -> int:
     killed = 0
     for p in psutil.process_iter(["cmdline", "pid"]):
         try:
-            if "benchmark-A/engine/ai/node.py" in " ".join(p.info["cmdline"] or ()):
+            if eo.NODE_MARK in " ".join(p.info["cmdline"] or ()):
                 p.terminate()
                 killed += 1
         except (psutil.NoSuchProcess, psutil.AccessDenied):
@@ -97,7 +99,7 @@ def cleanup_leaked() -> int:
         time.sleep(3)
         for p in psutil.process_iter(["cmdline"]):
             try:
-                if "benchmark-A/engine/ai/node.py" in " ".join(p.info["cmdline"] or ()):
+                if eo.NODE_MARK in " ".join(p.info["cmdline"] or ()):
                     p.kill()
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 continue

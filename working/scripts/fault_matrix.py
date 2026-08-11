@@ -115,7 +115,7 @@ class MemWatch:
                         continue
                     cmd = " ".join(p.info["cmdline"] or ())
                     if (p.info["pid"] == me or p.info["ppid"] == me
-                            or "eaas.py" in cmd or "benchmark-A/engine/ai/node.py" in cmd
+                            or "eaas.py" in cmd or eo.NODE_MARK in cmd
                             or "spawn_main" in cmd or "resource_tracker" in cmd):
                         if p.info["memory_info"]:
                             rss += p.info["memory_info"].rss

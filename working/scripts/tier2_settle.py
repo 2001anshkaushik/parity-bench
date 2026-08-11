@@ -67,7 +67,7 @@ def census(match_any: list[str]) -> dict:
     return {"processes": procs, "threads": threads, "rss_mb": round(rss, 1)}
 
 
-RR_MATCH = ["eaas.py", "benchmark-A/engine/ai/node.py"]
+RR_MATCH = [eo.ENGINE_MARK, eo.NODE_MARK]
 FA_MATCH = ["uvicorn", "asyncio_service"]
 
 

@@ -31,6 +31,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 
+from harness import engine_ops as eo  # noqa: E402
+
 UID = os.getuid()
 URI = "http://127.0.0.1:5565"
 OUT = ROOT / "results" / "process_scaling"
@@ -55,7 +57,7 @@ def snapshot() -> dict:
                 continue
             total += 1
             cmd = " ".join(p.info["cmdline"] or ())
-            if "benchmark-A/engine/ai/node.py" in cmd:
+            if eo.NODE_MARK in cmd:
                 node += 1
             if "eaas.py" in cmd and "5565" in cmd:
                 eng_rss = p.info["memory_info"].rss if p.info["memory_info"] else 0
