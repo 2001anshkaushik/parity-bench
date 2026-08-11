@@ -202,6 +202,76 @@ RocketRide's *effective* concurrency width is ~17 against a declared pool (`SCHE
 | **LlamaIndex 4,642 MB idle / 7,950 MB peak** | **AFFECTED — topology-confounded, biases against LlamaIndex.** |
 | **Wall-clock parity (+9 %)** | **AFFECTED — the entire gap is of the order of transport overhead.** |
 
+## 5b. PRIMARY RESULT — matched layers at concurrency 1 [2026-08-11]
+
+Both arms `client -> network -> service -> worker`. LlamaIndex now runs through `ws1/service.py`
+over HTTP at **1 uvicorn worker**; RocketRide unchanged. Config gate passed with both arms measured
+at **10 intra-op / 14 interop** threads, read from inside each worker process.
+
+| block | RocketRide RSS | wall | LlamaIndex-HTTP RSS | wall |
+| --- | ---: | ---: | ---: | ---: |
+| b0 | 2,001.3 MB | 1,119.9 s | 1,162.1 MB | 892.9 s |
+| b1 | 2,163.1 MB | 819.8 s | 1,202.4 MB | 794.4 s |
+| b2 | 2,158.9 MB | 805.3 s | 1,205.0 MB | 796.3 s |
+
+**Functional equivalence, unchanged by the transport [VERIFIED]:** goodput **1,965 / 1,965 / 1,965**
+(RocketRide) and **1,972 / 1,972 / 1,972** (LlamaIndex), faults **35** and **28**, identical in every
+block — and identical to the original in-process run. Routing LlamaIndex through HTTP changed which
+bytes come back not at all, which is what the earlier claim predicted.
+
+### The headline numbers
+
+| | in-process (original) | **matched layers** | gate |
+| --- | ---: | ---: | --- |
+| memory ratio RR/LI | 2.01× | **1.80×** | PASS (both arms ≤ 7.5 % over 3 blocks) |
+| wall ratio RR/LI | 1.09× | **1.03×** | see below |
+
+**Memory: 2.01× → 1.80×** [VERIFIED — 3 blocks, interleaved, randomised, gate passed]. Giving
+LlamaIndex the same shape closes about a fifth of the gap. It does **not** close it: RocketRide is
+still the heavier arm at concurrency 1, and §2.4's refuted objection is why — its task tree is one
+process holding one model, so the excess is a genuinely heavier worker, not a multiplication.
+
+**Wall: 1.09× → 1.03×** — effectively parity once LlamaIndex pays transport too. [PROVISIONAL, see
+the warm-up caveat below.]
+
+### Block 0 is warm-up at the BLOCK level — on both arms
+
+| arm | all 3 blocks | first block excluded |
+| --- | --- | --- |
+| RocketRide wall | spread **38.4 %** — FAIL | spread **1.79 %** — PASS |
+| LlamaIndex wall | spread **12.4 %** — FAIL | spread **0.24 %** — PASS |
+| RocketRide memory | 7.49 % — PASS | 0.19 % — PASS |
+| LlamaIndex memory | 3.57 % — PASS | 0.22 % — PASS |
+
+The first block of each arm is 12–38 % slower than the two that follow, and the two that follow
+agree to **0.24 %** and **1.79 %**. **The existing 50-document warm-up does not cover this** — the
+effect is at block scale, and it is the single largest source of apparent instability on this host.
+Excluding it, wall clock is not merely gate-passing but among the tightest measurements in this
+project.
+
+The ratios are unaffected either way (median is robust to one outlier): memory 1.80× both ways,
+wall 1.03× all-three vs 1.02× excluding warm-up.
+
+### Rule 5 — the gap shrank, which favours RocketRide, so the hunt was for artifacts that shrink it unfairly
+
+**Candidate: summing RSS across forked uvicorn workers double-counts copy-on-write shared pages**,
+inflating LlamaIndex and flattering RocketRide. Tested against the idle measurements: per-worker cost
+is **592.8 → 579.9 → 578.2 MB** at 1, 8 and 14 workers — a 2.5 % decline across a 14× increase in
+worker count. If sharing were material this would fall steeply; it does not, so each worker holds its
+own copy and the sum is not meaningfully double-counting. [VERIFIED at idle; re-checked per cell in
+the sweep, where the stakes are higher.]
+
+**Known bias in the other direction, disclosed not corrected:** the LlamaIndex service stays warm
+across the whole run (it is a service), while RocketRide's model-holding task process is torn down
+between blocks. Measured: **854.7 MB** of LlamaIndex sits resident during RocketRide's blocks versus
+**178.4 MB** of engine during LlamaIndex's — ~677 MB of asymmetric host pressure, **against
+RocketRide**. Correcting it would move the ratio further in RocketRide's favour, so 1.80× is
+conservative.
+
+**Hostile reviewer:** *"n=2 after you discard block 0, and your own gate demands n≥3."* Correct — the
+warm-up exclusion is labelled **PROVISIONAL** for that reason. The memory ratio does not depend on it
+(it passes at n=3 including block 0); only the wall-clock gate does.
+
 ## 6b. `run_service.sh` has been broken since the restructure [VERIFIED]
 
 **No clone of this repository could start the LlamaIndex service.** `run_service.sh` computed its
