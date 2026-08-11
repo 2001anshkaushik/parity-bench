@@ -1,4 +1,4 @@
-# RR-vs-LLAMA-Benchmarking
+# parity-bench
 
 Measurement work for **WS-1 "Service Parity"**: two implementations of the same document pipeline —
 the **RocketRide engine** and a **LlamaIndex FastAPI service** — running PDF → text → chunks →

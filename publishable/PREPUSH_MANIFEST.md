@@ -1,6 +1,6 @@
 # Pre-Push Review Package
 
-**Repo:** `RR-vs-LLAMA-Benchmarking` (private) · **branch:** `main` · **generated:** 2026-08-10
+**Repo:** `parity-bench` (private) · **branch:** `main` · **generated:** 2026-08-10
 
 **Nothing has been pushed. No remote is configured.** This document is the complete contents of the repository as it stands, for review before a first push.
 
@@ -105,7 +105,7 @@ This is what GitHub shows on landing.
 *(Headings below are demoted one level so the inlined file does not create sections in this manifest. Otherwise verbatim.)*
 
 
-### RR-vs-LLAMA-Benchmarking (README title)
+### parity-bench (README title)
 
 Measurement work for **WS-1 "Service Parity"**: two implementations of the same document pipeline —
 the **RocketRide engine** and a **LlamaIndex FastAPI service** — running PDF → text → chunks →
@@ -345,4 +345,39 @@ A reviewer who only wants current material should read `publishable/` and ignore
   visible to anyone else.
 - **Commit dates are all today.** The first commit message says so explicitly, but it is the first
   thing a reviewer will notice in `git log`.
+
+## j) GitHub repository metadata — ready to paste
+
+Written for someone who has never heard of RocketRide or WS-1, and leading with **how** it measures
+rather than **what won**. The repo is private, but the description and topics are the first thing
+any future reader sees.
+
+**Description** (309 characters, limit 350):
+
+```
+Benchmarking harness for two document-embedding pipelines, built around the measurement problem rather than the result: matched configuration verified in-process, per-document goodput and content-sanity gates, barrier-synchronised variance gating, and a correction history that records every withdrawn number.
+```
+
+**Topics** (8):
+
+```
+benchmarking  reproducible-research  performance-measurement  memory-profiling  embeddings  document-processing  llamaindex  python
+```
+
+| topic | why |
+| --- | --- |
+| `benchmarking` | the domain |
+| `reproducible-research` | the actual subject: pinned environments, sha256-manifested corpora, a regression test per defect |
+| `performance-measurement` | findable by someone with the same measurement problem |
+| `memory-profiling` | the axis this hardware can actually measure |
+| `embeddings` · `document-processing` | the workload |
+| `llamaindex` | the one framework named in public metadata; the engine is not public, so naming it would be meaningless to an outside reader |
+| `python` | language |
+
+**Deliberately omitted:** any topic implying a verdict (`comparison`, `vs`, `faster`), and the
+engine's name — no throughput comparison is published, and the metadata should not imply one.
+
+**Note on the repo name.** `parity-bench` describes the method (parity testing) rather than an
+outcome, which matches the description above. The previous name embedded both product names and a
+comparison framing.
 
