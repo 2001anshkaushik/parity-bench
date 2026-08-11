@@ -12,42 +12,43 @@
 
 | directory | files | size |
 | --- | ---: | ---: |
-| `./` | 8 | 52 KB |
-| `archive/docs/` | 21 | 245 KB |
-| `archive/results/` | 8 | 56 KB |
-| `archive/scripts/` | 9 | 112 KB |
+| `./` | 8 | 53 KB |
+| `archive/` | 1 | 4 KB |
+| `archive/docs/` | 21 | 251 KB |
+| `archive/results/` | 8 | 57 KB |
+| `archive/scripts/` | 9 | 115 KB |
 | `docker/` | 5 | 13 KB |
-| `publishable/` | 23 | 286 KB |
-| `repl_state/` | 9 | 225 KB |
-| `weekend_state/` | 7 | 339 KB |
-| `working/dossiers/` | 31 | 57 KB |
-| `working/handoff/` | 7 | 69 KB |
+| `publishable/` | 24 | 319 KB |
+| `repl_state/` | 9 | 231 KB |
+| `weekend_state/` | 7 | 347 KB |
+| `working/dossiers/` | 31 | 58 KB |
+| `working/handoff/` | 7 | 71 KB |
 | `working/handoff/parity/` | 4 | 30 KB |
-| `working/harness/` | 12 | 71 KB |
+| `working/harness/` | 12 | 73 KB |
 | `working/harness/adapters/` | 3 | 17 KB |
-| `working/nodes/cpu_probe/` | 4 | 2 KB |
+| `working/nodes/cpu_probe/` | 4 | 3 KB |
 | `working/nodes/env_probe/` | 4 | 3 KB |
 | `working/nodes/fault_probe/` | 4 | 6 KB |
 | `working/nodes/noop_probe/` | 4 | 2 KB |
 | `working/nodes/pdf_probe/` | 4 | 3 KB |
-| `working/nodes/split_embed/` | 4 | 6 KB |
+| `working/nodes/split_embed/` | 4 | 7 KB |
 | `working/pipes/` | 8 | 4 KB |
-| `working/results/` | 68 | 1,870 KB |
+| `working/results/` | 68 | 1,915 KB |
 | `working/results/alloc_hold/` | 1 | 2 KB |
 | `working/results/ceiling/` | 1 | 1 KB |
 | `working/results/deployment_parity/` | 1 | 1 KB |
-| `working/results/docker_ladder/` | 5 | 14 KB |
+| `working/results/docker_ladder/` | 5 | 15 KB |
 | `working/results/fault_isolation/` | 2 | 23 KB |
-| `working/results/fault_matrix/` | 4 | 32 KB |
-| `working/results/model_a/` | 1 | 2 KB |
+| `working/results/fault_matrix/` | 4 | 33 KB |
+| `working/results/model_a/` | 1 | 3 KB |
 | `working/results/operational/` | 1 | 1 KB |
 | `working/results/pool_width/` | 1 | 1 KB |
 | `working/results/process_scaling/` | 3 | 6 KB |
 | `working/results/tier2/` | 1 | 5 KB |
-| `working/scripts/` | 57 | 423 KB |
-| `working/wrappers/` | 1 | 3 KB |
-| `working/ws1/` | 10 | 54 KB |
-| **total** | **336** | **4.13 MB** |
+| `working/scripts/` | 57 | 434 KB |
+| `working/wrappers/` | 1 | 4 KB |
+| `working/ws1/` | 10 | 55 KB |
+| **total** | **338** | **4.16 MB** |
 
 ### Repository root
 
@@ -55,65 +56,70 @@
 | --- | ---: |
 | `.env.example` | 0.3 KB |
 | `.gitignore` | 2.6 KB |
-| `README.md` | 5.4 KB |
-| `REPLICATION_README.md` | 2.6 KB |
-| `matched_replication.py` | 14.5 KB |
-| `weekend_runner.sh` | 6.9 KB |
-| `weekend_summarise.py` | 3.6 KB |
-| `weekend_worker.py` | 16.0 KB |
+| `README.md` | 5.5 KB |
+| `REPLICATION_README.md` | 2.7 KB |
+| `matched_replication.py` | 14.9 KB |
+| `weekend_runner.sh` | 7.1 KB |
+| `weekend_summarise.py` | 3.7 KB |
+| `weekend_worker.py` | 16.4 KB |
 
 ### `publishable/` — the documents a reader is meant to start from
 
 | file | size |
 | --- | ---: |
-| `A3_SERIALIZATION_FINDING.md` | 9.9 KB |
-| `BENCHMARK_SETUP.md` | 10.6 KB |
-| `BUG_NUL_TRUNCATION.md` | 8.4 KB |
-| `DOCKER_ARCHITECTURE.md` | 13.4 KB |
-| `DOCKER_DEMO_RESULTS.md` | 12.3 KB |
-| `ENVIRONMENT.md` | 7.7 KB |
-| `FAIRNESS_BASIS.md` | 12.7 KB |
-| `INVENTORY.md` | 6.7 KB |
-| `MEETING_2026-08-10.md` | 34.7 KB |
-| `PARSER_DECISION.md` | 7.8 KB |
-| `PARSER_PREMISES.md` | 7.2 KB |
-| `PROVISIONING.md` | 3.1 KB |
-| `README.md` | 6.9 KB |
-| `REBASELINE_PLAN.md` | 8.3 KB |
-| `RUNBOOK_LLAMAINDEX.md` | 13.6 KB |
-| `SCHEMA_PROPOSAL.md` | 14.3 KB |
-| `STATE.md` | 57.6 KB |
-| `TOIL_INSTRUMENT.md` | 8.5 KB |
-| `TWO_TIER_PARSER_DESIGN.md` | 6.6 KB |
-| `VARIANCE_PROTOCOL.md` | 8.3 KB |
-| `WEEKEND_FORENSICS.md` | 18.9 KB |
-| `WEEKEND_RESULTS.md` | 2.3 KB |
-| `WEEKEND_RUN.md` | 6.3 KB |
+| `A3_SERIALIZATION_FINDING.md` | 10.2 KB |
+| `BENCHMARK_SETUP.md` | 12.0 KB |
+| `BUG_NUL_TRUNCATION.md` | 8.6 KB |
+| `DOCKER_ARCHITECTURE.md` | 13.7 KB |
+| `DOCKER_DEMO_RESULTS.md` | 12.6 KB |
+| `ENVIRONMENT.md` | 7.9 KB |
+| `FAIRNESS_BASIS.md` | 13.0 KB |
+| `INVENTORY.md` | 6.8 KB |
+| `MEETING_2026-08-10.md` | 35.5 KB |
+| `PARSER_DECISION.md` | 8.0 KB |
+| `PARSER_PREMISES.md` | 7.4 KB |
+| `PROVISIONING.md` | 3.2 KB |
+| `README.md` | 7.1 KB |
+| `REBASELINE_PLAN.md` | 8.5 KB |
+| `RUNBOOK_LLAMAINDEX.md` | 13.9 KB |
+| `SCHEMA_PROPOSAL.md` | 14.7 KB |
+| `STATE.md` | 59.0 KB |
+| `TOIL_INSTRUMENT.md` | 8.7 KB |
+| `TWO_TIER_PARSER_DESIGN.md` | 6.7 KB |
+| `VARIANCE_PROTOCOL.md` | 8.5 KB |
+| `WEEKEND_FORENSICS.md` | 19.3 KB |
+| `WEEKEND_RESULTS.md` | 2.4 KB |
+| `WEEKEND_RUN.md` | 6.4 KB |
 
 ## b) Commits
 
 All commits carry today's date: this is an initial import of work developed without version control. The grouping is by module, not a development narrative.
 
+**Subject lines only, no bodies — and here is why.** A `git filter-branch --msg-filter` that used `grep -q` emptied 18 of the 19 commit messages: `grep -q` exits early and leaves the rest of stdin unread, and in a msg-filter stdin *is* the message. The bodies could not be recovered, because the reflog and the `refs/original` backup were expired in the same session (both pitfalls are now recorded in `BENCHMARK_SETUP.md` §7). The subjects were restored from an earlier revision of **this table**, which is the only place they survived; every commit's file contents were untouched throughout, and all 19 tree hashes were verified identical to a pre-restore backup. One subject — the last one below — is **derived from its own diff** rather than restored, because a table cannot list the commit that writes it. Treat the subjects as accurate and the absence of bodies as a known loss, not a style choice.
+
 | # | hash | message (subject) | files | lines |
 | ---: | --- | --- | ---: | ---: |
-| 1 | `81d058f7` | chore: initial import of WS-1 benchmarking work | 2 | +73/-0 |
-| 2 | `e5bdcd90` | feat(harness): measurement instruments | 15 | +2266/-0 |
-| 3 | `684a999e` | feat(service): LlamaIndex FastAPI service | 10 | +1287/-0 |
-| 4 | `c09d3992` | feat(nodes): benchmark-only RocketRide engine nodes | 32 | +709/-0 |
-| 5 | `77485686` | feat(runners): benchmark runners and probes | 61 | +11321/-0 |
-| 6 | `6ecb632f` | test(evidence): result files, checkpoints and archived material | 186 | +166560/-0 |
-| 7 | `e12de3cc` | docs: findings, protocol and handoff material | 23 | +4640/-0 |
-| 8 | `7ca44e45` | docs: BENCHMARK_SETUP.md — build guide for Leela | 1 | +186/-0 |
-| 9 | `8e8c8a7e` | fix(evidence): retain container-ladder results where evidence lives | 6 | +1056/-1 |
-| 10 | `90845271` | docs: note pre-existing date inconsistencies in the archived progress log | 1 | +9/-0 |
-| 11 | `2a619096` | docs: root README | 1 | +92/-0 |
-| 12 | `657d886a` | docs: state cross-repo version pairings as facts, not verdicts | 2 | +29/-20 |
-| 13 | `5d7d4858` | docs: PREPUSH_MANIFEST.md — complete review package | 1 | +345/-0 |
-| 14 | `7ad49a0e` | docs: demote inlined README headings in the manifest | 1 | +11/-8 |
-| 15 | `b617d4ec` | docs: demote the inlined README title too | 1 | +1/-1 |
-| 16 | `ad66449f` | docs: archive/README.md and repo metadata | 3 | +108/-3 |
-| 17 | `8ca27b43` | docs: remove tool-authorship attribution from two archived documents | 2 | +2/-2 |
-| 18 | `270148e3` | docs: regenerate manifest commit table after the attribution edit | 1 | +1/-2 |
+| 1 | `1ad0b0d2` | chore: initial import of WS-1 benchmarking work | 2 | +73/-0 |
+| 2 | `14802a5a` | feat(harness): measurement instruments | 15 | +2266/-0 |
+| 3 | `89ca7d4a` | feat(service): LlamaIndex FastAPI service | 10 | +1287/-0 |
+| 4 | `a41e2417` | feat(nodes): benchmark-only RocketRide engine nodes | 32 | +709/-0 |
+| 5 | `296d580e` | feat(runners): benchmark runners and probes | 61 | +11321/-0 |
+| 6 | `c1b12df9` | test(evidence): result files, checkpoints and archived material | 186 | +166560/-0 |
+| 7 | `44e86d00` | docs: findings, protocol and handoff material | 23 | +4640/-0 |
+| 8 | `09fe48af` | docs: BENCHMARK_SETUP.md — build guide for Leela | 1 | +186/-0 |
+| 9 | `d672a869` | fix(evidence): retain container-ladder results where evidence lives | 6 | +1056/-1 |
+| 10 | `e8309011` | docs: note pre-existing date inconsistencies in the archived progress log | 1 | +9/-0 |
+| 11 | `588699c5` | docs: root README | 1 | +92/-0 |
+| 12 | `afbf12ee` | docs: state cross-repo version pairings as facts, not verdicts | 2 | +29/-20 |
+| 13 | `27f01742` | docs: PREPUSH_MANIFEST.md — complete review package | 1 | +345/-0 |
+| 14 | `08082e8d` | docs: demote inlined README headings in the manifest | 1 | +11/-8 |
+| 15 | `3508b0db` | docs: demote the inlined README title too | 1 | +1/-1 |
+| 16 | `5a346de6` | docs: archive/README.md and repo metadata | 3 | +108/-3 |
+| 17 | `a50fa610` | docs: remove tool-authorship attribution from two archived documents | 2 | +2/-2 |
+| 18 | `4e470bc7` | docs: regenerate manifest commit table after the attribution edit | 1 | +1/-2 |
+| 19 | `a3e5711a` | docs: repair manifest commit table and section c heading | 1 | +20/-0 |
+
+The commit that regenerates this table cannot appear in it. It is commit **20**, `docs: restore commit subjects, record the two git pitfalls that cost them` — the change that added the two `BENCHMARK_SETUP.md` §7 rows and everything you are reading in this section.
 
 ## c) Root `README.md` — complete text
 
@@ -227,11 +233,9 @@ find out whether your environment differs from the one these results came from.
   - 1. What this is and what it measures
   - 2. Engine lifecycle
   - 3. Thread parity — and why the config value is not the answer
-- {"torch_num_threads": 10, "torch_num_interop_threads": 14, "env": {...}, "pid": 35229}
   - 4. The 10 % variance gate
   - 5. Goodput and content sanity — shape is not enough
   - 6. Reproducing the matched replication
-- provision first — engine bundle and corpus are not in the repo
   - 7. Pitfalls that cost us weeks
   - 8. Where to look
 
@@ -251,6 +255,8 @@ find out whether your environment differs from the one these results came from.
 | **`str.replace("", x)` inserts between every character** | A 7 KB file became 263 KB. Guard any programmatic edit against an empty pattern. |
 | **`psutil.net_connections()` needs root on macOS** | Returns nothing without it, so a PID lookup silently falls back to matching by name — and then counts an unrelated five-day-old engine. Use `lsof`. |
 | **Matching processes by name** | `pgrep -f mything` also matches your own monitoring shell, so a finished run looks alive. Match by PID. |
+| **`grep -q` inside a `--msg-filter` eats the message** | `grep -q` exits the moment it decides, leaving the rest of stdin unread — and in a `git filter-branch --msg-filter` stdin *is* the commit message. Every commit the pattern did not match got an **empty** message, because the `cat` after it had nothing left to read. This emptied 18 of 19 messages here. Read stdin **fully into a variable first**, then decide. Test the filter standalone against one commit before pointing it at history. |
+| **`gc --prune=now` after a filter-branch destroys the only undo** | `filter-branch` leaves three recovery paths — `.git/refs/original/`, the reflog, and the old commits as dangling objects. `git reflog expire --expire=now --all && git gc --prune=now` removes all three at once, and a `rm -rf .git/refs/original` beforehand removes the fourth. That sequence is routinely recommended as "cleanup"; it is what made the above unrecoverable. **Back up the whole directory including `.git` before any history rewrite, and leave the reflog alone until the result is verified.** |
 
 ## e) Excluded paths
 

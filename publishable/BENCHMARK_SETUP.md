@@ -170,6 +170,8 @@ Each line is the symptom you will actually see.
 | **`str.replace("", x)` inserts between every character** | A 7 KB file became 263 KB. Guard any programmatic edit against an empty pattern. |
 | **`psutil.net_connections()` needs root on macOS** | Returns nothing without it, so a PID lookup silently falls back to matching by name — and then counts an unrelated five-day-old engine. Use `lsof`. |
 | **Matching processes by name** | `pgrep -f mything` also matches your own monitoring shell, so a finished run looks alive. Match by PID. |
+| **`grep -q` inside a `--msg-filter` eats the message** | `grep -q` exits the moment it decides, leaving the rest of stdin unread — and in a `git filter-branch --msg-filter` stdin *is* the commit message. Every commit the pattern did not match got an **empty** message, because the `cat` after it had nothing left to read. This emptied 18 of 19 messages here. Read stdin **fully into a variable first**, then decide. Test the filter standalone against one commit before pointing it at history. |
+| **`gc --prune=now` after a filter-branch destroys the only undo** | `filter-branch` leaves three recovery paths — `.git/refs/original/`, the reflog, and the old commits as dangling objects. `git reflog expire --expire=now --all && git gc --prune=now` removes all three at once, and a `rm -rf .git/refs/original` beforehand removes the fourth. That sequence is routinely recommended as "cleanup"; it is what made the above unrecoverable. **Back up the whole directory including `.git` before any history rewrite, and leave the reflog alone until the result is verified.** |
 
 ## 8. Where to look
 
