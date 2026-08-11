@@ -102,7 +102,10 @@ This is what GitHub shows on landing.
 
 ---8<--- BEGIN README.md ---8<---
 
-# RR-vs-LLAMA-Benchmarking
+*(Headings below are demoted one level so the inlined file does not create sections in this manifest. Otherwise verbatim.)*
+
+
+## RR-vs-LLAMA-Benchmarking
 
 Measurement work for **WS-1 "Service Parity"**: two implementations of the same document pipeline —
 the **RocketRide engine** and a **LlamaIndex FastAPI service** — running PDF → text → chunks →
@@ -112,7 +115,7 @@ the **RocketRide engine** and a **LlamaIndex FastAPI service** — running PDF �
 
 ---
 
-## Start here
+### Start here
 
 | you want to… | read |
 | --- | --- |
@@ -121,7 +124,7 @@ the **RocketRide engine** and a **LlamaIndex FastAPI service** — running PDF �
 | **check what a number means, or whether it still stands** | [`publishable/STATE.md`](publishable/STATE.md) — §5 is every withdrawn number, with why |
 | **run it** | [`publishable/PROVISIONING.md`](publishable/PROVISIONING.md) first — the engine and corpus are not in this repo |
 
-## Headline result
+### Headline result
 
 **Under a matched configuration the two implementations are functionally identical except for one
 defect.** [**VERIFIED** — 3 blocks × 2,000 documents per arm, interleaved, reproduced 3/3]
@@ -134,7 +137,7 @@ defect.** [**VERIFIED** — 3 blocks × 2,000 documents per arm, interleaved, re
 Identical to the document, every block. The arms differ by **exactly 7 documents per 2,000
 (0.35 %)**, and every one is the same defect: [`BUG_NUL_TRUNCATION.md`](publishable/BUG_NUL_TRUNCATION.md).
 
-### Other findings that stand
+#### Other findings that stand
 
 | finding | label |
 | --- | --- |
@@ -148,14 +151,14 @@ Identical to the document, every block. The arms differ by **exactly 7 documents
 moving Phase 2 to a Linux x64 host, along with the fact that **no `linux-arm64` engine build has
 ever been released** (all 51 releases checked), so RocketRide cannot be containerised here at all.
 
-## How claims are labelled
+### How claims are labelled
 
 Every claim carries **VERIFIED** (two independent methods, reproduced) / **PROVISIONAL** (one
 method) / **UNVERIFIED** (asserted, not established). Numbers that did not survive are not deleted
 — they are listed with the reason in `STATE.md` §5. **More findings have been withdrawn than kept**,
 including several that were favourable, and the corrections run in both directions.
 
-## Layout
+### Layout
 
 ```
 publishable/   push-ready docs — findings, setup guide, protocol, bug report, decision briefs
@@ -173,7 +176,7 @@ docker/        container design and the ladder runner
 
 Top-level runners: `matched_replication.py`, `weekend_runner.sh`, `weekend_worker.py`.
 
-## Not in this repo
+### Not in this repo
 
 | excluded | size | how to get it |
 | --- | ---: | --- |
@@ -186,7 +189,7 @@ Top-level runners: `matched_replication.py`, `weekend_runner.sh`, `weekend_worke
 `.env` is excluded on principle. It holds only a local URI and the placeholder key `MYAPIKEY`, but
 committing it is a habit that eventually leaks a real one — copy `.env.example` instead.
 
-## First thing to run
+### First thing to run
 
 ```bash
 ../.venv/bin/python working/scripts/regression_selftest.py
