@@ -162,7 +162,7 @@ class Decomposer(threading.Thread):
     def __init__(self, kind, inflight, engine_pid=None, port=None, interval=0.25):
         super().__init__(daemon=True)
         self.kind, self.inflight, self.engine_pid, self.port = kind, inflight, engine_pid, port
-        self.interval, self.rows, self._stop = interval, [], threading.Event()
+        self.interval, self.rows, self._halt = interval, [], threading.Event()
 
     def _rocket(self):
         eng = psutil.Process(self.engine_pid)
@@ -201,7 +201,7 @@ class Decomposer(threading.Thread):
                 "total_mb": round(pm + wm + rss_mb(), 1)}
 
     def run(self):
-        while not self._stop.is_set():
+        while not self._halt.is_set():
             try:
                 r = self._rocket() if self.kind == "rocketride" else self._llama()
                 if r:
@@ -212,7 +212,7 @@ class Decomposer(threading.Thread):
             time.sleep(self.interval)
 
     def stop(self):
-        self._stop.set()
+        self._halt.set()
         self.join(timeout=3)
 
 
