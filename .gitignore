@@ -35,6 +35,12 @@ repl_state/*.done
 docker/out/
 status.txt
 repl_status.txt
+# heartbeat for the matched-layer sweep; rewritten every few seconds
+sweep_status.txt
+# partial/tmp sweep checkpoints must never land; completed cells are committed deliberately
+# after the run, matching the repl_state/ and weekend_state/ precedent
+sweep_state/*.tmp
+sweep_state/*.done
 weekend_run.log
 nohup.out
 
