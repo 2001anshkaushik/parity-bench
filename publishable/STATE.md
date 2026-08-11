@@ -334,6 +334,12 @@ for mechanisms by which it instead flatters RocketRide (MATCHED_LAYERS.md §2.4)
 "its task tree holds more models" — is **refuted**: the tree is one process holding one model, so a
 matched re-run will shrink the gap, not erase it.
 
+### Platform addendum — 2026-08-11
+
+| # | finding | label |
+| --- | --- | --- |
+| P1 | **12.4 % wall-clock swing on byte-identical back-to-back blocks** (892.9 s vs 794.4 s, LlamaIndex-HTTP, same 2,000 docs, same order, same warm service, nothing changed between them; goodput 1,972 and 28 faults both times). The host's run-to-run floor **exceeds the project's own 10 % variance gate**, so no wall-clock result is reportable from this machine by either arm | **VERIFIED** (same run, same log) |
+
 ## 4. Verified findings, with labels
 
 | # | finding | label | evidence |

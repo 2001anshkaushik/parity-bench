@@ -449,6 +449,16 @@ async def amain(a):
             "all_cells_achieved": all(c["achieved_ok"] for c in g),
             "cells_swapped": sum(1 for c in g if c.get("swapped")),
             "quotable": all(c.get("quotable", False) for c in g),
+            # Residency bias, quantified AT THIS LEVEL rather than described once. The service is
+            # warm across a level by design, so its footprint sits on RocketRide's cells and scales
+            # with C — the same direction as the predicted crossover, so it must be visible per row.
+            "llamaindex_resident_during_rr_mb": round(st.median(
+                [c["residency"]["before_rocketride"]["ws1_tree_mb"] for c in g
+                 if c.get("residency", {}).get("before_rocketride", {}).get("ws1_tree_mb")] or [0]), 1),
+            "rocketride_resident_during_li_mb": round(st.median(
+                [c["residency"]["before_llamaindex"].get("engine_parent_mb", 0)
+                 + c["residency"]["before_llamaindex"].get("engine_task_mb", 0) for c in g
+                 if c.get("residency", {}).get("before_llamaindex")] or [0]), 1),
         })
 
     out = {"preregistration": "publishable/PREREGISTRATION.md",
@@ -458,13 +468,18 @@ async def amain(a):
            "engine_pid": ep, "cells": cells, "curve": curve}
 
     say("\n=== CURVE ===")
-    say(f"  {'C':>3} {'LI MB':>8} {'gate':>5} {'RR MB':>8} {'gate':>5} {'RR task':>8} "
-        f"{'RR tree':>8} {'RR/LI':>7} {'achieved':>9}")
+    say(f"  {'C':>3} {'LI MB':>8} {'gate':>5} {'RR MB':>8} {'gate':>5} {'RRtask':>7} "
+        f"{'RRtree':>8} {'RR/LI':>7} {'swapd':>6} {'quote':>6} {'LIresid':>8} {'RRresid':>8}")
     for c in curve:
         say(f"  {c['concurrency']:>3} {c['llamaindex_median_mb']:>8} {c['llamaindex_gate']:>5} "
             f"{c['rocketride_median_mb']:>8} {c['rocketride_gate']:>5} "
-            f"{str(c['rocketride_task_procs']):>8} {str(c['rocketride_tree_mb']):>8} "
-            f"{c['ratio_rr_over_li']:>7} {'OK' if c['all_cells_achieved'] else 'SHORT':>9}")
+            f"{str(c['rocketride_task_procs']):>7} {str(c['rocketride_tree_mb']):>8} "
+            f"{c['ratio_rr_over_li']:>7} {c['cells_swapped']:>6} "
+            f"{'YES' if c['quotable'] else 'no':>6} "
+            f"{c['llamaindex_resident_during_rr_mb']:>8} {c['rocketride_resident_during_li_mb']:>8}")
+    q = [c for c in curve if c["quotable"]]
+    say(f"\n  highest quotable C = {max((c['concurrency'] for c in q), default=None)}"
+        f"   (levels measured: {[c['concurrency'] for c in curve]})")
     cross = [c for c in curve if c["ratio_rr_over_li"] < 1.0]
     say(f"\n  CROSSOVER at C={cross[0]['concurrency']}" if cross else
         "\n  NO crossover in the measured range")
