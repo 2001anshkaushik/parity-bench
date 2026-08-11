@@ -6,7 +6,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PORT="${WS1_PORT:-8801}"
 WORKERS="${WS1_WORKERS:-14}"     # one per logical core (14 on M4 Pro), per uvicorn deployment docs
-PY="${WS1_PYTHON:-$ROOT/../.venv/bin/python}"
+# ROOT is working/, so the venv — which lives one level ABOVE the clone (PROVISIONING.md §4) — is
+# $ROOT/../../.venv, not $ROOT/../.venv. The latter was correct when ws1/ sat at the clone root and
+# silently stopped resolving when the tree was restructured into working/; the service then died at
+# launch with "No such file or directory" for every caller, since nothing sets WS1_PYTHON.
+PY="${WS1_PYTHON:-$ROOT/../../.venv/bin/python}"
+[ -x "$PY" ] || { echo "run_service.sh: interpreter not found at $PY (set WS1_PYTHON to override)" >&2; exit 127; }
 export WS1_DEVICE="${WS1_DEVICE:-cpu}"
 
 cd "$ROOT"

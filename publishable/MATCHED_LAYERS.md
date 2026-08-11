@@ -202,6 +202,37 @@ RocketRide's *effective* concurrency width is ~17 against a declared pool (`SCHE
 | **LlamaIndex 4,642 MB idle / 7,950 MB peak** | **AFFECTED — topology-confounded, biases against LlamaIndex.** |
 | **Wall-clock parity (+9 %)** | **AFFECTED — the entire gap is of the order of transport overhead.** |
 
+## 6b. `run_service.sh` has been broken since the restructure [VERIFIED]
+
+**No clone of this repository could start the LlamaIndex service.** `run_service.sh` computed its
+interpreter as `$ROOT/../.venv/bin/python` where `ROOT` is the directory *above* `ws1/`. That was
+correct while `ws1/` sat at the clone root. When the tree was restructured into `working/ws1/`,
+`ROOT` became `working/`, so the path resolved to `<clone>/.venv` — but the venv lives one level
+above the clone (`PROVISIONING.md` §4). Nothing sets `WS1_PYTHON`, so every caller died at launch
+with:
+
+```
+run_service.sh: line 23: .../working/../.venv/bin/python: No such file or directory
+```
+
+**Dating it:**
+
+| | |
+| --- | --- |
+| last service-dependent result in the repo | `f_sustained_decay.json`, **2026-08-07 11:56** |
+| every other service-mode result | 2026-08-05 → 2026-08-07, all earlier |
+| initial git import, already in the broken `working/` layout | **2026-08-10 16:57** |
+| fixed | 2026-08-11 |
+
+**So every service-mode number in this repo — including the 4,642 MB idle figure and the whole
+`memory_ceiling.json` table — was produced before the restructure, and none of them could be
+reproduced from any committed state of the repo until today.** The results are not wrong; they are
+simply not reachable by the instructions the repo ships. That is why this was invisible: nothing
+after 2026-08-07 needed the service, because the in-process arm had replaced it.
+
+Fixed to `$ROOT/../../.venv/bin/python`, plus an explicit `[ -x "$PY" ]` guard so a wrong path fails
+with a named error instead of a shell "No such file or directory" at line 23.
+
 ## 7. Re-run cost — NOT YET RUN
 
 **What must be built first:** a `LlamaHttpArm` in `weekend_worker.py` that drives

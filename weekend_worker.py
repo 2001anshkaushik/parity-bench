@@ -234,7 +234,62 @@ class RocketArm:
             pass
 
 
-ARMS = {"llamaindex": LlamaArm, "rocketride": RocketArm}
+class LlamaHttpArm:
+    """LlamaIndex driven over HTTP through ws1/service.py — the MATCHED-LAYER arm.
+
+    `LlamaArm` calls the pipeline in-process: no transport, no serialization, one OS process. The
+    RocketRide arm has always gone client -> WebSocket+DAP -> engine -> task process. Comparing them
+    measures the topology as much as the frameworks (publishable/MATCHED_LAYERS.md). This arm gives
+    LlamaIndex the same shape: separate driver, serialization boundary, server parent, out-of-process
+    worker.
+
+    The SERVICE LIFECYCLE IS THE CALLER'S, not this arm's — worker count is an experimental variable
+    and the service must be restarted when it changes.
+
+    rss() mirrors RocketArm exactly: server tree (uvicorn parent + every worker, resolved by
+    LISTENING SOCKET) + this driver. Never by process name.
+    """
+    name = "llamaindex_http"
+
+    def __init__(self, port: int = 8801, timeout: float = 1800.0):
+        import urllib.request
+        self.port, self.timeout = port, timeout
+        self.base = f"http://127.0.0.1:{port}"
+        self._n = 0
+        sys.path.insert(0, str(ROOT / "working"))
+        from harness import ws1_service as ws
+        self._ws = ws
+        parent, workers = ws.serving_pids(port)
+        if parent is None:
+            raise RuntimeError(f"no service listening on {port} — the caller must start and "
+                               f"warm-gate it before constructing this arm")
+        print(f"[ws1] driving parent pid={parent} with {len(workers)} worker(s) "
+              f"(matched by listening socket, not name)", flush=True)
+
+    def process(self, text):
+        import urllib.request
+        self._n += 1
+        body = json.dumps({"doc_id": f"d{os.getpid()}-{self._n}", "text": text}).encode()
+        req = urllib.request.Request(f"{self.base}/process", data=body,
+                                     headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=self.timeout) as r:
+            out = json.loads(r.read().decode())
+        if not out.get("ok"):
+            # same contract as the other arms: a fault is a result, not an exception
+            return [], []
+        ch = [c.get("text", "") for c in out.get("chunks", [])]
+        em = [c.get("embedding") or [] for c in out.get("chunks", [])]
+        return ch, em
+
+    def rss(self):
+        tree, _n = self._ws.tree_rss_mb(self.port)
+        return tree + rss_mb()
+
+    def close(self):
+        pass
+
+
+ARMS = {"llamaindex": LlamaArm, "rocketride": RocketArm, "llamaindex_http": LlamaHttpArm}
 
 
 def main() -> int:

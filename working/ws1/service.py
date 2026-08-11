@@ -101,9 +101,16 @@ async def lifespan(app: FastAPI):
             "limit_concurrency": None,
         },
     )
+    # torch threads are reported from INSIDE the worker, not inferred from the env it was launched
+    # with: torch caches its thread count at import, so an exported variable proves nothing. Thread
+    # count is the largest single lever measured in this project (3.07x at concurrency 1), so an
+    # arm-to-arm comparison that does not read this from the live worker is not matched.
+    import torch as _t
     print(f"[ws1] worker {os.getpid()} warm in {warm_s:.1f}s "
           f"(splitter={_pipeline.splitter_name}, mode={SPLITTER_MODE}, "
-          f"device declared={DEVICE} resolved={_pipeline.resolved_device()})", flush=True)
+          f"device declared={DEVICE} resolved={_pipeline.resolved_device()}, "
+          f"torch_threads={_t.get_num_threads()} torch_interop={_t.get_num_interop_threads()})",
+          flush=True)
     yield
 
 
