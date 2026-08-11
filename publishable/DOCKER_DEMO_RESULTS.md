@@ -129,6 +129,9 @@ reason matters:
 > This ladder runs **one in-process pipeline, one document at a time**. Memory here is dominated by
 > **worker count, not document size** — the LlamaIndex service's floor scales with workers
 > (4.6 GB idle at 8 workers), while per-document cost is modest even at 6,345 tokens.
+>
+> ⚠️ **Topology-confounded — the 8-worker floor is a configuration choice, not a framework
+> property. See [`MATCHED_LAYERS.md`](MATCHED_LAYERS.md).**
 
 **That is the memory-efficiency story, and it is a configuration lever rather than a framework
 property**: a service sized to its actual concurrency needs far less memory than one sized to its

@@ -36,9 +36,22 @@ Identical to the document, every block. The arms differ by **exactly 7 documents
 | --- | --- |
 | **`page_content` is truncated at the first NUL byte** in the engine's response. Embeddings are computed over the full text (cos = 1.0000 vs reference); only the returned text is lost. Silent — the vectors look perfect. Affects ~0.30 % of documents | **VERIFIED** (2 methods: offline scan + live pipeline detection) |
 | **Thread configuration is the largest lever measured.** Pinning changes concurrency scaling 1.43× → 3.04×, and costs 3.07× at concurrency 1. There is **no per-pipeline config surface** — only a process-level env var, global to the engine | **VERIFIED** |
-| **RocketRide uses ~2× the resident memory** on identical work (2.08× / 2.05× / 2.03× by three independent methods) | direction **VERIFIED**, magnitude **PROVISIONAL** — a 24 % spread from bimodality, not drift |
+| ⚠️ **RocketRide uses ~2× the resident memory** on identical work (2.08× / 2.05× / 2.03× by three independent methods) | **TOPOLOGY-CONFOUNDED** — see note below |
 | **~150 concurrent pipelines livelock**, leaving orphaned node processes. The other concurrency model shows no growth | **VERIFIED** (reproduced twice) |
 | **Throughput on this host is unmeasurable.** Ascending-cold reads 101 /s where descending reads 241 /s on the same service — a 2.2× swing from measurement order alone | **VERIFIED** |
+
+> ### ⚠️ The memory comparison is topology-confounded — [`MATCHED_LAYERS.md`](publishable/MATCHED_LAYERS.md)
+> The two arms did not run the same shape. **LlamaIndex ran in-process** — one process, no HTTP,
+> no serialization, `ws1/service.py` never used — while **RocketRide ran its full client-server
+> path**: three processes, WebSocket + DAP, and a ~240 MB engine parent with no counterpart in
+> the other arm. That biases the ~2× **against RocketRide**.
+>
+> It cuts both ways. Run the *other* direction — LlamaIndex behind uvicorn at 8 workers — and
+> this repo measures **LlamaIndex at 4,642 MB idle against RocketRide's 204 MB**, a 22.8×
+> verdict the opposite way on the same two systems. **Neither ratio is a property of the
+> frameworks; both are properties of a deployment choice.** Nothing is withdrawn — both numbers
+> are correct as measured. The functional-equivalence headline above is **unaffected**:
+> transport does not change which bytes come back.
 
 **No throughput comparison is published**, and none can be from this hardware. That is the case for
 moving Phase 2 to a Linux x64 host, along with the fact that **no `linux-arm64` engine build has

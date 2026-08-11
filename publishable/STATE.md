@@ -252,7 +252,7 @@ direction proof, prevalence, version/build identity, and answers to maintainer o
 | M4 | **Operational statement (not a stability verdict): size containers to PEAK, not median.** RocketRide peak/median **1.76×**, LlamaIndex **1.16×** — sizing to the median undersizes RocketRide by 76 % vs 16 % | **VERIFIED** |
 | M5 | **42 % run-to-run spread on byte-identical input** (medians 2,397 / 1,639 / 1,811 MB over the same first 200 docs). NOT the sawtooth: divergence is present in the **first** post-warm-up sample (2,631 vs 1,949 vs 1,951), so it is set at task creation, not accumulated. Same engine PID served all three, so not a fresh-engine effect | **cause UNVERIFIED** |
 | M6 | **No `linux-arm64` build has EVER been published.** All **51 releases** examined: win64 36, darwin-arm64 24, linux-x64 24, linux-arm64 **0**. Strengthens the platform verdict from "this release lacks it" to "the project has never shipped one" | **VERIFIED** |
-| M7 | Memory ratio **2.08×** median-to-median (matched windows) vs **3.0×** peak-to-peak. Different statistics, both real: 2.08× is consumption, 3.0× is what must be provisioned | **VERIFIED (direction)**, magnitude **PROVISIONAL** |
+| M7 | ⚠️ **TOPOLOGY-CONFOUNDED (MATCHED_LAYERS.md)** — Memory ratio **2.08×** median-to-median (matched windows) vs **3.0×** peak-to-peak. Different statistics, both real: 2.08× is consumption, 3.0× is what must be provisioned | **VERIFIED (direction)**, magnitude **PROVISIONAL** |
 
 **Meeting artifact: `publishable/MEETING_2026-08-10.md`** — platform verdict, what was measured,
 three product findings, memory, what is not established, and the phased roadmap. Verified clean:
@@ -286,7 +286,7 @@ engine restart? Blocks the memory magnitude claim. ~40 min.
 | --- | --- | --- |
 | S17-1 | **NOT A LEAK.** Six 2,000-doc blocks, same engine, never restarted: 2,065 / 2,674 / 2,717 / **2,055** / 2,070 / 2,112 MB. Block 4 fell 662 MB back to block 1's level. Modal cluster of 4 blocks at **2,055–2,112 (2.7 % spread)**; blocks 2–3 were a transient excursion that reverted | **VERIFIED** (6 blocks) |
 | S17-2 | **Component decomposition, sampled separately during each block**: engine parent **flat** (238.7 → 242.5 MB), task tree **declining** (1,568.6 → 1,538.2), **our own driver growing +51.7 MB**. Neither the engine nor its task grows; the only growth is our harness (~2.5 % of RocketRide's total, inflating it) | **VERIFIED** |
-| S17-3 | **Memory ratio ~2.0×, three independent methods**: matched-window 2.08×, fresh-vs-fresh 2.05×, all-six-block median **2.03×**. The earlier 2.5–2.6× came from the two excursion blocks and is superseded | **direction VERIFIED (3 methods)**, magnitude ~2.0× **PROVISIONAL** (gate fails at 24 % from bimodality, not centre uncertainty) |
+| S17-3 | ⚠️ **TOPOLOGY-CONFOUNDED (MATCHED_LAYERS.md)** — **Memory ratio ~2.0×, three independent methods**: matched-window 2.08×, fresh-vs-fresh 2.05×, all-six-block median **2.03×**. The earlier 2.5–2.6× came from the two excursion blocks and is superseded | **direction VERIFIED (3 methods)**, magnitude ~2.0× **PROVISIONAL** (gate fails at 24 % from bimodality, not centre uncertainty) |
 | S17-4 | **Goodput identical in all SIX RocketRide blocks** (1,965 every time) and all three LlamaIndex blocks (1,972). The 7-document difference per 2,000 is the NUL truncation, now reproduced 6/6 | **VERIFIED** |
 | S17-5 | The 24 % gate failure is **bimodality, not drift** — capacity must cover the excursion, but the service is not degrading over time | **VERIFIED** |
 | S17-6 | **CI estimator check**: 2.60× [1.96, 2.69] was ratio-of-medians with a bootstrap interval; correct estimator, but at n=3 the interval is the entire attainable range and the point sat high because the sample was left-skewed. **No central estimate belongs on a trending/bimodal sample** | **VERIFIED (methodological)** |
@@ -306,13 +306,33 @@ the secondary result.
 | --- | --- | --- |
 | S18-1 | **The excursion is NOT caused by a neighbouring LlamaIndex block.** Retrospective correlation was 6/6 (excursion in exactly the 2 RocketRide blocks following a LlamaIndex block, none of the 4 others) but confounded by session and time. Controlled RO→LL→RO test: 1,826.0 → 1,819.6 MB, **−0.4 %** | **REFUTED** (direct test) |
 | S18-2 | Host-level memory sampling (used / available / swap) added to the harness. The excursion window showed nothing distinguishing; A19 is now **instrumented but not yet triggered** | **VERIFIED** (instrument added) |
-| S18-3 | **Excluding our driver from RocketRide's total is ASYMMETRIC and must not be done.** It moves the ratio 2.01× → 1.74×, but LlamaIndex's single-process figure already contains the same harness work and cannot have it subtracted. Symmetric: count-on-both **2.01×**, exclude-from-both **~2.47×**. As-measured **2.01×** stands and is conservative | **VERIFIED (methodological)** |
+| S18-3 | ⚠️ **See MATCHED_LAYERS.md** — **Excluding our driver from RocketRide's total is ASYMMETRIC and must not be done.** It moves the ratio 2.01× → 1.74×, but LlamaIndex's single-process figure already contains the same harness work and cannot have it subtracted. Symmetric: count-on-both **2.01×**, exclude-from-both **~2.47×**. As-measured **2.01×** stands and is conservative | **VERIFIED (methodological)** |
 | S18-4 | Goodput reproduced again: RocketRide **1,965** in blocks 7 and 9, LlamaIndex **1,972** in block 8 — now **8/8** and **4/4** respectively | **VERIFIED** |
 
 **Regression test #10 added**: asserts the meeting artifact's protected content (thread-asymmetry
 table, "disadvantageous configuration", the VOID marking, the functional-equivalence lead, the
 no-reversal caveat, the withdrawn-leak marker) is present, and that withdrawn figures never appear
 without a withdrawal marker nearby. An edit destroyed this content twice; it is now structural.
+
+## 3f. SESSION 19 — the arms did not run the same shape [VERIFIED]
+
+**`publishable/MATCHED_LAYERS.md` is the full analysis.** Read it before quoting any memory or
+wall-clock number.
+
+| # | finding | label |
+| --- | --- | --- |
+| T1 | **LlamaIndex ran in-process; RocketRide ran client–server.** `weekend_worker.py:148` imports `LlamaIndexPipeline` and calls `self.p.process(text)` — no socket. `RocketArm` uses `RocketRideClient` over **WebSocket + DAP** to `:5565`. `matched_replication.py` and `docker/ladder.py` start uvicorn **zero** times. `working/ws1/service.py` was **never used** in any published run | **VERIFIED** (code + live process measurement) |
+| T2 | **Process topology 1 vs 3.** Live, engine `pid=38379`, 0.25 s sampling: RocketRide = driver + engine parent + **1** task child; LlamaIndex = 1 process, model loaded into the driver (RSS 22.9 → 560.0 MB across `warm()`). Independently reproduces M1 | **VERIFIED** (2 methods) |
+| T3 | **RocketRide carries a ~240 MB engine parent with no counterpart** in the other arm — 23 % of LlamaIndex's entire footprint — plus two extra interpreter baselines | **VERIFIED** (six-block decomposition, blocks 4–6) |
+| T4 | **The repo already published both directions and never reconciled them.** In-process LlamaIndex → RocketRide 2.0× worse. Uvicorn LlamaIndex at 8 workers → LlamaIndex **22.8× worse at idle** (4,642 vs 204 MB). Same two systems, opposite verdicts; the only variable is the LlamaIndex arm's topology. **Neither ratio is a framework property** | **VERIFIED** |
+| T5 | Transport cost ~+36 ms/document (n=4, spread 36–41 %, **fails the 10 % gate**). Over 2,000 docs that is the same order as the entire observed +72.7 s block gap — but transport cost and genuine per-document cost are **not separated** | **PROVISIONAL — direction only** |
+| T6 | `run_service.sh` defaults to **14** workers while the published 4,642 MB was taken at **8** — declared ≠ measured, and it moves the headline with a shell variable | **VERIFIED** |
+| T7 | **Functional equivalence is UNAFFECTED.** Goodput, fault classes and the NUL defect are properties of the bytes returned, not the transport. Both arms returned identical goodput every block *through different topologies* | **VERIFIED** |
+
+**Direction of bias:** the asymmetry biases **against RocketRide** on memory and wall clock. Hunted
+for mechanisms by which it instead flatters RocketRide (MATCHED_LAYERS.md §2.4); the strongest —
+"its task tree holds more models" — is **refuted**: the tree is one process holding one model, so a
+matched re-run will shrink the gap, not erase it.
 
 ## 4. Verified findings, with labels
 
@@ -328,7 +348,7 @@ without a withdrawal marker nearby. An edit destroyed this content twice; it is 
 | 1i | **Thread pinning at engine start → RR scaling 1.43×→3.04× @400tok and 1.18×→3.05× @1600tok**; helps above conc≈4, HURTS below (0.41–0.55× at conc 1) | **VERIFIED** (2 sessions, ABA design, n=5, gated) | `working/results/reanchor_tuned.json` |
 | 1k | **Pin verified INSIDE the task process**: `torch.get_num_threads()` = 10 default → 1 pinned. `torch_num_interop_threads` stays **14 even when pinned** — no env var reaches it | **VERIFIED** | `working/nodes/env_probe`, `working/results/reanchor_tuned.json` |
 | 1l | **Anchor B flips with tuning**: 1600tok/conc2 RR/LI = **1.201 [1.185,1.217] untuned** (reproduces the 1.190× reference) but **0.926 [0.917,0.934] tuned**. Best-achievable config is CONCURRENCY-DEPENDENT | **VERIFIED** (both arms pass the gate in both blocks) | `working/results/reanchor_tuned.json` |
-| 1m | **Peak RSS**: RR idle 204 MB → 2,356 MB @6400tok/c32; LI idle **4,642 MB** → **7,950 MB**. LI's floor is fixed (8 workers × model); RR grows with document size | **VERIFIED** (continuous 250 ms sampling) | `working/results/memory_ceiling.json`, `working/results/memory_rr_fixed.json` |
+| 1m | ⚠️ **TOPOLOGY-CONFOUNDED (MATCHED_LAYERS.md, opposite direction)** — **Peak RSS**: RR idle 204 MB → 2,356 MB @6400tok/c32; LI idle **4,642 MB** → **7,950 MB**. LI's floor is fixed (8 workers × model); RR grows with document size | **VERIFIED** (continuous 250 ms sampling) | `working/results/memory_ceiling.json`, `working/results/memory_rr_fixed.json` |
 | 1n | **A6 RESOLVED — 9.29 and 1.45 measure different statistics.** At default threads one embed: time-average **2.42 cores** (c=1) / 4.83 (c=8); p95 **4.17** / **10.08**; peak **7.75** / **13.09**. Finding 7's 9.29 is a p95/peak under load; session-7's 1.45 was a time-average with a contaminated baseline | **VERIFIED** | `working/scripts/a6_peak_vs_mean.py` |
 | 1o | **Engine PDF path is Tika, VERIFIED by execution** — `com.rocketride.tika_api.TikaApi`, JVM loaded **in-process via JNI** (no separate java process). Engine bundles OpenJDK 17.0.19 Temurin aarch64 | **VERIFIED** (source + execution) | `pdftest/`, engine binary strings |
 | 1p | **LlamaIndex has NO PDF reader installed**; core maps `.pdf`→`PDFReader` from the absent `llama-index-readers-file` and **silently returns `{}`**. Default parser once installed is **pypdf**, not PyMuPDF | **VERIFIED** | PyPI metadata + `llama_index.core` source |

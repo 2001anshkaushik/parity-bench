@@ -224,7 +224,6 @@ efficiency figure.
 > independent 200-document window (p0). The 10,000-document figures are reported separately and
 > never set against a 267-document number.
 
-
 ## 3b. MATCHED-WINDOW MEMORY (session 14) — supersedes the ratios in §3
 
 §3 compared a 267-document RocketRide window against LlamaIndex windows of different sizes, and
@@ -234,8 +233,21 @@ compared, post-warm-up (n ≥ 50).
 
 | window | LlamaIndex median | RocketRide median | ratio | LI amplitude | RR amplitude |
 | --- | ---: | ---: | ---: | ---: | ---: |
+
 | docs 0–267 | 938 MB | 1,954 MB | **2.08×** | 122 MB | 1,675 MB |
 | docs 0–2,100 | 972 MB | 2,018 MB | **2.08×** | 238 MB | 1,783 MB |
+
+> ### ⚠️ TOPOLOGY-CONFOUNDED — see [`MATCHED_LAYERS.md`](MATCHED_LAYERS.md)
+> **The two arms did not run the same shape.** LlamaIndex ran **in-process** (1 process, no
+> HTTP, no serialization; `working/ws1/service.py` was never used) while RocketRide ran its
+> full client→WebSocket+DAP→engine→task-tree path (3 processes). RocketRide therefore carries
+> a ~240 MB engine parent with **no counterpart in the other arm**, plus two extra interpreter
+> baselines and per-document serialization.
+> **Direction: biases AGAINST RocketRide.** The number below is not withdrawn and is correct
+> as measured — but it is a property of the topology, not of the frameworks.
+> The same repo also reports LlamaIndex at **4,642 MB idle vs RocketRide 204 MB** when
+> LlamaIndex is run behind uvicorn with 8 workers — **the opposite verdict on the same two
+> systems.** Neither ratio is a framework property. Re-run design: `MATCHED_LAYERS.md` §3.
 
 **The ratio is identical at both windows despite a 7.9× increase in coverage** — the strongest
 evidence yet that ~2× is the real figure rather than a window artifact.

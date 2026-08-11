@@ -44,11 +44,21 @@ UNVERIFIED.
 | RocketRide effective pool width **17.24** | **VERIFIED** (guarded instrument, escaped tracking, confirmed by doubling) | `working/results/anchor_c_width.json` |
 | LlamaIndex has **no single pool width** — sleeping holds do not occupy a worker (`/process` is a sync `def` on Starlette's threadpool). The instrument refused rather than reporting a number | **VERIFIED** | `working/results/anchor_c_width.json` |
 | Neither service decays under sustained load (RR +1.5 %, LI +1.0 % median, n=3 randomised, 0 failures) | **VERIFIED** (2 methods) | `working/results/decay_symmetric.json` |
+
 | Peak RSS: RocketRide 204 MB idle → 2,356 MB; LlamaIndex **4,642 MB idle** → 7,950 MB. Different memory *shapes* — LI's floor scales with worker count, RR grows with document size | **VERIFIED** (continuous 250 ms sampling) | `working/results/memory_ceiling.json` |
 | Custom Python **parse** nodes run in the engine — Tika is a default, not a constraint | **VERIFIED** (executed; byte-identical to standalone pypdf) | `working/nodes/pdf_probe/` |
 | PyMuPDF is **AGPL-3.0** / Artifex commercial; pypdf is BSD-3 and is LlamaIndex's own default | **VERIFIED** (package metadata) | `working/dossiers/` |
 | Ascending concurrency sweeps under-measure by up to 2.2×; pre-warming reproduces descending order | **VERIFIED** (3 orderings) | STATE.md §4b |
 | LlamaIndex saturates at **c16, ~226 /s @400 tok** when pre-warmed | **PROVISIONAL** (1 run) | `working/results/isolated_profile_llamaindex_PREWARM.json` |
+
+> ### ⚠️ TOPOLOGY-CONFOUNDED — see [`MATCHED_LAYERS.md`](MATCHED_LAYERS.md)
+> This comparison runs LlamaIndex behind uvicorn at **8 workers**, each holding its own model,
+> against RocketRide's single task process. The 4,642 MB floor is **8 × one model**, a
+> configuration choice — `run_service.sh` in fact defaults to **14** workers.
+> **Direction: biases AGAINST LlamaIndex.** Not withdrawn, correct as measured, but it is a
+> property of the worker count, not of the framework. The matched replication reports the
+> **opposite** verdict (RocketRide 2.0× worse) with LlamaIndex in-process at 1 worker.
+> Worker-count decision and re-run design: `MATCHED_LAYERS.md` §5.
 
 ## What was withdrawn, and why
 

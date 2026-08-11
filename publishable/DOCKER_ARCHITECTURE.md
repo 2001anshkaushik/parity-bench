@@ -94,6 +94,14 @@ sample understates the peak ~4.8×, which is how the first version of this measu
 to OOM would OOM because of a limit I picked, and it would look like a framework result. PDFs will
 push the working set up, not down.
 
+> ### ⚠️ TOPOLOGY-CONFOUNDED — see [`MATCHED_LAYERS.md`](MATCHED_LAYERS.md)
+> The 4,642 MB floor is **8 uvicorn workers × one model each** — a configuration choice, and
+> `run_service.sh` in fact defaults to **14**. RocketRide is compared against it running a single
+> task process. **Biases AGAINST LlamaIndex.** The matched replication reports the **opposite**
+> verdict (RocketRide 2.0× worse) with LlamaIndex in-process at 1 worker. Nothing is withdrawn —
+> both are correct as measured — but neither is a framework property. §5 there sets the
+> worker-count basis for a re-run.
+
 **Why the asymmetry is structural, not a defect:** the LlamaIndex service carries **4,642 MB before
 a single request arrives** — 8 uvicorn workers each holding a model and a torch runtime. Its
 parallelism comes from processes, so its floor scales with worker count. RocketRide's tree idles at
