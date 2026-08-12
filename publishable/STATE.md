@@ -196,7 +196,7 @@ There is **no RocketRide endurance result** from this run.
 
 | # | finding | label |
 | --- | --- | --- |
-| W1 | **RocketRide truncates returned `page_content` at the first NUL byte.** Embeddings are computed correctly over the full text (cos = 1.0000 vs LlamaIndex on all 11 chunks); only the returned text is lost. Truncation offset matched the first NUL exactly on 11/11 chunks; clean-ASCII null control byte-identical | **VERIFIED** (3/3 reproduction + mechanism + null control) |
+| W1 | **RocketRide truncates returned `page_content` at the first NUL byte.** Embeddings are computed correctly over the full text (cos = 1.0000 vs LlamaIndex on all 11 chunks); only the returned text is lost. Truncation offset matched the first NUL exactly on 11/11 chunks; clean-ASCII null control byte-identical | **VERIFIED** (3/3 reproduction + mechanism + null control) ⚠️ The `cos = 1.0000 vs LlamaIndex on all 11 chunks` half of this is **WEAKER than it reads**: two chunks agreeing in their first ~512 tokens return 1.0000 regardless of their tails, so that comparison could not have detected a late-chunk divergence. The truncation-offset match (11/11) and the null control are unaffected and carry the finding |
 | W2 | The failing document `001_001157.pdf` (index 267, sha256 `5e35cfd7…`) is **not** in the known 1.42 % malformed set — it parses cleanly but yields binary control characters from a broken font encoding | **VERIFIED** |
 | W3 | **The engine did not crash or cascade.** The run stopped because our gate is deliberately fatal | **VERIFIED** |
 | W4 | LlamaIndex completed 10,000 docs, 9,898 goodput; its 102 faults are pypdf extraction faults in shared pre-arm code, identical for both arms | **VERIFIED** |
@@ -219,7 +219,7 @@ walk could not be falsified; and a fatal content gate ended a 16-hour phase at 2
 | # | finding | label |
 | --- | --- | --- |
 | S1 | **NUL truncation reduced to a minimal reproducer**: `send("AAAA\x00BBBB")` returns `"AAAA"`. No PDF involved — the defect is in the text path | **VERIFIED** |
-| S2 | **Direction proven OUTBOUND, not inferred**: cos(returned vector, embedding of FULL text) = **1.0000**; vs truncated-text embedding = 0.7698. The engine embeds the full text and loses it only in the response | **VERIFIED** |
+| S2 | **Direction proven OUTBOUND, not inferred**: cos(returned vector, embedding of FULL text) = **1.0000**; vs truncated-text embedding = 0.7698. The engine embeds the full text and loses it only in the response | **VERIFIED** ⚠️ **Cosine has a measured blind spot** — it cannot discriminate content lost beyond ~2,000–2,500 chars into a chunk (measured 2026-08-12; embedder truncates at 512 tokens, credit Leela §4.10). **S2 stands**: every measured NUL offset (max 2,174) falls inside the discriminating window, which is why 1.0000 vs 0.7698 separated the hypotheses at all. Content now verified by chunk hash instead |
 | S3 | **Only `0x00` truncates.** All 32 other control chars (`0x01`–`0x1F`, `0x7F`) return intact | **VERIFIED** |
 | S4 | Only `page_content` is affected; `embedding`, `embedding_model`, `metadata`, `type` and all top-level keys are intact. **Untested:** error payloads, non-`response_documents` components | **VERIFIED** (within fields observed) |
 | S5 | Always cut at the **first** NUL — leading NUL empties the chunk entirely; trailing NUL loses nothing | **VERIFIED** (6 boundary cases) |
@@ -355,6 +355,16 @@ carries the full analysis.
 | S6 | **The 22.8× idle figure is NOT a point on the matched curve at any C.** It compared LlamaIndex idle at 8 workers (8 models eagerly pre-loaded) against RocketRide idle (engine parent, **no task, no model**). It measures **eager vs lazy model residency**, not memory efficiency. Correct answer to "what does an idle deployment cost"; not an answer to "which framework uses less memory" | **VERIFIED** |
 | S7 | RocketRide passes its variance gate at **every** concurrency level (3.6–7.2 %); LlamaIndex fails at C=8 and C=16 | **VERIFIED** |
 | S8 | **RocketRide task creation hung in `INITIALIZING` for 300 s** after ~14 create/terminate cycles on a 31.8 h engine. No orphans, engine responsive at 188 MB, and a manual probe then created a task in 6.8 s — transient, not degradation. Retry produced a ratio within 1 % of the other reps | **PROVISIONAL** (observed once) |
+
+### Adopted from Leela's benchmark, and deferred items — 2026-08-12
+
+| # | item | status |
+| --- | --- | --- |
+| L1 | **Chunk-hash content gate** (`harness/chunk_hash.py`) — hash returned chunk text against a reference computed **outside both frameworks**, rather than checking vector shape. Approach from her `pdf1k/ground_truth.py`. Demonstrated: on a NUL-bearing document the vector-shape gate **passes** while the chunk-hash gate **fails** with the exact offset. Both arms verified chunk-identical to the reference, 12/12 documents | **ADOPTED** — regression test `chunk_hash_gate` |
+| L2 | **512-token embedder truncation** (her CONTEXT_SNAPSHOT §4.10). Independently measured here: cosine stops discriminating past **~2,000–2,500 chars / 500–625 tokens** (cos 0.9378 at 2,000 → 1.0000 at 2,500). Every cosine claim in this repo re-examined; see S2 and W1 | **ADOPTED as a documented limit** (2 methods: her finding + our measurement) |
+| L3 | **`text + '\n'` canonical transform** — her Stage 0/1 finding, already in `ws1/pipeline.py` | previously adopted |
+| L4 | **cgroup-scoped memory accounting** — she sums RSS over all processes in the container cgroup, with per-process breakdown, and keeps the client out of the arm total. Cleaner boundary than our engine-tree + driver sum, which folds our driver into RocketRide's total (~250–320 MB inflation, disclosed) | **DEFERRED to Phase 2, deliberately.** Switching now would make every historical figure in this repo incomparable with its own successor. Phase 2 runs on Linux with real cgroups v2, where this becomes both natural and enforceable — adopt it at that boundary, not before. **Open item.** |
+| L5 | Ground-truth **reference embedding vectors** for a fixed sample (her `sample_vectors.json`) — drift detection across engine versions | **not adopted** — lower value for us than L1 given L2; logged for Phase 2 |
 
 ## 4. Verified findings, with labels
 

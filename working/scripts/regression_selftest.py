@@ -291,6 +291,66 @@ def t_node_mark_fails_loudly():
         importlib.reload(eo2)
 
 
+# ---------------------------------------------------------------- 12. chunk-hash content gate
+def t_chunk_hash_gate():
+    """The vector-shape gate passes on truncated content; the chunk-hash gate does not.
+
+    Approach adopted from Leela's bench_langgraph_prod (pdf1k/ground_truth.py). The embedder
+    truncates at 512 tokens while chunks are ~4,000 chars, so cosine similarity cannot see content
+    lost in a chunk's tail. Hashing the text can.
+
+    Runs entirely offline against the reference splitter — no engine, no service, no corpus."""
+    from harness.chunk_hash import (check_chunks, reference_chunks, effective_config,
+                                    ChunkHashMismatch)
+    from harness.goodput import check_document
+
+    cfg = effective_config()
+    assert cfg["chunk_size"] == 4000 and cfg["chunk_overlap"] == 200, (
+        f"splitter defaults moved: {cfg} — every chunk hash in the archive was computed at 4000/200")
+
+    text = ("Alpha beta gamma delta epsilon. " * 60) + "\x00" + ("Zeta eta theta iota kappa. " * 400)
+    ref = reference_chunks(text)
+    assert len(ref) > 1, "fixture must span multiple chunks or the count check cannot be exercised"
+
+    # --- null control: the reference must accept itself
+    check_chunks("self", ref, text)
+
+    # --- content truncated at the NUL (the documented engine defect) must FAIL
+    truncated = [ref[0].split("\x00")[0]] + ref[1:]
+    try:
+        check_chunks("truncated", truncated, text)
+    except ChunkHashMismatch as e:
+        assert "NUL" in str(e) or "SHORTER" in str(e), f"mismatch not diagnosed: {e}"
+    else:
+        raise AssertionError("chunk-hash gate accepted NUL-truncated content — it cannot fail")
+
+    # --- and the OLD gate must pass on that same input, which is why this test exists
+    dim = 384
+    vecs = [[1.0] + [0.0] * (dim - 1) if i % 2 == 0 else [0.0, 1.0] + [0.0] * (dim - 2)
+            for i in range(len(truncated))]
+    check_document("truncated", truncated, vecs)      # shape-valid, content wrong -> passes
+
+    # --- wrong chunk count must FAIL with a count-specific message
+    try:
+        check_chunks("dropped", ref[:-1], text)
+    except ChunkHashMismatch as e:
+        assert "COUNT" in str(e), f"count mismatch not diagnosed as a count problem: {e}"
+    else:
+        raise AssertionError("chunk-hash gate accepted a dropped chunk")
+
+    # --- missing the text+'\n' transform must FAIL (Leela's Stage 0/1 finding)
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+    no_nl = RecursiveCharacterTextSplitter(
+        chunk_size=4000, chunk_overlap=200, length_function=len).split_text(text)
+    if hash(tuple(no_nl)) != hash(tuple(ref)):
+        try:
+            check_chunks("no-newline", no_nl, text)
+        except ChunkHashMismatch:
+            pass
+        else:
+            raise AssertionError("gate did not notice the missing text+newline transform")
+
+
 # ---------------------------------------------------------------- 10. artifact protected content
 def t_artifact_protected_content():
     """Sessions 16 and 17: an edit to MEETING_2026-08-10.md destroyed the thread-asymmetry
@@ -340,6 +400,7 @@ if __name__ == "__main__":
           t_thread_settings_matched)
     check("node_mark_fails_loudly", "engine-node match errors instead of returning 0",
           t_node_mark_fails_loudly)
+    check("chunk_hash_gate", "content verified by hash, not vector shape", t_chunk_hash_gate)
     check("artifact_protected_content", "disclosure + VOID markers survive edits",
           t_artifact_protected_content)
     print("=" * 92)

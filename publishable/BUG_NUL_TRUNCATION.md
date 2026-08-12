@@ -43,6 +43,30 @@ reference embeddings of the full and truncated texts:
 | returned vector vs embedding of the **full** text | **1.0000** |
 | returned vector vs embedding of the **truncated** text | 0.7698 |
 
+> ### ⚠️ Vector-similarity evidence has a measured limit — read before quoting any cosine here
+> **The embedder truncates at 512 tokens while our chunks are ~4,000 characters** (finding credited
+> to Leela's `bench_langgraph_prod`, CONTEXT_SNAPSHOT §4.10). Measured independently here
+> (2026-08-12, MiniLM CPU, text identical to N chars then divergent):
+>
+> | divergence at | ~tokens | cos(full, truncated) | discriminating? |
+> | ---: | ---: | ---: | --- |
+> | 200 | 50 | 0.7128 | yes |
+> | 1,000 | 250 | 0.7499 | yes |
+> | 2,000 | 500 | 0.9378 | yes |
+> | **2,500** | **625** | **1.0000** | **no — indistinguishable** |
+> | 4,000 | 1,000 | 1.0000 | no |
+>
+> **Cosine cannot detect content lost beyond ~2,000–2,500 characters into a chunk.** Two chunks that
+> differ only in the tail embed identically.
+>
+> **This claim is UNAFFECTED**, because the measured NUL offsets are **0, 0, 50, 170, 193, 455,
+> 1,144, 1,294, 2,174** — every one inside the discriminating window, which is exactly why
+> `cos = 1.0000` (vs full text) against `0.7698` (vs truncated text) separated the two hypotheses.
+> Had a NUL fallen past ~2,500 chars, both candidates would have returned 1.0000 and the test would
+> have proved nothing. The offset 2,174 sits at the edge of that window.
+>
+> Content is now verified by **chunk hash** (`harness/chunk_hash.py`), which has no such blind spot.
+
 **The engine embedded the full text.** The vector is a perfect match for the complete input and
 clearly distinguishable from the truncated one. So the text is not lost on the way in — it is lost
 on the way out, in response serialisation.
