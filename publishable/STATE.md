@@ -397,6 +397,55 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### PHASE 2 HANDOFF — 2026-08-13
+
+Engine pinned **3.3.1 + SDK 1.3.0** (team decision; our pairing, the only manifest-correct one).
+Parser IN on both arms. `publishable/PRE_AWS_READINESS.md` carries the evidence.
+
+**TRAVELS TO AWS — gate-clean locally**
+
+| item | evidence |
+| --- | --- |
+| Parser IN, both arms | 50/50 documents, census closes on both arms |
+| Leela's census + structure + determinism gates | implemented; PASS on both arms (L2 tolerance 1e-3) |
+| Determinism under concurrency | 50/50 blast vs sequential, both arms |
+| In-process thread parity, refuses to run on mismatch | 10 intra-op / 14 interop, both arms, every run |
+| Content sanity (NUL + printable ratio) | 0 false positives on 50 documents |
+| Setup probe + environment manifest incl. **engine binary sha256** | `working/scripts/setup_probe.py` |
+| Cross-arm extraction fidelity as a REPORTED metric | median char ratio 0.9963 over 50 docs |
+| Per-arm chunk hash for the **LlamaIndex** arm | 0 failures on 50; reference is the arm's own returned text |
+
+**DOES NOT TRAVEL**
+
+| item | why | label |
+| --- | --- | --- |
+| **`harness/tika_reference.py` as a GATE** | standalone Tika does not reproduce in-process Tika byte-for-byte — glyph mapping differs (soft hyphen vs space, em-quad vs em-space) despite identical version, jars, `tika-config.xml` and JVM defaults. On 50 documents it produced 5 failures, **4 of them this artifact**. **ADVISORY ONLY. Do not run as a gate.** | root cause **UNVERIFIED** |
+| **The `+'\n\n'` reference rule as published** | measured byte-exact 8/8 on the *first 8 sorted* documents; holds **2 of 6** on a wider draw. The earlier 8/8 overstated it and is corrected in place. Must be re-derived, and re-derived again on 3.2.1 | **superseded** |
+| **Census identity as a HARD gate** | closes on both arms but the fault taxonomies are asymmetric — LlamaIndex returns typed error classes, RocketRide signals failure with an empty document list. It closes while meaning different things | **VERIFIED asymmetry** |
+| **Per-file corpus sha256 manifest** | still not built. Both Leela and Shashi have one; we are the weakest of the three on corpus provenance | MISSING |
+| **Warm-up at 25 documents** | insufficient for the LlamaIndex arm (1.08× steady at reps 25–50). Use **100** | **PROVISIONAL** |
+
+**NO independent parse reference exists for the RocketRide arm.** That is the honest state. The
+LlamaIndex arm has one (its own returned `extracted_text`); RocketRide does not, because the only
+candidate does not reproduce the engine byte-for-byte. Raised with the team as an open question
+rather than papered over — `publishable/TEAM_MESSAGE_2026-08-13.md`.
+
+**Cross-team, cross-version confirmations [VERIFIED]**
+
+| # | finding | label |
+| --- | --- | --- |
+| X1 | Leela's two expected-fail documents (`000164.pdf`, `000357.pdf`) return **0 documents on our engine 3.3.1**, reproducing her 3.2.1 result. Two teams, two engine versions, two harnesses | **VERIFIED** (2/2) |
+| X2 | Her `EXPECTED_FAIL` set is hardcoded to filenames that match **zero** documents in a `000_000164.pdf`-style corpus, so the check passes vacuously there. The underlying finding is sound; the mechanism does not port | **VERIFIED** |
+
+**Instrument defects caught this session** — the twelfth and thirteenth in this project, both of
+which would have travelled as RocketRide findings:
+
+* Driving `RocketPdfArm.process()` from a `ThreadPoolExecutor` calls `run_until_complete` on one
+  asyncio loop from several threads, silently abandoning coroutines and reporting **7/8 false
+  non-determinism**. Fixed to one loop with `asyncio.gather`; 50/50 clean after.
+* The 400-document warm-up measurement varied document index and document size together on a corpus
+  whose sizes span **2018×**. It measured size. Discarded and redone with a fixed fixture.
+
 ## 4. Verified findings, with labels
 
 | # | finding | label | evidence |
