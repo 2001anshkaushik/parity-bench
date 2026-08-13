@@ -430,6 +430,16 @@ LlamaIndex arm has one (its own returned `extracted_text`); RocketRide does not,
 candidate does not reproduce the engine byte-for-byte. Raised with the team as an open question
 rather than papered over — `publishable/TEAM_MESSAGE_2026-08-13.md`.
 
+**`000_000159` duplication — status recorded [VERIFIED what, UNVERIFIED why]**
+
+Engine returns that document's chunk list **twice, concatenated** (164 = 2 × 82, 82 unique hashes,
+first half == second half == reference). Three harness explanations tested and refuted: the two
+`parse` nodes are byte-identical; a single-input preprocessor variant reproduces it; the plain
+pipeline reproduces it. **Prevalence 1/98 documents (1.0 %); 97/98 match their reference exactly.**
+Largest document in the sample (4 MB) — size is a hypothesis, not a finding, at n=1. Mechanism
+unknown, so **not filed to the NUL report's standard**. Impact if indexed: that document is stored
+and retrieved double-weighted, silently.
+
 **Cross-team, cross-version confirmations [VERIFIED]**
 
 | # | finding | label |

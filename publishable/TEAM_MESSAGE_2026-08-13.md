@@ -74,6 +74,17 @@ can see, none verified:
 * accept that no independent reference exists for this arm and rely on the LlamaIndex arm plus
   content-sanity checks (NUL presence, printable ratio) to catch the same defect classes
 
+One candidate that looked better and is **not yet verified**: build the reference from the engine's
+own `parse` output, tapped off the `text` lane with a second `response_text` node, instead of from
+standalone Tika. On 98 documents that matched **97/98 exactly** — against 4-in-5 false failures from
+the standalone route. It only checks everything *downstream* of parse, which is a real limitation.
+
+**I could not confirm it catches the NUL case**, and the reason is worth knowing if either of you
+tries it: our NUL reproducer is `text/plain`, and `parse` consumes the `tags` lane, so plain text
+bypasses parse and the tap comes back **empty**. The gate then "fails" by comparing chunks against an
+empty reference — a false positive, not a detection. Testing it properly needs a PDF with a NUL in
+its extracted text, which I have not built.
+
 I am not proposing the standalone-Tika route. It is advisory in our repo and explicitly marked
 does-not-travel to AWS.
 

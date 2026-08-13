@@ -1,0 +1,1011 @@
+{
+ "_meta": {
+  "name": "dup_prevalence",
+  "written_utc": "20260813T203833Z",
+  "payload_sha256_12": "75a90994afc9",
+  "host": "ef116134-9c03-4348-b4d3-39d8a11ba5aa.attlocal.net",
+  "user": "ansh",
+  "pid": 27227,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "n": 100,
+  "rows": [
+   {
+    "doc": "000_000009.pdf",
+    "bytes": 39586,
+    "n_engine": 10,
+    "n_ref": 10,
+    "ratio": 1.0,
+    "unique_engine": 10,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000010.pdf",
+    "bytes": 120441,
+    "n_engine": 4,
+    "n_ref": 4,
+    "ratio": 1.0,
+    "unique_engine": 4,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000011.pdf",
+    "bytes": 31367,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000012.pdf",
+    "bytes": 22857,
+    "n_engine": 5,
+    "n_ref": 5,
+    "ratio": 1.0,
+    "unique_engine": 5,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000013.pdf",
+    "bytes": 38638,
+    "n_engine": 4,
+    "n_ref": 4,
+    "ratio": 1.0,
+    "unique_engine": 4,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000015.pdf",
+    "bytes": 55964,
+    "n_engine": 4,
+    "n_ref": 4,
+    "ratio": 1.0,
+    "unique_engine": 4,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000016.pdf",
+    "bytes": 150586,
+    "n_engine": 4,
+    "n_ref": 4,
+    "ratio": 1.0,
+    "unique_engine": 4,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000018.pdf",
+    "bytes": 94424,
+    "n_engine": 7,
+    "n_ref": 7,
+    "ratio": 1.0,
+    "unique_engine": 7,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000019.pdf",
+    "bytes": 124152,
+    "n_engine": 2,
+    "n_ref": 2,
+    "ratio": 1.0,
+    "unique_engine": 2,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000020.pdf",
+    "bytes": 4755,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000021.pdf",
+    "bytes": 4521,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000022.pdf",
+    "bytes": 21235,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000024.pdf",
+    "bytes": 44121,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000025.pdf",
+    "bytes": 197832,
+    "n_engine": 5,
+    "n_ref": 5,
+    "ratio": 1.0,
+    "unique_engine": 5,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000026.pdf",
+    "bytes": 97475,
+    "n_engine": 4,
+    "n_ref": 4,
+    "ratio": 1.0,
+    "unique_engine": 4,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000028.pdf",
+    "bytes": 205925,
+    "n_engine": 10,
+    "n_ref": 10,
+    "ratio": 1.0,
+    "unique_engine": 10,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000029.pdf",
+    "bytes": 3727214,
+    "n_engine": 2,
+    "n_ref": 2,
+    "ratio": 1.0,
+    "unique_engine": 2,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000135.pdf",
+    "bytes": 80961,
+    "n_engine": 13,
+    "n_ref": 13,
+    "ratio": 1.0,
+    "unique_engine": 13,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000137.pdf",
+    "bytes": 201776,
+    "n_engine": 2,
+    "n_ref": 2,
+    "ratio": 1.0,
+    "unique_engine": 2,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000140.pdf",
+    "bytes": 89719,
+    "n_engine": 2,
+    "n_ref": 2,
+    "ratio": 1.0,
+    "unique_engine": 2,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000141.pdf",
+    "bytes": 458941,
+    "n_engine": 12,
+    "n_ref": 12,
+    "ratio": 1.0,
+    "unique_engine": 12,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000142.pdf",
+    "bytes": 445338,
+    "n_engine": 5,
+    "n_ref": 5,
+    "ratio": 1.0,
+    "unique_engine": 5,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000143.pdf",
+    "bytes": 5189989,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000145.pdf",
+    "bytes": 45234,
+    "n_engine": 5,
+    "n_ref": 5,
+    "ratio": 1.0,
+    "unique_engine": 5,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000146.pdf",
+    "bytes": 3652867,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000147.pdf",
+    "bytes": 622082,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000149.pdf",
+    "bytes": 972022,
+    "n_engine": 9,
+    "n_ref": 9,
+    "ratio": 1.0,
+    "unique_engine": 9,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000150.pdf",
+    "bytes": 665275,
+    "n_engine": 3,
+    "n_ref": 3,
+    "ratio": 1.0,
+    "unique_engine": 3,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000152.pdf",
+    "bytes": 4406954,
+    "n_engine": 51,
+    "n_ref": 51,
+    "ratio": 1.0,
+    "unique_engine": 51,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000153.pdf",
+    "bytes": 2189678,
+    "n_engine": 42,
+    "n_ref": 42,
+    "ratio": 1.0,
+    "unique_engine": 42,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000155.pdf",
+    "bytes": 1339527,
+    "n_engine": 23,
+    "n_ref": 23,
+    "ratio": 1.0,
+    "unique_engine": 23,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000157.pdf",
+    "bytes": 1656438,
+    "n_engine": 9,
+    "n_ref": 9,
+    "ratio": 1.0,
+    "unique_engine": 9,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000159.pdf",
+    "bytes": 4051537,
+    "n_engine": 164,
+    "n_ref": 82,
+    "ratio": 2.0,
+    "unique_engine": 82,
+    "exact_double": true,
+    "matches_ref": false
+   },
+   {
+    "doc": "000_000161.pdf",
+    "bytes": 26603,
+    "n_engine": 5,
+    "n_ref": 5,
+    "ratio": 1.0,
+    "unique_engine": 5,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000162.pdf",
+    "bytes": 244584,
+    "n_engine": 7,
+    "n_ref": 7,
+    "ratio": 1.0,
+    "unique_engine": 7,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000163.pdf",
+    "bytes": 1048821,
+    "n_engine": 12,
+    "n_ref": 12,
+    "ratio": 1.0,
+    "unique_engine": 12,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000164.pdf",
+    "n_engine": 0,
+    "n_ref": 0,
+    "ratio": null
+   },
+   {
+    "doc": "000_000166.pdf",
+    "bytes": 238693,
+    "n_engine": 3,
+    "n_ref": 3,
+    "ratio": 1.0,
+    "unique_engine": 3,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000168.pdf",
+    "bytes": 552417,
+    "n_engine": 18,
+    "n_ref": 18,
+    "ratio": 1.0,
+    "unique_engine": 18,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000176.pdf",
+    "bytes": 74481,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000177.pdf",
+    "bytes": 300856,
+    "n_engine": 10,
+    "n_ref": 10,
+    "ratio": 1.0,
+    "unique_engine": 10,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000187.pdf",
+    "bytes": 9122928,
+    "n_engine": 43,
+    "n_ref": 43,
+    "ratio": 1.0,
+    "unique_engine": 43,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000189.pdf",
+    "bytes": 90222,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000196.pdf",
+    "bytes": 40291,
+    "n_engine": 3,
+    "n_ref": 3,
+    "ratio": 1.0,
+    "unique_engine": 3,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000208.pdf",
+    "bytes": 5582269,
+    "n_engine": 44,
+    "n_ref": 44,
+    "ratio": 1.0,
+    "unique_engine": 44,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000236.pdf",
+    "bytes": 12423,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000251.pdf",
+    "bytes": 10788,
+    "n_engine": 2,
+    "n_ref": 2,
+    "ratio": 1.0,
+    "unique_engine": 2,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000252.pdf",
+    "bytes": 200856,
+    "n_engine": 8,
+    "n_ref": 8,
+    "ratio": 1.0,
+    "unique_engine": 8,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000262.pdf",
+    "bytes": 429655,
+    "n_engine": 13,
+    "n_ref": 13,
+    "ratio": 1.0,
+    "unique_engine": 13,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000263.pdf",
+    "bytes": 18247,
+    "n_engine": 2,
+    "n_ref": 2,
+    "ratio": 1.0,
+    "unique_engine": 2,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000266.pdf",
+    "bytes": 19021,
+    "n_engine": 2,
+    "n_ref": 2,
+    "ratio": 1.0,
+    "unique_engine": 2,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000269.pdf",
+    "bytes": 2066037,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000270.pdf",
+    "bytes": 70312,
+    "n_engine": 13,
+    "n_ref": 13,
+    "ratio": 1.0,
+    "unique_engine": 13,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000272.pdf",
+    "bytes": 293665,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000280.pdf",
+    "bytes": 1174312,
+    "n_engine": 8,
+    "n_ref": 8,
+    "ratio": 1.0,
+    "unique_engine": 8,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000282.pdf",
+    "bytes": 3918750,
+    "n_engine": 59,
+    "n_ref": 59,
+    "ratio": 1.0,
+    "unique_engine": 59,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000314.pdf",
+    "bytes": 735686,
+    "n_engine": 12,
+    "n_ref": 12,
+    "ratio": 1.0,
+    "unique_engine": 12,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000316.pdf",
+    "bytes": 168192,
+    "n_engine": 13,
+    "n_ref": 13,
+    "ratio": 1.0,
+    "unique_engine": 13,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000324.pdf",
+    "bytes": 451440,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000325.pdf",
+    "bytes": 508018,
+    "n_engine": 47,
+    "n_ref": 47,
+    "ratio": 1.0,
+    "unique_engine": 47,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000331.pdf",
+    "bytes": 431084,
+    "n_engine": 7,
+    "n_ref": 7,
+    "ratio": 1.0,
+    "unique_engine": 7,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000332.pdf",
+    "bytes": 262996,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000333.pdf",
+    "bytes": 74480,
+    "n_engine": 3,
+    "n_ref": 3,
+    "ratio": 1.0,
+    "unique_engine": 3,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000334.pdf",
+    "bytes": 206182,
+    "n_engine": 30,
+    "n_ref": 30,
+    "ratio": 1.0,
+    "unique_engine": 30,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000336.pdf",
+    "bytes": 130717,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000337.pdf",
+    "bytes": 458008,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000338.pdf",
+    "bytes": 614385,
+    "n_engine": 10,
+    "n_ref": 10,
+    "ratio": 1.0,
+    "unique_engine": 10,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000339.pdf",
+    "bytes": 65206,
+    "n_engine": 10,
+    "n_ref": 10,
+    "ratio": 1.0,
+    "unique_engine": 10,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000340.pdf",
+    "bytes": 1664437,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000341.pdf",
+    "bytes": 109065,
+    "n_engine": 8,
+    "n_ref": 8,
+    "ratio": 1.0,
+    "unique_engine": 8,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000342.pdf",
+    "bytes": 41343,
+    "n_engine": 3,
+    "n_ref": 3,
+    "ratio": 1.0,
+    "unique_engine": 3,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000343.pdf",
+    "bytes": 64642,
+    "n_engine": 14,
+    "n_ref": 14,
+    "ratio": 1.0,
+    "unique_engine": 14,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000344.pdf",
+    "bytes": 2620315,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000345.pdf",
+    "bytes": 42273,
+    "n_engine": 2,
+    "n_ref": 2,
+    "ratio": 1.0,
+    "unique_engine": 2,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000346.pdf",
+    "bytes": 252172,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000347.pdf",
+    "bytes": 572552,
+    "n_engine": 20,
+    "n_ref": 20,
+    "ratio": 1.0,
+    "unique_engine": 20,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000348.pdf",
+    "bytes": 2300275,
+    "n_engine": 31,
+    "n_ref": 31,
+    "ratio": 1.0,
+    "unique_engine": 31,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000349.pdf",
+    "bytes": 39259,
+    "n_engine": 5,
+    "n_ref": 5,
+    "ratio": 1.0,
+    "unique_engine": 5,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000350.pdf",
+    "bytes": 4668,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000351.pdf",
+    "bytes": 256626,
+    "n_engine": 43,
+    "n_ref": 43,
+    "ratio": 1.0,
+    "unique_engine": 43,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000352.pdf",
+    "bytes": 333582,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000353.pdf",
+    "bytes": 97361,
+    "n_engine": 9,
+    "n_ref": 9,
+    "ratio": 1.0,
+    "unique_engine": 9,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000354.pdf",
+    "bytes": 96138,
+    "n_engine": 9,
+    "n_ref": 9,
+    "ratio": 1.0,
+    "unique_engine": 9,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000355.pdf",
+    "bytes": 233584,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000356.pdf",
+    "bytes": 23278,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000357.pdf",
+    "n_engine": 0,
+    "n_ref": 0,
+    "ratio": null
+   },
+   {
+    "doc": "000_000358.pdf",
+    "bytes": 273359,
+    "n_engine": 35,
+    "n_ref": 35,
+    "ratio": 1.0,
+    "unique_engine": 35,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000359.pdf",
+    "bytes": 1669388,
+    "n_engine": 47,
+    "n_ref": 47,
+    "ratio": 1.0,
+    "unique_engine": 47,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000360.pdf",
+    "bytes": 23897,
+    "n_engine": 5,
+    "n_ref": 5,
+    "ratio": 1.0,
+    "unique_engine": 5,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000361.pdf",
+    "bytes": 37579,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000362.pdf",
+    "bytes": 32528,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000363.pdf",
+    "bytes": 178805,
+    "n_engine": 42,
+    "n_ref": 42,
+    "ratio": 1.0,
+    "unique_engine": 42,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000364.pdf",
+    "bytes": 121566,
+    "n_engine": 3,
+    "n_ref": 3,
+    "ratio": 1.0,
+    "unique_engine": 3,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000365.pdf",
+    "bytes": 39757,
+    "n_engine": 10,
+    "n_ref": 10,
+    "ratio": 1.0,
+    "unique_engine": 10,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000366.pdf",
+    "bytes": 139216,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000367.pdf",
+    "bytes": 135513,
+    "n_engine": 6,
+    "n_ref": 6,
+    "ratio": 1.0,
+    "unique_engine": 6,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000368.pdf",
+    "bytes": 12084,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000369.pdf",
+    "bytes": 11558,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "unique_engine": 1,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000370.pdf",
+    "bytes": 45547,
+    "n_engine": 7,
+    "n_ref": 7,
+    "ratio": 1.0,
+    "unique_engine": 7,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "000_000371.pdf",
+    "bytes": 282008,
+    "n_engine": 9,
+    "n_ref": 9,
+    "ratio": 1.0,
+    "unique_engine": 9,
+    "exact_double": false,
+    "matches_ref": true
+   }
+  ],
+  "dup_ge_1_5": 1,
+  "exact_double": 1,
+  "matches_ref": 97
+ }
+}

@@ -87,6 +87,66 @@ explanation I cannot exclude: the `parse` node inside the 5-node pipeline may no
 text as the `parse` node in the extract-only pipeline. I have not verified that they agree, and it is
 the first thing to check.
 
+## 2b. `000_000159` duplication — characterised, and it is NOT the harness [VERIFIED]
+
+**What it is:** the engine returns the document's complete chunk list **twice, concatenated**.
+
+| check | result |
+| --- | --- |
+| engine chunks | **164** · reference from the engine's own parse output: **82** · ratio exactly **2.000** |
+| unique chunk hashes among the 164 | **82** |
+| `engine == reference + reference` | **True** |
+| first half == second half == reference | **True** |
+| interleaved (`c1,c1,c2,c2,…`) | False — it is concatenation, not interleaving |
+
+**Harness explanations tested and refuted** (this is unfavourable to RocketRide, so these came first):
+
+1. *"The 5-node pipeline's `parse` differs from the extract-only `parse` you built the reference
+   from."* — **Refuted.** Tapped both in one run: byte-identical, same sha256, 283,521 chars each.
+2. *"Our preprocessor has two inputs on the `text` lane (from `parse_1` and `webhook_1`), so it sees
+   the text twice."* — **Refuted.** A variant pipe fed only from `parse_1` returns the same 164
+   chunks and the same 580,104 characters.
+3. *"The tap node itself causes it."* — **Refuted.** The plain 5-node pipe (no tap) also returns 164.
+
+So the duplication is **downstream of `parse` and not caused by our wiring**.
+
+**Prevalence [VERIFIED — 100 documents scanned, 98 usable]:**
+
+* chunk-ratio ≥ 1.5× against its own reference: **1/98 (1.0 %)**
+* exact `[ref+ref]` duplication: **1/98**
+* chunks match reference exactly: **97/98**
+
+**So it is one document in 98, not a systemic defect** — an anecdote by prevalence, but a very clean
+one. The affected document is the largest in the sample at **4,051,537 bytes**; size is the obvious
+correlate but with n=1 it is a hypothesis, not a finding. **Not filed to the NUL report's standard**,
+because that standard needs a mechanism and a minimal reproducer, and I have neither: I know *what*
+happens and *where* (after parse), not *why*.
+
+**Impact if it reaches an index:** every chunk of that document is stored twice, so it is
+double-weighted in retrieval and consumes 2× the vector-store rows. Silent — the vectors are
+individually valid and the response looks healthy.
+
+**Open, and the next step:** whether it correlates with document size, and whether the engine emits
+the `documents` lane twice for inputs above some threshold. One 4 MB document is not enough to say.
+
+## 2c. A better reference candidate — promising, NOT verified
+
+The prevalence scan above built its reference from the **engine's own parse output**, tapped off the
+`text` lane, rather than from standalone Tika. That sidesteps the glyph-mapping problem entirely:
+**97/98 documents matched exactly**, against 4-in-5 false failures from the standalone-Tika
+reference.
+
+It is only *partially* independent — it trusts `parse` and checks everything downstream of it. That
+is still worth having, because it isolates split/chunk/response defects.
+
+**But whether it catches the NUL truncation is UNVERIFIED, and my attempt to test it failed for an
+instructive reason:** the NUL reproducer is `text/plain`, and the `parse` node consumes the `tags`
+lane, so plain text **bypasses parse entirely** and the tap returned **0 characters**. The gate then
+"failed" by comparing 3 chunks against an empty reference — a false positive, not a detection.
+
+**To test it properly needs a PDF that contains a NUL in its extracted text.** Not built. Until that
+exists, this remains a candidate, not a solution, and it does **not** travel as a gate.
+
 ## 3. What Leela's gates cannot catch — demonstrated twice
 
 **On a synthetic NUL document** (13,816 chars, NUL at offset 2,115), engine 3.3.1:
