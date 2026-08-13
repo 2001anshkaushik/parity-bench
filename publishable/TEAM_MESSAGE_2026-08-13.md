@@ -1,8 +1,8 @@
 # Team message — Leela, Shashi
 
 **Draft for Slack. Ansh · 2026-08-13.** Everything here is measured on engine `3.3.1.35` unless
-labelled otherwise. Four items: two confirmations of Leela's work, one warm-up number, and one open
-question I do not have an answer to.
+labelled otherwise. Four items: two confirmations of Leela's work, a warm-up number, and a working parse reference
+with a real-data demonstration of what the determinism gate cannot see.
 
 ---
 
@@ -47,47 +47,45 @@ finding.
 span **2018×**, so it measured document size, not warm-up. Worth knowing if either of you measures
 it the same way.)
 
-**4. Open question — the determinism gate has a blind spot, and I do not have a fix.**
+**4. We have a working parse reference now — and a real-data demonstration of the gate gap.**
 
-Comparing each arm against itself across two runs catches **non-determinism**, which is real and
-worth gating. It cannot catch **deterministic data loss**, because a deterministic defect reproduces
-identically in both runs and the comparison agrees with itself.
+Replacing the open question I was going to send you. Build the chunk reference from **the engine's
+own `parse` output**, tapped off the `text` lane with a second `response_text` node, rather than from
+standalone Tika. Both sides then come from the same in-process Tika, so the glyph-mapping problem
+that broke my earlier attempt disappears: **97/98 documents match exactly**, against 4-in-5 false
+failures the other way.
 
-Concretely, on our NUL-truncation defect (engine truncates returned `page_content` at the first NUL
-byte, same place every time): a self-comparison gate passes **3/3** on a document that lost **84 %**
-of its text. 100 % agreement on 100 % data loss.
+**The demonstration, on a real corpus document — no synthetic fixture needed.** `000_000159.pdf`,
+three runs through the full pipeline:
 
-**What I do not have is a working independent reference for the RocketRide arm.** I tried running the
-engine's own Tika 3.2.3 standalone — same jars, same `tika-config.xml`, separate process — and it
-does **not** reproduce the engine's in-process output byte-for-byte. Glyph mapping differs: engine
-`long term` where standalone gives `long‑term` (soft hyphen), engine ` ` where standalone gives
-` `. Same version, same config, JVM defaults already matching (UTF-8 / en / US). Root cause not
-found. Used as a gate on 50 documents it produced 5 failures, **4 of which were this mapping
-difference rather than an engine defect** — so it is worse than useless as a gate right now.
+| gate | result |
+| --- | --- |
+| determinism (n=3) | **PASS** — 164 chunks every run |
+| structure (384-d, finite, L2 1.0 ± 0.001) | **PASS** — all 164 vectors valid |
+| census (1 offered = 1 successful) | **PASS** |
+| parse-tap reference | **FAIL** — `chunk COUNT 164 != reference 82` |
 
-So: **has either of you got a better idea for an independent RocketRide parse reference?** Options I
-can see, none verified:
+The engine returns that document's chunk list **twice, concatenated** — 82 unique chunks, emitted
+164 times, first half == second half == reference. Every vector is individually valid and the
+response looks healthy, so all three gates pass while the content is silently stored double-weighted.
+That is the concrete version of the blind spot I was going to describe in the abstract.
 
-* reconcile the standalone/in-process Tika difference (I could not, in the time I gave it)
-* a structural check that does not need byte equality — e.g. assert chunk boundaries and counts
-  against the arm's own parse output, catching loss without requiring exact text
-* accept that no independent reference exists for this arm and rely on the LlamaIndex arm plus
-  content-sanity checks (NUL presence, printable ratio) to catch the same defect classes
+**Scope, measured rather than assumed.** It catches defects **downstream of** `parse`; it cannot
+catch defects **inside** parse, because it trusts parse by construction. Worth having anyway.
 
-One candidate that looked better and is **not yet verified**: build the reference from the engine's
-own `parse` output, tapped off the `text` lane with a second `response_text` node, instead of from
-standalone Tika. On 98 documents that matched **97/98 exactly** — against 4-in-5 false failures from
-the standalone route. It only checks everything *downstream* of parse, which is a real limitation.
+**It did NOT catch our NUL case, and the reason is worth your time:** on `038_038716.pdf` — the
+document we recorded as losing 98.9 % of its text under the old topology — the engine's **own parse
+output contains no NUL at all**. Tika does not emit the NUL that pypdf did. So there was nothing
+downstream to lose. **Our ~0.30 % NUL prevalence was measured parser-out with pypdf and should not
+be quoted for a Parser IN run until re-derived from Tika extractions.** The defect itself is
+unchanged and still reproduces (`'AAAA\x00BBBB'` → `'AAAA'` on 3.3.1.35, re-verified today).
 
-**I could not confirm it catches the NUL case**, and the reason is worth knowing if either of you
-tries it: our NUL reproducer is `text/plain`, and `parse` consumes the `tags` lane, so plain text
-bypasses parse and the tap comes back **empty**. The gate then "fails" by comparing chunks against an
-empty reference — a false positive, not a detection. Testing it properly needs a PDF with a NUL in
-its extracted text, which I have not built.
+**Duplication prevalence so far [PROVISIONAL]:** 1/98 on an arbitrary 100-document sample, plus a
+second instance found on a size ladder — `009_009442.pdf` at **2.25 MB**, also exact doubling. But
+documents at 3.00, 3.01 and 4.00 MB are clean, so it is **not a simple size threshold**. Two
+instances, exact `[ref+ref]` doubling both times, mechanism unknown. If either of you sees a
+chunk-count ratio near 2.0 against your own reference, that is this.
 
-I am not proposing the standalone-Tika route. It is advisory in our repo and explicitly marked
-does-not-travel to AWS.
+If you want the tap pipe and the reference builder, they are in our repo and portable —
+`working/pipes/product_pdf_tap.pipe` plus `harness/chunk_hash.py`.
 
----
-
-Everything above is in `publishable/PRE_AWS_READINESS.md` with the raw numbers.

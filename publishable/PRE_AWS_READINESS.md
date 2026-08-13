@@ -129,23 +129,59 @@ individually valid and the response looks healthy.
 **Open, and the next step:** whether it correlates with document size, and whether the engine emits
 the `documents` lane twice for inputs above some threshold. One 4 MB document is not enough to say.
 
-## 2c. A better reference candidate — promising, NOT verified
+## 2c. The parse-tap reference — PROMOTED, with its scope measured not assumed
 
-The prevalence scan above built its reference from the **engine's own parse output**, tapped off the
-`text` lane, rather than from standalone Tika. That sidesteps the glyph-mapping problem entirely:
-**97/98 documents matched exactly**, against 4-in-5 false failures from the standalone-Tika
-reference.
+Build the chunk reference from the **engine's own `parse` output**, tapped off the `text` lane with a
+second `response_text` node, instead of from standalone Tika. It sidesteps the glyph-mapping problem
+entirely because both sides come from the same in-process Tika.
 
-It is only *partially* independent — it trusts `parse` and checks everything downstream of it. That
-is still worth having, because it isolates split/chunk/response defects.
+### Real-data demonstration — stronger than the synthetic NUL case [VERIFIED]
 
-**But whether it catches the NUL truncation is UNVERIFIED, and my attempt to test it failed for an
-instructive reason:** the NUL reproducer is `text/plain`, and the `parse` node consumes the `tags`
-lane, so plain text **bypasses parse entirely** and the tap returned **0 characters**. The gate then
-"failed" by comparing 3 chunks against an empty reference — a false positive, not a detection.
+`000_000159.pdf`, run three times through the full 5-node pipeline:
 
-**To test it properly needs a PDF that contains a NUL in its extracted text.** Not built. Until that
-exists, this remains a candidate, not a solution, and it does **not** travel as a gate.
+| gate | result |
+| --- | --- |
+| **Leela — determinism** (n=3, chunk-hash lists identical) | **PASS** — 164 chunks every run |
+| **Leela — structure** (384-d, finite, L2 = 1.0 ± 0.001) | **PASS** — all 164 vectors valid |
+| **Leela — census** (1 offered = 1 successful) | **PASS** |
+| **parse-tap reference** | **FAIL** — `chunk COUNT 164 != reference 82` |
+
+**All three gates pass on a document whose content is silently stored twice.** This needs no
+hypothetical and no synthetic fixture — it is a real corpus document, and the failure is exactly the
+kind a benchmark is supposed to catch: every vector individually valid, the response healthy, the
+content doubled.
+
+### Scope — measured, and narrower than I expected
+
+**Catches:** defects *downstream of* `parse` that change chunk text or chunk count.
+[VERIFIED on the duplication class.]
+
+**Cannot catch:** defects *inside* `parse` itself. It trusts parse by construction. That is a real
+limitation, and it is still strictly better than having no reference at all.
+
+**It did NOT catch the NUL case — and the reason is not what I assumed.** Running
+`038_038716.pdf` (the document `BUG_NUL_TRUNCATION.md` records as losing 98.9 % of its text, 4 NULs,
+first at offset 422) through the tapped pipeline: **the engine's own parse output contains no NUL at
+all** (37,992 chars, `NUL present: False`), and the 12 returned chunks match the reference exactly.
+There was nothing downstream to lose.
+
+## 2d. The NUL finding's scope under Parser IN — now an open question [PROVISIONAL]
+
+The defect itself is **still live**: sending `'AAAA\x00BBBB'` (9 chars) on the `text/plain` path
+returns `'AAAA'` (4 chars) on engine 3.3.1.35, re-verified this session.
+
+But `BUG_NUL_TRUNCATION.md`'s **prevalence figure of ~0.30 % was measured under the old parser-out
+topology**, where our driver extracted with **pypdf** and sent text containing NULs into the engine.
+Under Parser IN the engine extracts with **Tika**, and on the one document tested Tika's output
+contains no NUL where pypdf's did.
+
+**So the question "how often does NUL truncation affect a Parser IN run?" is not answered by the old
+0.30 %.** It could be materially lower, or zero, if Tika does not emit NULs on this corpus. It is
+**not** a reason to downgrade the bug — the truncation is real and reproducible on any path that
+carries a NUL — but the prevalence number should not be quoted for Parser IN until re-measured.
+
+**Next step:** scan the corpus for NULs in *Tika* extractions (the tap gives this directly) rather
+than reusing the pypdf-derived count. Not done — flagged as the first correctness item for AWS.
 
 ## 3. What Leela's gates cannot catch — demonstrated twice
 

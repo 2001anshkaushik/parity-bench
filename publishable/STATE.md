@@ -415,6 +415,18 @@ Parser IN on both arms. `publishable/PRE_AWS_READINESS.md` carries the evidence.
 | Cross-arm extraction fidelity as a REPORTED metric | median char ratio 0.9963 over 50 docs |
 | Per-arm chunk hash for the **LlamaIndex** arm | 0 failures on 50; reference is the arm's own returned text |
 
+**PROMOTED — parse-tap reference [VERIFIED]**
+
+Build the chunk reference from the engine's own `parse` output (tapped via a second `response_text`
+node on the `text` lane), not standalone Tika. **97/98 exact** vs 4-in-5 false failures the other
+way. Catches defects downstream of parse; cannot catch defects inside parse. Travels.
+
+**NUL scope changed under Parser IN [PROVISIONAL]:** the ~0.30 % prevalence in
+`BUG_NUL_TRUNCATION.md` was measured parser-out with pypdf. On `038_038716.pdf` the engine's Tika
+output contains **no NUL**, so nothing truncates on that path. The defect is unchanged and still
+reproduces on text/plain (`'AAAA\\x00BBBB'` → `'AAAA'`, re-verified 2026-08-13); only the prevalence
+needs re-deriving from Tika extractions. Bannered in the bug report. **First correctness item on AWS.**
+
 **DOES NOT TRAVEL**
 
 | item | why | label |
@@ -432,13 +444,21 @@ rather than papered over — `publishable/TEAM_MESSAGE_2026-08-13.md`.
 
 **`000_000159` duplication — status recorded [VERIFIED what, UNVERIFIED why]**
 
-Engine returns that document's chunk list **twice, concatenated** (164 = 2 × 82, 82 unique hashes,
+Engine returns the document's chunk list **twice, concatenated** (164 = 2 × 82, 82 unique hashes,
 first half == second half == reference). Three harness explanations tested and refuted: the two
 `parse` nodes are byte-identical; a single-input preprocessor variant reproduces it; the plain
-pipeline reproduces it. **Prevalence 1/98 documents (1.0 %); 97/98 match their reference exactly.**
-Largest document in the sample (4 MB) — size is a hypothesis, not a finding, at n=1. Mechanism
-unknown, so **not filed to the NUL report's standard**. Impact if indexed: that document is stored
-and retrieved double-weighted, silently.
+pipeline reproduces it.
+
+**Second instance found** on a size ladder: `009_009442.pdf` at **2.25 MB**, also exact `[ref+ref]`
+doubling (144 = 2 × 72). **NOT a simple size threshold** — documents at 3.00, 3.01, 4.00 and 5.00 MB
+are clean, and the 2.25 MB case is smaller than the 4.05 MB one. Prevalence **1/98** on an arbitrary
+sample; **2 instances total** across ~110 documents examined. Mechanism unknown, so not filed to the
+NUL report's standard. Impact if indexed: those documents are stored and retrieved double-weighted,
+silently, with every vector individually valid.
+
+**Detection [VERIFIED]:** the parse-tap reference catches it while ALL THREE of Leela's gates pass —
+determinism n=3 (164 chunks every run), structure (all 164 vectors 384-d, finite, L2 within 1e-3),
+census (1 = 1). Real-data demonstration of the self-comparison blind spot.
 
 **Cross-team, cross-version confirmations [VERIFIED]**
 

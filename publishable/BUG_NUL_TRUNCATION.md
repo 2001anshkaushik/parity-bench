@@ -142,6 +142,15 @@ Extrapolated to the 10,000-document corpus that is roughly **30 documents (CI 10
 
 Low prevalence, but the loss per affected document is severe and unbounded:
 
+> ### ⚠️ PREVALENCE IS PARSER-OUT ONLY — re-measure under Parser IN
+> The ~0.30 % figure and the per-document table below were measured when our driver extracted
+> with **pypdf** and sent text into the engine. Under **Parser IN** (2026-08-12) the engine
+> extracts with **Tika**, and on `038_038716.pdf` — the worst case below, 98.9 % lost — the
+> engine's own parse output contains **no NUL at all**, so nothing is truncated on that path.
+> **The defect is unchanged and still reproduces** (`'AAAA\\x00BBBB'` → `'AAAA'` on 3.3.1.35,
+> re-verified 2026-08-13). Only the PREVALENCE is in question: it must be re-derived from NUL
+> counts in *Tika* extractions before being quoted for a Parser IN run.
+
 | document | chars | NULs | first NUL at | fraction of text lost | printable ratio |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | `027_027492.pdf` | 20,674 | 93 | 0 | **100 %** | 0.679 |
