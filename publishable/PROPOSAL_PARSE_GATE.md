@@ -39,6 +39,21 @@ same way. The gate detects only *non-determinism* — real, but a different prop
 [VERIFIED — n=3 re-runs, single defect class. The generalisation to other deterministic defects is
 reasoning, not measurement.]
 
+
+> ### ⚠️ CORRECTION 2026-08-13 — the byte-exact claim below was overstated
+> `engine_parse == standalone_tika + '\n\n'` was measured **byte-exact 8/8** on the *first 8 sorted*
+> documents. On a wider draw it holds **2 of 6**. Lengths still differ by exactly 2 everywhere
+> measured, but the bytes between do not always agree: standalone Tika maps some glyphs differently
+> from the engine's in-process Tika — e.g. engine `long term` vs standalone `long\xadterm` (soft
+> hyphen), engine `\u2003` vs standalone `\u2001`. Same version, same jars, same `tika-config.xml`;
+> JVM defaults already match (UTF-8 / en / US) and explicit overrides did not reproduce it. **Root
+> cause not established.**
+>
+> **The §1 demonstration is unaffected** — it does not depend on this rule. But the proposed gate is
+> **not ready to run as a hard gate**: on 50 documents it produced 5 failures, 4 of which were this
+> mapping difference rather than an engine defect. Keep it **advisory** until reconciled.
+> See `PRE_AWS_READINESS.md` §2.
+
 ## 2. The fix: standalone Tika, the engine's own parser, outside the engine
 
 The engine bundles Tika 3.2.3 and a JRE. Run that same Tika **outside** the engine process and use

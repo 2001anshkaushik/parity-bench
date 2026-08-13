@@ -15,8 +15,13 @@ This module takes the third option: run **the engine's own Tika 3.2.3**, from th
 with the engine's own `tika-config.xml`, in a **separate process**. Independent of the thing under
 test, but the same parser — so differences are defects, not parser disagreement.
 
-THE EXACT RULE  [VERIFIED — 8/8 documents byte-exact, sha256 equality]
+THE RULE  [CORRECTED 2026-08-13 — holds 2/6 on a wider draw, NOT 8/8]
 ---------------------------------------------------------------------
+⚠️ **This reference is ADVISORY, not a gate.** The rule below was measured byte-exact on the first 8
+sorted documents; on a wider draw it holds 2 of 6. Standalone Tika maps some glyphs differently from
+the engine's in-process Tika (soft hyphen vs space, em-quad vs em-space) despite identical version,
+jars and tika-config.xml. Root cause not established. Running this as a hard gate produces FALSE
+failures — measured: 4 of 5 flagged documents in a 50-document run.
     engine_parse_text == standalone_tika(pdf, engine/java/tika-config.xml) + "\\n\\n"
 
 The engine appends exactly two trailing newlines to Tika's output. The rule is ASSERTED rather than
@@ -50,7 +55,7 @@ JARS = ROOT / "engine" / "java" / "lib"
 CONFIG = ROOT / "engine" / "java" / "tika-config.xml"
 CLASSDIR = ROOT / "working" / "tika"
 
-ENGINE_SUFFIX = "\n\n"          # measured, 8/8 byte-exact on engine 3.3.1.35
+ENGINE_SUFFIX = "\n\n"          # length rule holds; BYTE equality does not (2/6) — advisory only
 
 
 class TikaReferenceUnavailable(RuntimeError):
