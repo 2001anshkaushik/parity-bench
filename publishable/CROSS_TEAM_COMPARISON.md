@@ -16,6 +16,19 @@ side by side — the difference between them would partly be the difference betw
 
 ---
 
+> ### ⚠️ SUPERSEDED 2026-08-13 — this two-way table is now three-way
+> Shashi's Haystack repo has since been read, and the comparison is in
+> [`THREE_WAY_COMPARISON.md`](THREE_WAY_COMPARISON.md). **Use that one.** The table below covers only
+> two of the three teams and its "we parse outside" rows are also out of date — we moved to Parser IN
+> on 2026-08-12.
+>
+> **The headline that changed:** Shashi is also on **`server-v3.2.1`**, so two of three teams share
+> an engine and **we are the outlier**. That settles by majority what the two-way table could only
+> pose as an open question.
+>
+> This document is retained, not deleted: its §2 (parser placement) and §4 (workload and gates)
+> reasoning still stands, and its 13-item pinning list is folded into the three-way §5.
+
 ## 1. The RocketRide arms — the shared baseline
 
 | | WS-1 (ours) | Leela's | direction / size |

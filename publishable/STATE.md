@@ -382,6 +382,21 @@ we had been running. Shashi and Leela are doing the same.
 | PI5 | **The engine does not reject non-PDF input** — sent 47 bytes of plain ASCII with `mimetype=application/pdf`, it returned **1 successful chunk** rather than a fault. The LlamaIndex arm returns `parse_failed`. A misidentified file is a silent success on one arm and a typed fault on the other | **PROVISIONAL** (single probe) |
 | PI6 | **Fault taxonomies are asymmetric.** LlamaIndex returns typed classes (`parse_failed`, `empty_extraction`, `malformed_input`); RocketRide signals failure by returning an **empty document list**, with no class. Fault-class comparisons between arms are not like-for-like | **VERIFIED** (4 probe cases) |
 
+### Three-way cross-team recon — 2026-08-13
+
+`publishable/THREE_WAY_COMPARISON.md` is the full table. Shashi's repo: `35ad350` (2026-08-11).
+
+| # | finding | label |
+| --- | --- | --- |
+| T3-1 | **Engine version is settled by majority: Leela and Shashi are BOTH on `server-v3.2.1`; we are alone on `3.3.1`.** We move. Everything re-baselines anyway | **VERIFIED** (both Dockerfiles + Shashi's benchmark script pin the 3.2.1 linux-x64 tarball) |
+| T3-2 | **All three run an SDK the engine manifest does not bundle, and three different ones**: ours 1.3.0/3.3.1 (paired), Leela 1.3.0/3.2.1 (3.2.1 bundles 1.1.1), Shashi 1.2.0/3.2.1 (1.2.0 pairs with 3.2.2) | **VERIFIED** |
+| T3-3 | **The dropped-splitter-kwargs defect was found independently by all three teams**, three harnesses, two engine versions. Shashi's response is the best of the three: he reads chunk lengths back out of Qdrant after a probe ingest and reconfigures his framework arm to match *actual* engine behaviour, printing `engine chunk-size config is INERT (known bug)`. All three arms converge on **4000/200** from three different declared configs | **VERIFIED** (3 independent discoveries) |
+| T3-4 | **Shashi's pipeline terminates in `qdrant`, not `response_documents`**, and he benchmarks ingest **+ a full RAG query phase** (chat → embedding → qdrant → llm_ollama → response_answers, Ollama llama3.2:1b). Different work is measured; his numbers are not ingestion-comparable with ours or Leela's | **VERIFIED** |
+| T3-5 | **Three thread configurations AND three mechanisms**: ours unpinned-measured-10 (env, read back in-process), Leela env-pinned-1, Shashi SDK-pinned-8 via `use(threads=8)`. Whether `use(threads=)` and `OMP_NUM_THREADS` control the same pool is **UNVERIFIED** — our in-process read-back is the only instrument among the three that could settle it | **BLOCKING, mechanism UNVERIFIED** |
+| T3-6 | **Three incompatible memory boundaries**: ours engine-tree+driver, Leela's container cgroup, Shashi's `getrusage(RUSAGE_SELF)` — driver only, which does not capture engine-side work at all | **VERIFIED** |
+| T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
+| T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
+
 ## 4. Verified findings, with labels
 
 | # | finding | label | evidence |
