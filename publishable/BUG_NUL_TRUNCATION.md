@@ -142,14 +142,20 @@ Extrapolated to the 10,000-document corpus that is roughly **30 documents (CI 10
 
 Low prevalence, but the loss per affected document is severe and unbounded:
 
-> ### ⚠️ PREVALENCE IS PARSER-OUT ONLY — re-measure under Parser IN
-> The ~0.30 % figure and the per-document table below were measured when our driver extracted
-> with **pypdf** and sent text into the engine. Under **Parser IN** (2026-08-12) the engine
-> extracts with **Tika**, and on `038_038716.pdf` — the worst case below, 98.9 % lost — the
-> engine's own parse output contains **no NUL at all**, so nothing is truncated on that path.
-> **The defect is unchanged and still reproduces** (`'AAAA\\x00BBBB'` → `'AAAA'` on 3.3.1.35,
-> re-verified 2026-08-13). Only the PREVALENCE is in question: it must be re-derived from NUL
-> counts in *Tika* extractions before being quoted for a Parser IN run.
+> ### ⚠️ STATUS UNDER PARSER IN (2026-08-13): real defect, NO observed reachable path via PDF ingestion
+> **Measured, not argued [VERIFIED — 303 documents]:** the engine's own Tika parse output contains
+> **zero NUL bytes and zero other control characters** (excluding \t \n \r) across a 303-document
+> scan — including all three documents where **pypdf** extraction produced NULs (`038_038716`,
+> `039_039797`, `027_027492`). Tika sanitises control characters that pypdf passes through.
+>
+> **Consequences:**
+> * The **defect is unchanged and still reproduces** on any path carrying a NUL:
+>   `'AAAA\x00BBBB'` → `'AAAA'` on 3.3.1.35, re-verified 2026-08-13. Text-lane integrations
+>   (webhook text, upstream systems sending extracted text) remain exposed.
+> * The **~0.30 % prevalence below is a pypdf-extraction number**. Under Parser IN (engine extracts
+>   with Tika) the observed prevalence on this corpus is **0/303**.
+> * Correct one-line status for reporting: **"real defect, no observed instance under Parser IN on
+>   this corpus; affects text-lane paths and any parser that emits control characters."**
 
 | document | chars | NULs | first NUL at | fraction of text lost | printable ratio |
 | --- | ---: | ---: | ---: | ---: | ---: |

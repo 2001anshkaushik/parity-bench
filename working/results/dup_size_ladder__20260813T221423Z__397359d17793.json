@@ -1,0 +1,197 @@
+{
+ "_meta": {
+  "name": "dup_size_ladder",
+  "written_utc": "20260813T221423Z",
+  "payload_sha256_12": "397359d17793",
+  "host": "ef116134-9c03-4348-b4d3-39d8a11ba5aa.attlocal.net",
+  "user": "ansh",
+  "pid": 34944,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "rows": [
+   {
+    "doc": "013_013724.pdf",
+    "bytes": 499789,
+    "tap_chars": 28681,
+    "n_engine": 8,
+    "n_ref": 8,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "033_033341.pdf",
+    "bytes": 375120,
+    "tap_chars": 3277,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "015_015474.pdf",
+    "bytes": 999950,
+    "tap_chars": 36216,
+    "n_engine": 10,
+    "n_ref": 10,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "020_020913.pdf",
+    "bytes": 750536,
+    "tap_chars": 46,
+    "n_engine": 0,
+    "n_ref": 0,
+    "ratio": null,
+    "exact_double": false,
+    "matches_ref": false
+   },
+   {
+    "doc": "038_038230.pdf",
+    "bytes": 2000142,
+    "tap_chars": 65260,
+    "n_engine": 18,
+    "n_ref": 18,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "002_002713.pdf",
+    "bytes": 1500582,
+    "tap_chars": 102831,
+    "n_engine": 28,
+    "n_ref": 28,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "039_039791.pdf",
+    "bytes": 3000029,
+    "tap_chars": 48873,
+    "n_engine": 14,
+    "n_ref": 14,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "009_009442.pdf",
+    "bytes": 2251609,
+    "tap_chars": 246694,
+    "n_engine": 144,
+    "n_ref": 72,
+    "ratio": 2.0,
+    "exact_double": true,
+    "matches_ref": false
+   },
+   {
+    "doc": "001_001687.pdf",
+    "bytes": 3998625,
+    "tap_chars": 10754,
+    "n_engine": 3,
+    "n_ref": 3,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "034_034014.pdf",
+    "bytes": 3009756,
+    "tap_chars": 59028,
+    "n_engine": 17,
+    "n_ref": 17,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "029_029454.pdf",
+    "bytes": 4998973,
+    "tap_chars": 39109,
+    "n_engine": 12,
+    "n_ref": 12,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "011_011411.pdf",
+    "bytes": 3754912,
+    "tap_chars": 836866,
+    "n_engine": 466,
+    "n_ref": 233,
+    "ratio": 2.0,
+    "exact_double": true,
+    "matches_ref": false
+   },
+   {
+    "doc": "007_007372.pdf",
+    "bytes": 6971720,
+    "tap_chars": 82787,
+    "n_engine": 23,
+    "n_ref": 23,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "013_013792.pdf",
+    "bytes": 5258893,
+    "tap_chars": 130679,
+    "n_engine": 39,
+    "n_ref": 39,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "003_003316.pdf",
+    "bytes": 10118779,
+    "tap_chars": 1501240,
+    "n_engine": 826,
+    "n_ref": 413,
+    "ratio": 2.0,
+    "exact_double": false,
+    "matches_ref": false
+   },
+   {
+    "doc": "004_004513.pdf",
+    "bytes": 7517562,
+    "tap_chars": 248179,
+    "n_engine": 136,
+    "n_ref": 68,
+    "ratio": 2.0,
+    "exact_double": true,
+    "matches_ref": false
+   },
+   {
+    "doc": "009_009802.pdf",
+    "bytes": 14116108,
+    "tap_chars": 1619,
+    "n_engine": 1,
+    "n_ref": 1,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   },
+   {
+    "doc": "022_022391.pdf",
+    "bytes": 26262215,
+    "tap_chars": 124932,
+    "n_engine": 34,
+    "n_ref": 34,
+    "ratio": 1.0,
+    "exact_double": false,
+    "matches_ref": true
+   }
+  ],
+  "n_dup": 4,
+  "n_good": 17
+ }
+}

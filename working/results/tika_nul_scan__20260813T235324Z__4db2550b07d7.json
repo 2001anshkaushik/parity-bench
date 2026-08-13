@@ -1,0 +1,2140 @@
+{
+ "_meta": {
+  "name": "tika_nul_scan",
+  "written_utc": "20260813T235324Z",
+  "payload_sha256_12": "4db2550b07d7",
+  "host": "ef116134-9c03-4348-b4d3-39d8a11ba5aa.attlocal.net",
+  "user": "ansh",
+  "pid": 4349,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "n": 303,
+  "nul_docs": 0,
+  "ctrl_docs": 0,
+  "kinds": {},
+  "rows": [
+   {
+    "doc": "038_038716.pdf",
+    "chars": 37992,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "039_039797.pdf",
+    "chars": 13721,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "027_027492.pdf",
+    "chars": 20864,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "000_000009.pdf",
+    "chars": 35228,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "000_000161.pdf",
+    "chars": 18669,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "000_000338.pdf",
+    "chars": 29884,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "000_000371.pdf",
+    "chars": 30133,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "000_000594.pdf",
+    "chars": 9751,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "000_000761.pdf",
+    "chars": 14488,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "000_000955.pdf",
+    "chars": 26741,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "001_001064.pdf",
+    "chars": 110343,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "001_001152.pdf",
+    "chars": 33289,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "001_001303.pdf",
+    "chars": 19977,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "001_001383.pdf",
+    "chars": 18372,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "001_001505.pdf",
+    "chars": 33110,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "001_001676.pdf",
+    "chars": 55275,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "001_001787.pdf",
+    "chars": 62777,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "001_001951.pdf",
+    "chars": 88173,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "002_002168.pdf",
+    "chars": 75793,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "002_002201.pdf",
+    "chars": 9791,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "002_002385.pdf",
+    "chars": 13454,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "002_002482.pdf",
+    "chars": 5269,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "002_002696.pdf",
+    "chars": 103918,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "002_002731.pdf",
+    "chars": 26606,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "002_002870.pdf",
+    "chars": 55574,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "003_003004.pdf",
+    "chars": 64993,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "003_003113.pdf",
+    "chars": 16,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "003_003195.pdf",
+    "chars": 36367,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "003_003412.pdf",
+    "chars": 19381,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "003_003627.pdf",
+    "chars": 83591,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "003_003689.pdf",
+    "chars": 6038,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "003_003830.pdf",
+    "chars": 12585,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "003_003865.pdf",
+    "chars": 63260,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "003_003967.pdf",
+    "chars": 28131,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "004_004138.pdf",
+    "chars": 10243,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "004_004334.pdf",
+    "chars": 128112,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "004_004453.pdf",
+    "chars": 2614,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "004_004570.pdf",
+    "chars": 13876,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "004_004669.pdf",
+    "chars": 3797,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "004_004883.pdf",
+    "chars": 8078,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "004_004981.pdf",
+    "chars": 10114,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "005_005015.pdf",
+    "chars": 5360,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "005_005184.pdf",
+    "chars": 4575,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "005_005259.pdf",
+    "chars": 34137,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "005_005405.pdf",
+    "chars": 57473,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "005_005521.pdf",
+    "chars": 2259,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "005_005747.pdf",
+    "chars": 179138,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "005_005781.pdf",
+    "chars": 4846,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "005_005932.pdf",
+    "chars": 477,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "006_006051.pdf",
+    "chars": 5551,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "006_006271.pdf",
+    "chars": 9046,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "006_006369.pdf",
+    "chars": 337210,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "006_006501.pdf",
+    "chars": 3206,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "006_006559.pdf",
+    "chars": 27509,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "006_006790.pdf",
+    "chars": 2819544,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "006_006965.pdf",
+    "chars": 11713,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "007_007055.pdf",
+    "chars": 38708,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "007_007157.pdf",
+    "chars": 13761,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "007_007232.pdf",
+    "chars": 3197,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "007_007510.pdf",
+    "chars": 47024,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "007_007683.pdf",
+    "chars": 6887,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "007_007718.pdf",
+    "chars": 16655,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "007_007940.pdf",
+    "chars": 89694,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "008_008019.pdf",
+    "chars": 8278,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "008_008053.pdf",
+    "chars": 66710,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "008_008255.pdf",
+    "chars": 19758,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "008_008405.pdf",
+    "chars": 11795,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "008_008583.pdf",
+    "chars": 105819,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "008_008715.pdf",
+    "chars": 62784,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "008_008839.pdf",
+    "chars": 51719,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "009_009001.pdf",
+    "chars": 45200,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "009_009077.pdf",
+    "chars": 612971,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "009_009157.pdf",
+    "chars": 8289,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "009_009268.pdf",
+    "chars": 22784,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "009_009434.pdf",
+    "chars": 79305,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "009_009488.pdf",
+    "chars": 91710,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "009_009688.pdf",
+    "chars": 3149,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "009_009886.pdf",
+    "chars": 42220,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "010_010102.pdf",
+    "chars": 1120338,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "010_010205.pdf",
+    "chars": 92996,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "010_010424.pdf",
+    "chars": 32708,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "010_010545.pdf",
+    "chars": 6165,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "010_010691.pdf",
+    "chars": 13700,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "010_010728.pdf",
+    "chars": 10700,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "010_010954.pdf",
+    "chars": 30630,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "011_011110.pdf",
+    "chars": 11248,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "011_011263.pdf",
+    "chars": 19593,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "011_011413.pdf",
+    "chars": 45361,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "011_011522.pdf",
+    "chars": 13767,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "011_011583.pdf",
+    "chars": 17922,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "011_011706.pdf",
+    "chars": 11728,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "011_011895.pdf",
+    "chars": 17847,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "011_011967.pdf",
+    "chars": 37929,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "012_012171.pdf",
+    "chars": 292434,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "012_012295.pdf",
+    "chars": 227283,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "012_012387.pdf",
+    "chars": 5042,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "012_012566.pdf",
+    "chars": 65849,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "012_012637.pdf",
+    "chars": 69657,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "012_012754.pdf",
+    "chars": 48368,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "012_012852.pdf",
+    "chars": 7592190,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "013_013054.pdf",
+    "chars": 93803,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "013_013139.pdf",
+    "chars": 776,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "013_013310.pdf",
+    "chars": 33863,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "013_013442.pdf",
+    "chars": 6571,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "013_013545.pdf",
+    "chars": 16197,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "013_013600.pdf",
+    "chars": 25789,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "013_013798.pdf",
+    "chars": 42337,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "013_013892.pdf",
+    "chars": 11640,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "014_014005.pdf",
+    "chars": 51557,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "014_014229.pdf",
+    "chars": 43763,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "014_014264.pdf",
+    "chars": 18818,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "014_014506.pdf",
+    "chars": 89381,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "014_014584.pdf",
+    "chars": 16824,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "014_014647.pdf",
+    "chars": 20673,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "014_014750.pdf",
+    "chars": 87715,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "014_014847.pdf",
+    "chars": 270628,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "014_014959.pdf",
+    "chars": 8826,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "015_015162.pdf",
+    "chars": 18016,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "015_015200.pdf",
+    "chars": 66387,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "015_015342.pdf",
+    "chars": 2574,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "015_015479.pdf",
+    "chars": 32817,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "015_015764.pdf",
+    "chars": 80892,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "015_015953.pdf",
+    "chars": 162679,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "016_016117.pdf",
+    "chars": 32480,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "016_016151.pdf",
+    "chars": 56635,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "016_016449.pdf",
+    "chars": 86630,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "016_016483.pdf",
+    "chars": 191353,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "016_016659.pdf",
+    "chars": 7242,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "016_016746.pdf",
+    "chars": 749,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "016_016819.pdf",
+    "chars": 92176,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "016_016878.pdf",
+    "chars": 46035,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "017_017138.pdf",
+    "chars": 4686,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "017_017171.pdf",
+    "chars": 43572,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "017_017275.pdf",
+    "chars": 50499,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "017_017390.pdf",
+    "chars": 54833,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "017_017426.pdf",
+    "chars": 13325,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "017_017620.pdf",
+    "chars": 27195,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "017_017812.pdf",
+    "chars": 13187,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "017_017888.pdf",
+    "chars": 829967,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "018_018011.pdf",
+    "chars": 66018,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "018_018147.pdf",
+    "chars": 12415,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "018_018255.pdf",
+    "chars": 14134,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "018_018467.pdf",
+    "chars": 10106,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "018_018502.pdf",
+    "chars": 198863,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "018_018761.pdf",
+    "chars": 13580,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "018_018873.pdf",
+    "chars": 54136,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "018_018933.pdf",
+    "chars": 104645,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "019_019032.pdf",
+    "chars": 6518,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "019_019067.pdf",
+    "chars": 1404,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "019_019328.pdf",
+    "chars": 1305,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "019_019438.pdf",
+    "chars": 18259,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "019_019538.pdf",
+    "chars": 51870,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "019_019572.pdf",
+    "chars": 530,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "019_019693.pdf",
+    "chars": 4403,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "019_019852.pdf",
+    "chars": 96158,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "019_019954.pdf",
+    "chars": 33831,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "020_020068.pdf",
+    "chars": 30994,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "020_020178.pdf",
+    "chars": 193198,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "020_020271.pdf",
+    "chars": 45601,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "020_020395.pdf",
+    "chars": 46480,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "020_020591.pdf",
+    "chars": 41406,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "020_020627.pdf",
+    "chars": 41583,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "020_020813.pdf",
+    "chars": 141661,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "021_021042.pdf",
+    "chars": 8809,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "021_021079.pdf",
+    "chars": 16402,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "021_021227.pdf",
+    "chars": 6978,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "021_021274.pdf",
+    "chars": 15862,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "021_021462.pdf",
+    "chars": 45285,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "021_021551.pdf",
+    "chars": 82986,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "021_021666.pdf",
+    "chars": 19101,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "021_021952.pdf",
+    "chars": 153620,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "022_022032.pdf",
+    "chars": 18561,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "022_022116.pdf",
+    "chars": 545,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "022_022195.pdf",
+    "chars": 13708,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "022_022399.pdf",
+    "chars": 4507,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "022_022441.pdf",
+    "chars": 5923,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "022_022545.pdf",
+    "chars": 62264,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "022_022753.pdf",
+    "chars": 99649,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "022_022826.pdf",
+    "chars": 54002,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "023_023062.pdf",
+    "chars": 15043,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "023_023167.pdf",
+    "chars": 137828,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "023_023310.pdf",
+    "chars": 27459,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "023_023445.pdf",
+    "chars": 30286,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "023_023515.pdf",
+    "chars": 10,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "023_023689.pdf",
+    "chars": 94192,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "023_023775.pdf",
+    "chars": 1559,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "023_023897.pdf",
+    "chars": 28941,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "024_024048.pdf",
+    "chars": 6605,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "024_024083.pdf",
+    "chars": 53311,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "024_024315.pdf",
+    "chars": 8310,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "024_024499.pdf",
+    "chars": 127275,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "024_024654.pdf",
+    "chars": 807270,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "024_024763.pdf",
+    "chars": 5944,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "024_024878.pdf",
+    "chars": 1238,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "025_025072.pdf",
+    "chars": 25385,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "025_025288.pdf",
+    "chars": 46846,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "025_025503.pdf",
+    "chars": 10237,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "025_025739.pdf",
+    "chars": 108361,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "025_025848.pdf",
+    "chars": 236303,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "025_025988.pdf",
+    "chars": 14569,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "026_026170.pdf",
+    "chars": 6309,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "026_026316.pdf",
+    "chars": 32750,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "026_026634.pdf",
+    "chars": 7880,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "026_026764.pdf",
+    "chars": 404,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "026_026840.pdf",
+    "chars": 74429,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "027_027012.pdf",
+    "chars": 9944,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "027_027178.pdf",
+    "chars": 6143,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "027_027297.pdf",
+    "chars": 56182,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "027_027352.pdf",
+    "chars": 36672,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "027_027473.pdf",
+    "chars": 6506,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "027_027555.pdf",
+    "chars": 22443,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "027_027763.pdf",
+    "chars": 2365,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "027_027804.pdf",
+    "chars": 4809,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "028_028044.pdf",
+    "chars": 5632,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "028_028079.pdf",
+    "chars": 14404,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "028_028322.pdf",
+    "chars": 7563,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "028_028459.pdf",
+    "chars": 19078,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "028_028615.pdf",
+    "chars": 34561,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "028_028816.pdf",
+    "chars": 6091,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "028_028868.pdf",
+    "chars": 19180,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "029_029026.pdf",
+    "chars": 29767,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "029_029215.pdf",
+    "chars": 133275,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "029_029461.pdf",
+    "chars": 24102,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "029_029641.pdf",
+    "chars": 116661,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "029_029754.pdf",
+    "chars": 2670,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "029_029931.pdf",
+    "chars": 6821,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "030_030103.pdf",
+    "chars": 88597,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "030_030232.pdf",
+    "chars": 40359,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "030_030406.pdf",
+    "chars": 39731,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "030_030495.pdf",
+    "chars": 531,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "030_030550.pdf",
+    "chars": 33530,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "030_030767.pdf",
+    "chars": 49392,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "030_030939.pdf",
+    "chars": 10392,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "031_031009.pdf",
+    "chars": 110602,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "031_031078.pdf",
+    "chars": 3373,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "031_031193.pdf",
+    "chars": 15263,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "031_031370.pdf",
+    "chars": 50486,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "031_031446.pdf",
+    "chars": 41642,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "031_031638.pdf",
+    "chars": 91360,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "031_031707.pdf",
+    "chars": 1290768,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "031_031820.pdf",
+    "chars": 2386,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "031_031983.pdf",
+    "chars": 12553,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "032_032049.pdf",
+    "chars": 13956,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "032_032286.pdf",
+    "chars": 11801,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "032_032394.pdf",
+    "chars": 18131,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "032_032451.pdf",
+    "chars": 11721,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "032_032626.pdf",
+    "chars": 12439,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "032_032721.pdf",
+    "chars": 85180,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "032_032993.pdf",
+    "chars": 39487,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "033_033039.pdf",
+    "chars": 5858,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "033_033308.pdf",
+    "chars": 105174,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "033_033342.pdf",
+    "chars": 35772,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "033_033555.pdf",
+    "chars": 328753,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "033_033693.pdf",
+    "chars": 3592,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "033_033746.pdf",
+    "chars": 8405,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "033_033816.pdf",
+    "chars": 44382,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "034_034040.pdf",
+    "chars": 21014,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "034_034215.pdf",
+    "chars": 14914,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "034_034302.pdf",
+    "chars": 7679,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "034_034385.pdf",
+    "chars": 7754,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "034_034624.pdf",
+    "chars": 3828,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "034_034719.pdf",
+    "chars": 122479,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "034_034885.pdf",
+    "chars": 6630,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "035_035031.pdf",
+    "chars": 106620,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "035_035263.pdf",
+    "chars": 25158,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "035_035296.pdf",
+    "chars": 70506,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "035_035550.pdf",
+    "chars": 14200,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "035_035785.pdf",
+    "chars": 172444,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "035_035988.pdf",
+    "chars": 131825,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "036_036113.pdf",
+    "chars": 21214,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "036_036217.pdf",
+    "chars": 222395,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "036_036368.pdf",
+    "chars": 6037,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "036_036457.pdf",
+    "chars": 30524,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "036_036656.pdf",
+    "chars": 24605,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "036_036755.pdf",
+    "chars": 3454,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "036_036791.pdf",
+    "chars": 40679,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "036_036904.pdf",
+    "chars": 125451,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "037_037042.pdf",
+    "chars": 113079,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "037_037115.pdf",
+    "chars": 7443,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "037_037354.pdf",
+    "chars": 58301,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "037_037425.pdf",
+    "chars": 3203,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "037_037654.pdf",
+    "chars": 966255,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "037_037917.pdf",
+    "chars": 13198,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "037_037950.pdf",
+    "chars": 19386,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "038_038255.pdf",
+    "chars": 43243,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "038_038398.pdf",
+    "chars": 4631,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "038_038494.pdf",
+    "chars": 178574,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "038_038617.pdf",
+    "chars": 8183,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "038_038702.pdf",
+    "chars": 5965,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "038_038794.pdf",
+    "chars": 78712,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "038_038906.pdf",
+    "chars": 34691,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "038_038945.pdf",
+    "chars": 9668,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "039_039149.pdf",
+    "chars": 6122,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "039_039355.pdf",
+    "chars": 25267,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "039_039467.pdf",
+    "chars": 45379,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "039_039670.pdf",
+    "chars": 11935,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "039_039739.pdf",
+    "chars": 46402,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "039_039798.pdf",
+    "chars": 4263,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "039_039947.pdf",
+    "chars": 131025,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "040_040119.pdf",
+    "chars": 389536,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "040_040160.pdf",
+    "chars": 67709,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "040_040344.pdf",
+    "chars": 55502,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   },
+   {
+    "doc": "040_040384.pdf",
+    "chars": 23148,
+    "nul": 0,
+    "ctrl_total": 0,
+    "ctrl_kinds": {}
+   }
+  ]
+ }
+}

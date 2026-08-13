@@ -86,6 +86,17 @@ documents at 3.00, 3.01 and 4.00 MB are clean, so it is **not a simple size thre
 instances, exact `[ref+ref]` doubling both times, mechanism unknown. If either of you sees a
 chunk-count ratio near 2.0 against your own reference, that is this.
 
+**Since drafting the above, both open threads closed [VERIFIED]:**
+
+* **Duplication is now a filed bug with a 4-line synthetic reproducer** — any text payload over
+  ~239.8k chars gets its full chunk list emitted **twice** (threshold bisected to 781 chars,
+  deterministic n=3 both sides, factor exactly 2 up to 750k). Not the document, not the PDF, not our
+  harness: pure repeated ASCII triggers it. `BUG_CHUNK_DUPLICATION.md`. Check any long-document
+  results you have for chunk counts at exactly 2× expectations.
+* **NUL truncation has no observed path under Parser IN**: 0/303 documents show NUL — or any control
+  character — in Tika output, including the three that produce NULs under pypdf. The defect is still
+  live on text-lane paths; the 0.30 % figure was pypdf-specific and is re-scoped in the bug report.
+
 If you want the tap pipe and the reference builder, they are in our repo and portable —
 `working/pipes/product_pdf_tap.pipe` plus `harness/chunk_hash.py`.
 

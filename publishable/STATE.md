@@ -460,6 +460,13 @@ silently, with every vector individually valid.
 determinism n=3 (164 chunks every run), structure (all 164 vectors 384-d, finite, L2 within 1e-3),
 census (1 = 1). Real-data demonstration of the self-comparison blind spot.
 
+**Closed 2026-08-13 — the two pre-AWS questions [VERIFIED]**
+
+| # | question | answer |
+| --- | --- | --- |
+| Q1 | Can NUL truncation occur under Parser IN? | **No observed path via PDF ingestion**: 0/303 documents have NUL — or any control char beyond \t\n\r — in Tika output, including all 3 known pypdf-NUL docs. Tika sanitises them. Defect itself still reproduces on text/plain. Bug report re-scoped |
+| Q2 | Is chunk duplication size-correlated? | **Yes — to extracted-TEXT length, not file size.** Threshold between **239,062 and 239,843 chars**, bisected, deterministic n=3 both sides. Synthetic minimal reproducer (4 lines, plain text). Factor exactly 2 up to 750k chars. 5 affected documents found; every one above threshold, every clean one below. **Filed: `BUG_CHUNK_DUPLICATION.md`** |
+
 **Cross-team, cross-version confirmations [VERIFIED]**
 
 | # | finding | label |
