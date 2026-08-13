@@ -366,6 +366,22 @@ carries the full analysis.
 | L4 | **cgroup-scoped memory accounting** — she sums RSS over all processes in the container cgroup, with per-process breakdown, and keeps the client out of the arm total. Cleaner boundary than our engine-tree + driver sum, which folds our driver into RocketRide's total (~250–320 MB inflation, disclosed) | **DEFERRED to Phase 2, deliberately.** Switching now would make every historical figure in this repo incomparable with its own successor. Phase 2 runs on Linux with real cgroups v2, where this becomes both natural and enforceable — adopt it at that boundary, not before. **Open item.** |
 | L5 | Ground-truth **reference embedding vectors** for a fixed sample (her `sample_vectors.json`) — drift detection across engine versions | **not adopted** — lower value for us than L1 given L2; logged for Phase 2 |
 
+### SCOPE CHANGE — Parser IN (2026-08-12)
+
+**Team decision, taken with eyes open.** PDF extraction moves inside each framework: the engine uses
+its stock `parse` node (Tika 3.2.3), the LlamaIndex service uses pypdf in-worker. This is **Tier 2
+(product comparison)** from `PARSER_DECISION.md`, chosen over the **Tier 1 (framework comparison)**
+we had been running. Shashi and Leela are doing the same.
+
+| # | consequence | label |
+| --- | --- | --- |
+| PI1 | **Every existing number was measured parser-out and needs re-baselining.** Memory crossover C≈3.2, the C-sweep, matched-layer 1.80×, the endurance runs. Not withdrawn — they are a valid Tier 1 result — but they are a different question and must never share a table with a Parser IN number | **superseded in scope, not in validity** |
+| PI2 | **Goodput and fault counts now include parser behaviour.** They are not comparable with the parser-out counts | **VERIFIED** (by construction) |
+| PI3 | **The chunk-hash gate had to be split.** One shared reference across two parsers would fire on every document with no defect present. Now: per-arm hash (hard gate, against that arm's own extracted text) + cross-arm fidelity (reported metric, not gated). Both directions asserted in regression test `parser_in_gate_split` | **VERIFIED** |
+| PI4 | **Cross-arm extraction fidelity, first measurement on real documents from our side** (n=12): char ratio median **1.0068** (p10 0.9898, p90 1.0435) — agrees with Leela's 0.994 on 140 PDFs. Word jaccard median **0.9899**; seq similarity median **0.9567**, min **0.3838**. Of 12 documents: 5 agree, **5 are same-words-different-order** (Tika vs pypdf disagree on multi-column/table reading order), 1 where Tika extracted materially more, 1 differing in content | **PROVISIONAL** (n=12, one host) |
+| PI5 | **The engine does not reject non-PDF input** — sent 47 bytes of plain ASCII with `mimetype=application/pdf`, it returned **1 successful chunk** rather than a fault. The LlamaIndex arm returns `parse_failed`. A misidentified file is a silent success on one arm and a typed fault on the other | **PROVISIONAL** (single probe) |
+| PI6 | **Fault taxonomies are asymmetric.** LlamaIndex returns typed classes (`parse_failed`, `empty_extraction`, `malformed_input`); RocketRide signals failure by returning an **empty document list**, with no class. Fault-class comparisons between arms are not like-for-like | **VERIFIED** (4 probe cases) |
+
 ## 4. Verified findings, with labels
 
 | # | finding | label | evidence |

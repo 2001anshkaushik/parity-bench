@@ -204,6 +204,25 @@ RocketRide's *effective* concurrency width is ~17 against a declared pool (`SCHE
 
 ## 5b. PRIMARY RESULT — matched layers at concurrency 1 [2026-08-11]
 
+> ### ⚠️ MEASURED PARSER-OUT — needs re-baselining under Parser IN (scope change 2026-08-12)
+> Every number in this section was measured with **PDF extraction in the driver**, common-mode to
+> both arms and outside each arm's measured region. The team has since standardised on **Parser
+> IN**: extraction moves inside each framework so the whole product is benchmarked (Tier 2 in
+> [`PARSER_DECISION.md`](PARSER_DECISION.md), chosen deliberately over the Tier 1 framework
+> comparison these numbers represent).
+>
+> **Parsing adds work to both arms, in directions not yet measured.** The engine now runs Tika 3.2.3
+> in-process; the LlamaIndex service now runs pypdf inside its workers. Memory and wall clock will
+> both move, and **the C ≈ 3.2 memory crossover in particular may move** — it sits between two
+> quotable levels only 2 apart.
+>
+> **These numbers are NOT withdrawn and NOT overwritten.** They are a valid Tier 1 framework
+> comparison. They are simply no longer the topology the team is measuring. Re-baseline before
+> quoting alongside any Parser IN result, and never place the two in the same table.
+>
+> **Also changed:** goodput and fault counts now include parser behaviour, so they are not
+> comparable with the counts below.
+
 Both arms `client -> network -> service -> worker`. LlamaIndex now runs through `ws1/service.py`
 over HTTP at **1 uvicorn worker**; RocketRide unchanged. Config gate passed with both arms measured
 at **10 intra-op / 14 interop** threads, read from inside each worker process.
@@ -273,6 +292,25 @@ warm-up exclusion is labelled **PROVISIONAL** for that reason. The memory ratio 
 (it passes at n=3 including block 0); only the wall-clock gate does.
 
 ## 5c. THE CURVE — concurrency sweep, and the crossover [2026-08-11]
+
+> ### ⚠️ MEASURED PARSER-OUT — needs re-baselining under Parser IN (scope change 2026-08-12)
+> Every number in this section was measured with **PDF extraction in the driver**, common-mode to
+> both arms and outside each arm's measured region. The team has since standardised on **Parser
+> IN**: extraction moves inside each framework so the whole product is benchmarked (Tier 2 in
+> [`PARSER_DECISION.md`](PARSER_DECISION.md), chosen deliberately over the Tier 1 framework
+> comparison these numbers represent).
+>
+> **Parsing adds work to both arms, in directions not yet measured.** The engine now runs Tika 3.2.3
+> in-process; the LlamaIndex service now runs pypdf inside its workers. Memory and wall clock will
+> both move, and **the C ≈ 3.2 memory crossover in particular may move** — it sits between two
+> quotable levels only 2 apart.
+>
+> **These numbers are NOT withdrawn and NOT overwritten.** They are a valid Tier 1 framework
+> comparison. They are simply no longer the topology the team is measuring. Re-baseline before
+> quoting alongside any Parser IN result, and never place the two in the same table.
+>
+> **Also changed:** goodput and fault counts now include parser behaviour, so they are not
+> comparable with the counts below.
 
 Pre-registered in [`PREREGISTRATION.md`](PREREGISTRATION.md) **before this ran**. 15 cells,
 C ∈ {1,2,4,8,16} × n=3 × 500 documents, levels in randomised order, one service cold start per

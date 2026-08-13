@@ -351,6 +351,64 @@ def t_chunk_hash_gate():
             raise AssertionError("gate did not notice the missing text+newline transform")
 
 
+# ------------------------------------------------- 13. parser-IN gate split behaves in both directions
+def t_parser_in_gate_split():
+    """Parser IN (2026-08-12): each arm parses with its own parser, so ONE shared chunk-hash
+    reference would fire on every document. The gate was split:
+      (a) per-arm chunk hash  -> stays a HARD gate, must still catch NUL truncation
+      (b) cross-arm fidelity  -> REPORTED metric, must NOT fire on legitimate parser differences
+
+    Both directions are asserted here. Offline: no engine, no service, no corpus."""
+    from harness.chunk_hash import check_chunks, reference_chunks, ChunkHashMismatch
+    from harness.extraction_fidelity import fidelity, seq_similarity, word_jaccard
+
+    # ---------- (a) per-arm gate still catches the defect, against its OWN text
+    arm_text = ("Alpha beta gamma delta epsilon. " * 60) + "\x00" + ("Zeta eta theta. " * 400)
+    ref = reference_chunks(arm_text)
+    check_chunks("own-text", ref, arm_text)                     # null control: passes
+    truncated = [ref[0].split("\x00")[0]] + ref[1:]
+    try:
+        check_chunks("nul", truncated, arm_text)
+    except ChunkHashMismatch as e:
+        assert "NUL" in str(e) or "SHORTER" in str(e), f"NUL truncation not diagnosed: {e}"
+    else:
+        raise AssertionError("per-arm gate no longer catches NUL truncation")
+
+    # ---------- (a) a SHARED reference across differently-parsed text would false-fire.
+    # This is why the gate had to be split; assert the failure mode is real.
+    other_parser_text = arm_text.replace("Alpha", "ALPHA")      # same doc, different parser output
+    try:
+        check_chunks("cross", reference_chunks(other_parser_text), arm_text)
+    except ChunkHashMismatch:
+        pass                                                     # expected: proves the hazard
+    else:
+        raise AssertionError("cross-parser text did not trip the hash gate — the split would be "
+                             "unnecessary, so one of these assumptions is wrong")
+
+    # ---------- (b) fidelity must NOT collapse on order-only differences
+    words = ("the quick brown fox jumps over the lazy dog " * 200).split()
+    a_txt = " ".join(words)
+    reordered = words[:]                                          # same words, different order
+    for i in range(0, len(reordered) - 10, 10):
+        reordered[i], reordered[i + 5] = reordered[i + 5], reordered[i]
+    b_txt = " ".join(reordered)
+    f = fidelity(a_txt, b_txt)
+    assert f["word_jaccard"] > 0.95, f"order-only change destroyed word_jaccard: {f}"
+    assert f["char_ratio"] and 0.95 < f["char_ratio"] < 1.05, f"char_ratio moved on reorder: {f}"
+
+    # ---------- (b) the difflib autojunk trap: near-identical text must NOT score ~0
+    near = a_txt.split()
+    for i in range(0, len(near), 100):
+        near[i] = "zzz"
+    s = seq_similarity(a_txt, " ".join(near))
+    assert s > 0.9, (f"seq_similarity {s:.4f} on 1%-different text — difflib autojunk is back on; "
+                     f"it scores 0.0000 with autojunk=True and 0.9930 with it off")
+
+    # ---------- (b) genuine content loss MUST still show up
+    half = fidelity(a_txt, " ".join(words[:len(words)//2]))
+    assert half["word_jaccard"] < 0.75, f"dropping half the text left jaccard high: {half}"
+
+
 # ---------------------------------------------------------------- 10. artifact protected content
 def t_artifact_protected_content():
     """Sessions 16 and 17: an edit to MEETING_2026-08-10.md destroyed the thread-asymmetry
@@ -401,6 +459,8 @@ if __name__ == "__main__":
     check("node_mark_fails_loudly", "engine-node match errors instead of returning 0",
           t_node_mark_fails_loudly)
     check("chunk_hash_gate", "content verified by hash, not vector shape", t_chunk_hash_gate)
+    check("parser_in_gate_split", "per-arm hash gates; cross-arm fidelity reports",
+          t_parser_in_gate_split)
     check("artifact_protected_content", "disclosure + VOID markers survive edits",
           t_artifact_protected_content)
     print("=" * 92)

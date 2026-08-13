@@ -191,14 +191,14 @@ class RocketArm:
         except Exception:
             return None
 
-    def __init__(self, tag: str = "rr"):
+    def __init__(self, tag: str = "rr", pipe: str = "embed_probe.pipe"):
         import asyncio, uuid
         from rocketride import RocketRideClient
         self.loop = asyncio.new_event_loop()
         self.engine_pid = self._engine_pid()
         print(f"[engine] driving pid={self.engine_pid} (matched by listening socket, not name)",
               flush=True)
-        base = json.loads((ROOT / "working" / "pipes" / "embed_probe.pipe").read_text())
+        base = json.loads((ROOT / "working" / "pipes" / pipe).read_text())
         # ONE LIVE TASK PER project_id (STATE.md section 9). A fixed id made p0, p3 and p4 collide
         # with each other — the first RocketRide phase claimed the id and every later phase died
         # with "Pipeline is already running". The id must be unique per phase AND per process, or
@@ -289,7 +289,62 @@ class LlamaHttpArm:
         pass
 
 
-ARMS = {"llamaindex": LlamaArm, "rocketride": RocketArm, "llamaindex_http": LlamaHttpArm}
+class RocketPdfArm(RocketArm):
+    """RocketRide under PARSER IN — the stock 5-node product pipeline, fed raw PDF bytes.
+
+        webhook -> parse -> preprocessor_langchain -> embedding_transformer -> response_documents
+
+    All five providers are STOCK. We already carry six custom nodes, which is the larger deviation
+    from what a customer runs; solving Parser IN with a seventh would make that worse. Lane wiring
+    (`parse` consumes `tags`, not the `data` its README documents) is copied from Leela's verified
+    pipeline rather than guessed.
+
+    Extraction happens in the engine via Tika 3.2.3 (jars in engine/java/lib, confirmed present;
+    parser identity confirmed by execution — see extract_text()).
+    """
+    name = "rocketride_pdf"
+    PIPE = "product_pdf.pipe"
+
+    def __init__(self, tag: str = "rrpdf"):
+        super().__init__(tag=tag, pipe=self.PIPE)
+
+    def process(self, pdf_bytes: bytes):
+        """Raw PDF bytes in, (chunks, embeddings) out. No driver-side extraction."""
+        import asyncio
+        out = self.loop.run_until_complete(
+            asyncio.wait_for(self.c.send(self.tok, pdf_bytes, mimetype="application/pdf"),
+                             timeout=1800))
+        docs = out.get("documents") or []
+        return ([d.get("page_content", "") for d in docs],
+                [d.get("embedding") or [] for d in docs])
+
+
+class LlamaHttpPdfArm(LlamaHttpArm):
+    """LlamaIndex under PARSER IN — POSTs raw PDF bytes to /process_pdf.
+
+    The service parses with pypdf inside the worker. Parse faults come back as `parse_failed` /
+    `empty_extraction` error classes; the driver no longer classifies them, so if the service did
+    not surface them the fault counts would read zero rather than move.
+    """
+    name = "llamaindex_http_pdf"
+
+    def process(self, pdf_bytes: bytes):
+        import urllib.request
+        self._n += 1
+        req = urllib.request.Request(
+            f"{self.base}/process_pdf", data=pdf_bytes,
+            headers={"Content-Type": "application/pdf", "X-Doc-Id": f"d{os.getpid()}-{self._n}"})
+        with urllib.request.urlopen(req, timeout=self.timeout) as r:
+            out = json.loads(r.read().decode())
+        self.last = out
+        if not out.get("ok"):
+            return [], []
+        return ([c.get("text", "") for c in out.get("chunks", [])],
+                [c.get("embedding") or [] for c in out.get("chunks", [])])
+
+
+ARMS = {"llamaindex": LlamaArm, "rocketride": RocketArm, "llamaindex_http": LlamaHttpArm,
+        "rocketride_pdf": RocketPdfArm, "llamaindex_http_pdf": LlamaHttpPdfArm}
 
 
 def main() -> int:

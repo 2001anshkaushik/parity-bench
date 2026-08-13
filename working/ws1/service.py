@@ -21,7 +21,7 @@ import os
 import time
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from .pipeline import LlamaIndexPipeline
@@ -163,6 +163,53 @@ def _maybe_inject(doc_id: str, text: str) -> None:
         for off in range(0, len(blob), 4096):
             blob[off] = 1
         del blob
+
+
+@app.post("/process_pdf")
+async def process_pdf(request: Request):
+    """Raw PDF bytes -> chunks + vectors, parsed INSIDE this service (Parser IN).
+
+    The body is the PDF itself, not JSON: base64 in a JSON envelope would add ~33 % transfer and
+    a decode step to the measured path for no benefit.
+
+    Extraction faults surface as `parse_failed` / `empty_extraction` error classes. They used to be
+    counted by the driver; if they were not returned here the fault taxonomy would read zero and
+    look like an improvement.
+    """
+    pid = os.getpid()
+    if _pipeline is None or _cfg is None:
+        return JSONResponse({"status": "starting"}, status_code=503)
+    doc_id = request.headers.get("x-doc-id", "unknown")
+    body = await request.body()
+    if not body:
+        return build_error(doc_id, "malformed_input", "empty body", _cfg, pid)
+
+    t0 = time.perf_counter()
+    try:
+        text = _pipeline.extract(body)
+    except Exception as e:
+        return build_error(doc_id, "parse_failed", f"{type(e).__name__}: {e}", _cfg, pid)
+    if not text.strip():
+        return build_error(doc_id, "empty_extraction",
+                           f"parser returned {len(text)} chars, none printable", _cfg, pid)
+
+    try:
+        chunks = _pipeline.split(text)
+    except Exception as e:
+        return build_error(doc_id, "split_failed", f"{type(e).__name__}: {e}", _cfg, pid)
+    try:
+        vecs = _pipeline.embed(chunks)
+    except Exception as e:
+        return build_error(doc_id, "embed_failed", f"{type(e).__name__}: {e}", _cfg, pid)
+
+    out = build_response(doc_id, chunks, vecs, _cfg, pid, None)
+    # The arm's OWN extracted text, so the per-arm chunk-hash gate can build its reference from it.
+    # Under Parser IN a shared reference would false-fire on every document.
+    out["extracted_text"] = text
+    out["extracted_chars"] = len(text)
+    out["parser"] = _pipeline.parser_version()
+    out["timing_ms"] = {"total": round((time.perf_counter() - t0) * 1000, 3)}
+    return out
 
 
 @app.post("/process")

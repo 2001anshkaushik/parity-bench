@@ -1,5 +1,24 @@
 # Weekend Run — rolling results
 
+> ### ⚠️ MEASURED PARSER-OUT — needs re-baselining under Parser IN (scope change 2026-08-12)
+> Every number in this section was measured with **PDF extraction in the driver**, common-mode to
+> both arms and outside each arm's measured region. The team has since standardised on **Parser
+> IN**: extraction moves inside each framework so the whole product is benchmarked (Tier 2 in
+> [`PARSER_DECISION.md`](PARSER_DECISION.md), chosen deliberately over the Tier 1 framework
+> comparison these numbers represent).
+>
+> **Parsing adds work to both arms, in directions not yet measured.** The engine now runs Tika 3.2.3
+> in-process; the LlamaIndex service now runs pypdf inside its workers. Memory and wall clock will
+> both move, and **the C ≈ 3.2 memory crossover in particular may move** — it sits between two
+> quotable levels only 2 apart.
+>
+> **These numbers are NOT withdrawn and NOT overwritten.** They are a valid Tier 1 framework
+> comparison. They are simply no longer the topology the team is measuring. Re-baseline before
+> quoting alongside any Parser IN result, and never place the two in the same table.
+>
+> **Also changed:** goodput and fault counts now include parser behaviour, so they are not
+> comparable with the counts below.
+
 _Generated 2026-08-09T19:44:43 from 7 checkpoints._
 
 **Both arms ran NATIVELY, not containerised.** `server-v3.3.1` ships darwin-arm64, linux-x64 and win64 — there is no linux-arm64 build — so containerising RocketRide on this host would need x86 emulation, which would corrupt exactly the numbers being measured. Running one arm containerised and one native would be asymmetric, which is worse. The memory ceiling is therefore a SOFT limit enforced by the worker, not a cgroup: a breach is detected and recorded, but it is not proof the process would have been killed at that point.

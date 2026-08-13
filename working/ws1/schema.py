@@ -17,7 +17,11 @@ from pydantic import BaseModel, Field
 
 SCHEMA_VERSION = "0.2"
 
-ErrorClass = Literal["split_failed", "embed_failed", "malformed_input", "timeout", "internal"]
+# parse_failed / empty_extraction added 2026-08-12 (Parser IN): extraction moved inside the arm,
+# so these are the arm's error classes now. The driver used to classify them; if they were not
+# surfaced here the fault counts would silently drop to zero rather than move.
+ErrorClass = Literal["parse_failed", "empty_extraction", "split_failed", "embed_failed",
+                     "malformed_input", "timeout", "internal"]
 
 
 # --------------------------------------------------------------------------- canonical encoder

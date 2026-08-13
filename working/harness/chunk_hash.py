@@ -20,6 +20,18 @@ of a chunk — which is exactly where truncation defects live.
 
 Hashing the chunk text detects it exactly, with no threshold to tune.
 
+⚠️ PER-ARM UNDER "PARSER IN" (2026-08-12 scope change)
+------------------------------------------------------
+Each arm now parses PDFs with its OWN parser (engine: Tika 3.2.3 via the stock `parse` node;
+LlamaIndex: pypdf), so the extracted text differs between arms **by construction**. `source_text`
+must therefore be **that arm's own extracted text**, not a shared pypdf reference — passing one
+arm's text while checking the other's chunks would fire the gate on every document with no defect
+present.
+
+This gate answers "did this arm split and return its own extraction correctly?" — it still catches
+NUL truncation, dropped chunks, and a missing `text + '\n'` transform. **Cross-arm parser
+differences are measured separately and NOT gated**: see `harness.extraction_fidelity`.
+
 THE REFERENCE IS COMPUTED OUTSIDE BOTH FRAMEWORKS
 -------------------------------------------------
 `reference_chunks()` imports **only** `langchain_text_splitters` — no llama_index, no engine, no
@@ -83,7 +95,10 @@ def effective_config() -> dict:
 
 
 def check_chunks(doc_id: str, returned, source_text: str) -> dict:
-    """Assert an arm's returned chunks match the offline reference exactly.
+    """Assert an arm's returned chunks match the offline reference built from ITS OWN text.
+
+    `source_text` MUST be the text that this arm extracted. Under Parser IN the arms extract
+    differently, so a shared reference would produce false failures on every document.
 
     Returns per-document evidence. Raises ChunkHashMismatch on any divergence, naming the first
     differing chunk and how it differs — a count mismatch and a content mismatch have different

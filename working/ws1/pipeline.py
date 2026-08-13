@@ -134,6 +134,51 @@ class LlamaIndexPipeline:
         return ("SentenceSplitter" if self.splitter_mode == "native"
                 else "RecursiveCharacterTextSplitter")
 
+    # -- extraction (Parser IN, 2026-08-12) --------------------------------
+    def extract(self, pdf_bytes: bytes) -> str:
+        """PDF bytes -> text, INSIDE the service.
+
+        Parser IN scope change: extraction used to happen in the driver, common-mode to both arms.
+        It now happens inside each arm so the whole product is benchmarked (Tier 2 in
+        PARSER_DECISION.md). Consequence: parse failures are this arm's failures and must surface
+        through the response as error classes, not be counted by the driver.
+
+        Parser selection, switchable via WS1_PDF_PARSER:
+
+        * ``pypdf`` (DEFAULT) — BSD-3. This is what llama-index's own PDFReader uses underneath
+          (`llama-index-readers-file` pins `pypdf<7,>=6.1.3`). We call pypdf directly rather than
+          going through PDFReader because that package **hard-requires pandas<3,>=2.0.0** — verified
+          against its PyPI metadata, not assumed — and pulling pandas into the measured service to
+          reach the same pypdf call would inflate the arm's memory for no functional gain.
+        * ``pymupdf`` — **AGPL-3.0, and its network clause reaches a service**. Selecting it is a
+          procurement decision, not a technical one. Never the default; the licence is restated at
+          the point of use so nobody enables it casually.
+        """
+        parser = os.environ.get("WS1_PDF_PARSER", "pypdf").lower()
+        if parser == "pypdf":
+            import io
+            import pypdf
+            reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
+            return "\n".join((page.extract_text() or "") for page in reader.pages)
+        if parser == "pymupdf":
+            # AGPL-3.0. Running this inside a network service triggers the network clause, which
+            # obliges you to offer the service's complete corresponding source to its users.
+            import fitz                                            # type: ignore
+            with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
+                return "\n".join(page.get_text() for page in doc)
+        raise ValueError(f"unknown WS1_PDF_PARSER={parser!r} (pypdf | pymupdf)")
+
+    @property
+    def parser_name(self) -> str:
+        return os.environ.get("WS1_PDF_PARSER", "pypdf").lower()
+
+    def parser_version(self) -> str:
+        if self.parser_name == "pypdf":
+            import pypdf
+            return f"pypdf {pypdf.__version__}"
+        import fitz                                                # type: ignore
+        return f"pymupdf {fitz.__doc__.strip().splitlines()[0] if fitz.__doc__ else '?'}"
+
     # -- processing --------------------------------------------------------
     def split(self, text: str) -> list[str]:
         """Chunk one document. Applies the canonical `text + '\\n'` transform.

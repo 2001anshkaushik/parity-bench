@@ -72,6 +72,22 @@ nothing is containerised on this host.
 
 ## 3. Pipeline, and how it is reproduced
 
+> ### ⚠️ UPDATED 2026-08-12 — we now parse INSIDE the arms, like you
+> This section previously said we parse outside both arms and run a 4-node pipeline. **That is no
+> longer true**, and since you are matching against it: we have moved to **Parser IN**.
+> * RocketRide: the stock **5-node** pipeline `webhook → parse → preprocessor_langchain →
+>   embedding_transformer → response_documents`, with your lane wiring (`parse` consumes `tags`,
+>   not the `data` its README documents — thank you, that saved a cycle). All stock; we did not add
+>   a seventh custom node.
+> * LlamaIndex: a `/process_pdf` endpoint takes raw PDF bytes and parses with **pypdf** in-worker.
+>   We call pypdf directly rather than through `PDFReader` because `llama-index-readers-file`
+>   hard-requires **pandas<3,>=2.0.0** (checked against its PyPI metadata) to reach the same pypdf.
+> * Driver: no longer extracts. It sends bytes.
+>
+> **So our two arms now use different parsers, like yours** — Tika 3.2.3 vs pypdf. Everything below
+> describing parser-out topology is superseded; the numbers it produced are being re-baselined.
+
+
 **Canonical 4-node RocketRide pipeline** (`working/pipes/embed_probe.pipe`), all stock providers:
 
 ```
