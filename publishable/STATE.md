@@ -1,6 +1,113 @@
 # STATE — durable resume point
 
-**Written 2026-08-05.** Assumes the reader knows nothing about this project. Read this first.
+**Written 2026-08-05, handoff section added 2026-08-14.** Assumes the reader knows nothing about
+this project. Read this first.
+
+---
+
+## 0a. ⏸️ PHASE 2 HANDOFF — READ THIS BEFORE ANYTHING ELSE (2026-08-14)
+
+**A session with zero memory of this work starts here. Everything below §0a is history.**
+
+### Where we are
+
+| | |
+| --- | --- |
+| **AWS box** | `i-0775f33f3dc16f6af` — **verified end to end** (SSM connect, S3 both directions, repo clone all confirmed working). **The box is STOPPED.** |
+| **Billing** | starts on `start-instances`. Nothing is being charged while it is stopped. |
+| **Auto-stop** | **1 % CPU for one hour → the box stops, silently, no warning.** An idle SSM session while you read docs will trip it. It does NOT trip during an actual run. |
+| **Team pin** | engine **3.3.1** + SDK **1.3.0**, **Parser IN**, stock 5-node shape. All three teams aligned on this. |
+| **Peers** | **Shashi and Leela are already running on AWS. We are behind** — that is the reason Phase 2 is the priority. |
+
+### DONE locally (all verified, all committed)
+
+* **Parser IN on both arms** — RocketRide 5-node stock pipeline (`product_pdf.pipe`) and the
+  LlamaIndex HTTP service both ingest raw PDF bytes and parse inside the arm.
+* **Five correctness gates** — census · structure (384-d, finite, L2 = 1.0 ± **1e-3**) ·
+  determinism (blast vs sequential chunk hashes) · independent reference (per-arm chunk hash) ·
+  content sanity (NUL + printable ratio < 0.90).
+* **50-doc smoke PASSING both arms** — census 50 = 49 + 1 + 0, structure 0 fail, determinism 50/50.
+  Latest: `working/results/smoke50_parser_in__20260814T021944Z__55a58b535e24.json`.
+* **Setup probe PASSING** — thread parity 10/10 measured in-process, 10/10 docs, deterministic.
+  Latest: `working/results/setup_probe__20260814T180651Z__fe98911e3a17.json`.
+* **Corpus manifest** — all 10,000 docs (sha256, bytes, pages, extracted chars) in
+  `working/results/corpus_manifest.jsonl`, deterministic selection rule + verifier
+  (`working/scripts/verify_corpus_manifest.py`, 10,000/10,000 MATCH).
+* **Metrics docs shipped** — `METRICS_AND_VERIFICATION.md` (the walk-in doc) and `TEAM_HANDOUT.md`.
+* **Regression suite** — 13 checks: 12 pass, 1 known xfail (`nul_truncation`, open upstream).
+
+### ⛔ NEVER RUN — do not assume any of this works
+
+* **`BUILD_ON_EC2.md` has never been executed.** Not one step.
+* **No x86-64 Docker build has ever run**, for either arm.
+* **The RocketRide image has never existed anywhere** — `docker/Dockerfile.rocketride` was written
+  from ELF/DT_NEEDED inspection of the release tarball and is **UNVERIFIED** until it builds.
+* **Nothing has run on the box beyond access checks** (SSM, S3, clone). No build, no engine boot,
+  no measurement.
+
+### 🚫 SUPERSEDED — must be RE-MEASURED on Linux, never carried forward
+
+Every one of these is a **macOS/arm64** number. Quoting any of them for Phase 2 is a reporting
+error, not a shortcut.
+
+| number | why it cannot travel |
+| --- | --- |
+| **memory crossover C ≈ 3.2** (S1) | macOS arm64 memory behaviour; re-derive from a Linux sweep |
+| **all C-sweep numbers** (C=1 1.95×, C=2, C=4, C=8, C=16 cells) | same host, same caveat |
+| **pool width 17.24** (`anchor_c_width.json`) | macOS scheduler measurement; the 32-ladder depends on re-measuring this **first** on the 32-vCPU host |
+| **the 12.4 % wall swing / A13** | low-power-state artifact of this laptop; the whole A13 saturation story is host-bound |
+| **C=16 cells invalidated by macOS memory compression** (+5.5 GB compressed) | **Linux has no compressor** — the gate is being replaced by cgroups v2 `memory.stat`; the invalidation reason itself does not exist on the target |
+| **every throughput figure** | already withdrawn once (session 11); never quote from this laptop |
+
+**What survives the platform change:** the gate logic, the harness, the corpus manifest, the two
+bug reports, and the correctness verdicts. Not the performance numbers.
+
+### The two filed bugs (both reproducible, both ours to defend)
+
+1. **`BUG_CHUNK_DUPLICATION.md`** — any text payload above **~239.8k chars** has its complete chunk
+   list emitted **exactly twice**, silently; all vectors valid. Threshold bisected: 239,062 clean /
+   239,843 double, n=3 each side. **Reproducer is 4 lines of synthetic ASCII, no PDF needed**:
+   `send(token, (unit*7000)[:239_843], mimetype="text/plain")` → 128 chunks where 64 are correct.
+   **Full-corpus census: 534/9,992 documents (5.34 %) are over the threshold.**
+2. **`BUG_NUL_TRUNCATION.md`** — text truncated at the first NUL. Still reproduces (the suite's
+   standing xfail is its detector). Re-scoped: **0/303 docs have NUL in Tika output**, so under
+   Parser IN it has no observed path on this corpus; the pypdf-path figure is **0.70 % by full
+   census** (70/9,992). Reproducer: send `"AAAA\x00BBBB"` as `text/plain`, expect 9 chars back.
+
+### Three open cross-team questions (need Leela + Shashi, not more local measurement)
+
+1. **Tika-vs-pypdf extraction ratio** — median 1.007 measured, but the manifest's char counts are
+   pypdf-derived while Parser IN runs Tika. Which is the reference for shared thresholds?
+2. **The 10 % spread definition** — spread of what over what: (max−min)/median, per block or per
+   run, before or after warm-up exclusion? Our gate and theirs may not be the same test.
+3. **Warm-up 25 vs 100** — Shashi uses 25; we measured LlamaIndex still 1.08× at reps 25–50 and
+   steady ~100. 25 bakes an ~8 % bias into one arm only. [Ours is PROVISIONAL — one fixture, one
+   host, cheap to settle on the box.]
+
+### Exact first commands on the box
+
+```bash
+# 1. START — BILLING BEGINS AT THIS LINE
+aws ec2 start-instances --instance-ids i-0775f33f3dc16f6af
+aws ec2 wait instance-running --instance-ids i-0775f33f3dc16f6af
+
+# 2. CONNECT (SSM — no SSH keys, no public ingress)
+aws ssm start-session --target i-0775f33f3dc16f6af
+
+# 3. KEEP IT ALIVE while you work: auto-stop is 1% CPU for 1h, silent.
+#    Run this in a spare shell during any long idle period (reading, planning):
+( while true; do timeout 50 md5sum /dev/zero >/dev/null; sleep 5; done ) &
+
+# 4. Then follow publishable/BUILD_ON_EC2.md from step 0. Do not skip the preflight —
+#    every later step assumes uname -m = x86_64, glibc >= 2.35, cgroup2fs, and lsof present.
+
+# 5. STOP THE BOX when done. Do not rely on auto-stop.
+aws ec2 stop-instances --instance-ids i-0775f33f3dc16f6af
+```
+
+**First real milestone on the box:** `docker build -f docker/Dockerfile.rocketride` succeeding and
+the engine answering `/version` with `3.3.1.35`. Until that happens, the RocketRide arm does not
+exist on Linux.
 
 ---
 

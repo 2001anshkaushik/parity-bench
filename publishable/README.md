@@ -1,7 +1,42 @@
 # WS-1 Service Parity — start here
 
 **Read this file first. Nothing else in this repository is a safe entry point.**
-Last updated 2026-08-07.
+Last updated **2026-08-14**.
+
+---
+
+## ⏸️ CURRENT STATE — Phase 2, waiting on the AWS box
+
+**Resuming with no memory of this work? Read `STATE.md` §0a first — it is the complete handoff.**
+This section is the 60-second version.
+
+* **Box `i-0775f33f3dc16f6af` is verified end to end** (SSM, S3 both directions, repo clone) and is
+  **STOPPED**. **Billing starts on `start-instances`.** Auto-stop is **1 % CPU for an hour,
+  silent** — an idle session will kill the box without warning.
+* **Team is pinned:** engine **3.3.1** + SDK **1.3.0**, **Parser IN**, stock 5-node pipeline. All
+  three teams aligned. **Shashi and Leela are already running on AWS; we are behind.**
+* **Done locally:** Parser IN on both arms · five correctness gates · 50-doc smoke passing both arms
+  · setup probe passing · 10,000-file corpus manifest + verifier · metrics docs shipped
+  (`METRICS_AND_VERIFICATION.md`, `TEAM_HANDOUT.md`) · 12 pass + 1 known xfail in the suite.
+* **NEVER RUN:** `BUILD_ON_EC2.md` (not one step) · any x86-64 Docker build · **the RocketRide image,
+  which has never existed anywhere** · anything on the box beyond access checks.
+* **🚫 Do not carry these to Phase 2 — all macOS/arm64, all must be re-measured on Linux:** the
+  C ≈ 3.2 memory crossover, every C-sweep cell, pool width 17.24, the 12.4 % wall swing and the
+  whole A13 story, the C=16 macOS-compression invalidation (**Linux has no compressor**), and
+  **every throughput figure**. The gates, harness, manifest and bug reports travel; the performance
+  numbers do not.
+* **Two filed bugs:** `BUG_CHUNK_DUPLICATION.md` (>~239.8k chars → chunks emitted exactly twice;
+  4-line synthetic reproducer; **5.34 % of the corpus is over the threshold**) and
+  `BUG_NUL_TRUNCATION.md` (truncation at first NUL; 0/303 under Tika, 0.70 % on pypdf paths).
+* **Three open cross-team questions:** the Tika-vs-pypdf extraction ratio (which is the reference?),
+  the exact definition of the 10 % spread gate, and warm-up 25 (Shashi) vs 100 (our measurement).
+
+**First commands on the box** — full sequence in `STATE.md` §0a, then `BUILD_ON_EC2.md` step 0:
+
+```bash
+aws ec2 start-instances --instance-ids i-0775f33f3dc16f6af   # BILLING STARTS HERE
+aws ssm start-session --target i-0775f33f3dc16f6af
+```
 
 ---
 
@@ -12,7 +47,11 @@ on an identical document split-and-embed pipeline, plus the instrumentation buil
 comparison trustworthy. Ansh owns the LlamaIndex arm; Shashi owns the RocketRide service; Leela
 owns the shared schema and the mt10k reference corpus.
 
-**Nothing here has been sent to the team.** Every shared document is still a draft.
+**Team state (2026-08-14):** the team is *aligned* on the engine 3.3.1 + SDK 1.3.0 pin and the
+Parser IN 5-node shape, and the metrics documents (`METRICS_AND_VERIFICATION.md`,
+`TEAM_HANDOUT.md`) are prepared for the pre-Phase-2 sync. **Which documents have actually been
+sent is not tracked in this repo — ask Ansh before assuming any of them landed.** Treat everything
+here as a draft until told otherwise.
 
 ## ⚠️ Read this before quoting any number
 
