@@ -1,8 +1,12 @@
 # ---------------------------------------------------------------------------------------------
-# WS-1 LlamaIndex service — linux/arm64 ONLY.
+# WS-1 LlamaIndex service — ARCH-PARAMETERIZED (2026-08-14, Phase 2).
 #
-# Rosetta emulation of an x86 base would silently change every number and would look like a
-# framework difference rather than an emulation artifact, so the platform is asserted FOUR times:
+# Emulation would silently change every number and look like a framework difference, so the
+# architecture is asserted, not assumed — but no longer HARDCODED to aarch64. Pass the arch you
+# intend and the build fails loudly on any mismatch:
+#     docker build --build-arg EXPECT_ARCH=x86_64 ...     (EC2)
+#     docker build --build-arg EXPECT_ARCH=aarch64 ...    (this laptop)
+# The assertion chain is unchanged in spirit:
 #   1. --platform on every FROM
 #   2. a build-time RUN that fails the build on the wrong arch (below, both stages)
 #   3. the service reports platform.machine() in /manifest
@@ -13,8 +17,12 @@
 # oversubscription pathology measured in A3_SERIALIZATION_FINDING.md (19% throughput, most of the
 # concurrency scaling).
 # ---------------------------------------------------------------------------------------------
+ARG EXPECT_ARCH=x86_64
 FROM --platform=$BUILDPLATFORM python:3.12-slim@sha256:229a2c5bfa27522db7815ea81f9bed70af17ccb9de9fc7ad142b1877b5830d36 AS builder
-RUN [ "$(uname -m)" = "aarch64" ] || (echo "ARCH ASSERT FAILED (builder): $(uname -m)" && exit 1)
+ARG EXPECT_ARCH
+RUN [ "$(uname -m)" = "$EXPECT_ARCH" ] || \
+    (echo "ARCH ASSERT FAILED (builder): building on $(uname -m) but EXPECT_ARCH=$EXPECT_ARCH." && \
+     echo "If this is intended, pass --build-arg EXPECT_ARCH=$(uname -m). Never emulate silently." && exit 1)
 ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
 WORKDIR /build
 COPY docker/requirements.txt .
@@ -30,7 +38,9 @@ print('model baked, dim =', m.get_sentence_embedding_dimension())"
 
 # ---------------------------------------------------------------------------------------------
 FROM --platform=$BUILDPLATFORM python:3.12-slim@sha256:229a2c5bfa27522db7815ea81f9bed70af17ccb9de9fc7ad142b1877b5830d36
-RUN [ "$(uname -m)" = "aarch64" ] || (echo "ARCH ASSERT FAILED (runtime): $(uname -m)" && exit 1)
+ARG EXPECT_ARCH
+RUN [ "$(uname -m)" = "$EXPECT_ARCH" ] || \
+    (echo "ARCH ASSERT FAILED (runtime): $(uname -m) != EXPECT_ARCH=$EXPECT_ARCH" && exit 1)
 
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin

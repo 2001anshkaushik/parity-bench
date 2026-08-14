@@ -28,7 +28,8 @@ from __future__ import annotations
 import math
 
 EMBED_DIM = 384
-L2_TOL = 1e-2
+L2_TOL = 1e-3   # team standard (Leela's spec tolerance); was 1e-2 — tightened 2026-08-14.
+                # Empirically safe: 50-doc smoke ran both arms at 1e-3 with 0 structure failures.
 
 
 class GoodputFailure(AssertionError):

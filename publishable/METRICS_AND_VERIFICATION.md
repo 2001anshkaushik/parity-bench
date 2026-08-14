@@ -26,11 +26,11 @@ refuses n=1).
 * **`BUG_CHUNK_DUPLICATION.md`** — any text payload over **~239.8k characters** gets its complete
   chunk list emitted **exactly twice**. Silent: every vector valid, response healthy. Found by our
   independent-reference gate on a document that **passes census, structure, and determinism**.
-  4-line synthetic reproducer, threshold bisected, deterministic n=3.
+  4-line synthetic reproducer, threshold bisected, deterministic n=3. **Full-corpus census: 534/9,992 documents (5.34 %) exceed the threshold** — a full 10k run doubles chunks on every one.
 * **`BUG_NUL_TRUNCATION.md`, re-scoped with data** — the truncation defect is real and still
   reproduces, but **0/303 documents** show NUL (or any control character) in Tika output, so under
   Parser IN it has no observed path on this corpus. "Real defect, no observed instance" is a
-  different — and correct — report from "0.30 % affected."
+  different — and correct — report from "0.70 % affected" (the full-census pypdf figure).
 
 In this project's history, **the instrument has been wrong more often than the systems under test**
 (§5: the defect log). The gates exist because each one caught something real.
@@ -144,7 +144,16 @@ major retraction in this project traces to one. This is the credibility argument
 | 18 | standalone-Tika reference (glyph mapping differs in-process) | **4/5 false defect reports against RocketRide** |
 
 18 recorded (the count was 13 at the start of this week; 13–18 were caught during Parser IN
-preparation, before AWS). **Notice the direction: several would have unfairly hurt RocketRide, one
+preparation, before AWS).
+
+**Test coverage, stated exactly:** the regression suite is **13 tests covering 11 of the 18**
+(#7-threads, #8 ×2 tests, #9, #16, plus the NUL/content/goodput/collision/setsid/artifact-guard
+classes). The other 7 are guarded differently and deliberately: **#1–6** belong to retired
+archive-era instruments with no live code to test (the defence is the protocol's two-method rule);
+**#11–12** are workflow rules (assert-nonempty edit pattern; no `grep -q` in filters) recorded in
+BENCHMARK_SETUP §7; **#14** is checked implicitly by the 50/50 blast-vs-sequential determinism run;
+**#15** is a methodology rule (fixed-fixture warm-up); **#17** (compressor gate) has **no test yet —
+open item, and the gate itself is macOS-specific and being replaced for Linux (§6)**. **Notice the direction: several would have unfairly hurt RocketRide, one
 unfairly flattered it. The gates cut both ways, which is the point.**
 
 ## §6 — Open items, with our position and the evidence

@@ -65,15 +65,30 @@ def hostmem() -> dict:
     import subprocess
     sw = psutil.swap_memory()
     out = {"swap_used_gb": round(sw.used / 1e9, 3), "swap_sin": sw.sin, "swap_sout": sw.sout}
-    try:
-        o = subprocess.run(["vm_stat"], capture_output=True, text=True, timeout=10).stdout
-        for key, name in (("Pages occupied by compressor", "compressed_pages"),
-                          ("Swapins", "swapins"), ("Swapouts", "swapouts")):
-            m = re.search(rf"{key}:\s+(\d+)", o)
-            if m:
-                out[name] = int(m.group(1))
-    except Exception:
-        pass
+    import sys as _sys
+    if _sys.platform == "darwin":
+        try:
+            o = subprocess.run(["vm_stat"], capture_output=True, text=True, timeout=10).stdout
+            for key, name in (("Pages occupied by compressor", "compressed_pages"),
+                              ("Swapins", "swapins"), ("Swapouts", "swapouts")):
+                m = re.search(rf"{key}:\s+(\d+)", o)
+                if m:
+                    out[name] = int(m.group(1))
+        except Exception:
+            pass
+    else:
+        # Linux: no compressor by default; swap activity from /proc/vmstat. Silently returning {}
+        # here (the old behaviour) would neuter the eviction gate without anyone noticing — the
+        # exact silently-weaker failure the 2026-08-14 Linux audit exists to prevent.
+        try:
+            vs = Path("/proc/vmstat").read_text()
+            for key, name in (("pswpin", "swapins"), ("pswpout", "swapouts")):
+                m = re.search(rf"^{key} (\d+)", vs, re.M)
+                if m:
+                    out[name] = int(m.group(1))
+            out["compressed_pages"] = 0        # explicit: not a thing on stock Linux
+        except Exception as e:
+            out["swap_probe_error"] = f"{type(e).__name__}"   # visible in every cell record
     v = psutil.virtual_memory()
     out["available_gb"] = round(v.available / 1e9, 2)
     return out

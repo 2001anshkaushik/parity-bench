@@ -1,0 +1,48 @@
+{
+ "_meta": {
+  "name": "setup_probe",
+  "written_utc": "20260814T004903Z",
+  "payload_sha256_12": "ad76033d3cf2",
+  "host": "ef116134-9c03-4348-b4d3-39d8a11ba5aa.attlocal.net",
+  "user": "ansh",
+  "pid": 76522,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "manifest": {
+   "utc": "2026-08-14T00:48:17Z",
+   "engine": {
+    "version": "3.3.1.35",
+    "hash": "a0817cc6",
+    "stamp": "2026-07-07T04:45:25Z"
+   },
+   "engine_binary_sha256": "5c359f44ad5a57880664efedb2059f434ac1fc4dfe1c35eec9f67f2f3a7caa0f",
+   "sdk_rocketride": "1.3.0",
+   "libraries": {
+    "llama-index-core": "0.14.23",
+    "sentence-transformers": "5.6.1",
+    "torch": "2.13.0",
+    "transformers": "5.14.1",
+    "langchain-text-splitters": "1.1.2",
+    "pypdf": "6.15.0",
+    "fastapi": "0.141.1",
+    "uvicorn": "0.52.1",
+    "numpy": "2.5.1"
+   },
+   "python": "3.12.13",
+   "host": {
+    "machine": "arm64",
+    "system": "Darwin",
+    "release": "25.6.0",
+    "cpu_count": 14
+   }
+  },
+  "threads": {
+   "rocketride": 10,
+   "llamaindex": 10
+  },
+  "n_docs": 10,
+  "failures": [],
+  "passed": true
+ }
+}

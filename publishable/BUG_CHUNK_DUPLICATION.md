@@ -70,12 +70,23 @@ we do not have. The reproducer above should let the engine team find it quickly.
 
 * Arbitrary 100-document sample: **1/98** usable documents affected (1.0 %)
 * Size-ladder sample (weighted to large documents): **4/17** affected
-* Combined: **5 distinct affected documents** — `000_000159` (283k chars), `009_009442` (247k),
-  `004_004513`, and the 3.75/10.12 MB ladder entries — every one with extracted text above the
-  threshold, every clean document below it or textless
+* Combined: **5 distinct affected documents** — `000_000159` (283,521 extracted chars),
+  `009_009442` (246,694), `003_003316`, `004_004513`, `011_011411` — every one with extracted text
+  above the ~239.8k threshold, every clean document below it or textless (verified against
+  `dup_size_ladder__20260813T221423Z`: zero violations of the threshold rule in either direction)
 
-**Prevalence is therefore a function of the corpus's text-length distribution.** On GovDocs1 ~1 % of
-documents exceed ~240k extracted characters; a contracts or reports corpus would be hit far harder.
+**Prevalence is therefore a function of the corpus's text-length distribution — and the full-corpus
+census supersedes the sample estimates above [VERIFIED — per-file manifest, all 10,000 documents]:**
+
+> **534 of 9,992 parseable documents (5.34 %) exceed the 239,843-char threshold** and would have
+> their chunks doubled in a full Parser IN run (`working/results/corpus_manifest.jsonl`, chars
+> pypdf-derived, Tika/pypdf median ratio 1.007 so ±~1 % on the count; only 2 documents sit inside
+> the 781-char uncertainty band).
+>
+> The earlier "~1 %" figure came from a 100-document sample drawn from the small-document head of
+> the corpus and is **superseded** — it under-counted 5×. A contracts or reports corpus would be hit
+> harder still. **At 5.34 % this is not a tail anomaly; it inflates any full-corpus RocketRide chunk
+> count by ~10 % on its own.**
 
 ## 6. Why every self-referential gate passes [VERIFIED]
 

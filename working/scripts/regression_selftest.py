@@ -4,6 +4,12 @@
 Each test names the incident it guards. A test here is not hypothetical: each one corresponds to a
 defect that actually produced a wrong number or lost data.
 
+COVERAGE (2026-08-14): 13 tests cover 11 of the 18 defects in the instrument log
+(METRICS_AND_VERIFICATION.md section 5). The uncovered 7: #1-6 are retired archive-era instruments
+with no live code to test; #11-12 are workflow rules (BENCHMARK_SETUP section 7); #14 is checked by
+the blast-vs-sequential determinism run; #15 is a methodology rule; #17 (compressor gate) has NO
+test yet and the gate is being replaced for Linux -- open item.
+
 Run:  ../.venv/bin/python working/scripts/regression_selftest.py
 Exit: 0 all pass, 1 any fail.  Tests needing a live engine are SKIPPED (not failed) when it is down.
 """

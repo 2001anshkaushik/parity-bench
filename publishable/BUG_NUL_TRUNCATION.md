@@ -152,7 +152,10 @@ Low prevalence, but the loss per affected document is severe and unbounded:
 > * The **defect is unchanged and still reproduces** on any path carrying a NUL:
 >   `'AAAA\x00BBBB'` → `'AAAA'` on 3.3.1.35, re-verified 2026-08-13. Text-lane integrations
 >   (webhook text, upstream systems sending extracted text) remain exposed.
-> * The **~0.30 % prevalence below is a pypdf-extraction number**. Under Parser IN (engine extracts
+> * Full-corpus census (2026-08-14, all 10,000 docs): **70/9,992 = 0.70 %** of documents carry a
+>   NUL in **pypdf**-extracted text — consistent with the earlier 3/991 sample (Wilson 95 %
+>   [0.10 %, 0.89 %]) and superseding it as the point estimate for pypdf paths.
+> * The **prevalence below is a pypdf-extraction number**. Under Parser IN (engine extracts
 >   with Tika) the observed prevalence on this corpus is **0/303**.
 > * Correct one-line status for reporting: **"real defect, no observed instance under Parser IN on
 >   this corpus; affects text-lane paths and any parser that emits control characters."**

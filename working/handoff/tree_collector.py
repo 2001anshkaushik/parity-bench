@@ -62,6 +62,21 @@ def _page_size() -> int:
 
 def read_vm_stat(page_size: int) -> dict[str, int]:
     """Parse `vm_stat` into byte counts. Returns {} if unavailable."""
+    import sys as _sys
+    if _sys.platform != "darwin":
+        # Linux (2026-08-14 audit): vm_stat does not exist; read swap activity from /proc/vmstat so
+        # the eviction signal survives the platform change instead of silently vanishing.
+        try:
+            vs = open("/proc/vmstat").read()
+            import re as _re
+            out = {}
+            for key, name in (("pswpin", "swapins"), ("pswpout", "swapouts")):
+                m = _re.search(rf"^{key} (\d+)", vs, _re.M)
+                if m:
+                    out[name] = int(m.group(1)) * page_size
+            return out
+        except Exception:
+            return {}
     if not shutil.which("vm_stat"):
         return {}
     try:
