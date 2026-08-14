@@ -23,6 +23,12 @@ THRESHOLD DERIVATION — from the corpus, not chosen:
     known-garbage extractions          0.6789 (027_027492) and 0.700 (001_001157, the doc that
                                        surfaced the NUL bug)
     => threshold 0.90 sits in the empty band between 0.9757 and 0.700.
+    PROVENANCE NOTE (2026-08-14 pre-send check): the three NUL-doc anchor ratios and the sample
+    identity (991 with text, of 1,000 sampled) are file-backed by nul_prevalence__20260810T024117Z.
+    The percentile figures above are recorded consistently in STATE.md S8 and five docs, but the
+    ratio DISTRIBUTION itself was not persisted to a result file — regression test bounds
+    (0.7003 < threshold < 0.9757) guard the band. Open item: persist the full-ratio distribution
+    when the threshold is next revisited, ideally on the 10k census.
     Measured on the sample: 1 of 991 documents falls below it, and that document is genuinely
     garbage (93 NULs, ratio 0.6789) — a true positive, not a false one.
 """

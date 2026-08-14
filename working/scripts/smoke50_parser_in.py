@@ -38,7 +38,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "working"))
 
 PORT = int(os.environ.get("SMOKE_PORT", "8851"))
-L2_TOL = 1e-3                      # Leela's tolerance, tighter than our 1e-2
+L2_TOL = 1e-3                      # team standard; goodput.py now matches (1e-3 everywhere)
 EMB_DIM = 384
 
 
