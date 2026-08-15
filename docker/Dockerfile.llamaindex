@@ -80,8 +80,56 @@ COPY docker/ladder.py /app/ladder.py
 RUN pip install --no-cache-dir \
       fastapi==0.141.1 uvicorn==0.52.1 uvloop==0.22.1 httptools==0.8.0
 
+# THE MODEL BAKE AT LINE 34 DOES NOT COVER THE RUNTIME LOADER. Root cause, measured:
+#
+#   llama_index/embeddings/huggingface/base.py:145   cache_folder = cache_folder or get_cache_dir()
+#   llama_index/core/utils.py:442-445                LLAMA_INDEX_CACHE_DIR, else
+#                                                    platformdirs.user_cache_dir("llama_index")
+#
+# `HuggingFaceEmbedding` passes that `cache_folder` straight to SentenceTransformer, which
+# OVERRIDES HF_HOME. So the builder's `SentenceTransformer(...)` bake populates /opt/hf, and the
+# runtime's `HuggingFaceEmbedding(...)` looks in ~/.cache/llama_index — a different directory
+# that is empty for user ws1. HF_HUB_OFFLINE then turns the miss into
+# "couldn't connect to https://huggingface.co ... couldn't find them in the cached files".
+#
+# Reproduced locally with a hermetic HOME: raw SentenceTransformer loads from the baked cache
+# fine; HuggingFaceEmbedding raises LocalEntryNotFoundError against the same cache. The two APIs
+# do not share a cache root. Pinning LLAMA_INDEX_CACHE_DIR and populating it here fixes it, and
+# the fetch is a tail layer so neither the builder pip layer nor the baked-model layer is touched.
+ENV LLAMA_INDEX_CACHE_DIR=/opt/li-cache
+RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 python -c "\
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding; \
+e = HuggingFaceEmbedding(model_name='sentence-transformers/multi-qa-MiniLM-L6-cos-v1', device='cpu'); \
+print('llama_index cache populated, dim', len(e.get_text_embedding_batch(['bake'])[0]))" \
+ && chmod -R a+rX /opt/li-cache
+
 RUN useradd -m -u 10001 ws1 && mkdir -p /app/out && chown -R ws1 /app
 USER ws1
+
+# BUILD-TIME PROOF that the baked cache actually loads OFFLINE, as the RUNTIME USER.
+#
+# The bake at line 34 proves the model downloaded in the *builder*, as *root*, with network.
+# It does not prove the runtime stage can load it: different user, no network, and the cache
+# arrived via COPY --from. Every one of those is a place this has failed. Without this step the
+# image builds green and 32 uvicorn workers discover the problem simultaneously at startup, with
+# "Application startup failed. Exiting." and exit code 0 — a broken image that looks healthy.
+#
+# Runs as ws1 so it also catches permission problems on /opt/hf, and inherits HF_HUB_OFFLINE=1
+# from the ENV block, so a build that silently re-downloads cannot pass. Costs ~10 s and
+# invalidates nothing above `COPY working/...`.
+#
+# HOME is forced to a scratch dir for the check so a cache under /root or /home/ws1 cannot
+# satisfy it — that leak is exactly what hid this bug: every load "worked" locally because the
+# developer's ~/.cache had the model, and the container is the first hermetic environment.
+RUN HOME=/tmp/hermetic-check python -c "\
+import os; \
+assert os.environ.get('HF_HUB_OFFLINE') == '1', 'HF_HUB_OFFLINE not set at build check'; \
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding; \
+e = HuggingFaceEmbedding(model_name='sentence-transformers/multi-qa-MiniLM-L6-cos-v1', device='cpu'); \
+v = e.get_text_embedding_batch(['offline cache check'])[0]; \
+assert len(v) == 384, f'expected 384 dims, got {len(v)}'; \
+print('OFFLINE CACHE OK: model loads as ws1, no network, no home cache, dim', len(v))" \
+ && rm -rf /tmp/hermetic-check
 
 EXPOSE 8801
 

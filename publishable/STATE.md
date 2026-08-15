@@ -547,6 +547,41 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 22 — instrument defect #20: the model bake never covered the runtime loader (2026-08-15)
+
+The x86-64 LlamaIndex container failed at startup, every uvicorn worker, with
+`OSError: We couldn't connect to 'https://huggingface.co' ... couldn't find them in the cached
+files`, despite `HF_HOME=/opt/hf`, `HF_HUB_OFFLINE=1` and a baked model.
+
+**Cause [VERIFIED — reproduced locally with the identical error, then fixed and re-verified]:**
+`llama-index-embeddings-huggingface` does not use `HF_HOME`.
+`base.py:145` does `cache_folder = cache_folder or get_cache_dir()`; `llama_index/core/utils.py:442`
+resolves that to `LLAMA_INDEX_CACHE_DIR` or `platformdirs.user_cache_dir("llama_index")`
+(`~/.cache/llama_index` on Linux). That `cache_folder` is handed to SentenceTransformer and
+**overrides HF_HOME**. The builder bakes with raw `SentenceTransformer(...)`, which honours
+HF_HOME and fills `/opt/hf`; the runtime loads with `HuggingFaceEmbedding(...)`, which looks in a
+directory that is empty for user `ws1`. Same model, two cache roots.
+
+**Why it never showed before:** the container is the project's first hermetic environment. Under a
+hermetic `HOME` the baked cache fails; with a developer `HOME` it passes, because
+`~/.cache/llama_index` already held the model. **Four of my own diagnostic runs passed for that
+reason and were false passes — the null control (empty HF_HOME) also passed, which is what
+exposed the leak.** The macOS runs in sessions 20–21 were reading from the user cache, not from
+any baked location; the "model baked into the image" claim was true only for the
+SentenceTransformer path, never for the path the service actually uses.
+
+**Refuted along the way, with evidence, so nobody re-runs them:** the fastapi/uvicorn/uvloop/
+httptools tail layer upgrades nothing (`uv pip compile` before/after: five additions, zero version
+changes — transformers, huggingface_hub, tokenizers, torch, safetensors, numpy all identical);
+huggingface_hub 1.26.0 → 1.27.0 is additive only and loads offline fine; a read-only HF_HOME loads
+fine.
+
+**Fix:** tail layer pins `LLAMA_INDEX_CACHE_DIR=/opt/li-cache`, populates it with the runtime
+loader (network on, at build time only), and a following `RUN` as `ws1` with `HOME` forced to a
+scratch dir proves an offline load. Neither the builder pip layer nor the baked-model layer is
+touched. A build that cannot load offline now fails the build instead of shipping an image that
+32 workers discover at startup with exit code 0.
+
 ### SESSION 21 — metrics adoption: one arm-agnostic module, wired and run (2026-08-14/15, laptop only)
 
 **Decision recorded:** Phase 2 runs **both arms in Docker** on the box — the native plan in
