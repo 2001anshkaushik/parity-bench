@@ -11,15 +11,30 @@ Last updated **2026-08-14**.
 This section is the 60-second version.
 
 * **Box `i-0775f33f3dc16f6af` is verified end to end** (SSM, S3 both directions, repo clone) and is
-  **STOPPED**. **Billing starts on `start-instances`.** Auto-stop is **1 % CPU for an hour,
-  silent** — an idle session will kill the box without warning.
+  **STOPPED**. **Billing starts on `start-instances`.** Auto-stop is silent — an idle session will
+  kill the box without warning.
+  > **CORRECTION 2026-08-14 — the auto-stop threshold is disputed.** This file previously said
+  > **1 % CPU for an hour**. Shashi's `AWS-RUNBOOK.md`, written after Dmitrii provisioned all three
+  > boxes, says **< 20 % instance CPU for 60 minutes** — on 32 vCPU that is 6.4 cores, against a
+  > measured 12.7 % idle floor. Both cannot be right and neither is measured. **Assume 20 %**: the
+  > error is asymmetric, and the one-core keep-alive this repo used to recommend (~3 %) would not
+  > save the box. `RUN_ON_EC2.md` §1a has an eight-core keep-alive. [UNVERIFIED — open item for
+  > Dmitrii]
 * **Team is pinned:** engine **3.3.1** + SDK **1.3.0**, **Parser IN**, stock 5-node pipeline. All
   three teams aligned. **Shashi and Leela are already running on AWS; we are behind.**
 * **Done locally:** Parser IN on both arms · five correctness gates · 50-doc smoke passing both arms
   · setup probe passing · 10,000-file corpus manifest + verifier · metrics docs shipped
   (`METRICS_AND_VERIFICATION.md`, `TEAM_HANDOUT.md`) · 12 pass + 1 known xfail in the suite.
-* **NEVER RUN:** `BUILD_ON_EC2.md` (not one step) · any x86-64 Docker build · **the RocketRide image,
-  which has never existed anywhere** · anything on the box beyond access checks.
+* **TODAY'S PLAN IS `RUN_ON_EC2.md`** — a native 200-document smoke, engine straight from the
+  release tarball. `BUILD_ON_EC2.md` is **superseded for today** (it builds images; not one step of
+  it has ever run).
+* **NEVER RUN:** any x86-64 Docker build of **our** images · anything on the box beyond what
+  `RUN_ON_EC2.md` sequences.
+  > **CORRECTION 2026-08-14 — "the RocketRide image has never existed anywhere" is no longer true.**
+  > Leela's `rocketride/Dockerfile` builds engine 3.3.1 and pins the **same extracted-binary
+  > sha256 we independently verified** (`95768e26…`); Shashi's `engine.Dockerfile` carries the
+  > onnxruntime boot patch. The accurate statement is that **ours** has never been built. Leela's is
+  > the documented fallback if the native path stalls — `RUN_ON_EC2.md` §10.
 * **🚫 Do not carry these to Phase 2 — all macOS/arm64, all must be re-measured on Linux:** the
   C ≈ 3.2 memory crossover, every C-sweep cell, pool width 17.24, the 12.4 % wall swing and the
   whole A13 story, the C=16 macOS-compression invalidation (**Linux has no compressor**), and
@@ -29,9 +44,18 @@ This section is the 60-second version.
   4-line synthetic reproducer; **5.34 % of the corpus is over the threshold**) and
   `BUG_NUL_TRUNCATION.md` (truncation at first NUL; 0/303 under Tika, 0.70 % on pypdf paths).
 * **Three open cross-team questions:** the Tika-vs-pypdf extraction ratio (which is the reference?),
-  the exact definition of the 10 % spread gate, and warm-up 25 (Shashi) vs 100 (our measurement).
+  the exact definition of the 10 % spread gate, and the warm-up count.
+  > **CORRECTION 2026-08-14 — the warm-up question was mis-attributed.** It is not "25 (Shashi) vs
+  > 100 (ours)". On his agreed branch Shashi's warm-up is **computed**,
+  > `max(4, 2 × threads)` for blast and **2** for sequential — that is **64** at 32 threads, not 25.
+  > **Leela** is the one on 25. Three values, not two: 64 / 25 / 100.
+* **🚩 CORPUS DIVERGENCE — the three result sets are not comparable.** Shashi is on **24
+  sha256-pinned arXiv cs.LG PDFs, hardlink-replicated** up to N; Leela and I are both on
+  **GovDocs1**. His "10,000 documents" is 24 unique files seen ~417 times each. This is not a
+  variant of one corpus, and no amount of harness alignment fixes it. Escalate before anyone builds
+  a three-way table.
 
-**First commands on the box** — full sequence in `STATE.md` §0a, then `BUILD_ON_EC2.md` step 0:
+**First commands on the box** — full sequence in **`RUN_ON_EC2.md`**:
 
 ```bash
 aws ec2 start-instances --instance-ids i-0775f33f3dc16f6af   # BILLING STARTS HERE

@@ -1,0 +1,215 @@
+{
+ "_meta": {
+  "name": "smoke50_parser_in",
+  "written_utc": "20260814T214738Z",
+  "payload_sha256_12": "de58acc55349",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 9994,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "n_offered": 3,
+  "threads": [
+   [
+    10,
+    14
+   ]
+  ],
+  "arms": {
+   "llamaindex_http_pdf": {
+    "census": {
+     "successful": 3,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": true,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "independent_hash_failures": 0,
+    "content_suspect": 0,
+    "records": [
+     {
+      "doc": "000_000009.pdf",
+      "submitted_sha256": "3fcfd899850be006b2d6616f8161e49479bc41424fa80e404f41233b77256ff3",
+      "latency_ms": 159.01,
+      "returned_doc_id": "d9994-1",
+      "n_chunks": 7,
+      "chunk_sha256": [
+       "f1648b7d764cbac03b8de3322fec887bcbfc9866c417d577f266b1171dae1860",
+       "7f415182f7916620f79a30112d07d3c650ba0c24ca7dc7ddab32df1049269caf",
+       "0a9f3717a073e9f9d413962c91d0161fe53a3098ec7f60951e8d7e3f24a6741d",
+       "0e9fd3d1abb74dd17ca79890b22620e0dc057a628cab1808d18d210774882edc",
+       "543ff9cdf7f0dc804e071c3df3ed15e4feffae22d5b661bdd2daf5c9a4ab4724",
+       "14f0b2322e47441ccd49ef20f97accb80da81d9102fd55aa4ba27cbe3934e126",
+       "3be946a0fa6568e204953a866e38086343d2f6dbe05b80abcb4cc483c50acb75"
+      ],
+      "chars": 26995,
+      "structure": [],
+      "outcome": "successful",
+      "independent_hash": "pass",
+      "extracted_chars": 26005,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000010.pdf",
+      "submitted_sha256": "7832f844839ed04e2979bc565642f36bf76e1682137071f0786d4c7418bf81d7",
+      "latency_ms": 66.36,
+      "returned_doc_id": "d9994-2",
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "69929f6c47b7f8c7b0614d0b5646ea06f91f448fa7215139835cdd838a601af3",
+       "9105244e3cc17309802d3839e20e7028f9f8329c71892d55f13878286437ddbf",
+       "1f507bbbbd478e744e9a2698794586365c4b9a6613b3507f36c7bbdb96250387",
+       "5552af224ee3c508b338424e4f911e44955f9c315127ccca34efeeb0c60b4a52"
+      ],
+      "chars": 12100,
+      "structure": [],
+      "outcome": "successful",
+      "independent_hash": "pass",
+      "extracted_chars": 11763,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000011.pdf",
+      "submitted_sha256": "44d4296ee6750f96a34455cf5d6d6e0a574ffe1419928780b5d2fddea0af3778",
+      "latency_ms": 9.11,
+      "returned_doc_id": "d9994-3",
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "08683142c388fe2e00ef1cfb347228f5867d0878eceafad916f81de5023370c9"
+      ],
+      "chars": 273,
+      "structure": [],
+      "outcome": "successful",
+      "independent_hash": "pass",
+      "extracted_chars": 276,
+      "deterministic": true
+     }
+    ]
+   },
+   "rocketride_pdf": {
+    "census": {
+     "successful": 3,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": true,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "independent_hash_failures": 0,
+    "content_suspect": 0,
+    "records": [
+     {
+      "doc": "000_000009.pdf",
+      "submitted_sha256": "3fcfd899850be006b2d6616f8161e49479bc41424fa80e404f41233b77256ff3",
+      "latency_ms": 561.46,
+      "returned_doc_id": null,
+      "n_chunks": 10,
+      "chunk_sha256": [
+       "bba1ccd423493e1acd692546c3ab968eb1af99cff03f3c805c74fc7be77eed0e",
+       "1e89deb357f8a4fd60374ef1c637029f6ed59573de37a44115f7e90b9d11335d",
+       "f311b287bcef704795ab47b03e0676b2cb88ff1cf538b6234cbabf67db47fbf2",
+       "f1d78d3149e579b7a056793fbca21f74ac7bec21558ce81e38976823910b941c",
+       "059e94e8a1681c047f379e42da498cb0918ad449379dd58a54cc23fc752f7958",
+       "1306d9e8c7083b526e4bb6d95fd9c4e4541b28e768e2b1c1d8580d5e14ca8a67",
+       "da1a88640031c1207714c7b96613a11654d8a7158de46e6a6591c205f3fa6f3b",
+       "ca240a50dda88ca511532acdf8d44bf92664d0a6eddc7a41e03c5bfb4ddf0dce",
+       "79d11d33f961e40f53c429228e83760b0351f6ddd84c055e25aceb9b8eb22c73",
+       "8cc0b03339195762ad2967c292f5421452b63ca9fe28e92dd19167a700100cc6"
+      ],
+      "chars": 35514,
+      "structure": [],
+      "outcome": "successful",
+      "independent_hash": "pass",
+      "extracted_chars": 35228,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000010.pdf",
+      "submitted_sha256": "7832f844839ed04e2979bc565642f36bf76e1682137071f0786d4c7418bf81d7",
+      "latency_ms": 126.07,
+      "returned_doc_id": null,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "7554508d32dda37ade72a5e86cde0b9b52784e54c58a7adaf3496f86481dde57",
+       "994414cafb9e20c08ad6eacf7f8ffd13d877a242c2da062a258af95d5e72b5a9",
+       "b9f86e017e827c9897b706b32b3d5228e4c52240eeea459fa3659b27abe49d17",
+       "014a1dd068e90d797a72cfa83f34d16be14781de4385a877e3d7ae5ae50e7f76"
+      ],
+      "chars": 11998,
+      "structure": [],
+      "outcome": "successful",
+      "independent_hash": "pass",
+      "extracted_chars": 11703,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000011.pdf",
+      "submitted_sha256": "44d4296ee6750f96a34455cf5d6d6e0a574ffe1419928780b5d2fddea0af3778",
+      "latency_ms": 32.19,
+      "returned_doc_id": null,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "26a41f95119d94ebff70cd09b415504291fb1db701a998db4d7c6d96aaa44bd3"
+      ],
+      "chars": 281,
+      "structure": [],
+      "outcome": "successful",
+      "independent_hash": "pass",
+      "extracted_chars": 288,
+      "deterministic": true
+     }
+    ]
+   }
+  },
+  "pipeline": {
+   "file": "product_pdf.pipe",
+   "nodes": [
+    "webhook",
+    "parse",
+    "preprocessor_langchain",
+    "embedding_transformer",
+    "response_documents"
+   ],
+   "sha256_raw": "bd775051ff5e43453dd4c0e4e1db465b34467cc3645047e077e75d0b262c823c",
+   "sha256_canonical": "f61165f7cf7ab1dbb30e0cc145d34dcdcbdc048fc90c3756d570fa217faa584b"
+  },
+  "corpus": {
+   "source": "govdocs1",
+   "glob": "000_*.pdf",
+   "rule": "sorted(*.pdf)[:N]",
+   "n": 3,
+   "sha256": "15a5d4dd827d80b11d98ab662e61be0fa1d3fb6e4230a3d9556aa4681dab1d8c",
+   "first": "000_000009.pdf",
+   "last": "000_000011.pdf"
+  },
+  "pinned": {
+   "workers": 1,
+   "threads": 10,
+   "blast_concurrency": 3,
+   "send_modes": [
+    "sequential",
+    "blast"
+   ],
+   "warm_up": "service-warm gated on distinct worker warm lines; no per-document warm-up in this smoke"
+  },
+  "cross_arm": [
+   {
+    "doc": "000_000009.pdf",
+    "chunk_delta": 3,
+    "char_ratio": 1.3156
+   },
+   {
+    "doc": "000_000010.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9916
+   },
+   {
+    "doc": "000_000011.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0293
+   }
+  ]
+ }
+}

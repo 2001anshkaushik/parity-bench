@@ -1,5 +1,23 @@
 # BUILD_ON_EC2 — first contact is executing a plan, not debugging one
 
+> ## ⛔ SUPERSEDED 2026-08-14 — use [`RUN_ON_EC2.md`](RUN_ON_EC2.md) instead
+>
+> This file builds Docker images. **Not one step of it has ever run.** Today's plan runs the engine
+> **natively from the release tarball**, which removes an unbounded first-build from the critical
+> path. Kept because §0 (preflight) and the "CANNOT be verified" table below are still accurate,
+> and because a container build remains the right follow-up.
+>
+> Two things below are now **wrong** and are corrected in `RUN_ON_EC2.md`:
+> * **§1 `python3.12 -m venv` will not work on Ubuntu 22.04 as written** — the system Python is
+>   3.10, and `numpy==2.5.1` / `scikit-learn==1.9.0` have **no cp310 wheel**. Python 3.12 must be
+>   installed first (`RUN_ON_EC2.md` §2a). [VERIFIED — PyPI JSON, 2026-08-14]
+> * **The engine cannot cold-boot unpatched on Linux at all**, in a container or out of one:
+>   `onnxruntime-gpu==1.20.1` no longer exists on PyPI and the constraints compile is
+>   all-or-nothing. Five files carry the pin, not three (`RUN_ON_EC2.md` §3a). [VERIFIED]
+>
+> The engine tarball pin in §3 (`d8dad45b…ce0281d8`) is **confirmed correct** — re-downloaded and
+> hashed 2026-08-14. The extracted `engine` binary is `95768e26…`, matching Leela's Dockerfile.
+
 **Ansh · 2026-08-14.** Target: Ubuntu 22.04 x86-64, ≥32 vCPU, 64 GB, gp3, Docker + cgroups v2
 (the amended spec). Every step is copy-paste; each has a check that must pass before the next.
 **Nothing below has run on x86-64 — that is the point of this file.** What cannot be verified

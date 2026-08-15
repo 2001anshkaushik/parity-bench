@@ -15,7 +15,16 @@ this project. Read this first.
 | --- | --- |
 | **AWS box** | `i-0775f33f3dc16f6af` — **verified end to end** (SSM connect, S3 both directions, repo clone all confirmed working). **The box is STOPPED.** |
 | **Billing** | starts on `start-instances`. Nothing is being charged while it is stopped. |
-| **Auto-stop** | **1 % CPU for one hour → the box stops, silently, no warning.** An idle SSM session while you read docs will trip it. It does NOT trip during an actual run. |
+| **Auto-stop** | **DISPUTED — assume < 20 % instance CPU for 60 min.** See correction below. Silent, no warning. |
+| **Today's plan** | **`RUN_ON_EC2.md`** — native 200-doc smoke, both arms, five gates, engine from the release tarball. `BUILD_ON_EC2.md` is superseded for today. |
+
+> **CORRECTION 2026-08-14 — auto-stop threshold.** This table said **1 % CPU for one hour**.
+> Shashi's `AWS-RUNBOOK.md`, written after Dmitrii provisioned all three identical boxes, says
+> **< 20 % instance CPU sustained for 60 minutes** — 6.4 cores on 32 vCPU, against a measured
+> 12.7 % idle floor. Neither figure is measured by us and they cannot both be right. **Assume the
+> stricter one:** under a 20 % rule the one-core `md5sum /dev/zero` keep-alive recorded in §0a below
+> is ~3 % and would *not* prevent the stop. `RUN_ON_EC2.md` §1a uses eight cores.
+> [UNVERIFIED — two conflicting documents; open item for Dmitrii]
 | **Team pin** | engine **3.3.1** + SDK **1.3.0**, **Parser IN**, stock 5-node shape. All three teams aligned on this. |
 | **Peers** | **Shashi and Leela are already running on AWS. We are behind** — that is the reason Phase 2 is the priority. |
 
@@ -38,12 +47,27 @@ this project. Read this first.
 
 ### ⛔ NEVER RUN — do not assume any of this works
 
-* **`BUILD_ON_EC2.md` has never been executed.** Not one step.
-* **No x86-64 Docker build has ever run**, for either arm.
-* **The RocketRide image has never existed anywhere** — `docker/Dockerfile.rocketride` was written
-  from ELF/DT_NEEDED inspection of the release tarball and is **UNVERIFIED** until it builds.
+* **`BUILD_ON_EC2.md` has never been executed.** Not one step. **Superseded for today** by
+  `RUN_ON_EC2.md`, which runs the engine natively and skips image building entirely.
+* **No x86-64 Docker build of OUR images has ever run**, for either arm.
+* **`docker/Dockerfile.rocketride` is ours and is UNVERIFIED** — written from ELF/DT_NEEDED
+  inspection of the release tarball, never built.
 * **Nothing has run on the box beyond access checks** (SSM, S3, clone). No build, no engine boot,
   no measurement.
+
+> **CORRECTION 2026-08-14 — "the RocketRide image has never existed anywhere" was wrong.**
+> Leela's `rocketride/Dockerfile` builds engine 3.3.1 on `linux/amd64` and pins
+> `ENGINE_SHA256=95768e26…` — **the same extracted-binary digest I verified independently today**
+> by downloading and hashing the tarball on the laptop. Shashi's `engine.Dockerfile` additionally
+> carries the onnxruntime boot patch. The correct claim is narrower: **our** image has never been
+> built. Leela's is the documented fallback if the native path stalls (`RUN_ON_EC2.md` §10).
+>
+> Also corrected: our ELF inspection is now **VERIFIED, not inferred**. Real `DT_NEEDED` parsed from
+> the dynamic section: `libc.so.6`, `ld-linux-x86-64.so.2`, `libm.so.6`, `libgcc_s.so.1`,
+> `libjvm.so`, `libc++.so.1`, `libc++abi.so.1`, `libunwind.so.1`; `DT_RUNPATH` is
+> `$ORIGIN/lib:$ORIGIN/java/jre/lib/server`; highest glibc symbol is **2.35** — exactly Ubuntu
+> 22.04, zero headroom. `libnuma`/`libcrypto` are dlopen probes, **not** hard deps; do not install
+> them. Tarball sha256 `d8dad45b…ce0281d8` confirmed against our own pin.
 
 ### 🚫 SUPERSEDED — must be RE-MEASURED on Linux, never carried forward
 
@@ -80,9 +104,22 @@ bug reports, and the correctness verdicts. Not the performance numbers.
    pypdf-derived while Parser IN runs Tika. Which is the reference for shared thresholds?
 2. **The 10 % spread definition** — spread of what over what: (max−min)/median, per block or per
    run, before or after warm-up exclusion? Our gate and theirs may not be the same test.
-3. **Warm-up 25 vs 100** — Shashi uses 25; we measured LlamaIndex still 1.08× at reps 25–50 and
-   steady ~100. 25 bakes an ~8 % bias into one arm only. [Ours is PROVISIONAL — one fixture, one
-   host, cheap to settle on the box.]
+3. **Warm-up — three values, not two.** We measured LlamaIndex still 1.08× at reps 25–50 and steady
+   at ~100; a shared warm-up below that bakes an ~8 % bias into one arm only. [Ours is PROVISIONAL —
+   one fixture, one host, cheap to settle on the box.]
+   > **CORRECTION 2026-08-14 — mis-attributed.** This said "Shashi uses 25". On his agreed branch
+   > `benchmark/shared-pipe-engine-3.3.1` the warm-up is **computed, not fixed**:
+   > `max(4, 2 × threads)` for blast and **2** for sequential (`rr_app.py:124`, `hs_app.py:87`) —
+   > **64** at 32 threads. **Leela** is the one on 25 (`smoke2.sh`, `warm_n=25`). So the spread is
+   > **64 (Shashi) / 25 (Leela) / 100 (ours)**, and Shashi's moves with thread count, which means it
+   > is not a constant anyone can agree to without also fixing the thread count.
+
+4. **🚩 CORPUS — the loud one.** Shashi's pinned dataset is **24 arXiv cs.LG PDFs, sha256-verified,
+   hardlink-replicated** to reach N (`seed_manifest.json`, `bench.py:fetch_seed_pdfs`). Leela and I
+   are both on **GovDocs1**. His 10,000-document run is 24 unique documents seen ~417 times each,
+   with the page-cache, parser-cache and size-distribution consequences that implies. **No harness
+   alignment makes those numbers commensurable with ours.** This is a decision for the group, not a
+   fix for any one harness.
 
 ### Exact first commands on the box
 
@@ -98,16 +135,22 @@ aws ssm start-session --target i-0775f33f3dc16f6af
 #    Run this in a spare shell during any long idle period (reading, planning):
 ( while true; do timeout 50 md5sum /dev/zero >/dev/null; sleep 5; done ) &
 
-# 4. Then follow publishable/BUILD_ON_EC2.md from step 0. Do not skip the preflight —
-#    every later step assumes uname -m = x86_64, glibc >= 2.35, cgroup2fs, and lsof present.
+# 4. Then follow publishable/RUN_ON_EC2.md from step 0 (NOT BUILD_ON_EC2.md — superseded).
+#    Do not skip the preflight — every later step assumes uname -m = x86_64, glibc >= 2.35,
+#    cgroup2fs, lsof present, and PYTHON 3.12 (22.04's 3.10 has no numpy/scikit-learn wheel).
 
 # 5. STOP THE BOX when done. Do not rely on auto-stop.
 aws ec2 stop-instances --instance-ids i-0775f33f3dc16f6af
 ```
 
-**First real milestone on the box:** `docker build -f docker/Dockerfile.rocketride` succeeding and
-the engine answering `/version` with `3.3.1.35`. Until that happens, the RocketRide arm does not
-exist on Linux.
+**First real milestone on the box:** the engine answering `/version` with `3.3.1.35`. Until that
+happens, the RocketRide arm does not exist on Linux.
+
+> **CORRECTION 2026-08-14 — the milestone no longer runs through Docker.** It previously read
+> "`docker build -f docker/Dockerfile.rocketride` succeeding and the engine answering `/version`".
+> Today's path is **native from the release tarball** (`RUN_ON_EC2.md` §3): unbounded first-build
+> work is removed from the critical path and the only external needs are three apt packages.
+> The `/version` half of the milestone is unchanged and is still the gate.
 
 ---
 
@@ -503,6 +546,35 @@ we had been running. Shashi and Leela are doing the same.
 | T3-6 | **Three incompatible memory boundaries**: ours engine-tree+driver, Leela's container cgroup, Shashi's `getrusage(RUSAGE_SELF)` — driver only, which does not capture engine-side work at all | **VERIFIED** |
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
+
+### SESSION 20 — cross-team alignment + native run plan (2026-08-14, laptop only, box stayed stopped)
+
+Peer repos re-fetched into `reference/` (Leela `main` @ `e1cd611`, Shashi
+`benchmark/shared-pipe-engine-3.3.1` @ `70259e4`) and diffed against ours on the seven things that
+decide comparability. Deliverable: **`publishable/RUN_ON_EC2.md`** — a native 200-doc smoke.
+
+**Established this session, with labels:**
+
+| finding | label | method |
+| --- | --- | --- |
+| All three teams' pipes are **semantically identical** — same 5 providers, same lane wiring; they differ only in `project_id` and whitespace. Canonical digest `f61165f7cf7ab1db…` on all three | **VERIFIED** | line-diff **and** key-sorted canonical hash, two methods |
+| Shashi's raw-`sha256` pipe gate therefore produces **three different values on identical pipes** — a false alarm, and his own doc's source-of-truth hash (`78d381d3…`, = Leela's file) no longer matches his repo-root file (`3cee2722…`) | **VERIFIED** | hashed all three files |
+| Engine tarball `d8dad45b…ce0281d8`; extracted `engine` binary `95768e26…d9747`. **Different objects — label which one you mean** | **VERIFIED** (two parties) | our pin ✓, and Leela's independently-derived `ENGINE_SHA256` ✓ |
+| Engine hard deps are exactly `libc++1 libc++abi1 libunwind8` (+ base libc/libm/libgcc); `libjvm` from the bundled JRE via `DT_RUNPATH`. `libnuma`/`libcrypto` are dlopen probes, **not** required | **VERIFIED** | real `DT_NEEDED` parse, cross-checked against a string scan |
+| Highest glibc symbol is **2.35** — Ubuntu 22.04 exactly, zero headroom | **VERIFIED** | `.gnu.version_r` scan |
+| `onnxruntime-gpu==1.20.1` is genuinely gone from PyPI; 1.20.0 and 1.20.2 remain. The pin is in **five** manifests, not three; `REQUIREMENTS_GLOBS` is recursive so all five compile | **VERIFIED** | PyPI JSON + grep over the extracted tarball. Shashi's *Dockerfile* catches all five; only his prose says three |
+| **Ubuntu 22.04's Python 3.10 cannot install our pins** — `numpy==2.5.1` and `scikit-learn==1.9.0` have no cp310 wheel, sdist only | **VERIFIED** | PyPI JSON per package |
+| 200 docs = **exactly govdocs1 zip 000**, and its first ten are name-for-name Leela's box selection | **VERIFIED** | null control: `sorted(*.pdf)[:200]` ≡ `sorted(000_*.pdf)[:200]`; all 200 match the committed manifest |
+| Shashi's corpus is **24 arXiv PDFs replicated**, not GovDocs1 | **VERIFIED** | `seed_manifest.json`, `bench.py:fetch_seed_pdfs` |
+
+**Changed in the harness** (all still 12 pass / 1 known xfail; validated by a real 3-doc run, all
+five gates PASS both arms): `smoke50_parser_in.py` gained `SMOKE_WORKERS` / `SMOKE_THREADS` /
+`SMOKE_BLAST_C` / `SMOKE_CORPUS_GLOB` (defaults reproduce the old behaviour exactly), a
+short-corpus refusal, and a `pipeline`/`corpus`/`pinned` provenance block matching Shashi's export
+keys; `verify_corpus_manifest.py` gained `--subset` (same gate scoped, refuses an empty directory);
+new `exfil_s3.sh` and `install_awscli_userdir.sh` — **we had no S3 path at all before today**.
+
+**Not done, deliberately:** no new metric, no new gate, no throughput number, no memory number.
 
 ### PHASE 2 HANDOFF — 2026-08-13
 

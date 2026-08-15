@@ -41,6 +41,19 @@ PORT = int(os.environ.get("SMOKE_PORT", "8851"))
 L2_TOL = 1e-3                      # team standard; goodput.py now matches (1e-3 everywhere)
 EMB_DIM = 384
 
+# Cross-team alignment knobs (2026-08-14). Defaults reproduce the macOS 50-doc smoke exactly, so
+# nothing local changes; RUN_ON_EC2.md sets them explicitly for the box. Shashi's harness pins
+# RR_THREADS == HS_WORKERS on both arms (SHARED-PIPELINE-NOTES §7) — SMOKE_WORKERS/SMOKE_THREADS
+# are how we honour that rule without hardcoding a host's core count into the script.
+WORKERS = int(os.environ.get("SMOKE_WORKERS", "1"))     # uvicorn workers on the LlamaIndex arm
+THREADS = int(os.environ.get("SMOKE_THREADS", "10"))    # OMP/MKL/BLAS per worker; also RR threads
+BLAST_C = int(os.environ.get("SMOKE_BLAST_C", "4"))     # in-flight docs during the determinism leg
+# Leela's box selection rule is sorted(*.pdf)[:N] over govdocs1 zip 000 (RUN_LOG_20260814 §3).
+# Our corpus/govdocs1/pdfs holds all 40 zips prefixed by archive, so the same rule restricted to
+# the 000_ prefix yields the identical document set. Verified: zip 000 contributes exactly 200
+# PDFs and its first ten match Leela's box corpus name-for-name.
+CORPUS_GLOB = os.environ.get("SMOKE_CORPUS_GLOB", "*.pdf")
+
 
 def say(m):
     print(m, flush=True)
@@ -81,12 +94,29 @@ def main() -> int:
     from weekend_worker import LlamaHttpPdfArm, RocketPdfArm
 
     N = int(sys.argv[1]) if len(sys.argv) > 1 else 50
-    pdfs = sorted((ROOT / "corpus" / "govdocs1" / "pdfs").glob("*.pdf"))[:N]
-    say(f"documents: {len(pdfs)}  (offered = {len(pdfs)})")
+    pdfs = sorted((ROOT / "corpus" / "govdocs1" / "pdfs").glob(CORPUS_GLOB))[:N]
+    say(f"documents: {len(pdfs)}  (offered = {len(pdfs)})  glob={CORPUS_GLOB}")
+    if len(pdfs) < N:
+        say(f"!! only {len(pdfs)} PDFs match — asked for {N}. Refusing: a short corpus makes the "
+            "census gate compare against the wrong denominator.")
+        return 2
+    # Cross-site comparability: the pipe bytes and the corpus bytes both have to be provable, or a
+    # chunk-hash difference between two sites is unattributable. Shashi asks for the pipe hash
+    # explicitly (SHARED-PIPELINE-NOTES, "compare pipe hashes before we compare numbers").
+    pipe_path = ROOT / "working" / "pipes" / "product_pdf.pipe"
+    pipe_raw = hashlib.sha256(pipe_path.read_bytes()).hexdigest()
+    _p = json.loads(pipe_path.read_text())
+    _p.pop("project_id", None)
+    pipe_canon = h(json.dumps(_p, sort_keys=True, separators=(",", ":")))
+    corpus_sha = h("".join(f.name + ":" + hashlib.sha256(f.read_bytes()).hexdigest()
+                           for f in pdfs))
+    say(f"pipe sha256 raw={pipe_raw[:16]}  canonical(project_id stripped)={pipe_canon[:16]}")
+    say(f"corpus sha256 (ordered name:sha list over {len(pdfs)} docs) = {corpus_sha[:16]}")
     ok_tika, why = tika_ok()
     say(f"tika reference: {'available' if ok_tika else 'UNAVAILABLE — ' + why}")
 
-    hsvc = ws.start(workers=1, port=PORT, threads=10)
+    say(f"service: workers={WORKERS} threads={THREADS} blast_concurrency={BLAST_C}")
+    hsvc = ws.start(workers=WORKERS, port=PORT, threads=THREADS)
     ws.wait_warm(hsvc, timeout=900)
     thr = sorted(set(hsvc.measured_threads.values()))
     say(f"service warm, torch(intra,interop)={thr}")
@@ -163,7 +193,7 @@ def main() -> int:
                     return name, [h(c) for c in ch]
                 except Exception:
                     return name, None
-            with cf.ThreadPoolExecutor(max_workers=4) as ex:
+            with cf.ThreadPoolExecutor(max_workers=BLAST_C) as ex:
                 out = dict(ex.map(one, blobs))
             arm.close()
             return out
@@ -186,7 +216,7 @@ def main() -> int:
                 c = RocketRideClient()
                 await c.connect(timeout=60000)
                 tok = (await c.use(filepath=str(pp.relative_to(ROOT))))["token"]
-                sem = asyncio.Semaphore(4)
+                sem = asyncio.Semaphore(BLAST_C)
                 res = {}
 
                 async def one(name, b):
@@ -221,7 +251,18 @@ def main() -> int:
         ws.stop(hsvc)
 
     # ---------------- verdicts ----------------
-    out = {"n_offered": len(pdfs), "threads": thr, "arms": {}}
+    out = {"n_offered": len(pdfs), "threads": thr, "arms": {},
+           # Provenance block — the fields the three harnesses have to agree on before any
+           # cross-site number is comparable. Same keys Shashi exports under `pipeline`/`pinned`.
+           "pipeline": {"file": pipe_path.name,
+                        "nodes": [c["provider"] for c in _p["components"]],
+                        "sha256_raw": pipe_raw, "sha256_canonical": pipe_canon},
+           "corpus": {"source": "govdocs1", "glob": CORPUS_GLOB, "rule": "sorted(*.pdf)[:N]",
+                      "n": len(pdfs), "sha256": corpus_sha,
+                      "first": pdfs[0].name, "last": pdfs[-1].name},
+           "pinned": {"workers": WORKERS, "threads": THREADS, "blast_concurrency": BLAST_C,
+                      "send_modes": ["sequential", "blast"], "warm_up": "service-warm gated on "
+                      "distinct worker warm lines; no per-document warm-up in this smoke"}}
     say("\n" + "=" * 96)
     for arm_name, recs in results.items():
         c = {"successful": 0, "expected": 0, "unexpected": 0}
