@@ -547,6 +547,52 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 28 — defect #24: external mode honoured in one place out of six (2026-08-15)
+
+The 200-doc smoke passed readiness (`32/32 workers warm`) and then died at
+`weekend_worker.py:264 RuntimeError: no service listening on 8801`. **Two detection methods
+disagreeing about the same port inside one process.** `SMOKE_EXTERNAL` was wired into the readiness
+path only; every other discovery site still assumed the service was a host process this driver
+had started.
+
+**Full audit — six sites, all host-side, all blind to a container:**
+
+| site | mechanism | was |
+| --- | --- | --- |
+| `weekend_worker.py:262` `LlamaHttpArm.__init__` | `lsof` via `serving_pids` | **hard raise** — the reported crash |
+| `weekend_worker.py:198` `RocketArm.__init__` | `lsof` on 5565, pidfile fallback | stored `None`, deferred the damage |
+| `weekend_worker.py:226` `RocketArm.rss` | `engine_tree_rss_mb(None)` → **falls back to matching processes NAMED `engine`** | the 104 MB wrong-process trap, re-armed |
+| `weekend_worker.py:285` `LlamaHttpArm.rss` | psutil tree walk | driver-only number reading as a measurement |
+| `smoke:service_root_pid` | both of the above | fed the sampler |
+| `smoke:CostSpan.__init__` | raised on `pid is None` | would have killed the run a second time |
+
+**Fix:** one predicate, `weekend_worker.external_services()`, reading the same `SMOKE_EXTERNAL`.
+In external mode host-side discovery becomes optional and non-fatal — readiness is proven by the
+HTTP/`/version` gates that do cross the boundary — and anything genuinely needing a host PID
+reports unavailable rather than guessing. `rss()` returns NaN instead of silently attributing some
+other process's memory; **the name-matching fallback is now unreachable in external mode**, which
+matters more than the crash did.
+
+**Cost sampling is the honest casualty.** Host psutil cannot sample a container, so in external
+mode cost is `None` with a named reason recorded in the manifest
+(`pinned.cost_unavailable_reason`), never a host number dressed as a container measurement. The
+correct Docker-mode source is Leela's in-container cgroup sampler via
+`metrics_shared.series_from_cgroup_jsonl()` — **that path is not yet wired into this driver**, so
+a Docker smoke currently yields correctness verdicts but no CPU numbers. Stated rather than papered
+over.
+
+[Verified: with `SMOKE_EXTERNAL` unset an arm on a dead port still RAISES; with it set the same arm
+constructs, `parent_pid=None`, `rss=nan`. Full external-mode run completes end to end.]
+
+**Presentation:** verdict labels no longer name people — A = intersection determinism / name-keyed
+census, B = symmetric determinism / count-keyed census, C = union. Gate names are unchanged and
+remain the teammates' own identifiers. Output is fixed-width ASCII, PASS/FAIL only, no trailing
+padding. The `gate_verdicts` JSON block is untouched, so it still carries the original keys — the
+display describes the rule, the JSON preserves machine compatibility.
+
+**Runbook:** every `tee` example now reads `${PIPESTATUS[0]}`. `$?` reports tee's status, and tee
+succeeds when the run it is capturing crashes — a failed run was printing `EXIT: 0`.
+
 ### SESSION 27 — correctness-gate parity: both dialects adopted, three verdicts (2026-08-15)
 
 Fresh clones: **Shashi `c8b4b2b3`** (moved from `70259e4`), **Leela `2cc0ccad`** (unchanged since

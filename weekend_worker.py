@@ -51,6 +51,26 @@ STATUS = ROOT / "status.txt"
 EXIT_OK, EXIT_CAP, EXIT_OOM, EXIT_ERR = 0, 10, 11, 1
 
 
+def external_services() -> bool:
+    """True when the services under test are CONTAINERS, not host processes.
+
+    Every host-side discovery path in this file — `lsof` by listening socket, psutil tree
+    walks, process-name matching — was written for services this driver started itself.
+    None of them is a reliable precondition once the service is in a container: the
+    listener may belong to a PID the host cannot resolve, and name matching would happily
+    match some other `engine` (it already cost this project a 104 MB accounting error, see
+    engine_tree_rss_mb).
+
+    So in external mode discovery becomes OPTIONAL and NON-FATAL. Readiness is proven by
+    the driver's HTTP/`/version` gates instead, which work across the boundary. Anything
+    that genuinely needs a host PID (RSS, CPU sampling) reports unavailable with a reason
+    rather than guessing or dying.
+
+    Single source of truth: the same SMOKE_EXTERNAL the driver already sets.
+    """
+    return os.environ.get("SMOKE_EXTERNAL", "") not in ("", "0", "false", "False")
+
+
 def rss_mb() -> float:
     """Current RSS. macOS ru_maxrss is BYTES; Linux reports kB. Measured, not assumed."""
     try:
@@ -196,8 +216,12 @@ class RocketArm:
         from rocketride import RocketRideClient
         self.loop = asyncio.new_event_loop()
         self.engine_pid = self._engine_pid()
-        print(f"[engine] driving pid={self.engine_pid} (matched by listening socket, not name)",
-              flush=True)
+        if self.engine_pid is None and external_services():
+            print("[engine] no host-visible listener on 5565 — external/container mode; "
+                  "readiness came from /version. RSS by process tree unavailable.", flush=True)
+        else:
+            print(f"[engine] driving pid={self.engine_pid} "
+                  "(matched by listening socket, not name)", flush=True)
         base = json.loads((ROOT / "working" / "pipes" / pipe).read_text())
         # ONE LIVE TASK PER project_id (STATE.md section 9). A fixed id made p0, p3 and p4 collide
         # with each other — the first RocketRide phase claimed the id and every later phase died
@@ -223,6 +247,13 @@ class RocketArm:
         return [d.get("page_content", "") for d in docs], [d.get("embedding") or [] for d in docs]
 
     def rss(self):
+        # engine_tree_rss_mb(None) falls back to matching processes NAMED "engine" — the
+        # exact mistake that counted an unrelated five-day-old install in the weekend run.
+        # In external mode there is no host PID to walk, so return the driver's own RSS and
+        # let the caller see that the service side is missing, rather than silently
+        # attributing some other process's memory to RocketRide.
+        if self.engine_pid is None:
+            return float("nan") if external_services() else engine_tree_rss_mb(None) + rss_mb()
         return engine_tree_rss_mb(self.engine_pid) + rss_mb()
 
     def close(self):
@@ -260,11 +291,21 @@ class LlamaHttpArm:
         from harness import ws1_service as ws
         self._ws = ws
         parent, workers = ws.serving_pids(port)
+        self.parent_pid, self.worker_pids = parent, workers
         if parent is None:
-            raise RuntimeError(f"no service listening on {port} — the caller must start and "
-                               f"warm-gate it before constructing this arm")
-        print(f"[ws1] driving parent pid={parent} with {len(workers)} worker(s) "
-              f"(matched by listening socket, not name)", flush=True)
+            if not external_services():
+                raise RuntimeError(f"no service listening on {port} — the caller must start and "
+                                   f"warm-gate it before constructing this arm")
+            # External mode: the listener belongs to a container, so a host-side lsof finding
+            # nothing proves nothing. Readiness was already established over HTTP by the
+            # driver's warm_workers gate — two detection methods disagreeing about one port
+            # in one process is what this branch exists to stop.
+            print(f"[ws1] port {port}: no host-visible listener — external/container mode, "
+                  "readiness came from /health warm_workers. RSS by process tree unavailable.",
+                  flush=True)
+        else:
+            print(f"[ws1] driving parent pid={parent} with {len(workers)} worker(s) "
+                  f"(matched by listening socket, not name)", flush=True)
 
     def process(self, text):
         import urllib.request
@@ -282,6 +323,10 @@ class LlamaHttpArm:
         return ch, em
 
     def rss(self):
+        # Same rule as RocketArm.rss(): a container's tree is not walkable from the host, so
+        # report NaN rather than a driver-only number that would read as a real measurement.
+        if self.parent_pid is None and external_services():
+            return float("nan")
         tree, _n = self._ws.tree_rss_mb(self.port)
         return tree + rss_mb()
 

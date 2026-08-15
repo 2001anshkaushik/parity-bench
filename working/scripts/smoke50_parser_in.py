@@ -3,14 +3,15 @@
 
 Run:  ../.venv/bin/python working/scripts/smoke50_parser_in.py [N]
 
-Reports TWO verdicts per arm so our output is directly comparable with Leela's:
+Reports THREE verdicts over identical records, so no reader has to re-derive ours:
 
-  LEELA'S GATES
-    census      offered = successful + expected + unexpected; N records, unique ids, zero silent
-    structure   >=1 chunk (or completed-empty), 384-d, finite, L2 = 1.0 +- 0.001,
-                response identity provably matches the submitted document
-    determinism chunk-hash lists identical between a BLAST run and a SEQUENTIAL run, per arm
-    cross-arm   chunk-count delta and char ratio, REPORTED not gated, + embedding parity fixture
+  Verdict A   intersection determinism, name-keyed census
+  Verdict B   symmetric determinism, count-keyed census
+  Verdict C   union (strictest; conjunction of A and B)
+
+Gate names are the teammates' own identifiers and are never re-worded: census, structure,
+determinism, duplication, workload_ratio_rr_over_li, normalization_parity, chunk_config_parity.
+Definitions and the file:line each was adopted from live in harness/gates_shared.py.
 
   OURS, ON TOP
     per-arm chunk hash against an INDEPENDENT reference
@@ -72,7 +73,9 @@ SAMPLE_INTERVAL_S = 0.5
 
 
 def say(m):
-    print(m, flush=True)
+    # rstrip: the fixed-width tables pad their last column, and trailing
+    # whitespace is noise the moment this is pasted into a summary.
+    print(str(m).rstrip(), flush=True)
 
 
 def h(s: str) -> str:
@@ -288,7 +291,11 @@ def main() -> int:
             "\n".join(json.dumps(r, separators=(",", ":")) for r in rows) + "\n")
 
     def service_root_pid(arm_name: str):
-        """The root of the SERVICE tree — the driver is never sampled (settled 2026-08-14)."""
+        """Root of the SERVICE tree — the driver is never sampled (settled 2026-08-14).
+
+        Returns None when the service is a container the host cannot resolve. Callers must
+        treat that as "cost unavailable", not as an error and not as zero.
+        """
         if arm_name.startswith("llamaindex"):
             parent, _workers = ws.serving_pids(PORT)
             return parent
@@ -302,14 +309,30 @@ def main() -> int:
         def __init__(self, arm_name: str, mode: str):
             self.tag = f"{'li' if arm_name.startswith('llamaindex') else 'rr'}_{mode}"
             self.path = run_dir / f"sampler_{self.tag}.jsonl"
+            self.pc = None
+            self.reason = None
             pid = service_root_pid(arm_name)
             if pid is None:
-                raise RuntimeError(f"BLOCKER: no service root pid for {arm_name} — cannot "
-                                   "sample cost. Refusing to emit metrics without it.")
-            self.pc = ProcessCollector(self.path, {"service": {"pids": [pid]}},
-                                       interval_s=SAMPLE_INTERVAL_S)
+                if not EXTERNAL:
+                    raise RuntimeError(f"BLOCKER: no service root pid for {arm_name} — cannot "
+                                       "sample cost. Refusing to emit metrics without it.")
+                # Container services are not reliably walkable from the host. Cost is then
+                # UNAVAILABLE with a reason, never a host-psutil number that would read as a
+                # measurement of the container. The correct Docker-mode source is Leela's
+                # in-container cgroup sampler via metrics_shared.series_from_cgroup_jsonl();
+                # that path is NOT wired into this driver yet.
+                self.reason = ("external/container mode: no host-visible service tree, and "
+                               "host psutil cannot sample a container. Wire the in-container "
+                               "cgroup sampler for Docker-mode cost numbers.")
+                say(f"  !! cost sampling DISABLED for {self.tag}: {self.reason}")
+            else:
+                self.pc = ProcessCollector(self.path, {"service": {"pids": [pid]}},
+                                           interval_s=SAMPLE_INTERVAL_S)
 
         def __enter__(self):
+            if self.pc is None:
+                self.epoch_anchor = time.time()
+                return self
             self.pc.start()
             # Child publishes readiness AFTER its collector started: anchor error is the
             # handshake latency (<0.1 s), far under the 0.5 s edge-attribution bound.
@@ -317,9 +340,12 @@ def main() -> int:
             return self
 
         def __exit__(self, *exc):
-            self.pc.stop()
+            if self.pc is not None:
+                self.pc.stop()
 
         def series(self):
+            if self.pc is None:
+                return None          # metrics_shared then emits None cost, never 0
             txt = self.path.read_text() if self.path.exists() else ""
             return ms.series_from_role_ticks(txt, "service", self.epoch_anchor)
 
@@ -328,6 +354,7 @@ def main() -> int:
     chunk_texts_by_arm: dict[str, dict] = {}
     vecs_by_arm: dict[str, dict] = {}
     cost_series: dict[str, list] = {}   # f"{arm}:{mode}" -> normalized series
+    cost_reasons: dict[str, str] = {}   # same key -> why cost is absent, if it is
     blast_rows: dict[str, list] = {}    # arm -> per-doc rows from the blast leg
     probed_dim: dict[str, int] = {}     # arm -> dim read off the arm's own loaded model
 
@@ -490,6 +517,7 @@ def main() -> int:
                     rec["ok"] = rec.get("outcome") == "successful"
                     recs.append(rec)
             cost_series[f"{arm_name}:sequential"] = span.series()
+            cost_reasons[f"{arm_name}:sequential"] = span.reason
             arm.close()
             # ---- OUR gates, post-loop, outside the sampled/timed span ----
             for rec in recs:
@@ -605,6 +633,7 @@ def main() -> int:
             with span:
                 blast, brows = runner()
             cost_series[f"{arm_name}:blast"] = span.series()
+            cost_reasons[f"{arm_name}:blast"] = span.reason
             blast_rows[arm_name] = brows
             dump_jsonl(f"perdoc_{'li' if arm_name.startswith('llamaindex') else 'rr'}_blast.jsonl",
                        brows)
@@ -651,6 +680,9 @@ def main() -> int:
                       # DECLARED != MEASURED, both arms, read back in-process.
                       "torch_threads_measured": threads_measured,
                       "service_mode": "external containers" if EXTERNAL else "driver-managed",
+                      "cost_available": all(cost_series.get(k) for k in cost_series),
+                      "cost_unavailable_reason": next(
+                          (r for r in cost_reasons.values() if r), None),
                       "cost_sampler": {"source": "psutil ProcessCollector (out-of-process, "
                                                  "dead-PID roll-forward)",
                                        "interval_s": SAMPLE_INTERVAL_S,
@@ -678,11 +710,11 @@ def main() -> int:
         ind_fail = [r for r in recs if str(r.get("independent_hash", "")).startswith("FAIL")]
         sus = [r for r in recs if r.get("content_suspect_chunks")]
         say(f"{arm_name}")
-        say(f"  LEELA  census      offered {len(pdfs)} = successful {c['successful']} + "
+        say(f"  census      offered {len(pdfs)} = successful {c['successful']} + "
             f"expected {c['expected']} + unexpected {c['unexpected']}   -> {'PASS' if census_ok else 'FAIL'}")
-        say(f"  LEELA  structure   {len(struct_fail)} failure(s)                      -> "
+        say(f"  structure   {len(struct_fail)} failure(s)                      -> "
             f"{'PASS' if not struct_fail else 'FAIL'}")
-        say(f"  LEELA  determinism {len(det_fail)} drifted, {len(det_unproven)} unproven"
+        say(f"  determinism {len(det_fail)} drifted, {len(det_unproven)} unproven"
             f"            -> {'PASS' if not det_fail and not det_unproven else 'FAIL'}")
         # Coverage, not just failures. Leela's rule (m0_correctness.ground_truth_match): zero
         # coverage is a vacuous result, not a pass. A "0 FAIL" printed by a check that never ran
@@ -692,13 +724,13 @@ def main() -> int:
         covered = sum(1 for r in recs
                       if str(r.get("independent_hash", "")).startswith(("pass", "FAIL")))
         if covered == 0:
-            say(f"  OURS   independent-reference    : NOT RUN (0/{n_ok} successful docs covered)"
+            say(f"  independent-reference    : NOT RUN (0/{n_ok} successful docs covered)"
                 f" — advisory check, dependency missing")
         else:
-            say(f"  OURS   independent-reference    : {len(ind_fail)} FAIL "
+            say(f"  independent-reference    : {len(ind_fail)} FAIL "
                 f"over {covered}/{n_ok} successful docs covered"
                 + ("  !! PARTIAL COVERAGE" if covered < n_ok else ""))
-        say(f"  OURS   content-suspect documents : {len(sus)}")
+        say(f"  content-suspect documents : {len(sus)}")
         out["arms"][arm_name] = {"census": c, "census_ok": census_ok,
                                  "structure_failures": len(struct_fail),
                                  "determinism_failures": len(det_fail),
@@ -717,8 +749,6 @@ def main() -> int:
     # where their definitions genuinely conflict both are computed and labelled rather
     # than one being chosen. Gate logic lives in harness/gates_shared.py with the
     # file:line it was adopted from; nothing here touches metrics_shared.py.
-    say("\n" + "=" * 96)
-    say("CORRECTNESS — three verdicts over identical records")
     out["gate_verdicts"] = {}
     for arm_name, recs in results.items():
         arm_key = "lg" if arm_name.startswith("llamaindex") else "rr"
@@ -760,16 +790,7 @@ def main() -> int:
             "determinism": gs.shashi_determinism(seq_digests, blast_digests,
                                                  "sequential", "blast"),
         }
-        v = gs.three_verdicts(shashi_checks, leela_checks)
-        out["gate_verdicts"][arm_name] = v
-        say(f"{arm_name}")
-        for suite in ("shashi", "leela", "union"):
-            marks = ""
-            if suite != "union":
-                marks = "  " + " ".join(
-                    f"{k}={'PASS' if x.get('PASS') else 'FAIL'}"
-                    for k, x in v[suite]["checks"].items())
-            say(f"  {suite.upper():7} {'PASS' if v[suite]['PASS'] else 'FAIL'}{marks}")
+        out["gate_verdicts"][arm_name] = gs.three_verdicts(shashi_checks, leela_checks)
 
     # Cross-arm gates that only exist once, not per arm (Shashi bench.py:337,356,431).
     li_s = out["gate_verdicts"]["llamaindex_http_pdf"]["shashi"]["checks"]["structure"]
@@ -784,11 +805,60 @@ def main() -> int:
     }
     cross["PASS"] = gs.gate_verdict(*cross.values())
     out["gate_verdicts"]["cross_arm"] = cross
-    say("CROSS-ARM (Shashi's, load-bearing for him)")
-    for k, x in cross.items():
-        if k != "PASS":
-            say(f"  {k:26} {'PASS' if x.get('PASS') else 'FAIL'}"
-                + (f"  ratio={x.get('ratio')}" if "ratio" in x else ""))
+
+    # ---- paste-ready table. Fixed widths, ASCII only, PASS/FAIL only. ----
+    # Gate names are the teammates' own identifiers and are never re-worded. Verdict
+    # labels state the RULE that distinguishes them rather than naming a person, so the
+    # table needs no legend. The gate_verdicts block written above is untouched by this;
+    # `duplication` is read out of the structure verdict where it already lives rather
+    # than being added to the JSON.
+    ARMS = [("llamaindex_http_pdf", "LLAMAINDEX"), ("rocketride_pdf", "ROCKETRIDE")]
+    W_GATE, W_COL = 26, 11
+
+    def mark(d) -> str:
+        return "PASS" if isinstance(d, dict) and d.get("PASS") is True else "FAIL"
+
+    def gv(arm, suite, gate):
+        return out["gate_verdicts"][arm][suite]["checks"].get(gate)
+
+    say("")
+    say("=" * 78)
+    say(f"CORRECTNESS GATES - {len(pdfs)} documents, identical records, three verdicts")
+    say("=" * 78)
+    say("")
+    say("GATES EVALUATED UNDER BOTH RULES")
+    say(f"{'':{W_GATE}}{'VERDICT A':{2 * W_COL}}{'VERDICT B':{2 * W_COL}}")
+    say(f"{'GATE':{W_GATE}}" + "".join(f"{lbl:{W_COL}}" for _, lbl in ARMS) * 2)
+    say("-" * 78)
+    for gate in ("census", "structure", "determinism"):
+        row = f"{gate:{W_GATE}}"
+        for suite in ("shashi", "leela"):
+            row += "".join(f"{mark(gv(a, suite, gate)):{W_COL}}" for a, _ in ARMS)
+        say(row)
+    say("")
+    say("GATES IN VERDICT A ONLY")
+    say(f"{'GATE':{W_GATE}}" + "".join(f"{lbl:{W_COL}}" for _, lbl in ARMS))
+    say("-" * 78)
+    say(f"{'duplication':{W_GATE}}" + "".join(
+        f"{mark((gv(a, 'shashi', 'structure') or {}).get('duplication')):{W_COL}}"
+        for a, _ in ARMS))
+    say("")
+    say("CROSS-ARM GATES, VERDICT A ONLY")
+    say(f"{'GATE':{W_GATE}}{'RESULT':{W_COL}}")
+    say("-" * 78)
+    for k in ("workload_ratio_rr_over_li", "normalization_parity", "chunk_config_parity"):
+        say(f"{k:{W_GATE}}{mark(cross[k]):{W_COL}}")
+    say("")
+    say("VERDICT SUMMARY")
+    say(f"{'VERDICT':{52}}" + "".join(f"{lbl:{W_COL}}" for _, lbl in ARMS))
+    say("-" * 78)
+    for key, label in (("shashi", "A  intersection determinism, name-keyed census"),
+                       ("leela",  "B  symmetric determinism, count-keyed census"),
+                       ("union",  "C  union (strictest; conjunction of A and B)")):
+        say(f"{label:{52}}" + "".join(
+            f"{('PASS' if out['gate_verdicts'][a][key]['PASS'] else 'FAIL'):{W_COL}}"
+            for a, _ in ARMS))
+    say("=" * 78)
 
     # ---------------- cross-arm, reported not gated ----------------
     li = {r["doc"]: r for r in results["llamaindex_http_pdf"]}

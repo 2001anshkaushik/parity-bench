@@ -31,6 +31,11 @@ follow-up. Rationale and the two-line dissent test: §10.
 | ⚠️ | executed by a teammate on a *different* stack; our variant is untried |
 | 🆕 | **never executed anywhere.** Surprises live here |
 
+**Reading exit codes in this file.** Several commands pipe to `tee`, and `$?` then reports
+**tee's** status — tee succeeds even when the run it is capturing crashed, so a failed run prints
+`EXIT: 0`. Every example below uses `${PIPESTATUS[0]}`, which is the status of the first command in
+the pipeline. If you adapt a command, keep that.
+
 Running total: **7 of the 24 numbered steps are 🆕.** They cluster in §3 (engine first boot) and
 §6 (RocketRide arm at 32 threads on Linux).
 
@@ -184,7 +189,7 @@ attached or the next person will think one of them is wrong.
 
 ```bash
 grep -rl "onnxruntime-gpu==1.20.1" engine --include="*.txt" | tee /tmp/onnx_patched.txt | wc -l
-#   EXPECT 5
+#   EXPECT 5   (grep's own status is ${PIPESTATUS[0]}; wc always succeeds)
 grep -rl "onnxruntime-gpu==1.20.1" engine --include="*.txt" \
   | xargs sed -i "s/onnxruntime-gpu==1.20.1/onnxruntime-gpu==1.20.2/"
 ! grep -rq "onnxruntime-gpu==1.20.1" engine --include="*.txt" && echo "PATCH OK"
@@ -339,6 +344,7 @@ SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_BLAST_C=32 SMOKE_CORPUS_GLOB='000_*.pdf' 
 
 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_BLAST_C=32 SMOKE_CORPUS_GLOB='000_*.pdf' \
   ../.venv/bin/python working/scripts/smoke50_parser_in.py 200 2>&1 | tee logs/smoke200.log
+echo "EXIT: ${PIPESTATUS[0]}"   # NOT $? — that is tee's status, and tee succeeds when the run crashes
 ```
 
 `SMOKE_THREADS=1` pins OMP/MKL/OpenBLAS/VECLIB per worker. With 32 worker processes, letting each
@@ -595,6 +601,7 @@ SMOKE_EXTERNAL=1 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_BLAST_C=32 \
 SMOKE_CORPUS_GLOB='000_*.pdf' SMOKE_PORT=8801 SMOKE_WARM_N=64 \
 RR_NODE_MARK='engine/ai/node.py' \
   ../.venv/bin/python working/scripts/smoke50_parser_in.py 200 2>&1 | tee logs/smoke200.log
+echo "EXIT: ${PIPESTATUS[0]}"   # NOT $? — that is tee's status, and tee succeeds when the run crashes
 ```
 
 `SMOKE_EXTERNAL=1` is what stops the driver starting its own service. Without it the driver would
