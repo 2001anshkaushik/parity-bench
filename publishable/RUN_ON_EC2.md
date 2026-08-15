@@ -1,6 +1,18 @@
 # RUN_ON_EC2 — native 200-document smoke, both arms
 
-**Ansh · 2026-08-14.** Target: `i-0775f33f3dc16f6af`, c7i.8xlarge, 32 vCPU / 61 GB, Ubuntu, x86-64.
+> ## ⚠️ DECISION CHANGED 2026-08-14 (same day, after writing) — BOTH ARMS RUN IN DOCKER
+>
+> The team decision is now **both arms in containers on x86-64, not native**. The native plan
+> below is **superseded for execution**: do not run §3 (native engine), §6 (native service) or
+> §7 as written. What survives unchanged: §0–§2 (preflight, Python 3.12, apt set), §3a's
+> onnxruntime patch (applies inside the image build — Leela's and Shashi's Dockerfiles both
+> carry it), §4 (corpus), §8 (exfil), §9's traps, and §11.
+> **Never mix topologies:** one arm in a container and one native is the exact confound
+> documented in `MATCHED_LAYERS.md` — both arms containerized or the run is unpublishable.
+> Metric functions are container-agnostic (`working/harness/metrics_shared.py`); the CPU
+> sampler is pluggable — psutil tree source natively, Leela's `cgroup_sampler.py` pattern
+> in-container (`series_from_cgroup_jsonl`, same downstream math). A Docker run sequence to
+> replace §3/§6/§7 is not yet written.
 Paste each block, check the stated expectation, move on. **Do not debug on the box** — if a check
 fails, §9 has the fix; if §9 does not have it, stop the box and come back to the laptop.
 

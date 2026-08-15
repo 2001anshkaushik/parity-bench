@@ -66,6 +66,33 @@ COPY working/ws1 /app/ws1
 COPY working/harness /app/harness
 COPY docker/ladder.py /app/ladder.py
 
+# The service stack, added as its OWN layer at the tail on purpose. docker/requirements.txt
+# deliberately omits fastapi/uvicorn ("the ladder calls the pipeline directly and never starts a
+# server") — but ws1/service.py:24 imports fastapi, so the image could not run the service at all.
+# Adding them to docker/requirements.txt would invalidate the builder pip layer AND the baked-model
+# layer, forcing a full rebuild including the model download. Installing here invalidates nothing
+# above `COPY working/...`.
+#
+# Versions are the MEASURED venv's, read via importlib.metadata — same rule as
+# docker/requirements.txt. uvloop/httptools are included because run_service.sh passes
+# `--loop uvloop --http httptools`; without them uvicorn silently falls back to asyncio/h11 while
+# /health keeps reporting uvloop from WS1_LOOP (declared != measured, in the direction that hides).
+RUN pip install --no-cache-dir \
+      fastapi==0.141.1 uvicorn==0.52.1 uvloop==0.22.1 httptools==0.8.0
+
 RUN useradd -m -u 10001 ws1 && mkdir -p /app/out && chown -R ws1 /app
 USER ws1
-ENTRYPOINT ["python", "/app/ladder.py"]
+
+EXPOSE 8801
+
+# 32 workers x 1 BLAS thread each (thread decision settled 2026-08-15; matches Shashi
+# compose.yml:37-39,63-65,90 and Leela docker-compose.yml:71). The BLAS pins are already in the
+# ENV block above and are unchanged; TORCH_INTEROP_THREADS stays UNSET on both arms, deliberately.
+# WS1_WORKERS is read by uvicorn (--workers) AND by service.py:39 for its own /health report, so
+# one variable keeps the two from disagreeing.
+ENV WS1_WORKERS=32 \
+    WS1_PORT=8801
+
+# sh -c + exec: exec form cannot expand ${WS1_WORKERS}; `exec` keeps uvicorn as PID 1 so SIGTERM
+# reaches it and workers shut down cleanly instead of being killed at the 10 s timeout.
+ENTRYPOINT ["sh", "-c", "exec python -m uvicorn ws1.service:app --host 0.0.0.0 --port 8801 --workers ${WS1_WORKERS:-32} --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30"]

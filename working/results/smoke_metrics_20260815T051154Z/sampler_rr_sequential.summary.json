@@ -1,0 +1,27 @@
+{
+  "roles": {
+    "service": {
+      "peak_rss_bytes": 3892641792,
+      "peak_rss_mb": 3712.31,
+      "peak_vms_bytes": 901370494976,
+      "peak_uss_bytes": null,
+      "peak_process_count": 2,
+      "peak_thread_count": 236,
+      "peak_fd_count": 218,
+      "distinct_pids_seen": 2,
+      "total_cpu_seconds": 2934.9202,
+      "ctx_switches_voluntary": 15213254,
+      "ctx_switches_involuntary": 0,
+      "samples": 1237,
+      "oom_events": 0,
+      "rss_leak_slope_bytes_per_s": 2065867.79,
+      "rss_final_over_initial": 2.4563
+    }
+  },
+  "system": {
+    "compressor_delta_bytes": 32210944,
+    "swapouts_delta": 0,
+    "compressions_delta": 22375,
+    "peak_system_mem_percent": 71.4
+  }
+}

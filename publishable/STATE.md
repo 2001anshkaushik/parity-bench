@@ -547,6 +547,54 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 21 — metrics adoption: one arm-agnostic module, wired and run (2026-08-14/15, laptop only)
+
+**Decision recorded:** Phase 2 runs **both arms in Docker** on the box — the native plan in
+`RUN_ON_EC2.md` is superseded for execution (banner added there). Metric functions are
+container-agnostic; only the cost sampler is pluggable.
+
+**Built:** `working/harness/metrics_shared.py` — pure functions, every definition cited to the
+teammate file:line it was adopted from (Leela's `perf_window`/latency shape/`cpu_utilization_valid`;
+Shashi's nearest-rank percentile/None-never-0; both teammates' cost-window slicing). Unit tests:
+`working/harness/test_metrics_shared.py`, **64/64 exact-value checks pass**. Cost sources:
+psutil `ProcessCollector` tree (native, 0.5 s, service tree only, driver excluded) and Leela's
+cgroup-sampler JSONL (Docker) — same tuple schema, identical downstream math.
+
+**Audit before building (their-code-vs-ours):** docs_per_s existed in 4 places here
+(runner.py:270, matched_layers_sweep.py:413, matched_replication.py:243, ladder.py:145) but never
+in the smoke; **chunks_per_s and cpu_utilization existed NOWHERE in our tree** (tree-wide grep);
+warm-up existed only driver-side (runner.py:109-114 — Shashi's placement, superseded by the
+settled metric-side rule); stats.py percentile is linear-interpolated and is NOT used by the new
+module (settled: nearest-rank).
+
+**Instrument defect #19, caught by the first 200-doc run:** the independent-reference gate (a
+standalone Tika JVM per doc, RR arm only) ran INSIDE the timed loop, landing in the
+completion-to-completion span — RR sequential read 0.25 docs/s; moving the gate post-loop gives
+~13 docs/s on the same 5-doc fixture (~9×, biased AGAINST RocketRide). All our gates now run
+post-loop from records, which is also both teammates' shape. Determinism semantics fixed in the
+same pass: a blast-leg failure now counts **unproven**, not drift (their shared semantics).
+
+**⚠️ RR docs/s from this run is NOT a throughput number — it is one stalled document.**
+`000_000344.pdf` (2.6 MB, returns **1 chunk**) took **314.5 s** in RR sequential — **52 % of the
+entire RR span** — and in the v1 blast leg the same document hit the 300 s timeout. Top 5 docs =
+82 % of RR's span; the equivalent LI figure is 31 %. Cross-arm on the same documents:
+000_000344 RR 314.5 s vs LI 1.74 s (**181×**), 000_000859 51×, 000_000282 25×; **15/198 documents
+are >10× slower on RR**, and slowness does not track chunk count (the worst offender emits one
+chunk). Candidate engine finding — large PDF, tiny text yield, enormous parse-path stall —
+reproducing in **both** send modes. **PROVISIONAL** (one host, n=1, macOS). Re-test on the box
+before it is claimed; if it reproduces on Linux it is a bug report, not a benchmark number.
+
+**200-doc run (v2, macOS — wiring validation; per policy no number here is publishable):** see
+`working/results/smoke50_parser_in__20260815T053227Z__c79e799b3baa.json` +
+`smoke_metrics_20260815T051154Z/` raw JSONL.
+Findings from v1 that stand: **5/18 independent-reference FAILs are exact whole-list 2× repeats**
+(BUG_CHUNK_DUPLICATION: docs 159, 595, 674, 762, 887 — note 762 duplicated at reference-extracted
+**213k chars, below the 239.8k synthetic threshold**; threshold is payload-path-dependent, worth
+a line in the bug report); the other 13 are ±1-char reference-vs-engine extraction offsets
+(instrument disagreement, open item T3-8 class, NOT new engine bugs); 1 RR blast doc
+(000_000344, 1.5 kB) hit the 300 s send timeout while big docs completed — engine blast-path
+starvation candidate, watch on the box.
+
 ### SESSION 20 — cross-team alignment + native run plan (2026-08-14, laptop only, box stayed stopped)
 
 Peer repos re-fetched into `reference/` (Leela `main` @ `e1cd611`, Shashi
