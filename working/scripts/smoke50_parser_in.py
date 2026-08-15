@@ -774,35 +774,47 @@ def main() -> int:
         for r in recs:
             chunks = chunk_texts_by_arm.get(arm_name, {}).get(r["doc"])
             vecs = vecs_by_arm.get(arm_name, {}).get(r["doc"])
-            row = {"doc": r["doc"], "ok": r.get("outcome") == "successful",
-                   "identity_ok": r.get("returned_doc_id") is not None
-                   or arm_key == "rr",
+            errored = r.get("outcome") == "unexpected"
+            row = {"doc": r["doc"], "errored": errored,
+                   "identity_ok": r.get("returned_doc_id") is not None or arm_key == "rr",
                    "sha_header_ok": True,
-                   "reason": r.get("error_class")}
+                   # OUR failure vocabulary mapped to Leela's at the boundary, so an expected
+                   # empty is not counted as an unexpected failure by her census.
+                   "reason": gs.to_leela_reason(r.get("error_class"))}
             if chunks is not None and vecs is not None:
                 row.update(gs.check_document(chunks, vecs, probed_dim[arm_name]))
             else:
                 row.update(n_chunks=r.get("n_chunks"),
                            chunk_sha256=r.get("chunk_sha256"),
                            vector_dim=probed_dim[arm_name], vectors_finite=True)
+            # ONE success rule, applied to this leg and the blast leg alike. Classifying the
+            # same document differently per leg is what manufactured phantom only_in_b.
+            row["ok"] = gs.classify_ok(row.get("n_chunks"), errored)
             gate_rows.append(row)
             seen_names.append(r["doc"])
             if row.get("n_chunks") == 0:
                 zero_chunk.append(r["doc"])
 
-        blast_rowset = [{"doc": b["doc"], "ok": bool(b.get("ok")),
-                         "chunk_sha256": b.get("chunk_sha256")}
-                        for b in blast_rows.get(arm_name, [])]
+        blast_rowset = []
+        for b in blast_rows.get(arm_name, []):
+            berr = not b.get("ok")
+            blast_rowset.append({"doc": b["doc"], "errored": berr,
+                                 "ok": gs.classify_ok(b.get("n_chunks"), berr),
+                                 "chunk_sha256": b.get("chunk_sha256")})
         seq_digests = {r["doc"]: r.get("chunk_sha256") for r in gate_rows if r["ok"]}
         blast_digests = {b["doc"]: b.get("chunk_sha256") for b in blast_rowset if b["ok"]}
+        # Zero-chunk documents are legitimate; both censuses need the allowlist or they call
+        # them defects. Neither can infer it.
+        exp_empty = gs.expected_empty_docs(gate_rows)
 
         leela_checks = {
-            "census": gs.leela_census(gate_rows, len(pdfs)),
+            "census": gs.leela_census(gate_rows, len(pdfs), expected_empty=exp_empty),
             "structure": gs.leela_structure(gate_rows, arm_key, probed_dim[arm_name]),
             "determinism": gs.leela_determinism(gate_rows, blast_rowset),
         }
         shashi_checks = {
             "census": gs.shashi_census([p.name for p in pdfs], seen_names,
+                                       expected_empty=exp_empty,
                                        zero_chunk_names=zero_chunk),
             "structure": gs.shashi_structure(gate_rows, probed_dim[arm_name]),
             "determinism": gs.shashi_determinism(seq_digests, blast_digests,
@@ -903,10 +915,25 @@ def main() -> int:
     # Same functions, same rows contract, both arms, both modes, both warm_n values.
     # macOS numbers: wiring validation only — every performance figure from this laptop is
     # superseded by policy (STATE.md §0a) and must be re-measured on the box.
-    say("\nMETRICS (metrics_shared; macOS = wiring validation, numbers NOT publishable)")
+    # Publishability is DERIVED from the platform, not asserted. The old string said "macOS"
+    # unconditionally and printed that on a Linux box run, which is the same class of defect as
+    # a hardcoded gate verdict: the caveat stopped tracking the thing it describes.
+    import platform as _plat
+    _machine, _system = _plat.machine(), _plat.system()
+    _native_x86 = _machine in ("x86_64", "AMD64")
+    _publishable = _native_x86 and _system == "Linux"
+    _why = (None if _publishable else
+            f"{_system}/{_machine} — the pinned target is Linux x86_64; "
+            "throughput and cost from any other platform are wiring validation only")
+    say(f"\nMETRICS (metrics_shared; platform {_system}/{_machine}; "
+        + ("publishable target platform)" if _publishable
+           else "NOT the target platform, numbers are wiring validation only)"))
     cpus = os.cpu_count()
     out["metrics"] = {"module": "working/harness/metrics_shared.py",
-                      "not_publishable_reason": "macOS/arm64 laptop — superseded by policy",
+                      "platform": {"system": _system, "machine": _machine,
+                                   "native_x86_64": _native_x86},
+                      "publishable": _publishable,
+                      "not_publishable_reason": _why,
                       "arms": {}}
     for arm_name in results:
         marm = out["metrics"]["arms"].setdefault(arm_name, {})

@@ -547,6 +547,53 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 29 — defect #25: the gate adapter contradicted the legacy path on identical records (2026-08-15)
+
+The box's 200-doc run at `525ea7d` produced two verdicts over ONE record set that disagreed:
+legacy said census 200 = 198 + 2 + 0 PASS and determinism 200/200 identical; the gate table said
+census FAIL on both arms under BOTH rules and determinism FAIL under the symmetric rule.
+**A gate failing identically on both arms under both rule sets is a harness defect**, and it was —
+in the adapter that built rows for the suites, which lived inline in the smoke and was never
+tested against the legacy path it was meant to reproduce.
+
+The box JSON was not in the repo or S3 (`ansh/` holds only `t.txt`), so I diagnosed on the
+**committed local 200-doc record, which has the identical shape** — 198 successful plus two
+legitimately empty documents. Reproduced exactly, then fixed:
+
+1. **Expected-empty was never plumbed.** `000_000164.pdf` and `000_000357.pdf` return zero chunks
+   legitimately. The adapter passed no allowlist and labelled them with OUR vocabulary
+   (`completed_empty`), which is not in Leela's `EMPTY_FAIL_REASONS` (`{"no_documents"}`). Her
+   census counted them unexpected failures; Shashi's counted them silent empties. **Both FAIL,
+   both arms** — exactly the reported signature. Fixed with `expected_empty_docs()` plus
+   `to_leela_reason()`, which maps our vocabulary to hers at the boundary rather than editing her
+   constant.
+2. **The two legs classified the same document differently.** Sequentially those docs are
+   `outcome="expected"` so the adapter set `ok=False`; in the blast leg the send returned, so
+   `ok=True` with zero chunks. The symmetric rule then reported `only_in_b` for documents **both
+   legs had processed** — an asymmetry manufactured by the adapter. `classify_ok()` is now the one
+   rule applied to both legs.
+   *Answering the question directly:* the phantoms were real entries produced by inconsistent
+   classification, not by any document missing from a leg. Separately, the local record carries
+   **one genuine asymmetry** — `000_000344.pdf` succeeds sequentially and hits the 300 s blast
+   timeout — and the symmetric rule is right to fail on it. The regression test distinguishes the
+   two: every `only_in_*` must be explained by a real leg-side failure.
+3. **Structure differing between A and B is NOT a defect.** Tolerance (1e-3) and dimension (384)
+   are identical, as verified — but they are not the only inputs. The A-side folds duplication
+   into structure (`chunk_list_duplicated` counts toward `n_bad`); the B-side has no duplication
+   concept. On the RR arm's 5 duplicated documents A fails and B passes. Pinned as intended so
+   nobody "fixes" it into agreement.
+
+**Regression test:** `working/harness/test_gate_agreement.py` — a golden-record test over the
+committed 200-doc result. Asserts census agrees three ways (legacy, count-keyed, name-keyed),
+that the two whole-corpus determinism rules agree, that no `only_in_*` is unexplained, and that
+the A/B structure divergence is intentional. Synthetic rows would not have caught this: the defect
+only appears when a document is neither a success nor a failure.
+
+**Platform caveat was hardcoded.** The metrics block printed "macOS = wiring validation" on a Linux
+box run. It is now derived: `platform.system()/machine()`, publishable only on Linux x86_64, with
+`platform` / `publishable` / `not_publishable_reason` in the manifest. Same class of defect as a
+hardcoded verdict — the caveat had stopped tracking the thing it describes.
+
 ### SESSION 28 — defect #24: external mode honoured in one place out of six (2026-08-15)
 
 The 200-doc smoke passed readiness (`32/32 workers warm`) and then died at

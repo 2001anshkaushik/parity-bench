@@ -429,6 +429,74 @@ def normalization_parity(struct_a: Dict, struct_b: Dict) -> Dict[str, Any]:
             "PASS": na is True and nb is True}
 
 
+# --------------------------------------------------------------- adapter + legacy path
+#
+# THE ADAPTER IS WHERE THE 2026-08-15 CONTRADICTION LIVED. The gate functions above are
+# faithful ports; the bug was in how the smoke built rows for them, inline and untested,
+# so the legacy per-arm block and the gate table disagreed on identical records:
+#
+#   legacy: census 200 = 198 + 2 + 0 PASS   |  gates: census FAIL, both arms, BOTH rules
+#   legacy: determinism 200/200 identical   |  gates: determinism FAIL under the symmetric rule
+#
+# Reproduced on the real 200-document records. Two adapter defects, one design note:
+#
+# 1. EXPECTED-EMPTY WAS NEVER PLUMBED. Two documents (000_000164, 000_000357) return zero
+#    chunks legitimately; the legacy block counts them in its `expected` bucket. The adapter
+#    passed no allowlist and labelled them with OUR vocabulary (`completed_empty`), which is
+#    not in Leela's EMPTY_FAIL_REASONS ({"no_documents"}). So Leela's census called them
+#    unexpected failures and Shashi's called them silent empties. Both FAIL, both arms —
+#    which is the signature of a harness defect, not a real one.
+#
+# 2. THE TWO LEGS CLASSIFIED THE SAME DOCUMENT DIFFERENTLY. Sequentially those docs are
+#    outcome="expected" so the adapter set ok=False; in the blast leg the send returned, so
+#    ok=True with zero chunks. The symmetric rule then reports only_in_b for documents that
+#    BOTH legs processed. The asymmetry was manufactured by the adapter, not observed.
+#    `classify_ok` is now the single rule applied to both legs.
+#
+# 3. NOT A DEFECT: structure legitimately differs between the two rules. The A-side folds
+#    duplication into structure (`chunk_list_duplicated` counts toward n_bad); the B-side has
+#    no duplication concept at all. On the RR arm's 5 duplicated documents A fails structure
+#    and B passes. Tolerance and dimension are identical between them — they are simply not
+#    the only inputs. Divergence here is the suites disagreeing, which is the point of
+#    reporting both.
+
+
+def classify_ok(n_chunks, errored: bool) -> bool:
+    """The ONE success rule, applied identically to every leg.
+
+    A document that returns zero chunks is not a success — it is an expected empty. Applying
+    this in one leg and not the other is what manufactured the phantom only_in_b.
+    """
+    return (not errored) and isinstance(n_chunks, int) and n_chunks > 0
+
+
+def expected_empty_docs(rows: List[Dict]) -> Set[str]:
+    """Documents that legitimately produced no content. Both censuses need this allowlist;
+    neither can infer it."""
+    return {r["doc"] for r in rows if r.get("n_chunks") == 0 and not r.get("errored")}
+
+
+def to_leela_reason(error_class: Optional[str]) -> Optional[str]:
+    """Map OUR failure vocabulary onto Leela's at the boundary rather than editing her
+    constant. `completed_empty` is our name for what she calls `no_documents`."""
+    return "no_documents" if error_class == "completed_empty" else error_class
+
+
+def legacy_verdicts(rows: List[Dict], n_offered: int,
+                    blast_rows: List[Dict]) -> Dict[str, bool]:
+    """The pre-gates per-arm block, as a function so it can be compared against the gate
+    suites instead of drifting from them. Census: every offered document accounted for,
+    unique, none unexpected. Determinism: no document whose chunk hashes differ between the
+    two legs."""
+    docs = [r["doc"] for r in rows]
+    census = (len(rows) == n_offered and len(set(docs)) == len(docs)
+              and not [r for r in rows if r.get("errored")])
+    b = {r["doc"]: r.get("chunk_sha256") for r in blast_rows}
+    drift = [r["doc"] for r in rows
+             if r["doc"] in b and b[r["doc"]] != r.get("chunk_sha256")]
+    return {"census": census, "determinism": not drift, "drift_docs": drift}
+
+
 # --------------------------------------------------------------- three verdicts
 
 def three_verdicts(shashi_checks: Dict[str, Dict], leela_checks: Dict[str, Dict]
