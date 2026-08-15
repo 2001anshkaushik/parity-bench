@@ -547,6 +547,47 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 24 — defect #22: RocketRide credentials came from a gitignored file (2026-08-15)
+
+The thread gate failed on the RocketRide arm with `AuthenticationException: No authorization
+provided`, reported as intra=None. Not a thread failure — the env_probe never reached the engine.
+
+**Cause [VERIFIED — from the SDK and the engine's own auth module]:** every RocketRide client in
+the driver is constructed bare (`weekend_worker.py:211`, `smoke50_parser_in.py:327,537`). The SDK
+resolves URI and key itself (`client.py:200-205`): explicit argument, else `os.environ`, else a
+**`.env` in the CWD**, else a default. `.env` is gitignored (`.gitignore:62`), so the laptop had
+`ROCKETRIDE_URI`/`ROCKETRIDE_APIKEY` and a fresh clone on the box had neither.
+
+**The engine does NOT accept any non-empty key.** `ai/account/oss/__init__.py:92-99` reads the
+SERVER's own `ROCKETRIDE_APIKEY` and does
+`if oss_key and oss_key != credential: return (401, 'Invalid API key')` —
+an exact `hmac.compare_digest` match. Both engine images set `local-dev`
+(ours `docker/Dockerfile.rocketride:59`, Leela's compose), while `start_engine.sh` defaults to
+`MYAPIKEY` for the native path. If the server key is empty the check is skipped entirely, but
+neither image does that.
+
+**The measured path had the identical gap** — the sequential leg (`weekend_worker.py:211`) and the
+blast leg (`:537`) construct the client exactly the same way. The env_probe only failed first
+because it runs first; the 200-doc smoke would have failed on both RR legs.
+
+**Second, worse trap found in the same code:** with `ROCKETRIDE_URI` unset the SDK falls back to
+`CONST_DEFAULT_WEB_CLOUD`. A driver with a missing variable does not fail — it silently measures
+the hosted service over the internet. The resolver now refuses any non-loopback URI.
+
+**Fix:** `resolve_rr_credentials()` runs before any client is built, resolves both values
+(environment → `.env` → default) and writes them into `os.environ` so every bare client in the
+process inherits them. Source of each value and the key's `sha256[:8]` (never the key) go into the
+manifest under `pinned.rocketride_client`. An auth failure now names the fingerprint it used and
+tells you to compare against `docker exec <rr> printenv ROCKETRIDE_APIKEY`.
+[Verified: bare `RocketRideClient()` connects with the environment stripped; non-loopback URI
+refused; defaults resolve to `local-dev`. **Not yet verified:** the `local-dev` default against a
+live container — the native engine here uses `MYAPIKEY`, so that path first executes on the box.]
+
+**`rocketride==1.3.0` added to `requirements.txt`.** It was missing and had to be hand-installed on
+the box. The "NOT here, deliberately" note conflated `rocketlib` (bundle-supplied, imported by our
+custom nodes inside the engine) with `rocketride` (the client SDK, pip-installed, used by every
+driver). Corrected.
+
 ### SESSION 23 — defect #21: readiness by PID sampling; and a gate that reported 0 FAIL without running (2026-08-15)
 
 **#21 — `wait_external` could not finish against a healthy container.** It polled `/health` until
