@@ -51,6 +51,39 @@ STATUS = ROOT / "status.txt"
 EXIT_OK, EXIT_CAP, EXIT_OOM, EXIT_ERR = 0, 10, 11, 1
 
 
+def container_root_pid(name: str) -> int | None:
+    """HOST pid of a container's main process, via `docker inspect`.
+
+    WHY THIS EXISTS — the sampler was never the problem, discovery was.
+
+    Docker on Linux does not hide container processes from the host: they appear in the
+    host PID table under host numbering, so `/proc/<hostpid>/stat` exists and is readable.
+    psutil reads exactly that for CPU (`_pslinux.py:1828` cpu_times -> _parse_stat_file ->
+    /proc/<pid>/stat) and `/proc/<pid>/statm` for RSS (`:1878`). **Both are world-readable
+    (0444), so an unprivileged host process CAN sample a container's tree.**
+
+    What an unprivileged host process CANNOT do is *find* those pids with lsof. lsof maps a
+    listening socket to a pid by reading `/proc/<pid>/fd/*`, which is 0500 owner-only. Our
+    containers run as uid 10001 (`Dockerfile.llamaindex`: useradd -u 10001 ws1) and the
+    driver runs as ssm-user, so `lsof -iTCP:8801` returns nothing for it — while the same
+    command under sudo lists the pids and emits "no pwd entry for UID 10001" for every one,
+    because root can read the fds but there is no host passwd entry for that uid.
+
+    `docker inspect` needs no procfs privilege at all, so it is the discovery mechanism in
+    external mode — for BOTH arms, so neither is sampled by a different source.
+    """
+    import subprocess
+    try:
+        r = subprocess.run(["docker", "inspect", "-f", "{{.State.Pid}}", name],
+                           capture_output=True, text=True, timeout=15)
+    except Exception:
+        return None
+    pid = (r.stdout or "").strip()
+    if r.returncode != 0 or not pid.isdigit() or int(pid) == 0:
+        return None            # 0 means the container exists but is not running
+    return int(pid)
+
+
 def external_services() -> bool:
     """True when the services under test are CONTAINERS, not host processes.
 
@@ -198,7 +231,7 @@ class RocketArm:
         # to name matching. lsof does not need root, and the pidfile is the declared value.
         import subprocess
         try:
-            out = subprocess.run(["lsof", "-nP", "-iTCP:5565", "-sTCP:LISTEN"],
+            out = subprocess.run(["lsof", "-nP", "-l", "-iTCP:5565", "-sTCP:LISTEN"],
                                  capture_output=True, text=True, timeout=15).stdout
             for ln in out.splitlines()[1:]:
                 f = ln.split()
@@ -216,6 +249,9 @@ class RocketArm:
         from rocketride import RocketRideClient
         self.loop = asyncio.new_event_loop()
         self.engine_pid = self._engine_pid()
+        if self.engine_pid is None and external_services():
+            self.engine_pid = container_root_pid(
+                os.environ.get("SMOKE_RR_CONTAINER", "rr"))
         if self.engine_pid is None and external_services():
             print("[engine] no host-visible listener on 5565 — external/container mode; "
                   "readiness came from /version. RSS by process tree unavailable.", flush=True)
@@ -291,6 +327,15 @@ class LlamaHttpArm:
         from harness import ws1_service as ws
         self._ws = ws
         parent, workers = ws.serving_pids(port)
+        if parent is None and external_services():
+            # lsof cannot see a container's fds unprivileged; docker inspect can.
+            parent = container_root_pid(os.environ.get("SMOKE_LI_CONTAINER", "li"))
+            if parent is not None:
+                try:
+                    import psutil
+                    workers = [k.pid for k in psutil.Process(parent).children(recursive=True)]
+                except Exception:
+                    workers = []
         self.parent_pid, self.worker_pids = parent, workers
         if parent is None:
             if not external_services():
@@ -325,8 +370,12 @@ class LlamaHttpArm:
     def rss(self):
         # Same rule as RocketArm.rss(): a container's tree is not walkable from the host, so
         # report NaN rather than a driver-only number that would read as a real measurement.
-        if self.parent_pid is None and external_services():
-            return float("nan")
+        if self.parent_pid is None:
+            return float("nan") if external_services() else self._ws.tree_rss_mb(self.port)[0]
+        if external_services():
+            # Walk the resolved container tree directly; tree_rss_mb re-runs lsof, which
+            # is the thing that cannot see it.
+            return engine_tree_rss_mb(self.parent_pid) + rss_mb()
         tree, _n = self._ws.tree_rss_mb(self.port)
         return tree + rss_mb()
 

@@ -596,8 +596,17 @@ comparable, and nothing downstream would say so.
 
 ### 12f. The 200-document smoke
 
+`SMOKE_LI_CONTAINER` / `SMOKE_RR_CONTAINER` must match the `--name` you gave each container.
+The driver needs them because **`lsof` cannot map a container's listening socket to a pid when
+run unprivileged** — it reads `/proc/<pid>/fd`, which is 0500, and the containers run as uid
+10001. `docker inspect -f '{{.State.Pid}}'` needs no such privilege, and the host pid it returns
+is a real pid whose `/proc/<pid>/stat` and `/proc/<pid>/statm` are world-readable — which is all
+the CPU/RSS sampler ever needed. Both arms are discovered and sampled this way; neither is on a
+different source.
+
 ```bash
-SMOKE_EXTERNAL=1 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_BLAST_C=32 \
+SMOKE_EXTERNAL=1 SMOKE_LI_CONTAINER=li SMOKE_RR_CONTAINER=rr \
+SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_BLAST_C=32 \
 SMOKE_CORPUS_GLOB='000_*.pdf' SMOKE_PORT=8801 SMOKE_WARM_N=64 \
 RR_NODE_MARK='engine/ai/node.py' \
   ../.venv/bin/python working/scripts/smoke50_parser_in.py 200 2>&1 | tee logs/smoke200.log

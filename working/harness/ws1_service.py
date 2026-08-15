@@ -100,7 +100,7 @@ def wait_warm(h: Ws1Handle, timeout: float = 600.0) -> Ws1Handle:
 def serving_pids(port: int) -> tuple[int | None, list[int]]:
     """(parent, workers) resolved by LISTENING SOCKET, never by process name."""
     try:
-        out = subprocess.run(["lsof", "-nP", f"-iTCP:{port}", "-sTCP:LISTEN"],
+        out = subprocess.run(["lsof", "-nP", "-l", f"-iTCP:{port}", "-sTCP:LISTEN"],
                              capture_output=True, text=True, timeout=15).stdout
     except Exception:
         return None, []

@@ -573,13 +573,33 @@ reports unavailable rather than guessing. `rss()` returns NaN instead of silentl
 other process's memory; **the name-matching fallback is now unreachable in external mode**, which
 matters more than the crash did.
 
-**Cost sampling is the honest casualty.** Host psutil cannot sample a container, so in external
-mode cost is `None` with a named reason recorded in the manifest
-(`pinned.cost_unavailable_reason`), never a host number dressed as a container measurement. The
-correct Docker-mode source is Leela's in-container cgroup sampler via
-`metrics_shared.series_from_cgroup_jsonl()` — **that path is not yet wired into this driver**, so
-a Docker smoke currently yields correctness verdicts but no CPU numbers. Stated rather than papered
-over.
+> **CORRECTED SAME DAY — "host psutil cannot sample a container" was WRONG.** Ansh challenged it
+> with box evidence (`lsof -i :8801` under sudo listing host pids 3307/3321 for uid 10001) and was
+> right. Docker on Linux does not hide container processes from the host; they appear in the host
+> PID table under host numbering. psutil reads `/proc/<pid>/stat` for CPU
+> (`_pslinux.py:1828`) and `/proc/<pid>/statm` for RSS (`:1878`), **both 0444 world-readable**, so
+> an unprivileged host process CAN sample a container's tree. I generalised from macOS, where
+> Docker runs in a VM and container pids genuinely are not host-visible. Wrong platform, wrong
+> conclusion.
+>
+> **The real defect is discovery, one layer up, and it is not UID resolution either.** `lsof` maps
+> a listening socket to a pid by reading `/proc/<pid>/fd/*`, which is **0500 owner-only**. The
+> containers run as uid 10001 (`Dockerfile.llamaindex`, `useradd -u 10001 ws1`) and the driver runs
+> as ssm-user, so `lsof -iTCP:8801` returns nothing. Run under sudo it succeeds and emits
+> "no pwd entry for UID 10001" per line — root can read the fds, but no host passwd entry exists
+> for that uid. The warning is a symptom of the privileged path working, not the cause of the
+> unprivileged path failing.
+>
+> **Fix:** `container_root_pid()` uses `docker inspect -f '{{.State.Pid}}'`, which needs no procfs
+> privilege, and hands the host pid to the existing psutil sampler. Applied to **both arms
+> identically** (`SMOKE_LI_CONTAINER` / `SMOKE_RR_CONTAINER`, defaults `li` / `rr`), so neither is
+> sampled by a different source. `lsof` also gains `-l` on both paths to stop the uid-warning
+> flood. Cost is therefore AVAILABLE in Docker mode; Leela's in-container cgroup sampler stays the
+> documented alternative in `metrics_shared`, not a necessity.
+>
+> Cost still reports `None` with a named reason if *neither* lsof nor docker inspect resolves a
+> pid — but the reason now says it is a discovery failure and names the env vars to set, rather
+> than claiming a sampling limitation that does not exist.
 
 [Verified: with `SMOKE_EXTERNAL` unset an arm on a dead port still RAISES; with it set the same arm
 constructs, `parent_pid=None`, `rss=nan`. Full external-mode run completes end to end.]

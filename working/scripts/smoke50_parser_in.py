@@ -210,7 +210,8 @@ def main() -> int:
     from harness.extraction_fidelity import fidelity, summarise
     from harness.tika_reference import available as tika_ok, reference_text
     from harness.resultio import write_result
-    from weekend_worker import LlamaHttpPdfArm, RocketPdfArm, RocketArm
+    from weekend_worker import (LlamaHttpPdfArm, RocketPdfArm, RocketArm,
+                                container_root_pid)
 
     # Before ANY RocketRideClient is constructed — including the env_probe below.
     from harness.rr_credentials import resolve as _resolve_rr, auth_hint
@@ -298,8 +299,22 @@ def main() -> int:
         """
         if arm_name.startswith("llamaindex"):
             parent, _workers = ws.serving_pids(PORT)
-            return parent
-        return RocketArm._engine_pid()
+            pid = parent
+            container = os.environ.get("SMOKE_LI_CONTAINER", "li")
+        else:
+            pid = RocketArm._engine_pid()
+            container = os.environ.get("SMOKE_RR_CONTAINER", "rr")
+        if pid is None and EXTERNAL:
+            # lsof cannot map a container's listening socket to a pid unprivileged —
+            # /proc/<pid>/fd is 0500 and the container runs as uid 10001. docker inspect
+            # needs no procfs privilege, and the host pid it returns is a REAL pid whose
+            # /proc/<pid>/stat and /proc/<pid>/statm are world-readable, which is all the
+            # psutil sampler ever needed. Same mechanism on both arms.
+            pid = container_root_pid(container)
+            if pid is not None:
+                say(f"  {arm_name}: sampling container '{container}' root pid {pid} "
+                    "(docker inspect; lsof cannot see it unprivileged)")
+        return pid
 
     class CostSpan:
         """psutil ProcessCollector (0.5 s, out-of-process) around one arm+mode span; yields the
@@ -321,9 +336,12 @@ def main() -> int:
                 # measurement of the container. The correct Docker-mode source is Leela's
                 # in-container cgroup sampler via metrics_shared.series_from_cgroup_jsonl();
                 # that path is NOT wired into this driver yet.
-                self.reason = ("external/container mode: no host-visible service tree, and "
-                               "host psutil cannot sample a container. Wire the in-container "
-                               "cgroup sampler for Docker-mode cost numbers.")
+                self.reason = (
+                    f"external mode: neither lsof nor `docker inspect` resolved a host pid "
+                    f"for {arm_name}. Set SMOKE_LI_CONTAINER / SMOKE_RR_CONTAINER to the "
+                    f"container names if they are not 'li' / 'rr'. (Host psutil CAN sample a "
+                    f"container tree — /proc/<hostpid>/stat and /statm are world-readable — so "
+                    f"this is a discovery failure, not a sampling limitation.)")
                 say(f"  !! cost sampling DISABLED for {self.tag}: {self.reason}")
             else:
                 self.pc = ProcessCollector(self.path, {"service": {"pids": [pid]}},
