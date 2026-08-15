@@ -549,6 +549,20 @@ no requirements file at all** (`find working/nodes -name 'requirement*'` → 0),
 sizes and mtimes are unchanged, `current_hash == stored_hash`, and `ensure_constraints()` returns
 at *"Constraints are up to date"*. Restart is seconds, not the 10–30 minute first boot.
 
+**The probe pipe is `a3_env_torch.pipe`, not `a3_env.pipe`.** `env_probe` alone gives
+`ModuleNotFoundError: No module named 'torch'`: it declares no requirements, so nothing in that
+pipeline installs or imports torch — and `torch.get_num_threads()` is the whole point of the gate.
+The probe pipe therefore also contains `preprocessor_langchain` + `embedding_transformer`, whose
+import chain (`nodes/embedding_transformer/sentenceTransformer.py:34` → `depends()` →
+`ai/common/models/transformers/requirements_sentence_transformers.txt` → sentence-transformers →
+torch) loads torch into the same task process at pipeline load.
+
+**First run of the probe may install sentence-transformers + torch into the engine's dependency
+cache** (`engine_cache_dir()` = `<engine dir>/cache`, shared across pipelines) — a few minutes and
+some network on a container that has not run an embedding pipeline yet. That cost is paid either
+way; the probe just front-loads it, which is preferable to paying it inside the first measured
+block.
+
 ⚠️ **Only `env_probe`, and only for the probe.** The measured pipe is five stock providers
 (`webhook`, `parse`, `preprocessor_langchain`, `embedding_transformer`, `response_documents`) —
 canonical digest `f61165f7cf7ab1db…`, unchanged. Do not copy the other five custom nodes; they are

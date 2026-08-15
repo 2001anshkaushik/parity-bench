@@ -339,7 +339,7 @@ def main() -> int:
         from rocketride import RocketRideClient
 
         async def go():
-            base = json.loads((ROOT / "working" / "pipes" / "a3_env.pipe").read_text())
+            base = json.loads((ROOT / "working" / "pipes" / "a3_env_torch.pipe").read_text())
             base["project_id"] = str(_u.uuid5(_u.NAMESPACE_DNS,
                                               f"envprobe-{os.getpid()}-{time.time()}"))
             pp = ROOT / "working" / "pipes" / "generated" / f"envprobe_{os.getpid()}.pipe"

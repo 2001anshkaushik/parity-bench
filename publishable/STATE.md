@@ -547,6 +547,39 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 26 — the thread probe needed torch in its own task process (2026-08-15)
+
+Box result: `env_probe` reaches the engine, pid 66, **all six thread vars = "1"**, `os_cpu_count`
+32 — the container `-e` pins DO reach the task process. Remaining failure was
+`ModuleNotFoundError: No module named 'torch'`, because `a3_env.pipe` contains only `env_probe`,
+which declares no requirements, so nothing in that pipeline installs or imports torch.
+
+**One pipeline is one task process [VERIFIED — code + prior measurement].** `ai/node.py` takes no
+per-component argument (only debug flags), reports `monitorStatus('Loading pipeline')` — singular —
+and hands the whole `sys.argv` to `rocketlib.processArguments`. There is no mechanism by which it
+could be per-component: it is never told which component it is. Corroborated by measurement already
+in the repo: `MATCHED_LAYERS.md` §1 records the 5-node `product_pdf.pipe` running with
+**child-process count constant at 1**.
+
+**Fix:** new `working/pipes/a3_env_torch.pipe` — `webhook → preprocessor_langchain →
+embedding_transformer` alongside `webhook → env_probe → response_text`. The embedding node's import
+chain (`sentenceTransformer.py:34` `depends()` → `requirements_sentence_transformers.txt` →
+sentence-transformers → torch) loads torch at pipeline-load time, in the process `env_probe` runs
+in. `env_probe` still declares **no requirements file**, so the constraints cache key
+(`_compute_hash(_find_requirement_files())`) is unchanged and no recompile is paid. `a3_env.pipe`
+is left in place; the measured pipe is untouched, canonical digest `f61165f7cf7ab1db`.
+
+**⚠️ My local pass is NOT evidence the fix works, and I am recording that rather than claiming it.**
+`engine_cache_dir()` is `<engine dir>/cache`, **shared across every pipeline of an engine install**,
+so once any pipeline has installed torch it stays importable. Our long-lived local engine already
+had it — the bare `a3_env.pipe` reports torch here too. The local run therefore proves only that
+the two-node pipe is valid and runs; it cannot distinguish "the added node supplied torch" from
+"torch was already installed". The code chain is the evidence. **First real test is the box.**
+
+Consequence worth knowing: on a container that has not yet run an embedding pipeline, the probe's
+first run installs sentence-transformers + torch into the engine cache — minutes and network. The
+smoke pays that cost anyway; the probe front-loads it out of the first measured block.
+
 ### SESSION 25 — defect #23: the readiness counter over-counted after `docker start` (2026-08-15)
 
 `/health` reported `warm_workers=33` against `declared_workers=32` on a restarted container.

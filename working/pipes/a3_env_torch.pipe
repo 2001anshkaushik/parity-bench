@@ -1,0 +1,21 @@
+{
+	"_comment": "Thread read-back probe. a3_env.pipe alone gives ModuleNotFoundError: No module named 'torch' — env_probe declares no requirements, so nothing in that pipeline installs or imports torch, and torch.get_num_threads() is exactly what the gate needs. Adding embedding_transformer to the SAME pipeline loads it: nodes/embedding_transformer/sentenceTransformer.py:34 calls depends() and then imports ai.common.models.SentenceTransformer, whose requirements_sentence_transformers.txt pulls sentence-transformers and therefore torch, at pipeline-load time. One pipeline is one task process (ai/node.py takes no per-component argument and reports 'Loading pipeline'), so env_probe sees the torch that embedding_transformer imported. env_probe still declares NO requirements file, so the constraints cache key is unchanged and no recompile is paid. This is the PROBE pipe only — the measured pipe product_pdf.pipe is untouched, canonical digest f61165f7cf7ab1db.",
+	"components": [
+		{ "id": "input",  "provider": "webhook", "config": {}, "ui": {} },
+		{ "id": "split",  "provider": "preprocessor_langchain",
+		  "config": { "profile": "default", "default": { "splitter": "RecursiveCharacterTextSplitter", "mode": "strlen" } },
+		  "ui": {},
+		  "input": [{ "lane": "text", "from": "input" }] },
+		{ "id": "embed",  "provider": "embedding_transformer",
+		  "config": { "profile": "miniLM" }, "ui": {},
+		  "input": [{ "lane": "documents", "from": "split" }] },
+		{ "id": "work",   "provider": "env_probe", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "input" }] },
+		{ "id": "output", "provider": "response_text", "config": {}, "ui": {},
+		  "input": [{ "lane": "text", "from": "work" }] }
+	],
+	"source": "input",
+	"project_id": "794e3236-21d3-5ef0-961c-ece96017d124",
+	"viewport": { "x": 0, "y": 0, "zoom": 1 },
+	"version": 1
+}
