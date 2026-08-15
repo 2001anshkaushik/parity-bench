@@ -583,6 +583,18 @@ tells you to compare against `docker exec <rr> printenv ROCKETRIDE_APIKEY`.
 refused; defaults resolve to `local-dev`. **Not yet verified:** the `local-dev` default against a
 live container — the native engine here uses `MYAPIKEY`, so that path first executes on the box.]
 
+**Widened 2026-08-15 (same day).** The first fix lived inside `smoke50_parser_in.py` and therefore
+covered only that script. An audit of every `RocketRideClient(` construction found **~30 other
+entry points with the identical gap**, including two the runbook itself invokes
+(`regression_selftest.py:79`, `verify_parser_in.py:17`). The resolver now lives in
+`working/harness/rr_credentials.py` and runs from `harness/__init__.py` on import
+(`strict=False`, so it can never raise at import time), which covers every script that imports the
+harness — all three runbook scripts do. The measured drivers additionally call
+`resolve(strict=True)`, where a non-loopback endpoint is fatal.
+Provenance is recorded on FIRST resolution and reused: without that, the driver's second call
+reported "process environment" for everything — true, but only because the import-time call had
+just put it there, which would have written a useless source into the manifest.
+
 **`rocketride==1.3.0` added to `requirements.txt`.** It was missing and had to be hand-installed on
 the box. The "NOT here, deliberately" note conflated `rocketlib` (bundle-supplied, imported by our
 custom nodes inside the engine) with `rocketride` (the client SDK, pip-installed, used by every

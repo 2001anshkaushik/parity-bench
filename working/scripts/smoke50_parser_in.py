@@ -79,61 +79,6 @@ def h(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
-def resolve_rr_credentials() -> dict:
-    """Resolve ROCKETRIDE_URI / ROCKETRIDE_APIKEY and put them in os.environ.
-
-    Every RocketRide client in this process is constructed bare — `RocketRideClient()` at
-    weekend_worker.py:211 (the measured sequential leg), and twice in this file (blast leg,
-    env_probe). The SDK then resolves both values itself (client.py:200-205): explicit argument,
-    else os.environ, else a `.env` in the CWD, else a default. `.env` is gitignored, which is
-    exactly why this worked on the laptop and failed on the box.
-
-    Two failure modes this closes:
-
-    * **Auth.** The engine in OSS mode compares the credential against the SERVER's own
-      ROCKETRIDE_APIKEY with `hmac.compare_digest` (ai/account/oss/__init__.py:92-99):
-      `if oss_key and oss_key != credential: return (401, 'Invalid API key')`. It is NOT
-      "any non-empty value" — it must match exactly. Both engine images set `local-dev`
-      (ours `docker/Dockerfile.rocketride:59`, Leela's compose), so that is the default here.
-      An empty server-side key disables the check entirely, which is worth knowing but is not
-      what either image does.
-
-    * **Wrong host, silently.** With no ROCKETRIDE_URI the SDK falls back to
-      CONST_DEFAULT_WEB_CLOUD — a benchmark driver with an unset variable does not fail, it
-      quietly measures the hosted service over the internet. Refused below.
-    """
-    def from_dotenv(key: str):
-        p = ROOT / ".env"
-        if not p.exists():
-            return None
-        for line in p.read_text().splitlines():
-            if line.startswith(f"{key}="):
-                return line.split("=", 1)[1].strip()
-        return None
-
-    out = {}
-    for key, default in (("ROCKETRIDE_URI", "http://127.0.0.1:5565"),
-                         ("ROCKETRIDE_APIKEY", "local-dev")):
-        if os.environ.get(key):
-            val, src = os.environ[key], "process environment"
-        elif from_dotenv(key):
-            val, src = from_dotenv(key), f"{ROOT}/.env (gitignored — absent on a fresh clone)"
-        else:
-            val, src = default, "driver default (matches both engine images)"
-        os.environ[key] = val          # so every bare RocketRideClient() in this process sees it
-        out[key] = {"source": src}
-        out[key]["value" if key.endswith("URI") else "sha256_8"] = (
-            val if key.endswith("URI") else hashlib.sha256(val.encode()).hexdigest()[:8])
-
-    host = os.environ["ROCKETRIDE_URI"]
-    if not any(h in host for h in ("127.0.0.1", "localhost", "::1")):
-        raise RuntimeError(
-            f"ROCKETRIDE_URI resolved to {host!r}, which is not loopback. Refusing: the SDK's "
-            "fallback when the variable is unset is the hosted cloud service, and a benchmark "
-            "that silently measures a remote endpoint is worse than one that fails.")
-    return out
-
-
 def wait_external(port: int, want_workers: int, timeout: float = 300.0) -> list[dict]:
     """Readiness for an already-running LlamaIndex container, on loopback.
 
@@ -251,7 +196,8 @@ def main() -> int:
     from weekend_worker import LlamaHttpPdfArm, RocketPdfArm, RocketArm
 
     # Before ANY RocketRideClient is constructed — including the env_probe below.
-    rr_creds = resolve_rr_credentials()
+    from harness.rr_credentials import resolve as _resolve_rr, auth_hint
+    rr_creds = _resolve_rr(strict=True)
     say(f"rocketride client: uri={os.environ['ROCKETRIDE_URI']} "
         f"({rr_creds['ROCKETRIDE_URI']['source']}), "
         f"apikey sha256[:8]={rr_creds['ROCKETRIDE_APIKEY']['sha256_8']} "
@@ -409,12 +355,7 @@ def main() -> int:
         except Exception as e:
             msg = f"{type(e).__name__}: {str(e)[:160]}"
             if "auth" in msg.lower() or "401" in msg:
-                msg += (f" | The engine compares the credential against ITS OWN "
-                        f"ROCKETRIDE_APIKEY and rejects a mismatch (401 'Invalid API key'). "
-                        f"Driver used sha256[:8]="
-                        f"{hashlib.sha256(os.environ.get('ROCKETRIDE_APIKEY','').encode()).hexdigest()[:8]}"
-                        f" from {rr_creds['ROCKETRIDE_APIKEY']['source']}. Compare with "
-                        f"`docker exec <rr container> printenv ROCKETRIDE_APIKEY`.")
+                msg += " | " + auth_hint()
             return {"error": msg}
 
     rr_threads = rr_thread_readback()
