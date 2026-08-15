@@ -11,8 +11,10 @@
 > documented in `MATCHED_LAYERS.md` — both arms containerized or the run is unpublishable.
 > Metric functions are container-agnostic (`working/harness/metrics_shared.py`); the CPU
 > sampler is pluggable — psutil tree source natively, Leela's `cgroup_sampler.py` pattern
-> in-container (`series_from_cgroup_jsonl`, same downstream math). A Docker run sequence to
-> replace §3/§6/§7 is not yet written.
+> in-container (`series_from_cgroup_jsonl`, same downstream math).
+> **The Docker sequence that replaces §3/§6/§7 is §12 at the bottom of this file.**
+
+**Ansh · 2026-08-14.** Target: `i-0775f33f3dc16f6af`, c7i.8xlarge, 32 vCPU / 61 GB, Ubuntu, x86-64.
 Paste each block, check the stated expectation, move on. **Do not debug on the box** — if a check
 fails, §9 has the fix; if §9 does not have it, stop the box and come back to the laptop.
 
@@ -461,3 +463,98 @@ supposed to finish today.
   timed can be published until it is one value.
 * **Send mode**: Shashi measures blast *and* sequential; Leela measures sequential closed-loop and
   has just added blast; our smoke measures sequential and uses blast only to drive determinism.
+
+---
+
+## 12. DOCKER SEQUENCE — replaces §3, §6 and §7 🆕
+
+Both arms in containers, `--network host`, identical CPU/memory envelope, identical thread pins.
+Never one arm native and one containerised: `MATCHED_LAYERS.md` documents that exact confound
+producing two opposite memory verdicts.
+
+**Thread decision (settled 2026-08-15):** 32 workers × **1 BLAS thread** each on both arms;
+`TORCH_INTEROP_THREADS` left **unset** on both. Matches Shashi (`compose.yml:37-39,63-65,90`) and
+Leela (`docker-compose.yml:71`). Both teammates already run BLAS=1 — this adopts their setting.
+
+### 12a. Build (§2a Python-3.12 preflight still applies to the host venv)
+
+```bash
+docker build -f docker/Dockerfile.rocketride --build-arg EXPECT_ARCH=x86_64 -t rr-engine:3.3.1 .
+docker build -f docker/Dockerfile.llamaindex --build-arg EXPECT_ARCH=x86_64 -t ws1-llamaindex:x86_64 .
+```
+
+`Dockerfile.llamaindex` serves `ws1.service:app` on `0.0.0.0:8801`. Its `ENTRYPOINT` used to be
+`ladder.py`, which calls the pipeline **in-process** — no server, no socket. That would have
+reintroduced the topology confound, and its arch assert refuses x86-64 besides. `ladder.py` is
+still in the image and is simply not used.
+
+### 12b. Start both arms
+
+```bash
+docker run -d --name rr --network host --cpus 32 --memory 58g \
+  -e RR_HOST=127.0.0.1 -e RR_PORT=5565 \
+  -e OMP_NUM_THREADS=1 -e MKL_NUM_THREADS=1 -e OPENBLAS_NUM_THREADS=1 \
+  -e VECLIB_MAXIMUM_THREADS=1 -e NUMEXPR_NUM_THREADS=1 -e TORCH_NUM_THREADS=1 \
+  rr-engine:3.3.1
+
+docker run -d --name li --network host --cpus 32 --memory 58g \
+  -e WS1_WORKERS=32 -e WS1_PORT=8801 -e WS1_DEVICE=cpu \
+  -e OMP_NUM_THREADS=1 -e MKL_NUM_THREADS=1 -e OPENBLAS_NUM_THREADS=1 \
+  -e VECLIB_MAXIMUM_THREADS=1 -e NUMEXPR_NUM_THREADS=1 -e TORCH_NUM_THREADS=1 \
+  ws1-llamaindex:x86_64
+```
+
+`--network host` means no published ports, so Leela's WebSocket-through-the-port-proxy question
+(`CONTEXT_SNAPSHOT` 4.6, which her `a33c75b` suggests was a missing `--host` flag) cannot arise.
+First engine boot is 10–30 min at near-zero CPU — §1a's keep-alive must already be running.
+
+```bash
+curl -s http://127.0.0.1:5565/version     # EXPECT version 3.3.1.35, hash a0817cc6
+```
+
+### 12c. PREFLIGHT — prove thread propagation BEFORE any measured run
+
+```bash
+SMOKE_EXTERNAL=1 SMOKE_PREFLIGHT=1 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_PORT=8801 \
+RR_NODE_MARK='engine/ai/node.py' \
+  ../.venv/bin/python working/scripts/smoke50_parser_in.py
+```
+
+Prints `pinned.torch_threads_measured` for both arms and exits **0 = PASS / 4 = FAIL**. It sends
+no documents. Read-back is in-process on both sides: LlamaIndex from `/health` on each live
+uvicorn worker, RocketRide from the `env_probe` node inside the engine's **task** process on a
+separate one-shot pipe, so the shared 5-node measured pipe stays byte-identical.
+
+**This gate exists because of a measured failure, not caution.** On the macOS native engine the
+task process inherited **none** of the six thread variables and torch chose 10 intra / 14 interop
+on its own. `docker run -e` reaching the container does not prove it reached the worker, and torch
+caches its thread count at import, so a variable set after import has no effect at all. If either
+arm reports anything other than intra=1, **stop** — cost numbers from mismatched arms are not
+comparable, and nothing downstream would say so.
+
+### 12d. Corpus, then the 200-document smoke
+
+```bash
+../.venv/bin/python working/scripts/fetch_govdocs.py 200          # = govdocs1 zip 000 exactly
+../.venv/bin/python working/scripts/verify_corpus_manifest.py --subset
+
+SMOKE_EXTERNAL=1 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_BLAST_C=32 \
+SMOKE_CORPUS_GLOB='000_*.pdf' SMOKE_PORT=8801 SMOKE_WARM_N=64 \
+RR_NODE_MARK='engine/ai/node.py' \
+  ../.venv/bin/python working/scripts/smoke50_parser_in.py 200 2>&1 | tee logs/smoke200.log
+```
+
+`SMOKE_EXTERNAL=1` is what stops the driver starting its own service. Without it the driver would
+launch a second LlamaIndex on 8801 and the run would measure whichever process won the port —
+the `start_engine.sh` idempotency trap in a new place. In external mode an unreachable arm is a
+hard failure with a named reason, never a silent fallback.
+
+### 12e. Ship it
+
+```bash
+bash working/scripts/exfil_s3.sh working/results logs/smoke200.log
+docker logs rr > logs/engine.log 2>&1; docker logs li > logs/ws1.log 2>&1
+bash working/scripts/exfil_s3.sh logs/engine.log logs/ws1.log
+docker rm -f rr li
+aws ec2 stop-instances --instance-ids i-0775f33f3dc16f6af --region us-east-1
+```

@@ -57,9 +57,9 @@ cd parity-bench && ../.venv/bin/python working/scripts/regression_selftest.py
 
 ```bash
 docker build -f docker/Dockerfile.rocketride --build-arg EXPECT_ARCH=x86_64 \
-    -t rr-engine:3.3.1-x64 .
+    -t rr-engine:3.3.1 .
 docker build -f docker/Dockerfile.llamaindex --build-arg EXPECT_ARCH=x86_64 \
-    -t ws1-llamaindex:x64 .
+    -t ws1-llamaindex:x86_64 .
 ```
 Both Dockerfiles hard-fail on the wrong arch — an assert firing means the build host is not what
 step 0 said. The engine tarball is fetched **pinned by sha256**
@@ -68,7 +68,7 @@ step 0 said. The engine tarball is fetched **pinned by sha256**
 ## 4. First engine boot — the highest-uncertainty moment
 
 ```bash
-docker run -d --name rr --cpus 12 --memory 10g -p 5565:5565 rr-engine:3.3.1-x64
+docker run -d --name rr --cpus 12 --memory 10g -p 5565:5565 rr-engine:3.3.1
 sleep 60 && curl -s http://127.0.0.1:5565/version
 # EXPECT: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6",...}}
 docker exec rr ./engine/java/jre/bin/java -version   # Temurin 17.0.19 from the BUNDLE, not apt

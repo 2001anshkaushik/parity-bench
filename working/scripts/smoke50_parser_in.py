@@ -53,6 +53,14 @@ BLAST_C = int(os.environ.get("SMOKE_BLAST_C", "4"))     # in-flight docs during 
 # the 000_ prefix yields the identical document set. Verified: zip 000 contributes exactly 200
 # PDFs and its first ten match Leela's box corpus name-for-name.
 CORPUS_GLOB = os.environ.get("SMOKE_CORPUS_GLOB", "*.pdf")
+# EXTERNAL SERVICE MODE. Set when both arms already run as containers on loopback
+# (LI http://127.0.0.1:8801, RR ws://127.0.0.1:5565). The driver then NEVER starts a service:
+# starting a second one would silently measure whichever process won the port, which is the
+# `start_engine.sh` idempotency trap in a new place. Unreachable => hard fail, never a fallback.
+EXTERNAL = os.environ.get("SMOKE_EXTERNAL", "") not in ("", "0", "false", "False")
+RR_VERSION_URL = os.environ.get("SMOKE_RR_URL", "http://127.0.0.1:5565") + "/version"
+# Preflight: prove thread propagation on both arms, print the manifest block, exit. No documents.
+PREFLIGHT = os.environ.get("SMOKE_PREFLIGHT", "") not in ("", "0", "false", "False")
 # Warm-up exclusion is METRIC-SIDE by completion rank (Leela's perf_window — settled 2026-08-14).
 # Primary 64, secondary 25 also emitted; the numbers are computed from the same rows, so changing
 # the pick later needs no re-run.
@@ -69,6 +77,61 @@ def say(m):
 
 def h(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
+
+
+def wait_external(port: int, want_workers: int, timeout: float = 900.0) -> list[dict]:
+    """Readiness for an already-running LlamaIndex container, on loopback.
+
+    `/health` is answered by ONE worker per connection, so a single 200 proves nothing — this
+    polls until `want_workers` DISTINCT worker_pids have each reported model_loaded. That is the
+    external-mode equivalent of counting 'warm in' lines, which live inside the container.
+
+    Raises on timeout. It must never fall back to starting a local service: two services on one
+    port means the run measures whichever one answered, and nothing in the output would say so.
+    """
+    import urllib.error
+    import urllib.request
+    seen: dict[int, dict] = {}
+    t0 = time.perf_counter()
+    last_err = None
+    while time.perf_counter() - t0 < timeout:
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=10) as r:
+                h = json.loads(r.read().decode())
+            if h.get("model_loaded"):
+                seen[h["worker_pid"]] = h
+            if len(seen) >= want_workers:
+                return list(seen.values())
+        except (urllib.error.URLError, OSError, ValueError) as e:
+            last_err = f"{type(e).__name__}: {str(e)[:120]}"
+        time.sleep(0.25)
+    raise RuntimeError(
+        f"LlamaIndex service NOT READY on 127.0.0.1:{port} after {timeout:.0f}s — saw "
+        f"{len(seen)}/{want_workers} distinct warm workers"
+        + (f" (last error {last_err})" if last_err else "")
+        + ". SMOKE_EXTERNAL is set, so the driver will NOT start one. Start the container "
+          "and re-run.")
+
+
+def check_engine(url: str) -> dict:
+    """Prove the RocketRide engine is answering before anything is sent to it.
+
+    /version is unauthenticated and carries the running build, so readiness and identity come
+    from one call. NOTE the shape of the check: `curl -w '%{http_code}' || echo 000` yields
+    `000000` on a refused connection and compares unequal to `000`, reporting a dead engine as
+    healthy — this project has already lost time to that.
+    """
+    import urllib.error
+    import urllib.request
+    try:
+        with urllib.request.urlopen(url, timeout=15) as r:
+            if r.status != 200:
+                raise RuntimeError(f"engine {url} returned HTTP {r.status}")
+            return json.loads(r.read().decode())
+    except (urllib.error.URLError, OSError, ValueError) as e:
+        raise RuntimeError(
+            f"RocketRide engine NOT REACHABLE at {url} ({type(e).__name__}: {str(e)[:120]}). "
+            "SMOKE_EXTERNAL is set, so the driver will NOT start one.") from e
 
 
 def structure_check(chunks, vecs, dim: int = EMB_DIM) -> list[str]:
@@ -130,11 +193,24 @@ def main() -> int:
     ok_tika, why = tika_ok()
     say(f"tika reference: {'available' if ok_tika else 'UNAVAILABLE — ' + why}")
 
-    say(f"service: workers={WORKERS} threads={THREADS} blast_concurrency={BLAST_C}")
-    hsvc = ws.start(workers=WORKERS, port=PORT, threads=THREADS)
-    ws.wait_warm(hsvc, timeout=900)
-    thr = sorted(set(hsvc.measured_threads.values()))
-    say(f"service warm, torch(intra,interop)={thr}")
+    say(f"service: workers={WORKERS} threads={THREADS} blast_concurrency={BLAST_C} "
+        f"mode={'EXTERNAL (containers on loopback)' if EXTERNAL else 'driver-managed'}")
+    hsvc = None
+    if EXTERNAL:
+        # Both arms must already be up. Fail loudly; never start one.
+        health = wait_external(PORT, WORKERS)
+        thr = sorted({(h["torch_threads"], h["torch_interop"]) for h in health})
+        li_thread_env = health[0].get("thread_env", {})
+        say(f"llamaindex: {len(health)} distinct warm workers on :{PORT}, "
+            f"torch(intra,interop)={thr}")
+        ver = check_engine(RR_VERSION_URL)
+        say(f"engine: {RR_VERSION_URL} -> {json.dumps(ver.get('data', ver))[:120]}")
+    else:
+        hsvc = ws.start(workers=WORKERS, port=PORT, threads=THREADS)
+        ws.wait_warm(hsvc, timeout=900)
+        thr = sorted(set(hsvc.measured_threads.values()))
+        li_thread_env = None
+        say(f"service warm, torch(intra,interop)={thr}")
 
     # Per-doc JSONL + sampler streams land here so every metric is re-derivable forever
     # (Leela's exfil contract: raw records, not just the report).
@@ -233,6 +309,48 @@ def main() -> int:
         f"interop={rr_threads.get('torch_num_interop_threads')} "
         f"env={rr_threads.get('env')}"
         + (f"  !! {rr_threads['error']}" if rr_threads.get("error") else ""))
+
+    threads_measured = {
+        "llamaindex_http_pdf": {
+            "source": ("/health from each live uvicorn worker (external mode)" if EXTERNAL
+                       else "warm line of each uvicorn worker (driver-managed)"),
+            "per_worker_intra_interop": [list(t) for t in thr],
+            "thread_env_in_worker": li_thread_env},
+        "rocketride_pdf": {
+            "source": "env_probe node inside the engine task process, separate one-shot pipe "
+                      "(a3_env.pipe); measured pipe untouched",
+            **rr_threads},
+    }
+
+    if PREFLIGHT:
+        # Thread propagation, proven on both arms, BEFORE any document is sent. On the box this
+        # is the gate: `docker run -e` reaching the container does not prove it reached the
+        # uvicorn worker or the engine's task process, and torch caches its count at import.
+        say("\npinned.torch_threads_measured =")
+        print(json.dumps(threads_measured, indent=2), flush=True)
+        want = THREADS
+        li_bad = [t for t in thr if t[0] != want]
+        rr_intra = rr_threads.get("torch_num_threads")
+        rr_bad = rr_intra != want
+        say("")
+        say(f"  declared BLAS/intra-op threads per worker : {want}")
+        say(f"  llamaindex measured intra                 : {[t[0] for t in thr]}"
+            f"   -> {'PASS' if not li_bad else 'FAIL'}")
+        say(f"  rocketride measured intra                 : {rr_intra}"
+            f"   -> {'PASS' if not rr_bad else 'FAIL'}")
+        say(f"  interop (left UNSET on both, reported)    : "
+            f"LI {[t[1] for t in thr]}  RR {rr_threads.get('torch_num_interop_threads')}")
+        if li_bad or rr_bad:
+            say("\nPREFLIGHT FAIL — the thread pin did not reach a worker/task process. "
+                "Do NOT run the measured smoke: cost numbers from mismatched arms are "
+                "not comparable.")
+            if hsvc:
+                ws.stop(hsvc)
+            return 4
+        say("\nPREFLIGHT PASS — both arms at the declared pin. Safe to run the 200-doc smoke.")
+        if hsvc:
+            ws.stop(hsvc)
+        return 0
 
     results = {}
     try:
@@ -423,7 +541,10 @@ def main() -> int:
                 f"sequential" + (f", {unproven} UNPROVEN (blast leg gave no result)"
                                  if unproven else ""))
     finally:
-        ws.stop(hsvc)
+        # Never tear down a service this driver did not start — in external mode the container
+        # is the operator's, and the second arm may still be mid-run against it.
+        if hsvc:
+            ws.stop(hsvc)
 
     # ---------------- verdicts ----------------
     out = {"n_offered": len(pdfs), "threads": thr, "arms": {},
@@ -443,15 +564,8 @@ def main() -> int:
                       "embedding_dim": {"source": "probed from each arm's loaded model, "
                                                   "one doc pre-span", "per_arm": probed_dim},
                       # DECLARED != MEASURED, both arms, read back in-process.
-                      "torch_threads_measured": {
-                          "llamaindex_http_pdf": {
-                              "source": "torch.get_num_threads()/get_num_interop_threads() per "
-                                        "uvicorn worker, reported on its warm line",
-                              "per_worker_intra_interop": [list(t) for t in thr]},
-                          "rocketride_pdf": {
-                              "source": "env_probe node inside the engine task process, separate "
-                                        "one-shot pipe (a3_env.pipe); measured pipe untouched",
-                              **rr_threads}},
+                      "torch_threads_measured": threads_measured,
+                      "service_mode": "external containers" if EXTERNAL else "driver-managed",
                       "cost_sampler": {"source": "psutil ProcessCollector (out-of-process, "
                                                  "dead-PID roll-forward)",
                                        "interval_s": SAMPLE_INTERVAL_S,

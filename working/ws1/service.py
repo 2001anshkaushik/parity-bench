@@ -119,12 +119,30 @@ app = FastAPI(title="WS-1 LlamaIndex service", lifespan=lifespan)
 
 @app.get("/health")
 async def health():
-    """Cheap enough to poll during a run — does no model work."""
+    """Cheap enough to poll during a run — does no model work.
+
+    `/health` is answered by ONE worker, whichever the kernel hands the connection to, so it is
+    NOT a readiness gate on its own — poll it until `declared_workers` distinct `worker_pid`s
+    have been seen. That is what the driver does in external-service mode, where the warm lines
+    are inside a container and unreachable.
+
+    torch_threads/torch_interop are read from the LIVE worker for the same reason the warm line
+    reports them: torch caches its thread count at import, so the launch environment proves
+    nothing. In a container these are the only way to confirm `docker run -e` actually reached
+    the worker.
+    """
+    import torch as _t
     return {
         "status": "ok",
         "service": "llamaindex",
         "model_loaded": bool(_pipeline and _pipeline.is_warm),
         "worker_pid": os.getpid(),
+        "declared_workers": WORKERS,
+        "torch_threads": _t.get_num_threads(),
+        "torch_interop": _t.get_num_interop_threads(),
+        "thread_env": {k: os.environ.get(k) for k in
+                       ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
+                        "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS", "TORCH_NUM_THREADS")},
     }
 
 
