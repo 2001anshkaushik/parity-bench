@@ -526,7 +526,35 @@ because the smoke driver validates the corpus first and exits 2 on a short one.
 thread gate answered before the download finishes, run 12d now and come back. Earlier revisions
 of this file sequenced the gate first and the driver exited 2 if you followed it.
 
-### 12d. PREFLIGHT — prove thread propagation BEFORE any measured run
+### 12d. Copy `env_probe` into the engine container — required before the preflight
+
+The RocketRide thread read-back runs our `env_probe` node. The container ships **stock nodes
+only**, so without this the probe fails with
+`RuntimeError: Component work references a provider with no registered service definition`.
+
+```bash
+docker cp working/nodes/env_probe rr:/opt/rocketride/engine/nodes/
+docker restart rr
+until curl -sf http://127.0.0.1:5565/version >/dev/null; do sleep 3; done
+curl -s http://127.0.0.1:5565/version      # EXPECT 3.3.1.35
+```
+
+**This does not modify the image** — `docker cp` writes to the container's writable layer. It is
+also lost on `docker rm`, so re-copy after recreating the container.
+
+**The restart does NOT re-pay the constraints compile.** `depends.py:708-748` keys the cache on
+`_compute_hash(_find_requirement_files())`, and `_find_requirement_files()` globs only
+`requirement*.txt`, `nodes/**/requirement*.txt`, `ai/**/requirement*.txt`. **`env_probe` contains
+no requirements file at all** (`find working/nodes -name 'requirement*'` → 0), so the file set,
+sizes and mtimes are unchanged, `current_hash == stored_hash`, and `ensure_constraints()` returns
+at *"Constraints are up to date"*. Restart is seconds, not the 10–30 minute first boot.
+
+⚠️ **Only `env_probe`, and only for the probe.** The measured pipe is five stock providers
+(`webhook`, `parse`, `preprocessor_langchain`, `embedding_transformer`, `response_documents`) —
+canonical digest `f61165f7cf7ab1db…`, unchanged. Do not copy the other five custom nodes; they are
+not on the measured path and every one added is another `nodes/**` directory the engine scans.
+
+### 12e. PREFLIGHT — prove thread propagation BEFORE any measured run
 
 ```bash
 SMOKE_EXTERNAL=1 SMOKE_PREFLIGHT=1 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_PORT=8801 \
@@ -546,7 +574,7 @@ caches its thread count at import, so a variable set after import has no effect 
 arm reports anything other than intra=1, **stop** — cost numbers from mismatched arms are not
 comparable, and nothing downstream would say so.
 
-### 12e. The 200-document smoke
+### 12f. The 200-document smoke
 
 ```bash
 SMOKE_EXTERNAL=1 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_BLAST_C=32 \
@@ -560,7 +588,7 @@ launch a second LlamaIndex on 8801 and the run would measure whichever process w
 the `start_engine.sh` idempotency trap in a new place. In external mode an unreachable arm is a
 hard failure with a named reason, never a silent fallback.
 
-### 12f. Tika reference — the engine tarball must also be on the HOST
+### 12g. Tika reference — the engine tarball must also be on the HOST
 
 The independent-reference check shells out to the engine's OWN Tika, from
 `engine/java/jre/bin/java` + `engine/java/lib` + `engine/java/tika-config.xml`. In Docker mode
@@ -582,7 +610,7 @@ reference is the engine's own Tika 3.2.3 with the engine's own config.
 
 Set `SMOKE_REQUIRE_TIKA=1` to make a missing reference fatal instead of reported.
 
-### 12g. Ship it
+### 12h. Ship it
 
 ```bash
 bash working/scripts/exfil_s3.sh working/results logs/smoke200.log
