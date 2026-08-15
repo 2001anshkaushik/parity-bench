@@ -20,6 +20,7 @@ from __future__ import annotations
 import os
 import time
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -41,6 +42,21 @@ WORKERS = int(os.environ.get("WS1_WORKERS", "1"))
 _pipeline: LlamaIndexPipeline | None = None
 _cfg: ServiceConfig | None = None
 _lib_versions: dict = {}
+
+# Where each worker records that it finished lifespan startup. See the note at the write site.
+WARM_ROOT = Path(os.environ.get("WS1_WARM_DIR", "/tmp/ws1_warm"))
+
+
+def _warm_dir() -> Path:
+    """Per-supervisor marker directory: /tmp/ws1_warm/<uvicorn supervisor pid>/."""
+    return WARM_ROOT / str(os.getppid())
+
+
+def _warm_count() -> int:
+    try:
+        return sum(1 for _ in _warm_dir().iterdir())
+    except OSError:
+        return 0
 
 
 def _library_versions() -> dict:
@@ -105,6 +121,21 @@ async def lifespan(app: FastAPI):
     # with: torch caches its thread count at import, so an exported variable proves nothing. Thread
     # count is the largest single lever measured in this project (3.07x at concurrency 1), so an
     # arm-to-arm comparison that does not read this from the live worker is not matched.
+    # AGGREGATE readiness marker. A caller outside the container cannot count 'warm in' log lines,
+    # and polling /health until N distinct worker_pids appear does NOT work: uvicorn workers share
+    # one listening socket and the kernel's accept bias can route almost every short-lived
+    # connection to the same worker, so the poll can run for its whole timeout having seen two or
+    # three PIDs. Each worker instead drops a marker file, and any worker can count them — one
+    # request then answers "how many workers are warm" exactly.
+    #
+    # Keyed by getppid() (the uvicorn supervisor, shared by all workers of THIS run and different
+    # after a restart) so a stale marker from a previous container cannot inflate the count.
+    try:
+        _warm_dir().mkdir(parents=True, exist_ok=True)
+        (_warm_dir() / str(os.getpid())).write_text(str(warm_s))
+    except OSError as e:
+        print(f"[ws1] WARNING: could not write warm marker: {e}", flush=True)
+
     import torch as _t
     print(f"[ws1] worker {os.getpid()} warm in {warm_s:.1f}s "
           f"(splitter={_pipeline.splitter_name}, mode={SPLITTER_MODE}, "
@@ -121,10 +152,11 @@ app = FastAPI(title="WS-1 LlamaIndex service", lifespan=lifespan)
 async def health():
     """Cheap enough to poll during a run — does no model work.
 
-    `/health` is answered by ONE worker, whichever the kernel hands the connection to, so it is
-    NOT a readiness gate on its own — poll it until `declared_workers` distinct `worker_pid`s
-    have been seen. That is what the driver does in external-service mode, where the warm lines
-    are inside a container and unreachable.
+    `warm_workers` is the readiness signal: an AGGREGATE count of workers that finished lifespan
+    startup, read from marker files, so ONE request answers it. Do NOT gate by polling until N
+    distinct `worker_pid`s appear — uvicorn workers share a listening socket and the kernel's
+    accept bias can send nearly every short-lived connection to the same worker, so that poll can
+    spin for its entire timeout having seen a handful of PIDs on a fully warm service.
 
     torch_threads/torch_interop are read from the LIVE worker for the same reason the warm line
     reports them: torch caches its thread count at import, so the launch environment proves
@@ -138,6 +170,7 @@ async def health():
         "model_loaded": bool(_pipeline and _pipeline.is_warm),
         "worker_pid": os.getpid(),
         "declared_workers": WORKERS,
+        "warm_workers": _warm_count(),
         "torch_threads": _t.get_num_threads(),
         "torch_interop": _t.get_num_interop_threads(),
         "thread_env": {k: os.environ.get(k) for k in

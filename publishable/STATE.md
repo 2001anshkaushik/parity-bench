@@ -547,6 +547,42 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 23 — defect #21: readiness by PID sampling; and a gate that reported 0 FAIL without running (2026-08-15)
+
+**#21 — `wait_external` could not finish against a healthy container.** It polled `/health` until
+`want_workers` DISTINCT `worker_pid`s had been seen. That is not a container-boundary problem —
+the PIDs only need to be distinct, not host-resolvable — it is a **sampling** problem: uvicorn
+workers share one listening socket, and the kernel's accept bias for short-lived connections is
+strongly non-uniform, so a fully warm 32-worker service can return the same two or three PIDs
+indefinitely. Coupon-collector against a sampler that may never emit most coupons. The 900 s
+default timeout with no progress output completed the illusion of a hang.
+**Correct signal: an aggregate the service computes itself.** Each worker writes a marker file at
+the end of lifespan startup, keyed by `getppid()` (the uvicorn supervisor, shared by that run's
+workers, different after a restart, so stale markers cannot inflate it); `/health` returns
+`warm_workers`. One request answers it. Verified: log line count 4 == `warm_workers` 4. Timeout
+now 300 s with a progress line, and an image lacking the field is a named error, not a hang.
+Note the thread read-back in external mode is **one sampled worker, not a census** — same accept
+bias — and is now labelled that way in the output.
+
+**A gate that printed `0 FAIL` having run on zero documents.** The Tika independent-reference
+check needs `engine/java/jre/bin/java`, which Docker mode never extracts; the run printed
+`UNAVAILABLE` once and then reported `independent-reference hash: 0 FAIL`. A second, distinct
+fail-open existed on the LlamaIndex arm: if a response omitted `extracted_text` the document was
+skipped with no trace. Both now record `not_run:<reason>` per document, and the verdict prints
+**coverage with its denominator** — `NOT RUN (0/198 covered)` or `N FAIL over C/198 covered`,
+flagging partial coverage. Adopted from Leela's `ground_truth_match`: zero coverage is a vacuous
+result, not a pass.
+**On whether a missing gate dependency should be fatal:** for a *gate*, yes — census, structure
+and determinism already hard-fail. This particular check is **advisory by design**
+(`tika_reference.py` docstring: standalone Tika disagrees with the engine's in-process Tika on
+some glyphs; as a hard gate it produced 4 false failures in 5 on a 50-doc run), so the default is
+loud-and-recorded rather than fatal, with `SMOKE_REQUIRE_TIKA=1` to make it fatal. The silence was
+the bug; the fatality is a per-check judgement.
+
+**Ordering:** `RUN_ON_EC2.md` §12 put the thread gate before the corpus fetch, but the driver
+validated the corpus first and exited 2. Preflight sends no documents, so it no longer requires a
+corpus at all, and the runbook now fetches the corpus first regardless.
+
 ### SESSION 22 — instrument defect #20: the model bake never covered the runtime loader (2026-08-15)
 
 The x86-64 LlamaIndex container failed at startup, every uvicorn worker, with

@@ -79,38 +79,62 @@ def h(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
-def wait_external(port: int, want_workers: int, timeout: float = 900.0) -> list[dict]:
+def wait_external(port: int, want_workers: int, timeout: float = 300.0) -> list[dict]:
     """Readiness for an already-running LlamaIndex container, on loopback.
 
-    `/health` is answered by ONE worker per connection, so a single 200 proves nothing — this
-    polls until `want_workers` DISTINCT worker_pids have each reported model_loaded. That is the
-    external-mode equivalent of counting 'warm in' lines, which live inside the container.
+    Gates on `/health`'s **aggregate** `warm_workers` count, which the service derives from one
+    marker file per worker. One request answers it.
+
+    It previously polled until `want_workers` DISTINCT `worker_pid`s had been seen, and that was
+    wrong — not because of the container boundary (the PIDs only need to be distinct, not
+    host-resolvable) but because uvicorn's workers share a single listening socket. Which worker
+    accepts a connection is the kernel's choice, and its bias for short-lived connections is
+    strongly non-uniform: a fully warm 32-worker service can return the same two or three PIDs for
+    thousands of requests. Collecting all 32 is a coupon-collector problem against a sampler that
+    may never emit most of the coupons, so the poll ran to its timeout on a healthy service.
 
     Raises on timeout. It must never fall back to starting a local service: two services on one
     port means the run measures whichever one answered, and nothing in the output would say so.
     """
     import urllib.error
     import urllib.request
-    seen: dict[int, dict] = {}
     t0 = time.perf_counter()
     last_err = None
-    while time.perf_counter() - t0 < timeout:
+    last_seen = -1
+    next_note = 15.0
+    while True:
+        elapsed = time.perf_counter() - t0
         try:
             with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=10) as r:
                 h = json.loads(r.read().decode())
-            if h.get("model_loaded"):
-                seen[h["worker_pid"]] = h
-            if len(seen) >= want_workers:
-                return list(seen.values())
+            if "warm_workers" not in h:
+                raise RuntimeError(
+                    f"/health on 127.0.0.1:{port} has no `warm_workers` field. That field is the "
+                    "readiness signal in external mode; without it the driver cannot tell a "
+                    "half-warm service from a ready one. The container is running an image built "
+                    "before this field existed — rebuild it.")
+            warm = h["warm_workers"]
+            if warm != last_seen:
+                say(f"  readiness: {warm}/{want_workers} workers warm ({elapsed:.0f}s)")
+                last_seen = warm
+            if warm >= want_workers:
+                return [h]
         except (urllib.error.URLError, OSError, ValueError) as e:
             last_err = f"{type(e).__name__}: {str(e)[:120]}"
-        time.sleep(0.25)
+        if elapsed >= timeout:
+            break
+        if elapsed >= next_note:
+            say(f"  ... still waiting ({elapsed:.0f}/{timeout:.0f}s)"
+                + (f", last error {last_err}" if last_err else ""))
+            next_note = elapsed + 15.0
+        time.sleep(0.5)
     raise RuntimeError(
-        f"LlamaIndex service NOT READY on 127.0.0.1:{port} after {timeout:.0f}s — saw "
-        f"{len(seen)}/{want_workers} distinct warm workers"
+        f"LlamaIndex service NOT READY on 127.0.0.1:{port} after {timeout:.0f}s — "
+        f"warm_workers={last_seen if last_seen >= 0 else 'unknown'}, wanted {want_workers}"
         + (f" (last error {last_err})" if last_err else "")
-        + ". SMOKE_EXTERNAL is set, so the driver will NOT start one. Start the container "
-          "and re-run.")
+        + f". Check `docker logs <container> | grep -c 'warm in'` — if that is already "
+          f"{want_workers}, the service is warm and the mismatch is in SMOKE_WORKERS. "
+          "SMOKE_EXTERNAL is set, so the driver will NOT start a service.")
 
 
 def check_engine(url: str) -> dict:
@@ -173,8 +197,12 @@ def main() -> int:
 
     N = int(sys.argv[1]) if len(sys.argv) > 1 else 50
     pdfs = sorted((ROOT / "corpus" / "govdocs1" / "pdfs").glob(CORPUS_GLOB))[:N]
-    say(f"documents: {len(pdfs)}  (offered = {len(pdfs)})  glob={CORPUS_GLOB}")
-    if len(pdfs) < N:
+    say(f"documents: {len(pdfs)}  (offered = {len(pdfs)})  glob={CORPUS_GLOB}"
+        + ("   [PREFLIGHT: not required]" if PREFLIGHT else ""))
+    # PREFLIGHT sends no documents — it proves thread propagation and exits. Requiring a corpus
+    # for it forced the runbook to fetch ~350 MB before it could check a thread pin, and the
+    # driver exited 2 if you followed the documented order.
+    if len(pdfs) < N and not PREFLIGHT:
         say(f"!! only {len(pdfs)} PDFs match — asked for {N}. Refusing: a short corpus makes the "
             "census gate compare against the wrong denominator.")
         return 2
@@ -192,6 +220,18 @@ def main() -> int:
     say(f"corpus sha256 (ordered name:sha list over {len(pdfs)} docs) = {corpus_sha[:16]}")
     ok_tika, why = tika_ok()
     say(f"tika reference: {'available' if ok_tika else 'UNAVAILABLE — ' + why}")
+    # A dependency-missing check must not be able to read as a clean result. This one is
+    # ADVISORY by design (tika_reference.py's own docstring: standalone Tika disagrees with the
+    # engine's in-process Tika on some glyphs, so as a hard gate it produced 4 false failures in
+    # 5 on a 50-doc run), so a missing JRE is not automatically fatal — but it is never silent,
+    # and SMOKE_REQUIRE_TIKA=1 makes it fatal for runs that depend on it.
+    if not ok_tika:
+        say("!! the independent-reference check will NOT RUN on the RocketRide arm. Its column "
+            "will read NOT RUN, never '0 FAIL'. Fix: extract the engine tarball so "
+            "engine/java/jre/bin/java exists (TikaExtract.class is already committed).")
+        if os.environ.get("SMOKE_REQUIRE_TIKA", "") not in ("", "0", "false", "False"):
+            say("SMOKE_REQUIRE_TIKA is set — refusing to run without the reference.")
+            return 5
 
     say(f"service: workers={WORKERS} threads={THREADS} blast_concurrency={BLAST_C} "
         f"mode={'EXTERNAL (containers on loopback)' if EXTERNAL else 'driver-managed'}")
@@ -201,8 +241,11 @@ def main() -> int:
         health = wait_external(PORT, WORKERS)
         thr = sorted({(h["torch_threads"], h["torch_interop"]) for h in health})
         li_thread_env = health[0].get("thread_env", {})
-        say(f"llamaindex: {len(health)} distinct warm workers on :{PORT}, "
-            f"torch(intra,interop)={thr}")
+        # The thread read-back comes from whichever worker answered. It is one sample, not all
+        # 32 — the accept bias that broke PID collection makes "poll until you have seen them
+        # all" unavailable here too. Recorded as such rather than implied to be a census.
+        say(f"llamaindex: {health[0]['warm_workers']}/{WORKERS} workers warm on :{PORT}, "
+            f"torch(intra,interop)={thr} [sampled from 1 worker]")
         ver = check_engine(RR_VERSION_URL)
         say(f"engine: {RR_VERSION_URL} -> {json.dumps(ver.get('data', ver))[:120]}")
     else:
@@ -432,6 +475,14 @@ def main() -> int:
                     except ChunkHashMismatch as e:
                         rec["independent_hash"] = f"FAIL: {e}"
                     rec["extracted_chars"] = len(src)
+                else:
+                    # Second fail-open path, distinct from the missing JRE: on the LlamaIndex arm
+                    # the reference is the service's own `extracted_text`, and if a response
+                    # omits it the doc was silently skipped by the check with no trace. Name it
+                    # per document so coverage is countable instead of assumed.
+                    rec["independent_hash"] = ("not_run: no tika reference" if not src and
+                                               not arm_name.startswith("llamaindex")
+                                               else "not_run: no extracted_text in response")
                 sus = [i for i, c in enumerate(chunks) if inspect(c)["suspect"]]
                 if sus:
                     rec["content_suspect_chunks"] = sus
@@ -595,13 +646,32 @@ def main() -> int:
             f"{'PASS' if not struct_fail else 'FAIL'}")
         say(f"  LEELA  determinism {len(det_fail)} drifted, {len(det_unproven)} unproven"
             f"            -> {'PASS' if not det_fail and not det_unproven else 'FAIL'}")
-        say(f"  OURS   independent-reference hash: {len(ind_fail)} FAIL")
+        # Coverage, not just failures. Leela's rule (m0_correctness.ground_truth_match): zero
+        # coverage is a vacuous result, not a pass. A "0 FAIL" printed by a check that never ran
+        # on a single document is the exact silent degradation this project keeps getting burned
+        # by, so the count and the denominator are always printed together.
+        n_ok = sum(1 for r in recs if r.get("outcome") == "successful")
+        covered = sum(1 for r in recs
+                      if str(r.get("independent_hash", "")).startswith(("pass", "FAIL")))
+        if covered == 0:
+            say(f"  OURS   independent-reference    : NOT RUN (0/{n_ok} successful docs covered)"
+                f" — advisory check, dependency missing")
+        else:
+            say(f"  OURS   independent-reference    : {len(ind_fail)} FAIL "
+                f"over {covered}/{n_ok} successful docs covered"
+                + ("  !! PARTIAL COVERAGE" if covered < n_ok else ""))
         say(f"  OURS   content-suspect documents : {len(sus)}")
         out["arms"][arm_name] = {"census": c, "census_ok": census_ok,
                                  "structure_failures": len(struct_fail),
                                  "determinism_failures": len(det_fail),
                                  "determinism_unproven": len(det_unproven),
                                  "independent_hash_failures": len(ind_fail),
+                                 "independent_reference": {
+                                     "available": ok_tika if not arm_name.startswith("llamaindex")
+                                     else None,
+                                     "unavailable_reason": None if ok_tika else why,
+                                     "covered": covered, "successful": n_ok,
+                                     "ran": covered > 0, "full_coverage": covered == n_ok},
                                  "content_suspect": len(sus), "records": recs}
 
     # ---------------- cross-arm, reported not gated ----------------

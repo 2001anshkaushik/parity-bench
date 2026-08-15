@@ -512,7 +512,21 @@ First engine boot is 10–30 min at near-zero CPU — §1a's keep-alive must alr
 curl -s http://127.0.0.1:5565/version     # EXPECT version 3.3.1.35, hash a0817cc6
 ```
 
-### 12c. PREFLIGHT — prove thread propagation BEFORE any measured run
+### 12c. Corpus — fetch it before the preflight
+
+```bash
+../.venv/bin/python working/scripts/fetch_govdocs.py 200          # = govdocs1 zip 000 exactly
+../.venv/bin/python working/scripts/verify_corpus_manifest.py --subset
+```
+
+Network-bound (~350 MB), so start it while the images build. It is listed before the preflight
+because the smoke driver validates the corpus first and exits 2 on a short one.
+
+**The preflight itself no longer needs a corpus** — it sends no documents — so if you want the
+thread gate answered before the download finishes, run 12d now and come back. Earlier revisions
+of this file sequenced the gate first and the driver exited 2 if you followed it.
+
+### 12d. PREFLIGHT — prove thread propagation BEFORE any measured run
 
 ```bash
 SMOKE_EXTERNAL=1 SMOKE_PREFLIGHT=1 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_PORT=8801 \
@@ -532,12 +546,9 @@ caches its thread count at import, so a variable set after import has no effect 
 arm reports anything other than intra=1, **stop** — cost numbers from mismatched arms are not
 comparable, and nothing downstream would say so.
 
-### 12d. Corpus, then the 200-document smoke
+### 12e. The 200-document smoke
 
 ```bash
-../.venv/bin/python working/scripts/fetch_govdocs.py 200          # = govdocs1 zip 000 exactly
-../.venv/bin/python working/scripts/verify_corpus_manifest.py --subset
-
 SMOKE_EXTERNAL=1 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_BLAST_C=32 \
 SMOKE_CORPUS_GLOB='000_*.pdf' SMOKE_PORT=8801 SMOKE_WARM_N=64 \
 RR_NODE_MARK='engine/ai/node.py' \
@@ -549,7 +560,29 @@ launch a second LlamaIndex on 8801 and the run would measure whichever process w
 the `start_engine.sh` idempotency trap in a new place. In external mode an unreachable arm is a
 hard failure with a named reason, never a silent fallback.
 
-### 12e. Ship it
+### 12f. Tika reference — the engine tarball must also be on the HOST
+
+The independent-reference check shells out to the engine's OWN Tika, from
+`engine/java/jre/bin/java` + `engine/java/lib` + `engine/java/tika-config.xml`. In Docker mode
+nothing extracts the tarball on the host, so those paths do not exist and the check silently did
+not run. Extract it host-side (§3 of the native plan, extract only — do not start it):
+
+```bash
+mkdir -p engine && cd engine
+curl -fsSL -o engine.tar.gz \
+  https://github.com/rocketride-org/rocketride-server/releases/download/server-v3.3.1/rocketride-server-v3.3.1-linux-x64.tar.gz
+echo "d8dad45bd084c65443ddb5907965ee1c8424f82fa5dcd5b11476ed66ce0281d8  engine.tar.gz" | sha256sum -c -
+tar -xzf engine.tar.gz && rm engine.tar.gz && cd ..
+ls engine/java/jre/bin/java engine/java/tika-config.xml working/tika/TikaExtract.class
+```
+
+`TikaExtract.class` is committed, so extraction is the only missing piece — the bundle ships a
+JRE with no `javac`, so nothing needs compiling on the box. Same tarball as the container, so the
+reference is the engine's own Tika 3.2.3 with the engine's own config.
+
+Set `SMOKE_REQUIRE_TIKA=1` to make a missing reference fatal instead of reported.
+
+### 12g. Ship it
 
 ```bash
 bash working/scripts/exfil_s3.sh working/results logs/smoke200.log
