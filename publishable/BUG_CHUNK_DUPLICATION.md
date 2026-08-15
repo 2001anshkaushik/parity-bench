@@ -1,5 +1,24 @@
 # BUG: pipeline emits every chunk twice for text payloads above ~239.8k characters
 
+> ## ✅ ROOT-CAUSED IN SOURCE 2026-08-15 — the trigger is CHUNK COUNT, not character count
+>
+> Shashi found the mechanism (`ENGINE-ISSUE-3.3.1-chunk-duplication-2026-08-15.md`, his
+> `c8b4b2b3`), crediting the empirical finding below. `nodes/embedding_transformer/IInstance.py`:
+> `writeDocuments()` returns `preventDefault()` on the buffer path but **not** on the flush path,
+> so once the buffer reaches `maxDocuments = 64` the node writes the batch downstream itself AND
+> the engine also forwards the original event — the same embedded `Doc` objects land twice.
+>
+> **The predicate is `>= 64 chunks`.** Our "~239,800 characters" was a proxy for it: 64 chunks ×
+> ~3,750 chars ≈ 240k. **Every character-based figure below, including the "5.34 % of the corpus"
+> census, is therefore a proxy measurement and understates or overstates depending on a document's
+> chunk-length distribution.** Re-derive any corpus census on chunk count. The reproducer and the
+> observed behaviour are unaffected — only the stated trigger changes.
+>
+> Our `gates_shared.duplication_verdict()` now reports both `over_chunk_trigger` (>= 64 chunks, the
+> real predicate) and `over_char_proxy` (>= 239,800 chars, kept for continuity with earlier runs).
+
+
+
 **Engine `3.3.1.35` (hash `a0817cc6`) · SDK `rocketride` 1.3.0 · found 2026-08-13 · Ansh (WS-1)**
 
 **Severity: silent data duplication.** Every affected document's complete chunk list is returned

@@ -200,6 +200,7 @@ def structure_check(chunks, vecs, dim: int = EMB_DIM) -> list[str]:
 def main() -> int:
     from harness import ws1_service as ws
     from harness import metrics_shared as ms
+    from harness import gates_shared as gs
     from harness.chunk_hash import check_chunks, ChunkHashMismatch
     from harness.collector_proc import ProcessCollector
     from harness.content_sanity import inspect
@@ -322,6 +323,10 @@ def main() -> int:
             txt = self.path.read_text() if self.path.exists() else ""
             return ms.series_from_role_ticks(txt, "service", self.epoch_anchor)
 
+    # Kept per arm for the gate suites: they need the chunk TEXTS and VECTORS, which the
+    # verdict loop runs long after the per-doc loop has moved on.
+    chunk_texts_by_arm: dict[str, dict] = {}
+    vecs_by_arm: dict[str, dict] = {}
     cost_series: dict[str, list] = {}   # f"{arm}:{mode}" -> normalized series
     blast_rows: dict[str, list] = {}    # arm -> per-doc rows from the blast leg
     probed_dim: dict[str, int] = {}     # arm -> dim read off the arm's own loaded model
@@ -436,6 +441,7 @@ def main() -> int:
                 f"(from {pdfs[0].name}, excluded from the measured span)")
             recs = []
             chunk_texts: dict[str, list] = {}   # doc -> chunks, for post-loop gates
+            vecs_keep: dict[str, list] = {}      # doc -> vectors, for the gate suites
             li_src: dict[str, str] = {}         # doc -> service-returned extracted text (LI)
             span = CostSpan(arm_name, "sequential")
             with span:
@@ -473,6 +479,7 @@ def main() -> int:
                         # RocketRide. Teammates compute all gates post-hoc from records.
                         if rec["outcome"] == "successful":
                             chunk_texts[f.name] = chunks
+                            vecs_keep[f.name] = vecs
                             if arm_name.startswith("llamaindex"):
                                 li_src[f.name] = last.get("extracted_text")
                     except Exception as e:
@@ -510,8 +517,11 @@ def main() -> int:
                 sus = [i for i, c in enumerate(chunks) if inspect(c)["suspect"]]
                 if sus:
                     rec["content_suspect_chunks"] = sus
+            chunk_texts_by_arm[arm_name] = dict(chunk_texts)
+            vecs_by_arm[arm_name] = dict(vecs_keep)
             chunk_texts.clear()
             li_src.clear()
+            vecs_keep.clear()
             results[arm_name] = recs
             dump_jsonl(f"perdoc_{'li' if arm_name.startswith('llamaindex') else 'rr'}_sequential.jsonl", recs)
             say(f"  {arm_name}: {len(recs)} records")
@@ -701,6 +711,84 @@ def main() -> int:
                                      "covered": covered, "successful": n_ok,
                                      "ran": covered > 0, "full_coverage": covered == n_ok},
                                  "content_suspect": len(sus), "records": recs}
+
+    # ---------------- THREE VERDICTS: Shashi's gates, Leela's, and the union ----------
+    # Same records, three readings. Neither teammate should have to re-derive ours, and
+    # where their definitions genuinely conflict both are computed and labelled rather
+    # than one being chosen. Gate logic lives in harness/gates_shared.py with the
+    # file:line it was adopted from; nothing here touches metrics_shared.py.
+    say("\n" + "=" * 96)
+    say("CORRECTNESS — three verdicts over identical records")
+    out["gate_verdicts"] = {}
+    for arm_name, recs in results.items():
+        arm_key = "lg" if arm_name.startswith("llamaindex") else "rr"
+        gate_rows, seen_names, zero_chunk = [], [], []
+        for r in recs:
+            chunks = chunk_texts_by_arm.get(arm_name, {}).get(r["doc"])
+            vecs = vecs_by_arm.get(arm_name, {}).get(r["doc"])
+            row = {"doc": r["doc"], "ok": r.get("outcome") == "successful",
+                   "identity_ok": r.get("returned_doc_id") is not None
+                   or arm_key == "rr",
+                   "sha_header_ok": True,
+                   "reason": r.get("error_class")}
+            if chunks is not None and vecs is not None:
+                row.update(gs.check_document(chunks, vecs, probed_dim[arm_name]))
+            else:
+                row.update(n_chunks=r.get("n_chunks"),
+                           chunk_sha256=r.get("chunk_sha256"),
+                           vector_dim=probed_dim[arm_name], vectors_finite=True)
+            gate_rows.append(row)
+            seen_names.append(r["doc"])
+            if row.get("n_chunks") == 0:
+                zero_chunk.append(r["doc"])
+
+        blast_rowset = [{"doc": b["doc"], "ok": bool(b.get("ok")),
+                         "chunk_sha256": b.get("chunk_sha256")}
+                        for b in blast_rows.get(arm_name, [])]
+        seq_digests = {r["doc"]: r.get("chunk_sha256") for r in gate_rows if r["ok"]}
+        blast_digests = {b["doc"]: b.get("chunk_sha256") for b in blast_rowset if b["ok"]}
+
+        leela_checks = {
+            "census": gs.leela_census(gate_rows, len(pdfs)),
+            "structure": gs.leela_structure(gate_rows, arm_key, probed_dim[arm_name]),
+            "determinism": gs.leela_determinism(gate_rows, blast_rowset),
+        }
+        shashi_checks = {
+            "census": gs.shashi_census([p.name for p in pdfs], seen_names,
+                                       zero_chunk_names=zero_chunk),
+            "structure": gs.shashi_structure(gate_rows, probed_dim[arm_name]),
+            "determinism": gs.shashi_determinism(seq_digests, blast_digests,
+                                                 "sequential", "blast"),
+        }
+        v = gs.three_verdicts(shashi_checks, leela_checks)
+        out["gate_verdicts"][arm_name] = v
+        say(f"{arm_name}")
+        for suite in ("shashi", "leela", "union"):
+            marks = ""
+            if suite != "union":
+                marks = "  " + " ".join(
+                    f"{k}={'PASS' if x.get('PASS') else 'FAIL'}"
+                    for k, x in v[suite]["checks"].items())
+            say(f"  {suite.upper():7} {'PASS' if v[suite]['PASS'] else 'FAIL'}{marks}")
+
+    # Cross-arm gates that only exist once, not per arm (Shashi bench.py:337,356,431).
+    li_s = out["gate_verdicts"]["llamaindex_http_pdf"]["shashi"]["checks"]["structure"]
+    rr_s = out["gate_verdicts"]["rocketride_pdf"]["shashi"]["checks"]["structure"]
+    li_chunks = sum(r.get("n_chunks") or 0 for r in results["llamaindex_http_pdf"])
+    rr_chunks = sum(r.get("n_chunks") or 0 for r in results["rocketride_pdf"])
+    cross = {
+        "workload_ratio_rr_over_li": gs.workload_ratio_gate(rr_chunks, li_chunks),
+        "normalization_parity": gs.normalization_parity(rr_s, li_s),
+        "chunk_config_parity": gs.chunk_config_parity(
+            (4000, 200), (4000, 200)),   # both arms configured from the same measured pair
+    }
+    cross["PASS"] = gs.gate_verdict(*cross.values())
+    out["gate_verdicts"]["cross_arm"] = cross
+    say("CROSS-ARM (Shashi's, load-bearing for him)")
+    for k, x in cross.items():
+        if k != "PASS":
+            say(f"  {k:26} {'PASS' if x.get('PASS') else 'FAIL'}"
+                + (f"  ratio={x.get('ratio')}" if "ratio" in x else ""))
 
     # ---------------- cross-arm, reported not gated ----------------
     li = {r["doc"]: r for r in results["llamaindex_http_pdf"]}

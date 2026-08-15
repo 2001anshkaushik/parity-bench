@@ -547,6 +547,53 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 27 — correctness-gate parity: both dialects adopted, three verdicts (2026-08-15)
+
+Fresh clones: **Shashi `c8b4b2b3`** (moved from `70259e4`), **Leela `2cc0ccad`** (unchanged since
+session 24). Shashi's new commit root-causes BUG_CHUNK_DUPLICATION — see the correction below.
+
+**Which gates are LOAD-BEARING, from the code, not from prose:**
+
+| | load-bearing (can fail a run) | defined but cannot fail anything |
+| --- | --- | --- |
+| **Leela** | census, structure, determinism — `gate_verdict()` → `m0_PASS` → `overall_PASS` → `sys.exit(1)` (`smoke2_report.py:46,117,142`) | **`ground_truth_match()` and `parity_fixture()` have ZERO call sites** in any report or runner |
+| **Shashi** | every gate is a bare `assert` in `bench.py`: both arms produced chunks (:333-334), chunk-config parity (:337), workload ratio 0.4–2.5 (:356), multi-process serving (:370), census present+ok (:389-390), structure present + `docs_checked>0` + `norm_ok` (:399-403), **duplication present+ok (:413-414)**, structure ok (:431), determinism ok (:800) | near-duplicate band (logged), `workload_asymmetry` 0.8–1.25 (warn), `threads_activated`, `emb_model_source` |
+
+So Shashi's suite is strictly larger, and `parity_fixture` — which the ask listed as one of theirs —
+is **not** load-bearing for Leela today. Adopted anyway, labelled accurately.
+
+**Adopted** into `working/harness/gates_shared.py`, every function citing its source file:line:
+Leela's `gate_verdict` (PASS is True exactly), per-arm `REQUIRED_TRUE`, `leela_census`,
+`leela_structure`, `leela_determinism`, `parity_fixture`; Shashi's `repeat_factor`,
+`duplication_verdict`, the identical-vector check (`vectors_not_distinct`), `shashi_census`,
+`shashi_structure` (with the `docs_checked>0` vacuous-coverage refusal), `shashi_determinism`,
+plus the three cross-arm gates step 2 turned up that we did not have: **workload-ratio hard band,
+chunk-config parity, normalization parity**. 60 unit tests, each gate mutation-tested (break the
+defect it catches, confirm FAIL). `metrics_shared.py` untouched.
+
+**Two genuine conflicts, both implemented and labelled, neither chosen:**
+1. **Determinism asymmetry.** Shashi compares the intersection only and is silent on
+   `only_in_a`/`only_in_b` (`correctness.py:440-469`) — correct for him, his blast phase is `n` and
+   sequential is `seq_n`. Leela FAILS on asymmetry (`m0_correctness.py:150-158`) — correct for her,
+   both passes are the same corpus. Ours runs the same corpus both ways, so Leela's is the stricter
+   and more apt reading, but both are computed and reported.
+2. **Census shape.** Shashi keys on document NAMES (duplicates/missing/unexpected/non-allowlisted
+   empty); Leela keys on offered COUNT (records==offered, no dup, no unexpected failures, manifest
+   check). Different denominators, both computed.
+   *Not* a conflict, checked: both use `NORM_TOL = 1e-3` absolute per vector and 384 dims.
+
+**Output**: the smoke now prints `SHASHI / LEELA / UNION` per arm plus Shashi's cross-arm block, and
+writes `gate_verdicts` to the result JSON with every component verdict kept. Union is the
+conjunction. Nobody has to re-derive ours and nothing is hidden behind a single boolean.
+
+> **CORRECTION — BUG_CHUNK_DUPLICATION trigger.** Shashi root-caused it:
+> `embedding_transformer/IInstance.py` `writeDocuments()` omits `preventDefault()` on the flush
+> path, so at `maxDocuments = 64` the node writes the batch downstream AND the engine forwards the
+> original event. **The predicate is `>= 64 chunks`, not `~239,800 characters`** — ours was a proxy
+> (64 × ~3,750). **The "5.34 % of the corpus" census is therefore a proxy figure and must be
+> re-derived on chunk count.** Banner added to `BUG_CHUNK_DUPLICATION.md`; the verdict now reports
+> both `over_chunk_trigger` and `over_char_proxy`.
+
 ### SESSION 26 — the thread probe needed torch in its own task process (2026-08-15)
 
 Box result: `env_probe` reaches the engine, pid 66, **all six thread vars = "1"**, `os_cpu_count`
