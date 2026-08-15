@@ -143,4 +143,11 @@ ENV WS1_WORKERS=32 \
 
 # sh -c + exec: exec form cannot expand ${WS1_WORKERS}; `exec` keeps uvicorn as PID 1 so SIGTERM
 # reaches it and workers shut down cleanly instead of being killed at the 10 s timeout.
-ENTRYPOINT ["sh", "-c", "exec python -m uvicorn ws1.service:app --host 0.0.0.0 --port 8801 --workers ${WS1_WORKERS:-32} --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30"]
+#
+# The `rm -rf` is the readiness markers. `docker start` reuses the writable layer AND restarts the
+# PID namespace at 1, so without this the previous run's markers survive under a supervisor key
+# that the new run can collide with, and warm_workers counts both runs (observed: 33 of 32).
+# Clearing here is race-free — it happens before any worker exists. The service also keys markers
+# by supervisor start time, and the driver refuses warm_workers > declared_workers; this is the
+# cheapest of the three and stops the directory growing without bound.
+ENTRYPOINT ["sh", "-c", "rm -rf /tmp/ws1_warm; exec python -m uvicorn ws1.service:app --host 0.0.0.0 --port 8801 --workers ${WS1_WORKERS:-32} --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30"]

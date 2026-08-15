@@ -114,6 +114,19 @@ def wait_external(port: int, want_workers: int, timeout: float = 300.0) -> list[
                     "half-warm service from a ready one. The container is running an image built "
                     "before this field existed — rebuild it.")
             warm = h["warm_workers"]
+            declared = h.get("declared_workers")
+            # HARD ERROR, not a pass. A census above the population means the marker set is
+            # contaminated (stale files from a previous `docker start`, seen as 33 of 32), and a
+            # contaminated count can satisfy `warm >= want` while real workers are still loading —
+            # the run would then measure a partially warm service and say nothing. Same class as
+            # cpu_utilization > 1.0: an impossible reading is a defect, not a datum.
+            if declared is not None and warm > declared:
+                raise RuntimeError(
+                    f"/health reports warm_workers={warm} > declared_workers={declared} "
+                    f"(warm_key={h.get('warm_key')}). The readiness count is contaminated by "
+                    "markers from a previous supervisor, so it cannot prove the service is warm. "
+                    "Recreate the container (`docker rm -f` then `docker run`) or clear "
+                    "/tmp/ws1_warm inside it, and re-run. Refusing to measure.")
             if warm != last_seen:
                 say(f"  readiness: {warm}/{want_workers} workers warm ({elapsed:.0f}s)")
                 last_seen = warm

@@ -97,6 +97,17 @@ def resolve(strict: bool = False) -> dict:
 
     uri = os.environ["ROCKETRIDE_URI"]
     out["loopback"] = any(h in uri for h in LOOPBACK)
+    # Record the endpoint the client ACTUALLY connects to, not just the string we fed it. The SDK
+    # normalises http(s)/bare host:port into ws(s)://host:port/task/service
+    # (connection.py:396-410), so `http://127.0.0.1:5565` and the `ws://127.0.0.1:5565/task/service`
+    # both engine images declare are the same endpoint. Recording only the input would make a
+    # cross-site manifest diff look like a divergence when there is none.
+    try:
+        from rocketride.mixins.connection import ConnectionMixin
+        out["ROCKETRIDE_URI"]["resolved_websocket"] = ConnectionMixin._get_websocket_uri(
+            uri, "/task/service")
+    except Exception as e:
+        out["ROCKETRIDE_URI"]["resolved_websocket"] = f"unresolved: {type(e).__name__}"
     if strict and not out["loopback"]:
         raise RuntimeError(
             f"ROCKETRIDE_URI resolved to {uri!r}, which is not loopback. Refusing: the SDK's "

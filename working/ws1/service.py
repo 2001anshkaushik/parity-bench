@@ -47,9 +47,29 @@ _lib_versions: dict = {}
 WARM_ROOT = Path(os.environ.get("WS1_WARM_DIR", "/tmp/ws1_warm"))
 
 
+def _supervisor_key() -> str:
+    """Identity of THIS uvicorn supervisor: pid + its start time.
+
+    The pid alone is NOT unique. Inside a container the PID namespace restarts at 1 on every
+    `docker start`, so the supervisor is handed the same low pid it had last time, the previous
+    run's marker directory is reused, and the count becomes the UNION of two runs' workers —
+    observed as warm_workers=33 against declared_workers=32 on a restarted container. Start time
+    disambiguates, because the kernel keeps running across a container restart.
+    """
+    ppid = os.getppid()
+    try:
+        import psutil
+        return f"{ppid}-{int(psutil.Process(ppid).create_time() * 1e6)}"
+    except Exception:
+        try:                                    # Linux fallback: field 22 of /proc/<pid>/stat
+            fields = Path(f"/proc/{ppid}/stat").read_bytes().split(b")")[-1].split()
+            return f"{ppid}-{int(fields[19])}"
+        except Exception:
+            return str(ppid)                    # last resort; the >declared guard still catches it
+
+
 def _warm_dir() -> Path:
-    """Per-supervisor marker directory: /tmp/ws1_warm/<uvicorn supervisor pid>/."""
-    return WARM_ROOT / str(os.getppid())
+    return WARM_ROOT / _supervisor_key()
 
 
 def _warm_count() -> int:
@@ -128,8 +148,9 @@ async def lifespan(app: FastAPI):
     # three PIDs. Each worker instead drops a marker file, and any worker can count them — one
     # request then answers "how many workers are warm" exactly.
     #
-    # Keyed by getppid() (the uvicorn supervisor, shared by all workers of THIS run and different
-    # after a restart) so a stale marker from a previous container cannot inflate the count.
+    # Keyed by _supervisor_key() — pid AND start time. Keying on pid alone was wrong: a container
+    # PID namespace restarts at 1, so `docker start` reuses the previous supervisor's pid and its
+    # marker directory, and the count becomes the union of both runs (seen: 33 of a declared 32).
     try:
         _warm_dir().mkdir(parents=True, exist_ok=True)
         (_warm_dir() / str(os.getpid())).write_text(str(warm_s))
@@ -171,6 +192,11 @@ async def health():
         "worker_pid": os.getpid(),
         "declared_workers": WORKERS,
         "warm_workers": _warm_count(),
+        # A census cannot exceed the population. If it does, the marker set is contaminated and
+        # the count is not a readiness signal at all — it can report ready while real workers are
+        # still loading. Surfaced here and refused by the driver; never clamped.
+        "warm_count_valid": _warm_count() <= WORKERS,
+        "warm_key": _supervisor_key(),
         "torch_threads": _t.get_num_threads(),
         "torch_interop": _t.get_num_interop_threads(),
         "thread_env": {k: os.environ.get(k) for k in

@@ -547,6 +547,42 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 25 — defect #23: the readiness counter over-counted after `docker start` (2026-08-15)
+
+`/health` reported `warm_workers=33` against `declared_workers=32` on a restarted container.
+
+**My keying was wrong, and wrong in the environment it was written for.** I keyed the marker
+directory on `getppid()` and claimed it would differ after a restart. Inside a container the **PID
+namespace restarts at 1**, so `docker start` hands the uvicorn supervisor the same low pid it had
+before, the previous run's marker directory is reused, and the count becomes the UNION of two
+runs' workers. The reasoning assumed host-like pid churn; containers are the opposite.
+
+**Direction of the error is the dangerous one.** Over-counting means `warm >= want` can be
+satisfied while real workers are still loading, so the run measures a partially warm service and
+nothing in the output says so.
+
+**Fixed three ways, deliberately redundant:**
+1. Key is now `pid-<supervisor start time>` (`psutil.Process(ppid).create_time()`, `/proc` field 22
+   fallback). Start time survives a PID-namespace reset because the kernel keeps running.
+2. The image entrypoint does `rm -rf /tmp/ws1_warm` before `exec uvicorn` — race-free, before any
+   worker exists, and stops the directory growing without bound.
+3. **`warm_workers > declared_workers` is a HARD ERROR**, in the service (`warm_count_valid`) and
+   in the driver, which refuses to measure. Yes it should be: a census cannot exceed its
+   population, so the reading is not a datum but a defect — the same call Leela makes on
+   `cpu_utilization > 1.0` (`m7_resources.py:131-135`) and Shashi on `threads_activated` when
+   peak < baseline (`metrics.py:79-80`). Never clamped.
+
+[Verified: two sequential runs with markers deliberately left on disk produce distinct keys and
+`warm=2 declared=2 valid=True` each; a stubbed 33/32 is refused with a named error; a clean 32/32
+still passes immediately. **Not reproduced locally:** the pid *collision* itself — that needs a
+container PID namespace, and it is exactly what the start-time component addresses.]
+
+**Minor, resolved:** the manifest recorded `http://127.0.0.1:5565` while both images declare
+`ws://127.0.0.1:5565/task/service`. Not a divergence — the SDK normalises http(s)/bare host:port to
+`ws(s)://host:port/task/service` (`connection.py:396-410`), confirmed by resolving it. The manifest
+now records `resolved_websocket` alongside the input, so a cross-site diff cannot read the two
+spellings as a mismatch.
+
 ### SESSION 24 — defect #22: RocketRide credentials came from a gitignored file (2026-08-15)
 
 The thread gate failed on the RocketRide arm with `AuthenticationException: No authorization
