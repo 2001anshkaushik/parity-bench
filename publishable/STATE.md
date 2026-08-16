@@ -547,6 +547,60 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 30 — defect #26: peakRSS was a SUM of per-process RSS (2026-08-16)
+
+**Do not quote `peakRSS` from any run before this session.** The box reported LlamaIndex peak
+memory as **34,411.8 MB** while `docker stats` on the same container showed **20.06 GiB** and the
+a-priori estimate was ~580 MB × 32 ≈ 18.6 GB. The harness was the outlier and the harness was
+wrong.
+
+**What it measured [VERIFIED from code].** `collector.py:360` `rss += snap.rss` over every process
+in the tree; `:378` `peak_rss = max(peak_rss, rss)`. So it is **the peak of a SUM of per-process
+RSS**, and `psutil.memory_info().rss` counts a resident page in full for *every* process mapping
+it. The 32 uvicorn workers fork after loading torch and the model, so those pages are shared
+copy-on-write and were counted 33 times. **A summed RSS is a footprint multiplied by an unknown
+sharing factor, not a footprint.**
+
+**We had no deduplicated cross-check at all.** `want_uss` defaults False (`collector.py:218`) and
+`collector_proc.py` never set it, so USS was never collected and PSS was never implemented. Both
+now are — PSS is the only per-process figure that sums correctly (private + shared/n_mappers).
+
+**The bias is not a constant, which matters more than the absolute error.** It scales with the
+number of processes sharing pages: LlamaIndex forks 32 workers off one model (badly inflated);
+RocketRide runs engine parent + 1 task child with almost nothing shared (close to correct). **So a
+LlamaIndex-over-RocketRide memory ratio from summed RSS is wrong in a direction that scales with
+worker count** — the arms skew in opposite directions, which is exactly the pattern observed.
+
+**RocketRide's opposite skew is page cache, as suspected.** `docker stats` MemUsage is
+`memory.current − inactive_file` and therefore includes active page cache; a run that read 7.78 GB
+of PDF blocks fills it. That is why RR shows 6.5–7.5 GiB there against ~2.8 GB of anonymous
+memory. Page cache is reclaimable and is not the arm's footprint; cgroup `anon` excludes it.
+
+**Comparability — the answer to "which figure do we quote".** Leela reads cgroup `memory.stat anon`
+(`cgroup_sampler.py:55-62`, with the explicit note that `memory.current` includes page cache);
+Shashi reads the Docker API `memory_stats.stats.rss`, falling back to `usage − file`
+(`cstats.py:132-140`). **Both are cgroup-level and deduplicated** — the kernel charges a shared
+page to the cgroup once. **Our summed RSS is not comparable to either. Quote cgroup `anon`.**
+
+**Built:** `working/harness/memory_sources.py` reads the container's own cgroup from the host,
+resolving the path via `/proc/<pid>/cgroup` rather than guessing Docker's directory layout, and
+reports every figure named — `memory.peak` (kernel HWM, **unsampled**, so it cannot miss a spike
+between ticks, which answers Shashi's review point on our M5), `anon`, `file`, `current`, and a
+`docker_stats_equivalent` so a reader comparing against a screenshot knows which line they are
+looking at. The smoke prints a named memory table and writes `pinned.memory_sources`, including
+`sharing_factor_summed_over_anon` — the sum-over-anon ratio, which *is* the sharing factor made
+visible rather than hidden.
+
+Source hierarchy, best first: cgroup `memory.peak` (unsampled HWM) → cgroup `anon` (comparable to
+the teammates) → summed PSS (deduplicated but decimated every 20 ticks ≈ 10 s) → summed RSS
+(never quote).
+
+[Verified: USS/PSS plumbing proven end to end — a 33-sample collector run returns
+`peak_uss_bytes=36,585,472`. PSS is **Linux-only**: `hasattr(memory_full_info(), "pss")` is False
+on Darwin, so it reads `-` here and will populate on the box. The cgroup reader correctly reports
+unavailable on macOS rather than fabricating a number. **Not yet exercised on Linux** — the cgroup
+figures first appear on the next box run.]
+
 ### SESSION 29 — defect #25: the gate adapter contradicted the legacy path on identical records (2026-08-15)
 
 The box's 200-doc run at `525ea7d` produced two verdicts over ONE record set that disagreed:

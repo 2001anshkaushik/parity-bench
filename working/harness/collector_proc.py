@@ -49,6 +49,8 @@ def child_main(argv: list[str] | None = None) -> int:
     ap.add_argument("--discovery-interval", type=float, default=1.0)
     ap.add_argument("--ceiling-bytes", type=int, default=0)
     ap.add_argument("--enforce", action="store_true")
+    ap.add_argument("--want-uss", action="store_true",
+                    help="also collect USS and PSS (smaps; decimated). PSS is the\nonly per-process figure that sums correctly across forked workers.")
     ap.add_argument("--summary", required=True)
     ap.add_argument("--ready", required=True)
     args = ap.parse_args(argv)
@@ -60,6 +62,7 @@ def child_main(argv: list[str] | None = None) -> int:
         discovery_interval_s=args.discovery_interval,
         rss_ceiling_bytes=args.ceiling_bytes or None,
         enforce_ceiling=args.enforce,
+        want_uss=args.want_uss,
     )
 
     stopping = {"v": False}
@@ -101,6 +104,7 @@ class ProcessCollector:
         discovery_interval_s: float = 1.0,
         rss_ceiling_bytes: int | None = None,
         enforce_ceiling: bool = False,
+        want_uss: bool = False,
         python: str | None = None,
     ):
         self.out_path = Path(out_path)
@@ -111,6 +115,7 @@ class ProcessCollector:
         self.discovery_interval_s = discovery_interval_s
         self.rss_ceiling_bytes = rss_ceiling_bytes
         self.enforce_ceiling = enforce_ceiling
+        self.want_uss = want_uss
         self.python = python or sys.executable
         self._proc: subprocess.Popen | None = None
         self._summary: dict | None = None
@@ -141,6 +146,8 @@ class ProcessCollector:
             cmd += ["--ceiling-bytes", str(self.rss_ceiling_bytes)]
         if self.enforce_ceiling:
             cmd.append("--enforce")
+        if self.want_uss:
+            cmd.append("--want-uss")
         env = dict(os.environ)
         root = str(Path(__file__).resolve().parent.parent)
         env["PYTHONPATH"] = root + os.pathsep + env.get("PYTHONPATH", "")

@@ -78,6 +78,10 @@ def say(m):
     print(str(m).rstrip(), flush=True)
 
 
+def _fmt_mb(v) -> str:
+    return "-" if v is None else f"{v:,.1f}"
+
+
 def h(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
@@ -204,6 +208,7 @@ def main() -> int:
     from harness import ws1_service as ws
     from harness import metrics_shared as ms
     from harness import gates_shared as gs
+    from harness import memory_sources as msrc
     from harness.chunk_hash import check_chunks, ChunkHashMismatch
     from harness.collector_proc import ProcessCollector
     from harness.content_sanity import inspect
@@ -345,7 +350,8 @@ def main() -> int:
                 say(f"  !! cost sampling DISABLED for {self.tag}: {self.reason}")
             else:
                 self.pc = ProcessCollector(self.path, {"service": {"pids": [pid]}},
-                                           interval_s=SAMPLE_INTERVAL_S)
+                                           interval_s=SAMPLE_INTERVAL_S,
+                                           want_uss=True)
 
         def __enter__(self):
             if self.pc is None:
@@ -361,6 +367,9 @@ def main() -> int:
             if self.pc is not None:
                 self.pc.stop()
 
+        def summary(self):
+            return self.pc.summary() if self.pc is not None else {}
+
         def series(self):
             if self.pc is None:
                 return None          # metrics_shared then emits None cost, never 0
@@ -373,6 +382,7 @@ def main() -> int:
     vecs_by_arm: dict[str, dict] = {}
     cost_series: dict[str, list] = {}   # f"{arm}:{mode}" -> normalized series
     cost_reasons: dict[str, str] = {}   # same key -> why cost is absent, if it is
+    mem_sources: dict[str, dict] = {}   # arm -> every memory figure, each named
     blast_rows: dict[str, list] = {}    # arm -> per-doc rows from the blast leg
     probed_dim: dict[str, int] = {}     # arm -> dim read off the arm's own loaded model
 
@@ -536,6 +546,15 @@ def main() -> int:
                     recs.append(rec)
             cost_series[f"{arm_name}:sequential"] = span.series()
             cost_reasons[f"{arm_name}:sequential"] = span.reason
+            # MEMORY, every source named. A summed-per-process RSS peak must never ship on
+            # its own: shared copy-on-write pages are counted once per worker, so with 32
+            # forked uvicorn workers it over-counts by roughly the sharing factor. cgroup
+            # anon is the figure comparable to Leela's and Shashi's.
+            _sum = (span.summary().get("roles", {}).get("service", {}) or {})
+            mem_sources[arm_name] = msrc.memory_report(
+                service_root_pid(arm_name), _sum.get("peak_rss_mb"))
+            mem_sources[arm_name]["summed_process_pss_peak_mb"] = _sum.get("peak_pss_mb")
+            mem_sources[arm_name]["peak_process_count"] = _sum.get("peak_process_count")
             arm.close()
             # ---- OUR gates, post-loop, outside the sampled/timed span ----
             for rec in recs:
@@ -698,6 +717,7 @@ def main() -> int:
                       # DECLARED != MEASURED, both arms, read back in-process.
                       "torch_threads_measured": threads_measured,
                       "service_mode": "external containers" if EXTERNAL else "driver-managed",
+                      "memory_sources": mem_sources,
                       "cost_available": all(cost_series.get(k) for k in cost_series),
                       "cost_unavailable_reason": next(
                           (r for r in cost_reasons.values() if r), None),
@@ -955,6 +975,26 @@ def main() -> int:
                     f"cores={d['effective_cores']}  util={d['cpu_utilization']}"
                     f"{'' if d.get('cpu_utilization_valid') in (True, None) else ' INVALID'}  "
                     f"peakRSS={d['peak_rss_mb']}MB")
+
+    say("")
+    say("MEMORY - every source named; a summed-RSS peak is NOT a footprint")
+    say(f"{'ARM':24}{'summed RSS':>13}{'summed PSS':>13}{'cgroup anon':>13}"
+        f"{'cgroup peak':>13}{'procs':>7}")
+    say("-" * 84)
+    for arm_name, m in mem_sources.items():
+        say(f"{arm_name:24}"
+            f"{_fmt_mb(m.get('summed_process_rss_peak_mb')):>13}"
+            f"{_fmt_mb(m.get('summed_process_pss_peak_mb')):>13}"
+            f"{_fmt_mb(m.get('cgroup_anon_mb')):>13}"
+            f"{_fmt_mb(m.get('cgroup_peak_mb')):>13}"
+            f"{str(m.get('peak_process_count') or '-'):>7}")
+        if m.get("sharing_factor_summed_over_anon"):
+            say(f"{'':24}summed/anon = {m['sharing_factor_summed_over_anon']}x "
+                "(shared pages counted once per process)")
+        if m.get("cgroup_unavailable_reason"):
+            say(f"{'':24}cgroup unavailable: {m['cgroup_unavailable_reason']}")
+    say("QUOTE cgroup anon against Leela's and Shashi's memory figures - both read the")
+    say("cgroup, where a shared page is charged once. Summed RSS is not comparable to either.")
 
     p = write_result("smoke50_parser_in", out)
     say(f"\nwritten -> {p}")

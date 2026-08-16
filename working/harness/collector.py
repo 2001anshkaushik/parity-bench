@@ -118,6 +118,7 @@ def read_vm_stat(page_size: int) -> dict[str, int]:
 @dataclass
 class ProcSnapshot:
     rss: int = 0
+    pss: int | None = None
     vms: int = 0
     uss: int | None = None
     threads: int = 0
@@ -134,6 +135,7 @@ class RoleAggregate:
 
     role: str
     peak_rss: int = 0
+    peak_pss: int = 0
     peak_vms: int = 0
     peak_uss: int = 0
     peak_procs: int = 0
@@ -175,16 +177,22 @@ def _sample_one(proc: psutil.Process, want_uss: bool) -> ProcSnapshot | None:
                 fds = proc.num_fds()
             except (psutil.AccessDenied, NotImplementedError):
                 fds = 0
-            uss = None
+            uss = pss = None
             if want_uss:
+                # PSS is the only per-process figure that SUMS correctly: private + shared/N,
+                # so a page shared by 33 forked workers contributes once in total rather than
+                # 33 times. RSS sums to an over-count, USS to an under-count. psutil reads
+                # both from smaps_rollup where available (_pslinux.py:1904,1934).
                 try:
-                    uss = proc.memory_full_info().uss
+                    fi = proc.memory_full_info()
+                    uss, pss = fi.uss, getattr(fi, "pss", None)
                 except (psutil.AccessDenied, NotImplementedError, ValueError):
-                    uss = None
+                    uss = pss = None
             return ProcSnapshot(
                 rss=mem.rss,
                 vms=mem.vms,
                 uss=uss,
+                pss=pss,
                 threads=proc.num_threads(),
                 fds=fds,
                 cpu_user=cpu.user,
@@ -345,7 +353,7 @@ class TreeCollector:
 
         for role, agg in self.aggregates.items():
             tracked = self._tracked[role]
-            rss = vms = uss = threads = fds = 0
+            rss = vms = uss = pss = threads = fds = 0
             n_live = 0
             dead: list[int] = []
 
@@ -361,6 +369,8 @@ class TreeCollector:
                 vms += snap.vms
                 if snap.uss is not None:
                     uss += snap.uss
+                if snap.pss is not None:
+                    pss += snap.pss
                 threads += snap.threads
                 fds += snap.fds
 
@@ -378,6 +388,7 @@ class TreeCollector:
                 agg.peak_rss = max(agg.peak_rss, rss)
                 agg.peak_vms = max(agg.peak_vms, vms)
                 agg.peak_uss = max(agg.peak_uss, uss)
+                agg.peak_pss = max(agg.peak_pss, pss)
                 agg.peak_procs = max(agg.peak_procs, n_live)
                 agg.peak_threads = max(agg.peak_threads, threads)
                 agg.peak_fds = max(agg.peak_fds, fds)
@@ -436,6 +447,9 @@ class TreeCollector:
                 "peak_rss_mb": round(agg.peak_rss / 2**20, 2),
                 "peak_vms_bytes": agg.peak_vms,
                 "peak_uss_bytes": agg.peak_uss or None,
+                # PSS sums correctly across processes sharing pages; peak_rss does not.
+                "peak_pss_bytes": agg.peak_pss or None,
+                "peak_pss_mb": round(agg.peak_pss / 2**20, 2) if agg.peak_pss else None,
                 "peak_process_count": agg.peak_procs,
                 "peak_thread_count": agg.peak_threads,
                 "peak_fd_count": agg.peak_fds,
