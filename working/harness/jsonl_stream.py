@@ -25,12 +25,26 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 
 class JsonlWriter:
-    """Append-and-flush one record at a time. Never buffers the run in memory."""
+    """Append-and-flush one record at a time. Never buffers the run in memory.
+
+    THREAD-SAFE. The blast leg writes from a ThreadPoolExecutor, and two threads interleaving
+    inside one `write()` would produce a spliced line that is neither record — corruption in
+    the middle of the file, which `read_completed` refuses to resume from (correctly, but the
+    run is already lost by then). A single lock around write+flush makes each record atomic
+    with respect to other threads. The RocketRide blast leg is a single-threaded asyncio loop
+    so it needs no lock, but it costs nothing there and one writer with one contract is worth
+    more than two.
+
+    The lock does NOT make this multi-PROCESS safe. Concurrent appends from separate processes
+    can still interleave; nothing here does that, and O_APPEND under the pipe-buffer size would
+    usually save us anyway, but do not rely on it.
+    """
 
     def __init__(self, path: Path, fsync_every: int = 0):
         self.path = Path(path)
@@ -38,6 +52,7 @@ class JsonlWriter:
         self.fsync_every = fsync_every
         self._n = 0
         self._fh = None
+        self._lock = threading.Lock()
 
     def __enter__(self) -> "JsonlWriter":
         # Append, so a resumed run adds to what survived instead of truncating it. Opening
@@ -47,11 +62,13 @@ class JsonlWriter:
 
     def write(self, row: Dict[str, Any]) -> None:
         assert self._fh is not None, "JsonlWriter used outside its context manager"
-        self._fh.write(json.dumps(row, separators=(",", ":")) + "\n")
-        self._fh.flush()                      # out of process memory, into the page cache
-        self._n += 1
-        if self.fsync_every and self._n % self.fsync_every == 0:
-            os.fsync(self._fh.fileno())       # onto the disk; only if the caller asked
+        line = json.dumps(row, separators=(",", ":")) + "\n"
+        with self._lock:                      # one whole record at a time, never spliced
+            self._fh.write(line)
+            self._fh.flush()                  # out of process memory, into the page cache
+            self._n += 1
+            if self.fsync_every and self._n % self.fsync_every == 0:
+                os.fsync(self._fh.fileno())   # onto the disk; only if the caller asked
 
     def __exit__(self, *exc) -> None:
         if self._fh is not None:

@@ -612,10 +612,30 @@ existing directory without it **refuses and exits 6**.
 A truncated final line (process died mid-write) is expected, is skipped with a note, and that
 document is re-run. An unparseable line that is *not* last is treated as corruption and raises.
 
-⚠️ **The blast leg is still buffered and is NOT resumable.** Only the sequential leg streams.
-On the 200-doc box run the blast legs were 70 s (LI) and 277 s (RR); scaled to 10k that is
-roughly 4 hours of all-or-nothing work. Decide whether that is acceptable before committing to
-10k — see the note in `STATE.md` session 31.
+**Both legs stream and both resume.** The blast leg writes from a ThreadPoolExecutor through a
+lock, so concurrent threads cannot splice two records into one line.
+
+**The legs can be run SEPARATELY** with `SMOKE_LEGS`, so the short supervised work and the long
+overnight work are different invocations:
+
+```bash
+SMOKE_LEGS=blast       ...   # short, watch it
+SMOKE_LEGS=sequential  ...   # long, leave it
+```
+
+Same `SMOKE_RUN_DIR` for both. Determinism compares the two legs, so whichever runs second reads
+the other's records off disk; if a leg has never run, it says so and reports its documents
+unproven rather than passing on no evidence. Default is both legs.
+
+### 12f-tika. Tika reference at 10k scale — measure before you pay for it
+
+The independent-reference check spawns **one JVM per document**. Measured on 25 real GovDocs:
+mean **0.599 s/doc** (p50 0.574, p95 0.652, max 1.028). At 10,000 documents that is
+**~1.7 hours of pure JVM startup**, on the RocketRide arm only, for a check that is
+**advisory for us and load-bearing for neither teammate**.
+
+For a 10k run, set `SMOKE_TIKA_SAMPLE=200` — the check then runs on a deterministic sample and
+the sample size is recorded in the manifest, so the coverage denominator is never implied.
 
 ### 12f. The 200-document smoke
 

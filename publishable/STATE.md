@@ -547,6 +547,42 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 32 — blast leg durable, legs separable, Tika priced (2026-08-16)
+
+**Blast leg now streams and resumes, same contract as sequential.** The LlamaIndex blast leg
+writes from a `ThreadPoolExecutor`, so `JsonlWriter` took a `threading.Lock` around write+flush:
+two threads interleaving inside one write would splice a line that is neither record — corruption
+mid-file, which `read_completed` correctly refuses to resume from, by which point the run is lost.
+The RocketRide blast leg is a single-threaded asyncio loop and needs no lock, but shares the
+writer: one contract beats two. **The lock is not multi-process safe** and is documented as such.
+`dump_jsonl` is deleted — no call sites remain, so the buffered path cannot come back by habit.
+
+[Verified the same way as sequential: `kill -9` mid-blast left **14 records durable and 0
+unparseable lines** — the lock holds under real concurrency. Resume then reported "14 on disk,
+16 to go" and finished at **30 records / 30 unique / 0 duplicates**, with determinism 30/30 on
+both arms across two separate invocations.]
+
+**Legs are separable — `SMOKE_LEGS=sequential|blast`** (default both), so short supervised work and
+long overnight work are different invocations against one `SMOKE_RUN_DIR`. Determinism compares the
+legs, so whichever runs second reads the other's records from disk; a leg that has never run is
+reported as such and its documents are unproven rather than passing on no evidence.
+
+**Tika priced at scale [MEASURED, not estimated].** 25 real GovDocs through
+`tika_reference.standalone_text`: mean **0.599 s/doc**, p50 0.574, p95 0.652, max 1.028 — one JVM
+per document. **10,000 docs ≈ 1.7 h** on the RocketRide arm alone, for a check that is advisory by
+its own docstring and load-bearing for neither teammate.
+
+**Recommendation: sample it at 10k, do not drop it.** `SMOKE_TIKA_SAMPLE=200` runs a deterministic
+stride sample (every k-th by sorted name — reproducible, and spread across the corpus rather than
+clustered at the small documents up front), costs ~2 minutes instead of 1.7 hours, and records
+`tika_sample_size` in the manifest with per-arm coverage. **What we lose:** it is the only gate
+that catches a *deterministic* defect — census, structure and determinism all PASS on a doubled
+document, and this is what caught BUG_CHUNK_DUPLICATION. At 200/10,000 we would expect to see
+~2 % of duplication instances, so we would detect that the defect exists but **not** enumerate
+every affected document. Given the engine bug is now root-caused and patched upstream by Shashi,
+detection is enough; enumeration is not worth 1.7 h. Dropping it entirely would leave zero
+independent evidence on the RocketRide arm, which is why sampling beats disabling.
+
 ### SESSION 31 — defect #27: a killed run lost everything; and the 10k memory question (2026-08-16)
 
 **The smoke buffered.** `dump_jsonl` did `write_text` on the complete list **after** the loop

@@ -66,6 +66,17 @@ PREFLIGHT = os.environ.get("SMOKE_PREFLIGHT", "") not in ("", "0", "false", "Fal
 # explicit — silently appending to a previous run's records would mix two runs into one file.
 # Pair it with SMOKE_RUN_DIR pointing at the run you are continuing.
 RESUME = os.environ.get("SMOKE_RESUME", "") not in ("", "0", "false", "False")
+# SMOKE_LEGS selects which legs run, so the non-resumable-in-practice work can be supervised
+# and the long legs left overnight. Comma-separated: sequential,blast (default both).
+# Determinism compares the two legs, so it is only computed when BOTH ran in this invocation
+# or the other leg's records are already on disk from a previous one.
+LEGS = {x.strip() for x in os.environ.get("SMOKE_LEGS", "sequential,blast").split(",") if x.strip()}
+# The independent-reference check spawns a JVM PER DOCUMENT: measured 0.599 s/doc mean, so
+# ~1.7 h at 10k on the RocketRide arm alone. It is advisory for us and load-bearing for neither
+# teammate. A positive value samples that many documents deterministically (every k-th by sorted
+# order, so it is reproducible and not clustered); 0 = every document, the default.
+TIKA_SAMPLE = int(os.environ.get("SMOKE_TIKA_SAMPLE", "0"))
+_UNKNOWN_LEGS = LEGS - {"sequential", "blast"}
 # Warm-up exclusion is METRIC-SIDE by completion rank (Leela's perf_window — settled 2026-08-14).
 # Primary 64, secondary 25 also emitted; the numbers are computed from the same rows, so changing
 # the pick later needs no re-run.
@@ -223,6 +234,17 @@ def main() -> int:
     from weekend_worker import (LlamaHttpPdfArm, RocketPdfArm, RocketArm,
                                 container_root_pid)
 
+    if _UNKNOWN_LEGS:
+        say(f"!! SMOKE_LEGS has unknown leg(s): {sorted(_UNKNOWN_LEGS)}. "
+            "Valid: sequential, blast.")
+        return 7
+    if not LEGS:
+        say("!! SMOKE_LEGS is empty — nothing to run.")
+        return 7
+    if LEGS != {"sequential", "blast"}:
+        say(f"LEGS: running {sorted(LEGS)} only "
+            "(determinism needs both; it uses the other leg's records from disk if present)")
+
     # Before ANY RocketRideClient is constructed — including the env_probe below.
     from harness.rr_credentials import resolve as _resolve_rr, auth_hint
     rr_creds = _resolve_rr(strict=True)
@@ -299,10 +321,6 @@ def main() -> int:
     run_dir = Path(os.environ["SMOKE_RUN_DIR"]) if os.environ.get("SMOKE_RUN_DIR") \
         else ROOT / "working" / "results" / f"smoke_metrics_{stamp}"
     run_dir.mkdir(parents=True, exist_ok=True)
-
-    def dump_jsonl(name: str, rows: list[dict]):
-        (run_dir / name).write_text(
-            "\n".join(json.dumps(r, separators=(",", ":")) for r in rows) + "\n")
 
     def service_root_pid(arm_name: str):
         """Root of the SERVICE tree — the driver is never sampled (settled 2026-08-14).
@@ -522,7 +540,7 @@ def main() -> int:
             li_src: dict[str, str] = {}         # doc -> service-returned extracted text (LI)
             span = CostSpan(arm_name, "sequential")
             with span, JsonlWriter(seq_path) as seq_out:
-                for f in pdfs:
+                for f in (pdfs if "sequential" in LEGS else []):
                     if f.name in done_docs:
                         continue            # already durable on disk from an earlier attempt
                     blob = f.read_bytes()
@@ -584,9 +602,21 @@ def main() -> int:
             mem_sources[arm_name]["peak_process_count"] = _sum.get("peak_process_count")
             arm.close()
             # ---- OUR gates, post-loop, outside the sampled/timed span ----
+            # Deterministic stride sample, not random: reproducible across runs and across the
+            # two arms, and it spreads the sample over the corpus instead of clustering it at
+            # the front where the small documents happen to live.
+            tika_scope = None
+            if TIKA_SAMPLE and TIKA_SAMPLE < len(recs):
+                stride = max(1, len(recs) // TIKA_SAMPLE)
+                tika_scope = {r["doc"] for r in sorted(recs, key=lambda x: x["doc"])[::stride]}
+                say(f"  independent-reference SAMPLED: {len(tika_scope)}/{len(recs)} documents "
+                    f"(every {stride}th by name; ~{0.599 * len(tika_scope):.0f}s of JVM starts)")
             for rec in recs:
                 chunks = chunk_texts.get(rec["doc"])
                 if chunks is None:
+                    continue
+                if tika_scope is not None and rec["doc"] not in tika_scope:
+                    rec["independent_hash"] = "not_run: outside the sampled subset"
                     continue
                 src = (li_src.get(rec["doc"]) if arm_name.startswith("llamaindex")
                        else (reference_text(ROOT / "corpus" / "govdocs1" / "pdfs" / rec["doc"])
@@ -621,37 +651,44 @@ def main() -> int:
             say(f"  {arm_name}: {len(recs)} records -> {seq_path.name}")
 
         # ---- determinism: a BLAST run (concurrent) vs the SEQUENTIAL run above
-        say("\ndeterminism: blast run vs sequential run, per arm")
+        say("\ndeterminism: blast run vs sequential run, per arm"
+            + ("" if "blast" in LEGS else " (blast leg NOT run; using on-disk records)"))
         blobs = [(f.name, f.read_bytes()) for f in pdfs]
 
         # LlamaIndex: blocking urllib, so threads are the right concurrency primitive.
         # Returns (hashes-by-doc, per-doc rows) — the rows feed metrics_shared; blast latency is
         # batch-position latency under a client cap of BLAST_C, labeled open-loop-blast.
-        def blast_llama():
+        def blast_llama(out_path, prior, done):
             import concurrent.futures as cf
             arm = LlamaHttpPdfArm(port=PORT)
+            todo = [(n, b) for n, b in blobs if n not in done]
 
-            def one(item):
-                name, b = item
-                row = {"doc": name, "submit_ns": time.time_ns()}
-                try:
-                    ch, _ = arm.process(b)
-                    row.update(completion_ns=time.time_ns(), ok=True,
-                               n_chunks=len(ch), chunk_sha256=[h(c) for c in ch])
-                except Exception as e:
-                    row.update(completion_ns=time.time_ns(), ok=False,
-                               error_class=type(e).__name__)
-                return row
-            with cf.ThreadPoolExecutor(max_workers=BLAST_C) as ex:
-                rows = list(ex.map(one, blobs))
+            with JsonlWriter(out_path) as w:
+                def one(item):
+                    name, b = item
+                    row = {"doc": name, "submit_ns": time.time_ns()}
+                    try:
+                        ch, _ = arm.process(b)
+                        row.update(completion_ns=time.time_ns(), ok=True,
+                                   n_chunks=len(ch), chunk_sha256=[h(c) for c in ch])
+                    except Exception as e:
+                        row.update(completion_ns=time.time_ns(), ok=False,
+                                   error_class=type(e).__name__)
+                    # Durable before the next document is dispatched. JsonlWriter holds a lock,
+                    # so concurrent worker threads cannot splice two records into one line.
+                    w.write(row)
+                    return row
+                with cf.ThreadPoolExecutor(max_workers=BLAST_C) as ex:
+                    fresh = list(ex.map(one, todo))
             arm.close()
+            rows = prior + fresh
             return {r["doc"]: r.get("chunk_sha256") for r in rows}, rows
 
         # RocketRide: ONE asyncio loop, C concurrent send() coroutines. Driving RocketPdfArm.process
         # from a ThreadPoolExecutor calls run_until_complete on one loop from several threads, which
         # silently abandons coroutines ("coroutine 'send' was never awaited") and reports spurious
         # non-determinism. Measured: that harness bug alone produced 7/8 false "drift".
-        def blast_rocket():
+        def blast_rocket(out_path, prior, done):
             import uuid as _u
             from rocketride import RocketRideClient
 
@@ -667,6 +704,7 @@ def main() -> int:
                 tok = (await c.use(filepath=str(pp.relative_to(ROOT))))["token"]
                 sem = asyncio.Semaphore(BLAST_C)
                 rows = []
+                todo = [(n, b) for n, b in blobs if n not in done]
 
                 async def one(name, b):
                     row = {"doc": name, "submit_ns": time.time_ns()}
@@ -682,27 +720,50 @@ def main() -> int:
                             row.update(completion_ns=time.time_ns(), ok=False,
                                        error_class=type(e).__name__)
                     rows.append(row)
+                    w.write(row)          # durable as each send completes
                 try:
-                    await asyncio.gather(*(one(n_, b) for n_, b in blobs))
+                    await asyncio.gather(*(one(n_, b) for n_, b in todo))
                 finally:
                     try:
                         await asyncio.wait_for(c.terminate(tok), timeout=60)
                     except Exception:
                         pass
                     await c.disconnect()
-                return {r["doc"]: r.get("chunk_sha256") for r in rows}, rows
-            return asyncio.run(go())
+                allrows = prior + rows
+                return {r["doc"]: r.get("chunk_sha256") for r in allrows}, allrows
+            with JsonlWriter(out_path) as w:
+                return asyncio.run(go())
 
         for arm_name, runner in (("llamaindex_http_pdf", blast_llama),
                                  ("rocketride_pdf", blast_rocket)):
-            span = CostSpan(arm_name, "blast")
-            with span:
-                blast, brows = runner()
-            cost_series[f"{arm_name}:blast"] = span.series()
-            cost_reasons[f"{arm_name}:blast"] = span.reason
+            blast_path = run_dir / (
+                f"perdoc_{'li' if arm_name.startswith('llamaindex') else 'rr'}_blast.jsonl")
+            prior, done_b, torn_b = ([], set(), None)
+            if RESUME:
+                prior, done_b, torn_b = read_completed(blast_path)
+                if torn_b:
+                    say(f"  !! {torn_b}")
+                if done_b:
+                    say(f"  RESUME {arm_name} blast: {len(done_b)} on disk, "
+                        f"{len(pdfs) - len(done_b)} to go")
+            elif blast_path.exists():
+                say(f"  !! {blast_path.name} exists and SMOKE_RESUME is not set. Refusing to "
+                    "append to a previous run's records.")
+                return 6
+            if "blast" in LEGS:
+                span = CostSpan(arm_name, "blast")
+                with span:
+                    blast, brows = runner(blast_path, prior, done_b)
+                cost_series[f"{arm_name}:blast"] = span.series()
+                cost_reasons[f"{arm_name}:blast"] = span.reason
+            else:
+                # Leg skipped: read whatever a previous invocation left. Determinism then
+                # compares against real records rather than silently reporting everything
+                # unproven, which would read as a clean gate on no evidence.
+                brows, _d, _t = read_completed(blast_path)
+                blast = {r["doc"]: r.get("chunk_sha256") for r in brows}
+                say(f"  {arm_name} blast: {len(brows)} records read from disk (leg not run)")
             blast_rows[arm_name] = brows
-            dump_jsonl(f"perdoc_{'li' if arm_name.startswith('llamaindex') else 'rr'}_blast.jsonl",
-                       brows)
             # Unproven ≠ drift (both teammates' semantics: Leela m0_correctness.py:144-158
             # counts a None side as failure; Shashi correctness.py:440-469 names it
             # `unproven` separately). A blast-leg timeout must not read as hash instability.
@@ -747,6 +808,11 @@ def main() -> int:
                       "torch_threads_measured": threads_measured,
                       "service_mode": "external containers" if EXTERNAL else "driver-managed",
                       "memory_sources": mem_sources,
+                      "legs_run": sorted(LEGS),
+                      "tika_sample_size": TIKA_SAMPLE or None,
+                      "tika_sample_note": (
+                          "0/None = every document. A positive value is a deterministic stride "
+                          "sample; the covered count per arm is in arms.*.independent_reference."),
                       "cost_available": all(cost_series.get(k) for k in cost_series),
                       "cost_unavailable_reason": next(
                           (r for r in cost_reasons.values() if r), None),
