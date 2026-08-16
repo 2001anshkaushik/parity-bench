@@ -5,154 +5,101 @@ this project. Read this first.
 
 ---
 
-## 0a. ⏸️ PHASE 2 HANDOFF — READ THIS BEFORE ANYTHING ELSE (2026-08-14)
+## 0a. ⏸️ HANDOFF — READ THIS BEFORE ANYTHING ELSE (2026-08-16)
 
-**A session with zero memory of this work starts here. Everything below §0a is history.**
+**A session with zero memory of this work starts here. Everything below §0a is history, newest
+session first from `SESSION 33` down.** Sessions 20–33 are the current architecture; anything
+older describes a harness that has since been substantially rebuilt.
 
 ### Where we are
 
 | | |
 | --- | --- |
-| **AWS box** | `i-0775f33f3dc16f6af` — **verified end to end** (SSM connect, S3 both directions, repo clone all confirmed working). **The box is STOPPED.** |
-| **Billing** | starts on `start-instances`. Nothing is being charged while it is stopped. |
-| **Auto-stop** | **DISPUTED — assume < 20 % instance CPU for 60 min.** See correction below. Silent, no warning. |
-| **Today's plan** | **`RUN_ON_EC2.md`** — native 200-doc smoke, both arms, five gates, engine from the release tarball. `BUILD_ON_EC2.md` is superseded for today. |
+| **Phase** | Phase 2 is RUNNING. Both arms execute in **Docker on x86-64**. A 200-doc run on the box is green and publishable; **the 10k run is the next milestone and is unblocked as of session 33.** |
+| **AWS box** | `i-0775f33f3dc16f6af`, c7i.8xlarge, 32 vCPU / 61 GB. Driven by SSM only — **`ssm:SendCommand` is DENIED** for our role (AccessDeniedException, verified), so interactive `start-session` with piped stdin is the only channel. |
+| **Auto-stop** | **DISPUTED — assume < 20 % instance CPU for 60 min**, i.e. 6.4 cores on 32 vCPU, against a 12.7 % idle floor. Our older note said 1 %. Use the eight-core keep-alive in `RUN_ON_EC2.md` §1a. [UNVERIFIED — open item for Dmitrii] |
+| **Topology rule** | **Both arms containerized or the run is unpublishable.** One native + one containerized is the exact confound in `MATCHED_LAYERS.md` that produced two opposite memory verdicts. |
+| **Team pin** | engine **3.3.1** + SDK **1.3.0**, Parser IN, stock 5-node pipe. Measured-pipe canonical digest **`f61165f7cf7ab1db`** — check it before comparing anything. |
 
-> **CORRECTION 2026-08-14 — auto-stop threshold.** This table said **1 % CPU for one hour**.
-> Shashi's `AWS-RUNBOOK.md`, written after Dmitrii provisioned all three identical boxes, says
-> **< 20 % instance CPU sustained for 60 minutes** — 6.4 cores on 32 vCPU, against a measured
-> 12.7 % idle floor. Neither figure is measured by us and they cannot both be right. **Assume the
-> stricter one:** under a 20 % rule the one-core `md5sum /dev/zero` keep-alive recorded in §0a below
-> is ~3 % and would *not* prevent the stop. `RUN_ON_EC2.md` §1a uses eight cores.
-> [UNVERIFIED — two conflicting documents; open item for Dmitrii]
-| **Team pin** | engine **3.3.1** + SDK **1.3.0**, **Parser IN**, stock 5-node shape. All three teams aligned on this. |
-| **Peers** | **Shashi and Leela are already running on AWS. We are behind** — that is the reason Phase 2 is the priority. |
+### The document to execute
 
-### DONE locally (all verified, all committed)
+**`publishable/RUN_ON_EC2.md` §12** is the Docker sequence. §1–§2 (preflight, Python 3.12, apt
+set), §3a (onnxruntime patch), §4 (corpus), §8 (exfil), §9 (traps) still apply. §3/§6/§7 describe
+the superseded native path — do not run them. `BUILD_ON_EC2.md` is superseded entirely.
 
-* **Parser IN on both arms** — RocketRide 5-node stock pipeline (`product_pdf.pipe`) and the
-  LlamaIndex HTTP service both ingest raw PDF bytes and parse inside the arm.
-* **Five correctness gates** — census · structure (384-d, finite, L2 = 1.0 ± **1e-3**) ·
-  determinism (blast vs sequential chunk hashes) · independent reference (per-arm chunk hash) ·
-  content sanity (NUL + printable ratio < 0.90).
-* **50-doc smoke PASSING both arms** — census 50 = 49 + 1 + 0, structure 0 fail, determinism 50/50.
-  Latest: `working/results/smoke50_parser_in__20260814T021944Z__55a58b535e24.json`.
-* **Setup probe PASSING** — thread parity 10/10 measured in-process, 10/10 docs, deterministic.
-  Latest: `working/results/setup_probe__20260814T180651Z__fe98911e3a17.json`.
-* **Corpus manifest** — all 10,000 docs (sha256, bytes, pages, extracted chars) in
-  `working/results/corpus_manifest.jsonl`, deterministic selection rule + verifier
-  (`working/scripts/verify_corpus_manifest.py`, 10,000/10,000 MATCH).
-* **Metrics docs shipped** — `METRICS_AND_VERIFICATION.md` (the walk-in doc) and `TEAM_HANDOUT.md`.
-* **Regression suite** — 13 checks: 12 pass, 1 known xfail (`nul_truncation`, open upstream).
+### Peer scale — the reason NOT to run 10k blindly [VERIFIED from their uploads, session 33 recon]
 
-### ⛔ NEVER RUN — do not assume any of this works
+**Nobody is running 10,000 unique documents. Nobody is close.**
 
-* **`BUILD_ON_EC2.md` has never been executed.** Not one step. **Superseded for today** by
-  `RUN_ON_EC2.md`, which runs the engine natively and skips image building entirely.
-* **No x86-64 Docker build of OUR images has ever run**, for either arm.
-* **`docker/Dockerfile.rocketride` is ours and is UNVERIFIED** — written from ELF/DT_NEEDED
-  inspection of the release tarball, never built.
-* **Nothing has run on the box beyond access checks** (SSM, S3, clone). No build, no engine boot,
-  no measurement.
+| | corpus | unique docs | offered | reps |
+| --- | --- | ---: | ---: | ---: |
+| Shashi `measured/2026-08-14/n200-seq50-191105Z` | arXiv cs.LG | **24** (hardlink-replicated) | 200 blast / 50 seq | 1 |
+| Shashi `sessions/2026-08-15/s500-043653Z` | arXiv | 24 | 500 | **FAILED** (smoke rc=1, measured rc=1) |
+| Leela `blast/20260814T210610Z` (LangGraph) | GovDocs1 | **150** | 150 | 3 |
+| Leela `rr/2026081[45]*` × 5 (RocketRide) | GovDocs1 | **200** | 200 | 1 each |
 
-> **CORRECTION 2026-08-14 — "the RocketRide image has never existed anywhere" was wrong.**
-> Leela's `rocketride/Dockerfile` builds engine 3.3.1 on `linux/amd64` and pins
-> `ENGINE_SHA256=95768e26…` — **the same extracted-binary digest I verified independently today**
-> by downloading and hashing the tarball on the laptop. Shashi's `engine.Dockerfile` additionally
-> carries the onnxruntime boot patch. The correct claim is narrower: **our** image has never been
-> built. Leela's is the documented fallback if the native path stalls (`RUN_ON_EC2.md` §10).
->
-> Also corrected: our ELF inspection is now **VERIFIED, not inferred**. Real `DT_NEEDED` parsed from
-> the dynamic section: `libc.so.6`, `ld-linux-x86-64.so.2`, `libm.so.6`, `libgcc_s.so.1`,
-> `libjvm.so`, `libc++.so.1`, `libc++abi.so.1`, `libunwind.so.1`; `DT_RUNPATH` is
-> `$ORIGIN/lib:$ORIGIN/java/jre/lib/server`; highest glibc symbol is **2.35** — exactly Ubuntu
-> 22.04, zero headroom. `libnuma`/`libcrypto` are dlopen probes, **not** hard deps; do not install
-> them. Tarball sha256 `d8dad45b…ce0281d8` confirmed against our own pin.
+Shashi's `materialize()` does `seeds[i % 24]` with hardlinks, so his "200 documents" is 24 files
+seen ~8.3× each — **his docs/s is not comparable with ours in either direction**. Leela's two arms
+are also not comparable *with each other*: 150 vs 200 docs, 3 vs 1 reps, 12-CPU cap vs uncapped.
+`run.sh 10000` exists in Shashi's runbook as a planned command; it has never executed.
 
-### 🚫 SUPERSEDED — must be RE-MEASURED on Linux, never carried forward
+### Current architecture — what exists now
 
-Every one of these is a **macOS/arm64** number. Quoting any of them for Phase 2 is a reporting
-error, not a shortcut.
-
-| number | why it cannot travel |
+| module | what it is |
 | --- | --- |
-| **memory crossover C ≈ 3.2** (S1) | macOS arm64 memory behaviour; re-derive from a Linux sweep |
-| **all C-sweep numbers** (C=1 1.95×, C=2, C=4, C=8, C=16 cells) | same host, same caveat |
-| **pool width 17.24** (`anchor_c_width.json`) | macOS scheduler measurement; the 32-ladder depends on re-measuring this **first** on the 32-vCPU host |
-| **the 12.4 % wall swing / A13** | low-power-state artifact of this laptop; the whole A13 saturation story is host-bound |
-| **C=16 cells invalidated by macOS memory compression** (+5.5 GB compressed) | **Linux has no compressor** — the gate is being replaced by cgroups v2 `memory.stat`; the invalidation reason itself does not exist on the target |
-| **every throughput figure** | already withdrawn once (session 11); never quote from this laptop |
+| `working/harness/metrics_shared.py` | THE metrics module, arm-agnostic, pure functions, 64 unit tests. Settled decisions are frozen here — do not re-litigate. |
+| `working/harness/gates_shared.py` | Both teammates' gate dialects + the union, every function citing its source file:line. 60 unit tests, each mutation-tested. |
+| `working/harness/memory_sources.py` | cgroup reader. **Quote `cgroup anon`**, never summed RSS. |
+| `working/harness/jsonl_stream.py` | Crash-durable per-doc records + resume. Thread-safe writer. |
+| `working/harness/rr_credentials.py` | Endpoint + key resolution; runs on `harness` import. |
+| `working/scripts/smoke50_parser_in.py` | The driver. Both arms, both legs, five gates, three verdicts, metrics, memory. |
+| `working/scripts/fetch_govdocs.py` | Manifest-driven corpus fetcher. `DONE` means verified. |
 
-**What survives the platform change:** the gate logic, the harness, the corpus manifest, the two
-bug reports, and the correctness verdicts. Not the performance numbers.
+### Settled decisions — do not change without the team
 
-### The two filed bugs (both reproducible, both ours to defend)
+* **Warm-up**: metric-side, by completion rank (Leela's `perf_window`). Primary **64**, secondary 25 also emitted. (Shashi computes `max(4, 2×threads)` = 64 at 32 threads; Leela uses 25. Three values, one unresolved question.)
+* **Percentile**: nearest-rank, integer ceil, no interpolation (Shashi's).
+* **Threads**: 32 workers × **1 BLAS thread**, `TORCH_INTEROP_THREADS` **unset** on both arms.
+* **Embedding dim**: probed from each arm's loaded model, never a 384 constant.
+* **Unavailable ⇒ `None`**, never 0 or inf. `cpu_utilization > 1.0` is INVALID, never clamped.
+* **Model**: all four arms load `sentence-transformers/multi-qa-MiniLM-L6-cos-v1`. VERIFIED from the engine's own `nodes/embedding_transformer/services.json:81-87`; `miniAll` is a 384-dim decoy.
 
-1. **`BUG_CHUNK_DUPLICATION.md`** — any text payload above **~239.8k chars** has its complete chunk
-   list emitted **exactly twice**, silently; all vectors valid. Threshold bisected: 239,062 clean /
-   239,843 double, n=3 each side. **Reproducer is 4 lines of synthetic ASCII, no PDF needed**:
-   `send(token, (unit*7000)[:239_843], mimetype="text/plain")` → 128 chunks where 64 are correct.
-   **Full-corpus census: 534/9,992 documents (5.34 %) are over the threshold.**
-2. **`BUG_NUL_TRUNCATION.md`** — text truncated at the first NUL. Still reproduces (the suite's
-   standing xfail is its detector). Re-scoped: **0/303 docs have NUL in Tika output**, so under
-   Parser IN it has no observed path on this corpus; the pypdf-path figure is **0.70 % by full
-   census** (70/9,992). Reproducer: send `"AAAA\x00BBBB"` as `text/plain`, expect 9 chars back.
+### Driver flags
 
-### Three open cross-team questions (need Leela + Shashi, not more local measurement)
+| flag | effect |
+| --- | --- |
+| `SMOKE_EXTERNAL=1` | services are containers; never start one, discovery becomes non-fatal |
+| `SMOKE_LEGS=sequential\|blast` | run one leg (default both); the other's records are read from disk |
+| `SMOKE_RESUME=1` + `SMOKE_RUN_DIR` | continue a killed run from what survived |
+| `SMOKE_PREFLIGHT=1` | thread-propagation gate only, no documents, exit 0/4 |
+| `SMOKE_TIKA_SAMPLE=N` | deterministic stride sample for the JVM-per-doc check (0.599 s/doc) |
+| `SMOKE_WORKERS` / `SMOKE_THREADS` / `SMOKE_BLAST_C` / `SMOKE_CORPUS_GLOB` / `SMOKE_WARM_N` | the pins |
+| `SMOKE_LI_CONTAINER` / `SMOKE_RR_CONTAINER` | container names for `docker inspect` pid discovery |
+| `SMOKE_REQUIRE_TIKA=1` | make a missing Tika reference fatal instead of reported |
 
-1. **Tika-vs-pypdf extraction ratio** — median 1.007 measured, but the manifest's char counts are
-   pypdf-derived while Parser IN runs Tika. Which is the reference for shared thresholds?
-2. **The 10 % spread definition** — spread of what over what: (max−min)/median, per block or per
-   run, before or after warm-up exclusion? Our gate and theirs may not be the same test.
-3. **Warm-up — three values, not two.** We measured LlamaIndex still 1.08× at reps 25–50 and steady
-   at ~100; a shared warm-up below that bakes an ~8 % bias into one arm only. [Ours is PROVISIONAL —
-   one fixture, one host, cheap to settle on the box.]
-   > **CORRECTION 2026-08-14 — mis-attributed.** This said "Shashi uses 25". On his agreed branch
-   > `benchmark/shared-pipe-engine-3.3.1` the warm-up is **computed, not fixed**:
-   > `max(4, 2 × threads)` for blast and **2** for sequential (`rr_app.py:124`, `hs_app.py:87`) —
-   > **64** at 32 threads. **Leela** is the one on 25 (`smoke2.sh`, `warm_n=25`). So the spread is
-   > **64 (Shashi) / 25 (Leela) / 100 (ours)**, and Shashi's moves with thread count, which means it
-   > is not a constant anyone can agree to without also fixing the thread count.
+### ⛔ Numbers that must never be quoted
 
-4. **🚩 CORPUS — the loud one.** Shashi's pinned dataset is **24 arXiv cs.LG PDFs, sha256-verified,
-   hardlink-replicated** to reach N (`seed_manifest.json`, `bench.py:fetch_seed_pdfs`). Leela and I
-   are both on **GovDocs1**. His 10,000-document run is 24 unique documents seen ~417 times each,
-   with the page-cache, parser-cache and size-distribution consequences that implies. **No harness
-   alignment makes those numbers commensurable with ours.** This is a decision for the group, not a
-   fix for any one harness.
+* **Any `peakRSS` from before session 30** — it is a SUM of per-process RSS, over-counting shared pages by a factor that *scales with worker count* (32-worker LI badly inflated, 2-process RR nearly correct). Not usable even as a ratio.
+* **Any performance figure from macOS/arm64** — superseded by policy. The metrics block now derives the caveat from `platform.system()/machine()`.
+* **Anything in `archive/`.**
+* **BUG_CHUNK_DUPLICATION's "~239.8k chars" and "5.34 % of corpus"** — the real predicate is **≥ 64 chunks** (root-caused by Shashi); the char figures are proxies needing re-derivation.
 
-### Exact first commands on the box
+### Defect register, sessions 20–33 — all found in OUR instrument
 
-```bash
-# 1. START — BILLING BEGINS AT THIS LINE
-aws ec2 start-instances --instance-ids i-0775f33f3dc16f6af
-aws ec2 wait instance-running --instance-ids i-0775f33f3dc16f6af
+`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33).
 
-# 2. CONNECT (SSM — no SSH keys, no public ingress)
-aws ssm start-session --target i-0775f33f3dc16f6af
+**The pattern, stated plainly: in this project the instrument is wrong more often than the system
+under test. Ten instrument defects in fourteen sessions, zero product defects found by us in that
+window that were not already known.** Behave accordingly — the Standing Verification Protocol in
+§2 is not ceremony.
 
-# 3. KEEP IT ALIVE while you work: auto-stop is 1% CPU for 1h, silent.
-#    Run this in a spare shell during any long idle period (reading, planning):
-( while true; do timeout 50 md5sum /dev/zero >/dev/null; sleep 5; done ) &
+### Before the 10k run — the remaining checklist
 
-# 4. Then follow publishable/RUN_ON_EC2.md from step 0 (NOT BUILD_ON_EC2.md — superseded).
-#    Do not skip the preflight — every later step assumes uname -m = x86_64, glibc >= 2.35,
-#    cgroup2fs, lsof present, and PYTHON 3.12 (22.04's 3.10 has no numpy/scikit-learn wheel).
-
-# 5. STOP THE BOX when done. Do not rely on auto-stop.
-aws ec2 stop-instances --instance-ids i-0775f33f3dc16f6af
-```
-
-**First real milestone on the box:** the engine answering `/version` with `3.3.1.35`. Until that
-happens, the RocketRide arm does not exist on Linux.
-
-> **CORRECTION 2026-08-14 — the milestone no longer runs through Docker.** It previously read
-> "`docker build -f docker/Dockerfile.rocketride` succeeding and the engine answering `/version`".
-> Today's path is **native from the release tarball** (`RUN_ON_EC2.md` §3): unbounded first-build
-> work is removed from the critical path and the only external needs are three apt packages.
-> The `/version` half of the milestone is unchanged and is still the gate.
-
----
+1. ✅ Corpus complete and manifest-verified (session 33).
+2. ✅ Both legs stream + resume; legs separable.
+3. ⬜ **One cgroup-instrumented 200-doc run** — `memory_sources.py` shipped after the last box run, so **no cgroup memory figure exists yet**. ~20 min, and it converts the OOM question from an extrapolation of an over-counted number into a measurement.
+4. ⬜ Decide `SMOKE_TIKA_SAMPLE=200` (recommended) vs full (adds ~1.7 h).
+5. ⬜ Raise the corpus divergence with the group before anyone builds a three-way table.
 
 ## 0. What this is
 
@@ -175,9 +122,29 @@ LlamaIndex service and all measurement work lives.
 | Engine | `server-v3.3.1`, reports `3.3.1.35` hash `a0817cc6`, installed at `<clone>/engine/` |
 | Engine SHA256 | `846df27ae8b52cd3ed4975124f76462f0cac3ba2e1677a012508247efde6a836` |
 | SDK | `rocketride` 1.3.0 (co-released with server 3.3.1 — pairing verified from release manifests) |
-| Key libs | llama-index-core 0.14.23, sentence-transformers 5.6.1, torch 2.13.0, langchain-text-splitters 1.1.2 |
+| Key libs | llama-index-core 0.14.23, sentence-transformers 5.6.1, torch 2.13.0, langchain-text-splitters 1.1.2, **rocketride 1.3.0 (the client SDK — pip-installed; `rocketlib` is the bundle-supplied one imported by nodes INSIDE the engine)** |
 
-**Cost constraint: $0. Everything runs locally. No paid cloud.**
+**⚠️ THIS TABLE DESCRIBES THE LAPTOP. The measurement target is the AWS box** — c7i.8xlarge,
+32 vCPU / 61 GB, Ubuntu, x86-64, both arms in Docker. The `$0 / no paid cloud` constraint that
+used to sit here is **obsolete**: the box is metered at ~$1.43/h and is the only platform whose
+numbers are publishable. Laptop figures are wiring validation, and the metrics block now derives
+that caveat from `platform.system()/machine()` rather than asserting it.
+
+Platform facts that matter, all VERIFIED by parsing the artifacts:
+
+* Engine binary is **x86-64 only** — no linux-arm64 asset exists. Tarball sha256
+  `d8dad45b…ce0281d8`; extracted `engine` binary `95768e26…d9747` (matches Leela's independently
+  derived pin). Tarball extracts **flat** — never `--strip-components`.
+* Highest glibc symbol referenced is **2.35** — Ubuntu 22.04 exactly, **zero headroom**.
+* Real `DT_NEEDED`: `libc.so.6`, `ld-linux-x86-64.so.2`, `libm.so.6`, `libgcc_s.so.1`, `libjvm.so`,
+  `libc++.so.1`, `libc++abi.so.1`, `libunwind.so.1`. So apt needs exactly
+  `libc++1 libc++abi1 libunwind8`. `libnuma`/`libcrypto` are dlopen probes — do NOT install them.
+* Ubuntu 22.04's system Python is **3.10 and cannot install our pins** — `numpy==2.5.1` and
+  `scikit-learn==1.9.0` have no cp310 wheel. Install 3.12 first.
+* Engine 3.3.1 **cannot cold-boot on Linux unpatched**: `onnxruntime-gpu==1.20.1` was removed from
+  PyPI and the constraints compile is all-or-nothing. The pin is in **five** manifests, not three.
+* The engine's dependency cache is `<engine dir>/cache`, **shared across all pipelines** — once any
+  pipeline installs torch it stays importable, which is why a local "it works" can be a false pass.
 
 ## 2. THE STANDING VERIFICATION PROTOCOL (verbatim — this governs everything)
 
@@ -546,6 +513,41 @@ we had been running. Shashi and Leela are doing the same.
 | T3-6 | **Three incompatible memory boundaries**: ours engine-tree+driver, Leela's container cgroup, Shashi's `getrusage(RUSAGE_SELF)` — driver only, which does not capture engine-side work at all | **VERIFIED** |
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
+
+### SESSION 33 — defect #28: the fetcher counted its own arithmetic; peer-scale recon (2026-08-16)
+
+**BLOCKER, found on the box.** `verify_corpus_manifest.py` FULL reported 9,800/10,000 with 200
+missing from zip 040, while `fetch_govdocs.py 10000` had printed `DONE total_pdfs=10000`.
+
+**The divergence, exactly.** The manifest defines **248** files from zip 040 (10,000 across zips
+000–040). The fetcher took **48** — short by exactly 200, the number already on disk from the
+earlier `fetch_govdocs.py 200`. Cause: `have` was seeded from the disk once, then advanced by
+`have += n` where `n` counted files **written**. Re-extracting zip 000, whose 200 files were
+already present, added 200 to the counter and 0 to the disk, so the counter ran +200 ahead for the
+rest of the walk, reached 10,000 while the disk held 9,800, and truncated zip 040 mid-way. The
+re-run repeated the same re-extraction and printed DONE again. **It read the disk once at startup
+and the manifest never** — the same defect class as `echo $?` reporting tee's status: the success
+signal measured the wrong object.
+
+**Fix:** the fetcher is manifest-driven. It computes the missing set, downloads only the zips
+containing missing files, extracts only those members, verifies every file against the recorded
+size (sha256 with `--verify`), and prints `DONE` only on a match; incomplete **exits 1** and names
+the files. Discovery mode (`--no-manifest`) survives for BUILDING a manifest and now re-measures
+the disk each pass and skips existing files.
+
+[Verified by reproducing the box state locally — hid the same 200 files from zip 040; the fetcher
+identified `need 1 zip(s): [40]`, fetched only `040.zip`, repaired in **3m18s**, and
+`verify_corpus_manifest.py` FULL then returned **MATCH 10000/10000, 0 missing, 0 changed**. Null
+control: 3 files hidden + network blocked → "NOT DONE", named them, exit 1. The 200-doc path is
+unaffected.]
+
+**Peer-scale recon [VERIFIED from their S3 uploads and `git ls-remote`].** Full ref enumeration:
+three refs, no tags; Shashi's `main` is a strict ancestor of his benchmark branch (`0 14`), so
+nothing is unanalysed. Findings are in §0a — the short version is that **no teammate runs 10,000
+unique documents**, Shashi replicates 24 arXiv seeds by hardlink, and Leela's two arms are not
+comparable with each other. A correction to my own earlier report: I initially listed one Leela RR
+run; there are **five** — my `s3 ls` had been truncated by `head` and I reported the truncated view
+as complete.
 
 ### SESSION 32 — blast leg durable, legs separable, Tika priced (2026-08-16)
 
@@ -1429,43 +1431,58 @@ that touches the wire format, by design.
 
 ## 8. Exact commands
 
-All from the clone root.
+**The current run path is `RUN_ON_EC2.md` §12 (Docker, both arms).** The commands below are the
+LOCAL/native ones, kept for laptop work and for the harnesses that predate Phase 2. Anything that
+starts a service natively is not the Phase 2 path.
 
-### Engine
+### Corpus (manifest-driven; DONE means verified)
 
 ```bash
-bash working/scripts/start_engine.sh          # ~60 s cold (embedded-Python bootstrap), ~1 s warm
-bash working/scripts/stop_engine.sh
-curl -s http://127.0.0.1:5565/version # health + identity in one call. /ping is auth-gated, returns 401
+../.venv/bin/python working/scripts/fetch_govdocs.py 10000    # fetches only what is missing
+echo "FETCH EXIT: $?"                                          # 0 = matches the manifest, 1 = not
+../.venv/bin/python working/scripts/verify_corpus_manifest.py            # FULL, independent
+../.venv/bin/python working/scripts/verify_corpus_manifest.py --subset   # smoke-sized slice
 ```
 
-### LlamaIndex service
+### The driver — see §0a for the full flag table
 
 ```bash
+# thread-propagation gate, no documents, exit 0/4
+SMOKE_EXTERNAL=1 SMOKE_PREFLIGHT=1 SMOKE_WORKERS=32 SMOKE_THREADS=1 SMOKE_PORT=8801 \
+  ../.venv/bin/python working/scripts/smoke50_parser_in.py
+
+# one leg at a time, resumable, same run dir
+SMOKE_LEGS=blast      SMOKE_RUN_DIR=<dir> SMOKE_RESUME=1 ... smoke50_parser_in.py 10000
+SMOKE_LEGS=sequential SMOKE_RUN_DIR=<dir> SMOKE_RESUME=1 ... smoke50_parser_in.py 10000
+echo "EXIT: ${PIPESTATUS[0]}"    # NOT $? if you piped to tee — tee succeeds when the run dies
+```
+
+### Test suites — all four must pass before anything is quoted
+
+```bash
+../.venv/bin/python working/harness/test_metrics_shared.py    # 64 exact-value checks
+../.venv/bin/python working/harness/test_gates_shared.py      # 60, each gate mutation-tested
+../.venv/bin/python working/harness/test_gate_agreement.py    # golden-record, legacy vs gates
+../.venv/bin/python working/scripts/regression_selftest.py    # 12 pass + 1 known xfail
+```
+
+### Engine and service, natively (laptop only)
+
+```bash
+bash working/scripts/start_engine.sh     # idempotent; refuses a second instance on the port
+curl -s http://127.0.0.1:5565/version    # readiness AND identity; /ping is auth-gated (401)
 WS1_DEVICE=cpu WS1_WORKERS=8 WS1_PORT=8801 nohup bash working/ws1/run_service.sh > logs/ws1.out 2>&1 &
-until [ "$(grep -c 'warm in' logs/ws1.out)" -ge 8 ]; do sleep 3; done; grep -c 'warm in' logs/ws1.out
-../.venv/bin/python working/ws1/smoke.py      # ALL PASS expected, exit 0
-pkill -f "uvicorn ws1.service"
+until [ "$(grep -c 'warm in' logs/ws1.out)" -ge 8 ]; do sleep 3; done
 ```
 
-`/health` returning 200 does **NOT** mean the service is ready — it is answered by one worker.
-Count `warm in` lines instead.
+`/health` returning 200 does **NOT** mean ready — it is answered by one worker. Count `warm in`
+lines natively; in a container read `/health`'s aggregate `warm_workers` (and the driver refuses
+`warm_workers > declared_workers`).
 
-### Parity harness
-
-```bash
-../.venv/bin/python working/scripts/corpus_characterize.py   # verify corpus, ~2 min, must be 10000/10000
-bash working/scripts/start_engine.sh
-../.venv/bin/python working/scripts/parity_corpus.py         # both arms interleaved + chunk sweep, ~25 min
-```
-
-### Other instruments
+### Exfil
 
 ```bash
-../.venv/bin/python working/scripts/engine_variance.py       # engine throughput under full protocol
-../.venv/bin/python working/scripts/variance_gate.py --cmd "..." --reps 5 --threshold 0.10
-../.venv/bin/python working/scripts/pool_width.py            # RocketRide effective width (needs fault_probe node)
-cd handoff && ../../.venv/bin/python test_collector_overhead.py
+bash working/scripts/exfil_s3.sh working/results logs/<run>.log   # -> s3://.../ansh/<stamp>/
 ```
 
 ## 9. Traps that have already cost time
@@ -1487,23 +1504,46 @@ cd handoff && ../../.venv/bin/python test_collector_overhead.py
 
 ```
 <clone>/
-  working/ws1/            THE SERVICE — schema.py (wire contract, isolated) | pipeline.py (LlamaIndex,
-                  no HTTP) | service.py (HTTP only) | run_service.sh | smoke.py | exp_*.py
-  working/scripts/        engine start/stop, parity harnesses, corpus tools, variance gate, pool_width
-  working/handoff/        drop-in modules for Shashi + parity/ replication request
-  working/harness/        engine_ops, seeds, stats, collector, env_capture
-  working/pipes/          probe_minimal.pipe, fault_probe.pipe, embed_probe.pipe (4-node w/ embedding)
-  working/nodes/          fault_probe — benchmark-only engine node
-  data/mt10k/     verified corpus sample (2,000 docs)
-  working/results/        all raw JSON
-  engine/         the RocketRide 3.3.1 binary bundle
+  working/harness/        THE SHARED LIBRARY — everything below is current architecture
+    metrics_shared.py       arm-agnostic metrics, pure functions, settled decisions frozen
+    gates_shared.py         both teammates' gate dialects + union + the record adapter
+    memory_sources.py       cgroup reader; quote `anon`, never summed RSS
+    jsonl_stream.py         crash-durable records + resume; thread-safe writer
+    rr_credentials.py       endpoint/key resolution, runs on `harness` import
+    collector.py            psutil tree sampler (RSS/USS/PSS, 0.5 s, out-of-process)
+    collector_proc.py       parent-side handle; spawns the sampler in its own interpreter
+    chunk_hash.py / content_sanity.py / extraction_fidelity.py / tika_reference.py / goodput.py
+    ws1_service.py          service lifecycle + PID-by-listening-socket resolution
+    test_metrics_shared.py / test_gates_shared.py / test_gate_agreement.py
+  working/ws1/            THE LLAMAINDEX SERVICE — schema.py (wire contract) | pipeline.py
+                          (no HTTP) | service.py (HTTP + /health with warm_workers) | run_service.sh
+  working/scripts/        smoke50_parser_in.py (THE DRIVER) | fetch_govdocs.py (manifest-driven)
+                          verify_corpus_manifest.py | start_engine.sh | exfil_s3.sh
+                          install_awscli_userdir.sh | regression_selftest.py | setup_probe.py
+  working/pipes/          product_pdf.pipe (THE MEASURED PIPE, canonical f61165f7cf7ab1db)
+                          a3_env_torch.pipe (thread probe: env_probe + embedding_transformer so
+                          torch is loaded in the same task process) | a3_env.pipe (torch-less)
+  working/nodes/          benchmark-only engine nodes; env_probe is the one Phase 2 needs.
+                          NONE carry requirements.txt, so copying them pays no constraints recompile
+  working/results/        raw JSON + smoke_metrics_<stamp>/ per-doc JSONL and sampler streams
+  corpus/govdocs1/pdfs/   10,000 GovDocs1 PDFs, manifest-verified
+  docker/                 Dockerfile.llamaindex (serves uvicorn) | Dockerfile.rocketride
+  engine/                 the RocketRide 3.3.1 bundle (x86-64; extract flat)
+  reference-fresh2/       teammates' repos, re-cloned fresh — treat older clones as void
 ```
 
-Key docs: `CROSSOVER` work → `PARITY_CORPUS_FINDINGS.md`; claim scoping → `SCOPED_CLAIM.md`;
-running the service → `RUNBOOK_LLAMAINDEX.md`; team brief → `FINDINGS_FOR_WS1.md`;
-history → `progress.md`.
+Key docs: **`RUN_ON_EC2.md` §12 is the run path.** Memory comparability → session 30 + §0a;
+gate dialects → `gates_shared.py` docstring; bug reports → `BUG_CHUNK_DUPLICATION.md` (trigger
+corrected to ≥64 chunks), `BUG_NUL_TRUNCATION.md`; topology confound → `MATCHED_LAYERS.md`.
 
 <!-- trap appended 2026-08-10: `setsid` does not exist on macOS. `nohup ... &` alone survives the
      parent shell. A `nohup setsid ...` invocation dies instantly with "setsid: No such file or
      directory" and, if unverified, looks exactly like a running job. Verify every detached launch
      BY PID, never by assumption — this failure has now occurred twice in this project. -->
+
+<!-- trap appended 2026-08-15: a JSON `.pipe` file in a working tree on this Mac is rewritten by
+     a format-on-save daemon within seconds — a fresh clone showed ` M` immediately, with three
+     different hashes across three reads. It expands compact JSON, so our already-expanded pipe is
+     untouched and a teammate's compact one is not. NEVER hash a .pipe from a working tree; use
+     `git show HEAD:<path> | shasum -a 256`. This produced a false accusation that a teammate's
+     pipe had drifted; his committed bytes were correct all along. -->
