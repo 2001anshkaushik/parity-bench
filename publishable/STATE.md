@@ -91,7 +91,7 @@ are also not comparable *with each other*: 150 vs 200 docs, 3 vs 1 reps, 12-CPU 
 `#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34).
 
 **The pattern, stated plainly: in this project the instrument is wrong more often than the system
-under test. Twelve instrument defects in fifteen sessions, zero product defects found by us in that
+under test. Thirteen instrument defects in fifteen sessions, zero product defects found by us in that
 window that were not already known.** Behave accordingly — the Standing Verification Protocol in
 §2 is not ceremony.
 
