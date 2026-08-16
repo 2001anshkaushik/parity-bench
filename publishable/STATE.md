@@ -8,7 +8,7 @@ this project. Read this first.
 ## 0a. ⏸️ HANDOFF — READ THIS BEFORE ANYTHING ELSE (2026-08-16)
 
 **A session with zero memory of this work starts here. Everything below §0a is history, newest
-session first from `SESSION 34` down.** Sessions 20–34 are the current architecture; anything
+session first from `SESSION 35` down.** Sessions 20–35 are the current architecture; anything
 older describes a harness that has since been substantially rebuilt.
 
 ### Where we are
@@ -43,6 +43,44 @@ seen ~8.3× each — **his docs/s is not comparable with ours in either directio
 are also not comparable *with each other*: 150 vs 200 docs, 3 vs 1 reps, 12-CPU cap vs uncapped.
 `run.sh 10000` exists in Shashi's runbook as a planned command; it has never executed.
 
+**Peer refs move almost daily. Re-clone before any comparison.** As of session 35: Leela
+`aws-bench` **`6f7ce2e`**, Shashi `benchmark/shared-pipe-engine-3.3.1` **`ce15326`** — both moved
+that same day. Shashi's `main` (`35ad350`) is NOT his benchmark branch.
+
+### ⚠ Scale is not comparable across n — the single most important cross-site rule [VERIFIED, session 35]
+
+**A 200-document throughput figure is structurally biased LOW against a 10,000-document one for
+the same engine, and the bias worsens with concurrency.** Throughput is `(n − warm) / span` and
+`span` ends when the LAST document finishes; GovDocs1 is severely heavy-tailed — **the slowest
+1 % of documents carry 58.6 % of all service seconds**. At n=200, C=32 there are ~6 waves, so the
+span is set by maxima; at n=10,000 there are ~312 and it converges to `C / mean`. Simulated from
+ONE measured service-time distribution: 0.850 docs/s at n=200 vs 8.026 at n=10,000, a **9.44×**
+ratio at C=32 (1.72× at C=4, 3.01× at C=8).
+
+That is why Leela's 0.68–0.74 (200 docs) and our 4.03 (10k) are **the same engine**, and why our
+own 200-doc runs read 0.52–0.67. **Never put figures from different n in one table.** Reproduce
+with `working/scripts/throughput_ramp.py <perdoc.jsonl> --concurrency 32`.
+
+### Envelope gaps vs BOTH teammates — named, UNQUANTIFIED [session 35]
+
+| | us | Leela | Shashi |
+|---|---|---|---|
+| CPU allocation | `--cpus 32` CFS **quota** | **cpuset 0-23** (24 cores) | **cpuset**, both services identical |
+| client / driver | **host, unpinned, shares the arm's cores** | own container, cpuset 24-31 | own container |
+| memory | **`--memory 58g` hard cap** | **uncapped**, measured | **uncapped** |
+| per-request deadline | 300 s | 3600 s, one deadline both arms | per-phase budget |
+
+None of the four is measured. Our driver competing with the container under test is the one most
+likely to matter, and it is not symmetric between arms.
+
+### Parallelism — MEASURED, and it refutes the concern that preceded it [session 35]
+
+**RocketRide 23.05 effective cores, LlamaIndex 30.51**, on the box. We pass no `use(threads=)`;
+Shashi passes `threads=<host cores>` and gets 24.28. **Our RocketRide arm sits next to Shashi's,
+not near Leela's 5.8–5.9** — Leela's figure describes his 24-core cpuset and single batched
+`send_files`, not an engine default. No `use(threads=)` change is warranted. Residual RR-vs-LI
+gap **1.32×**.
+
 ### Current architecture — what exists now
 
 | module | what it is |
@@ -54,6 +92,9 @@ are also not comparable *with each other*: 150 vs 200 docs, 3 vs 1 reps, 12-CPU 
 | `working/harness/rr_credentials.py` | Endpoint + key resolution; runs on `harness` import. |
 | `working/scripts/smoke50_parser_in.py` | The driver. Both arms, both legs, five gates, three verdicts, metrics, memory. |
 | `working/scripts/fetch_govdocs.py` | Manifest-driven corpus fetcher. `DONE` means verified. |
+| `working/scripts/blast_latency_salvage.py` | Recovers service latency from pre-`79ad702` blast records (FIFO admission model, null-controlled). |
+| `working/scripts/analyze_sampler.py` | Process fan-out + memory trajectory from sampler streams already on disk. |
+| `working/scripts/throughput_ramp.py` | Replays measured service times through a C-server queue: why n=200 and n=10k disagree. |
 
 ### Settled decisions — do not change without the team
 
@@ -521,6 +562,119 @@ we had been running. Shashi and Leela are doing the same.
 | T3-6 | **Three incompatible memory boundaries**: ours engine-tree+driver, Leela's container cgroup, Shashi's `getrusage(RUSAGE_SELF)` — driver only, which does not capture engine-side work at all | **VERIFIED** |
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
+
+### SESSION 35 — why our numbers differ from the teammates': it is scale (2026-08-16)
+
+Analysis only; nothing in the measurement path changed. Peer repos re-cloned into
+`reference-latest/`; **both had moved that day**:
+
+| repo | branch | was | **now** | that day's commit |
+|---|---|---|---|---|
+| Leela | `aws-bench` | `2cc0cca` | **`6f7ce2e`** | corpus: OFFSET for a disjoint document set; warm-up docs never measured |
+| Shashi | `benchmark/shared-pipe-engine-3.3.1` | `c8b4b2b` | **`ce15326`** | Support alternative pinned corpora: SEED_MANIFEST + SEED_N + 500-seed builder |
+
+**The question.** Leela's RocketRide blast reports 0.68–0.74 docs/s on 200 documents (~285 s);
+ours reports 4.03 on 10,000 (~2,470 s). Our own 200-doc blast was 0.52–0.67 — agreeing with his,
+not with our own 10k.
+
+#### The answer: a 200-document throughput number is structurally biased LOW
+
+**Corpus is not the cause.** Our first 200 documents average **616.4 KB** against **616.2 KB**
+for all 10,000, and are *lighter* by pages (22.9 vs 29.6 mean). Heavier documents would have made
+the small run slower; they are not heavier.
+
+**The obvious ramp test is invalid and was discarded.** Slicing a run into deciles by COMPLETION
+RANK always shows a decaying rate, because completion rank sorts documents by duration — the fast
+ones finish first by construction. That profile measures the size distribution, not the engine.
+
+**The mechanism is heavy tail × finite wave count.** Throughput is `(n − warm) / span`, and
+`span` ends when the *last* document finishes. Measured on our own blast records, **the slowest
+1 % of documents carry 58.6 % of all service seconds** (mean 3.261 s, median 0.203 s). At n=200
+with C=32 there are only ~6 waves, so the span is governed by the slowest document in each wave —
+a **maximum**. At n=10,000 there are ~312 waves and it converges to `C / mean`.
+
+Replaying ONE measured service-time distribution through a C-server FIFO queue
+(`working/scripts/throughput_ramp.py`):
+
+| C | n | waves | sim docs/s | ratio vs n=200 |
+|---|---|---|---|---|
+| 4 | 200 | 50 | 0.683 | 1.00× |
+| 4 | 10000 | 2500 | 1.177 | 1.72× |
+| 8 | 200 | 25 | 0.761 | 1.00× |
+| 8 | 10000 | 1250 | 2.290 | 3.01× |
+| 32 | 200 | 6 | 0.850 | 1.00× |
+| 32 | 10000 | 312 | 8.026 | **9.44×** |
+
+Simulated n=200 at C=32 is **0.850 docs/s** against Leela's observed 0.68–0.74 and our 0.52–0.67.
+The predicted 200→10k ratio at C=32 is 9.4×; observed is 4.03/0.6 ≈ 6.7×. Same direction, same
+order, and the effect **grows with C exactly as the wave argument requires** — a prediction the
+simulation made before it was checked against the box numbers. **VERIFIED** (simulation +
+independent agreement with two separately-measured small-n figures).
+
+> **RULE FOR THE THREE-WAY TABLE: 200-document and 10,000-document throughput figures must never
+> share a row, in either direction.** Given the tail weight, 200 is too few for a stable figure
+> whoever runs it — our n=200 simulation spread was ±0.413 on a 0.683 mean, roughly ±60 %. This
+> needs raising with the group **before** the table is built.
+
+#### effective_cores: my `use(threads=)` concern was WRONG
+
+I flagged that we pass nothing to `use()` while Shashi passes `threads=8`, and reasoned from
+Leela's comment ("~5.8–5.9 effective cores… the limiter is the engine's pool") that our
+RocketRide arm was running at a fifth of our LlamaIndex arm's parallelism.
+
+**Measured on the box, that is refuted: RocketRide 23.05 effective cores, LlamaIndex 30.51.**
+
+RocketRide lands next to Shashi's `threads=<host cores>` figure of 24.28, not near Leela's 5.8.
+**Leela's 5.8 is the outlier, not ours** — his arm is confined to a 24-core cpuset and drives the
+engine through one batched `send_files`, so his number describes his configuration, not an engine
+default. The engine's default pool is not inherently ~6-way, and no `use(threads=)` change is
+warranted here. The residual RR-vs-LI gap is **1.32×**, worth noting and nothing like 5×.
+
+*Register note: I reasoned from a teammate's measurement of a different configuration to a claim
+about ours, and stated it as the headline concern. Ours was measurable from a record already on
+disk. Measure our own instrument before importing someone else's number as a finding about it.*
+
+#### Four envelope gaps where we differ from BOTH of them
+
+| | us | Leela | Shashi |
+|---|---|---|---|
+| CPU allocation | `--cpus 32` — CFS **quota**, whole box | **cpuset 0-23**, arm gets 24 cores | **cpuset**, identical for both services |
+| client / driver | **on the host, unpinned**, sharing the arm's cores | own container, **cpuset 24-31** | own container |
+| memory | **`--memory 58g` hard cap** | **uncapped**, measured ("a 10 g cap would have OOM-killed RocketRide, peak 10,536 MB") | **uncapped** |
+| per-request deadline | 300 s | 3600 s, **one deadline both arms** | per-phase budget |
+
+Leela pins the measuring client onto separate cores so it "can never steal from the arm it is
+measuring". Ours competes with the container under test on the same 32 cores — with 32 uvicorn
+workers plus a 32-thread driver that is oversubscription, and it is not symmetric between arms.
+All four are **UNQUANTIFIED**: named, not measured.
+
+#### What is genuinely aligned, and what differs in definition
+
+**Aligned:** all three pipelines are `webhook → parse → preprocessor_langchain →
+embedding_transformer → response_documents`, parsing inside the framework; all three now run
+correctness gates **post-loop** (that was our defect #19, not theirs); all three on GovDocs1; all
+three cgroup-based on memory. `pipelineTraceLevel` was checked and is a non-difference — the SDK
+captures a trace only when set, and Leela's probe found `_trace` never materialises anyway.
+
+**Differs by definition:**
+
+| | blast implementation | per-doc timestamps | warm-up |
+|---|---|---|---|
+| Leela | ONE `send_files(200 files)`; engine holds the backlog | **derived** from the engine's `upload_time`, self-labelled `timing_source: "batch_upload_time (derived, not measured)"` | 25 **disjoint** docs, excluded, timed separately |
+| Shashi | ONE `send_files(files)` | none in blast; `wall_s` only | `max(4, 2×threads)`, excluded |
+| us | N individual `send()` with a client semaphore of C | client-observed | metric-side: drop the first 64 **completions of the measured corpus** |
+
+His per-document figure is the engine's self-reported processing time; ours is a client-observed
+round trip including transport. Our warm-up drops the 64 *fastest* documents rather than the
+first 64 submitted, and they are measured-corpus documents rather than disjoint ones — his
+policy is the better of the two.
+
+Also worth carrying forward: Leela records **372–399 threads alive** at a client concurrency of
+8–11, corroborating that the box's "307–321 PIDs" is a **thread** count (defect #31).
+
+**Could not fetch his S3 exports** — no `aws` CLI or `boto3` on the laptop. Everything above is
+from committed peer code plus our own per-document records. His records would settle per-document
+service time directly; his code was enough to establish what those records mean.
 
 ### SESSION 34 — defects #29 and #30, found in the 10k blast output (2026-08-16)
 
