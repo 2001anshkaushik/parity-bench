@@ -8,7 +8,7 @@ this project. Read this first.
 ## 0a. ⏸️ HANDOFF — READ THIS BEFORE ANYTHING ELSE (2026-08-16)
 
 **A session with zero memory of this work starts here. Everything below §0a is history, newest
-session first from `SESSION 33` down.** Sessions 20–33 are the current architecture; anything
+session first from `SESSION 34` down.** Sessions 20–34 are the current architecture; anything
 older describes a harness that has since been substantially rebuilt.
 
 ### Where we are
@@ -83,23 +83,30 @@ are also not comparable *with each other*: 150 vs 200 docs, 3 vs 1 reps, 12-CPU 
 * **Any performance figure from macOS/arm64** — superseded by policy. The metrics block now derives the caveat from `platform.system()/machine()`.
 * **Anything in `archive/`.**
 * **BUG_CHUNK_DUPLICATION's "~239.8k chars" and "5.34 % of corpus"** — the real predicate is **≥ 64 chunks** (root-caused by Shashi); the char figures are proxies needing re-derivation.
+* **Every blast-leg latency written before `79ad702`** — RocketRide's clock started at batch open and LlamaIndex's at admission, so the two arms measured different quantities (defect #29). The 10k run's `rocketride blast p50 1120 s / p95 2150 s` is ~99 % client-side queue wait. **Blast throughput from the same records is unaffected and stands.**
 
-### Defect register, sessions 20–33 — all found in OUR instrument
+### Defect register, sessions 20–34 — all found in OUR instrument
 
-`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33).
+`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak (session 34).
 
 **The pattern, stated plainly: in this project the instrument is wrong more often than the system
-under test. Ten instrument defects in fourteen sessions, zero product defects found by us in that
+under test. Twelve instrument defects in fifteen sessions, zero product defects found by us in that
 window that were not already known.** Behave accordingly — the Standing Verification Protocol in
 §2 is not ceremony.
+
+**Two of the twelve (#19, #29) were direction-asymmetric and both ran AGAINST RocketRide.** That is
+worth knowing when the direction-of-bias rule tempts you to relax on a finding that hurts us: the
+instrument has no loyalty, and an artifact that flatters the rival is exactly as likely.
 
 ### Before the 10k run — the remaining checklist
 
 1. ✅ Corpus complete and manifest-verified (session 33).
 2. ✅ Both legs stream + resume; legs separable.
-3. ⬜ **One cgroup-instrumented 200-doc run** — `memory_sources.py` shipped after the last box run, so **no cgroup memory figure exists yet**. ~20 min, and it converts the OOM question from an extrapolation of an over-counted number into a measurement.
-4. ⬜ Decide `SMOKE_TIKA_SAMPLE=200` (recommended) vs full (adds ~1.7 h).
-5. ⬜ Raise the corpus divergence with the group before anyone builds a three-way table.
+3. ✅ Blast clock symmetric on both arms; both stamps recorded (session 34, `79ad702`).
+4. ⬜ **One cgroup-instrumented 200-doc run** — `memory_sources.py` shipped after the last box run, so **no cgroup memory figure exists yet**. ~20 min, and it converts the OOM question from an extrapolation of an over-counted number into a measurement.
+5. ⬜ Decide `SMOKE_TIKA_SAMPLE=200` (recommended) vs full (adds ~1.7 h).
+6. ⬜ Raise the corpus divergence with the group before anyone builds a three-way table.
+7. ⬜ **Re-run the blast leg (~40 min)** to replace the reconstructed latencies with measured ones. Sequential is unaffected and does not need re-running.
 
 ## 0. What this is
 
@@ -513,6 +520,97 @@ we had been running. Shashi and Leela are doing the same.
 | T3-6 | **Three incompatible memory boundaries**: ours engine-tree+driver, Leela's container cgroup, Shashi's `getrusage(RUSAGE_SELF)` — driver only, which does not capture engine-side work at all | **VERIFIED** |
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
+
+### SESSION 34 — defects #29 and #30, found in the 10k blast output (2026-08-16)
+
+The 10k blast leg completed. Two defects in its own report, both caught by a reader doing
+arithmetic across two lines of the same page. Sequential was still running on the box and was
+not touched; **nothing in this session's diagnosis required the box.**
+
+#### #29 — the two arms started the latency clock at different points
+
+The report said:
+
+| arm | blast p50 | blast p95 | docs/s |
+|---|---|---|---|
+| llamaindex | 2.05 s | 17.6 s | 6.40 |
+| rocketride | **1120 s** | **2150 s** | 4.03 |
+
+RocketRide's p95 was 87 % of the whole 2,481 s leg, which is the signature of every document
+being stamped as submitted at *t*=0.
+
+**Concurrency was matched; the clock was not.** `SMOKE_BLAST_C` bounds in-flight work on both
+arms — `cf.ThreadPoolExecutor(max_workers=BLAST_C)` on LlamaIndex, `asyncio.Semaphore(BLAST_C)`
+on RocketRide. But LlamaIndex stamped `submit_ns` **inside** the pool worker, which runs only
+once a thread is free (admission), while RocketRide stamped it **before** `async with sem`. As
+`asyncio.gather` starts every coroutine in the loop's first pass, all N documents were stamped
+within milliseconds of batch open, and each one carried the full client-side queue wait as
+"latency".
+
+**Measured, not inferred** — submit-stamp spread as a fraction of leg duration, two local
+200-doc runs:
+
+| run | arm | n | leg | submit spread | % of leg |
+|---|---|---|---|---|---|
+| `…044726Z` | llamaindex | 200 | 66.6 s | 64.97 s | **97.6 %** |
+| `…044726Z` | rocketride | 200 | 319.1 s | 0.001 s | **0.0 %** |
+| `…051154Z` | llamaindex | 200 | 68.9 s | 67.25 s | **97.5 %** |
+| `…051154Z` | rocketride | 200 | 319.4 s | 0.001 s | **0.0 %** |
+
+Four more runs at n=5/6 show the same direction. **Direction of bias: against RocketRide**, by
+roughly 550× at 10k.
+
+**Throughput is untouched, verified by null control.** At `warm_n>0` the throughput window spans
+*completion to completion* and never reads `submit_ns`. Forcing either stamping convention onto
+either arm leaves `docs_per_s` bit-identical (3.0662 → 3.0662, 0.4491 → 0.4491) on both local
+runs. **The blast throughput comparison in the 10k report stands as published.**
+
+**The fix keeps both definitions.** Both arms now record `enqueue_ns` *and* `admit_ns`, with
+`submit_ns == admit_ns`, so service latency and Leela's batch-position latency come out of one
+set of records and the choice never costs another run. The old label was also wrong for both
+arms: a bounded client pool is not open-loop, and blast is now reported as `closed-loop` with
+`client_concurrency` beside it, plus a separate `blast_batchpos` row carrying Leela's
+definition.
+
+**Salvage without re-running:** `working/scripts/blast_latency_salvage.py`. A bounded pool of C
+is a FIFO queue, so `admit[k] = completion_sorted[k−C]` for `k ≥ C`. Gated on a null control
+that reconstructs the arm which *already* recorded real admission stamps — it must reproduce
+them or the script reports nothing. On `…051154Z` it reproduced LlamaIndex's recorded p50/p90/
+p95/p99 to **worst error 0.014 %**. Applied to RocketRide it turns p50 36.11 s → **0.148 s** and
+p95 88.95 s → **9.33 s** (PROVISIONAL — a model, superseded by any post-fix run).
+
+#### #30 — the memory table and the metrics line described different legs
+
+`peakRSS=84960.6MB` on one line; `summed RSS 1,513.8 · cgroup anon 1,025.4 · 1.48×` on another.
+84,960/1,025 is 83×, not 1.48×.
+
+**Both figures were right for what they measured and were never the same measurement.**
+`mem_sources` was populated only inside the sequential leg and keyed on the arm alone, so the
+table always described a 1–2 process tree, while the metrics line beside it carried a *blast*
+peak from a tree of `BLAST_C`-plus processes. The over-count scales with the number of processes
+sharing pages, so the sequential leg's 1.48× sharing factor is meaningless applied to a blast
+peak — a point `memory_sources.py`'s own docstring already made, which the report then violated
+by printing them adjacent.
+
+**Why 85 GB survived a 58 GB cap:** the cgroup charges a shared page **once**, however many
+processes map it; summed RSS charges it once **per** process. A footprint that size would have
+been OOM-killed. **The number surviving is the proof that it is not a footprint** — now an
+automatic check (`summed_rss_exceeds_cgroup_limit`), since it costs one comparison.
+
+**Arm attribution is UNVERIFIED.** No `aws` CLI or `boto3` on the laptop, so the record was not
+fetched. From the code, 84,960 MB / 33 uvicorn workers = 2,574 MB per process is right for
+torch + the embedding model, whereas a 2-process RocketRide tree would need 42 GB per process
+under a 58 GB cap. Settle it from the record — `metrics.arms.*.blast_warm64` and the
+`n_procs`/`rss` columns of `sampler_rr_blast.jsonl` — before quoting either.
+
+Fixed: memory captured per arm **per leg**, sharing factor scoped to its own leg, the three
+cgroup columns labelled for what they are (this-leg peak / **point sample** / all-leg HWM), and
+the metrics-line field renamed `peak_summed_process_rss_mb` so it cannot be lifted out and read
+as a footprint.
+
+New tests, both passing: `test_blast_symmetry.py` (both concurrency patterns against one
+synthetic service, plus a deliberately reintroduced bug the control is required to catch) and
+`test_memory_sources.py`. All five suites pass. Pushed as `79ad702`.
 
 ### SESSION 33 — defect #28: the fetcher counted its own arithmetic; peer-scale recon (2026-08-16)
 
