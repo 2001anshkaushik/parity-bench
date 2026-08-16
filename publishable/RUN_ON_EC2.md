@@ -522,8 +522,22 @@ curl -s http://127.0.0.1:5565/version     # EXPECT version 3.3.1.35, hash a0817c
 
 ```bash
 ../.venv/bin/python working/scripts/fetch_govdocs.py 200          # = govdocs1 zip 000 exactly
+echo "FETCH EXIT: $?"                                             # 0 = verified against manifest
 ../.venv/bin/python working/scripts/verify_corpus_manifest.py --subset
 ```
+
+**The fetcher is manifest-driven and `DONE` means verified**, not "a counter reached N". It
+computes which files are missing, downloads only the zips containing them, and exits **1** with
+the missing filenames if the corpus still does not match. For the full corpus:
+
+```bash
+../.venv/bin/python working/scripts/fetch_govdocs.py 10000        # only fetches what is missing
+echo "FETCH EXIT: $?"
+../.venv/bin/python working/scripts/verify_corpus_manifest.py     # FULL mode, independent check
+```
+
+Add `--verify` to sha256 every file rather than checking size only — slower, definitive, and
+worth it once before a 10k run.
 
 Network-bound (~350 MB), so start it while the images build. It is listed before the preflight
 because the smoke driver validates the corpus first and exits 2 on a short one.
