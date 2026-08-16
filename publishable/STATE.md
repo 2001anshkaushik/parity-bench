@@ -129,7 +129,7 @@ gap **1.32×**.
 
 ### Defect register, sessions 20–34 — all found in OUR instrument
 
-`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34).
+`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34) · `#32` OPEN — unset `ttl` defaults to 900 s idle while our own per-doc deadline is 1800 s; 371 docs lost, cause unconfirmed (session 36).
 
 **The pattern, stated plainly: in this project the instrument is wrong more often than the system
 under test. Thirteen instrument defects in fifteen sessions, zero product defects found by us in that
@@ -139,6 +139,57 @@ window that were not already known.** Behave accordingly — the Standing Verifi
 **Two of the twelve (#19, #29) were direction-asymmetric and both ran AGAINST RocketRide.** That is
 worth knowing when the direction-of-bias rule tempts you to relax on a finding that hurts us: the
 instrument has no loyalty, and an artifact that flatters the rival is exactly as likely.
+
+### 🔴 OPEN — the 10k sequential leg died at document 9,629; ttl is the prime suspect [session 36]
+
+**371 contiguous failures** (docs 9,630–10,000), every one "Your pipeline is not running … task
+terminated". Container never restarted (`restarts=0`, up 27 h). Engine log: `child process pid
+2045259 exit status already read: will report returncode 255`.
+
+**From the SDK/server source — VERIFIED, not inferred:**
+
+| fact | source |
+|---|---|
+| SDK sends **no** `ttl` when not passed; server applies its own default | `engine/rocketride/mixins/execution.py:245` |
+| server default `CONST_DEFAULT_TTL = 15 * 60` = **900 s** | `packages/ai/src/ai/constants.py:55`, used at `task_server.py:1087` |
+| it is an **IDLE** timer, not wall-clock: swept every 60 s, `_idle_time += 60`, terminate when `_idle_time >= _ttl` | `task_server.py:355-380` |
+| `reset_idle_timer()` has **exactly one** call site — the top of `_send_data()`, i.e. at SUBMISSION. The clock therefore runs for the whole time a document is being processed | `task_engine.py:734`, `:1699` |
+| `ttl=0` means **no timeout** ("Skip TTL enforcement if ttl is 0") | `task_server.py:365` |
+| a TTL stop does `engine.terminate()` → `engine.kill()`, awaiting `engine.wait()` (which reaps the status) | `task_engine.py:2320-2340` |
+
+**What each of us passes:** Shashi `ttl=0` (`rr_app.py:138`) · Leela `ttl=7200`
+(`rr_driver.py:177`) · **us: nothing → 900 s**. We are the only one of the three relying on a
+default we never read.
+
+**THE INVERSION, and it is ours.** Our sequential per-document client deadline is **1800 s**
+(`weekend_worker.py:409-410`) — **twice** the engine's 900 s idle TTL. Any document taking
+900–1800 s is killed by the engine mid-processing while our client is still waiting. **A ttl must
+always exceed the client's own per-request timeout; 900 < 1800 is a configuration error on our
+side.**
+
+**Cause NOT yet established, and one piece of evidence cuts against TTL.** Doc 9,629 is
+`039_039660.pdf` (3.32 MB, 39 pages, 10,699 chars — top 2.6 % most image-heavy by bytes/char),
+but five *worse* documents earlier in the corpus (indices 591, 3,492, 5,236, 6,343, 6,854) all
+passed. "A monster document stalled" is not obviously the story.
+
+**THE ONE CHECK THAT SETTLES IT** — consecutive `submit_ns` gaps in
+`working/results/run10k/perdoc_rr_sequential.jsonl` near index 9,629. In a tight sequential loop
+the gap between submissions IS the previous document's service time.
+
+* any gap **≥ 900 s** → TTL fired, the engine did what it documents, **this is our config gap and
+  a footnote**;
+* largest gap **well under 900 s** → TTL did not fire, something else killed the child, **and that
+  is a product finding**.
+
+**Nothing about this goes in a report until that check runs.** Note also that the TTL termination
+message goes through `debug_message`, so its absence from the engine log is not evidence against
+TTL. The `returncode 255` line is *consistent* with the TTL path (`stop_task` awaits
+`engine.wait()`, reaping the status, and a later reader finds it already read) but does not prove
+it.
+
+**Direction of bias:** 371 documents recorded as RocketRide failures. Publishing that as a
+RocketRide reliability result, if the cause is our unset `ttl`, would be a false product finding
+against our own engine.
 
 ### Before the 10k run — the remaining checklist
 
