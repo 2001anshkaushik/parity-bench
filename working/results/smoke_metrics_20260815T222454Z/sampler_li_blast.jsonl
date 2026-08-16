@@ -1,0 +1,2 @@
+{"kind":"role_tick","t":0.002622624975629151,"role":"service","n_procs":4,"rss":1307688960,"vms":1785096486912,"uss":null,"threads":12,"fds":63,"cpu_s":7.918409}
+{"kind":"role_tick","t":0.5076643748907372,"role":"service","n_procs":4,"rss":1429716992,"vms":1785202130944,"uss":null,"threads":12,"fds":64,"cpu_s":8.558607}

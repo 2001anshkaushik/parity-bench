@@ -79,6 +79,7 @@ are also not comparable *with each other*: 150 vs 200 docs, 3 vs 1 reps, 12-CPU 
 
 ### ⛔ Numbers that must never be quoted
 
+* **`rocketride 1,025.4 MB cgroup anon` from the 10k blast** — a post-leg point sample, taken after the engine released its task processes (defect #31). **No valid cgroup figure exists for either 10k blast leg.**
 * **Any `peakRSS` from before session 30** — it is a SUM of per-process RSS, over-counting shared pages by a factor that *scales with worker count* (32-worker LI badly inflated, 2-process RR nearly correct). Not usable even as a ratio.
 * **Any performance figure from macOS/arm64** — superseded by policy. The metrics block now derives the caveat from `platform.system()/machine()`.
 * **Anything in `archive/`.**
@@ -87,7 +88,7 @@ are also not comparable *with each other*: 150 vs 200 docs, 3 vs 1 reps, 12-CPU 
 
 ### Defect register, sessions 20–34 — all found in OUR instrument
 
-`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak (session 34).
+`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34).
 
 **The pattern, stated plainly: in this project the instrument is wrong more often than the system
 under test. Twelve instrument defects in fifteen sessions, zero product defects found by us in that
@@ -597,11 +598,23 @@ processes map it; summed RSS charges it once **per** process. A footprint that s
 been OOM-killed. **The number surviving is the proof that it is not a footprint** — now an
 automatic check (`summed_rss_exceeds_cgroup_limit`), since it costs one comparison.
 
-**Arm attribution is UNVERIFIED.** No `aws` CLI or `boto3` on the laptop, so the record was not
-fetched. From the code, 84,960 MB / 33 uvicorn workers = 2,574 MB per process is right for
-torch + the embedding model, whereas a 2-process RocketRide tree would need 42 GB per process
-under a 58 GB cap. Settle it from the record — `metrics.arms.*.blast_warm64` and the
-`n_procs`/`rss` columns of `sampler_rr_blast.jsonl` — before quoting either.
+> **CORRECTION (same session).** I attributed the 84,960.6 MB to LlamaIndex by inferring
+> 84,960/33 uvicorn workers = 2,574 MB per process. **Wrong, and wrong in the direction that
+> flattered us.** From the record: **llamaindex blast 36,427.1 MB, rocketride blast 84,960.6 MB.**
+> The inference was per-process arithmetic run backwards — it assumed the arm with more known
+> processes owned the larger sum, when the sum is what identifies the fan-out, not the reverse.
+> The lesson for the register: *a plausible mechanism is not evidence of which side it happened
+> on.* I had the record's location and did not fetch it (no `aws`/`boto3` on the laptop) and
+> should have marked the attribution UNKNOWN rather than naming a most-likely arm.
+
+**This inverts the memory headline.** At 200-doc sequential, RocketRide was 3.0 GB anon against
+LlamaIndex 20.8 GB. At 10k blast the *summed* ordering reverses. RocketRide blast summed RSS was
+**9,209 MB at 200 docs and 84,960 MB at 10k under the same C=32** — concurrency held constant
+while the figure moved 9.2×, so the fan-out is not explained by concurrency alone.
+
+**There is NO valid cgroup figure for either 10k blast leg.** The table's `rocketride 1,025.4
+anon / 2 procs` is a post-leg point sample taken after the engine released its task processes —
+see defect #31.
 
 Fixed: memory captured per arm **per leg**, sharing factor scoped to its own leg, the three
 cgroup columns labelled for what they are (this-leg peak / **point sample** / all-leg HWM), and
@@ -611,6 +624,31 @@ as a footprint.
 New tests, both passing: `test_blast_symmetry.py` (both concurrency patterns against one
 synthetic service, plus a deliberately reintroduced bug the control is required to catch) and
 `test_memory_sources.py`. All five suites pass. Pushed as `79ad702`.
+
+#### #31 — cgroup anon was read once, AFTER the leg, and printed in a column headed "peak"
+
+`capture_memory` called `memory_report()` after the span closed, so `anon` and `current` were
+point samples of a container that had already released whatever the leg was holding. Only
+`memory.peak` was a real high-water mark, and it is cumulative over the container's lifetime, so
+it spans every leg. Three different kinds of number, three adjacent columns, one heading.
+
+**Minimum fix, and why it is where it is.** anon has no kernel HWM (`memory.peak` tracks
+`memory.current`, which includes page cache), so an anon peak must be sampled. It is now sampled
+**on the collector's existing 0.5 s process tick** — `collector.py::_sample_cgroup` resolves the
+container's cgroup once from any tracked pid and reads `memory.stat anon`, `memory.current` and
+`pids.current` on every tick, tracking peaks in `RoleAggregate`. No new thread, no new file, no
+new argument, and one clock: `cost_window()` already slices the tick stream to the throughput
+window, so anon gets the same treatment as CPU and RSS. Fields reach the report through
+`summary()` as `peak_cgroup_anon_mb` / `peak_cgroup_current_mb` / `peak_cgroup_tasks`.
+
+**`pids.current` counts TASKS, not processes.** The box's reported 307–321 "PIDs" is very likely
+threads: the local macOS RocketRide blast leg reached **290 threads in 2 processes** at C=4. The
+report now prints `procs` and `tasks` in separate columns with `tasks_per_process_at_peak`, so
+the two can never be read as the same quantity again.
+
+Also new: `working/scripts/analyze_sampler.py` — reads the sampler streams already on disk and
+separates *bounded-by-concurrency* from *grows-with-documents* from *per-process leak*, using
+the second-half slope so a model load is not reported as a leak.
 
 ### SESSION 33 — defect #28: the fetcher counted its own arithmetic; peer-scale recon (2026-08-16)
 

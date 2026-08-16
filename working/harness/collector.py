@@ -56,6 +56,11 @@ from typing import Callable, Iterable
 
 import psutil
 
+# One reader for the cgroup, shared with the reporting path, so the sampler and the report can
+# never drift on what `anon` means. Absolute import: this module is loaded both as
+# `harness.collector` and, in the out-of-process child, as part of `-m harness.collector_proc`.
+from harness.memory_sources import cgroup_memory, cgroup_path_for_pid
+
 PidSource = Callable[[], Iterable[int]]
 
 DEFAULT_INTERVAL_S = 0.10
@@ -141,6 +146,16 @@ class RoleAggregate:
     peak_procs: int = 0
     peak_threads: int = 0
     peak_fds: int = 0
+    # cgroup v2, sampled on the SAME tick as the per-process figures (defect #31, 2026-08-16).
+    # The driver used to read the cgroup once, after the leg, and print the result in a column
+    # headed "peak" — so the 10k blast reported 1,025.4 MB anon and 2 processes, both taken
+    # after the engine had already released its task processes. Sampling it here puts anon on
+    # the same clock as RSS and inside the same throughput window.
+    peak_cgroup_anon: int = 0
+    peak_cgroup_current: int = 0
+    peak_cgroup_pids: int = 0
+    cgroup_path: str | None = None
+    cgroup_reads: int = 0
     # CPU seconds retired by processes that have exited.
     retired_cpu_user: float = 0.0
     retired_cpu_sys: float = 0.0
@@ -402,14 +417,59 @@ class TreeCollector:
                 if self.enforce_ceiling:
                     self._terminate_role(role)
 
-            self._write({
+            row = {
                 "kind": "role_tick", "t": t, "role": role, "n_procs": n_live,
                 "rss": rss, "vms": vms, "uss": uss or None, "threads": threads, "fds": fds,
                 "cpu_s": round(agg.total_cpu_seconds(), 6),
-            })
+            }
+            row.update(self._sample_cgroup(agg, tracked))
+            self._write(row)
 
         if self._tick % SYSTEM_DECIMATION == 0:
             self._sample_system(t)
+
+    def _sample_cgroup(self, agg: "RoleAggregate", tracked: dict) -> dict:
+        """cgroup v2 memory for this role's container, on this tick.
+
+        WHY IT LIVES ON THE PROCESS TICK. anon has no kernel high-water mark — unlike
+        `memory.peak`, which tracks `memory.current` and therefore includes page cache — so an
+        anon peak has to be sampled. Sampling it here rather than in a second thread keeps one
+        clock: `cost_window()` already slices the tick stream to the throughput window, so anon
+        gets the identical treatment as CPU and RSS with no new plumbing and no chance of two
+        samplers disagreeing about when a leg began.
+
+        The path is resolved from a tracked pid and cached: a container's cgroup does not move,
+        and re-reading `/proc/<pid>/cgroup` every tick would just add syscalls. Any tracked pid
+        will do — every process in the tree is in the same container cgroup. On a host without
+        cgroup v2 (macOS, cgroup v1) every field is None, which is the correct answer, not zero.
+        """
+        if agg.cgroup_path is None:
+            for pid in tracked:
+                cg = cgroup_path_for_pid(pid)
+                if cg is not None:
+                    agg.cgroup_path = str(cg)
+                    break
+            else:
+                return {}
+        m = cgroup_memory(Path(agg.cgroup_path))
+        anon, cur = m.get("anon_bytes"), m.get("current_bytes")
+        if anon is None and cur is None:
+            return {}
+        agg.cgroup_reads += 1
+        if anon:
+            agg.peak_cgroup_anon = max(agg.peak_cgroup_anon, anon)
+        if cur:
+            agg.peak_cgroup_current = max(agg.peak_cgroup_current, cur)
+        # pids.current counts TASKS, i.e. threads, not processes — the two differ by an order of
+        # magnitude for a threaded engine, and confusing them turns 32 task processes with ten
+        # threads apiece into an apparent 320-process fan-out. Recorded next to n_procs so the
+        # two can never be read as the same quantity.
+        try:
+            npids = int((Path(agg.cgroup_path) / "pids.current").read_text().strip())
+            agg.peak_cgroup_pids = max(agg.peak_cgroup_pids, npids)
+        except (OSError, ValueError):
+            npids = None
+        return {"cg_anon": anon, "cg_current": cur, "cg_pids_tasks": npids}
 
     def _sample_system(self, t: float) -> None:
         vm = psutil.virtual_memory()
@@ -452,6 +512,16 @@ class TreeCollector:
                 "peak_pss_mb": round(agg.peak_pss / 2**20, 2) if agg.peak_pss else None,
                 "peak_process_count": agg.peak_procs,
                 "peak_thread_count": agg.peak_threads,
+                # Sampled DURING the leg, on the process tick — not read once after it.
+                # cgroup anon is the figure comparable to Leela's and Shashi's; it is the only
+                # memory number here that is deduplicated across processes sharing pages.
+                "peak_cgroup_anon_mb": (round(agg.peak_cgroup_anon / 2**20, 2)
+                                        if agg.peak_cgroup_anon else None),
+                "peak_cgroup_current_mb": (round(agg.peak_cgroup_current / 2**20, 2)
+                                           if agg.peak_cgroup_current else None),
+                "peak_cgroup_tasks": agg.peak_cgroup_pids or None,
+                "cgroup_path": agg.cgroup_path,
+                "cgroup_samples": agg.cgroup_reads,
                 "peak_fd_count": agg.peak_fds,
                 "distinct_pids_seen": len(agg.pids_seen),
                 "total_cpu_seconds": round(agg.total_cpu_seconds(), 4),

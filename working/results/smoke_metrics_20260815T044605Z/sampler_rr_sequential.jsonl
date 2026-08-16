@@ -1,0 +1,8 @@
+{"kind":"role_tick","t":0.002296999911777675,"role":"service","n_procs":2,"rss":1066205184,"vms":900156751872,"uss":null,"threads":224,"fds":204,"cpu_s":2283.900429}
+{"kind":"role_tick","t":0.5033823329722509,"role":"service","n_procs":2,"rss":1067483136,"vms":900156751872,"uss":null,"threads":224,"fds":204,"cpu_s":2284.714707}
+{"kind":"role_tick","t":1.0034242909168825,"role":"service","n_procs":2,"rss":1116667904,"vms":900198645760,"uss":null,"threads":223,"fds":204,"cpu_s":2285.311859}
+{"kind":"role_tick","t":1.5073275829199702,"role":"service","n_procs":2,"rss":1116766208,"vms":900198645760,"uss":null,"threads":223,"fds":204,"cpu_s":2285.555636}
+{"kind":"role_tick","t":2.003424374968745,"role":"service","n_procs":2,"rss":1118322688,"vms":900198645760,"uss":null,"threads":223,"fds":204,"cpu_s":2285.862342}
+{"kind":"role_tick","t":2.5035086249699816,"role":"service","n_procs":2,"rss":1180434432,"vms":900253696000,"uss":null,"threads":223,"fds":205,"cpu_s":2286.498974}
+{"kind":"role_tick","t":3.0073261249344796,"role":"service","n_procs":2,"rss":1182482432,"vms":900253696000,"uss":null,"threads":223,"fds":205,"cpu_s":2287.008699}
+{"kind":"role_tick","t":3.507351915934123,"role":"service","n_procs":2,"rss":1182482432,"vms":900253696000,"uss":null,"threads":223,"fds":205,"cpu_s":2287.150612}

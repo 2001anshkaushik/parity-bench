@@ -1,0 +1,2258 @@
+{
+ "_meta": {
+  "name": "smoke50_parser_in",
+  "written_utc": "20260816T012202Z",
+  "payload_sha256_12": "173f7544fe2b",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 74670,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "n_offered": 30,
+  "threads": [
+   [
+    1,
+    14
+   ]
+  ],
+  "arms": {
+   "llamaindex_http_pdf": {
+    "census": {
+     "successful": 30,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": true,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "determinism_unproven": 30,
+    "independent_hash_failures": 0,
+    "independent_reference": {
+     "available": null,
+     "unavailable_reason": null,
+     "covered": 30,
+     "successful": 30,
+     "ran": true,
+     "full_coverage": true
+    },
+    "content_suspect": 0,
+    "records": [
+     {
+      "doc": "000_000009.pdf",
+      "submitted_sha256": "3fcfd899850be006b2d6616f8161e49479bc41424fa80e404f41233b77256ff3",
+      "submit_ns": 1786843261477978000,
+      "completion_ns": 1786843261736438000,
+      "latency_ms": 258.46,
+      "returned_doc_id": "d74670-2",
+      "n_chunks": 7,
+      "chunk_sha256": [
+       "f1648b7d764cbac03b8de3322fec887bcbfc9866c417d577f266b1171dae1860",
+       "7f415182f7916620f79a30112d07d3c650ba0c24ca7dc7ddab32df1049269caf",
+       "0a9f3717a073e9f9d413962c91d0161fe53a3098ec7f60951e8d7e3f24a6741d",
+       "0e9fd3d1abb74dd17ca79890b22620e0dc057a628cab1808d18d210774882edc",
+       "543ff9cdf7f0dc804e071c3df3ed15e4feffae22d5b661bdd2daf5c9a4ab4724",
+       "14f0b2322e47441ccd49ef20f97accb80da81d9102fd55aa4ba27cbe3934e126",
+       "3be946a0fa6568e204953a866e38086343d2f6dbe05b80abcb4cc483c50acb75"
+      ],
+      "chars": 26995,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 26005,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000010.pdf",
+      "submitted_sha256": "7832f844839ed04e2979bc565642f36bf76e1682137071f0786d4c7418bf81d7",
+      "submit_ns": 1786843261737735000,
+      "completion_ns": 1786843261908597000,
+      "latency_ms": 170.86,
+      "returned_doc_id": "d74670-3",
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "69929f6c47b7f8c7b0614d0b5646ea06f91f448fa7215139835cdd838a601af3",
+       "9105244e3cc17309802d3839e20e7028f9f8329c71892d55f13878286437ddbf",
+       "1f507bbbbd478e744e9a2698794586365c4b9a6613b3507f36c7bbdb96250387",
+       "5552af224ee3c508b338424e4f911e44955f9c315127ccca34efeeb0c60b4a52"
+      ],
+      "chars": 12100,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 11763,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000011.pdf",
+      "submitted_sha256": "44d4296ee6750f96a34455cf5d6d6e0a574ffe1419928780b5d2fddea0af3778",
+      "submit_ns": 1786843261909085000,
+      "completion_ns": 1786843261918098000,
+      "latency_ms": 9.01,
+      "returned_doc_id": "d74670-4",
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "08683142c388fe2e00ef1cfb347228f5867d0878eceafad916f81de5023370c9"
+      ],
+      "chars": 273,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 276,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000012.pdf",
+      "submitted_sha256": "1138e868dc3e44bd3f1dafd60ff3ed0d14a42ab1b17964ac475edac46789b5d0",
+      "submit_ns": 1786843261918413000,
+      "completion_ns": 1786843262114776000,
+      "latency_ms": 196.36,
+      "returned_doc_id": "d74670-5",
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "89e068f2ac7f1b9a055f8d6e5f7cd3dc488942078f34988ca4fc4fb04556f4df",
+       "508988990e15ba6bad6bb795346e9d3888e445db9522298bd9a8b715313bdbec",
+       "34a2cfd57dfa4efe749a38c199a0e62629d5939573a7a9f5c590272e93196d45",
+       "c31ba2e691da69c5c49b3184550a12b34d6f7d130974893f5b1b4d0aa565d975",
+       "81384d95ba1505fcb25e5b4f2210a3ded8e59883d67bee943162f6449e5000d6"
+      ],
+      "chars": 17041,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 16327,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000013.pdf",
+      "submitted_sha256": "76c4dfb49667db90af7acdfba9e1d366fe14c4af6197d9f1daacb39a6511d0a1",
+      "submit_ns": 1786843262115224000,
+      "completion_ns": 1786843262249679000,
+      "latency_ms": 134.46,
+      "returned_doc_id": "d74670-6",
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "4deb977adff892feefa908151734394f4985213a564e036626069aab697b74ea",
+       "99e045d6d5a80b39252b4931d1a13c05d3e99693c6638fc36d9b2fe594accae2",
+       "c9c7c0a8e142c866bdec8d39e46c1241a3f0f3205e604d60ad5b2ba4970fd51d",
+       "49d18a4c1d6b236e4d1d61b0d52a140b869b6accba33b90363906f7617412330"
+      ],
+      "chars": 14694,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 14140,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000015.pdf",
+      "submitted_sha256": "eca0f217f9fdbc5f9509894e45b247dc4cb611f534832bd368f791f4bd14796b",
+      "submit_ns": 1786843262250841000,
+      "completion_ns": 1786843262402441000,
+      "latency_ms": 151.6,
+      "returned_doc_id": "d74670-7",
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "89045ec46cf0b08f3133eca5aeb34b5f47ee5ae42ffd180e6a69608045139ca4",
+       "aac24cae918f40755132d98ddc295ce39d661a6772312e19e61a3317486d2bf0",
+       "bd87756d846692858674793ac42684748920ddc8410a0526bac22a1dab40a031",
+       "032c7fd30ac5bfb1de38f0f50463b86a85c6b550f418e3d804ab65df76515069"
+      ],
+      "chars": 13733,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 13202,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000016.pdf",
+      "submitted_sha256": "58fe21359f9caba5bb1224d65026c5333f9747c1fe8d9d94d8f21294ecc1f53a",
+      "submit_ns": 1786843262404362000,
+      "completion_ns": 1786843262576703000,
+      "latency_ms": 172.34,
+      "returned_doc_id": "d74670-8",
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "08ed9c3501749d5d3055bcbc22c3b6ae9b36bce55e02e2b8aecdb2b93dd5da76",
+       "bfc377f35ad179ff9e38eba2863c156cdf33bc7684cabbe62e96cd5eb293b5d4",
+       "b02fa461400cd85376106ce2b54c968a5c039137210d6dc55db8b8f23cb6f15c",
+       "3c7b406e760f440c71990d3c9667a1ef3306b2a6cce81d358f96a1b810c2dcd8"
+      ],
+      "chars": 13600,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 13063,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000018.pdf",
+      "submitted_sha256": "ed65a432e4091cf9a7b9ff7983055dbeee91752c864dca14baa35b1e85ce1103",
+      "submit_ns": 1786843262577874000,
+      "completion_ns": 1786843262832505000,
+      "latency_ms": 254.63,
+      "returned_doc_id": "d74670-9",
+      "n_chunks": 6,
+      "chunk_sha256": [
+       "9cb913d991c286458cf8f6affba3d08733a4bb3a6f29177bc3afb3aaa74e1ef6",
+       "40dd0f93e109205d4391615b979e1af2b0253e3ffa002c7eb535930eb7c70f4a",
+       "086c19158ebb1cf1c7cf64e4465074ed9ac3d3beff698b531c6a92b9503e5475",
+       "d2df8917e795f4a997a5d4cbad1b94941fc136094a300aadfe5b6e734ce612d2",
+       "17a344dd90baee84347a66d911a42595c22d31944756f2dc14f70f0150a91d8b",
+       "4bede13d3d39415e03bfa93c0fef9bd73041c6bfb6bf67ccd1824967ab373ffe"
+      ],
+      "chars": 23761,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 23094,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000019.pdf",
+      "submitted_sha256": "dc738585d318b2992a41b12832788b24fed94d318ef962103fbeaa613c7ca93c",
+      "submit_ns": 1786843262833662000,
+      "completion_ns": 1786843262955324000,
+      "latency_ms": 121.66,
+      "returned_doc_id": "d74670-10",
+      "n_chunks": 3,
+      "chunk_sha256": [
+       "182e5c9f04866cf420efd92e48c40313d9ab7ad6a1976352d44de546c9e01acd",
+       "42e4f5e7a2c3ea110b3e2636d3af0c68b5ebdcd586ba92d73ab511d0b4267212",
+       "5c3168675d16725565bb2b80064af802469c5cdcd0bce7d31d201e1a7f8bf1c5"
+      ],
+      "chars": 5570,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 5397,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000020.pdf",
+      "submitted_sha256": "98887d138becb7b802c6dd3de8189197195a458a202d9b9a982a301f2010ee89",
+      "submit_ns": 1786843262956451000,
+      "completion_ns": 1786843262983710000,
+      "latency_ms": 27.26,
+      "returned_doc_id": "d74670-11",
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "42216e60c92be489a561fde45e0083f85634be38e0fd5c57dd48cbc77daa75d2"
+      ],
+      "chars": 2263,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 2264,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000021.pdf",
+      "submitted_sha256": "b4380011d8c1e4ab6ccca1380ce81f9b9144ea8d06e9814210d63a959b74e6e3",
+      "submit_ns": 1786843262984151000,
+      "completion_ns": 1786843263004577000,
+      "latency_ms": 20.43,
+      "returned_doc_id": "d74670-12",
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "03dddf73c297ca56b73a45a83614c1f9cb5e885ab2706d7ff9448c93d17e16db"
+      ],
+      "chars": 1720,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 1721,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000022.pdf",
+      "submitted_sha256": "7d67ca64d83ab9a046874777c6ce27a8951743f97c78b188cbaa32d02f022179",
+      "submit_ns": 1786843263004936000,
+      "completion_ns": 1786843263226258000,
+      "latency_ms": 221.32,
+      "returned_doc_id": "d74670-13",
+      "n_chunks": 6,
+      "chunk_sha256": [
+       "2b3c37af50960c2aaeab1573040421e424ad592100feddecacd57f406ab38fcb",
+       "416ddfe7055365478d7e6af8c139a84a577036ba1cfa3a71dbec175ddd36782b",
+       "3d6dc1ba6d6d62ea6959f76d4776bb1ae5befb93b44129fa14f72dd2740eb6bc",
+       "d2b6190b764bb9676d65798155e149d1fa7153c5696e9fcb2862c4bb18d241a2",
+       "767e99312ac9d2573890b868a1d4126137c4f506d9824f608460360bbe73f074",
+       "d98272aa06aa55419959d562647cb35d8160f3ef813a3b04e0bd9da8d200eef0"
+      ],
+      "chars": 20417,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 19574,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000024.pdf",
+      "submitted_sha256": "dfa3b40bd8422184f589df4329e3f5a5f07884905d3d82e529cc75f6082eb8bb",
+      "submit_ns": 1786843263227482000,
+      "completion_ns": 1786843263265914000,
+      "latency_ms": 38.43,
+      "returned_doc_id": "d74670-14",
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "e4caa443aa17135e5faca7fc54219e77e99941d65e893e4ce14bf1a6ff5adf37"
+      ],
+      "chars": 914,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 915,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000025.pdf",
+      "submitted_sha256": "c6df45d7788b84731ab863999834f7e196b8561f15541690c6a096bedd1a22eb",
+      "submit_ns": 1786843263266477000,
+      "completion_ns": 1786843263430265000,
+      "latency_ms": 163.79,
+      "returned_doc_id": "d74670-15",
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "37756d2a43cac09de2cbd7f592e3d233e6da7084f5501bc63ad9afe677b08782",
+       "4e61503e00905cf10e01cf78c0a74b8680806aaac537027eea8489755b73ed0a",
+       "666ae403282080ed5dc3f7f92f5437c7ad62fcfd2f775483e4804d3a2d5d5469",
+       "8eb6ec01cbd11eded1b6097d3041b4150b879b00ab8cb64f5cd28712b4be8198"
+      ],
+      "chars": 15625,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 15161,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000026.pdf",
+      "submitted_sha256": "7f0d5dffdf7aebaf5a6aa5c9344b8685a68a670fe0904c3162c770e68cc8da2e",
+      "submit_ns": 1786843263431450000,
+      "completion_ns": 1786843263800558000,
+      "latency_ms": 369.11,
+      "returned_doc_id": "d74670-16",
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "eac31e5e71f15dafb1bc3ae414a777387b8216d58e8d9b0377e3031b7fb9d978",
+       "f3ac102367ed72ba25a9b909bf264b387c406ad8db2681327d112e35d8de4ef8",
+       "a3690f0917ea5e33a1324e58ddb31d32f2a97bcd3f72e5aa0da5a95b662dd3cf",
+       "4997fb4b4b1c09becc04fd041e019c16d6e98feab5a89261be050d8ec3e85016"
+      ],
+      "chars": 14034,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 13619,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000028.pdf",
+      "submitted_sha256": "99ec2ff852b8692a7f1a2a27de8b6d8125faa8aba8a35c6f88b4a0c68ca6e3fc",
+      "submit_ns": 1786843263801802000,
+      "completion_ns": 1786843264196611000,
+      "latency_ms": 394.81,
+      "returned_doc_id": "d74670-17",
+      "n_chunks": 10,
+      "chunk_sha256": [
+       "44dc321ed3085c7c749e71177ee48f607391c5097563ef1426a0bc167511c271",
+       "c2d554890e75d56d5de7e99e70f5bdc1871af8d8c4449ace2f5b56d8a6006457",
+       "b63cdba361cb2fe2ca6e09ac87fa1b2ff45331ba92de50246b370cbcca054f7f",
+       "9861c1cee5cc6a0a12aaf14d64ae379ce0f7aa4f80f69e1016744942ea2ac433",
+       "d120b225d83e71ad904d5b221aae52149d7156f6a4fe3eb004735116181ca6c7",
+       "c5dd6c5676d1cc75f4c4f24b01cdae9ddcdba60d2d01bfa57b78c79d033feeff",
+       "04ae394f304f14abcc501fdf2a34b3898501a74b29d3f7724f9c78c29455fbe7",
+       "1974bd3ba82e57ea830f80a0a7a00e5e0ea1a8d2cd69cbbaa8513e7ad03e6b45",
+       "2d421d620260ce9d503f8fcc0980cfe58c6401ecb49717d96b9a7ddc437ddcf8",
+       "0dad538810ebe15043a62e3fc1d2ac517954d2861ffff46db8f81089197239b6"
+      ],
+      "chars": 37092,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 35887,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000029.pdf",
+      "submitted_sha256": "0688ba309c87485dd8d96c1d9d29db420f59973b50c65324ce040dca8d34a817",
+      "submit_ns": 1786843264200146000,
+      "completion_ns": 1786843268498769000,
+      "latency_ms": 4298.63,
+      "returned_doc_id": "d74670-18",
+      "n_chunks": 2,
+      "chunk_sha256": [
+       "28d47c4f4dd2fb28c2faa025441ccb18b5093e4835ae0d6bccc96478bd18ae6b",
+       "df6afe794fac02b374d77bd0129c30dcd0e75279136453755f990fd3aa5bca29"
+      ],
+      "chars": 5992,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 5797,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000135.pdf",
+      "submitted_sha256": "677d1055b3490d275fb9abfadc03d0b5be9d9ae5f17e89e0aed6935a59c1bce7",
+      "submit_ns": 1786843268499841000,
+      "completion_ns": 1786843268980949000,
+      "latency_ms": 481.11,
+      "returned_doc_id": "d74670-19",
+      "n_chunks": 12,
+      "chunk_sha256": [
+       "24b111b9fd804bc82ce02e1b9d7b4f509aed47aa2d0160f76c69b345c2b1cd1b",
+       "9867058836505a7db65a8e565e25a44617ac26a591b141cc1cedb287b8a61f03",
+       "7bd88cc3c155d5873862eb19137cc47cc4ceb2983bab2135315ecd83e7d75b64",
+       "50e39ee3fb076acd2214249fbcc9e983bf5bd87bc8466360bec73356d670131d",
+       "ac482e2d99307e1ad9962e764268a98c58758381f9c631c268ca9573da092652",
+       "7551d39c9568fb7657935995ff0ab694bf990ede3f623de163593aae95abe5aa",
+       "f31e97e65e4a587d7432973ac40920b1c8206a910cddb603ded3e615b017f4b2",
+       "0cbc848e1e3d25b62aee9c58610f4107a49a15a6561854057d5415ddb2658cd8",
+       "0a591539fcb64c5c05267b95ae53ff636b55e6f2dd222e21cf2a519f89becb21",
+       "8ec54a172cd7a9be6d92e12e8351957d2798d44f0fd14aa87fc75261a7d65cf5",
+       "74999c3b68ca99e180272b3a07c92eb35be8579a8b04c89b2e72db659104f839",
+       "11a96398cea612a771f9fff7af0cb284cbc73dfb289c5731fe4789711ab2933e"
+      ],
+      "chars": 45845,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 44096,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000137.pdf",
+      "submitted_sha256": "a17891eddc4266fab4282fd397372a5e188eec545359d7a85e87c8a2b2fd0ece",
+      "submit_ns": 1786843268982290000,
+      "completion_ns": 1786843269060333000,
+      "latency_ms": 78.04,
+      "returned_doc_id": "d74670-20",
+      "n_chunks": 2,
+      "chunk_sha256": [
+       "99ceea87b60cc00f1a054a12ef4a89bffca3ec9ea0e319d6c8192cf98b68e59c",
+       "015e4c7556d75bf04a04b570a8a8c82d67bb84dbb1da2db416b19a51d49081b4"
+      ],
+      "chars": 5411,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 5414,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000140.pdf",
+      "submitted_sha256": "95eb64a51258d6b14093a1d738e5c08fee854bfd91ed7bcf855217b3e67fb9b4",
+      "submit_ns": 1786843269061533000,
+      "completion_ns": 1786843269245933000,
+      "latency_ms": 184.4,
+      "returned_doc_id": "d74670-21",
+      "n_chunks": 2,
+      "chunk_sha256": [
+       "aa8ab8c9308e3cfd39a603fb3ac726104a60a2ca69e9f2e71356cd547a811b0a",
+       "5a558c080d3a0908b82e89a00ba769a8f6c0a42d96020c9364489e634f123f57"
+      ],
+      "chars": 5601,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 5501,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000141.pdf",
+      "submitted_sha256": "d5c2ba720935779020734a7b9b4d150cf535fae895dc4dd3833239ef5ac5ebf7",
+      "submit_ns": 1786843269246715000,
+      "completion_ns": 1786843269679254000,
+      "latency_ms": 432.54,
+      "returned_doc_id": "d74670-22",
+      "n_chunks": 11,
+      "chunk_sha256": [
+       "8a1f3c0f8458d594411f074bbd9226aa2bccd5846de3811487b17da16d086117",
+       "6f11227738b5faaf334f355dfb303f9ca33ab3d1366f805b6d6cdf74d448a2e7",
+       "cc0e4e284f9b2d36e0afc0d0b68629925d2dba481195800041f24cb0309259d4",
+       "4304985345e86d60db2dfccdc4e9b110f62f3882645f9f1f9602fc0fd149bfa2",
+       "d0f137883d303341023841b75a5d6f9616c14f33859ac110125db974857a3e7d",
+       "a007e44cb50e1b8a4661b54569eb4381ac9439c3402c355c7f967603b39af537",
+       "acc2836762a899c14a4558cae7a9438165de6a9c19db9ce693654af14054d79f",
+       "202a2f9e5de7097b7fcc99647da962d66b94a5550c947f4235a8b92074b9396d",
+       "d8858340f0d7c6dc70d47c824d900ed08c44e9063fe6ba20071eef3bb9a35548",
+       "dbfe267c0785b89eb30931de6cfdabe0c1c89b5e91701d39c449e31eec3602f8",
+       "f54b150acddf037bbcc6be4af3fdb727ee6649d985c0a2ba43f750a2b521e5a2"
+      ],
+      "chars": 40371,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 38756,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000142.pdf",
+      "submitted_sha256": "bdd62b32cf5211cda13f9bdfe850456f661d0d8692c883056174fdfd289b2268",
+      "submit_ns": 1786843269680689000,
+      "completion_ns": 1786843269899063000,
+      "latency_ms": 218.37,
+      "returned_doc_id": "d74670-23",
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "49cb0bc1a37ad0761d019f7b88743556084a88a00b8d8255e5a96ba33ae16a0e",
+       "435affec9058b1e0424ed44d6e2538e27c8464a74d4cc265805403604d220a2d",
+       "1f7301245958b84506fcb26692fb06e7884699b847386a9a09fc70409515ecb3",
+       "f7f8b5cfd37d998ae07b923f99ea2f3783e20160c1fa65322c33fee606705566",
+       "81ed04ce0cc5b60b7adf8249fe4114a8a317f2531b1aa5a901463964aedbc995"
+      ],
+      "chars": 18732,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 18013,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000143.pdf",
+      "submitted_sha256": "1487f8508ee01fa1a585014229b8eac0f712b523bb519eaa98551f5276ab4aaf",
+      "submit_ns": 1786843269902710000,
+      "completion_ns": 1786843269948372000,
+      "latency_ms": 45.66,
+      "returned_doc_id": "d74670-24",
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "742782deee93753da11e339ea5cb5098d43b4c59f444105de34d157ddb7b2b00"
+      ],
+      "chars": 2894,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 2894,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000145.pdf",
+      "submitted_sha256": "7e8c998142af4b2514a9a98fe482334bb50edc102b2224f1d0d29eebfff22caa",
+      "submit_ns": 1786843269948806000,
+      "completion_ns": 1786843270115626000,
+      "latency_ms": 166.82,
+      "returned_doc_id": "d74670-25",
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "8e69fc6932716851356bac6b65c74e93a8245288959b5e747404e1dfb579f8d5",
+       "2b59ea62ce44bfa620830e520597512f2d45b7c62f291beed774fc49b000366c",
+       "bcdfe7f61e0e88c2c85a1cbe8e134c557e1293646cb9280390769c9076f03f47",
+       "53e70c136a1e418015f0ef0c677deff79b0f7c89bfb1fdc5ce54d5ad61c0dd3f"
+      ],
+      "chars": 13654,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 13141,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000146.pdf",
+      "submitted_sha256": "e635a6241b0645cdf8cc8e5b8c7a3dcd5a7aaa0af7c89305533bfe0efbaaf458",
+      "submit_ns": 1786843270118441000,
+      "completion_ns": 1786843270674833000,
+      "latency_ms": 556.39,
+      "returned_doc_id": "d74670-26",
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "b9a7b9e061f58c7fda7a0385758cbe0cd04e4f260195eaaef8a9df6703ba0751"
+      ],
+      "chars": 1018,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 1019,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000147.pdf",
+      "submitted_sha256": "823321cb76913c61f37e5509df48ce87cc319f160e3b62b9111fdaca698697fc",
+      "submit_ns": 1786843270676189000,
+      "completion_ns": 1786843270930168000,
+      "latency_ms": 253.98,
+      "returned_doc_id": "d74670-27",
+      "n_chunks": 6,
+      "chunk_sha256": [
+       "e6eebbba6ddd4d6271e46ff684f66fd1d4185ae1cea6873de9605a1ab656029b",
+       "7f967ed19075ae48b8733efad7707d2afa5afac36d5d94e7f89040216e91888e",
+       "7cf35905543a61883f522f17930fab2910e1bb305038ea5c135f5ce3d1259ef3",
+       "4a6f61af1ffc7e81e7778e4c43c49b249e66819b67b23920f26f7e21436735b2",
+       "b59b463a43fdfde279990003b7c8da6125bc8061a92fba5a45db722ba75b9f3d",
+       "7db9eb28eb330608e2f39e648ccc47db9abaea2fe3e4528d46a6045a29523d8e"
+      ],
+      "chars": 23056,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 22408,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000149.pdf",
+      "submitted_sha256": "b7f8ffae8ccd7c5805f107adf9cf0a0f07ab9f4b95cac87069bb4e9d7817a35b",
+      "submit_ns": 1786843270931816000,
+      "completion_ns": 1786843271381011000,
+      "latency_ms": 449.2,
+      "returned_doc_id": "d74670-28",
+      "n_chunks": 9,
+      "chunk_sha256": [
+       "78f5b0eae4ca87a45f1ab2f352b659f235e39d2fe6bd079496bb3db96f36b23f",
+       "1d4a598b01ac9df6c9347416e7d6bad3017dac8d86f0f95a3cb2b40a91bb2805",
+       "7480668c054be91b51e070922c2591014be7fe2a79b728a81559e4cbf7acd92c",
+       "314a39f5ef9407ae4e70f44a2277e8b2fbd0d5ac7a2cdf758f965f8c90155a90",
+       "eedbf0d7ca65960902d7c8bebb46acbec7c3630a09c8896f32efcf850d9505f0",
+       "a254e45c5f5829a4de5e8aacc2badc0bbbbf37f82ff49863c756bfec3ab3c650",
+       "32b221ce4a2328305a8c071b0bd6e4a149244dda1b2bb480e006ae8bf946de49",
+       "a4716c0765528b4fd1d538ac1b6bcc22469682cd84972799450acd5f60b9ec17",
+       "dbcd6e87c1721db74384d333d7f33a9e94c0f0a3a8f29e66561badfd67f55a21"
+      ],
+      "chars": 33806,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 32688,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000150.pdf",
+      "submitted_sha256": "11c83236ca2a595aa2f2f3456791562b545b2c8ef42b1d390d1c7172725cf848",
+      "submit_ns": 1786843271382550000,
+      "completion_ns": 1786843272162818000,
+      "latency_ms": 780.27,
+      "returned_doc_id": "d74670-29",
+      "n_chunks": 3,
+      "chunk_sha256": [
+       "8d6ad7afbfd30f4deca74ef3c489c2998a46769ec0b24898ff397761c25059b7",
+       "5d760255cf5adb015147d2363aff6f8391627b5147f420359a296c04dd943a5e",
+       "a9e94e9e7aa32e8ab44f451104d4fecddbcf43840ec54455486a2bbbbbbde94f"
+      ],
+      "chars": 8520,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 8141,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000152.pdf",
+      "submitted_sha256": "0fd83d2aa11747d402e25283c5ca51e06810708a7e4a6db611493a5abbda0347",
+      "submit_ns": 1786843272166029000,
+      "completion_ns": 1786843274904719000,
+      "latency_ms": 2738.69,
+      "returned_doc_id": "d74670-30",
+      "n_chunks": 48,
+      "chunk_sha256": [
+       "741b1e9d96a3f02ac2aaf7be856faaafc5b487acb5e001b35379a27484cf2c31",
+       "c632f0e0ea27b8e3368dd0b75fcfad308f11d69905a11e5fd49bb75c466af96b",
+       "9b5287b1d65b79f58e1a60f50b5f18d2202a65bb4c9f0e7632633dd9fd24802c",
+       "2429d136ecaf9308d47e9c9e4ef71e0724f0523713d85174ecdab909ff51ea46",
+       "281a6a5398cf96762bd11c84a8597a6a2b442a2cd2c64d515ac16827c29f6503",
+       "343ca481c428551420967f4e936e1ab8e311cb91be0ae9ba6cf1502eac12ee9d",
+       "98152aef1f4d7ae34266d625cfc96bad48a628a49e01f9920547c70a7d0f4b6d",
+       "e1dce75f23769b8d4261e4b26d5d892c50f03d529d0b4e39447d7c5480ba9274",
+       "8569f46224f3b33f65e15a19ada237bc8b4b5e56d8bcabc24d6de1ac387d271e",
+       "98e4ef849338369396ace9f3ca40a57baae1f016a60d59cad68f7cdf1c0b8af2",
+       "72b4ee7ab7b932a9193d3f0531f89bf75540ca3ad1db68d94ea8c958ec6060eb",
+       "78235bafd29f1817724a6bf4dcd9abc17005536d856340168e31db2fad062d29",
+       "403278e165be8e1169f1353f6361eef4b02ffbc4b5e1a40796f09f8deb02c14e",
+       "418503278d593cf5591ab40d99f8a3e6965d19512af0f83bb14ab11d2124caeb",
+       "07aa85f2e87466ac316dd5aff42a61df3410c63029ddb239cae675b372fd8243",
+       "17a65f6f61450fc4eea124c72404451f0d769f3c74def7a1aa5d64d8c79d79a8",
+       "9a3296b4fb2655e1ef998d8e82c438134e0536995efc684e85b6c5f8c9d61621",
+       "ab9aaa7e35158e9a1502741019ebd843eba56fb013b3b066e486baef822bab4d",
+       "32441144f7a28bd6eb562af62ae0e73f39590b2b95cefec4a96030a934739542",
+       "8cf604303869de1ddd83113eb51013101b296f6c9e2ca24fee7a438948d57863",
+       "ac6e8fcd45fadd3404b603242126e42b0917ffc4c2e639be8db59dd6cdfd8c90",
+       "03ef892c55efdde889a8ba6fad2de5d5cab1d76a12bfcf8ae8d4ea9d43540325",
+       "e4f70f0bda9b4ccc33a7eb2466f6d8d5a1d87a18d306e21bf54d5fb8eec88db0",
+       "77e09d8df481d0c25851329e35eddfd578f87d54aecc80ede6a6934b873e9516",
+       "968e0347ba7f03406522dab07668650f705f6f4a0fdec50d3870db57a25b3cdd",
+       "d57c586beb1a5666a1272a1eb382fe5b6de19630f4ce3a036b46024be65c8b18",
+       "06c3090d17371d24bc5f8685823c56246433a25cfc40a0577c6896eec79448aa",
+       "f793c3082b318fea963fadfebe9cf4753861d443d27aa5e7bae21a8fef38128c",
+       "dd37d0dba274f57e6d643f9c903ef4862da5267da1cda95840bc8c8a6afd2021",
+       "d0ce03115c4d54f2e85276bcce1f46837a4d657b56cf34ad9cd96fa925383a50",
+       "85cd481bbe6ceb3f113a231290e9c906b6954dede4b26f746b6d797f99732b3c",
+       "6c4251732f8b6038594d97ffb8ebf254cf7576fb923efaec422cb6c72d3db5a4",
+       "c542011089a03981382eee99064185ee000363dd5b9580d13fe42610c1fe9a50",
+       "4b4f2baaa98b720ededeb0cce13da056a8b5e89cb8bcea0c19e2c7639a90d705",
+       "ad0eb760f260dac420c2824750b5909d13450dc4d1819bd6aae1c1d188a47266",
+       "7f3f7fec8871de9906148d7d5ca65b92156d5d74a781edaca7460972ee116e11",
+       "ae7c6a1bbbe9ef76a3abc0329c2143c6d8f59e66143a37733e6978b36a46918d",
+       "a02cd702ef8bab871a1fe7dd89fb89c88e8f2cc210d168e1a9c06f248615b792",
+       "92df040d1dccb1dc54446437e47d7d0083b5ec550f76528d3031a71a96905090",
+       "572049ff7709d5c9113a4c36edbb04947e0ef375843d1109e3e1e294b7a0af29",
+       "090366b3df936621b780a3cdef32addec45e5411c4f933507c9a8955af379d9f",
+       "030b37fd475a2e3ca2ef05300b8d17046cf9ea26b9274435f4bf721fa3fdf5af",
+       "dc8e8c61f2cf96c015640cb52e01a55db87ddff79502c85948321759998b337d",
+       "416a30770976cbf86016d1961b3cdf606bcf28a1fb698e7001f594e353aa22b5",
+       "75e4b51eb8bbde9f714315a1f7c4ce6f530b673241b921c7ccb8cffb5b0b2ec4",
+       "cf318ea4d6be9126330466c0250ce3a47ef9a123cc5a317545139f0c4e893dd3",
+       "b66d642484759b4056372e5f661dda3b9a42bcb3d655b52651a24cc465bb717e",
+       "dc75a7bf9d4225101a6f4e9fd28e8a9325c94e8f004d3da10719270e754abe0c"
+      ],
+      "chars": 182916,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 175275,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000153.pdf",
+      "submitted_sha256": "1e4a0b0010051cc24cb05d05cd19299fa8efb97cfc83ef59777f2306da25cbd9",
+      "submit_ns": 1786843274907007000,
+      "completion_ns": 1786843276779129000,
+      "latency_ms": 1872.13,
+      "returned_doc_id": "d74670-31",
+      "n_chunks": 48,
+      "chunk_sha256": [
+       "7e0ef3b18c7f597784fb3adbdbac60932498d553aa7dbbfdfdf97b4e5c954f25",
+       "3cebfa052a8aba09e2ea2cbecb251f8782ab7bd1066d646c17e395d80f5b52f9",
+       "86ce8f944f85f291f5afe512137e3253424db0ebd1de04fb49831b3a63251282",
+       "cfd31bab70445d7ec5eb5b9f9e513d976d7b75afe4d2bcbe54792c416c1c6ae5",
+       "7d964446683e5929b3248eec3964309f88f257f89bccd4b8b9f8bf722029f214",
+       "55f5a8a9ccb796c70d4860341030c3e44cecdf5e3855ad82012c7a3c7ca50476",
+       "fff790a3545e3f13a0e1d73090a6ea3ec9059e40ae4ffc936de72c8ef14e3fb8",
+       "65e6367a562118a4f2d1431bcd9ce2318d207545ecbf4894975878b6201b850b",
+       "62e3b73c0e77c923b7ff1fed7d2ca4427be1979436431cbec6d5078f5adfa346",
+       "5560e5cc5e91e376d25feb5a1144256926541b342dd1a2ae726d8e1ac68125e0",
+       "9a9a7dfd28ebbd6a6ae97aa91e16f2c0c3e9b5f55931d433eaf9fae28dd8a8d3",
+       "6b738c7ac8eed23f355aec28e988edf54013c0f00f66f375cd36f879db7043db",
+       "52079f6be00b96412ebc80bbbdbb8d613c3f5af6076512f69cf32837290d53b9",
+       "c437e8ba491e2e73da9fb57abfe740606935977285eeff0716002bcd4684a121",
+       "fc905b888b62c8d177e6679ad91424b5dfdaa9e855e09b4d86ef90057041323c",
+       "016d83cc22216cb0f9d80b3a50cdd5904b002836c9864827f88bcd6c7d9f396d",
+       "3ffe47c366abd91b972b83e638a30a68d8cfee000aab642563b322fb8e48686c",
+       "422c2eddb21c187d8eb0eb8b6c889c0a66e20db3316d2cae95f04b04b710bd01",
+       "bbd62d861ea3f53c365596dc2d8bb59c8b187193f78d9c085aa3180676b78a53",
+       "1c1022e5782c4396868150e6a8d5255663abeaf8aedf63817be32501eb3778f2",
+       "90937a8f8e7a0f65e7bfc2466a1ab04930493af183572109cde5c0ca1c95b671",
+       "b43f5533c284bb63a1006efbdfbaf6ed7377044a0ab3c087c24087f110f782ed",
+       "17183d5587eee4c7581ac065bde70990e7975c936e012e0a7df9db2e74c1c72e",
+       "1cbebc2769fd5a47d495fe956159314046fd60e5f8ed19bd24435d5ad0b8aee2",
+       "2d1f2a7d07cf31080446b5a1da4f53fd76ab5303fd391995e3d65745a0f62d96",
+       "bc4107f949ee26b0e5d82cb11d95ad682ceb13b26b2bf69f5e62d47a8885bc88",
+       "5b4dbc7e74db0bc39ff23153ab2a017c1495130a67e46cf39d278b4a020886fe",
+       "d237a6e06fa95158e2cdc7edba0a9debca166db9666103c9db52b5ca31a76c7e",
+       "4d9a51d8a03f5aaaf339720d0869ccaae87c9f914671b023d99949528811dcb9",
+       "599ae0145410caf0c9a7471c2c4c3add68beeb50322ab3195e0c915cb8a8a3ed",
+       "4ea7d0962255344dd2106f6247731cd9da5c00705673f4bf193a3a7564b3734e",
+       "fa933526a35c14870ed7f6fb65644b203839b5fa3a5a576caf6e16e553903a3e",
+       "0693e4a4f5cbebc887db5add529b31867bc6f79542e1c5e78c6d43ccd2df6428",
+       "c21b0aea5bc0895d8a8a0a1e3ce30936ef2d4590b4d5795c4765eeefa34bc907",
+       "dc3f0973fcc27d54a5cec17d65ee46cdfa2c36befc7c65add3a1508cadccb8e7",
+       "af75b46fde57382a49179a5879297fe8fdef0975a19e63f71bcbda2c42d60689",
+       "27950b41f067722ea399896cba777c961f6ad880ef5b26fdfc84cf867abbf22c",
+       "7789ef5132b8e72a4df46a518dcafa41c5c1ba315dd7f65f84adb0e303f36e4a",
+       "fd81fea02ca0e45c5d001d51c5234a68758f62ea602d477946702ef67e7183aa",
+       "fd8c902b2e0f904aa21536b7384938bb937b82017b15c814aac400b4bd620baf",
+       "a8838a05503047e16e1c307640a987d08fa4d6a33b9eac9cd3c2c55c14fbbcf2",
+       "89bb435d715407207d74dbe495cd74866eac5b89344022b80592c8b825cb4472",
+       "9a0a1482728033c9a543bf18579fcd231677dc0b0cf17efcea4d832e2814a08b",
+       "83c4434613f9d3e7cc453230bb2e7557b236878b122ee354de6769a73f510a0c",
+       "8586931c2f8559eafcde8105474a0c4b583e6203d7efb02176fe767f8705040d",
+       "6af1e4da8109462e3e14bcc249072e98b7e01a8515bc50eb2efc5199cb405cfa",
+       "92a7e6dd3fd774c121880f34644464e2d4ebe6701875932b13b54f0a9372db09",
+       "1045368c6244bdb94de1b262346a3b9f39565df49f10af1895a78cbbc1230e60"
+      ],
+      "chars": 152707,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 152212,
+      "deterministic": null
+     }
+    ]
+   },
+   "rocketride_pdf": {
+    "census": {
+     "successful": 30,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": true,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "determinism_unproven": 30,
+    "independent_hash_failures": 2,
+    "independent_reference": {
+     "available": true,
+     "unavailable_reason": null,
+     "covered": 30,
+     "successful": 30,
+     "ran": true,
+     "full_coverage": true
+    },
+    "content_suspect": 0,
+    "records": [
+     {
+      "doc": "000_000009.pdf",
+      "submitted_sha256": "3fcfd899850be006b2d6616f8161e49479bc41424fa80e404f41233b77256ff3",
+      "submit_ns": 1786843286389462000,
+      "completion_ns": 1786843286563740000,
+      "latency_ms": 174.28,
+      "returned_doc_id": null,
+      "n_chunks": 10,
+      "chunk_sha256": [
+       "bba1ccd423493e1acd692546c3ab968eb1af99cff03f3c805c74fc7be77eed0e",
+       "1e89deb357f8a4fd60374ef1c637029f6ed59573de37a44115f7e90b9d11335d",
+       "f311b287bcef704795ab47b03e0676b2cb88ff1cf538b6234cbabf67db47fbf2",
+       "f1d78d3149e579b7a056793fbca21f74ac7bec21558ce81e38976823910b941c",
+       "059e94e8a1681c047f379e42da498cb0918ad449379dd58a54cc23fc752f7958",
+       "1306d9e8c7083b526e4bb6d95fd9c4e4541b28e768e2b1c1d8580d5e14ca8a67",
+       "da1a88640031c1207714c7b96613a11654d8a7158de46e6a6591c205f3fa6f3b",
+       "ca240a50dda88ca511532acdf8d44bf92664d0a6eddc7a41e03c5bfb4ddf0dce",
+       "79d11d33f961e40f53c429228e83760b0351f6ddd84c055e25aceb9b8eb22c73",
+       "8cc0b03339195762ad2967c292f5421452b63ca9fe28e92dd19167a700100cc6"
+      ],
+      "chars": 35514,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 35228,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000010.pdf",
+      "submitted_sha256": "7832f844839ed04e2979bc565642f36bf76e1682137071f0786d4c7418bf81d7",
+      "submit_ns": 1786843286564160000,
+      "completion_ns": 1786843286658627000,
+      "latency_ms": 94.47,
+      "returned_doc_id": null,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "7554508d32dda37ade72a5e86cde0b9b52784e54c58a7adaf3496f86481dde57",
+       "994414cafb9e20c08ad6eacf7f8ffd13d877a242c2da062a258af95d5e72b5a9",
+       "b9f86e017e827c9897b706b32b3d5228e4c52240eeea459fa3659b27abe49d17",
+       "014a1dd068e90d797a72cfa83f34d16be14781de4385a877e3d7ae5ae50e7f76"
+      ],
+      "chars": 11998,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 11703,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000011.pdf",
+      "submitted_sha256": "44d4296ee6750f96a34455cf5d6d6e0a574ffe1419928780b5d2fddea0af3778",
+      "submit_ns": 1786843286659166000,
+      "completion_ns": 1786843286685269000,
+      "latency_ms": 26.1,
+      "returned_doc_id": null,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "26a41f95119d94ebff70cd09b415504291fb1db701a998db4d7c6d96aaa44bd3"
+      ],
+      "chars": 281,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 288,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000012.pdf",
+      "submitted_sha256": "1138e868dc3e44bd3f1dafd60ff3ed0d14a42ab1b17964ac475edac46789b5d0",
+      "submit_ns": 1786843286685709000,
+      "completion_ns": 1786843286829773000,
+      "latency_ms": 144.06,
+      "returned_doc_id": null,
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "0b42989a05f8908cee4f9c8561957194c5036f6180878fc9fe4f728cabd75f99",
+       "d48434733d1cd1fe45448b2b3b684f0604f248bd3af59188f9a271e205d6a3cb",
+       "820a136fa604b3341bc3676afb92bbb39454d1f91b3b9238b76cff80af73344a",
+       "e65a535ffbdec98c3e97b73b886365136c0411605b669c4852ea82ad326c200f",
+       "3db36dfc99f01dad92371ce8cb2fa9706bbecccf178b2f8da34a73e3c3cd3e8d"
+      ],
+      "chars": 16547,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 16316,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000013.pdf",
+      "submitted_sha256": "76c4dfb49667db90af7acdfba9e1d366fe14c4af6197d9f1daacb39a6511d0a1",
+      "submit_ns": 1786843286830279000,
+      "completion_ns": 1786843286892748000,
+      "latency_ms": 62.47,
+      "returned_doc_id": null,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "d09bef5f8c9a3c7d083977bedead46ebde96a9babaebfcc914c035f6e6b72a18",
+       "ee6b3e51ca780d152f29fe418d04648587b14da67587095388fae57663a62f2d",
+       "84c66bfbc32d01fa98d46d7a63678286d96c0c91d602e23bf0e39c8fc595f5aa",
+       "c5ef2b01323c45ce343d2f67c2b3b1ec390dbfbd03a9b8f884c7581f5e35de7e"
+      ],
+      "chars": 14286,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 13996,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000015.pdf",
+      "submitted_sha256": "eca0f217f9fdbc5f9509894e45b247dc4cb611f534832bd368f791f4bd14796b",
+      "submit_ns": 1786843286893013000,
+      "completion_ns": 1786843286956854000,
+      "latency_ms": 63.84,
+      "returned_doc_id": null,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "968eab8fb7e2fd9c74c503cb2664a4144d93fb26ceb4f79f60913c15b99e73db",
+       "e0ec05fde0ac167ee57a8854d731801d059f9b0cb40853c1d513dd89cf37583e",
+       "5f4b9f0b92ac0a6900179bad23795c7a71edcd7b6a3d85c7c03192e15c218a40",
+       "0fdf59fd7e28a10e35cabd7752c0acb0d012390cf8d89592d71dc10072b1ab69"
+      ],
+      "chars": 13502,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 13203,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000016.pdf",
+      "submitted_sha256": "58fe21359f9caba5bb1224d65026c5333f9747c1fe8d9d94d8f21294ecc1f53a",
+      "submit_ns": 1786843286957141000,
+      "completion_ns": 1786843287158643000,
+      "latency_ms": 201.5,
+      "returned_doc_id": null,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "a8712ab02f5b7ca0db303f5421dd4fbd66c122e6f74129751e4b608598d83205",
+       "9e309d396cfa3b4325da1d81ff2cc362652df7cdc42f92809e530534e62e2ff9",
+       "19a13e810178c25bbfb29943cf06952794c01a885186fc51acbf03ad7044bee2",
+       "64d4f1c61522d752e11a5f1cc0192625ec3bebe056f6a098e1fccae88bfa5f53"
+      ],
+      "chars": 13461,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 13347,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000018.pdf",
+      "submitted_sha256": "ed65a432e4091cf9a7b9ff7983055dbeee91752c864dca14baa35b1e85ce1103",
+      "submit_ns": 1786843287159431000,
+      "completion_ns": 1786843287344387000,
+      "latency_ms": 184.96,
+      "returned_doc_id": null,
+      "n_chunks": 7,
+      "chunk_sha256": [
+       "480da55d22d604ff29e842a7aac2dcfe3d794bda3c9eb5b2d0c177328a4753f7",
+       "784f96eccc5fb740068be870143a98d794b51baa405cb1b8b8f757d7c7022176",
+       "efbb20ecb30a79c93627f068ac86ddfda290558e87c1ddc05410ec5c28d9d6f8",
+       "d1854bcf63b494e2c73979da65f8e3f562a698e08d8d6e6c68771790bc092951",
+       "ca1aacc2fa8297b3a1beca904f223e217e1038a2afadccb5a744e2c117f6b37d",
+       "e2dbdefcac99952e3637079febdbd4b18b2fab61c0b43ccaef4e8f4728e55480",
+       "4289fe258e08fc6b19e0f41f8be75972897a58d259e6afb0a23eada59da7a53e"
+      ],
+      "chars": 23673,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 23529,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000019.pdf",
+      "submitted_sha256": "dc738585d318b2992a41b12832788b24fed94d318ef962103fbeaa613c7ca93c",
+      "submit_ns": 1786843287345286000,
+      "completion_ns": 1786843287504501000,
+      "latency_ms": 159.21,
+      "returned_doc_id": null,
+      "n_chunks": 2,
+      "chunk_sha256": [
+       "66ad7e0232af103bfad5b836f47419c27b8f46ec7d89ddd0a52d33229c44049f",
+       "4920253cc487109daea2c0aac9d0a2c7eecc826db5f890d51284d485cbdfe307"
+      ],
+      "chars": 5610,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 5425,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000020.pdf",
+      "submitted_sha256": "98887d138becb7b802c6dd3de8189197195a458a202d9b9a982a301f2010ee89",
+      "submit_ns": 1786843287504952000,
+      "completion_ns": 1786843287536594000,
+      "latency_ms": 31.64,
+      "returned_doc_id": null,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "8b7ce0514a18fe72c7a545433989d1902a7f57bec76da705efa599dc960d28ae"
+      ],
+      "chars": 2277,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 2283,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000021.pdf",
+      "submitted_sha256": "b4380011d8c1e4ab6ccca1380ce81f9b9144ea8d06e9814210d63a959b74e6e3",
+      "submit_ns": 1786843287536991000,
+      "completion_ns": 1786843287564084000,
+      "latency_ms": 27.09,
+      "returned_doc_id": null,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "9550d0dcf175e2757966266fa98730534a0187607a7267e16245d383bf468b32"
+      ],
+      "chars": 1733,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 1739,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000022.pdf",
+      "submitted_sha256": "7d67ca64d83ab9a046874777c6ce27a8951743f97c78b188cbaa32d02f022179",
+      "submit_ns": 1786843287564899000,
+      "completion_ns": 1786843287661943000,
+      "latency_ms": 97.04,
+      "returned_doc_id": null,
+      "n_chunks": 6,
+      "chunk_sha256": [
+       "d5ae8978b600d5d912f64c189649a7a53ad2acd33f6afa3d06afe1d8644ea013",
+       "5774c8ad7c77843610aa9f87434e2987ddda2a3f0e2f6619a81fac9b36e608fc",
+       "6b06aee75cd8c7730f5813b1a67ceeac42b62fd418ee7b4886d299dab1207e5b",
+       "07d02d9cbeef30c895fc3c8df6f17341e0a9728723b20f3356ab00bb866c62b4",
+       "69b4563e0bc2ef309ca6f6054b5b2e138e45dab9cc04046c21b8ab0c97d99cf9",
+       "3a0ce986cc8b4f1698022823a6165d51e960448f1d5c4cf3be1e144dc36a08cb"
+      ],
+      "chars": 19631,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 19633,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000024.pdf",
+      "submitted_sha256": "dfa3b40bd8422184f589df4329e3f5a5f07884905d3d82e529cc75f6082eb8bb",
+      "submit_ns": 1786843287663240000,
+      "completion_ns": 1786843287701504000,
+      "latency_ms": 38.27,
+      "returned_doc_id": null,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "7de8da09ba8a2fe08a679e8144e207ddd1d5124b28a4bfe613e5b79e274c2334"
+      ],
+      "chars": 987,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 993,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000025.pdf",
+      "submitted_sha256": "c6df45d7788b84731ab863999834f7e196b8561f15541690c6a096bedd1a22eb",
+      "submit_ns": 1786843287702302000,
+      "completion_ns": 1786843287900390000,
+      "latency_ms": 198.09,
+      "returned_doc_id": null,
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "9a010e8f5aacd1e111b598b165e7bb3bad67b0448067ac4813f59bc3463cf93c",
+       "b9e6b8e138eccd9a20fe1e51466eaa3975266f33f8364bc146cd53e74d9f8613",
+       "4219c357db08850b2ea7e4f041200c75e5fb17799d17b4b77ba9a84c9bcdedea",
+       "23a1fb89317f6794362df3fa29a09fad313dfa66e0be4534173c45a40092eeb7",
+       "c1ca01bb2d926d95df86574037a6216999f289185d7bb890c603874ef78d1736"
+      ],
+      "chars": 15638,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 15394,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000026.pdf",
+      "submitted_sha256": "7f0d5dffdf7aebaf5a6aa5c9344b8685a68a670fe0904c3162c770e68cc8da2e",
+      "submit_ns": 1786843287900950000,
+      "completion_ns": 1786843288008671000,
+      "latency_ms": 107.72,
+      "returned_doc_id": null,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "d7502150643dec64d1c28650e1e10701dd88a6f3b1863b64aa57336b32da98bd",
+       "62f9b20095ccbb2b66c27a789a0707831f291085139bb94e20a4917e60ca4562",
+       "f258b731bcba32311d6dad8afb780faac2fd95f6772202947b764d93895f7d45",
+       "ed1e63eba15b31778532ff4e83fd72db6d648a5b851246479576e1b61f625e6c"
+      ],
+      "chars": 13677,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 13641,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000028.pdf",
+      "submitted_sha256": "99ec2ff852b8692a7f1a2a27de8b6d8125faa8aba8a35c6f88b4a0c68ca6e3fc",
+      "submit_ns": 1786843288009781000,
+      "completion_ns": 1786843288156134000,
+      "latency_ms": 146.35,
+      "returned_doc_id": null,
+      "n_chunks": 10,
+      "chunk_sha256": [
+       "c5fd6811555c29866b4526c8f6be17b80969528b81d705ae1bf8a538cf605200",
+       "0abc9bcfcd4229727d4e67dc81e306812ad0876eb6d7089be202675b6215d1a9",
+       "a511f1a9d1655671f245cdd968ebef91103688fdee18d1639a3ddd443572cde1",
+       "8587b4d0fd6890ccf70bf815a424f02949405fb9967791a7184a8b347869eb61",
+       "3a67e38d766a35f79f0e4a86c9dda806ec353fb952c96b2bcbe4de8cf6218104",
+       "3e2a7353779b18ad6d81b48bae327ddedc173bfceb492ddba90b66446ee7816b",
+       "d7a95b1cda45f777eca52e08c09bcc9f8cde17a4dfb4acea2e5ad782f37ab508",
+       "613bab05e62b97a29550f3c8c0f67f0051fdff9381f173ce85335dc6ec5c3be6",
+       "63fca40679997a588cce0a0c425816c50f2cab0ec96b817bf1bc5363dd2c7460",
+       "13d1afb89bd2aadfc849a5fa7cdb0737eefa156906c927fb6a6c3c633f1c8976"
+      ],
+      "chars": 36616,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 36098,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000029.pdf",
+      "submitted_sha256": "0688ba309c87485dd8d96c1d9d29db420f59973b50c65324ce040dca8d34a817",
+      "submit_ns": 1786843288159986000,
+      "completion_ns": 1786843289342388000,
+      "latency_ms": 1182.4,
+      "returned_doc_id": null,
+      "n_chunks": 2,
+      "chunk_sha256": [
+       "0b3ea4a70b1cbfcda01827926d5df9fde3a435fcb1635b766f20a687c89a126a",
+       "c544f3dc14276a261c5083c083306290f3bdb214cd002ecd0c138a98636a477e"
+      ],
+      "chars": 6420,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 6245,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000135.pdf",
+      "submitted_sha256": "677d1055b3490d275fb9abfadc03d0b5be9d9ae5f17e89e0aed6935a59c1bce7",
+      "submit_ns": 1786843289343642000,
+      "completion_ns": 1786843289515074000,
+      "latency_ms": 171.43,
+      "returned_doc_id": null,
+      "n_chunks": 13,
+      "chunk_sha256": [
+       "265f7bd2256fb53b0f98fd7a66489f5e8c62a0929ba15594f5cfdf9123b8f2ad",
+       "7dcf0601182e9b52a3b69ae8b3408e035700306eeb857f14bd2ce4fd88ece2b9",
+       "3b6d1e0c1c4b10946a30de6d46ca22f62def54351794c21c925b43bb8c434b24",
+       "58a24359d4aa0d039f6ea157b7b6997db6fd55b0003b53e343aaf9b40dadbaeb",
+       "2dac17dc40e0556dbec59a8ffc3158d43f93969669f51b3f71cebe1b33c05023",
+       "adbfdaa3599bab6d21ac4757dc71c40794833dc97714484ea6c21a0cdde77f09",
+       "43e2b3b2b00a9e506af5b6cb30c87a65bfcef6f0ba73e56d7523b571c7477f15",
+       "1561a9fba9a0019aabc23c489b3b654859875f40754c28834ea7b308e33024f9",
+       "d8d48f028c766f194bde436be537b4c49879f95d4782240cdc4a3afac258234e",
+       "315bedf23192d349e5a183c2a9e33d2fe4b83e880c49216e879d076957e5a4cd",
+       "3f89781e83e052aca446410b70f5e6cb9ac277c6b7c5ff1df5c67292ec5efcfa",
+       "c7fe383a5693423131ce756f6b1b079dab0ba722cd295e5991dbeced05242372",
+       "0ffd90239a18f25c1c3562f3d76f3e50a90694ad4dd0c5d5d6566bbbcbedb9a4"
+      ],
+      "chars": 43114,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 41878,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000137.pdf",
+      "submitted_sha256": "a17891eddc4266fab4282fd397372a5e188eec545359d7a85e87c8a2b2fd0ece",
+      "submit_ns": 1786843289516916000,
+      "completion_ns": 1786843290112321000,
+      "latency_ms": 595.41,
+      "returned_doc_id": null,
+      "n_chunks": 2,
+      "chunk_sha256": [
+       "122980e1b274da11759a33a44e70de43b2bf3da5153b33721b6c4a06ae884ca0",
+       "c09aa52ef43d72ce52cf8f0f1f10bb36d51044bca244092c29410156c2b2d9ca"
+      ],
+      "chars": 5469,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 5479,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000140.pdf",
+      "submitted_sha256": "95eb64a51258d6b14093a1d738e5c08fee854bfd91ed7bcf855217b3e67fb9b4",
+      "submit_ns": 1786843290113578000,
+      "completion_ns": 1786843290186580000,
+      "latency_ms": 73.0,
+      "returned_doc_id": null,
+      "n_chunks": 2,
+      "chunk_sha256": [
+       "04d004e199129c765a8e9edd6c7326d60ef267f72ae34f517937ce2b28494b14",
+       "1664f78f7e6d090fcd5b5f70f00d07f226830d361e7e6de97cbe2656965fe68c"
+      ],
+      "chars": 5622,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 5504,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000141.pdf",
+      "submitted_sha256": "d5c2ba720935779020734a7b9b4d150cf535fae895dc4dd3833239ef5ac5ebf7",
+      "submit_ns": 1786843290188444000,
+      "completion_ns": 1786843290473682000,
+      "latency_ms": 285.24,
+      "returned_doc_id": null,
+      "n_chunks": 12,
+      "chunk_sha256": [
+       "40f4e7f5864534e9c42b36301dca86c3c20acb370e83593f9c64c25d03a35d48",
+       "2c066699560c62aec385a41fa1b8e5aea2eed702487784beccfb4f60b41f54fb",
+       "982f19bb1f29410da05aea8f3a3b7e4f5545c30698b8fb82d1611038c5083a6d",
+       "df41b1a7b94b661d41b77b05c77ccd1bce2fe937b104ba1b65d42aac1b2371c8",
+       "fec2f183c3ffecfef47d5abe54b603dc22ee23e501c79502fdcce3816abcb711",
+       "766a78ae81bf7613c05d714b8c1a7236c1459fa548ac2d492ddb8bdb18586184",
+       "9fa484e9074635b0c11227e44bfcf995309e119f940adeba1bdd2c41cac8cbd6",
+       "2caabbdb3657aab99f441853fe66490fd36742c9eef54b787a7914c9613d680e",
+       "d146a69101a5ad3ad672ad284398de0730171634da51a9c69dca9bc18c383fb7",
+       "db03ba6bb5a5567e67cca4e991766a4251a61b5d91731abf9db05d91941b08f5",
+       "b1779595ecc7375c08d91190f5dd6ac910cfb949d95df9b31376a698deb5e466",
+       "6078f0d087e7e9d9a1d8287fc157df98f560d4f03d2d013a549c02c07daf9460"
+      ],
+      "chars": 39916,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 38769,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000142.pdf",
+      "submitted_sha256": "bdd62b32cf5211cda13f9bdfe850456f661d0d8692c883056174fdfd289b2268",
+      "submit_ns": 1786843290474940000,
+      "completion_ns": 1786843290573353000,
+      "latency_ms": 98.41,
+      "returned_doc_id": null,
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "77959dc4200ce6c3c039da197587f82c0c04618f4a85712dab66cc40e79fb3ff",
+       "d6213ea8e8e7d62a49f69443d3d33f1be687412346bfc3355c1d7fb518132673",
+       "1402c74810f2e0ab21d8fe97424ade8f2545567c560a1af37207c5ac3343e6f2",
+       "08e0a0da70064266e03a4315eef65bced38125cc58cf71e4297a6cae02c33703",
+       "ec3dfcb3d1cc6dd2c76b77422706c2a170bf6da99baf51eb70d6d90ac857b835"
+      ],
+      "chars": 18382,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "FAIL: 000_000142.pdf: chunk 0/5 content differs (len 3804 vs reference 3805).  <- returned is SHORTER: content lost in the tail, invisible to cosine",
+      "extracted_chars": 18076,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000143.pdf",
+      "submitted_sha256": "1487f8508ee01fa1a585014229b8eac0f712b523bb519eaa98551f5276ab4aaf",
+      "submit_ns": 1786843290579060000,
+      "completion_ns": 1786843291211818000,
+      "latency_ms": 632.76,
+      "returned_doc_id": null,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "6c049eb92dc44abac39742101e23bf51e09aa64d121f7f70d9eeba28d4fa1f03"
+      ],
+      "chars": 2913,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 2919,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000145.pdf",
+      "submitted_sha256": "7e8c998142af4b2514a9a98fe482334bb50edc102b2224f1d0d29eebfff22caa",
+      "submit_ns": 1786843291213157000,
+      "completion_ns": 1786843291292621000,
+      "latency_ms": 79.46,
+      "returned_doc_id": null,
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "f0cfaa0e0362031dbb6bf4c1166c4f093e4005cab0fdf2bcc3b6e7072b406587",
+       "eaf70878aa105f8509e5771baa77cf4a3ff3a5281abd720a2b6a270d511bab96",
+       "88a8ca8579455b059a6c62eff0e01003b56edf85ac4bcf23da42940f85fed7c8",
+       "cb2e3de53483715ff3de8c8703b186dc873d43dfca39afdb04cf50e791bb9897",
+       "d159ff458127ceee628451b2cf9d3690f5d8469d7d954806f230499763a60565"
+      ],
+      "chars": 13789,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 13419,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000146.pdf",
+      "submitted_sha256": "e635a6241b0645cdf8cc8e5b8c7a3dcd5a7aaa0af7c89305533bfe0efbaaf458",
+      "submit_ns": 1786843291296978000,
+      "completion_ns": 1786843291979155000,
+      "latency_ms": 682.18,
+      "returned_doc_id": null,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "c58d9c8a8202d84f5448c03d01ef381d43ba997038028ad2a0b0c3ba7c40bceb"
+      ],
+      "chars": 1043,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 1049,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000147.pdf",
+      "submitted_sha256": "823321cb76913c61f37e5509df48ce87cc319f160e3b62b9111fdaca698697fc",
+      "submit_ns": 1786843291980886000,
+      "completion_ns": 1786843292622721000,
+      "latency_ms": 641.84,
+      "returned_doc_id": null,
+      "n_chunks": 6,
+      "chunk_sha256": [
+       "f2407b79a5601b2b05d4d287b90acbc70becc7b2f9302e07d5d2348e024a1b87",
+       "1b866b8731438b066df8abd34d7b4eb7b7555e0958727113904fd123fc678549",
+       "a62bc8f5ecb9869148766dd1a394e70fa6512596fcfcb33a3f33c99d3e378e5c",
+       "368655c531e3cd320145f6232552b976672f29bd2f2bd768c0f268874529f721",
+       "c35958b56bbbca56d092da5d5b183539e19d90ec46fe0a081360ca855a2ee599",
+       "86a7220458cabd713b9febc3c6f622368378d13645cf206939ee088c743aee3e"
+      ],
+      "chars": 22489,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 22467,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000149.pdf",
+      "submitted_sha256": "b7f8ffae8ccd7c5805f107adf9cf0a0f07ab9f4b95cac87069bb4e9d7817a35b",
+      "submit_ns": 1786843292625639000,
+      "completion_ns": 1786843292936587000,
+      "latency_ms": 310.95,
+      "returned_doc_id": null,
+      "n_chunks": 9,
+      "chunk_sha256": [
+       "cec22f973e9a80ab1c769bf590a35a63d4446c9b3ee79531d2264981e299dc58",
+       "129a5dd2368439a90a08904661513b1614fa106e79d73fb45313ede27b5ac038",
+       "6d3110e2b4eb2878dfd017fc3f141a549f9f22ab359a9c5de76a3cdb85d7ba31",
+       "b57a2287fedfd425821d2669e8eedc6896f7cbb7a399e6e8d0ca71c11d99288f",
+       "3cb8feb948f6adf5c5ed5a7ffe9ef76ef8824ad6d3fdc65b7ac549dc7d04fb5b",
+       "7d20e67c686554ceff36c76ca846634be10907c79daadf4b6c5d6a371a0db907",
+       "126000e01087c09c92332713924432d27fea5645371bf3d005b7ac56d2d645e0",
+       "88a2e86717d529d41122ccb3d19e95bbca9bda5bf0e6f94e3176b4e7b53597a8",
+       "467413b02c50a44444ca833df93b86b57f1cb37837afa2f20147758737a13dfa"
+      ],
+      "chars": 32974,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 32686,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000150.pdf",
+      "submitted_sha256": "11c83236ca2a595aa2f2f3456791562b545b2c8ef42b1d390d1c7172725cf848",
+      "submit_ns": 1786843292938318000,
+      "completion_ns": 1786843293530462000,
+      "latency_ms": 592.15,
+      "returned_doc_id": null,
+      "n_chunks": 3,
+      "chunk_sha256": [
+       "823917ac6bf565b2166b003a25bcc17d1ce50b448bfb3a2d689599b86d65fc9a",
+       "7626052bd8bbd206099c9b167ed3f0df30daafd585da770734f0f62c2bc650c6",
+       "b2ade0297417f9fc8f892734cfd97588e9dcc262eab2648b94934a4d1fa7a475"
+      ],
+      "chars": 9274,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 8995,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000152.pdf",
+      "submitted_sha256": "0fd83d2aa11747d402e25283c5ca51e06810708a7e4a6db611493a5abbda0347",
+      "submit_ns": 1786843293534947000,
+      "completion_ns": 1786843297169546000,
+      "latency_ms": 3634.6,
+      "returned_doc_id": null,
+      "n_chunks": 51,
+      "chunk_sha256": [
+       "a4f86975590b2c3c2b5ba8f0449d1f00671e2e75e2c916b506d282c190065ea1",
+       "c21a28f8327e8af5cfaade77c57cd4836bb9573269a055df072e274194954a23",
+       "c66084a8a0ca66ccbb49c0f27c3f7a65d5794525a75d08c0f0481dc6f09b6e47",
+       "6ad1b30bd43a78379f7e12cc60e29cfcc80196911e14df65a9df7ad9ed175f55",
+       "13c1ec8f18e7bd45b137bbc55301525a9236230d73afbeaa7050967269757eed",
+       "c2ee33c3d34bc47df89d7495877a162554fcf2f582aea6a3db262a78d7c61c3b",
+       "1da898fb3beb10d64cbd8946aa11548a10ed7da9e1bc270c8ac55d85bcf2b59c",
+       "a69fafd46d755dba9b43877897a4a6564341c896a7ceecef3f1d27bdd1915d38",
+       "0db6bf91cced914d0020d3fb55b4b528ecf1ae56418f987abd4c2df349e35548",
+       "f00f9309c01e3c7287a2fba911cf7742cac37430a826095733309c81b1cc7769",
+       "87cf1174574d1435eadea30c329528bf7ab37aa47d9c98da201b181bbb53aa97",
+       "8a4141076862ccd33aa5d4317cc530c1ee80a9b3dee591fbbfa52af0b2819846",
+       "59b9d22a9000c59d4c3e174fe3ef71dbef92ffe42d106e65d005a14b5fc41f7b",
+       "ee55ee23073b128fa2d1298b16b59affa35dd191fd1edd6af2a7a32e7b0532ea",
+       "bade484a5a6372aa2e7801511d6de9b35203a1d280d034cc0a8f9157da35223e",
+       "9f5dbcd088088de8dc3310d42317e2120098df6ce8e7e73aadb35e99021fe5a7",
+       "6172ec1588cc15025eeb72d9ee5193a0e6d3a007c697b1c4d2f59c0cae1ce877",
+       "ed1827da05dc7c7df8f972329446e11f4431c0ba3d88d773bbecb69f2a3cd5fc",
+       "821c289f0f335120bf31be51bd8c752779e261894e2cc54a3b437dff4a77fd62",
+       "367668693c772c16613f3140bf89198d19bd61200d520fc80031719d1c79a322",
+       "583e6c617b68dabcc0762786e40304b3837a7b9d23385ef0c5c1149e20e238d7",
+       "5a5e869ee2579163830f5689e443d6057789112a8514abd0640aedcbb3037f6f",
+       "663fe498ed66deddc7747488bdfa050ba95c370ae622a7f5edcfb6ded92f15af",
+       "802d46a7263c2d40648eaff9498a77f31574f9d530b4971ad602597c028d8d69",
+       "2db11d87016e018d47825526c96ee336855828eae4adb92b6de4f7ba8bb85c4b",
+       "bcfb872177e30cb7005d5879f499521f0619184e95427b09a7caceda0d65f303",
+       "43c90656cac96c482e768eaa269747976299d72d103de07c4897ab9e98c3f901",
+       "7b38ead0eeab2c8f289f042428abfa8778ca330c05fa658b55e72a46356115c5",
+       "9f76bc4abc876982822d60c69dbb9108f7ef754f16c258ffc2889781e821649d",
+       "e9d2f3f57c934fd3a49200567c26d73e0121f4c89415f329d8af3896ef05a3e5",
+       "5b2ef0d3243e3be84467ba6f8f1d5e809318be7ede0a6d7d285f120b26c260e7",
+       "76d22ff19875ba73f4e63250d2e76a9327d0d1b3694157ea875f134e5703f35f",
+       "947f7919b5a04a459ee15b321e1bf9ef74640e6dda4b7dd3d0e04f36837e1729",
+       "5527574773de6c73c64f1ebac0a218e0f592348e8ce1299b028967d97bc3f5ba",
+       "63ebfec8aa5de0941453aaba790ff0327d3c66e936ed97fad6851d6a2951df7c",
+       "06e20441ae0199acbae4b4b8ddbf2d52a1f8ff61061c4eb4aecce6091eb7e4de",
+       "c33a4f51037dfdc13b185fa623fc791a4d2b1020a0106f2ecb0bfd18c8ae8ac1",
+       "b0ac6e393c7dc4f7ff775b1e00ede3710d2b469533c83995313ae3a4934d46fe",
+       "5ffb3b9fdfd7191105cc2116518d4ee4b61f4497d50cc17e88a03b353119ccad",
+       "b1e72cf3a4be880d46cb3737305e8778efc26d3194562685696176ec92c7b000",
+       "457fe3faa6f31bdf70ba0f307ad186051f9d8dae853b8427f5ddd7d4831eba8d",
+       "de3b65c79a34079e7d2f4edd3e3d6fc39dceb521c9f0fdf17d8efddbd7c011bf",
+       "abd31e1e02e4351836f37b4eeb8c763ed2006174e033421f8fd9aee5301af6c2",
+       "652e80c232b086b11f8b6676fc948b7a17037d96991a2b2978c8cbeffd061134",
+       "059e89fd0b732585774f9c6c4f4691e242686ffb4133511abbf135020541a5f9",
+       "65f87da4a7e6f223a7a6b83000dd9b4a2407624e202b572e92619e6508d307e3",
+       "14b02046714a31efd637c2edc680da588354f100d8ddd6957a1628e9a513fcdd",
+       "de11f5bbc6563c9c33bfe380951994669bf75639a31d26dbc7d4ae4f29a0da3b",
+       "62c6608afd4120adb449ecc2af4f0140af252ce180957de654f7c68bf1e068d1",
+       "1d0d7ea3a9a6489dbab5fca8a5b4fe5a2e0da45fc02fdee9d72f57d81c890ae2",
+       "37c95240a2304881d48ce1576d76f57e97c5c266219f0ed7a4d1dbfa46b21e44"
+      ],
+      "chars": 181131,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "FAIL: 000_000152.pdf: chunk 24/51 content differs (same length, different bytes).",
+      "extracted_chars": 175792,
+      "deterministic": null
+     },
+     {
+      "doc": "000_000153.pdf",
+      "submitted_sha256": "1e4a0b0010051cc24cb05d05cd19299fa8efb97cfc83ef59777f2306da25cbd9",
+      "submit_ns": 1786843297173188000,
+      "completion_ns": 1786843298129466000,
+      "latency_ms": 956.28,
+      "returned_doc_id": null,
+      "n_chunks": 42,
+      "chunk_sha256": [
+       "12395d0767dc68fe9853687d1fffb7b0440dacb3194732af44a26c01d90ca281",
+       "a2728960f0237e2e2fc6c893340dee7d470099d700720cc138ab6b81ea17f2b8",
+       "f59d030fe912c7ce507c3c7400d1c57c37aa6ad4ccf4c4cfbe64fd7ef2c75fe6",
+       "43d8943681d8a526a167b062316cfe200eab04e69ccca0158058274d590bac5f",
+       "53132f7e8077eb4feb0a33ab1a219f8ad5c5f75b3795309df04e61763dda36cc",
+       "81616287f8f74b06503d1d076c06859ac15e6e47398c56452fbd2e4fc1375068",
+       "bcfe2d87cdf1d49eae5ef6e4f684296bc6b41d04b70f6ca100eaceef4a3aeefa",
+       "75fd8bd9367dda1d93f469614c763e785f87354e394164ac79db87a734269e67",
+       "3603c5e953f4dd6817a78543153418a2ea0deaaf7d2bb9646ce68a85aae4e746",
+       "0c087f1a394c2ed90a54360e9447499be58996562aded8a8103f3b054030ca02",
+       "31649caf3520a1e626f2de715e2930306d90cfbef1d77ab975153f56fb5d15d3",
+       "15496bbc7edf162190c68f3491fb1c47e8bbd3de33d2d7773d093fb88f38c8e6",
+       "cbeaa3a67efc6e981fee850ab6aaa4e0f8325dcb46080395693b95310072d7a7",
+       "9e9074aaf0871fd0a6489052bea278d1b1c2d81a988384db62099b75353b3f2c",
+       "3c8af3f8754324402ee6073b70d4c6a1202648d27d82b562d20a28eb915266f1",
+       "02f9fd13de2ddecd6b0fe2bc04b6bf52b3025b6a2b385851fc0caec18564f0b5",
+       "7694d5fb819bf0583c57a2a4b5111300818d6285d297cbd66c4f300d224957e2",
+       "46f945c7b54e21c3958ed03e66932c914b51fcf3755c76eddc931acddf965b9b",
+       "4e3c973a96e153d5274701eca11a0ca50622fe04c2485fceb864d4bedead0d5d",
+       "828fa07837bacc589fb7a7fff10079f21176a7c4d593bf8f42fd67b44ef5eb3f",
+       "9e0b0726bc70ef708f7eb3a7e06b0571f0e127f9fc6a67a0b803997f67227e2b",
+       "b22a7d1f76d17f9c8952d47c745f1faf7ce8110a1d137da7d6cc80969065dfba",
+       "008045d9bda123e2c44364a718fced1647e3b121cb77bc7d3f028893b4655c41",
+       "72e4aeb46049bf1f5a21d0c2c446f0b66b1ed816e0b47a0534890e59c1ae2baf",
+       "ebcd95c70af6fde72aef66e0f01d88a127a5fda66e8967e935ae60319a02ec17",
+       "9b4c8c1b133b0f314c3174974533358d142870462ee547f8d16e5b8b4f414d7d",
+       "c50367ad62d59fc286200835604d370212bd8c3af33ee2aa352cf62ba1f0d5f0",
+       "da57e9cacac8c5a8bb3e03bf9dac63ac52d0b9c8724aa3c28c0d75909e7ffefb",
+       "252e018b8a98c8bc385fbdde394323c961b3dff88126426235564d2e91ba0fe4",
+       "a8b59866a1962a2e9377a375785283b3813ba155a4e282abf2e60313b3e49b4f",
+       "bbee5dbff494691ef2ef2242e660fc5e7dec8a10726cdc8a9e18fe227e1255dd",
+       "79aed46e6afe4095f43d3cca9ce4b50c86b7212156124bf1ad21b53aee5f9f2e",
+       "973b4d22491601f3f176c08d43bb9421c3d571d716beb598b95e182fce0d380d",
+       "31ecb7af5afc1b4c0e95370b360ddad7bb933a903c84c887753407999bf423bf",
+       "084f7e68f4a5533763eecf4e867a31aec073ffef32fac4fe5ded5ba750901cad",
+       "e07bd54587cbec49aa36f6880d5a06f27d7de7918a4411bdb3b1c34945e24db0",
+       "b72ea2ad2a89e257b1c0c51eaedabf9550ef4461abd7113aab4d339e5a815f84",
+       "35d59fb9965c1ed28672ef6937932f751801ece86d7cb877170c09fb32b467e1",
+       "f1e7cf2ae317e82965139c0ffb6c6595aed565231bbbf82f5c14227a7b5e239a",
+       "1b564da5c0a3ff7f0219f9e00e580145325a825116944be5421261bebf6003be",
+       "513c0798309eac6b1e53d5d75ca969da1aaa27552cff5fbfbb9ff60fe50b1732",
+       "999e65344615401f7df671b928febc0e823cfbd5eacdb57abc58b7a14fc3b3f7"
+      ],
+      "chars": 163022,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 156815,
+      "deterministic": null
+     }
+    ]
+   }
+  },
+  "pipeline": {
+   "file": "product_pdf.pipe",
+   "nodes": [
+    "webhook",
+    "parse",
+    "preprocessor_langchain",
+    "embedding_transformer",
+    "response_documents"
+   ],
+   "sha256_raw": "bd775051ff5e43453dd4c0e4e1db465b34467cc3645047e077e75d0b262c823c",
+   "sha256_canonical": "f61165f7cf7ab1dbb30e0cc145d34dcdcbdc048fc90c3756d570fa217faa584b"
+  },
+  "corpus": {
+   "source": "govdocs1",
+   "glob": "000_*.pdf",
+   "rule": "sorted(*.pdf)[:N]",
+   "n": 30,
+   "sha256": "3891d6835c714ae73c69e66d139c81003c2635008ff14f3997338896c0200a81",
+   "first": "000_000009.pdf",
+   "last": "000_000153.pdf"
+  },
+  "pinned": {
+   "workers": 1,
+   "threads": 1,
+   "blast_concurrency": 4,
+   "send_modes": [
+    "sequential",
+    "blast"
+   ],
+   "warm_n": {
+    "primary": 2,
+    "secondary": 25,
+    "placement": "metric-side, by completion rank (perf_window; settled 2026-08-14)"
+   },
+   "embedding_dim": {
+    "source": "probed from each arm's loaded model, one doc pre-span",
+    "per_arm": {
+     "llamaindex_http_pdf": 384,
+     "rocketride_pdf": 384
+    }
+   },
+   "torch_threads_measured": {
+    "llamaindex_http_pdf": {
+     "source": "warm line of each uvicorn worker (driver-managed)",
+     "per_worker_intra_interop": [
+      [
+       1,
+       14
+      ]
+     ],
+     "thread_env_in_worker": null
+    },
+    "rocketride_pdf": {
+     "source": "env_probe node inside the engine task process, separate one-shot pipe (a3_env.pipe); measured pipe untouched",
+     "pid": 74681,
+     "env": {
+      "OMP_NUM_THREADS": null,
+      "MKL_NUM_THREADS": null,
+      "OPENBLAS_NUM_THREADS": null,
+      "VECLIB_MAXIMUM_THREADS": null,
+      "NUMEXPR_NUM_THREADS": null,
+      "TORCH_NUM_THREADS": null
+     },
+     "os_cpu_count": 14,
+     "threads_alive": 5,
+     "torch_num_threads": 10,
+     "torch_num_interop_threads": 14,
+     "torch_version": "2.10.0"
+    }
+   },
+   "service_mode": "driver-managed",
+   "memory_sources": {
+    "llamaindex_http_pdf": {
+     "summed_process_rss_peak_mb": 1047.86,
+     "summed_process_rss_note": "peak of a SUM of per-process RSS (collector.py:360,378). Shared copy-on-write pages are counted once per mapping process, so with N forked workers this OVER-counts by roughly the sharing factor. NOT comparable to Leela's or Shashi's figures.",
+     "comparable_to_teammates": "cgroup_anon_mb",
+     "comparable_note": "Leela reads cgroup memory.stat anon (cgroup_sampler.py:55-62); Shashi reads the Docker API memory_stats.stats.rss, else usage-file (cstats.py:132-140). Both are cgroup-level: the kernel charges a shared page once per cgroup, not once per process. Quote anon against theirs.",
+     "cgroup": null,
+     "cgroup_unavailable_reason": "no cgroup v2 directory for pid 74673 (cgroup v1 host, or the pid is gone)",
+     "summed_process_pss_peak_mb": null,
+     "peak_process_count": 2
+    },
+    "rocketride_pdf": {
+     "summed_process_rss_peak_mb": 2284.14,
+     "summed_process_rss_note": "peak of a SUM of per-process RSS (collector.py:360,378). Shared copy-on-write pages are counted once per mapping process, so with N forked workers this OVER-counts by roughly the sharing factor. NOT comparable to Leela's or Shashi's figures.",
+     "comparable_to_teammates": "cgroup_anon_mb",
+     "comparable_note": "Leela reads cgroup memory.stat anon (cgroup_sampler.py:55-62); Shashi reads the Docker API memory_stats.stats.rss, else usage-file (cstats.py:132-140). Both are cgroup-level: the kernel charges a shared page once per cgroup, not once per process. Quote anon against theirs.",
+     "cgroup": null,
+     "cgroup_unavailable_reason": "no cgroup v2 directory for pid 38379 (cgroup v1 host, or the pid is gone)",
+     "summed_process_pss_peak_mb": null,
+     "peak_process_count": 2
+    }
+   },
+   "cost_available": true,
+   "cost_unavailable_reason": null,
+   "cost_sampler": {
+    "source": "psutil ProcessCollector (out-of-process, dead-PID roll-forward)",
+    "interval_s": 0.5,
+    "scope": "service process tree only, driver excluded",
+    "pluggable": "box/Docker mode consumes Leela's cgroup_sampler JSONL via metrics_shared.series_from_cgroup_jsonl"
+   },
+   "available_cpus": 14,
+   "rocketride_client": {
+    "ROCKETRIDE_URI": {
+     "source": "/Users/ansh/RocketRide/Benchmarking/benchmark-A/.env (gitignored \u2014 absent on a fresh clone)",
+     "value": "http://127.0.0.1:5565",
+     "resolved_websocket": "ws://127.0.0.1:5565/task/service"
+    },
+    "ROCKETRIDE_APIKEY": {
+     "source": "/Users/ansh/RocketRide/Benchmarking/benchmark-A/.env (gitignored \u2014 absent on a fresh clone)",
+     "sha256_8": "2dff2665"
+    },
+    "loopback": true
+   },
+   "raw_records_dir": "/private/tmp/claude-501/-Users-ansh-RocketRide-Benchmarking/a49db818-88a8-4ed0-a03f-c25c50461af4/scratchpad/blast_test"
+  },
+  "gate_verdicts": {
+   "llamaindex_http_pdf": {
+    "shashi": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "expected": 30,
+       "recorded": 30,
+       "n_missing": 0,
+       "missing": [],
+       "n_duplicates": 0,
+       "duplicates": [],
+       "n_unexpected": 0,
+       "unexpected": [],
+       "n_silent_empty": 0,
+       "silent_empty": [],
+       "PASS": true
+      },
+      "structure": {
+       "docs_checked": 30,
+       "n_bad": 0,
+       "reasons": [],
+       "expected_dim": 384,
+       "norm_ok": true,
+       "duplication": {
+        "n_duplicated": 0,
+        "duplicated_docs": [],
+        "max_repeat_factor": 1,
+        "n_over_chunk_trigger": 0,
+        "PASS": true
+       },
+       "PASS": true
+      },
+      "determinism": {
+       "label_a": "sequential",
+       "label_b": "blast",
+       "compared": 0,
+       "identical": 0,
+       "n_mismatched": 0,
+       "mismatched": [],
+       "n_unproven": 0,
+       "unproven": [],
+       "PASS": false
+      }
+     }
+    },
+    "leela": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "offered": 30,
+       "records": 30,
+       "silent": 0,
+       "duplicate_docs": [],
+       "missing_docs": null,
+       "unexpected_docs": null,
+       "completed": 30,
+       "failed_by_reason": {},
+       "unexpected_failures": 0,
+       "unexpected_failure_docs": [],
+       "PASS": true
+      },
+      "structure": {
+       "bad_docs": {},
+       "completed_empty": [],
+       "PASS": true
+      },
+      "determinism": {
+       "compared": 0,
+       "mismatch_docs": [],
+       "n_mismatch": 0,
+       "only_in_a": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "only_in_b": [],
+       "PASS": false
+      }
+     }
+    },
+    "union": {
+     "PASS": false,
+     "note": "conjunction of both suites over identical records"
+    }
+   },
+   "rocketride_pdf": {
+    "shashi": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "expected": 30,
+       "recorded": 30,
+       "n_missing": 0,
+       "missing": [],
+       "n_duplicates": 0,
+       "duplicates": [],
+       "n_unexpected": 0,
+       "unexpected": [],
+       "n_silent_empty": 0,
+       "silent_empty": [],
+       "PASS": true
+      },
+      "structure": {
+       "docs_checked": 30,
+       "n_bad": 0,
+       "reasons": [],
+       "expected_dim": 384,
+       "norm_ok": true,
+       "duplication": {
+        "n_duplicated": 0,
+        "duplicated_docs": [],
+        "max_repeat_factor": 1,
+        "n_over_chunk_trigger": 0,
+        "PASS": true
+       },
+       "PASS": true
+      },
+      "determinism": {
+       "label_a": "sequential",
+       "label_b": "blast",
+       "compared": 0,
+       "identical": 0,
+       "n_mismatched": 0,
+       "mismatched": [],
+       "n_unproven": 0,
+       "unproven": [],
+       "PASS": false
+      }
+     }
+    },
+    "leela": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "offered": 30,
+       "records": 30,
+       "silent": 0,
+       "duplicate_docs": [],
+       "missing_docs": null,
+       "unexpected_docs": null,
+       "completed": 30,
+       "failed_by_reason": {},
+       "unexpected_failures": 0,
+       "unexpected_failure_docs": [],
+       "PASS": true
+      },
+      "structure": {
+       "bad_docs": {},
+       "completed_empty": [],
+       "PASS": true
+      },
+      "determinism": {
+       "compared": 0,
+       "mismatch_docs": [],
+       "n_mismatch": 0,
+       "only_in_a": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "only_in_b": [],
+       "PASS": false
+      }
+     }
+    },
+    "union": {
+     "PASS": false,
+     "note": "conjunction of both suites over identical records"
+    }
+   },
+   "cross_arm": {
+    "workload_ratio_rr_over_li": {
+     "ratio": 1.0183,
+     "hard_band": [
+      0.4,
+      2.5
+     ],
+     "advisory_band": [
+      0.8,
+      1.25
+     ],
+     "workload_asymmetry": false,
+     "PASS": true
+    },
+    "normalization_parity": {
+     "a_norm_ok": true,
+     "b_norm_ok": true,
+     "PASS": true
+    },
+    "chunk_config_parity": {
+     "a": [
+      4000,
+      200
+     ],
+     "b": [
+      4000,
+      200
+     ],
+     "PASS": true
+    },
+    "PASS": true
+   }
+  },
+  "cross_arm": [
+   {
+    "doc": "000_000009.pdf",
+    "chunk_delta": 3,
+    "char_ratio": 1.3156
+   },
+   {
+    "doc": "000_000010.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9916
+   },
+   {
+    "doc": "000_000011.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0293
+   },
+   {
+    "doc": "000_000012.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.971
+   },
+   {
+    "doc": "000_000013.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9722
+   },
+   {
+    "doc": "000_000015.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9832
+   },
+   {
+    "doc": "000_000016.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9898
+   },
+   {
+    "doc": "000_000018.pdf",
+    "chunk_delta": 1,
+    "char_ratio": 0.9963
+   },
+   {
+    "doc": "000_000019.pdf",
+    "chunk_delta": -1,
+    "char_ratio": 1.0072
+   },
+   {
+    "doc": "000_000020.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0062
+   },
+   {
+    "doc": "000_000021.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0076
+   },
+   {
+    "doc": "000_000022.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9615
+   },
+   {
+    "doc": "000_000024.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0799
+   },
+   {
+    "doc": "000_000025.pdf",
+    "chunk_delta": 1,
+    "char_ratio": 1.0008
+   },
+   {
+    "doc": "000_000026.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9746
+   },
+   {
+    "doc": "000_000028.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9872
+   },
+   {
+    "doc": "000_000029.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0714
+   },
+   {
+    "doc": "000_000135.pdf",
+    "chunk_delta": 1,
+    "char_ratio": 0.9404
+   },
+   {
+    "doc": "000_000137.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0107
+   },
+   {
+    "doc": "000_000140.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0037
+   },
+   {
+    "doc": "000_000141.pdf",
+    "chunk_delta": 1,
+    "char_ratio": 0.9887
+   },
+   {
+    "doc": "000_000142.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9813
+   },
+   {
+    "doc": "000_000143.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0066
+   },
+   {
+    "doc": "000_000145.pdf",
+    "chunk_delta": 1,
+    "char_ratio": 1.0099
+   },
+   {
+    "doc": "000_000146.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0246
+   },
+   {
+    "doc": "000_000147.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9754
+   },
+   {
+    "doc": "000_000149.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9754
+   },
+   {
+    "doc": "000_000150.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0885
+   },
+   {
+    "doc": "000_000152.pdf",
+    "chunk_delta": 3,
+    "char_ratio": 0.9902
+   },
+   {
+    "doc": "000_000153.pdf",
+    "chunk_delta": -6,
+    "char_ratio": 1.0675
+   }
+  ],
+  "metrics": {
+   "module": "working/harness/metrics_shared.py",
+   "platform": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "native_x86_64": false
+   },
+   "publishable": false,
+   "not_publishable_reason": "Darwin/arm64 \u2014 the pinned target is Linux x86_64; throughput and cost from any other platform are wiring validation only",
+   "arms": {
+    "llamaindex_http_pdf": {
+     "sequential_warm2": {
+      "mode": "closed-loop",
+      "warm_n": 2,
+      "successful_in_window": 28,
+      "window_docs": 28,
+      "window_span_s": 14.871,
+      "successful_chunks": 208,
+      "docs_per_s": 1.8829,
+      "chunks_per_s": 13.9874,
+      "window_t0_ns": 1786843261908597000,
+      "window_t1_ns": 1786843276779129000,
+      "latency": {
+       "n": 28,
+       "p50": 0.1964,
+       "p90": 1.8721,
+       "p95": 2.7387,
+       "p99": 4.2986,
+       "max": 4.2986,
+       "mean": 0.5297,
+       "failed_items": 0,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 2
+      },
+      "cpu_s": 14.884,
+      "cpu_s_per_doc": 0.5316,
+      "cpu_s_per_chunk": 0.07156,
+      "effective_cores": 1.001,
+      "peak_rss_mb": 1047.9,
+      "cost_samples_in_window": 30,
+      "cpu_utilization": 0.0715,
+      "cpu_utilization_valid": true,
+      "available_cpus": 14
+     },
+     "sequential_warm25": {
+      "mode": "closed-loop",
+      "warm_n": 25,
+      "successful_in_window": 5,
+      "window_docs": 5,
+      "window_span_s": 6.104,
+      "successful_chunks": 114,
+      "docs_per_s": 0.8191,
+      "chunks_per_s": 18.6754,
+      "window_t0_ns": 1786843270674833000,
+      "window_t1_ns": 1786843276779129000,
+      "latency": {
+       "n": 5,
+       "p50": 0.7803,
+       "p90": 2.7387,
+       "p95": 2.7387,
+       "p99": 2.7387,
+       "max": 2.7387,
+       "mean": 1.2189,
+       "failed_items": 0,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 25
+      },
+      "cpu_s": 5.978,
+      "cpu_s_per_doc": 1.1956,
+      "cpu_s_per_chunk": 0.05244,
+      "effective_cores": 0.979,
+      "peak_rss_mb": 870.5,
+      "cost_samples_in_window": 12,
+      "cpu_utilization": 0.07,
+      "cpu_utilization_valid": true,
+      "available_cpus": 14
+     },
+     "blast_warm2": {
+      "error": "0 completions <= warm_n=2",
+      "warm_n": 2,
+      "mode": "open-loop-blast"
+     },
+     "blast_warm25": {
+      "error": "0 completions <= warm_n=25",
+      "warm_n": 25,
+      "mode": "open-loop-blast"
+     }
+    },
+    "rocketride_pdf": {
+     "sequential_warm2": {
+      "mode": "closed-loop",
+      "warm_n": 2,
+      "successful_in_window": 28,
+      "window_docs": 28,
+      "window_span_s": 11.471,
+      "successful_chunks": 209,
+      "docs_per_s": 2.441,
+      "chunks_per_s": 18.2201,
+      "window_t0_ns": 1786843286658627000,
+      "window_t1_ns": 1786843298129466000,
+      "latency": {
+       "n": 28,
+       "p50": 0.1592,
+       "p90": 0.9563,
+       "p95": 1.1824,
+       "p99": 3.6346,
+       "max": 3.6346,
+       "mean": 0.408,
+       "failed_items": 0,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 2
+      },
+      "cpu_s": 28.157,
+      "cpu_s_per_doc": 1.0056,
+      "cpu_s_per_chunk": 0.13472,
+      "effective_cores": 2.455,
+      "peak_rss_mb": 2284.1,
+      "cost_samples_in_window": 23,
+      "cpu_utilization": 0.1753,
+      "cpu_utilization_valid": true,
+      "available_cpus": 14
+     },
+     "sequential_warm25": {
+      "mode": "closed-loop",
+      "warm_n": 25,
+      "successful_in_window": 5,
+      "window_docs": 5,
+      "window_span_s": 6.15,
+      "successful_chunks": 111,
+      "docs_per_s": 0.813,
+      "chunks_per_s": 18.0479,
+      "window_t0_ns": 1786843291979155000,
+      "window_t1_ns": 1786843298129466000,
+      "latency": {
+       "n": 5,
+       "p50": 0.6418,
+       "p90": 3.6346,
+       "p95": 3.6346,
+       "p99": 3.6346,
+       "max": 3.6346,
+       "mean": 1.2272,
+       "failed_items": 0,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 25
+      },
+      "cpu_s": 12.814,
+      "cpu_s_per_doc": 2.5628,
+      "cpu_s_per_chunk": 0.11544,
+      "effective_cores": 2.084,
+      "peak_rss_mb": 2284.1,
+      "cost_samples_in_window": 12,
+      "cpu_utilization": 0.1488,
+      "cpu_utilization_valid": true,
+      "available_cpus": 14
+     },
+     "blast_warm2": {
+      "error": "0 completions <= warm_n=2",
+      "warm_n": 2,
+      "mode": "open-loop-blast"
+     },
+     "blast_warm25": {
+      "error": "0 completions <= warm_n=25",
+      "warm_n": 25,
+      "mode": "open-loop-blast"
+     }
+    }
+   }
+  }
+ }
+}

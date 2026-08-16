@@ -1,0 +1,722 @@
+{
+ "_meta": {
+  "name": "smoke50_parser_in",
+  "written_utc": "20260815T222110Z",
+  "payload_sha256_12": "f47eee7a0c11",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 54991,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "n_offered": 4,
+  "threads": [
+   [
+    10,
+    14
+   ]
+  ],
+  "arms": {
+   "llamaindex_http_pdf": {
+    "census": {
+     "successful": 4,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": true,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "determinism_unproven": 0,
+    "independent_hash_failures": 0,
+    "independent_reference": {
+     "available": null,
+     "unavailable_reason": null,
+     "covered": 4,
+     "successful": 4,
+     "ran": true,
+     "full_coverage": true
+    },
+    "content_suspect": 0,
+    "records": [
+     {
+      "doc": "000_000009.pdf",
+      "submitted_sha256": "3fcfd899850be006b2d6616f8161e49479bc41424fa80e404f41233b77256ff3",
+      "submit_ns": 1786832437176932000,
+      "completion_ns": 1786832437291233000,
+      "latency_ms": 114.3,
+      "returned_doc_id": "d54991-2",
+      "n_chunks": 7,
+      "chunk_sha256": [
+       "f1648b7d764cbac03b8de3322fec887bcbfc9866c417d577f266b1171dae1860",
+       "7f415182f7916620f79a30112d07d3c650ba0c24ca7dc7ddab32df1049269caf",
+       "0a9f3717a073e9f9d413962c91d0161fe53a3098ec7f60951e8d7e3f24a6741d",
+       "0e9fd3d1abb74dd17ca79890b22620e0dc057a628cab1808d18d210774882edc",
+       "543ff9cdf7f0dc804e071c3df3ed15e4feffae22d5b661bdd2daf5c9a4ab4724",
+       "14f0b2322e47441ccd49ef20f97accb80da81d9102fd55aa4ba27cbe3934e126",
+       "3be946a0fa6568e204953a866e38086343d2f6dbe05b80abcb4cc483c50acb75"
+      ],
+      "chars": 26995,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 26005,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000010.pdf",
+      "submitted_sha256": "7832f844839ed04e2979bc565642f36bf76e1682137071f0786d4c7418bf81d7",
+      "submit_ns": 1786832437291507000,
+      "completion_ns": 1786832437356604000,
+      "latency_ms": 65.1,
+      "returned_doc_id": "d54991-3",
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "69929f6c47b7f8c7b0614d0b5646ea06f91f448fa7215139835cdd838a601af3",
+       "9105244e3cc17309802d3839e20e7028f9f8329c71892d55f13878286437ddbf",
+       "1f507bbbbd478e744e9a2698794586365c4b9a6613b3507f36c7bbdb96250387",
+       "5552af224ee3c508b338424e4f911e44955f9c315127ccca34efeeb0c60b4a52"
+      ],
+      "chars": 12100,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 11763,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000011.pdf",
+      "submitted_sha256": "44d4296ee6750f96a34455cf5d6d6e0a574ffe1419928780b5d2fddea0af3778",
+      "submit_ns": 1786832437356820000,
+      "completion_ns": 1786832437366242000,
+      "latency_ms": 9.42,
+      "returned_doc_id": "d54991-4",
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "08683142c388fe2e00ef1cfb347228f5867d0878eceafad916f81de5023370c9"
+      ],
+      "chars": 273,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 276,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000012.pdf",
+      "submitted_sha256": "1138e868dc3e44bd3f1dafd60ff3ed0d14a42ab1b17964ac475edac46789b5d0",
+      "submit_ns": 1786832437366382000,
+      "completion_ns": 1786832437435594000,
+      "latency_ms": 69.21,
+      "returned_doc_id": "d54991-5",
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "89e068f2ac7f1b9a055f8d6e5f7cd3dc488942078f34988ca4fc4fb04556f4df",
+       "508988990e15ba6bad6bb795346e9d3888e445db9522298bd9a8b715313bdbec",
+       "34a2cfd57dfa4efe749a38c199a0e62629d5939573a7a9f5c590272e93196d45",
+       "c31ba2e691da69c5c49b3184550a12b34d6f7d130974893f5b1b4d0aa565d975",
+       "81384d95ba1505fcb25e5b4f2210a3ded8e59883d67bee943162f6449e5000d6"
+      ],
+      "chars": 17041,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 16327,
+      "deterministic": true
+     }
+    ]
+   },
+   "rocketride_pdf": {
+    "census": {
+     "successful": 4,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": true,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "determinism_unproven": 0,
+    "independent_hash_failures": 0,
+    "independent_reference": {
+     "available": true,
+     "unavailable_reason": null,
+     "covered": 4,
+     "successful": 4,
+     "ran": true,
+     "full_coverage": true
+    },
+    "content_suspect": 0,
+    "records": [
+     {
+      "doc": "000_000009.pdf",
+      "submitted_sha256": "3fcfd899850be006b2d6616f8161e49479bc41424fa80e404f41233b77256ff3",
+      "submit_ns": 1786832447199220000,
+      "completion_ns": 1786832447373549000,
+      "latency_ms": 174.33,
+      "returned_doc_id": null,
+      "n_chunks": 10,
+      "chunk_sha256": [
+       "bba1ccd423493e1acd692546c3ab968eb1af99cff03f3c805c74fc7be77eed0e",
+       "1e89deb357f8a4fd60374ef1c637029f6ed59573de37a44115f7e90b9d11335d",
+       "f311b287bcef704795ab47b03e0676b2cb88ff1cf538b6234cbabf67db47fbf2",
+       "f1d78d3149e579b7a056793fbca21f74ac7bec21558ce81e38976823910b941c",
+       "059e94e8a1681c047f379e42da498cb0918ad449379dd58a54cc23fc752f7958",
+       "1306d9e8c7083b526e4bb6d95fd9c4e4541b28e768e2b1c1d8580d5e14ca8a67",
+       "da1a88640031c1207714c7b96613a11654d8a7158de46e6a6591c205f3fa6f3b",
+       "ca240a50dda88ca511532acdf8d44bf92664d0a6eddc7a41e03c5bfb4ddf0dce",
+       "79d11d33f961e40f53c429228e83760b0351f6ddd84c055e25aceb9b8eb22c73",
+       "8cc0b03339195762ad2967c292f5421452b63ca9fe28e92dd19167a700100cc6"
+      ],
+      "chars": 35514,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 35228,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000010.pdf",
+      "submitted_sha256": "7832f844839ed04e2979bc565642f36bf76e1682137071f0786d4c7418bf81d7",
+      "submit_ns": 1786832447373923000,
+      "completion_ns": 1786832447471171000,
+      "latency_ms": 97.25,
+      "returned_doc_id": null,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "7554508d32dda37ade72a5e86cde0b9b52784e54c58a7adaf3496f86481dde57",
+       "994414cafb9e20c08ad6eacf7f8ffd13d877a242c2da062a258af95d5e72b5a9",
+       "b9f86e017e827c9897b706b32b3d5228e4c52240eeea459fa3659b27abe49d17",
+       "014a1dd068e90d797a72cfa83f34d16be14781de4385a877e3d7ae5ae50e7f76"
+      ],
+      "chars": 11998,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 11703,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000011.pdf",
+      "submitted_sha256": "44d4296ee6750f96a34455cf5d6d6e0a574ffe1419928780b5d2fddea0af3778",
+      "submit_ns": 1786832447472224000,
+      "completion_ns": 1786832447497670000,
+      "latency_ms": 25.45,
+      "returned_doc_id": null,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "26a41f95119d94ebff70cd09b415504291fb1db701a998db4d7c6d96aaa44bd3"
+      ],
+      "chars": 281,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 288,
+      "deterministic": true
+     },
+     {
+      "doc": "000_000012.pdf",
+      "submitted_sha256": "1138e868dc3e44bd3f1dafd60ff3ed0d14a42ab1b17964ac475edac46789b5d0",
+      "submit_ns": 1786832447498074000,
+      "completion_ns": 1786832447643345000,
+      "latency_ms": 145.27,
+      "returned_doc_id": null,
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "0b42989a05f8908cee4f9c8561957194c5036f6180878fc9fe4f728cabd75f99",
+       "d48434733d1cd1fe45448b2b3b684f0604f248bd3af59188f9a271e205d6a3cb",
+       "820a136fa604b3341bc3676afb92bbb39454d1f91b3b9238b76cff80af73344a",
+       "e65a535ffbdec98c3e97b73b886365136c0411605b669c4852ea82ad326c200f",
+       "3db36dfc99f01dad92371ce8cb2fa9706bbecccf178b2f8da34a73e3c3cd3e8d"
+      ],
+      "chars": 16547,
+      "structure": [],
+      "outcome": "successful",
+      "ok": true,
+      "independent_hash": "pass",
+      "extracted_chars": 16316,
+      "deterministic": true
+     }
+    ]
+   }
+  },
+  "pipeline": {
+   "file": "product_pdf.pipe",
+   "nodes": [
+    "webhook",
+    "parse",
+    "preprocessor_langchain",
+    "embedding_transformer",
+    "response_documents"
+   ],
+   "sha256_raw": "bd775051ff5e43453dd4c0e4e1db465b34467cc3645047e077e75d0b262c823c",
+   "sha256_canonical": "f61165f7cf7ab1dbb30e0cc145d34dcdcbdc048fc90c3756d570fa217faa584b"
+  },
+  "corpus": {
+   "source": "govdocs1",
+   "glob": "000_*.pdf",
+   "rule": "sorted(*.pdf)[:N]",
+   "n": 4,
+   "sha256": "63be5855a5f12b3ff861194b6855bb664955762d52c70fdc05f04dcfbf5dad49",
+   "first": "000_000009.pdf",
+   "last": "000_000012.pdf"
+  },
+  "pinned": {
+   "workers": 1,
+   "threads": 10,
+   "blast_concurrency": 4,
+   "send_modes": [
+    "sequential",
+    "blast"
+   ],
+   "warm_n": {
+    "primary": 2,
+    "secondary": 25,
+    "placement": "metric-side, by completion rank (perf_window; settled 2026-08-14)"
+   },
+   "embedding_dim": {
+    "source": "probed from each arm's loaded model, one doc pre-span",
+    "per_arm": {
+     "llamaindex_http_pdf": 384,
+     "rocketride_pdf": 384
+    }
+   },
+   "torch_threads_measured": {
+    "llamaindex_http_pdf": {
+     "source": "warm line of each uvicorn worker (driver-managed)",
+     "per_worker_intra_interop": [
+      [
+       10,
+       14
+      ]
+     ],
+     "thread_env_in_worker": null
+    },
+    "rocketride_pdf": {
+     "source": "env_probe node inside the engine task process, separate one-shot pipe (a3_env.pipe); measured pipe untouched",
+     "pid": 54999,
+     "env": {
+      "OMP_NUM_THREADS": null,
+      "MKL_NUM_THREADS": null,
+      "OPENBLAS_NUM_THREADS": null,
+      "VECLIB_MAXIMUM_THREADS": null,
+      "NUMEXPR_NUM_THREADS": null,
+      "TORCH_NUM_THREADS": null
+     },
+     "os_cpu_count": 14,
+     "threads_alive": 5,
+     "torch_num_threads": 10,
+     "torch_num_interop_threads": 14,
+     "torch_version": "2.10.0"
+    }
+   },
+   "service_mode": "driver-managed",
+   "cost_sampler": {
+    "source": "psutil ProcessCollector (out-of-process, dead-PID roll-forward)",
+    "interval_s": 0.5,
+    "scope": "service process tree only, driver excluded",
+    "pluggable": "box/Docker mode consumes Leela's cgroup_sampler JSONL via metrics_shared.series_from_cgroup_jsonl"
+   },
+   "available_cpus": 14,
+   "rocketride_client": {
+    "ROCKETRIDE_URI": {
+     "source": "/Users/ansh/RocketRide/Benchmarking/benchmark-A/.env (gitignored \u2014 absent on a fresh clone)",
+     "value": "http://127.0.0.1:5565",
+     "resolved_websocket": "ws://127.0.0.1:5565/task/service"
+    },
+    "ROCKETRIDE_APIKEY": {
+     "source": "/Users/ansh/RocketRide/Benchmarking/benchmark-A/.env (gitignored \u2014 absent on a fresh clone)",
+     "sha256_8": "2dff2665"
+    },
+    "loopback": true
+   },
+   "raw_records_dir": "/Users/ansh/RocketRide/Benchmarking/benchmark-A/working/results/smoke_metrics_20260815T222025Z"
+  },
+  "gate_verdicts": {
+   "llamaindex_http_pdf": {
+    "shashi": {
+     "PASS": true,
+     "checks": {
+      "census": {
+       "expected": 4,
+       "recorded": 4,
+       "n_missing": 0,
+       "missing": [],
+       "n_duplicates": 0,
+       "duplicates": [],
+       "n_unexpected": 0,
+       "unexpected": [],
+       "n_silent_empty": 0,
+       "silent_empty": [],
+       "PASS": true
+      },
+      "structure": {
+       "docs_checked": 4,
+       "n_bad": 0,
+       "reasons": [],
+       "expected_dim": 384,
+       "norm_ok": true,
+       "duplication": {
+        "n_duplicated": 0,
+        "duplicated_docs": [],
+        "max_repeat_factor": 1,
+        "n_over_chunk_trigger": 0,
+        "PASS": true
+       },
+       "PASS": true
+      },
+      "determinism": {
+       "label_a": "sequential",
+       "label_b": "blast",
+       "compared": 4,
+       "identical": 4,
+       "n_mismatched": 0,
+       "mismatched": [],
+       "n_unproven": 0,
+       "unproven": [],
+       "PASS": true
+      }
+     }
+    },
+    "leela": {
+     "PASS": true,
+     "checks": {
+      "census": {
+       "offered": 4,
+       "records": 4,
+       "silent": 0,
+       "duplicate_docs": [],
+       "missing_docs": null,
+       "unexpected_docs": null,
+       "completed": 4,
+       "failed_by_reason": {},
+       "unexpected_failures": 0,
+       "unexpected_failure_docs": [],
+       "PASS": true
+      },
+      "structure": {
+       "bad_docs": {},
+       "completed_empty": [],
+       "PASS": true
+      },
+      "determinism": {
+       "compared": 4,
+       "mismatch_docs": [],
+       "n_mismatch": 0,
+       "only_in_a": [],
+       "only_in_b": [],
+       "PASS": true
+      }
+     }
+    },
+    "union": {
+     "PASS": true,
+     "note": "conjunction of both suites over identical records"
+    }
+   },
+   "rocketride_pdf": {
+    "shashi": {
+     "PASS": true,
+     "checks": {
+      "census": {
+       "expected": 4,
+       "recorded": 4,
+       "n_missing": 0,
+       "missing": [],
+       "n_duplicates": 0,
+       "duplicates": [],
+       "n_unexpected": 0,
+       "unexpected": [],
+       "n_silent_empty": 0,
+       "silent_empty": [],
+       "PASS": true
+      },
+      "structure": {
+       "docs_checked": 4,
+       "n_bad": 0,
+       "reasons": [],
+       "expected_dim": 384,
+       "norm_ok": true,
+       "duplication": {
+        "n_duplicated": 0,
+        "duplicated_docs": [],
+        "max_repeat_factor": 1,
+        "n_over_chunk_trigger": 0,
+        "PASS": true
+       },
+       "PASS": true
+      },
+      "determinism": {
+       "label_a": "sequential",
+       "label_b": "blast",
+       "compared": 4,
+       "identical": 4,
+       "n_mismatched": 0,
+       "mismatched": [],
+       "n_unproven": 0,
+       "unproven": [],
+       "PASS": true
+      }
+     }
+    },
+    "leela": {
+     "PASS": true,
+     "checks": {
+      "census": {
+       "offered": 4,
+       "records": 4,
+       "silent": 0,
+       "duplicate_docs": [],
+       "missing_docs": null,
+       "unexpected_docs": null,
+       "completed": 4,
+       "failed_by_reason": {},
+       "unexpected_failures": 0,
+       "unexpected_failure_docs": [],
+       "PASS": true
+      },
+      "structure": {
+       "bad_docs": {},
+       "completed_empty": [],
+       "PASS": true
+      },
+      "determinism": {
+       "compared": 4,
+       "mismatch_docs": [],
+       "n_mismatch": 0,
+       "only_in_a": [],
+       "only_in_b": [],
+       "PASS": true
+      }
+     }
+    },
+    "union": {
+     "PASS": true,
+     "note": "conjunction of both suites over identical records"
+    }
+   },
+   "cross_arm": {
+    "workload_ratio_rr_over_li": {
+     "ratio": 1.1765,
+     "hard_band": [
+      0.4,
+      2.5
+     ],
+     "advisory_band": [
+      0.8,
+      1.25
+     ],
+     "workload_asymmetry": false,
+     "PASS": true
+    },
+    "normalization_parity": {
+     "a_norm_ok": true,
+     "b_norm_ok": true,
+     "PASS": true
+    },
+    "chunk_config_parity": {
+     "a": [
+      4000,
+      200
+     ],
+     "b": [
+      4000,
+      200
+     ],
+     "PASS": true
+    },
+    "PASS": true
+   }
+  },
+  "cross_arm": [
+   {
+    "doc": "000_000009.pdf",
+    "chunk_delta": 3,
+    "char_ratio": 1.3156
+   },
+   {
+    "doc": "000_000010.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.9916
+   },
+   {
+    "doc": "000_000011.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 1.0293
+   },
+   {
+    "doc": "000_000012.pdf",
+    "chunk_delta": 0,
+    "char_ratio": 0.971
+   }
+  ],
+  "metrics": {
+   "module": "working/harness/metrics_shared.py",
+   "not_publishable_reason": "macOS/arm64 laptop \u2014 superseded by policy",
+   "arms": {
+    "llamaindex_http_pdf": {
+     "sequential_warm2": {
+      "mode": "closed-loop",
+      "warm_n": 2,
+      "successful_in_window": 2,
+      "window_docs": 2,
+      "window_span_s": 0.079,
+      "successful_chunks": 6,
+      "docs_per_s": 25.3197,
+      "chunks_per_s": 75.959,
+      "window_t0_ns": 1786832437356604000,
+      "window_t1_ns": 1786832437435594000,
+      "latency": {
+       "n": 2,
+       "p50": 0.0094,
+       "p90": 0.0692,
+       "p95": 0.0692,
+       "p99": 0.0692,
+       "max": 0.0692,
+       "mean": 0.0393,
+       "failed_items": 0,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 2
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "sequential_warm25": {
+      "error": "4 completions <= warm_n=25",
+      "warm_n": 25,
+      "mode": "closed-loop"
+     },
+     "blast_warm2": {
+      "mode": "open-loop-blast",
+      "warm_n": 2,
+      "successful_in_window": 2,
+      "window_docs": 2,
+      "window_span_s": 0.077,
+      "successful_chunks": 6,
+      "docs_per_s": 26.1025,
+      "chunks_per_s": 78.3075,
+      "window_t0_ns": 1786832455960062000,
+      "window_t1_ns": 1786832456036683000,
+      "latency": {
+       "n": 2,
+       "p50": 0.26,
+       "p90": 0.2686,
+       "p95": 0.2686,
+       "p99": 0.2686,
+       "max": 0.2686,
+       "mean": 0.2643,
+       "failed_items": 0,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 2
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "blast_warm25": {
+      "error": "4 completions <= warm_n=25",
+      "warm_n": 25,
+      "mode": "open-loop-blast"
+     }
+    },
+    "rocketride_pdf": {
+     "sequential_warm2": {
+      "mode": "closed-loop",
+      "warm_n": 2,
+      "successful_in_window": 2,
+      "window_docs": 2,
+      "window_span_s": 0.172,
+      "successful_chunks": 6,
+      "docs_per_s": 11.6162,
+      "chunks_per_s": 34.8485,
+      "window_t0_ns": 1786832447471171000,
+      "window_t1_ns": 1786832447643345000,
+      "latency": {
+       "n": 2,
+       "p50": 0.0254,
+       "p90": 0.1453,
+       "p95": 0.1453,
+       "p99": 0.1453,
+       "max": 0.1453,
+       "mean": 0.0854,
+       "failed_items": 0,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 2
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "sequential_warm25": {
+      "error": "4 completions <= warm_n=25",
+      "warm_n": 25,
+      "mode": "closed-loop"
+     },
+     "blast_warm2": {
+      "mode": "open-loop-blast",
+      "warm_n": 2,
+      "successful_in_window": 2,
+      "window_docs": 2,
+      "window_span_s": 0.165,
+      "successful_chunks": 15,
+      "docs_per_s": 12.0928,
+      "chunks_per_s": 90.6958,
+      "window_t0_ns": 1786832463372508000,
+      "window_t1_ns": 1786832463537896000,
+      "latency": {
+       "n": 2,
+       "p50": 0.5413,
+       "p90": 0.5973,
+       "p95": 0.5973,
+       "p99": 0.5973,
+       "max": 0.5973,
+       "mean": 0.5693,
+       "failed_items": 0,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 2
+      },
+      "cpu_s": 1.434,
+      "cpu_s_per_doc": 0.717,
+      "cpu_s_per_chunk": 0.0956,
+      "effective_cores": 8.691,
+      "peak_rss_mb": 1021.4,
+      "cost_samples_in_window": 1,
+      "cpu_utilization": 0.6208,
+      "cpu_utilization_valid": true,
+      "available_cpus": 14
+     },
+     "blast_warm25": {
+      "error": "4 completions <= warm_n=25",
+      "warm_n": 25,
+      "mode": "open-loop-blast"
+     }
+    }
+   }
+  }
+ }
+}

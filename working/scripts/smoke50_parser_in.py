@@ -426,7 +426,33 @@ def main() -> int:
         m = msrc.memory_report(service_root_pid(arm_name), _sum.get("peak_rss_mb"))
         m["summed_process_pss_peak_mb"] = _sum.get("peak_pss_mb")
         m["peak_process_count"] = _sum.get("peak_process_count")
+        m["peak_thread_count"] = _sum.get("peak_thread_count")
+        m["distinct_pids_seen"] = _sum.get("distinct_pids_seen")
         m["leg"] = leg
+        # THE HEADLINE, sampled during the leg on the process tick (defect #31). Everything
+        # `memory_report` produced above is a post-leg point read and can only describe the
+        # container after it has released whatever the leg was holding: the 10k blast reported
+        # 1,025.4 MB anon over 2 processes that way, taken after the engine had already torn
+        # its task processes down. The sampled figure below is the one to quote.
+        m["cgroup_anon_peak_mb"] = _sum.get("peak_cgroup_anon_mb")
+        m["cgroup_current_peak_mb"] = _sum.get("peak_cgroup_current_mb")
+        m["cgroup_peak_tasks"] = _sum.get("peak_cgroup_tasks")
+        m["cgroup_samples_in_leg"] = _sum.get("cgroup_samples")
+        m["quote_this"] = ("cgroup_anon_peak_mb" if _sum.get("peak_cgroup_anon_mb")
+                           else None)
+        if not _sum.get("peak_cgroup_anon_mb"):
+            m["no_sampled_anon_reason"] = (
+                "the collector resolved no cgroup v2 group for this arm — cgroup v1 host, "
+                "macOS, or the root pid was gone before the first tick. The post-leg point "
+                "sample below is NOT a substitute for a peak.")
+        # tasks != processes. cgroup pids.current counts threads, so a threaded engine reads
+        # ~10x its process count; reported side by side so they cannot be conflated.
+        if _sum.get("peak_cgroup_tasks") and _sum.get("peak_process_count"):
+            m["tasks_per_process_at_peak"] = round(
+                _sum["peak_cgroup_tasks"] / max(_sum["peak_process_count"], 1), 1)
+        if _sum.get("peak_rss_mb") and _sum.get("peak_cgroup_anon_mb"):
+            m["sharing_factor_sampled"] = round(
+                _sum["peak_rss_mb"] / _sum["peak_cgroup_anon_mb"], 2)
         # cgroup anon/current are read ONCE, here, after the leg — a point sample, not a peak.
         # Only memory.peak is a kernel high-water mark, and it is cumulative since the container
         # started (or was last reset), so it spans every leg and any earlier run in the same
@@ -1165,23 +1191,31 @@ def main() -> int:
 
     say("")
     say("MEMORY - every source named, PER LEG; a summed-RSS peak is NOT a footprint")
-    say(f"{'ARM:LEG':30}{'summed RSS':>13}{'summed PSS':>13}{'cgroup anon':>13}"
-        f"{'cgroup peak':>13}{'procs':>7}")
-    say(f"{'':30}{'peak, this leg':>13}{'peak, this leg':>13}{'POINT sample':>13}"
-        f"{'HWM, all legs':>13}{'peak':>7}")
-    say("-" * 89)
+    say(f"{'ARM:LEG':30}{'cgroup anon':>13}{'summed RSS':>13}{'summed PSS':>13}"
+        f"{'procs':>7}{'tasks':>7}{'anon pt':>10}")
+    say(f"{'':30}{'PEAK sampled':>13}{'peak (sum)':>13}{'peak (sum)':>13}"
+        f"{'peak':>7}{'peak':>7}{'post-leg':>10}")
+    say("-" * 93)
     for key, m in mem_sources.items():
         say(f"{key:30}"
+            f"{_fmt_mb(m.get('cgroup_anon_peak_mb')):>13}"
             f"{_fmt_mb(m.get('summed_process_rss_peak_mb')):>13}"
             f"{_fmt_mb(m.get('summed_process_pss_peak_mb')):>13}"
-            f"{_fmt_mb(m.get('cgroup_anon_mb')):>13}"
-            f"{_fmt_mb(m.get('cgroup_peak_mb')):>13}"
-            f"{str(m.get('peak_process_count') or '-'):>7}")
-        if m.get("sharing_factor_summed_over_anon"):
-            say(f"{'':30}summed/anon = {m['sharing_factor_summed_over_anon']}x "
-                f"in THIS leg only ({m.get('peak_process_count')} procs at peak)")
+            f"{str(m.get('peak_process_count') or '-'):>7}"
+            f"{str(m.get('cgroup_peak_tasks') or '-'):>7}"
+            f"{_fmt_mb(m.get('cgroup_anon_mb')):>10}")
+        if m.get("sharing_factor_sampled"):
+            say(f"{'':30}summed RSS / sampled anon = {m['sharing_factor_sampled']}x "
+                f"in THIS leg only ({m.get('peak_process_count')} procs, "
+                f"{m.get('tasks_per_process_at_peak')} tasks/proc at peak)")
+        if m.get("no_sampled_anon_reason"):
+            say(f"{'':30}!! NO SAMPLED ANON: {m['no_sampled_anon_reason']}")
+        if m.get("summed_rss_impossible_as_footprint"):
+            say(f"{'':30}!! {m['summed_rss_impossible_as_footprint']}")
         if m.get("cgroup_unavailable_reason"):
             say(f"{'':30}cgroup unavailable: {m['cgroup_unavailable_reason']}")
+    say("QUOTE 'cgroup anon PEAK sampled' against Leela's and Shashi's figures. 'anon pt' is a")
+    say("single read taken AFTER the leg and is not a peak. 'tasks' counts threads, not procs.")
     say("Columns are DIFFERENT KINDS of number and do not divide into each other across rows.")
     say("QUOTE cgroup anon against Leela's and Shashi's memory figures - both read the")
     say("cgroup, where a shared page is charged once. Summed RSS is not comparable to either.")

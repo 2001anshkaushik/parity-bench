@@ -89,8 +89,54 @@ def main() -> int:
         m2 = msrc.cgroup_memory(cg2)
         check("unlimited cgroup -> max_mb is None, no flag", m2["max_mb"] is None)
 
+        collector_cgroup_tick(cg)
+
     print("\n" + ("ALL PASS" if not _fails else f"{len(_fails)} FAILED: {_fails}"))
     return 1 if _fails else 0
+
+
+def collector_cgroup_tick(cg: Path) -> None:
+    """The collector's per-tick cgroup read (defect #31), without psutil or a Linux kernel.
+
+    Only the new logic is under test: resolve the path once from any tracked pid, read it on
+    every tick, keep the PEAK rather than the last value, and keep tasks distinct from
+    processes. The kernel's own numbers are not our arithmetic and are not mocked-and-asserted.
+    """
+    import types
+    if "psutil" not in sys.modules:                      # this laptop has no psutil
+        stub = types.ModuleType("psutil")
+        for n in ("NoSuchProcess", "ZombieProcess", "AccessDenied", "Error"):
+            setattr(stub, n, type(n, (Exception,), {}))
+        stub.Process = object
+        stub.process_iter = lambda *a, **k: []
+        stub.virtual_memory = stub.swap_memory = lambda: None
+        sys.modules["psutil"] = stub
+    from harness import collector as col
+
+    (cg / "pids.current").write_text("321")
+    col.cgroup_path_for_pid = lambda pid: cg if pid == 99 else None
+    agg = col.RoleAggregate(role="service")
+    tc = col.TreeCollector.__new__(col.TreeCollector)
+
+    r1 = col.TreeCollector._sample_cgroup(tc, agg, {99: None})
+    check("cgroup resolved from a tracked pid", agg.cgroup_path == str(cg))
+    check("tick row carries anon", abs(r1["cg_anon"] / 1048576 - 1025.4) < 0.2)
+    check("tick row keeps TASKS separate from procs", r1["cg_pids_tasks"] == 321)
+
+    # A later, smaller reading must not lower the peak — the whole point of sampling.
+    fake_cgroup(cg, anon_mb=12.0, file_mb=1.0, peak_mb=2100.0, limit_mb=58000.0)
+    col.TreeCollector._sample_cgroup(tc, agg, {99: None})
+    check("peak anon survives a later smaller sample",
+          abs(agg.peak_cgroup_anon / 1048576 - 1025.4) < 0.2,
+          f"{agg.peak_cgroup_anon / 1048576:.1f} MB after a 12 MB tick")
+    check("both ticks counted", agg.cgroup_reads == 2, agg.cgroup_reads)
+
+    # No cgroup (macOS, cgroup v1) must yield nothing at all, never a zero.
+    agg2 = col.RoleAggregate(role="service")
+    col.cgroup_path_for_pid = lambda pid: None
+    check("no cgroup -> empty tick fields, not zeros",
+          col.TreeCollector._sample_cgroup(tc, agg2, {1: None}) == {}
+          and agg2.peak_cgroup_anon == 0 and agg2.cgroup_path is None)
 
 
 if __name__ == "__main__":
