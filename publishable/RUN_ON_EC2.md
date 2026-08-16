@@ -594,6 +594,29 @@ caches its thread count at import, so a variable set after import has no effect 
 arm reports anything other than intra=1, **stop** — cost numbers from mismatched arms are not
 comparable, and nothing downstream would say so.
 
+### 12f-pre. Crash durability and resume — read before any long run
+
+Per-document records **stream to JSONL and are flushed as each document completes**, so a kill
+costs at most the in-flight document. To continue a killed run, point at the same directory and
+set the resume flag:
+
+```bash
+SMOKE_RUN_DIR=working/results/smoke_metrics_<stamp> SMOKE_RESUME=1 <the same command>
+```
+
+`SMOKE_RUN_DIR` pins the directory — without it each run gets a fresh stamp and there is nothing
+to resume from. `SMOKE_RESUME` is required and deliberately not the default: appending to a
+previous run's records without being asked would merge two runs into one file. Running into an
+existing directory without it **refuses and exits 6**.
+
+A truncated final line (process died mid-write) is expected, is skipped with a note, and that
+document is re-run. An unparseable line that is *not* last is treated as corruption and raises.
+
+⚠️ **The blast leg is still buffered and is NOT resumable.** Only the sequential leg streams.
+On the 200-doc box run the blast legs were 70 s (LI) and 277 s (RR); scaled to 10k that is
+roughly 4 hours of all-or-nothing work. Decide whether that is acceptable before committing to
+10k — see the note in `STATE.md` session 31.
+
 ### 12f. The 200-document smoke
 
 `SMOKE_LI_CONTAINER` / `SMOKE_RR_CONTAINER` must match the `--name` you gave each container.

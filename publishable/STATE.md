@@ -547,6 +547,56 @@ we had been running. Shashi and Leela are doing the same.
 | T3-7 | **We are the weakest of the three on provenance**: no per-file corpus sha256 manifest (both of them have one) and no engine-binary hash (Shashi records one). We also carry 6 custom nodes and a hand-copied pypdf where both of them carry zero | **VERIFIED** |
 | T3-8 | **Unresolved conflict for our refactor:** no `text + '\n'` transform found in Shashi's Haystack arm, which uses `DocumentSplitter(split_by="character")` rather than a LangChain splitter. Leela established the engine appends exactly one newline. Needs a direct check before any joint run | **UNVERIFIED — flagged, not assumed** |
 
+### SESSION 31 — defect #27: a killed run lost everything; and the 10k memory question (2026-08-16)
+
+**The smoke buffered.** `dump_jsonl` did `write_text` on the complete list **after** the loop
+finished. A run killed at document 7,000 of 10,000 left **nothing on disk** — the file did not
+exist yet, the list died with the process, and the result JSON is written later still. At ~25 h
+for 10k that is an all-or-nothing bet on a box whose auto-stop fires silently.
+
+**Fixed for the sequential leg** — `working/harness/jsonl_stream.py`. One line appended and
+flushed per document; `SMOKE_RESUME=1` + `SMOKE_RUN_DIR` continues from what survived.
+`flush()` (page cache, survives process death) per record, `fsync` at close, not per line —
+10k syncs to defend against power loss we are not trying to defend against. A torn final line is
+expected and skipped with a note; an unparseable line that is not last raises as corruption.
+Refusing to resume without the flag is deliberate: silently appending would merge two runs.
+[Verified by `kill -9` mid-run: 16 records durable; refusal without the flag; torn line detected;
+resume then produced **40 records, 40 unique, 0 duplicates**.]
+
+⚠️ **The blast leg is still buffered and not resumable.** On the box's 200-doc run the blast legs
+were 70 s (LI) and 277 s (RR) — scaled to 10k, roughly **4 hours of all-or-nothing work**. Left
+undone deliberately rather than rushed: the LI blast writes from a `ThreadPoolExecutor` and needs
+a write lock, and I would rather flag it than ship a poorly-tested concurrent writer. **Decision
+needed before 10k.**
+
+**MEMORY SLOPE — from the box's own sampler streams** (`ansh/smoke_metrics_20260815T233408Z`,
+Linux x86_64, 200 docs). Back-half fit, which excludes the warm-up ramp for the reason
+`collector._leak_slope` already documents:
+
+| stream | start MB | peak MB | end MB | back-half slope | MB/doc |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| li_sequential | 33,946 | **34,412** | 34,282 | +0.490 MB/s | +0.86 |
+| rr_sequential | 1,506 | 2,813 | 2,415 | +0.174 MB/s | +0.74 |
+| li_blast | 34,306 | 35,456 | 34,207 | +0.134 MB/s | +0.05 |
+| rr_blast | 157 | **10,184** | 113 | −1.422 MB/s | −1.97 |
+
+**LlamaIndex memory is FLAT, and that is the finding.** It *starts* at 33,946 MB before documents
+are processed and peaks at 34,412 — total growth across 200 documents is **466 MB on a 34 GB
+base**. It is a fixed startup cost (32 workers × model), not a document-count function. RocketRide
+sequential grows +0.74 MB/doc and is decelerating (whole-run average 1.54 MB/s vs back-half 0.17);
+RocketRide blast spikes to 10.2 GB and **fully releases** (ends at 113 MB), so it is transient, not
+accumulation.
+
+**Does 10k risk OOM? On this evidence, not from document count.** Naive linear extrapolation adds
+~8.6 GB (LI) and ~7.4 GB (RR seq) over 10k — but both slopes are decelerating plateaus, so linear
+is an upper bound, and the dominant LI term does not scale with documents at all.
+**Caveat that matters:** every figure above is **summed per-process RSS**, which over-counts
+shared pages by the sharing factor (defect #26) — the LI 34 GB is 32 workers each counted with the
+same model pages. The real footprint is smaller and the real headroom larger. `memory_sources.py`
+now collects cgroup `anon` and `memory.peak`, but **shipped after this run**, so no cgroup figure
+exists yet. **Get one cgroup-instrumented 200-doc run before betting 25 hours on an extrapolation
+of an over-counted number.**
+
 ### SESSION 30 — defect #26: peakRSS was a SUM of per-process RSS (2026-08-16)
 
 **Do not quote `peakRSS` from any run before this session.** The box reported LlamaIndex peak

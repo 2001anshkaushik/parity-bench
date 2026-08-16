@@ -62,6 +62,10 @@ EXTERNAL = os.environ.get("SMOKE_EXTERNAL", "") not in ("", "0", "false", "False
 RR_VERSION_URL = os.environ.get("SMOKE_RR_URL", "http://127.0.0.1:5565") + "/version"
 # Preflight: prove thread propagation on both arms, print the manifest block, exit. No documents.
 PREFLIGHT = os.environ.get("SMOKE_PREFLIGHT", "") not in ("", "0", "false", "False")
+# RESUME: continue a run that was killed, from the per-doc JSONL that survived on disk. Must be
+# explicit — silently appending to a previous run's records would mix two runs into one file.
+# Pair it with SMOKE_RUN_DIR pointing at the run you are continuing.
+RESUME = os.environ.get("SMOKE_RESUME", "") not in ("", "0", "false", "False")
 # Warm-up exclusion is METRIC-SIDE by completion rank (Leela's perf_window — settled 2026-08-14).
 # Primary 64, secondary 25 also emitted; the numbers are computed from the same rows, so changing
 # the pick later needs no re-run.
@@ -209,6 +213,7 @@ def main() -> int:
     from harness import metrics_shared as ms
     from harness import gates_shared as gs
     from harness import memory_sources as msrc
+    from harness.jsonl_stream import JsonlWriter, read_completed, rewrite_atomically
     from harness.chunk_hash import check_chunks, ChunkHashMismatch
     from harness.collector_proc import ProcessCollector
     from harness.content_sanity import inspect
@@ -288,8 +293,11 @@ def main() -> int:
 
     # Per-doc JSONL + sampler streams land here so every metric is re-derivable forever
     # (Leela's exfil contract: raw records, not just the report).
+    # A resumed run MUST land in the same directory or there is nothing to resume from.
+    # SMOKE_RUN_DIR pins it; otherwise a fresh stamp per run, as before.
     stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
-    run_dir = ROOT / "working" / "results" / f"smoke_metrics_{stamp}"
+    run_dir = Path(os.environ["SMOKE_RUN_DIR"]) if os.environ.get("SMOKE_RUN_DIR") \
+        else ROOT / "working" / "results" / f"smoke_metrics_{stamp}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
     def dump_jsonl(name: str, rows: list[dict]):
@@ -494,13 +502,29 @@ def main() -> int:
             probed_dim[arm_name] = len(p_vecs[0])
             say(f"  {arm_name}: probed dim={probed_dim[arm_name]} "
                 f"(from {pdfs[0].name}, excluded from the measured span)")
-            recs = []
+            seq_path = run_dir / (
+                f"perdoc_{'li' if arm_name.startswith('llamaindex') else 'rr'}_sequential.jsonl")
+            recs, done_docs, torn = ([], set(), None)
+            if RESUME:
+                recs, done_docs, torn = read_completed(seq_path)
+                if torn:
+                    say(f"  !! {torn}")
+                if done_docs:
+                    say(f"  RESUME {arm_name}: {len(done_docs)} documents already on disk, "
+                        f"{len(pdfs) - len(done_docs)} to go")
+            elif seq_path.exists():
+                say(f"  !! {seq_path.name} exists and SMOKE_RESUME is not set. Refusing to "
+                    "append to a previous run's records — set SMOKE_RESUME=1 to continue it, "
+                    "or use a fresh SMOKE_RUN_DIR.")
+                return 6
             chunk_texts: dict[str, list] = {}   # doc -> chunks, for post-loop gates
             vecs_keep: dict[str, list] = {}      # doc -> vectors, for the gate suites
             li_src: dict[str, str] = {}         # doc -> service-returned extracted text (LI)
             span = CostSpan(arm_name, "sequential")
-            with span:
+            with span, JsonlWriter(seq_path) as seq_out:
                 for f in pdfs:
+                    if f.name in done_docs:
+                        continue            # already durable on disk from an earlier attempt
                     blob = f.read_bytes()
                     rec = {"doc": f.name, "submitted_sha256": hashlib.sha256(blob).hexdigest()}
                     rec["submit_ns"] = time.time_ns()
@@ -543,6 +567,9 @@ def main() -> int:
                         rec["error_class"] = f"{type(e).__name__}"
                         rec["error"] = str(e)[:200]
                     rec["ok"] = rec.get("outcome") == "successful"
+                    # Durable BEFORE the next document starts. A kill now costs this one
+                    # document, not the whole run.
+                    seq_out.write(rec)
                     recs.append(rec)
             cost_series[f"{arm_name}:sequential"] = span.series()
             cost_reasons[f"{arm_name}:sequential"] = span.reason
@@ -588,8 +615,10 @@ def main() -> int:
             li_src.clear()
             vecs_keep.clear()
             results[arm_name] = recs
-            dump_jsonl(f"perdoc_{'li' if arm_name.startswith('llamaindex') else 'rr'}_sequential.jsonl", recs)
-            say(f"  {arm_name}: {len(recs)} records")
+            # The post-loop gates add independent_hash / content_suspect to each record;
+            # rewrite atomically so a crash leaves the streamed file, never a half-merge.
+            rewrite_atomically(seq_path, recs)
+            say(f"  {arm_name}: {len(recs)} records -> {seq_path.name}")
 
         # ---- determinism: a BLAST run (concurrent) vs the SEQUENTIAL run above
         say("\ndeterminism: blast run vs sequential run, per arm")
