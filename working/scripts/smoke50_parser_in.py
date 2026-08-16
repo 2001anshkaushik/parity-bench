@@ -408,7 +408,42 @@ def main() -> int:
     vecs_by_arm: dict[str, dict] = {}
     cost_series: dict[str, list] = {}   # f"{arm}:{mode}" -> normalized series
     cost_reasons: dict[str, str] = {}   # same key -> why cost is absent, if it is
-    mem_sources: dict[str, dict] = {}   # arm -> every memory figure, each named
+    mem_sources: dict[str, dict] = {}   # f"{arm}:{leg}" -> every memory figure, each named
+
+    def capture_memory(arm_name: str, leg: str, span) -> None:
+        """Every memory source for ONE arm in ONE leg, each named for what it is.
+
+        PER LEG, not per arm (defect #30, 2026-08-16). This used to run only in the sequential
+        leg and key on the arm alone, so the memory table described a 1-2 process tree while
+        the metrics line beside it carried a blast-leg peak from a tree of BLAST_C-plus
+        processes. A reader could then divide one by the other: 84,960 MB against a 1,025 MB
+        cgroup anon reads as 83x when the printed sharing factor said 1.48x. Neither figure was
+        wrong for what it measured; they were never the same measurement, and nothing on the
+        page said so. The over-count scales with the process count, so a sharing factor is only
+        ever valid for the leg it was measured in.
+        """
+        _sum = (span.summary().get("roles", {}).get("service", {}) or {})
+        m = msrc.memory_report(service_root_pid(arm_name), _sum.get("peak_rss_mb"))
+        m["summed_process_pss_peak_mb"] = _sum.get("peak_pss_mb")
+        m["peak_process_count"] = _sum.get("peak_process_count")
+        m["leg"] = leg
+        # cgroup anon/current are read ONCE, here, after the leg — a point sample, not a peak.
+        # Only memory.peak is a kernel high-water mark, and it is cumulative since the container
+        # started (or was last reset), so it spans every leg and any earlier run in the same
+        # container. Say so rather than letting three adjacent columns look like one kind of
+        # number.
+        m["cgroup_sampling"] = {
+            "anon_mb": "point sample taken at end of this leg — NOT a peak",
+            "current_mb": "point sample taken at end of this leg — NOT a peak",
+            "peak_mb": ("kernel high-water mark, unsampled, cumulative since container start "
+                        "or last reset — spans ALL legs, not just this one"),
+        }
+        if m.get("sharing_factor_summed_over_anon"):
+            m["sharing_factor_note"] = (
+                f"valid for the {leg} leg only ({m.get('peak_process_count')} processes at "
+                "peak). Do not apply it to another leg's summed RSS — the over-count scales "
+                "with the number of processes sharing pages.")
+        mem_sources[f"{arm_name}:{leg}"] = m
     blast_rows: dict[str, list] = {}    # arm -> per-doc rows from the blast leg
     probed_dim: dict[str, int] = {}     # arm -> dim read off the arm's own loaded model
 
@@ -595,11 +630,7 @@ def main() -> int:
             # its own: shared copy-on-write pages are counted once per worker, so with 32
             # forked uvicorn workers it over-counts by roughly the sharing factor. cgroup
             # anon is the figure comparable to Leela's and Shashi's.
-            _sum = (span.summary().get("roles", {}).get("service", {}) or {})
-            mem_sources[arm_name] = msrc.memory_report(
-                service_root_pid(arm_name), _sum.get("peak_rss_mb"))
-            mem_sources[arm_name]["summed_process_pss_peak_mb"] = _sum.get("peak_pss_mb")
-            mem_sources[arm_name]["peak_process_count"] = _sum.get("peak_process_count")
+            capture_memory(arm_name, "sequential", span)
             arm.close()
             # ---- OUR gates, post-loop, outside the sampled/timed span ----
             # Deterministic stride sample, not random: reproducible across runs and across the
@@ -655,9 +686,25 @@ def main() -> int:
             + ("" if "blast" in LEGS else " (blast leg NOT run; using on-disk records)"))
         blobs = [(f.name, f.read_bytes()) for f in pdfs]
 
+        # TWO CLOCKS PER DOCUMENT, ON BOTH ARMS. `enqueue_ns` is when the batch opened and the
+        # item joined the client queue; `admit_ns` is when it went on the wire, after the
+        # BLAST_C cap let it through. `submit_ns` == `admit_ns` so metrics_shared measures
+        # SERVICE latency identically on both arms.
+        #
+        # DEFECT #29 (2026-08-16), which this replaces. LlamaIndex stamped `submit_ns` inside
+        # the worker thread — i.e. at admission — while RocketRide stamped it at coroutine
+        # creation, BEFORE `async with sem`, so all N documents were stamped at t0 and every
+        # one of them carried the whole client-side queue wait in its "latency". Measured on
+        # two local 200-doc runs: LlamaIndex submit spread 65.0 s and 67.2 s over 67 s and 69 s
+        # legs (97.6%, 97.5% — spread across the leg); RocketRide 0.001 s over a 319 s leg
+        # (0.0% — every document stamped at batch open). At 10k that printed RocketRide p50
+        # 1120 s against LlamaIndex 2.05 s, a ~550x artifact of where the clock started.
+        # Recording BOTH stamps means neither definition has to win: service latency and
+        # Leela's batch-position latency are now derivable from the same records, so the
+        # choice never costs another run.
+        enqueue_ns = time.time_ns()
+
         # LlamaIndex: blocking urllib, so threads are the right concurrency primitive.
-        # Returns (hashes-by-doc, per-doc rows) — the rows feed metrics_shared; blast latency is
-        # batch-position latency under a client cap of BLAST_C, labeled open-loop-blast.
         def blast_llama(out_path, prior, done):
             import concurrent.futures as cf
             arm = LlamaHttpPdfArm(port=PORT)
@@ -666,7 +713,10 @@ def main() -> int:
             with JsonlWriter(out_path) as w:
                 def one(item):
                     name, b = item
-                    row = {"doc": name, "submit_ns": time.time_ns()}
+                    # Reached only once a pool thread is free: this IS the admission instant.
+                    admit = time.time_ns()
+                    row = {"doc": name, "enqueue_ns": enqueue_ns, "admit_ns": admit,
+                           "submit_ns": admit}
                     try:
                         ch, _ = arm.process(b)
                         row.update(completion_ns=time.time_ns(), ok=True,
@@ -707,8 +757,11 @@ def main() -> int:
                 todo = [(n, b) for n, b in blobs if n not in done]
 
                 async def one(name, b):
-                    row = {"doc": name, "submit_ns": time.time_ns()}
+                    # `gather` starts every coroutine in the loop's first pass, so a stamp
+                    # taken HERE is the batch-open time for all N documents, not a submission.
+                    row = {"doc": name, "enqueue_ns": enqueue_ns}
                     async with sem:
+                        row["admit_ns"] = row["submit_ns"] = time.time_ns()
                         try:
                             o = await asyncio.wait_for(
                                 c.send(tok, b, mimetype="application/pdf"), timeout=300)
@@ -756,6 +809,9 @@ def main() -> int:
                     blast, brows = runner(blast_path, prior, done_b)
                 cost_series[f"{arm_name}:blast"] = span.series()
                 cost_reasons[f"{arm_name}:blast"] = span.reason
+                # The blast leg runs BLAST_C requests in flight, so its process count — and
+                # therefore its summed-RSS over-count — is nothing like the sequential leg's.
+                capture_memory(arm_name, "blast", span)
             else:
                 # Leg skipped: read whatever a previous invocation left. Determinism then
                 # compares against real records rather than silently reporting everything
@@ -1050,44 +1106,83 @@ def main() -> int:
                       "publishable": _publishable,
                       "not_publishable_reason": _why,
                       "arms": {}}
+    # Both blast legs are a BOUNDED CLIENT POOL of BLAST_C, not an open-loop arrival process:
+    # nothing is submitted until a slot frees, so offered load is throttled by the system under
+    # test. Measured from admission the result is closed-loop service latency. Leela's
+    # batch-position figure is still reported, from `enqueue_ns`, as its own row — the two are
+    # never merged, and neither definition needs a second run to obtain.
+    def _batchpos(rows):
+        """Same rows, clock moved back to batch open — Leela's open-loop-blast definition.
+
+        ALL OR NOTHING. A run resumed from records written before defect #29 mixes rows that
+        carry `enqueue_ns` with rows that do not, and silently dropping the older ones would
+        compute a percentile over whichever subset happened to be fresh — a partial reported
+        as whole, which is the defect class this harness keeps tripping over. Emit nothing
+        and say why instead.
+        """
+        if not rows:
+            return []
+        missing = [r for r in rows if not r.get("enqueue_ns")]
+        if missing:
+            say(f"  !! batch-position latency unavailable: {len(missing)}/{len(rows)} rows "
+                "predate the enqueue_ns stamp (defect #29). Not reporting a partial.")
+            return []
+        return [{**r, "submit_ns": r["enqueue_ns"]} for r in rows]
+
     for arm_name in results:
         marm = out["metrics"]["arms"].setdefault(arm_name, {})
-        for mode, mrows in (("sequential", results[arm_name]),
-                            ("blast", blast_rows.get(arm_name, []))):
-            series = cost_series.get(f"{arm_name}:{mode}")
-            label = "closed-loop" if mode == "sequential" else "open-loop-blast"
+        cells = [("sequential", results[arm_name], "closed-loop"),
+                 ("blast", blast_rows.get(arm_name, []), "closed-loop"),
+                 ("blast_batchpos", _batchpos(blast_rows.get(arm_name, [])),
+                  "open-loop-blast")]
+        for mode, mrows, label in cells:
+            series = cost_series.get(f"{arm_name}:{mode.split('_')[0]}")
             for wn in (WARM_N_PRIMARY, WARM_N_SECONDARY):
                 d = ms.derive_side(mrows, series, warm_n=wn, available_cpus=cpus, mode=label)
+                if mode.startswith("blast"):
+                    d["client_concurrency"] = BLAST_C
+                # The metric is peak-of-a-SUM-of-per-process-RSS over THIS leg's window. Named
+                # in place so the figure cannot be lifted out of the line and read as a
+                # footprint, and cannot be divided by the memory table's sequential-leg
+                # sharing factor (defect #30).
+                d["peak_summed_process_rss_mb"] = d.pop("peak_rss_mb", None)
+                d["peak_summed_process_rss_note"] = (
+                    f"peak of a SUM of per-process RSS over the {mode} window; shared pages "
+                    "counted once per process. NOT a footprint, NOT comparable across legs "
+                    "with different process counts.")
                 marm[f"{mode}_warm{wn}"] = d
                 if "error" in d:
-                    say(f"  {arm_name:22} {mode:10} warm_n={wn:<3} -> {d['error']}")
+                    say(f"  {arm_name:22} {mode:14} warm_n={wn:<3} -> {d['error']}")
                     continue
                 lat = d.get("latency") or {}
-                say(f"  {arm_name:22} {mode:10} warm_n={wn:<3} "
+                say(f"  {arm_name:22} {mode:14} warm_n={wn:<3} "
                     f"docs/s={d['docs_per_s']}  chunks/s={d['chunks_per_s']}  "
                     f"p50={lat.get('p50')}s p95={lat.get('p95')}s [{lat.get('mode', '?')}]  "
                     f"cpu_s={d['cpu_s']}  cpu_s/doc={d['cpu_s_per_doc']}  "
                     f"cores={d['effective_cores']}  util={d['cpu_utilization']}"
                     f"{'' if d.get('cpu_utilization_valid') in (True, None) else ' INVALID'}  "
-                    f"peakRSS={d['peak_rss_mb']}MB")
+                    f"summedRSS={d['peak_summed_process_rss_mb']}MB(not a footprint)")
 
     say("")
-    say("MEMORY - every source named; a summed-RSS peak is NOT a footprint")
-    say(f"{'ARM':24}{'summed RSS':>13}{'summed PSS':>13}{'cgroup anon':>13}"
+    say("MEMORY - every source named, PER LEG; a summed-RSS peak is NOT a footprint")
+    say(f"{'ARM:LEG':30}{'summed RSS':>13}{'summed PSS':>13}{'cgroup anon':>13}"
         f"{'cgroup peak':>13}{'procs':>7}")
-    say("-" * 84)
-    for arm_name, m in mem_sources.items():
-        say(f"{arm_name:24}"
+    say(f"{'':30}{'peak, this leg':>13}{'peak, this leg':>13}{'POINT sample':>13}"
+        f"{'HWM, all legs':>13}{'peak':>7}")
+    say("-" * 89)
+    for key, m in mem_sources.items():
+        say(f"{key:30}"
             f"{_fmt_mb(m.get('summed_process_rss_peak_mb')):>13}"
             f"{_fmt_mb(m.get('summed_process_pss_peak_mb')):>13}"
             f"{_fmt_mb(m.get('cgroup_anon_mb')):>13}"
             f"{_fmt_mb(m.get('cgroup_peak_mb')):>13}"
             f"{str(m.get('peak_process_count') or '-'):>7}")
         if m.get("sharing_factor_summed_over_anon"):
-            say(f"{'':24}summed/anon = {m['sharing_factor_summed_over_anon']}x "
-                "(shared pages counted once per process)")
+            say(f"{'':30}summed/anon = {m['sharing_factor_summed_over_anon']}x "
+                f"in THIS leg only ({m.get('peak_process_count')} procs at peak)")
         if m.get("cgroup_unavailable_reason"):
-            say(f"{'':24}cgroup unavailable: {m['cgroup_unavailable_reason']}")
+            say(f"{'':30}cgroup unavailable: {m['cgroup_unavailable_reason']}")
+    say("Columns are DIFFERENT KINDS of number and do not divide into each other across rows.")
     say("QUOTE cgroup anon against Leela's and Shashi's memory figures - both read the")
     say("cgroup, where a shared page is charged once. Summed RSS is not comparable to either.")
 

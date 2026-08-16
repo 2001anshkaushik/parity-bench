@@ -122,7 +122,7 @@ def cgroup_memory(cg: Path) -> Dict[str, Any]:
     out["file_bytes"] = stat.get("file")
     out["shmem_bytes"] = stat.get("shmem")
     out["kernel_bytes"] = stat.get("kernel")
-    for k in ("current", "peak", "anon", "file"):
+    for k in ("current", "peak", "anon", "file", "max"):
         b = out.get(f"{k}_bytes")
         out[f"{k}_mb"] = round(b / 1048576, 1) if b is not None else None
     # docker stats' MemUsage column is current minus inactive_file, not `anon`; recorded so a
@@ -168,6 +168,21 @@ def memory_report(pid: Optional[int], summed_rss_mb: Optional[float]) -> Dict[st
     rep["cgroup"] = m
     rep["cgroup_anon_mb"] = m.get("anon_mb")
     rep["cgroup_peak_mb"] = m.get("peak_mb")
+    rep["cgroup_limit_mb"] = m.get("max_mb")
     if summed_rss_mb and m.get("anon_mb"):
         rep["sharing_factor_summed_over_anon"] = round(summed_rss_mb / m["anon_mb"], 2)
+    # THE CHEAPEST INSTRUMENT CHECK WE HAVE, and it was missing when a summed-RSS "peak" of
+    # 84,960 MB shipped from a container capped at 58 GB (defect #30). A real footprint cannot
+    # exceed its own cgroup limit — the kernel would have OOM-killed it. A number that does
+    # exceed it has proved, by surviving, that it is not a footprint. The reason the sum can
+    # run so far past the cap is that the cgroup charges a shared page ONCE however many
+    # processes map it, while summed RSS charges it once PER process.
+    lim = m.get("max_mb")
+    if summed_rss_mb and lim and summed_rss_mb > lim:
+        rep["summed_rss_exceeds_cgroup_limit"] = True
+        rep["summed_rss_impossible_as_footprint"] = (
+            f"summed RSS {summed_rss_mb:.1f} MB exceeds this cgroup's own limit "
+            f"{lim:.1f} MB by {summed_rss_mb / lim:.1f}x. The container was not OOM-killed, "
+            f"so the figure is an over-count of shared pages, not a footprint. Quote "
+            f"cgroup anon ({m.get('anon_mb')} MB).")
     return rep
