@@ -191,6 +191,82 @@ it.
 RocketRide reliability result, if the cause is our unset `ttl`, would be a false product finding
 against our own engine.
 
+### 🔴 COMPARABILITY BLOCKER — Leela patched the engine; our 10k did not [session 37]
+
+Leela `aws-bench` **`a5c3b5d`** "RocketRide BUG_CHUNK_DUPLICATION: patch, permanent gate,
+provenance" (2026-08-16). Shashi `benchmark/shared-pipe-engine-3.3.1` moved to **`d2b210d`**.
+
+**It is an ENGINE-SIDE patch, and it changes what the engine EMITS.** `aws_bench/arms/
+rocketride/Dockerfile` rewrites `nodes/embedding_transformer/IInstance.py` at image build,
+inserting `return self.preventDefault()` after `self._flushDocuments()` — the flush already
+delivers the batch downstream, and the node then also falls through to the default forwarding
+action, emitting the same document list twice. Build-time guards fail the build if the file is
+missing, the source shape changed, or the patch is already applied. Gated behind
+`ARG RR_DUP_PATCH=1`; `RR_DUP_PATCH=0` builds stock 3.3.1 so the delta can be quantified.
+Image carries `LABEL benchmark.rocketride.duplication_patch=...`.
+
+He *also* added a harness-side **gate** (`metrics/m0_correctness.py::self_duplication`,
+repeat_factor over ordered chunk hashes) — but that is detection, not correction. **The
+correction is in the product.**
+
+**Our exposure, MEASURED on our own records (unpatched engine):** **5 of 199 documents (2.5 %)
+at repeat_factor exactly 2**, reproduced across two independent local 200-doc runs and on BOTH
+legs. Leela measures 51/987 (5.2 %) on his corpus; same defect, same factor, different rate
+because different documents. All five of ours have ≥64 chunks (164, 276, 1872, 132, 344),
+consistent with Shashi's root cause (`maxDocuments=64` flush) — **our `over_chunk_trigger ≥ 64`
+predicate caught 5 of 5**, so our gate is mechanically right, not an arbitrary threshold.
+
+**What it contaminates in our 10k:** chunk counts for affected documents are doubled, so
+`chunks_per_s` is inflated and `cpu_s_per_chunk` deflated; the engine also did the extra work,
+so `docs_per_s` is depressed — **against RocketRide**. Determinism is unaffected (both legs
+duplicate identically).
+
+**A patched-engine result and an unpatched-engine result are not comparable.** Before any joint
+table: agree whether the three-way run is stock 3.3.1 or patched, and record engine sha256 +
+patch id in provenance either way (Leela now makes those REQUIRED fields).
+
+### New scope — fault tolerance, data isolation, LOC: who has what [session 37]
+
+| | Leela | Shashi | us |
+|---|---|---|---|
+| **fault tolerance** | `metrics/m4_m5_faults.py` — M4 `blast_radius`, M5 `fault_isolation`. **Code exists, NOT wired** into `report.py` or `matched_run.sh`; no `fault_manifest` in the repo | `bench.py:526`, **wired** at `:662`. 1 poison PDF + 6 good, blast, separate run, engine restarted first | none |
+| **data isolation** | **nothing** | **nothing** | none |
+| **lines of code** | `metrics/m6_loc.py` — complete counting rule, static, standalone | **nothing** | none |
+
+Neither has *published results* for any of the three. Definitions exist for two of them; data
+isolation is unclaimed by all three.
+
+**Shashi's fault protocol (the one to match — it is the only one wired):** 1 poison document
+(valid `%PDF-1.7` header + 64 KB `os.urandom`, so magic-byte sniffing does not catch it) plus 6
+good documents, blast mode, as a SEPARATE run — "exception paths and retries change timing, so a
+poisoned batch measures resilience, not speed". Recorded: `batch_survived`, `good_docs_ok`,
+`collateral_failures` (**the** metric), `service_alive_after`, `recovery_ok`, `surfacing` (did the
+SERVICE report the failure, or only our proof layer — a success-shaped empty response scores 0).
+Leela's M4 adds `time_to_next_success_s` and an attribution window (60 s), free from our records.
+
+**M6 LOC — Leela's rule, adopted verbatim.** Count = non-blank, non-comment lines; Python
+docstrings excluded; pure Python, no `cloc`. Four layers per arm: `pipeline_definition`,
+`compute_transforms`, `serving_integration`, `client_harness`. **The load-bearing line is
+`"compute_transforms": []  # engine-internal: product code, not user code` for RocketRide** — the
+engine's internals are not counted because a developer does not write them, exactly as
+LangChain's/LangGraph's internals are not counted for the other arm. Symmetric in rule, asymmetric
+in result, and that asymmetry IS the product difference being measured. **A hostile reviewer goes
+straight at this line, so it must be stated before the number, not after.**
+
+Applied to our repo with Leela's `count_loc` verbatim:
+
+| layer | llamaindex | rocketride |
+|---|---:|---:|
+| pipeline_definition | 210 | 78 |
+| compute_transforms | 195 | 0 |
+| serving_integration | 164 | 58 |
+| client_harness | 140 | 13 |
+| **arm total** | **709** | **149** |
+
+**4.8×.** Our measurement harness (`working/harness/*`, ~5,400 lines) is **excluded** — it is
+benchmark scaffolding, not what a developer writes to build the pipeline. **PROVISIONAL**: one
+counting pass, no second method.
+
 ### Before the 10k run — the remaining checklist
 
 1. ✅ Corpus complete and manifest-verified (session 33).
