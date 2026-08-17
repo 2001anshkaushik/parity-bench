@@ -224,6 +224,7 @@ def main() -> int:
     from harness import metrics_shared as ms
     from harness import gates_shared as gs
     from harness import memory_sources as msrc
+    from harness import provenance_leela as pvl
     from harness.jsonl_stream import JsonlWriter, read_completed, rewrite_atomically
     from harness.chunk_hash import check_chunks, ChunkHashMismatch
     from harness.collector_proc import ProcessCollector
@@ -879,6 +880,29 @@ def main() -> int:
            "corpus": {"source": "govdocs1", "glob": CORPUS_GLOB, "rule": "sorted(*.pdf)[:N]",
                       "n": len(pdfs), "sha256": corpus_sha,
                       "first": pdfs[0].name, "last": pdfs[-1].name},
+           # Leela's 24 REQUIRED fields under HIS key names (provenance.py:16-27). Our own
+           # blocks below carry the same information under ours; his `check()` matches by key,
+           # so without this a consumer marks our run "not publishable" on 23 of 24.
+           "provenance_leela": {
+               arm_name: pvl.build(
+                   arm=arm_name, mode="sequential+blast", corpus_sha=corpus_sha,
+                   corpus_n=len(pdfs),
+                   offered_concurrency=BLAST_C,
+                   # RocketRide: we pass no `threads=` to use(), so there is no configured
+                   # value. Recorded as Leela records it in his own banner rather than as
+                   # None, which his check() would read as a missing field rather than as
+                   # the accurate statement that nothing was configured.
+                   configured_concurrency=(WORKERS if arm_name.startswith("llamaindex")
+                                           else "unset (engine default)"),
+                   warmup_policy=(f"metric-side, first {WARM_N_PRIMARY} completions excluded "
+                                  "(perf_window by completion rank)"),
+                   timeout_s=1800,
+                   parser=("pypdf" if arm_name.startswith("llamaindex") else "tika-3.2.3"),
+                   chunk_size=4000, chunk_overlap=200,
+                   embedding_model="sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+                   container=(LI_CONTAINER if arm_name.startswith("llamaindex")
+                              else RR_CONTAINER) if EXTERNAL else None)
+               for arm_name in results},
            "pinned": {"workers": WORKERS, "threads": THREADS, "blast_concurrency": BLAST_C,
                       "send_modes": ["sequential", "blast"],
                       "warm_n": {"primary": WARM_N_PRIMARY, "secondary": WARM_N_SECONDARY,
