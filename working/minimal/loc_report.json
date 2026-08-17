@@ -1,0 +1,137 @@
+{
+ "counter_source": "imported from /Users/ansh/RocketRide/Benchmarking/reference-now/leela/aws_bench/metrics/m6_loc.py",
+ "as_built": {
+  "llamaindex": {
+   "pipeline_definition": {
+    "total": 210,
+    "files": {
+     "working/ws1/pipeline.py": 112,
+     "working/ws1/schema.py": 98
+    }
+   },
+   "compute_transforms": {
+    "total": 195,
+    "files": {
+     "working/ws1/service.py": 195
+    }
+   },
+   "serving_integration": {
+    "total": 164,
+    "files": {
+     "docker/Dockerfile.llamaindex": 141,
+     "working/ws1/run_service.sh": 23
+    }
+   },
+   "client_harness": {
+    "total": 67,
+    "files": {
+     "@LlamaHttpArm": 52,
+     "@LlamaHttpPdfArm": 15
+    }
+   },
+   "arm_total": 636
+  },
+  "rocketride": {
+   "pipeline_definition": {
+    "total": 78,
+    "files": {
+     "working/pipes/product_pdf.pipe": 78
+    }
+   },
+   "compute_transforms": {
+    "total": 0,
+    "files": {}
+   },
+   "serving_integration": {
+    "total": 58,
+    "files": {
+     "docker/Dockerfile.rocketride": 58
+    }
+   },
+   "client_harness": {
+    "total": 72,
+    "files": {
+     "@RocketArm": 59,
+     "@RocketPdfArm": 13
+    }
+   },
+   "arm_total": 208
+  }
+ },
+ "minimal": {
+  "llamaindex": {
+   "pipeline_definition": {
+    "total": 0,
+    "files": {}
+   },
+   "compute_transforms": {
+    "total": 58,
+    "files": {
+     "working/minimal/li/service.py": 58
+    }
+   },
+   "serving_integration": {
+    "total": 25,
+    "files": {
+     "working/minimal/li/Dockerfile": 25
+    }
+   },
+   "client_harness": {
+    "total": 21,
+    "files": {
+     "working/minimal/li/client.py": 21
+    }
+   },
+   "arm_total": 104
+  },
+  "rocketride": {
+   "pipeline_definition": {
+    "total": 72,
+    "files": {
+     "working/minimal/rr/pipeline.pipe": 72
+    }
+   },
+   "compute_transforms": {
+    "total": 0,
+    "files": {}
+   },
+   "serving_integration": {
+    "total": 14,
+    "files": {
+     "working/minimal/rr/Dockerfile": 14
+    }
+   },
+   "client_harness": {
+    "total": 35,
+    "files": {
+     "working/minimal/rr/client.py": 35
+    }
+   },
+   "arm_total": 121
+  }
+ },
+ "pipe_formatting_spread": {
+  "as_built": {
+   "as_stored": 78,
+   "indent_2": 78,
+   "compact": 1,
+   "one_node_per_line": 7
+  },
+  "minimal": {
+   "as_stored": 72,
+   "indent_2": 72,
+   "compact": 1,
+   "one_node_per_line": 7
+  }
+ },
+ "ratio_as_built": 3.06,
+ "ratio_minimal": 0.86,
+ "ratio_range": [
+  0.5,
+  5.26
+ ],
+ "rule": "working/minimal/COUNTING_RULE.md",
+ "removed": "working/minimal/REMOVED.md",
+ "validated_by_run": false,
+ "validation_note": "counts are static and exact; the MINIMAL implementations are import-checked only. Functional equivalence needs a box run \u2014 see REMOVED.md 'Validation'."
+}
