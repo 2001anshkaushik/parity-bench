@@ -267,6 +267,27 @@ Applied to our repo with Leela's `count_loc` verbatim:
 benchmark scaffolding, not what a developer writes to build the pipeline. **PROVISIONAL**: one
 counting pass, no second method.
 
+### 🔴 FINAL SWEEP before the meeting — Leela moved again, Shashi did not [session 38, 2026-08-17]
+
+**Shashi: ZERO commits since `d2b210d`.** Nothing to revise on his side.
+
+**Leela `aws-bench` `a5c3b5d` → `0a0b558`** (5 commits). What matters:
+
+| change | effect on us |
+|---|---|
+| **M4 `blast_radius` redefined** (`0a0b558`): now counts **DISTINCT** collateral docs and takes `independent_failures`, a set of docs that fail in a clean baseline | **METHOD WE COPIED IS STALE.** `working/harness/fault_metrics.py` has the pre-fix version. Our 1-poison protocol makes the distinct-vs-sum defect inert, and all 7 documents our fault experiment selects extract text (276–26,005 chars), so no independent failure can fire — **by luck of the draw, not by design.** 21/10,000 corpus documents are text-free |
+| Leela **retracted a finding** with it: his first real fault run reported blast radius 3 (LG) / 2 (RR); both were the SAME always-failing text-free PDF. Re-derived to 0/0, PASS | nothing of ours changes; it is a live instance of exactly the defect class our register tracks |
+| **He now HAS data isolation** (`e728d51`, `fault_report.py::data_isolation`) | **CONTRADICTS OUR SUMMARY CLAIM** that neither teammate has any. His definition differs: unrelated docs must be **byte-identical to a clean baseline within a fault run**. Ours is two tenants, disjoint corpora, concurrent, cross-tenant content. Adjacent, not the same question |
+| **Fault work is now WIRED** (`run/fault_run.sh`) and has been run | our "neither has published results" is now false for Leela |
+| His fault corpus is **4 kinds** — corrupt, zero_byte, truncated, oversized_garbage (`corpus/make_faults.py`) | ours copies **Shashi's** single poison (%PDF header + 64 KB random). Say which we match; we do not match Leela here |
+| **`native_saturation` mode**: the arms deliberately use DIFFERENT submission interfaces — LangGraph a bounded HTTP window, RocketRide one whole-corpus SDK batch. *"Fairness lives in the equal cpuset, not the interface."* | **contradicts our framing** that our N-individual-sends shape is a deviation from their batched shape. He now argues forcing a match "would benchmark our misuse of one API rather than either product" |
+| **"we measured per-document RocketRide submission at roughly a third of its batched throughput"** | **CHANGES A NUMBER WE PRESENT.** Our blast leg is per-document sends at C=32. Our 4.03 docs/s may understate RocketRide by ~3× purely from submission shape — **a handicap we imposed on our own arm** |
+| `verify_output.py` (`240d570`) reads the ACTUAL text and vectors, not just hashes — "a hash is just as stable for garbage as for prose" | a correctness capability neither we nor Shashi have. Not a contradiction; a gap |
+| `rr_driver.py`: new assert that `threads` reached `use()`. **ttl still 7200. WARM still 25. cpuset unchanged. deadline still 3600 s both arms** | no config beliefs change |
+| **`RR_DUP_PATCH` default still `1`** | unchanged: he runs patched, we run stock. Comparability blocker stands |
+
+No result JSONs are committed to his repo; S3 could not be checked from this laptop (no `aws`/`boto3`).
+
 ### Before the 10k run — the remaining checklist
 
 1. ✅ Corpus complete and manifest-verified (session 33).
