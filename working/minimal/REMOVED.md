@@ -86,17 +86,31 @@ is product behaviour, not scaffolding.
 
 ## The numbers
 
+> **THIRD COUNTING ERROR, found by independent re-verification (`verify_loc.py`).** Leela's
+> counter picks its comment prefix with `COMMENT_PREFIXES.get(path.suffix or path.name)`, which
+> only recognises a file named exactly `Dockerfile`. Ours are `Dockerfile.llamaindex` and
+> `Dockerfile.rocketride` — suffix `.llamaindex` / `.rocketride` — so **their comments were
+> counted as code**. Our Dockerfiles are the most comment-dense files in the repo. The `minimal/`
+> Dockerfiles are named plainly and were always correct, which is why only the as-built column
+> moved. Leela's own numbers are unaffected: his files are bare `Dockerfile`.
+> `serving_integration` LI **164 → 85**, RR **58 → 29**.
+
 | layer | LI built | LI min | RR built | RR min |
 | --- | ---: | ---: | ---: | ---: |
 | pipeline_definition | 210 | 0 | 78 | 72 |
 | compute_transforms | 195 | 58 | 0 | 0 |
-| serving_integration | 164 | 25 | 58 | 14 |
+| serving_integration | **85** | 25 | **29** | 14 |
 | client_harness | 67 | 21 | 72 | 35 |
-| **arm total** | **636** | **104** | **208** | **121** |
+| **arm total** | **557** | **104** | **179** | **121** |
 
-* **as-built / as-built = 3.1×**
+* **as-built / as-built = 3.1×** (both arms were inflated similarly, so the ratio barely moved
+  even though both absolute figures were wrong)
 * **minimal / minimal = 0.9×** — RocketRide slightly *larger*
-* **range = 0.5× .. 5.3×** (the mixed pairings, which bound a hostile reading)
+* **range = 0.6× .. 5.4×** (the mixed pairings, which bound a hostile reading)
+
+Verified by a second method sharing no code with the first: `ast` line spans instead of text
+slicing, and Python's `tokenize` instead of a triple-quote state machine. All 21 other cells
+agree exactly.
 
 `pipeline_definition` is 0 for minimal LlamaIndex because no declarative artifact exists on that
 arm — the stage wiring *is* the handler, and it is counted once under `compute_transforms`.

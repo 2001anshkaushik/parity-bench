@@ -1,0 +1,166 @@
+{
+ "method_b": {
+  "as_built": {
+   "llamaindex": {
+    "pipeline_definition": 210,
+    "compute_transforms": 195,
+    "serving_integration": 85,
+    "client_harness": 67,
+    "arm_total": 557
+   },
+   "rocketride": {
+    "pipeline_definition": 78,
+    "compute_transforms": 0,
+    "serving_integration": 29,
+    "client_harness": 72,
+    "arm_total": 179
+   }
+  },
+  "minimal": {
+   "llamaindex": {
+    "pipeline_definition": 0,
+    "compute_transforms": 58,
+    "serving_integration": 25,
+    "client_harness": 21,
+    "arm_total": 104
+   },
+   "rocketride": {
+    "pipeline_definition": 72,
+    "compute_transforms": 0,
+    "serving_integration": 14,
+    "client_harness": 35,
+    "arm_total": 121
+   }
+  }
+ },
+ "method_a": {
+  "as_built": {
+   "llamaindex": {
+    "pipeline_definition": 210,
+    "compute_transforms": 195,
+    "serving_integration": 164,
+    "client_harness": 67,
+    "arm_total": 636
+   },
+   "rocketride": {
+    "pipeline_definition": 78,
+    "compute_transforms": 0,
+    "serving_integration": 58,
+    "client_harness": 72,
+    "arm_total": 208
+   }
+  },
+  "minimal": {
+   "llamaindex": {
+    "pipeline_definition": 0,
+    "compute_transforms": 58,
+    "serving_integration": 25,
+    "client_harness": 21,
+    "arm_total": 104
+   },
+   "rocketride": {
+    "pipeline_definition": 72,
+    "compute_transforms": 0,
+    "serving_integration": 14,
+    "client_harness": 35,
+    "arm_total": 121
+   }
+  }
+ },
+ "disagreements": [
+  [
+   "as_built",
+   "llamaindex",
+   "serving_integration",
+   164,
+   85
+  ],
+  [
+   "as_built",
+   "llamaindex",
+   "arm_total",
+   636,
+   557
+  ],
+  [
+   "as_built",
+   "rocketride",
+   "serving_integration",
+   58,
+   29
+  ],
+  [
+   "as_built",
+   "rocketride",
+   "arm_total",
+   208,
+   179
+  ]
+ ],
+ "pipe_formatting": {
+  "as_stored": 72,
+  "indent_2": 72,
+  "one_node_per_line": 7,
+  "compact": 1
+ },
+ "semantic_units": {
+  "as_built": {
+   "llamaindex": {
+    "authored_python_units": 38,
+    "declared_nodes": 0,
+    "total": 38,
+    "detail": {
+     "working/ws1/pipeline.py": 14,
+     "working/ws1/schema.py": 7,
+     "working/ws1/service.py": 10,
+     "@LlamaHttpArm": 5,
+     "@LlamaHttpPdfArm": 2
+    }
+   },
+   "rocketride": {
+    "authored_python_units": 9,
+    "declared_nodes": 5,
+    "total": 14,
+    "detail": {
+     "@RocketArm": 6,
+     "@RocketPdfArm": 3
+    }
+   }
+  },
+  "minimal": {
+   "llamaindex": {
+    "authored_python_units": 7,
+    "declared_nodes": 0,
+    "total": 7,
+    "detail": {
+     "working/minimal/li/service.py": 3,
+     "working/minimal/li/client.py": 4
+    }
+   },
+   "rocketride": {
+    "authored_python_units": 4,
+    "declared_nodes": 5,
+    "total": 9,
+    "detail": {
+     "working/minimal/rr/client.py": 4
+    }
+   }
+  }
+ },
+ "canonical_bytes": {
+  "as_built": {
+   "llamaindex": 33643,
+   "rocketride": 6867
+  },
+  "minimal": {
+   "llamaindex": 6353,
+   "rocketride": 3451
+  }
+ },
+ "minimal_ratio_by_formatting": {
+  "as_stored": 0.86,
+  "indent_2": 0.86,
+  "one_node_per_line": 1.857,
+  "compact": 2.08
+ }
+}
