@@ -127,6 +127,17 @@ def _engine_patch_state() -> Dict[str, Any]:
                      "repeat_factor 2. self_duplication must read 0 on a patched build.")}
 
 
+def _container_root_pid(name: str) -> Optional[int]:
+    """HOST pid of a container's main process. Delegates to weekend_worker.container_root_pid so
+    there is ONE discovery mechanism in the project, used identically on both arms — defect #24
+    was a check honoured on one arm and not the other, and this is the same shape of mistake."""
+    try:
+        from weekend_worker import container_root_pid
+        return container_root_pid(name)
+    except Exception:
+        return None
+
+
 def _run_docker(container: str, fmt: str) -> Optional[str]:
     """One `docker inspect -f` field, or None. Used for read-backs where a config value must be
     confirmed in EFFECT rather than trusted from the command that set it."""
