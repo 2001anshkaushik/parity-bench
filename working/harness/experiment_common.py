@@ -127,6 +127,39 @@ def _engine_patch_state() -> Dict[str, Any]:
                      "repeat_factor 2. self_duplication must read 0 on a patched build.")}
 
 
+def service_available_cpus(container: str) -> Tuple[Optional[int], str]:
+    """The SERVICE's CPU allocation, for utilisation denominators. NEVER the driver's affinity.
+
+    Defect #34: the driver runs under `taskset -c 24-31` while the container runs on cpuset
+    0-23, so `len(os.sched_getaffinity(0))` in the driver returned 8 where the service had 24 —
+    cpu_utilization printed 1.58 INVALID for a true 52.8%. Every utilisation cell sampled while
+    the driver is pinned was affected.
+
+    Order: the container's own cgroup `cpuset.cpus.effective` (MEASURED — what the kernel
+    granted), then `docker inspect .HostConfig.CpusetCpus` (DECLARED — labelled as such), then
+    (None, reason). There is deliberately no affinity fallback: a wrong-process denominator is
+    exactly the defect this function exists to prevent, and None keeps utilisation None rather
+    than confidently wrong.
+    """
+    from harness.memory_sources import cgroup_path_for_pid, cgroup_cpuset_count, parse_cpuset
+    pid = _container_root_pid(container)
+    if pid is not None:
+        cg = cgroup_path_for_pid(pid)
+        if cg is not None:
+            r = cgroup_cpuset_count(cg)
+            if r["cpus"]:
+                return r["cpus"], (f"{r['source']} of container '{container}' "
+                                   f"(pid {pid}) = {r['raw']!r} — MEASURED")
+    declared = _run_docker(container, "{{.HostConfig.CpusetCpus}}")
+    n = parse_cpuset(declared) if declared and declared != "<no value>" else None
+    if n:
+        return n, (f"docker inspect CpusetCpus of '{container}' = {declared!r} — DECLARED, "
+                   "not measured (cgroup read failed)")
+    return None, (f"could not resolve a cpuset for container '{container}' by cgroup or "
+                  "docker inspect; utilisation stays None rather than using the driver's "
+                  "affinity (defect #34)")
+
+
 def _container_root_pid(name: str) -> Optional[int]:
     """HOST pid of a container's main process. Delegates to weekend_worker.container_root_pid so
     there is ONE discovery mechanism in the project, used identically on both arms — defect #24

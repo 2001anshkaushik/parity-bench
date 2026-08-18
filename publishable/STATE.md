@@ -129,10 +129,10 @@ gap **1.32×**.
 
 ### Defect register, sessions 20–34 — all found in OUR instrument
 
-`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34) · `#32` OPEN — unset `ttl` defaults to 900 s idle while our own per-doc deadline is 1800 s; 371 docs lost, cause unconfirmed (session 36) · `#33` the Phase-2 image recipe omitted the onnxruntime boot patch our own §1 documents — both rr images built green and crash-looped on the box (session 39).
+`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34) · `#32` OPEN — unset `ttl` defaults to 900 s idle while our own per-doc deadline is 1800 s; 371 docs lost, cause unconfirmed (session 36) · `#33` the Phase-2 image recipe omitted the onnxruntime boot patch our own §1 documents — both rr images built green and crash-looped on the box (session 39) · `#34` cpu_utilization divided by the DRIVER's taskset affinity (8) instead of the service container's cpuset (24) — util printed 1.58 INVALID for a true 52.8% (session 40) · `#35` engine_side_concurrency summed completion OFFSETS as if they were per-file durations and published an impossible 281.266 against threads=24; upload_time is now CLASSIFIED (offset vs duration, s vs ms) before anything is derived from it (session 40).
 
 **The pattern, stated plainly: in this project the instrument is wrong more often than the system
-under test. Fifteen instrument defects in twenty sessions, zero product defects found by us in that
+under test. Seventeen instrument defects in twenty-one sessions, zero product defects found by us in that
 window that were not already known.** Behave accordingly — the Standing Verification Protocol in
 §2 is not ceremony.
 
@@ -343,6 +343,48 @@ NOT warmed: anything materialised at first `use()`. Recorded in the
 compiles at boot carries that compile's memory in its cumulative cgroup `memory.peak`; prewarmed
 containers will not — no published number is affected (no cgroup figure has shipped yet), but
 peaks from the two container generations must not be compared.
+
+### SESSION 40 — the N=1000 batched probe: two instrument defects, one corroboration (2026-08-17)
+
+The probe completed and its own output contained defects #34 and #35, both caught by review
+before any 10k run.
+
+**#34 — wrong process's CPU allocation as the utilisation denominator.** My cpuset fix replaced
+`os.cpu_count()` with `sched_getaffinity(0)` — correct until the same day's runbook pinned the
+driver to `taskset -c 24-31`. The driver's 8 CPUs then divided the SERVICE's utilisation while
+the container ran on cpuset 0-23 (24): util printed **1.5832 INVALID** for a true **52.8 %**
+(`effective_cores` 12.67/24 agrees). The two changes contradicted each other in the same
+session. **The `cpu_utilization_valid` guard did its job** — flagged, never clamped — which is
+the only reason this surfaced. Fixed: `service_available_cpus()` reads the container's own
+cgroup `cpuset.cpus.effective` (MEASURED), falls back to `docker inspect` (labelled DECLARED),
+and deliberately has **no affinity fallback** — None over confidently wrong. Applied to the
+batched arm and to every `derive_side` cell in the smoke, per arm.
+
+**#35 — a category error, not a unit error.** `engine_side_concurrency = sum(upload_time)/wall`
+printed **281.266**, impossible against `threads_requested=24`. The ms-vs-s hypothesis fails
+twice over: the SDK docstring prints upload_time as seconds, and 0.281 would contradict the
+sampler's 12.67 effective cores. The tell is Leela's own `records_from_batch`: he derives
+`completion_ns = t0 + upload_time` — upload_time is a **completion OFFSET from batch open**,
+and for n completions across a wall, sum(offsets)/wall lands near n/2 — 281 on 988 documents is
+exactly that shape. Fixed: `classify_upload_time()` tests both hypotheses at both scales and
+every downstream value follows the classification — concurrency publishes ONLY under duration
+semantics (else None with the evidence); the derived latency percentiles are relabelled
+**batch-position latency** under offset semantics (they include queue wait; comparable with
+Leela's derived column, not with our measured column). Null-control test reproduces the 281 on
+synthetic offsets and requires the classifier to refuse it (`test_batched_semantics.py`).
+
+**Census under real corpora:** `CENSUS_EMPTY_POLICY=report` (Shashi bench.py:412-435) adopted on
+the batched arm — ok=988/1000 was the legitimately-empty rate, not lost work. Empty documents
+are named and cross-referenced against the manifest's pypdf extraction ("defeats both parsers"
+vs "Tika-side disagreement"); hard loss still fails regardless of policy.
+
+**The corroboration, PROVISIONAL until 10k:** corrected utilisation **52.8 %** against Shashi's
+independently measured **52.9 %** on his batched RocketRide arm — different harness, different
+corpus build, same number. That is the headline the utilisation path now has to deserve.
+
+**Direction-of-bias note for the pair:** #34 invalidated a real RocketRide result (against RR);
+#35 flattered RR with impossible parallelism (for RR). One probe, both directions — the
+instrument has no loyalty.
 
 ### Before the 10k run — the remaining checklist
 

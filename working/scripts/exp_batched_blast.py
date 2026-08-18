@@ -115,7 +115,8 @@ def records_from_batch(corpus: List[Path], out, t0_ns: int) -> List[Dict[str, An
             "input_sha256": hashlib.sha256(blob).hexdigest(),
             "size_bytes": len(blob),
             "submit_ns": t0_ns,
-            "timing_source": "batch upload_time (DERIVED, not measured)",
+            "timing_source": ("batch upload_time (DERIVED, not measured; semantics "
+                              "classified post-hoc — see result upload_time_semantics)"),
         }
         it = by_name.get(pdf.name)
         if it is None:
@@ -139,6 +140,57 @@ def records_from_batch(corpus: List[Path], out, t0_ns: int) -> List[Dict[str, An
         rec["reason"] = "completed" if docs else "no_documents"
         recs.append(rec)
     return recs
+
+
+def classify_upload_time(values, wall_s: float, threads: int) -> Dict[str, Any]:
+    """What IS upload_time — a per-file duration, or a completion offset from batch open?
+
+    Defect #35, found on the N=1000 probe: engine_side_concurrency printed 281.266, which is
+    impossible (it cannot exceed threads_requested=24). The formula sum(upload_time)/wall
+    assumed upload_time is a per-file BUSY DURATION. Leela's own records_from_batch derives
+    completion_ns = t0 + upload_time — i.e. he treats it as an OFFSET from batch open — and
+    the SDK's send_files docstring prints it as seconds ("in {upload_time:.2f}s", data.py).
+    For n files completing across a wall of W, sum(offsets)/W lands near n/2, and 281 on 988
+    completions is exactly that shape. Sum-over-wall on offsets is a category error, not a
+    unit error.
+
+    So classify from the numbers themselves, and let every downstream label follow:
+      duration hypothesis  needs max <= wall and sum <= threads*wall  (a file cannot run
+                           longer than the batch; total busy cannot exceed the pool)
+      offset hypothesis    needs max ~= wall  (the last completion IS the batch return)
+    Seconds are tried first — the SDK documents seconds — and milliseconds only if seconds
+    fits neither, flagged as contradicting the docstring. Ambiguous or unclassifiable means
+    every derived value ships as None with this dict as the reason. Never publish a number
+    whose meaning failed classification.
+    """
+    v = [x for x in (values or []) if isinstance(x, (int, float)) and x >= 0]
+    if not v:
+        return {"semantics": "unclassifiable", "scale": None,
+                "reason": "no upload_time values on any record"}
+    out = {"n": len(v)}
+    for scale, sname in ((1.0, "seconds (SDK data.py docstring: '{upload_time:.2f}s')"),
+                         (1e-3, "milliseconds — CONTRADICTS the SDK docstring, flagged")):
+        u = [x * scale for x in v]
+        mx, sm = max(u), sum(u)
+        duration_ok = mx <= wall_s * 1.10 and sm <= threads * wall_s * 1.10
+        offset_ok = wall_s * 0.50 <= mx <= wall_s * 1.10
+        ev = {"scale_tried": sname, "max_s": round(mx, 3), "sum_s": round(sm, 1),
+              "wall_s": round(wall_s, 1), "sum_over_wall": round(sm / wall_s, 3),
+              "max_over_wall": round(mx / wall_s, 3), "threads": threads}
+        if duration_ok and not offset_ok:
+            return {**out, "semantics": "duration", "scale": scale, "evidence": ev,
+                    "reason": f"fits duration only at {sname}"}
+        if offset_ok and not duration_ok:
+            return {**out, "semantics": "offset", "scale": scale, "evidence": ev,
+                    "reason": f"fits offset only at {sname}: max ~= wall (last completion is "
+                              "the batch return) while sum exceeds the pool ceiling"}
+        if offset_ok and duration_ok:
+            return {**out, "semantics": "ambiguous", "scale": scale, "evidence": ev,
+                    "reason": f"BOTH hypotheses fit at {sname}; refusing to pick. No derived "
+                              "value is published from an ambiguous basis."}
+        out[f"rejected_at_{'s' if scale == 1.0 else 'ms'}"] = ev
+    return {**out, "semantics": "unclassifiable", "scale": None,
+            "reason": "fits neither hypothesis at either scale; see rejected evidence"}
 
 
 def _upload_time_percentiles(ok_rows) -> Dict[str, Any]:
@@ -247,10 +299,67 @@ def main() -> int:
     # ~1.0, and that IS head-of-line blocking. `effective_cores` is what the CPU sampler saw.
     # Two sources with different failure modes, deliberately not merged.
     ut = [x["upload_time_s"] for x in ok if x.get("upload_time_s")]
+    # Defect #34: this denominator used the DRIVER's sched_getaffinity — 8 cpus under
+    # `taskset -c 24-31` — while the service ran on cpuset 0-23 (24). util printed 1.58
+    # INVALID for a true 52.8%. The denominator now comes from the service container's own
+    # cgroup, with the source recorded beside every number it divides.
+    svc_cpus, svc_cpus_src = (ec.service_available_cpus(ec.RR_CONTAINER) if ec.EXTERNAL
+                              else (len(os.sched_getaffinity(0))
+                                    if hasattr(os, "sched_getaffinity") else os.cpu_count(),
+                                    "driver affinity (native mode: service is a child of "
+                                    "the driver and shares it)"))
+    say(f"  available_cpus={svc_cpus}  source: {svc_cpus_src}")
+    uts = classify_upload_time(ut, wall, RR_THREADS)
+    say(f"  upload_time semantics: {uts['semantics']} — {uts['reason']}")
     cost = ms.cost_window(
         ms.series_from_role_ticks((run_dir / "sampler_rr_batched.jsonl").read_text(),
                                   "service", anchor) if pc else None,
         r["t0_ns"] / 1e9, r["t1_ns"] / 1e9)
+
+    # CENSUS_EMPTY_POLICY (Shashi bench.py:412-435, adopted for GovDocs): on a real-world
+    # corpus a fraction of documents genuinely defeats an extractor. Under "report", a
+    # success-shaped empty (`no_documents`) is NAMED, COUNTED and EXPORTED rather than
+    # aborting the run — the head-to-head then rests on the mutually-extracted subset. Hard
+    # loss (no response for a submitted file, transport errors) always fails regardless of
+    # policy: "LOST work always fails" is his rule and stays ours. Each empty document is
+    # cross-referenced against the manifest's pypdf extraction so "defeats both parsers" and
+    # "Tika-side disagreement" are distinguishable without a re-run.
+    empty_docs = sorted(x["doc"] for x in recs
+                        if not x.get("ok") and x.get("reason") == "no_documents")
+    policy = os.environ.get("CENSUS_EMPTY_POLICY", "report")
+    pypdf_chars = {}
+    mpath = ROOT / "working" / "results" / "corpus_manifest.jsonl"
+    if mpath.exists():
+        for line in mpath.read_text().splitlines():
+            if line.strip():
+                try:
+                    m = json.loads(line)
+                    pypdf_chars[m["file"]] = m.get("extracted_chars_pypdf")
+                except (json.JSONDecodeError, KeyError):
+                    continue
+    empty_annotated = {
+        d: ("defeats pypdf too (0 chars in manifest) — empty on both parsers"
+            if pypdf_chars.get(d) == 0 else
+            f"pypdf extracted {pypdf_chars[d]} chars — Tika-side extraction disagreement"
+            if d in pypdf_chars else "not in manifest")
+        for d in empty_docs}
+    census = gs.leela_census(recs, len(corpus),
+                             expected_empty=set(empty_docs) if policy == "report"
+                             else frozenset())
+    census_policy = {
+        "policy": policy,
+        "source": "Shashi bench.py:412-435 (CENSUS_EMPTY_POLICY=report for GovDocs)",
+        "empty_documents": len(empty_docs),
+        "empty_named": empty_annotated,
+        "subset_basis": (f"throughput and gates rest on the {len(ok)}-document extracted "
+                         f"subset; {len(empty_docs)} empty documents are reported, not "
+                         "failures" if policy == "report" and empty_docs else None),
+        "hard_loss_note": "no_response_for_file and transport errors fail REGARDLESS of "
+                          "policy — lost work always fails",
+    }
+    if empty_docs:
+        say(f"  census: {len(empty_docs)} empty document(s) under policy={policy}: "
+            f"{empty_docs[:8]}{'...' if len(empty_docs) > 8 else ''}")
 
     out: Dict[str, Any] = {
         "experiment": "batched_blast",
@@ -296,27 +405,38 @@ def main() -> int:
                 measured=False),
             "upload_time_derived": gs.derived(
                 _upload_time_percentiles(ok),
-                basis=("engine's own per-file upload_time (Leela rr_driver.py:117-120, "
-                       "timing_source 'batch_upload_time (derived, not measured)'). This is the "
-                       "engine's account of its own service time, NOT a client round trip: it "
-                       "excludes queue wait inside the batch and excludes transport. Comparable "
-                       "with Leela's column, NOT with our per-document arm's measured latency."),
+                basis=(("BATCH-POSITION latency: upload_time classified as a completion "
+                        "OFFSET from batch open, so these percentiles INCLUDE queue wait "
+                        "inside the batch. Comparable with Leela's derived column (his "
+                        "completion_ns = t0 + upload_time is the same reading); NOT service "
+                        "latency and NOT comparable with the per-document arm's measured "
+                        "column.") if uts["semantics"] == "offset" else
+                       ("engine per-file processing DURATION (classified): excludes queue "
+                        "wait inside the batch and transport. Comparable with Leela's "
+                        "column.") if uts["semantics"] == "duration" else
+                       (f"UNINTERPRETED: upload_time semantics {uts['semantics']} — "
+                        f"{uts['reason']}. Raw percentiles retained for forensics only; "
+                        "do not put them in any latency table.")),
                 measured=False),
         },
         "achieved_parallelism": {
+            # Published ONLY when upload_time classifies as a per-file DURATION. On the
+            # N=1000 probe it classifies as an OFFSET (max ~= wall), where sum/wall is a
+            # category error that printed an impossible 281.266 (> threads=24). Defect #35.
             "engine_side_concurrency": gs.derived(
-                round(sum(ut) / wall, 3) if ut and wall > 0 else None,
-                basis=("sum(engine upload_time) / batch wall. ~1.0 means the batch was processed "
-                       "essentially one document at a time — head-of-line blocking. Derived from "
-                       "the engine's own per-file timings, so it inherits their accuracy."),
+                (round(sum(x * uts["scale"] for x in ut) / wall, 3)
+                 if uts["semantics"] == "duration" and ut and wall > 0 else None),
+                basis=(f"sum(upload_time)/wall, valid ONLY under duration semantics. "
+                       f"Classification: {uts['semantics']} — {uts['reason']}"),
                 measured=False),
+            "upload_time_semantics": uts,
             "effective_cores": cost and ms.effective_cores(cost["cpu_s"], cost["window_s"]),
             "cpu_s": cost and cost["cpu_s"],
             "cpu_s_per_chunk": (ms.cpu_s_per_chunk(cost["cpu_s"], chunks) if cost else None),
-            "cpu_utilization": (ms.cpu_utilization(
-                cost["cpu_s"], cost["window_s"],
-                len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity")
-                else os.cpu_count()) if cost else None),
+            "cpu_utilization": (ms.cpu_utilization(cost["cpu_s"], cost["window_s"], svc_cpus)
+                                if cost and svc_cpus else None),
+            "available_cpus": svc_cpus,
+            "available_cpus_source": svc_cpus_src,
             "cost_note": None if cost else "no cost samples resolved to this window",
         },
         "attribution": {
@@ -328,7 +448,8 @@ def main() -> int:
         },
         "gates": {
             "self_duplication": gs.self_duplication(recs),
-            "census": gs.leela_census(recs, len(corpus)),
+            "census": census,
+            "census_policy": census_policy,
         },
         "provenance": ec.provenance({
             "threads_requested": RR_THREADS,
@@ -391,7 +512,11 @@ def main() -> int:
     if out["attribution"]["unattributed"]:
         fails.append(f"{len(out['attribution']['unattributed'])} files unattributed")
     if not out["gates"]["census"].get("PASS", True):
-        fails.append("census failed")
+        c = out["gates"]["census"]
+        fails.append(f"census failed BEYOND the empty policy: silent={c.get('silent')} "
+                     f"duplicates={len(c.get('duplicate_docs') or [])} "
+                     f"unexpected_failures={c.get('unexpected_failures')} "
+                     f"(policy={policy} already excused {len(empty_docs)} empty docs)")
     out["PASS"] = not fails
     out["failed_checks"] = fails
     return ec.verdict_exit(not fails, write_result("exp_batched_blast", out), fails)

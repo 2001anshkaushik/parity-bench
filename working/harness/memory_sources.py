@@ -186,3 +186,44 @@ def memory_report(pid: Optional[int], summed_rss_mb: Optional[float]) -> Dict[st
             f"so the figure is an over-count of shared pages, not a footprint. Quote "
             f"cgroup anon ({m.get('anon_mb')} MB).")
     return rep
+
+
+def parse_cpuset(spec) -> "Optional[int]":
+    """Count CPUs in a kernel cpuset list ("0-23", "0-3,8-11", "0"). None on empty/garbage —
+    never 0, which would read as a real allocation of zero cores."""
+    if not spec or not isinstance(spec, str):
+        return None
+    n = 0
+    try:
+        for part in spec.strip().split(","):
+            if not part:
+                continue
+            if "-" in part:
+                lo, hi = part.split("-", 1)
+                n += int(hi) - int(lo) + 1
+            else:
+                int(part)
+                n += 1
+    except ValueError:
+        return None
+    return n or None
+
+
+def cgroup_cpuset_count(cg: Path) -> Dict[str, Any]:
+    """The cpuset actually IN EFFECT for a cgroup — the kernel's answer, not docker's config.
+
+    Defect #34: cpu_utilization divided by the DRIVER's taskset affinity (8 cpus) while the
+    SERVICE container ran on cpuset 0-23 (24), reporting util=1.58 INVALID for a true 52.8%.
+    The denominator for a service's utilisation must come from the service's own cgroup.
+    `cpuset.cpus.effective` first (what the kernel granted), `cpuset.cpus` as fallback.
+    """
+    for fname in ("cpuset.cpus.effective", "cpuset.cpus"):
+        try:
+            raw = (cg / fname).read_text().strip()
+        except OSError:
+            continue
+        n = parse_cpuset(raw)
+        if n:
+            return {"cpus": n, "raw": raw, "source": f"cgroup {fname}"}
+    return {"cpus": None, "raw": None,
+            "source": "no readable cpuset file in this cgroup (cgroup v1 host, or not a leaf)"}

@@ -1004,9 +1004,11 @@ def main() -> int:
                                        "pluggable": "box/Docker mode consumes Leela's "
                                                     "cgroup_sampler JSONL via "
                                                     "metrics_shared.series_from_cgroup_jsonl"},
-                      "available_cpus": (len(os.sched_getaffinity(0))
-                                        if hasattr(os, "sched_getaffinity")
-                                        else os.cpu_count()),
+                      # DRIVER affinity, named as such — never a utilisation denominator
+                      # for a containerised service (defect #34).
+                      "driver_affinity_cpus": (len(os.sched_getaffinity(0))
+                                               if hasattr(os, "sched_getaffinity")
+                                               else os.cpu_count()),
                       "host_cpu_count": os.cpu_count(),
                       # Which credentials the RocketRide arm actually used, and where they came
                       # from. The key itself is never written to a result file — a fingerprint is
@@ -1227,16 +1229,34 @@ def main() -> int:
     say(f"\nMETRICS (metrics_shared; platform {_system}/{_machine}; "
         + ("publishable target platform)" if _publishable
            else "NOT the target platform, numbers are wiring validation only)"))
-    # AFFINITY, not host count. Under `docker run --cpuset-cpus 0-23` (and under taskset for
-    # the driver) os.cpu_count() still returns the host's 32, so cpu_utilization would divide
-    # by 32 while only 24 cores were reachable — understating utilisation by 25% silently.
-    cpus = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count()
+    # Defect #34 (supersedes the affinity fix that introduced it): the DRIVER's affinity is 8
+    # under `taskset -c 24-31` while the SERVICE containers run on cpuset 0-23 (24), so using
+    # sched_getaffinity here divided every utilisation by the wrong process's allocation —
+    # util printed 1.58 INVALID for a true 52.8%. The denominator now comes from each SERVICE
+    # container's own cgroup, per arm, source recorded. Driver affinity remains correct only
+    # in native mode, where the service is the driver's child and genuinely shares it.
+    _drv = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count()
+    cpus_by_arm: dict[str, int | None] = {}
+    cpus_src: dict[str, str] = {}
+    for _arm, _cont in (("llamaindex_http_pdf", os.environ.get("SMOKE_LI_CONTAINER", "li")),
+                        ("rocketride_pdf", os.environ.get("SMOKE_RR_CONTAINER", "rr"))):
+        if EXTERNAL:
+            from harness import experiment_common as _ec
+            cpus_by_arm[_arm], cpus_src[_arm] = _ec.service_available_cpus(_cont)
+        else:
+            cpus_by_arm[_arm] = _drv
+            cpus_src[_arm] = "driver sched_getaffinity (native mode: service is a child)"
+        say(f"  available_cpus[{_arm}] = {cpus_by_arm[_arm]}  ({cpus_src[_arm]})")
+
     out["metrics"] = {"module": "working/harness/metrics_shared.py",
                       "platform": {"system": _system, "machine": _machine,
                                    "native_x86_64": _native_x86},
                       "publishable": _publishable,
                       "not_publishable_reason": _why,
                       "arms": {}}
+    out["metrics"]["available_cpus"] = {"by_arm": cpus_by_arm, "source_by_arm": cpus_src,
+                                        "driver_affinity_cpus": _drv,
+                                        "host_cpu_count": os.cpu_count()}
     # Both blast legs are a BOUNDED CLIENT POOL of BLAST_C, not an open-loop arrival process:
     # nothing is submitted until a slot frees, so offered load is throttled by the system under
     # test. Measured from admission the result is closed-loop service latency. Leela's
@@ -1269,7 +1289,8 @@ def main() -> int:
         for mode, mrows, label in cells:
             series = cost_series.get(f"{arm_name}:{mode.split('_')[0]}")
             for wn in (WARM_N_PRIMARY, WARM_N_SECONDARY):
-                d = ms.derive_side(mrows, series, warm_n=wn, available_cpus=cpus, mode=label)
+                d = ms.derive_side(mrows, series, warm_n=wn,
+                                   available_cpus=cpus_by_arm.get(arm_name), mode=label)
                 if mode.startswith("blast"):
                     d["client_concurrency"] = BLAST_C
                     # Shashi's basis-field pattern (rr_app.py:175-188): a derived number must
