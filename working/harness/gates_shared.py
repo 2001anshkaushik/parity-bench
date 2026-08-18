@@ -550,16 +550,51 @@ def legacy_verdicts(rows: List[Dict], n_offered: int,
 
 # --------------------------------------------------------------- three verdicts
 
+def not_run(gate: str, offered: Optional[int] = None, reason: str = "") -> Dict[str, Any]:
+    """A gate that evaluated ZERO records reports NOT RUN with its denominator — never FAIL.
+
+    Defect #38: under SMOKE_LEGS=blast the verdict path read the (legitimately empty)
+    sequential record set and every fail-closed gate emitted FAIL over zero records —
+    "offered 9975 = successful 0 + expected 0 + unexpected 0 -> FAIL" on both arms, while
+    9,975 real records sat in the blast JSONLs. A fail-closed verdict over an empty input is
+    indistinguishable from a real failure, and that is how a false product finding ships.
+
+    The boundary, stated: NOT RUN is for a gate whose input LEG never executed. A leg that
+    ran and produced zero records is a genuine catastrophic FAIL and must stay one —
+    Leela's vacuous-is-not-a-pass rule is about that case and is untouched.
+    """
+    return {"verdict": "NOT RUN", "PASS": None, "records": 0, "offered": offered,
+            "reason": reason or "the leg this gate evaluates did not run"}
+
+
 def three_verdicts(shashi_checks: Dict[str, Dict], leela_checks: Dict[str, Dict]
                    ) -> Dict[str, Any]:
     """Same records, three verdicts. The union is the conjunction — a run is union-clean
     only if it satisfies BOTH suites. Nothing is hidden: every component verdict is kept
-    alongside so a reader can see which suite failed and on what."""
-    s = gate_verdict(*shashi_checks.values())
-    lv = gate_verdict(*leela_checks.values())
+    alongside so a reader can see which suite failed and on what.
+
+    Checks with PASS=None (NOT RUN, from `not_run`) are EXCLUDED from each suite's
+    conjunction and counted separately: an unexecuted gate neither passes nor fails a suite,
+    and folding it into fail-closed gate_verdict() would reintroduce defect #38. A suite
+    whose every check is NOT RUN reports PASS=None, not True — no records, no verdict.
+    """
+    def suite(checks: Dict[str, Dict]):
+        ran = {k: v for k, v in checks.items() if not (isinstance(v, dict)
+                                                       and v.get("PASS") is None
+                                                       and v.get("verdict") == "NOT RUN")}
+        skipped = sorted(set(checks) - set(ran))
+        verdict = gate_verdict(*ran.values()) if ran else None
+        return verdict, skipped
+
+    s, s_skip = suite(shashi_checks)
+    lv, l_skip = suite(leela_checks)
+    union = (s and lv) if (s is not None and lv is not None) else None
     return {
-        "shashi": {"PASS": s, "checks": shashi_checks},
-        "leela": {"PASS": lv, "checks": leela_checks},
-        "union": {"PASS": s and lv,
-                  "note": "conjunction of both suites over identical records"},
+        "shashi": {"PASS": s, "checks": shashi_checks, "not_run": s_skip},
+        "leela": {"PASS": lv, "checks": leela_checks, "not_run": l_skip},
+        "union": {"PASS": union,
+                  "not_run": sorted(set(s_skip) | set(l_skip)),
+                  "note": "conjunction of both suites over identical records; NOT-RUN "
+                          "gates are excluded from the conjunction and listed, never "
+                          "counted as failures"},
     }

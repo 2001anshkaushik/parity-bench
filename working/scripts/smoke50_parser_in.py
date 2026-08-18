@@ -803,13 +803,20 @@ def main() -> int:
         # Recording BOTH stamps means neither definition has to win: service latency and
         # Leela's batch-position latency are now derivable from the same records, so the
         # choice never costs another run.
-        enqueue_ns = time.time_ns()
+        #
+        # Defect #39: this stamp used to be taken HERE, once, before both runners — and the
+        # arms run sequentially, so the second arm's enqueue_ns predated its own batch open
+        # by the entire first leg (~40 min at 10k). Its batch-position latency absorbed the
+        # other arm's leg, and its warm_n=0 window (anchored on min(submit)=the stale stamp)
+        # disagreed with warm_n=64 (anchored on its own completions) by exactly that gap.
+        # Each runner now stamps its OWN batch open.
 
         # LlamaIndex: blocking urllib, so threads are the right concurrency primitive.
         def blast_llama(out_path, prior, done):
             import concurrent.futures as cf
             arm = LlamaHttpPdfArm(port=PORT)
             todo = [(n, b) for n, b in blobs if n not in done]
+            enqueue_ns = time.time_ns()          # THIS arm's batch open (defect #39)
 
             with JsonlWriter(out_path) as w:
                 def one(item):
@@ -857,6 +864,7 @@ def main() -> int:
                 sem = asyncio.Semaphore(BLAST_C)
                 rows = []
                 todo = [(n, b) for n, b in blobs if n not in done]
+                enqueue_ns = time.time_ns()      # THIS arm's batch open (defect #39)
 
                 async def one(name, b):
                     # `gather` starts every coroutine in the loop's first pass, so a stamp
@@ -1075,10 +1083,35 @@ def main() -> int:
     # than one being chosen. Gate logic lives in harness/gates_shared.py with the
     # file:line it was adopted from; nothing here touches metrics_shared.py.
     out["gate_verdicts"] = {}
-    for arm_name, recs in results.items():
+    out["gate_basis"] = {}
+    for arm_name in results:
         arm_key = "lg" if arm_name.startswith("llamaindex") else "rr"
+        # Defect #38: this loop read `results` — the SEQUENTIAL record set — unconditionally.
+        # Under SMOKE_LEGS=blast that set is legitimately empty, and every fail-closed gate
+        # reported FAIL over zero records while 9,975 real records sat in the blast JSONLs.
+        # The gate basis is now whichever leg ran; what the blast leg cannot support
+        # (identity, vector fields, two-leg determinism) reports NOT RUN, never FAIL.
+        if results[arm_name]:
+            basis, src = "sequential", results[arm_name]
+            basis_note = "sequential leg records (full fields)"
+        elif blast_rows.get(arm_name):
+            basis = "blast"
+            basis_note = ("blast leg records — sequential leg not run. The blast leg does "
+                          "not capture returned_doc_id or vector fields, so structure "
+                          "gates report NOT RUN rather than failing on absent data.")
+            src = [{"doc": b["doc"],
+                    "outcome": "successful" if b.get("ok") else "unexpected",
+                    "error_class": b.get("error_class"),
+                    "returned_doc_id": None,
+                    "n_chunks": b.get("n_chunks"),
+                    "chunk_sha256": b.get("chunk_sha256")} for b in blast_rows[arm_name]]
+        else:
+            basis, src, basis_note = "none", [], "NO leg ran for this arm"
+        out["gate_basis"][arm_name] = {"basis": basis, "note": basis_note,
+                                       "records": len(src)}
+        say(f"  {arm_name}: gate basis = {basis} ({len(src)} records)")
         gate_rows, seen_names, zero_chunk = [], [], []
-        for r in recs:
+        for r in src:
             chunks = chunk_texts_by_arm.get(arm_name, {}).get(r["doc"])
             vecs = vecs_by_arm.get(arm_name, {}).get(r["doc"])
             errored = r.get("outcome") == "unexpected"
@@ -1113,20 +1146,37 @@ def main() -> int:
         # Zero-chunk documents are legitimate; both censuses need the allowlist or they call
         # them defects. Neither can infer it.
         exp_empty = gs.expected_empty_docs(gate_rows)
+        both_legs = bool(results[arm_name]) and bool(blast_rows.get(arm_name))
+        structure_ok = basis == "sequential"      # blast rows lack identity + vector fields
 
         leela_checks = {
             "census": gs.leela_census(gate_rows, len(pdfs), expected_empty=exp_empty),
-            "structure": gs.leela_structure(gate_rows, arm_key, probed_dim[arm_name]),
-            "determinism": gs.leela_determinism(gate_rows, blast_rowset),
+            "structure": (gs.leela_structure(gate_rows, arm_key, probed_dim[arm_name])
+                          if structure_ok else gs.not_run(
+                              "structure", len(pdfs),
+                              "blast records carry no identity or vector fields")),
+            "determinism": (gs.leela_determinism(gate_rows, blast_rowset)
+                            if both_legs else gs.not_run(
+                                "determinism", len(pdfs),
+                                "requires two independent legs; only one ran")),
         }
         shashi_checks = {
             "census": gs.shashi_census([p.name for p in pdfs], seen_names,
                                        expected_empty=exp_empty,
                                        zero_chunk_names=zero_chunk),
-            "structure": gs.shashi_structure(gate_rows, probed_dim[arm_name]),
-            "determinism": gs.shashi_determinism(seq_digests, blast_digests,
+            "structure": (gs.shashi_structure(gate_rows, probed_dim[arm_name])
+                          if structure_ok else gs.not_run(
+                              "structure", len(pdfs),
+                              "blast records carry no vector fields")),
+            "determinism": gs.not_run("determinism", len(pdfs),
+                                      "requires two independent legs; only one ran")
+            if not both_legs else gs.shashi_determinism(seq_digests, blast_digests,
                                                  "sequential", "blast"),
         }
+        if basis == "none":
+            say(f"  !! {arm_name}: no leg ran — every gate reports NOT RUN, none FAIL")
+            leela_checks = {k: gs.not_run(k, len(pdfs), "no leg ran") for k in leela_checks}
+            shashi_checks = {k: gs.not_run(k, len(pdfs), "no leg ran") for k in shashi_checks}
         out["gate_verdicts"][arm_name] = gs.three_verdicts(shashi_checks, leela_checks)
 
     # Cross-arm gates that only exist once, not per arm (Shashi bench.py:337,356,431).

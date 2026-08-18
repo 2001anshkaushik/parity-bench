@@ -446,11 +446,20 @@ def main() -> int:
             "unattributed": [x["doc"] for x in recs
                              if x.get("reason") == "no_response_for_file"][:20],
         },
-        "gates": {
+        # Zero-record and zero-success guards (defect #38's class). recs empty -> gates are
+        # NOT RUN, not FAIL. And a run where NOTHING succeeded must not let the empty policy
+        # excuse its way to a PASS: excusing 100% of documents as "legitimately empty" is a
+        # vacuous subset, and vacuous is not a pass.
+        "gates": ({
+            "self_duplication": gs.not_run("self_duplication", len(corpus),
+                                           "no records produced"),
+            "census": gs.not_run("census", len(corpus), "no records produced"),
+            "census_policy": census_policy,
+        } if not recs else {
             "self_duplication": gs.self_duplication(recs),
             "census": census,
             "census_policy": census_policy,
-        },
+        }),
         "provenance": ec.provenance({
             "threads_requested": RR_THREADS,
             "threads_observed": None,
@@ -501,13 +510,19 @@ def main() -> int:
     say(f"  engine_side_concurrency={ap['engine_side_concurrency']['value']}  "
         f"effective_cores={ap['effective_cores']}  util={ap['cpu_utilization']}")
     sd = out["gates"]["self_duplication"]
-    say(f"  self_duplication: {sd['duplicated_docs']}/{sd['checked']} duplicated "
-        f"factors={sd['factors']}")
+    if sd.get("verdict") == "NOT RUN":
+        say(f"  self_duplication: NOT RUN — {sd['reason']}")
+    else:
+        say(f"  self_duplication: {sd['duplicated_docs']}/{sd['checked']} duplicated "
+            f"factors={sd['factors']}")
     if out["attribution"]["unattributed"]:
         say(f"  !! {len(out['attribution']['unattributed'])} submitted files got NO response")
 
     fails = []
-    if not sd["PASS"]:
+    if recs and not ok:
+        fails.append(f"ZERO successful documents of {len(recs)} — the subset basis is empty; "
+                     f"the empty policy cannot excuse a run that did no work")
+    if sd.get("PASS") is False:            # None = NOT RUN, which is not a failure
         fails.append(f"self_duplication: {sd['duplicated_docs']} documents duplicated")
     if out["attribution"]["unattributed"]:
         fails.append(f"{len(out['attribution']['unattributed'])} files unattributed")

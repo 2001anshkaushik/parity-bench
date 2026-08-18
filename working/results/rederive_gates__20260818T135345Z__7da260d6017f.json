@@ -1,0 +1,518 @@
+{
+ "_meta": {
+  "name": "rederive_gates",
+  "written_utc": "20260818T135345Z",
+  "payload_sha256_12": "7da260d6017f",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 22559,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "experiment": "rederive_gates",
+  "run_dir": "working/results/smoke_metrics_20260815T051154Z",
+  "offered": 200,
+  "source_note": "pure re-derivation from per-document JSONL already on disk; no service was contacted",
+  "arms": {
+   "llamaindex_http_pdf": {
+    "legs": {
+     "sequential": "200 records",
+     "blast": "200 records"
+    },
+    "gate_basis": "sequential",
+    "self_duplication": {
+     "checked": 198,
+     "duplicated_docs": 0,
+     "factors": [],
+     "docs": {},
+     "duplicated_frac": 0.0,
+     "PASS": true,
+     "vacuous": false
+    },
+    "gate_verdicts": {
+     "shashi": {
+      "PASS": true,
+      "checks": {
+       "census": {
+        "expected": 200,
+        "recorded": 200,
+        "n_missing": 0,
+        "missing": [],
+        "n_duplicates": 0,
+        "duplicates": [],
+        "n_unexpected": 0,
+        "unexpected": [],
+        "n_silent_empty": 0,
+        "silent_empty": [],
+        "PASS": true
+       },
+       "structure": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 200,
+        "reason": "vector fields are not persisted in per-doc JSONL"
+       },
+       "determinism": {
+        "label_a": "sequential",
+        "label_b": "blast",
+        "compared": 198,
+        "identical": 198,
+        "n_mismatched": 0,
+        "mismatched": [],
+        "n_unproven": 0,
+        "unproven": [],
+        "PASS": true
+       }
+      },
+      "not_run": [
+       "structure"
+      ]
+     },
+     "leela": {
+      "PASS": false,
+      "checks": {
+       "census": {
+        "offered": 200,
+        "records": 200,
+        "silent": 0,
+        "duplicate_docs": [],
+        "missing_docs": null,
+        "unexpected_docs": null,
+        "completed": 198,
+        "failed_by_reason": {
+         "no_documents": 2
+        },
+        "unexpected_failures": 2,
+        "unexpected_failure_docs": [
+         "000_000164.pdf",
+         "000_000357.pdf"
+        ],
+        "PASS": false
+       },
+       "structure": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 200,
+        "reason": "identity and vector fields are not persisted in per-doc JSONL"
+       },
+       "determinism": {
+        "compared": 198,
+        "mismatch_docs": [],
+        "n_mismatch": 0,
+        "only_in_a": [],
+        "only_in_b": [],
+        "PASS": true
+       }
+      },
+      "not_run": [
+       "structure"
+      ]
+     },
+     "union": {
+      "PASS": false,
+      "not_run": [
+       "structure"
+      ],
+      "note": "conjunction of both suites over identical records; NOT-RUN gates are excluded from the conjunction and listed, never counted as failures"
+     }
+    },
+    "metrics": {
+     "sequential_warm0": {
+      "mode": "closed-loop",
+      "warm_n": 0,
+      "successful_in_window": 198,
+      "window_docs": 200,
+      "window_span_s": 69.346,
+      "successful_chunks": 2697,
+      "docs_per_s": 2.8553,
+      "chunks_per_s": 38.8922,
+      "window_t0_ns": 1786770714657297000,
+      "window_t1_ns": 1786770784002797000,
+      "latency": {
+       "n": 198,
+       "p50": 0.1178,
+       "p90": 0.7892,
+       "p95": 1.536,
+       "p99": 4.3722,
+       "max": 8.4733,
+       "mean": 0.3496,
+       "failed_items": 2,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 0
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "sequential_warm64": {
+      "mode": "closed-loop",
+      "warm_n": 64,
+      "successful_in_window": 135,
+      "window_docs": 136,
+      "window_span_s": 42.915,
+      "successful_chunks": 1990,
+      "docs_per_s": 3.1458,
+      "chunks_per_s": 46.3711,
+      "window_t0_ns": 1786770741088094000,
+      "window_t1_ns": 1786770784002797000,
+      "latency": {
+       "n": 135,
+       "p50": 0.1139,
+       "p90": 0.67,
+       "p95": 0.9228,
+       "p99": 3.1573,
+       "max": 8.4733,
+       "mean": 0.3173,
+       "failed_items": 1,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 64
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "blast_warm0": {
+      "mode": "closed-loop",
+      "warm_n": 0,
+      "successful_in_window": 200,
+      "window_docs": 200,
+      "window_span_s": 68.949,
+      "successful_chunks": 2697,
+      "docs_per_s": 2.9007,
+      "chunks_per_s": 39.1157,
+      "window_t0_ns": 1786771545114210000,
+      "window_t1_ns": 1786771614063561000,
+      "latency": {
+       "n": 200,
+       "p50": 0.6712,
+       "p90": 3.4205,
+       "p95": 5.5415,
+       "p99": 9.2206,
+       "max": 11.8483,
+       "mean": 1.3762,
+       "failed_items": 0,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 0
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "blast_warm64": {
+      "mode": "closed-loop",
+      "warm_n": 64,
+      "successful_in_window": 136,
+      "window_docs": 136,
+      "window_span_s": 44.354,
+      "successful_chunks": 2043,
+      "docs_per_s": 3.0662,
+      "chunks_per_s": 46.0614,
+      "window_t0_ns": 1786771569709688000,
+      "window_t1_ns": 1786771614063561000,
+      "latency": {
+       "n": 136,
+       "p50": 0.7149,
+       "p90": 3.3863,
+       "p95": 5.4158,
+       "p99": 9.4572,
+       "max": 11.8483,
+       "mean": 1.352,
+       "failed_items": 0,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 64
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     }
+    },
+    "batchpos_correction": {
+     "note": "no admit_ns on any row \u2014 pre-#29 records; nothing to correct"
+    }
+   },
+   "rocketride_pdf": {
+    "legs": {
+     "sequential": "200 records",
+     "blast": "200 records"
+    },
+    "gate_basis": "sequential",
+    "self_duplication": {
+     "checked": 198,
+     "duplicated_docs": 5,
+     "factors": [
+      2
+     ],
+     "docs": {
+      "000_000159.pdf": 2,
+      "000_000595.pdf": 2,
+      "000_000674.pdf": 2,
+      "000_000762.pdf": 2,
+      "000_000887.pdf": 2
+     },
+     "duplicated_frac": 0.02525,
+     "PASS": false,
+     "vacuous": false
+    },
+    "gate_verdicts": {
+     "shashi": {
+      "PASS": true,
+      "checks": {
+       "census": {
+        "expected": 200,
+        "recorded": 200,
+        "n_missing": 0,
+        "missing": [],
+        "n_duplicates": 0,
+        "duplicates": [],
+        "n_unexpected": 0,
+        "unexpected": [],
+        "n_silent_empty": 0,
+        "silent_empty": [],
+        "PASS": true
+       },
+       "structure": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 200,
+        "reason": "vector fields are not persisted in per-doc JSONL"
+       },
+       "determinism": {
+        "label_a": "sequential",
+        "label_b": "blast",
+        "compared": 197,
+        "identical": 197,
+        "n_mismatched": 0,
+        "mismatched": [],
+        "n_unproven": 0,
+        "unproven": [],
+        "PASS": true
+       }
+      },
+      "not_run": [
+       "structure"
+      ]
+     },
+     "leela": {
+      "PASS": false,
+      "checks": {
+       "census": {
+        "offered": 200,
+        "records": 200,
+        "silent": 0,
+        "duplicate_docs": [],
+        "missing_docs": null,
+        "unexpected_docs": null,
+        "completed": 198,
+        "failed_by_reason": {
+         "no_documents": 2
+        },
+        "unexpected_failures": 2,
+        "unexpected_failure_docs": [
+         "000_000164.pdf",
+         "000_000357.pdf"
+        ],
+        "PASS": false
+       },
+       "structure": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 200,
+        "reason": "identity and vector fields are not persisted in per-doc JSONL"
+       },
+       "determinism": {
+        "compared": 197,
+        "mismatch_docs": [],
+        "n_mismatch": 0,
+        "only_in_a": [
+         "000_000344.pdf"
+        ],
+        "only_in_b": [],
+        "PASS": false
+       }
+      },
+      "not_run": [
+       "structure"
+      ]
+     },
+     "union": {
+      "PASS": false,
+      "not_run": [
+       "structure"
+      ],
+      "note": "conjunction of both suites over identical records; NOT-RUN gates are excluded from the conjunction and listed, never counted as failures"
+     }
+    },
+    "metrics": {
+     "sequential_warm0": {
+      "mode": "closed-loop",
+      "warm_n": 0,
+      "successful_in_window": 198,
+      "window_docs": 200,
+      "window_span_s": 617.961,
+      "successful_chunks": 4577,
+      "docs_per_s": 0.3204,
+      "chunks_per_s": 7.4066,
+      "window_t0_ns": 1786770793813688000,
+      "window_t1_ns": 1786771411775030000,
+      "latency": {
+       "n": 198,
+       "p50": 0.1448,
+       "p90": 1.1678,
+       "p95": 5.1275,
+       "p99": 73.3527,
+       "max": 314.5058,
+       "mean": 3.0456,
+       "failed_items": 2,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 0
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "sequential_warm64": {
+      "mode": "closed-loop",
+      "warm_n": 64,
+      "successful_in_window": 135,
+      "window_docs": 136,
+      "window_span_s": 477.281,
+      "successful_chunks": 3767,
+      "docs_per_s": 0.2829,
+      "chunks_per_s": 7.8926,
+      "window_t0_ns": 1786770934494424000,
+      "window_t1_ns": 1786771411775030000,
+      "latency": {
+       "n": 135,
+       "p50": 0.1276,
+       "p90": 1.13,
+       "p95": 4.8597,
+       "p99": 73.3527,
+       "max": 314.5058,
+       "mean": 3.5331,
+       "failed_items": 1,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 64
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "blast_warm0": {
+      "mode": "closed-loop",
+      "warm_n": 0,
+      "successful_in_window": 199,
+      "window_docs": 200,
+      "window_span_s": 319.426,
+      "successful_chunks": 4576,
+      "docs_per_s": 0.623,
+      "chunks_per_s": 14.3257,
+      "window_t0_ns": 1786771621387426000,
+      "window_t1_ns": 1786771940813833000,
+      "latency": {
+       "n": 199,
+       "p50": 28.2764,
+       "p90": 66.4956,
+       "p95": 88.4351,
+       "p99": 94.0788,
+       "max": 149.1067,
+       "mean": 33.4939,
+       "failed_items": 1,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 0
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "blast_warm64": {
+      "mode": "closed-loop",
+      "warm_n": 64,
+      "successful_in_window": 135,
+      "window_docs": 136,
+      "window_span_s": 300.596,
+      "successful_chunks": 3861,
+      "docs_per_s": 0.4491,
+      "chunks_per_s": 12.8445,
+      "window_t0_ns": 1786771640217726000,
+      "window_t1_ns": 1786771940813833000,
+      "latency": {
+       "n": 135,
+       "p50": 36.1133,
+       "p90": 76.4324,
+       "p95": 88.9459,
+       "p99": 94.0788,
+       "max": 149.1067,
+       "mean": 45.7706,
+       "failed_items": 1,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 64
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     }
+    },
+    "batchpos_correction": {
+     "note": "no admit_ns on any row \u2014 pre-#29 records; nothing to correct"
+    }
+   }
+  },
+  "PASS": false,
+  "failed": [
+   "llamaindex_http_pdf: leela suite FAIL",
+   "rocketride_pdf: leela suite FAIL"
+  ]
+ }
+}

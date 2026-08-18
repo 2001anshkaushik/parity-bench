@@ -129,10 +129,10 @@ gap **1.32×**.
 
 ### Defect register, sessions 20–34 — all found in OUR instrument
 
-`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34) · `#32` OPEN — unset `ttl` defaults to 900 s idle while our own per-doc deadline is 1800 s; 371 docs lost, cause unconfirmed (session 36) · `#33` the Phase-2 image recipe omitted the onnxruntime boot patch our own §1 documents — both rr images built green and crash-looped on the box (session 39) · `#34` cpu_utilization divided by the DRIVER's taskset affinity (8) instead of the service container's cpuset (24) — util printed 1.58 INVALID for a true 52.8% (session 40) · `#35` engine_side_concurrency summed completion OFFSETS as if they were per-file durations and published an impossible 281.266 against threads=24; upload_time is now CLASSIFIED (offset vs duration, s vs ms) before anything is derived from it (session 40) · `#36` bare `LI_CONTAINER` in the provenance block (98fd10e) inside an `if EXTERNAL` branch — passed py_compile and every local run, killed the first external 10k post-loop after 9,975 records, no report written (session 41) · `#37` smoke_phase2 read thread pins back on ONE arm — an engine UNPINNED at torch=16 passed the smoke while LlamaIndex ran pinned at 1; third occurrence of the one-armed-check class (#24, #25) (session 41).
+`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34) · `#32` OPEN — unset `ttl` defaults to 900 s idle while our own per-doc deadline is 1800 s; 371 docs lost, cause unconfirmed (session 36) · `#33` the Phase-2 image recipe omitted the onnxruntime boot patch our own §1 documents — both rr images built green and crash-looped on the box (session 39) · `#34` cpu_utilization divided by the DRIVER's taskset affinity (8) instead of the service container's cpuset (24) — util printed 1.58 INVALID for a true 52.8% (session 40) · `#35` engine_side_concurrency summed completion OFFSETS as if they were per-file durations and published an impossible 281.266 against threads=24; upload_time is now CLASSIFIED (offset vs duration, s vs ms) before anything is derived from it (session 40) · `#36` bare `LI_CONTAINER` in the provenance block (98fd10e) inside an `if EXTERNAL` branch — passed py_compile and every local run, killed the first external 10k post-loop after 9,975 records, no report written (session 41) · `#37` smoke_phase2 read thread pins back on ONE arm — an engine UNPINNED at torch=16 passed the smoke while LlamaIndex ran pinned at 1; third occurrence of the one-armed-check class (#24, #25) (session 41) · `#38` under SMOKE_LEGS=blast the verdict path read the empty SEQUENTIAL record set and every fail-closed gate shipped FAIL over zero records while 9,975 real records sat in the blast JSONLs — gates now follow the leg that ran, and a gate whose leg did not run reports NOT RUN with its denominator, never FAIL (session 42) · `#39` ONE enqueue stamp taken before both blast runners: the second arm's batch-position latency absorbed the first arm's entire leg, and its warm_n=0 window disagreed with warm_n=64 by exactly that gap — stamps are now per-arm, and rederive_gates.py corrects existing records via min(admit_ns) (session 42).
 
 **The pattern, stated plainly: in this project the instrument is wrong more often than the system
-under test. Nineteen instrument defects in twenty-two sessions, zero product defects found by us in that
+under test. Twenty-one instrument defects in twenty-three sessions, zero product defects found by us in that
 window that were not already known.** Behave accordingly — the Standing Verification Protocol in
 §2 is not ceremony.
 
@@ -419,6 +419,34 @@ the engine via the env_probe one-shot pipe ported from smoke50:502 — with one 
 them: **absent pins fail first, independently** (two unpinned arms agreeing must not pass),
 then intra-thread disagreement fails, then env-var-by-var differences fail. The container's
 declared env is read too, labelled DECLARED, so a failure names the launch mistake.
+
+### SESSION 42 — defects #38 and #39: gates judged the leg that never ran; one clock for two arms (2026-08-18)
+
+**#38.** The 10k per-document blast completed rc=0 with correct metrics — and the gate path
+read `results` (the sequential set, legitimately empty under `SMOKE_LEGS=blast`) instead of the
+9,975-record blast set the metrics had just consumed from the same directory. Every fail-closed
+gate shipped FAIL over zero records: census "offered 9975 = successful 0 + expected 0 +
+unexpected 0 → FAIL" on BOTH arms, determinism 0/0, cross-arm FAIL. **A fail-closed verdict
+over an empty input is indistinguishable from a real failure — the false-product-finding shape.**
+Fixed three ways: (1) the gate basis is now whichever leg ran, with blast-based gates honestly
+degrading (structure NOT RUN — blast records carry no identity or vector fields; determinism
+NOT RUN unless both legs exist); (2) `gates_shared.not_run()` + `three_verdicts` now exclude
+NOT-RUN gates from each suite's conjunction and list them — an all-NOT-RUN suite reports
+PASS=None, never True; (3) the boundary is stated: NOT RUN is for a leg that never executed —
+a leg that ran and produced zero records stays a genuine FAIL (Leela's vacuous-is-not-a-pass
+rule untouched). `working/scripts/rederive_gates.py` re-judges any run directory from its
+per-document JSONL, so the 40-minute leg is not repeated.
+
+**#39, found via the user's "minor" windowing question.** `rocketride blast_batchpos` warm_n=0
+reported 1.665 docs/s against 2.7664 at warm_n=64 on the same leg. Not a windowing artifact:
+ONE `enqueue_ns` was stamped before BOTH blast runners, and the arms run sequentially — so the
+second arm's (RR's) batch-open stamp predated its own leg by the first arm's entire leg. The
+warm_n=0 window anchors on min(submit)=that stale stamp; warm_n=64 anchors on RR's own
+completions and is immune. **The warm_n=64 figure is the valid one of the two.** RR
+batch-position LATENCY from `run10k_p2_blast_v2` is corrupted at every warm_n and must not be
+quoted except from `rederive_gates.py`'s corrected cells (batch open := min(admit_ns), labelled
+derived, stale gap reported). Closed-loop blast cells anchor on admits and are unaffected.
+Stamps are now taken per-arm inside each runner.
 
 ### Before the 10k run — the remaining checklist
 
