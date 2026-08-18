@@ -129,10 +129,10 @@ gap **1.32×**.
 
 ### Defect register, sessions 20–34 — all found in OUR instrument
 
-`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34) · `#32` OPEN — unset `ttl` defaults to 900 s idle while our own per-doc deadline is 1800 s; 371 docs lost, cause unconfirmed (session 36) · `#33` the Phase-2 image recipe omitted the onnxruntime boot patch our own §1 documents — both rr images built green and crash-looped on the box (session 39) · `#34` cpu_utilization divided by the DRIVER's taskset affinity (8) instead of the service container's cpuset (24) — util printed 1.58 INVALID for a true 52.8% (session 40) · `#35` engine_side_concurrency summed completion OFFSETS as if they were per-file durations and published an impossible 281.266 against threads=24; upload_time is now CLASSIFIED (offset vs duration, s vs ms) before anything is derived from it (session 40).
+`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34) · `#32` OPEN — unset `ttl` defaults to 900 s idle while our own per-doc deadline is 1800 s; 371 docs lost, cause unconfirmed (session 36) · `#33` the Phase-2 image recipe omitted the onnxruntime boot patch our own §1 documents — both rr images built green and crash-looped on the box (session 39) · `#34` cpu_utilization divided by the DRIVER's taskset affinity (8) instead of the service container's cpuset (24) — util printed 1.58 INVALID for a true 52.8% (session 40) · `#35` engine_side_concurrency summed completion OFFSETS as if they were per-file durations and published an impossible 281.266 against threads=24; upload_time is now CLASSIFIED (offset vs duration, s vs ms) before anything is derived from it (session 40) · `#36` bare `LI_CONTAINER` in the provenance block (98fd10e) inside an `if EXTERNAL` branch — passed py_compile and every local run, killed the first external 10k post-loop after 9,975 records, no report written (session 41) · `#37` smoke_phase2 read thread pins back on ONE arm — an engine UNPINNED at torch=16 passed the smoke while LlamaIndex ran pinned at 1; third occurrence of the one-armed-check class (#24, #25) (session 41).
 
 **The pattern, stated plainly: in this project the instrument is wrong more often than the system
-under test. Seventeen instrument defects in twenty-one sessions, zero product defects found by us in that
+under test. Nineteen instrument defects in twenty-two sessions, zero product defects found by us in that
 window that were not already known.** Behave accordingly — the Standing Verification Protocol in
 §2 is not ceremony.
 
@@ -378,6 +378,13 @@ the batched arm — ok=988/1000 was the legitimately-empty rate, not lost work. 
 are named and cross-referenced against the manifest's pypdf extraction ("defeats both parsers"
 vs "Tika-side disagreement"); hard loss still fails regardless of policy.
 
+> **CORRECTION (session 41): the corroboration below is VOID.** The rr container was started
+> without the six thread env vars, so the engine ran **UNPINNED at torch=16** through BOTH
+> N=1000 probes while LlamaIndex ran pinned at 1. The 52.8 % arithmetic correction of #34
+> stands, but the number describes an unpinned engine and its match with Shashi's 52.9 % must
+> be re-taken pinned before it is quoted again. Every rr container since the cpuset switch is
+> affected. The smoke existed to make this impossible to miss and did not — defect #37.
+
 **The corroboration, PROVISIONAL until 10k:** corrected utilisation **52.8 %** against Shashi's
 independently measured **52.9 %** on his batched RocketRide arm — different harness, different
 corpus build, same number. That is the headline the utilisation path now has to deserve.
@@ -385,6 +392,33 @@ corpus build, same number. That is the headline the utilisation path now has to 
 **Direction-of-bias note for the pair:** #34 invalidated a real RocketRide result (against RR);
 #35 flattered RR with impossible parallelism (for RR). One probe, both directions — the
 instrument has no loyalty.
+
+### SESSION 41 — defects #36 and #37: the NameError after 9,975 records, and the one-armed thread gate (2026-08-17)
+
+**#36.** `NameError: LI_CONTAINER` at smoke50:978 killed the first external 10k **post-loop** —
+after both arms had streamed all 9,975 records, before any report. Attribution corrected by
+`git log -S`: introduced by the provenance commit **`98fd10e`**, not by the cpuset edit — the
+bare name sits inside an `if EXTERNAL` conditional, so every local run skipped the branch and
+py_compile can not see undefined names at all. The 9,975 per-document records are durable JSONL
+and survive; the RR half of that run is void regardless (it ran unpinned, see #37), the LI half
+is valid. Fixed with module-level constants, and closed structurally:
+`working/harness/static_names.py` — a symtable-scoped undefined-name checker (stdlib only) that
+flags a name a function loads which is neither local, free, module-level nor builtin, without
+executing any branch. **Null-controlled on the live defect before the fix**: it reported
+`LI_CONTAINER`/`RR_CONTAINER` at lines 978/979 exactly, then swept 101 files clean. Now runs as
+suite `test_static_names.py` (with a planted-defect control) and as **section 0 of
+smoke_phase2**, so no guarded driver can reach a run with an undefined name again.
+
+**#37.** smoke_phase2's read-backs checked thread state on LlamaIndex only. The rr container
+was launched without the six thread env vars: LlamaIndex pinned at torch=1, engine **unpinned
+at torch=16**, smoke green. Both N=1000 batched probes measured that mismatch — the 52.8 %/
+52.9 % Shashi corroboration is VOID (banner added at session 40) and every rr container since
+the cpuset switch is affected. Third occurrence of the one-armed-check class (#24, #25).
+Fixed as **section D**: both task processes read from the INSIDE — LlamaIndex via `/health`,
+the engine via the env_probe one-shot pipe ported from smoke50:502 — with one gate across
+them: **absent pins fail first, independently** (two unpinned arms agreeing must not pass),
+then intra-thread disagreement fails, then env-var-by-var differences fail. The container's
+declared env is read too, labelled DECLARED, so a failure names the launch mistake.
 
 ### Before the 10k run — the remaining checklist
 

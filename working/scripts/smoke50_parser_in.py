@@ -49,6 +49,12 @@ EMB_DIM = 384
 WORKERS = int(os.environ.get("SMOKE_WORKERS", "1"))     # uvicorn workers on the LlamaIndex arm
 THREADS = int(os.environ.get("SMOKE_THREADS", "10"))    # OMP/MKL/BLAS per worker; also RR threads
 BLAST_C = int(os.environ.get("SMOKE_BLAST_C", "4"))
+# Container names, defined ONCE at module level. Defect #36: the provenance block (98fd10e)
+# referenced these as bare names that existed only in experiment_common — inside an
+# `if EXTERNAL` conditional, so every local run skipped the branch and the first external run
+# hit NameError post-loop, after 9,975 records and before any report was written.
+LI_CONTAINER = os.environ.get("SMOKE_LI_CONTAINER", "li")
+RR_CONTAINER = os.environ.get("SMOKE_RR_CONTAINER", "rr")
 # Arms whose blast leg uses a BATCHED send. Their per-document latency is derived,
 # never measured, and is labelled as such. Empty while both arms send per-document.
 BATCHED_ARMS = {x for x in os.environ.get("SMOKE_BATCHED_ARMS", "").split(",") if x}     # in-flight docs during the determinism leg
@@ -1238,8 +1244,8 @@ def main() -> int:
     _drv = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count()
     cpus_by_arm: dict[str, int | None] = {}
     cpus_src: dict[str, str] = {}
-    for _arm, _cont in (("llamaindex_http_pdf", os.environ.get("SMOKE_LI_CONTAINER", "li")),
-                        ("rocketride_pdf", os.environ.get("SMOKE_RR_CONTAINER", "rr"))):
+    for _arm, _cont in (("llamaindex_http_pdf", LI_CONTAINER),
+                        ("rocketride_pdf", RR_CONTAINER)):
         if EXTERNAL:
             from harness import experiment_common as _ec
             cpus_by_arm[_arm], cpus_src[_arm] = _ec.service_available_cpus(_cont)
