@@ -55,6 +55,17 @@ from harness.resultio import write_result                # noqa: E402
 from harness.rr_credentials import RR_TTL_S              # noqa: E402
 
 N = int(os.environ.get("SMOKE_N", "10000"))
+# THREADS. On a batched call the engine's own pool is the ONLY source of parallelism — the client
+# sends one message and waits — so leaving `threads` unset does not measure a default, it measures
+# an UNSET PARAMETER, and any low concurrency would then be reported as head-of-line blocking when
+# it was our omission. Leela measured ~5.8 effective cores with no threads= against the comparable
+# Haystack-suite run's 24.28 WITH it; Shashi passes RR_THREADS=32 (bench.py:47).
+# 24 = our cpuset width (0-23). One engine worker per reachable core.
+#
+# REQUESTED IS NOT ACTIVATED. `use(threads=)` is a request; the engine's realised pool size is not
+# observable from the client (Leela records threads_observed: null for exactly this reason). The
+# number below is what we ASKED FOR and is recorded as such.
+RR_THREADS = int(os.environ.get("SMOKE_RR_THREADS", "24"))
 WARM_DOCS = int(os.environ.get("SMOKE_WARM_DOCS", "25"))
 BATCH_TIMEOUT_S = int(os.environ.get("SMOKE_BATCH_TIMEOUT_S", "36000"))
 say = ec.say
@@ -130,13 +141,30 @@ def records_from_batch(corpus: List[Path], out, t0_ns: int) -> List[Dict[str, An
     return recs
 
 
+def _upload_time_percentiles(ok_rows) -> Dict[str, Any]:
+    """Percentiles over the engine's per-file upload_time. Nearest-rank, the settled method
+    (metrics_shared.percentile, Shashi metrics.py:84-93) — same estimator as every other
+    percentile we publish, so the only difference from our measured column is the SOURCE."""
+    v = [r["upload_time_s"] for r in ok_rows if isinstance(r.get("upload_time_s"), (int, float))]
+    if not v:
+        return {"n": 0, "note": "no upload_time on any record"}
+    out = {"n": len(v), "sum_s": round(sum(v), 3)}
+    for q in (50, 90, 95, 99):
+        out[f"p{q}"] = round(ms.percentile(v, q), 4)
+    out["max"] = round(max(v), 4)
+    out["mean"] = round(sum(v) / len(v), 4)
+    return out
+
+
 async def run(corpus: List[Path], warm: List[Path], pipe_path: Path) -> Dict[str, Any]:
     from rocketride import RocketRideClient
 
     c = RocketRideClient()
     await c.connect(timeout=60000)
-    tok = (await c.use(filepath=str(pipe_path.relative_to(ROOT)), ttl=RR_TTL_S))["token"]
-    say(f"  pipeline up, ttl={RR_TTL_S}s")
+    used = await c.use(filepath=str(pipe_path.relative_to(ROOT)), ttl=RR_TTL_S,
+                       threads=RR_THREADS)
+    tok = used["token"]
+    say(f"  pipeline up, ttl={RR_TTL_S}s, threads_requested={RR_THREADS}")
 
     # Driver-side warm-up on DISJOINT documents, outside every measured window (Leela WARM=25,
     # rr_driver.py:244 `all_pdfs[n:n + warm_docs]`).
@@ -256,12 +284,25 @@ def main() -> int:
             basis=("batch websocket API — send_files returns all documents at once, so the "
                    "first observable result IS the batch completion (Shashi rr_app.py:186-188)"),
             measured=False),
-        "latency_per_document": gs.derived(
-            None,
-            basis=("NOT AVAILABLE. One submit, one return: per-document instants do not exist. "
-                   "upload_time is recorded per document and is the engine's own account, not a "
-                   "client observation — see perdoc_rr_batched.jsonl timing_source."),
-            measured=False),
+        # TWO entries, never one. The client-observed value genuinely does not exist under an
+        # atomic call, and saying so is the honest answer — but Leela HAS an upload_time column,
+        # and a bare null on our side leaves a hole in the three-way table. So both travel:
+        # the null with its reason, and his derived figure with its basis.
+        "latency_per_document": {
+            "client_observed": gs.derived(
+                None,
+                basis=("NOT AVAILABLE. One submit, one return: per-document client instants do "
+                       "not exist under a batched send."),
+                measured=False),
+            "upload_time_derived": gs.derived(
+                _upload_time_percentiles(ok),
+                basis=("engine's own per-file upload_time (Leela rr_driver.py:117-120, "
+                       "timing_source 'batch_upload_time (derived, not measured)'). This is the "
+                       "engine's account of its own service time, NOT a client round trip: it "
+                       "excludes queue wait inside the batch and excludes transport. Comparable "
+                       "with Leela's column, NOT with our per-document arm's measured latency."),
+                measured=False),
+        },
         "achieved_parallelism": {
             "engine_side_concurrency": gs.derived(
                 round(sum(ut) / wall, 3) if ut and wall > 0 else None,
@@ -289,8 +330,49 @@ def main() -> int:
             "self_duplication": gs.self_duplication(recs),
             "census": gs.leela_census(recs, len(corpus)),
         },
-        "provenance": ec.provenance(),
+        "provenance": ec.provenance({
+            "threads_requested": RR_THREADS,
+            "threads_observed": None,
+            "threads_note": ("threads_requested is what use() was ASKED for; the engine's realised "
+                             "pool size is not observable from the client. Requested != activated "
+                             "!= effective cores — the last of those is measured from the CPU "
+                             "sampler and reported under achieved_parallelism."),
+            "ttl_s": RR_TTL_S,
+            "warm_up_policy_open_question": (
+                "OPEN FOR THE GROUP, not resolved here. Leela warms 25 documents taken from "
+                "BEYOND the measured set (matched_run.sh WARM=25, rr_driver.py:244 "
+                "all_pdfs[n:n+warm_docs]). Shashi warms max(4, 2*threads) for blast and 2 for "
+                "sequential, on files[:warm_n] — i.e. the FIRST MEASURED DOCUMENTS, which are "
+                "then measured cache-hot while their peers are cold. The policies differ in "
+                "COUNT and in DISJOINTNESS. We use Leela's 25 disjoint because disjointness is a "
+                "correctness property while the count is a tuning knob, but this is a divergence "
+                "neither teammate has flagged and it needs a group decision."),
+        }),
     }
+    # PROJECTION. There are no partial records under an atomic call: a timeout costs the entire
+    # run. So a short batch has to answer "can the long one finish" BEFORE the long one is
+    # started. Linear scaling is the optimistic case and is labelled as such — a scheduler that
+    # degrades with queue depth will do worse, never better.
+    if len(corpus) < 10000:
+        per_doc = wall / max(len(ok), 1)
+        proj = per_doc * 10000
+        out["projection_to_10k"] = gs.derived(
+            round(proj, 1),
+            basis=(f"linear extrapolation from n={len(corpus)} at {wall:.1f}s "
+                   f"({per_doc:.3f}s/doc). OPTIMISTIC: assumes the batch scheduler does not "
+                   f"degrade with queue depth. Compare against SMOKE_BATCH_TIMEOUT_S="
+                   f"{BATCH_TIMEOUT_S}s."),
+            measured=False)
+        out["projection_to_10k"]["fits_in_timeout"] = proj < BATCH_TIMEOUT_S
+        out["projection_to_10k"]["headroom_x"] = round(BATCH_TIMEOUT_S / proj, 2) if proj else None
+        say(f"\n  PROJECTION to 10k: {proj / 3600:.2f} h at {per_doc:.3f}s/doc "
+            f"(timeout {BATCH_TIMEOUT_S / 3600:.1f} h, "
+            f"headroom {out['projection_to_10k']['headroom_x']}x) "
+            f"— LINEAR, optimistic")
+        if proj >= BATCH_TIMEOUT_S:
+            say("  !! the 10k batch would NOT finish inside the timeout. An atomic call has no "
+                "partial records, so that would cost the entire run.")
+
     tp = out["throughput"]
     say(f"\n  docs/s={tp['docs_per_s']}  chunks/s={tp['chunks_per_s']}  "
         f"ok={tp['documents_ok']}/{tp['documents_total']}")
