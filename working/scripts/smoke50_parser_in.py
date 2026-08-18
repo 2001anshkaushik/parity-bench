@@ -48,7 +48,10 @@ EMB_DIM = 384
 # are how we honour that rule without hardcoding a host's core count into the script.
 WORKERS = int(os.environ.get("SMOKE_WORKERS", "1"))     # uvicorn workers on the LlamaIndex arm
 THREADS = int(os.environ.get("SMOKE_THREADS", "10"))    # OMP/MKL/BLAS per worker; also RR threads
-BLAST_C = int(os.environ.get("SMOKE_BLAST_C", "4"))     # in-flight docs during the determinism leg
+BLAST_C = int(os.environ.get("SMOKE_BLAST_C", "4"))
+# Arms whose blast leg uses a BATCHED send. Their per-document latency is derived,
+# never measured, and is labelled as such. Empty while both arms send per-document.
+BATCHED_ARMS = {x for x in os.environ.get("SMOKE_BATCHED_ARMS", "").split(",") if x}     # in-flight docs during the determinism leg
 # Leela's box selection rule is sorted(*.pdf)[:N] over govdocs1 zip 000 (RUN_LOG_20260814 §3).
 # Our corpus/govdocs1/pdfs holds all 40 zips prefixed by archive, so the same rule restricted to
 # the 000_ prefix yields the identical document set. Verified: zip 000 contributes exactly 200
@@ -80,8 +83,11 @@ _UNKNOWN_LEGS = LEGS - {"sequential", "blast"}
 # Warm-up exclusion is METRIC-SIDE by completion rank (Leela's perf_window — settled 2026-08-14).
 # Primary 64, secondary 25 also emitted; the numbers are computed from the same rows, so changing
 # the pick later needs no re-run.
-WARM_N_PRIMARY = int(os.environ.get("SMOKE_WARM_N", "64"))
-WARM_N_SECONDARY = 25
+# 0 is now PRIMARY: warm-up is driver-side (25 disjoint documents, excluded before the
+# span), so a second metric-side exclusion would drop real measured work. 64 is kept as
+# the secondary only so a Phase-2 number can still be laid beside a pre-Phase-2 one.
+WARM_N_PRIMARY = int(os.environ.get("SMOKE_WARM_N", "0"))
+WARM_N_SECONDARY = 64
 # CPU sampling: our psutil ProcessCollector (out-of-process, dead-PID roll-forward), 0.5 s,
 # service process tree only, driver excluded — identical setup on both arms (settled 2026-08-14).
 SAMPLE_INTERVAL_S = 0.5
@@ -225,6 +231,7 @@ def main() -> int:
     from harness import gates_shared as gs
     from harness import memory_sources as msrc
     from harness import provenance_leela as pvl
+    from harness import rr_credentials as rrc
     from harness.jsonl_stream import JsonlWriter, read_completed, rewrite_atomically
     from harness.chunk_hash import check_chunks, ChunkHashMismatch
     from harness.collector_proc import ProcessCollector
@@ -255,7 +262,23 @@ def main() -> int:
         f"({rr_creds['ROCKETRIDE_APIKEY']['source']})")
 
     N = int(sys.argv[1]) if len(sys.argv) > 1 else 50
-    pdfs = sorted((ROOT / "corpus" / "govdocs1" / "pdfs").glob(CORPUS_GLOB))[:N]
+    _all = sorted((ROOT / "corpus" / "govdocs1" / "pdfs").glob(CORPUS_GLOB))
+    pdfs = _all[:N]
+    # DRIVER-SIDE WARM-UP, 25 DISJOINT documents taken from BEYOND the measured set
+    # (Leela matched_run.sh WARM=25; rr_driver.py:194 `all_pdfs[n:n + warm_docs]`).
+    #
+    # Metric-side warm-up (perf_window, warm_n=64 by completion rank) is INCOHERENT under a
+    # batched send: a batch has one submit and one return, so "the first 64 completions" is the
+    # 64 documents the engine happened to finish first, i.e. the 64 FASTEST — dropping them
+    # inflates the remainder rather than excluding a cold start. Disjoint documents also stop a
+    # warmed document from later being measured cache-hot alongside cold peers.
+    WARM_DOCS = int(os.environ.get("SMOKE_WARM_DOCS", "25"))
+    warm_pdfs = _all[N:N + WARM_DOCS]
+    warm_disjoint = len(warm_pdfs) == WARM_DOCS
+    if WARM_DOCS and not warm_disjoint:
+        say(f"  !! only {len(_all)} documents match {CORPUS_GLOB} for N={N}+warm={WARM_DOCS}; "
+            "warm-up would REUSE measured documents. Refusing — widen the glob or lower N.")
+        return 7
     say(f"documents: {len(pdfs)}  (offered = {len(pdfs)})  glob={CORPUS_GLOB}"
         + ("   [PREFLIGHT: not required]" if PREFLIGHT else ""))
     # PREFLIGHT sends no documents — it proves thread propagation and exits. Requiring a corpus
@@ -473,6 +496,8 @@ def main() -> int:
         mem_sources[f"{arm_name}:{leg}"] = m
     blast_rows: dict[str, list] = {}    # arm -> per-doc rows from the blast leg
     probed_dim: dict[str, int] = {}     # arm -> dim read off the arm's own loaded model
+    warm_by_arm: dict[str, dict] = {}   # arm -> driver-side warm-up record
+    broke: dict[str, dict] = {}         # arm -> where the K-consecutive breaker fired
 
     def rr_thread_readback() -> dict:
         """torch.get_num_threads()/get_num_interop_threads() read INSIDE the engine's task
@@ -495,7 +520,8 @@ def main() -> int:
             pp.write_text(json.dumps(base))
             c = RocketRideClient()
             await c.connect(timeout=60000)
-            tok = (await c.use(filepath=str(pp.relative_to(ROOT))))["token"]
+            tok = (await c.use(filepath=str(pp.relative_to(ROOT)),
+                               ttl=rrc.RR_TTL_S))["token"]
             try:
                 o = await asyncio.wait_for(c.send(tok, "probe", mimetype="text/plain"),
                                            timeout=120)
@@ -600,6 +626,34 @@ def main() -> int:
             chunk_texts: dict[str, list] = {}   # doc -> chunks, for post-loop gates
             vecs_keep: dict[str, list] = {}      # doc -> vectors, for the gate suites
             li_src: dict[str, str] = {}         # doc -> service-returned extracted text (LI)
+            # Warm-up batch: OUTSIDE the CostSpan, so its CPU, memory and wall time are not in
+            # any measured window. Timed and reported separately, never merged.
+            warm_s = None
+            if warm_pdfs and not done_docs:
+                _tw = time.perf_counter()
+                _wok = 0
+                for wf in warm_pdfs:
+                    try:
+                        arm.process(wf.read_bytes())
+                        _wok += 1
+                    except Exception as e:
+                        say(f"    warm-up {wf.name}: {type(e).__name__}")
+                warm_s = round(time.perf_counter() - _tw, 2)
+                say(f"  {arm_name}: warm-up {_wok}/{len(warm_pdfs)} disjoint documents in "
+                    f"{warm_s}s (excluded from every measured window)")
+                if _wok == 0:
+                    say(f"  BLOCKER: every warm-up document failed on {arm_name}. The arm is "
+                        "not serving; refusing to start a measured span against it.")
+                    return 8
+            warm_by_arm[arm_name] = {"docs": len(warm_pdfs), "ok": _wok if warm_pdfs else 0,
+                                     "seconds": warm_s, "disjoint_from_measured": warm_disjoint,
+                                     "policy": "driver-side, disjoint, excluded (Leela WARM=25)"}
+            # K=3 CONSECUTIVE-FAILURE BREAKER. Defect #32: the 10k sequential leg kept sending to
+            # a dead task for 371 documents because every error was recorded as a per-document
+            # fact. Some errors are about the SESSION, not the document. Three in a row is not a
+            # run worth finishing.
+            BREAK_K = int(os.environ.get("SMOKE_BREAK_K", "3"))
+            _consec = 0
             span = CostSpan(arm_name, "sequential")
             with span, JsonlWriter(seq_path) as seq_out:
                 for f in (pdfs if "sequential" in LEGS else []):
@@ -647,6 +701,20 @@ def main() -> int:
                         rec["error_class"] = f"{type(e).__name__}"
                         rec["error"] = str(e)[:200]
                     rec["ok"] = rec.get("outcome") == "successful"
+                    # Session-level failure detection. Counts CONSECUTIVE failures only: an
+                    # isolated bad document is a per-document fact and the run continues.
+                    _consec = 0 if rec["ok"] else _consec + 1
+                    if _consec >= BREAK_K:
+                        seq_out.write(rec)
+                        recs.append(rec)
+                        say(f"  BREAKER: {BREAK_K} consecutive failures on {arm_name} at "
+                            f"{f.name} (last: {rec.get('error_class')} "
+                            f"{str(rec.get('error'))[:120]}). Aborting this leg — the records "
+                            f"written so far are durable in {seq_path.name}.")
+                        broke[arm_name] = {"at_doc": f.name, "after": len(recs),
+                                           "consecutive": _consec,
+                                           "last_error": rec.get("error_class")}
+                        break
                     # Durable BEFORE the next document starts. A kill now costs this one
                     # document, not the whole run.
                     seq_out.write(rec)
@@ -778,7 +846,8 @@ def main() -> int:
                 pp.write_text(json.dumps(base))
                 c = RocketRideClient()
                 await c.connect(timeout=60000)
-                tok = (await c.use(filepath=str(pp.relative_to(ROOT))))["token"]
+                tok = (await c.use(filepath=str(pp.relative_to(ROOT)),
+                               ttl=rrc.RR_TTL_S))["token"]
                 sem = asyncio.Semaphore(BLAST_C)
                 rows = []
                 todo = [(n, b) for n, b in blobs if n not in done]
@@ -883,6 +952,12 @@ def main() -> int:
            # Leela's 24 REQUIRED fields under HIS key names (provenance.py:16-27). Our own
            # blocks below carry the same information under ours; his `check()` matches by key,
            # so without this a consumer marks our run "not publishable" on 23 of 24.
+           # Leela m0_correctness.py:311 — the SENSITIVE detector (fires on any doc with >1
+           # chunk, not only >=64). This is what PROVES the duplication patch worked: on
+           # rr:patched it must read 0 duplicated documents.
+           "self_duplication": {a: gs.self_duplication(results[a]) for a in results},
+           "warm_up": warm_by_arm,
+           "breaker": broke or None,
            "provenance_leela": {
                arm_name: pvl.build(
                    arm=arm_name, mode="sequential+blast", corpus_sha=corpus_sha,
@@ -929,7 +1004,10 @@ def main() -> int:
                                        "pluggable": "box/Docker mode consumes Leela's "
                                                     "cgroup_sampler JSONL via "
                                                     "metrics_shared.series_from_cgroup_jsonl"},
-                      "available_cpus": os.cpu_count(),
+                      "available_cpus": (len(os.sched_getaffinity(0))
+                                        if hasattr(os, "sched_getaffinity")
+                                        else os.cpu_count()),
+                      "host_cpu_count": os.cpu_count(),
                       # Which credentials the RocketRide arm actually used, and where they came
                       # from. The key itself is never written to a result file — a fingerprint is
                       # enough to prove two sites used the same one.
@@ -1149,7 +1227,10 @@ def main() -> int:
     say(f"\nMETRICS (metrics_shared; platform {_system}/{_machine}; "
         + ("publishable target platform)" if _publishable
            else "NOT the target platform, numbers are wiring validation only)"))
-    cpus = os.cpu_count()
+    # AFFINITY, not host count. Under `docker run --cpuset-cpus 0-23` (and under taskset for
+    # the driver) os.cpu_count() still returns the host's 32, so cpu_utilization would divide
+    # by 32 while only 24 cores were reachable — understating utilisation by 25% silently.
+    cpus = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count()
     out["metrics"] = {"module": "working/harness/metrics_shared.py",
                       "platform": {"system": _system, "machine": _machine,
                                    "native_x86_64": _native_x86},
@@ -1191,6 +1272,15 @@ def main() -> int:
                 d = ms.derive_side(mrows, series, warm_n=wn, available_cpus=cpus, mode=label)
                 if mode.startswith("blast"):
                     d["client_concurrency"] = BLAST_C
+                    # Shashi's basis-field pattern (rr_app.py:175-188): a derived number must
+                    # carry the sentence saying what it is. Per-document latency under a batched
+                    # send is not observed — the batch has one submit and one return.
+                    if d.get("latency") and BATCHED_ARMS and arm_name in BATCHED_ARMS:
+                        d["latency"]["basis"] = (
+                            "DERIVED, not measured: batched send_files returns the whole batch "
+                            "at once, so per-document completion comes from the engine's own "
+                            "upload_time and submit is the batch open instant")
+                        d["latency"]["measured"] = False
                 # The metric is peak-of-a-SUM-of-per-process-RSS over THIS leg's window. Named
                 # in place so the figure cannot be lifted out of the line and read as a
                 # footprint, and cannot be divided by the memory table's sequential-leg

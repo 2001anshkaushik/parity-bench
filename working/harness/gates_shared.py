@@ -100,6 +100,57 @@ def repeat_factor(hashes: Sequence[Optional[str]]) -> int:
     return 1
 
 
+def self_duplication(rows: List[Dict]) -> Dict[str, Any]:
+    """Leela m0_correctness.py:311-353 (`a5c3b5d`), adopted verbatim in behaviour.
+
+    A SINGLE-ARM check: does this arm emit the same document list more than once? It needs no
+    second arm, so it survives a RocketRide upgrade and fires on any run rather than only on
+    runs that happen to include a comparison arm.
+
+    WHY THIS AND NOT ONLY `duplication_verdict`. Ours reports `over_chunk_trigger` at >= 64
+    chunks — mechanically correct, since the engine flushes at maxDocuments=64 — but that
+    predicate is a claim about the CAUSE. This one asks only about the SHAPE of the list and
+    fires on any document with more than one chunk. It is the sensitive detector, and it is
+    what proves the duplication patch worked: after RR_DUP_PATCH=1 it must read 0 duplicated
+    documents, and a threshold that never looked below 64 chunks could not prove that.
+
+    Measured before the patch: Leela 51/987 at factor 2, LangGraph 0/987; ours 5/199 at
+    factor 2.
+    """
+    ok = [r for r in (rows or []) if r.get("ok")]
+    dup: Dict[str, int] = {}
+    for r in ok:
+        h = r.get("chunk_sha256")
+        if isinstance(h, list) and len(h) > 1:
+            k = repeat_factor(h)
+            if k > 1:
+                dup[r["doc"]] = k
+    return {
+        "checked": len(ok),
+        "duplicated_docs": len(dup),
+        "factors": sorted(set(dup.values())),
+        "docs": dict(sorted(dup.items())[:20]),
+        "duplicated_frac": round(len(dup) / len(ok), 5) if ok else None,
+        # Vacuous is not a pass: zero documents checked proves nothing about duplication.
+        "PASS": (len(dup) == 0) if ok else False,
+        "vacuous": not ok,
+    }
+
+
+def derived(value, *, basis: str, measured: bool = False) -> Dict[str, Any]:
+    """Shashi's basis-field pattern (`rr_app.py:175-188`), generalised.
+
+    Any number that was not directly observed travels with the sentence explaining what it
+    actually is. He applies it to `time_to_first_result_s`, where a batch API has no first
+    result and the honest value is the whole batch wall time — so he reports `wall_s` and says
+    so in `time_to_first_result_basis` rather than letting a derived number pass as measured.
+
+    Use this for every value the batched arm cannot observe directly. A derived number is not a
+    problem; a derived number that looks measured is.
+    """
+    return {"value": value, "basis": basis, "measured": bool(measured)}
+
+
 def duplication_verdict(hashes: Sequence[Optional[str]],
                         lengths: Sequence[int]) -> Dict[str, Any]:
     """Shashi correctness.py:138-176.

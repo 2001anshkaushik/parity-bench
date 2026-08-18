@@ -122,3 +122,13 @@ def auth_hint() -> str:
     return (f"The engine compares the credential against ITS OWN ROCKETRIDE_APIKEY and rejects a "
             f"mismatch with 401 'Invalid API key'. Driver used sha256[:8]={fp}. Compare with "
             f"`docker exec <rr container> printenv ROCKETRIDE_APIKEY`.")
+
+
+# TTL, explicit. The server default is CONST_DEFAULT_TTL = 900 s of IDLE
+# (ai/constants.py:55), reset only in _send_data() — i.e. at SUBMISSION — so a single
+# document taking longer than 900 s is killed mid-processing. Our per-document client
+# deadline is 1800 s, so the default inverts the two and that is defect #32: the 10k
+# sequential leg lost 371 documents to "pipeline is not running".
+# 7200 (Leela rr_driver.py:215) over 0: a ttl must EXCEED the client timeout, and 7200
+# does that 4x while still bounding a leaked task. ttl=0 never reaps at all.
+RR_TTL_S = 7200

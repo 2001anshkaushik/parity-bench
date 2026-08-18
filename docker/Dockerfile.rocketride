@@ -49,6 +49,56 @@ RUN pip3 install --no-cache-dir --target /tmp/pdflibs "pypdf==${PYPDF_VERSION}" 
     && /opt/rocketride/engine/bin/python3 -c "import pypdf; print('embedded pypdf', pypdf.__version__)" \
         || echo "WARN: embedded-interpreter import check could not run (bin layout differs) — verify at first boot"
 
+# --- BUG_CHUNK_DUPLICATION correction (RocketRide 3.3.1) -----------------------------------------
+# Ported from Leela's aws_bench/arms/rocketride/Dockerfile at a5c3b5d, mechanism unchanged.
+#
+# nodes/embedding_transformer/IInstance.py calls _flushDocuments(), which already delivers the
+# batch downstream, and then falls through to the node's default forwarding action — emitting the
+# SAME document list a second time. Measured: Leela 51/987 documents came back [A,B,C,A,B,C] at
+# repeat_factor 2 against 0/987 for LangGraph; ours 5/199. preventDefault() after the flush
+# suppresses the second emission.
+#
+# This MODIFIES THE PRODUCT UNDER TEST, so it is a build ARG. RR_DUP_PATCH=0 builds stock 3.3.1
+# so the delta can be measured rather than assumed.
+#
+# Four guards, all fail-closed — the && chain IS the `then` branch, so any failure exits non-zero
+# and fails the build: file present; exactly ONE preventDefault before (source-shape check, so a
+# future engine that already fixed this cannot be double-patched); the awk anchors on the comment
+# line AND the 8-space-indented call; exactly TWO after (the patch demonstrably took).
+ARG RR_DUP_PATCH=1
+RUN if [ "$RR_DUP_PATCH" = "1" ]; then \
+      F="$(find /opt/rocketride/engine -path '*/nodes/embedding_transformer/IInstance.py' \
+            -type f | head -1)" \
+      && test -n "$F" \
+      && [ "$(grep -c 'preventDefault' "$F")" = "1" ] \
+      && awk '{ \
+           print; \
+           if (prev ~ /# Flush the documents$/ && \
+               $0 ~ /^        self\._flushDocuments\(\)$/) { \
+             print "        # BENCH PATCH BUG_CHUNK_DUPLICATION:"; \
+             print "        # Flush already delivered this batch downstream."; \
+             print "        return self.preventDefault()"; \
+           } \
+           prev=$0; \
+         }' "$F" > "$F.patched" \
+      && mv "$F.patched" "$F" \
+      && [ "$(grep -c 'preventDefault' "$F")" = "2" ] \
+      && echo "BUG_CHUNK_DUPLICATION patch applied to $F"; \
+    else echo "BUG_CHUNK_DUPLICATION patch SKIPPED (stock 3.3.1)"; fi
+# LABEL FIX vs Leela's version: his LABEL sits outside the `if`, so a RR_DUP_PATCH=0 image is
+# still labelled "preventDefault-after-embedding-flush" — a stock build that claims to be patched.
+#
+# NOT fixed with `${RR_DUP_PATCH:+...}`: `:+` substitutes when the variable is set and NON-EMPTY,
+# and the string "0" is non-empty, so RR_DUP_PATCH=0 would still expand to the patched label. That
+# is the same bug with extra steps. The flag itself is carried instead, and the patch id names
+# only WHICH patch the flag refers to. These two keys are exactly Leela's REQUIRED provenance
+# fields, so `docker inspect` and our result JSON now agree by construction.
+ARG RR_DUP_PATCH
+LABEL benchmark.rocketride.engine_version="3.3.1" \
+      benchmark.rocketride.duplication_patch_applied="${RR_DUP_PATCH}" \
+      benchmark.rocketride.duplication_patch_id="preventDefault-after-embedding-flush"
+# -------------------------------------------------------------------------------------------------
+
 # --- benchmark nodes: env_probe is REQUIRED (the in-process thread-parity gate reads through it).
 # The engine loads nodes from engine/nodes/, not from the repo.
 COPY working/nodes/env_probe /opt/rocketride/engine/nodes/env_probe

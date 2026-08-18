@@ -88,15 +88,11 @@ def provenance(extra: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "platform": {"system": platform.system(), "machine": platform.machine(),
                      "publishable": platform.system() == "Linux"
                      and platform.machine() == "x86_64"},
-        "engine": {
-            "duplication_patch_applied": False,
-            "duplication_patch_note": (
-                "stock 3.3.1. Leela's aws-bench a5c3b5d patches "
-                "nodes/embedding_transformer/IInstance.py to add preventDefault() after "
-                "_flushDocuments(); we have NOT applied it. Measured exposure on our corpus: "
-                "5/199 documents at repeat_factor 2. A patched-engine result is not comparable "
-                "with this one."),
-        },
+        # READ from the image label, never asserted. We now build rr:patched AND rr:stock, so a
+        # hardcoded False is a lie half the time — and the whole point of the label is that the
+        # artifact says what it is. None means we could not read it, which is not the same as
+        # unpatched and must not be recorded as if it were.
+        "engine": _engine_patch_state(),
         "mode": {"external": EXTERNAL, "li_container": LI_CONTAINER if EXTERNAL else None,
                  "rr_container": RR_CONTAINER if EXTERNAL else None, "port": PORT},
         "image_digests": _image_digests() if EXTERNAL else None,
@@ -104,6 +100,42 @@ def provenance(extra: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     if extra:
         p.update(extra)
     return p
+
+
+def _engine_patch_state() -> Dict[str, Any]:
+    """Is the RocketRide image under test patched for BUG_CHUNK_DUPLICATION?
+
+    From `docker inspect` labels written by docker/Dockerfile.rocketride. A patched-engine result
+    and a stock one are not comparable, and this is the only field in the export that says which
+    one produced the numbers.
+    """
+    if not EXTERNAL:
+        return {"duplication_patch_applied": None,
+                "reason": "not external mode — no container to inspect"}
+    applied = _run_docker(RR_CONTAINER,
+                          "{{index .Config.Labels \"benchmark.rocketride.duplication_patch_applied\"}}")
+    pid_ = _run_docker(RR_CONTAINER,
+                       "{{index .Config.Labels \"benchmark.rocketride.duplication_patch_id\"}}")
+    if applied in (None, "", "<no value>"):
+        return {"duplication_patch_applied": None, "duplication_patch_id": None,
+                "reason": ("image carries no duplication_patch_applied label — it predates the "
+                           "patch build. UNKNOWN, which is not the same as unpatched.")}
+    return {"duplication_patch_applied": applied == "1",
+            "duplication_patch_id": pid_ if applied == "1" else None,
+            "label_raw": applied,
+            "note": ("measured exposure on stock 3.3.1, our corpus: 5/199 documents at "
+                     "repeat_factor 2. self_duplication must read 0 on a patched build.")}
+
+
+def _run_docker(container: str, fmt: str) -> Optional[str]:
+    """One `docker inspect -f` field, or None. Used for read-backs where a config value must be
+    confirmed in EFFECT rather than trusted from the command that set it."""
+    try:
+        r = subprocess.run(["docker", "inspect", "-f", fmt, container],
+                           capture_output=True, text=True, timeout=20)
+        return (r.stdout.strip() or None) if r.returncode == 0 else None
+    except Exception:
+        return None
 
 
 def _image_digests() -> Dict[str, Any]:

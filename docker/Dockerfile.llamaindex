@@ -138,7 +138,10 @@ EXPOSE 8801
 # ENV block above and are unchanged; TORCH_INTEROP_THREADS stays UNSET on both arms, deliberately.
 # WS1_WORKERS is read by uvicorn (--workers) AND by service.py:39 for its own /health report, so
 # one variable keeps the two from disagreeing.
-ENV WS1_WORKERS=32 \
+# 24, not 32: the arm runs on cpuset 0-23 and one worker per core is the tuning. A worker count
+# above the cpuset width oversubscribes and measures scheduler thrash. Read back at runtime via
+# /health rather than trusted from here.
+ENV WS1_WORKERS=24 \
     WS1_PORT=8801
 
 # sh -c + exec: exec form cannot expand ${WS1_WORKERS}; `exec` keeps uvicorn as PID 1 so SIGTERM

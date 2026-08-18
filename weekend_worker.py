@@ -215,6 +215,9 @@ class LlamaArm:
         pass
 
 
+from harness.rr_credentials import RR_TTL_S  # noqa: E402
+
+
 class RocketArm:
     """RocketRide over the canonical 4-node pipeline, driven synchronously."""
     name = "rocketride"
@@ -270,7 +273,8 @@ class RocketArm:
         p.write_text(json.dumps(base))
         self.c = RocketRideClient()
         self.loop.run_until_complete(self.c.connect(timeout=60000))
-        r = self.loop.run_until_complete(self.c.use(filepath=str(p.relative_to(ROOT))))
+        r = self.loop.run_until_complete(
+            self.c.use(filepath=str(p.relative_to(ROOT)), ttl=RR_TTL_S))
         self.tok = r["token"]
 
     def process(self, text):
