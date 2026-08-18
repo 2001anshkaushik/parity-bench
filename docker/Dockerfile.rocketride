@@ -187,6 +187,18 @@ COPY working/nodes/pdf_probe /opt/rocketride/engine/nodes/pdf_probe
 # the compiled constraints cache is discarded with the stage, so first boot on the box
 # recompiles it, as it always has.
 # RR_BOOT_CHECK=0 skips (offline builds); the skip is recorded in the marker, never silent.
+#
+# THE COMPILED CONSTRAINTS CACHE IS CARRIED FORWARD, not discarded. The engine keys this cache
+# on md5 over each requirements file's path:size:mtime (depends.py, read in session 29), and
+# both this stage and the final stage inherit the SAME engine-stage layers — identical paths,
+# bytes and mtimes — so the key matches by construction and first container boot skips the
+# 10-30 min compile. A key miss degrades to a recompile, never to wrongness. What is carried is
+# EXACTLY $ENGINE_DIR/cache; boot logs, /tmp and any lock files still die with the stage. This
+# also freezes dependency RESOLUTION at image-build time and captures it in the image digest —
+# first-boot resolution floats with PyPI state, so baking it is the more reproducible of the
+# two, and it gives this image the hermetic-at-runtime property the LlamaIndex image has had
+# since its model bake. NOT warmed: anything materialised at first use() — this stage never
+# spawns a task.
 # ---------------------------------------------------------------------------------------------
 FROM engine AS bootcheck
 ARG RR_BOOT_CHECK=1
@@ -195,7 +207,11 @@ COPY docker/bootcheck_rocketride.py /tmp/bootcheck_rocketride.py
 RUN if [ "$RR_BOOT_CHECK" = "1" ]; then \
       RR_BOOT_TIMEOUT_S="$RR_BOOT_TIMEOUT_S" python3 /tmp/bootcheck_rocketride.py; \
     else \
-      echo "boot check SKIPPED (RR_BOOT_CHECK=0)" | tee /tmp/boot-ok; \
+      # The cache dir must exist even on skip, or the final stage's COPY fails the build.
+      # A skipped build ships an EMPTY cache and the marker says so — first boot compiles.
+      mkdir -p "$ENGINE_DIR/cache" \
+      && echo "boot check SKIPPED (RR_BOOT_CHECK=0) — constraints cache NOT prewarmed" \
+         | tee /tmp/boot-ok; \
     fi
 
 # ---------------------------------------------------------------------------------------------
@@ -204,6 +220,12 @@ RUN if [ "$RR_BOOT_CHECK" = "1" ]; then \
 # ---------------------------------------------------------------------------------------------
 FROM engine
 COPY --from=bootcheck /tmp/boot-ok /opt/rocketride/.boot-check
+# The compiled constraints cache from the verified boot — see the bootcheck header for why this
+# is carried and what is deliberately NOT. Cold-boot compile stays measurable when wanted:
+# `rm -rf /opt/rocketride/engine/cache` inside a container restores it.
+COPY --from=bootcheck /opt/rocketride/engine/cache /opt/rocketride/engine/cache
+ARG RR_BOOT_CHECK=1
+LABEL benchmark.rocketride.constraints_cache_prewarmed="${RR_BOOT_CHECK}"
 COPY docker/rocketride-entrypoint.sh /usr/local/bin/rocketride-entrypoint.sh
 RUN chmod +x /usr/local/bin/rocketride-entrypoint.sh
 

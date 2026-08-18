@@ -329,6 +329,21 @@ stated in the script: proves boot + listen + handshake, does NOT prove a task ca
 loads and task-process spawn remain `smoke_phase2.py`'s job. `RR_BOOT_CHECK=0` skips for
 offline builds, and the skip is recorded in `/opt/rocketride/.boot-check`, never silent.
 
+**Addendum, same session — the bootcheck's compiled constraints cache is CARRIED into the
+final image.** The engine keys the cache on md5 over each requirements file's path:size:mtime
+(`depends.py`, session 29), and both stages inherit the same engine-stage layers, so the key
+matches by construction: first container boot skips the 10–30 min compile; a key miss degrades
+to a recompile, never to wrongness. Provenance improves, not degrades — resolution is frozen at
+image-build time and captured in the image digest (first-boot resolution floats with PyPI), and
+the RR image gains the hermetic-at-runtime property the LI image has had since its model bake.
+NOT warmed: anything materialised at first `use()`. Recorded in the
+`constraints_cache_prewarmed` label and in `.boot-check` (with the cache's file count and size);
+`RR_BOOT_CHECK=0` builds ship an EMPTY cache and say so. Cold-boot compile stays measurable via
+`rm -rf /opt/rocketride/engine/cache` in a container. One comparability note: a container that
+compiles at boot carries that compile's memory in its cumulative cgroup `memory.peak`; prewarmed
+containers will not — no published number is affected (no cgroup figure has shipped yet), but
+peaks from the two container generations must not be compared.
+
 ### Before the 10k run — the remaining checklist
 
 1. ✅ Corpus complete and manifest-verified (session 33).

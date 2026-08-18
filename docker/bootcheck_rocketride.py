@@ -15,10 +15,12 @@ WHAT IT PROVES AND WHAT IT DOES NOT — the boundary, stated rather than implied
   does NOT    prove a task can spawn: use() + send() load models and spawn the task process,
               which is minutes of work and network — that is smoke_phase2.py's job on the box.
 
-It runs in a THROWAWAY build stage, so boot residue (logs, caches, lock files) never ships in
-the runtime layers. Deliberate cost: the constraints cache compiled during this boot is
-discarded with the stage, so the first boot on the box recompiles it — which has been true of
-every boot to date, and needs network exactly as this build step does.
+It runs in a THROWAWAY build stage, so boot residue (logs, lock files) never ships in the
+runtime layers — with ONE deliberate exception: the compiled constraints cache under
+<engine>/cache is COPY'd into the final image, because the engine keys it on the requirements
+files' path:size:mtime and the final stage shares those files bit-identically, so the key
+matches and first container boot skips the 10-30 min compile. The marker below records the
+cache's size so the carry is visible, and a key miss merely recompiles — slow, never wrong.
 """
 import os
 import socket
@@ -115,8 +117,20 @@ def main() -> int:
     except subprocess.TimeoutExpired:
         proc.kill()
         proc.wait()
+    n_files, n_bytes = 0, 0
+    for dp, _, fns in os.walk(os.path.join(ENGINE_DIR, "cache")):
+        for fn in fns:
+            try:
+                n_bytes += os.path.getsize(os.path.join(dp, fn))
+                n_files += 1
+            except OSError:
+                pass
     with open(MARKER, "w") as fh:
-        fh.write(f"boot-check PASSED: port open in {boot_s:.0f}s; sdk={sdk_state}\n")
+        fh.write(f"boot-check PASSED: port open in {boot_s:.0f}s; sdk={sdk_state}; "
+                 f"constraints cache {n_files} files / {n_bytes / 1e6:.0f} MB "
+                 f"carried into the final image\n")
+    print(f"[bootcheck] constraints cache: {n_files} files, {n_bytes / 1e6:.0f} MB "
+          "(carried into the final image)", flush=True)
     print("[bootcheck] PASSED", flush=True)
     return 0
 
