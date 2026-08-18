@@ -129,10 +129,10 @@ gap **1.32×**.
 
 ### Defect register, sessions 20–34 — all found in OUR instrument
 
-`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34) · `#32` OPEN — unset `ttl` defaults to 900 s idle while our own per-doc deadline is 1800 s; 371 docs lost, cause unconfirmed (session 36).
+`#19` Tika gate inside the timed loop (~8.5× against RR) · `#20` model bake missed the runtime loader (llama-index ignores `HF_HOME`) · `#21` readiness by PID sampling (kernel accept bias) · `#22` credentials from a gitignored `.env` · `#23` readiness over-count after `docker start` (container PID namespace resets) · `#24` external mode honoured in 1 of 6 discovery sites · `#25` gate adapter contradicted the legacy path · `#26` peakRSS a summed RSS · `#27` killed run lost everything · `#28` fetcher counted its own arithmetic (session 33) · `#29` blast stamped the latency clock at different points on the two arms (~550× against RR) · `#30` memory table described the sequential leg while the metrics line beside it carried a blast-leg peak · `#31` cgroup anon read once AFTER the leg and printed under a "peak" heading (session 34) · `#32` OPEN — unset `ttl` defaults to 900 s idle while our own per-doc deadline is 1800 s; 371 docs lost, cause unconfirmed (session 36) · `#33` the Phase-2 image recipe omitted the onnxruntime boot patch our own §1 documents — both rr images built green and crash-looped on the box (session 39).
 
 **The pattern, stated plainly: in this project the instrument is wrong more often than the system
-under test. Thirteen instrument defects in fifteen sessions, zero product defects found by us in that
+under test. Fifteen instrument defects in twenty sessions, zero product defects found by us in that
 window that were not already known.** Behave accordingly — the Standing Verification Protocol in
 §2 is not ceremony.
 
@@ -287,6 +287,47 @@ counting pass, no second method.
 | **`RR_DUP_PATCH` default still `1`** | unchanged: he runs patched, we run stock. Comparability blocker stands |
 
 No result JSONs are committed to his repo; S3 could not be checked from this laptop (no `aws`/`boto3`).
+
+### SESSION 39 — defect #33: the image recipe lost the onnx boot patch; full parity restored (2026-08-17)
+
+Both `rr:stock` and `rr:patched` built green and **crash-looped on the box**: `Failed to compile
+constraints ... onnxruntime-gpu==1.20.1`. Root cause (Leela's FINDING_rr_linux_boot.md, adopted):
+**onnxruntime-gpu 1.20.1 was never published to PyPI** — the Darwin branch of the pin resolves,
+the Linux branch cannot, and the engine compiles ALL requirements files at boot, so an opt-in NER
+feature this benchmark never loads kills boot on any Linux host. The pin sits in **five** files
+across `ai/` and `nodes/`, and all must move together — partial patching produces the WORSE
+"==1.20.1 and ==1.20.2" conflict because constraint compilation is global.
+
+**How the knowledge was lost.** The five-file patch is documented in our own §1, was applied in
+the runbook-era image, and is in Leela's proven Dockerfile — **two of whose steps credit our old
+image as their source**. `docker/Dockerfile.rocketride` was written fresh on 2026-08-14 and
+carried none of it (verified: zero occurrences in its entire git history). The knowledge made a
+round trip through her repo while falling out of ours. A fact recorded in STATE.md is not a fact
+enforced by a build.
+
+**Fixed, full parity diff against her file.** Adopted: the onnx block whole (find across all
+`*.txt`, sed 1.20.1→1.20.2, fail the build if any 1.20.1 remains); the extracted-binary sha256
+(`95768e26…`, her pin — checked AFTER flattening, alongside our tarball pin: two artifacts, two
+failure modes); nested-tarball flattening + `engine`/`ai/eaas.py` presence tests + `chmod +x`;
+`rocketride==1.3.0` SDK pin; `procps`; python hygiene env; and an entrypoint script with the
+**explicit `--host=0.0.0.0` bind** — her comment records that the default interface inside a
+container is unreachable through Docker's published-port proxy ("WebSocket upgrade rejected"),
+root-caused as a missing flag and not a product defect. Not adopted, with reasons in the file:
+her python:3.12 base (ours derives from the measured glibc floor + DT_NEEDED incl. libunwind8,
+which she omits); her `--platform` emulation allowance (we hard-assert arch — never emulate
+silently); her `COPY data/` (our corpus mounts; baked copies drift, her own argument); her
+unconditional LABEL (labels a stock build as patched — reported to her).
+
+**Build-time boot assertion added** — the failure mode was a green build that cannot start the
+one artifact it exists to run, so a throwaway `bootcheck` stage now boots the engine with the
+SAME binary and SAME `--host/--port` flags as the entrypoint, waits for the listener, performs a
+real SDK WebSocket handshake, and fails the build with the boot log otherwise. Feasible at build
+time because the bundle is self-contained (JRE + CPython included); the step needs network for
+the constraints compile — the same requirement every first boot has always had. Residue dies
+with the stage; the marker COPY into the final image is what forces the stage to run. Boundary
+stated in the script: proves boot + listen + handshake, does NOT prove a task can spawn — model
+loads and task-process spawn remain `smoke_phase2.py`'s job. `RR_BOOT_CHECK=0` skips for
+offline builds, and the skip is recorded in `/opt/rocketride/.boot-check`, never silent.
 
 ### Before the 10k run — the remaining checklist
 
