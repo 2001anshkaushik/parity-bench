@@ -448,6 +448,43 @@ quoted except from `rederive_gates.py`'s corrected cells (batch open := min(admi
 derived, stale gap reported). Closed-loop blast cells anchor on admits and are unaffected.
 Stamps are now taken per-arm inside each runner.
 
+### SESSION 43 — Leela's "connection acceptance ceiling": root cause found in engine source (2026-08-18)
+
+Leela observed: 128 offered WebSocket connections → 11 accepted / 117 refused; 200 → same 11;
+12 → "pool: 11 clients (1 failed)"; identical at 24/32 threads and cores; the 11 sockets
+multiplex (~77 docs in flight) but a 3-chunk document inherited a 34-minute wait behind a heavy
+one at 10k.
+
+**Root cause, VERIFIED IN SOURCE at the shipped tag** (`rocketride-server`,
+`server-v3.3.1:packages/ai/src/ai/constants.py:69`, enforcement in `task_server.py`; identical
+at HEAD): **`CONST_MAX_UNAUTHED_CONNS_PER_IP = 10`**. Auth happens on the FIRST DAP message,
+not the WS upgrade, so every connection holds an "unauthenticated slot" from upgrade until its
+auth message; the slot frees on successful auth or disconnect; over the cap the server does
+`websocket.close(code=1008)`. It is an anti-DoS cap per client IP — and behind docker-proxy or
+a bench-client container, every client shares ONE IP.
+
+**Every number he reported falls out of that one constant**: his pool builder connects a main
+client (auths, frees its slot), then gathers the extras SIMULTANEOUSLY — offered 12 → 11 extras
+burst → 10 admitted + 1 refused = "11 clients (1 failed)"; offered 128 → 10 + 1 = 11 accepted,
+117 refused; thread-independent because it is a security constant, not a pool.
+
+**Consequence: it is NOT a connection ceiling.** Authenticated connections release their slots;
+the apparent ceiling is burst admission (10) × a non-retrying pool builder. Two separate
+findings for the ticket: (a) the unauth-burst cap interacting with SDK connect (documentation /
+retry issue), (b) head-of-line queueing on a multiplexed socket (real scheduling finding,
+regardless of (a)).
+
+**Our harness cannot have seen it**: every RocketRide path opens ONE client — `SMOKE_BLAST_C=32`
+is 32 in-flight sends multiplexed over one socket (`smoke50:860`, semaphore around `c.send`),
+the batched arm is one client, data isolation two. We never offered a connection burst. Our own
+head-of-line observations over one socket are consistent with his tail mechanism.
+
+`working/scripts/probe_ws_ceiling.py` carries six falsifiable predictions (bare-sequential caps
+at exactly 10 even staggered; SDK-sequential does NOT cap; SDK-burst-with-retry reaches N;
+refusal is upgrade-level, never TCP) plus the `ss -ltn`/fd-limit environment checks Leela asked
+for. If any prediction fails on the box, the hypothesis is wrong and the raw table ships, not
+the story. PROVISIONAL until that run.
+
 ### Before the 10k run — the remaining checklist
 
 1. ✅ Corpus complete and manifest-verified (session 33).
