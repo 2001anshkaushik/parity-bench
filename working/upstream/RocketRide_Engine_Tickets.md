@@ -226,7 +226,7 @@ therefore a conservative estimate.
 Artifacts: `smoke50_parser_in__20260818T094225Z__a5fd8e2033b7.json` (per-document) ·
 `exp_batched_blast__20260818T150551Z__373adce246fc.json` (batch).
 
-## Mechanism — head-of-line blocking
+## Mechanism — tail-drain stranding (verified against the scheduler source)
 
 Live CPU sampling of the batched run shows two distinct regimes:
 
