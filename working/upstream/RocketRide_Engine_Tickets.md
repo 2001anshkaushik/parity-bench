@@ -1,8 +1,10 @@
 # RocketRide Engine — Two Tickets
 
 Drafted from the WS-1 cross-team benchmark campaign, 14–18 August 2026.
-Three independent harnesses (Leela / LangGraph · Shashi / Haystack · Ansh / LlamaIndex),
-three separately built corpora, three separate c7i.8xlarge hosts.
+Three independent harnesses — each comparing RocketRide against a different framework
+(LangGraph, Haystack, LlamaIndex) — three separately built corpora, three separate
+c7i.8xlarge hosts. Harnesses are identified below by the framework they measured against;
+all three findings are reproducible from the artifacts listed in the appendix.
 
 > All bundle- and source-side facts below are verified against
 > `rocketride-org/rocketride-server` at HEAD `1138936` and every `server-v3.x` tag; the
@@ -137,9 +139,9 @@ sha-pinned fixture above is the verified end-to-end reproduction.*
 
 | Harness | Finding |
 |---|---|
-| **Leela** (LangGraph, Tika-vs-Tika) | 51 of 987 documents at `repeat_factor = 2` → **0 of 987** after the fix. With both arms on the same extractor, corrected RocketRide chunk counts converge to LangGraph's to within 7 |
-| **Shashi** (Haystack) | `doc-00003` emitted 2× — caught by a newly added duplication gate. Before/after smoke: `220 → 110` chunks on that document, `351 → 241` total. Cross-arm workload ratio `1.58 → 1.09`. Root-caused in source |
-| **Ansh** (LlamaIndex) | Fixture above halves exactly, 5 of 5. **`self_duplication` = 0 duplicated of 9,847 documents at 10k scale.** Correction verified *in the shipped artifact* (`grep -c preventDefault` = 1 stock / 2 patched) before any measurement |
+| **LangGraph harness** (Tika-vs-Tika) | 51 of 987 documents at `repeat_factor = 2` → **0 of 987** after the fix. With both arms on the same extractor, corrected RocketRide chunk counts converge to LangGraph's to within 7 |
+| **Haystack harness** | `doc-00003` emitted 2× — caught by a newly added duplication gate. Before/after smoke: `220 → 110` chunks on that document, `351 → 241` total. Cross-arm workload ratio `1.58 → 1.09`. Root-caused in source |
+| **LlamaIndex harness** | Fixture above halves exactly, 5 of 5. **`self_duplication` = 0 duplicated of 9,847 documents at 10k scale.** Correction verified *in the shipped artifact* (`grep -c preventDefault` = 1 stock / 2 patched) before any measurement |
 
 ## Impact
 
@@ -149,7 +151,7 @@ retrieval scoring toward documents that happen to cross the buffer threshold.
 **Pre-fix throughput figures are wrong in two directions.** `chunks_per_s` is inflated and
 `cpu_s_per_chunk` deflated because duplicates are counted — but **`docs_per_s` is *depressed***,
 because the engine genuinely performs the doubled embedding work. Measured inflation ~16% on
-Shashi's corpus, higher on corpora with more large documents.
+the Haystack harness's corpus, higher on corpora with more large documents.
 
 **Undetectable by cross-arm equality gating.** When both benchmark arms share an engine, both
 duplicate identically and equality passes. Only per-side repeat detection catches this class —
@@ -252,7 +254,7 @@ wrongly: why steady state holds at ~17.7 of 24 while the queue is still deep, an
 per-document client path measures higher average utilisation on identical input. The controlled
 experiment bounds the effect and localises it to the submission path; no further.
 
-**Client-side view of the same queue behaviour** (Leela, c128, 10k): the worst wait in the run
+**Client-side view of the same queue behaviour** (LangGraph harness, c128, 10k): the worst wait in the run
 was a **3-chunk document that waited 34 minutes** — FIFO position behind indivisible large
 items, not processing time. Wait grows with backlog: 310 s at n=1,000 → 2,050 s at n=10,000.
 
@@ -260,21 +262,21 @@ items, not processing time. Wait grows with backlog: 310 s at n=1,000 → 2,050 
 
 | Harness | Submission shape | CPU utilisation | Effective cores |
 |---|---|---:|---:|
-| Ansh | native batch, 24-core cpuset | **50.4%** | 12.09 / 24 |
-| Shashi | native batch, 32 host cores | **52.9%** | 16.9 / 32 |
-| Leela | c128, 32 cores | **56.7%** | 18.1 / 32 |
-| Leela | SDK batch, 24 threads | **60.9%** | 14.6 / 24 |
-| **Ansh** | **per-document, C=32** | **69.2%** | **16.61 / 24** |
+| LlamaIndex harness | native batch, 24-core cpuset | **50.4%** | 12.09 / 24 |
+| Haystack harness | native batch, 32 host cores | **52.9%** | 16.9 / 32 |
+| LangGraph harness | c128, 32 cores | **56.7%** | 18.1 / 32 |
+| LangGraph harness | SDK batch, 24 threads | **60.9%** | 14.6 / 24 |
+| **LlamaIndex harness** | **per-document, C=32** | **69.2%** | **16.61 / 24** |
 
 The engine plateaus at **~12–18 effective cores whether offered 24 or 32.**
 
 ## Counter-evidence that isolates the cause to input heterogeneity
 
-**On a uniform corpus the same engine saturates.** Shashi's contract corpus (24 seed PDFs
+**On a uniform corpus the same engine saturates.** A contract corpus (24 seed PDFs
 replicated to 10,000 — every document the same size) reached **92.8% utilisation, 29.7 of 32
 cores**, on the identical engine build.
 
-**Cost per chunk is flat across corpora** — Shashi measures 0.285 → 0.281 CPU-s per chunk
+**Cost per chunk is flat across corpora** — 0.285 → 0.281 CPU-s per chunk measured
 between the uniform and heterogeneous corpora. Processing is not slower on real documents;
 scheduling is.
 
@@ -294,7 +296,7 @@ engine.
 them unattributable to the work requested and impossible to write an SLA around.
 
 **Time to first result.** Under an atomic batch, no per-document RESULT is returned until the
-entire call completes (confirmed). Shashi measured a first result at **3,466 s** against a
+entire call completes (confirmed). A first result was measured at **3,466 s** against a
 streaming competitor's **0.089 s**. The SDK does document per-file progress events for
 `send_files` (`open`/`write`/`close`/`complete`/`error` — `rocketride/mixins/data.py`); none of
 the three harnesses consumed them, and whether `complete` fires per file mid-batch is untested.
@@ -327,7 +329,7 @@ ordering and granularity:
 
 ## Related
 
-- **Ticket 3 (recommended, not drafted here): surface parse failures.** A corrupt document currently returns `action: "complete"` with an objectId, metadata and an empty document list — structurally indistinguishable from a legitimately empty PDF. All three harnesses hit this; surfacing scored 0/1 (Ansh) and 0/4 (Leela) against competitors surfacing 4/4. Separate defect, separate fix, same campaign.
+- **Ticket 3 (recommended, not drafted here): surface parse failures.** A corrupt document currently returns `action: "complete"` with an objectId, metadata and an empty document list — structurally indistinguishable from a legitimately empty PDF. All three harnesses hit this; surfacing scored 0/1 and 0/4 in two of them, against competitor frameworks surfacing 4/4. Separate defect, separate fix, same campaign.
 - **`BUG_CHUNK_DUPLICATION`** (Ticket 1) is independent — all measurements above are on a corrected build.
 
 ---
@@ -345,5 +347,5 @@ ordering and granularity:
 | Hardware | c7i.8xlarge, 32 vCPU, 61 GiB MemTotal measured (64 GiB nominal), Linux x86-64 native |
 | Corpus | GovDocs1, 9,975–10,000 unique documents, sha256-pinned per document |
 | Measurement | kernel cgroup counters via container PID · client-observed clocks · fail-closed gates · no framework self-reporting |
-| Full reports | Ansh `WS1_Benchmark_Complete.md` · Shashi `RESULTS-RR-vs-HS-2026-08-17.md` + `RUN-SPECS` · Leela `BENCHMARK_RUNS.md` |
+| Full reports | Per-harness benchmark reports and run specifications, published alongside the artifacts |
 | Artifacts | `s3://rocketride-benchmark-data/` |
