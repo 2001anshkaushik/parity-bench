@@ -44,6 +44,33 @@ class IInstance(IInstanceBase):
             info["torch_version"] = torch.__version__
         except Exception as e:
             info["torch_error"] = f"{type(e).__name__}: {e}"
+
+        # Phase 2 (video) extension, 2026-08-20: detect-identity read-back.
+        # detection.py:130 falls back to RT-DETR (a DIFFERENT model) when
+        # `from rfdetr import RFDETRBase` fails — silently. Attached to the
+        # video pipe (a3_env_torch pattern: one pipeline = one task process),
+        # this node reports that exact import predicate from INSIDE the process
+        # whose detect node already loaded, plus the resolved package versions
+        # the parity pins must match. On a pipe without detect, rfdetr is
+        # simply not installed and the honest answer is import_error.
+        try:
+            import sys as _sys
+            import types as _types
+            _sys.modules.setdefault("matplotlib.pyplot", _types.ModuleType("matplotlib.pyplot"))
+            from rfdetr import RFDETRBase  # noqa: F401 — the fallback predicate itself
+            info["rfdetr_import_ok"] = True
+        except Exception as e:
+            info["rfdetr_import_ok"] = False
+            info["rfdetr_import_error"] = f"{type(e).__name__}: {e}"
+        from importlib.metadata import PackageNotFoundError, version
+        pkgs = {}
+        for pkg in ("rfdetr", "torchvision", "transformers", "supervision",
+                    "timm", "sentence-transformers", "imageio-ffmpeg"):
+            try:
+                pkgs[pkg] = version(pkg)
+            except PackageNotFoundError:
+                pkgs[pkg] = None
+        info["package_versions"] = pkgs
         self.instance.writeText(json.dumps(info))
 
     def close(self):

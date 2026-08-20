@@ -33,7 +33,8 @@ import sys
 import time
 from pathlib import Path
 
-from rocketride import RocketRide
+# rocketride imports lazily in main(): the census/analysis helpers here are
+# imported by probe_concurrency.py and unit checks on machines without the SDK.
 
 
 def sh(cmd: list[str]) -> str:
@@ -122,8 +123,13 @@ def analyse_documents(docs: list[dict]) -> dict:
     n = len(hashes)
     chunk_ids = [(d.get('metadata') or {}).get('chunkId') for d in docs]
     monotone = all(isinstance(c, int) for c in chunk_ids) and chunk_ids == sorted(chunk_ids)
-    # Stock-defect signature: the WHOLE list emitted twice.
-    doubled = n % 2 == 0 and n > 0 and hashes[: n // 2] == hashes[n // 2:]
+    # Stock-defect signature: the WHOLE list emitted twice. Mirrors
+    # gates_shared.whole_list_doubled (the probe is harness-free by design):
+    # None = indeterminate — a uniform list ([A,A]==[A,A]) can be organic
+    # static-scene content and must never read as a verdict either way.
+    half = hashes[: n // 2]
+    doubled = (None if (n and n % 2 == 0 and half == hashes[n // 2:] and len(set(half)) < 2)
+               else (n % 2 == 0 and n > 0 and half == hashes[n // 2:]))
     lens = [len(c) for c in contents]
     return {
         'n_chunks': n,
@@ -160,6 +166,7 @@ async def main() -> int:
               'pipe': args.pipe, 'tokens': args.tokens, 'sends': [], 'rc': 0}
     print(f'video {len(blob)} bytes, pipe {args.pipe}')
 
+    from rocketride import RocketRide
     client = RocketRide(uri=f'ws://127.0.0.1:{args.port}/task/service', apikey='local-dev')
     await client.connect()
 

@@ -11,19 +11,30 @@ BYTES=$(stat -c %s "$VIDEO" 2>/dev/null || stat -f %z "$VIDEO")
 LOG="probe_disk_$(date +%Y%m%d_%H%M%S).log"
 echo "video=$VIDEO bytes=$BYTES -> $LOG"
 
+# HOST ffmpeg is deliberately the venv's imageio-ffmpeg binary (the host ships
+# no ffmpeg). This does NOT distort the disk measurement: in measured runs the
+# only component that touches the DISK is the DRIVER's host-side corpus read —
+# both arms receive the video as streamed/posted BYTES and decode from memory.
+# So host-side cold read + decode is exactly the I/O surface under test, and
+# the binary is the same imageio-ffmpeg build family both arms use.
 FFMPEG=$(python3 -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())" 2>/dev/null || command -v ffmpeg)
 [ -n "$FFMPEG" ] || { echo "NOT DONE — no ffmpeg (pip install imageio-ffmpeg)"; exit 1; }
 
 HAVE_SUDO=0
 if sudo -n true 2>/dev/null; then HAVE_SUDO=1; fi
+FADVISE="$(dirname "$0")/drop_cache_fadvise.py"
 drop_caches() {
   if [ "$HAVE_SUDO" = "1" ]; then
     sync; echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null; echo cold
+  elif python3 "$FADVISE" "$VIDEO" >/dev/null 2>&1; then
+    # No sudo: per-file fadvise(DONTNEED) with a behavioral read-back proving
+    # eviction (sample read must run at device speed, not cache speed).
+    echo cold-fadvise
   else
     echo warm-only
   fi
 }
-[ "$HAVE_SUDO" = "1" ] || echo "WARNING: no passwordless sudo — cold-cache rows will read cache=warm-only" | tee -a "$LOG"
+[ "$HAVE_SUDO" = "1" ] || echo "note: no passwordless sudo — using fadvise(DONTNEED) + proof; rows read cache=cold-fadvise (or warm-only if the proof fails)" | tee -a "$LOG"
 
 disk_read_bytes() { awk '{ if ($3 !~ /loop|ram/) s += $6 * 512 } END { print s }' /proc/diskstats 2>/dev/null || echo 0; }
 

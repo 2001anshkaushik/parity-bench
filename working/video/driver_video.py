@@ -1,0 +1,760 @@
+#!/usr/bin/env python3
+"""Phase 2 video driver — one arm per invocation, both RR postures from one code path.
+
+APPROVED DESIGN (2026-08-20):
+  * Crossroad 9: RocketRide runs at BOTH postures, labelled side by side —
+      default: 1 token, threads UNSET (engine default = CONST_DEFAULT_MAX_THREADS
+               = 64, constants.py:48 — a serial detection queue with 63 waiters,
+               because detect inference is under one process-local threading.Lock
+               per pipeline instance);
+      parity:  M tokens (M = LlamaIndex worker count unless overridden), giving
+               RocketRide M independent detector instances.
+    One Posture dataclass, one submit path; the posture only changes how many
+    use() tokens exist and what threads= is passed. Neither posture alone is
+    publishable.
+  * Workload parity is MEASURED (gates_shared.char_conservation_parity, ±2% on
+    sum-of-chunk-chars), chunk-count ratio reported unguarded, provenance
+    chunk_size/chunk_overlap populated FROM RECORDS.
+  * Arms run ONE AT A TIME: this driver refuses to drive both in one process.
+
+Discipline carried (each with its Phase 1 defect number):
+  #29 both stamps per item (enqueue_ns before admission, admit_ns inside),
+      identical code path for both arms and both legs;
+  #27 jsonl_stream append+flush per record, resume via read_completed;
+  #37 thread pins read back from INSIDE the task process (RR: env_probe
+      attached to a GENERATED variant of the measured pipe — a3_env_torch
+      pattern; LI: /health per worker pid) and checked by ONE function fed by
+      both arms (gates_shared.thread_pin_parity), absence fails first;
+  #34 utilisation denominators come from the container's own cgroup (collector);
+  #32 ttl=7200 explicit + K=3 consecutive-failure breaker;
+  #38 a gate over a leg that did not run reports NOT RUN; a leg that ran and
+      produced zero records is a FAIL;
+  #21-class: LI warm-up must OBSERVE every declared worker pid serving before
+      the measured leg (kernel accept routing is not round-robin).
+
+Run (box):
+    python3 working/video/driver_video.py --arm rocketride --posture default \
+        --leg sequential --n 5 --out-dir working/video/results/<run>
+    python3 working/video/driver_video.py --cross RR.jsonl LI.jsonl
+HELD: the run plan (n values, blast concurrency, parity threads) — this file
+takes them as arguments and refuses to invent them.
+"""
+
+from __future__ import annotations
+
+import argparse
+import asyncio
+import hashlib
+import json
+import os
+import resource
+import subprocess
+import sys
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'working'))
+
+from harness import gates_shared as gs                 # noqa: E402
+from harness import provenance_leela as pvl            # noqa: E402
+from harness.jsonl_stream import JsonlWriter, read_completed  # noqa: E402
+
+PIPE_PATH = ROOT / 'working' / 'video' / 'benchmark_video_detect.pipe'
+MANIFEST_DEFAULT = ROOT / 'working' / 'video' / 'ami_video_manifest.jsonl'
+GENERATED_DIR = ROOT / 'working' / 'pipes' / 'generated'
+EMBED_MODEL = 'sentence-transformers/multi-qa-MiniLM-L6-cos-v1'
+BREAKER_K = 3
+THREAD_KEYS = ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS',
+               'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS', 'TORCH_NUM_THREADS')
+
+
+def say(msg: str) -> None:
+    print(f'[driver] {msg}', flush=True)
+
+
+def sha256_bytes(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# Posture — Crossroad 9, one code path
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class Posture:
+    name: str                 # 'default' | 'parity' (RR); 'workers' (LI, informational)
+    tokens: int               # RR use() count; LI: declared workers (read back, not set here)
+    threads: Optional[int]    # RR use(threads=); None = UNSET (engine default 64)
+
+    def label(self) -> str:
+        t = 'unset(engine-default-64)' if self.threads is None else str(self.threads)
+        return f'{self.name}[tokens={self.tokens},threads={t}]'
+
+
+# ---------------------------------------------------------------------------
+# Manifest
+# ---------------------------------------------------------------------------
+
+def load_manifest(path: Path) -> tuple[dict, List[dict]]:
+    rows = [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
+    meta = rows[0].get('_meta', {}) if rows and '_meta' in rows[0] else {}
+    return meta, [r for r in rows if '_meta' not in r]
+
+
+def expected_frames(row: dict, interval_s: int = 15) -> Optional[int]:
+    """Manifest-derived expectation for `-vf fps=1/interval`: frames at
+    t = 0, interval, 2*interval, ... strictly below the video duration.
+    The PROBE pins this formula against reality (84 on ES2002a.Corner)
+    before any gate consumes it."""
+    dur, fps = row.get('video_s'), row.get('fps')
+    if not dur or not fps:
+        return None
+    return int(dur // interval_s) + 1 if dur % interval_s else int(dur // interval_s)
+
+
+def verify_corpus(rows: List[dict], corpus_dir: Path) -> List[str]:
+    bad = []
+    for r in rows:
+        p = corpus_dir / r['file']
+        if not p.exists():
+            bad.append(f"{r['file']}: missing")
+        elif p.stat().st_size != r['bytes']:
+            bad.append(f"{r['file']}: size {p.stat().st_size} != {r['bytes']}")
+    return bad
+
+
+# ---------------------------------------------------------------------------
+# Record derivation — one shape, both arms
+# ---------------------------------------------------------------------------
+
+def record_from_rr(result: dict) -> dict:
+    docs = (result or {}).get('documents') or []
+    contents = [d.get('page_content') or '' for d in docs]
+    lens = [len(c) for c in contents]
+    hashes = [sha256_bytes(c.encode()) for c in contents]
+    ids = [(d.get('metadata') or {}).get('chunkId') for d in docs]
+    n = len(docs)
+    # gs.whole_list_doubled: True = defect signature, False = clean, None =
+    # indeterminate (uniform content — a static scene can produce identical
+    # chunks organically; never folded into PASS or FAIL).
+    doubled = gs.whole_list_doubled(hashes)
+    return {
+        'n_chunks': n,
+        'chunk_chars': lens,
+        'chunk_sha256': hashes,
+        'sum_chunk_chars': sum(lens),
+        # Frame read-back: the detection schema has NO nested arrays, so '['
+        # occurs exactly once per frame's JSON. Splitter seams drop only
+        # whitespace (measured: '\n'/' ' only), so the bracket count survives
+        # chunking exactly. Method recorded because it differs from LI's.
+        'frames_observed': sum(c.count('[') for c in contents) if n else None,
+        'frames_observed_method': 'bracket-count',
+        'chunkid_monotone': all(isinstance(i, int) for i in ids) and ids == sorted(ids),
+        'whole_list_doubled': doubled,
+        'n_detections': None,      # not recoverable client-side on this arm; honest None
+        'stage_s': None,
+        'serving_pid': None,
+    }
+
+
+def record_from_li(body: dict) -> dict:
+    return {
+        'n_chunks': body.get('n_chunks'),
+        'chunk_chars': body.get('chunk_chars'),
+        'chunk_sha256': body.get('chunk_sha256'),
+        'sum_chunk_chars': sum(body.get('chunk_chars') or []),
+        'frames_observed': body.get('n_frames'),
+        'frames_observed_method': 'extractor-count',
+        'chunkid_monotone': True,   # LI chunks arrive ordered by construction
+        'whole_list_doubled': gs.whole_list_doubled(body.get('chunk_sha256') or []),
+        'n_detections': body.get('n_detections'),
+        'stage_s': body.get('stage_s'),
+        'serving_pid': body.get('pid'),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Arms — submit_one is THE single code path both arms and both legs share
+# ---------------------------------------------------------------------------
+
+class RRArm:
+    name = 'rocketride_video'
+
+    def __init__(self, port: int, posture: Posture, pipe_path: Path):
+        self.port = port
+        self.posture = posture
+        self.pipe_path = pipe_path
+        self.client = None
+        self.tokens: List[str] = []
+        self._rr = 0
+
+    async def start(self):
+        from rocketride import RocketRide
+        self.client = RocketRide(uri=f'ws://127.0.0.1:{self.port}/task/service',
+                                 apikey='local-dev')
+        await self.client.connect()
+        for _ in range(self.posture.tokens):
+            kwargs: Dict[str, Any] = dict(filepath=str(self.pipe_path), ttl=7200)
+            if self.posture.threads is not None:
+                kwargs['threads'] = self.posture.threads
+            started = await self.client.use(**kwargs)
+            self.tokens.append(started['token'])
+        say(f'RR: {len(self.tokens)} token(s) live, posture {self.posture.label()}')
+
+    def _next_token(self) -> tuple[int, str]:
+        i = self._rr % len(self.tokens)
+        self._rr += 1
+        return i, self.tokens[i]
+
+    async def process(self, blob: bytes, name: str) -> dict:
+        idx, token = self._next_token()
+        result = await self.client.send(token, blob, objinfo={'name': name},
+                                        mimetype='video/x-msvideo')
+        rec = record_from_rr(result)
+        rec['token_index'] = idx
+        return rec
+
+    async def stop(self):
+        if self.client:
+            await self.client.disconnect()
+
+
+class LIArm:
+    name = 'llamaindex_video'
+
+    def __init__(self, port: int):
+        self.port = port
+        self.declared_workers: Optional[int] = None
+
+    async def start(self):
+        health = await self.health()
+        self.declared_workers = health.get('declared_workers')
+        say(f'LI: warm_workers={health.get("warm_workers")} '
+            f'declared={self.declared_workers} detect_impl={health.get("detect_impl")}')
+
+    async def health(self) -> dict:
+        import urllib.request
+        return await asyncio.to_thread(
+            lambda: json.load(urllib.request.urlopen(
+                f'http://127.0.0.1:{self.port}/health', timeout=30)))
+
+    async def process(self, blob: bytes, name: str) -> dict:
+        import urllib.request
+        req = urllib.request.Request(f'http://127.0.0.1:{self.port}/process_video',
+                                     data=blob, method='POST',
+                                     headers={'Content-Type': 'application/octet-stream'})
+
+        def _post():
+            with urllib.request.urlopen(req, timeout=7200) as resp:
+                return json.load(resp)
+
+        body = await asyncio.to_thread(_post)
+        if 'error' in body:
+            raise RuntimeError(f'LI service error: {body}')
+        return record_from_li(body)
+
+    async def stop(self):
+        pass
+
+
+# ---------------------------------------------------------------------------
+# Read-backs (preflight; fail-closed, absence first)
+# ---------------------------------------------------------------------------
+
+def generate_envprobe_pipe() -> Path:
+    """Measured pipe + env_probe + response_text (a3_env_torch pattern).
+    Same task process as the loaded video nodes, so the rfdetr import predicate
+    and the thread pins are read where they matter. Measured pipe untouched."""
+    base = json.loads(PIPE_PATH.read_text())
+    base['components'].append({'id': 'envprobe_1', 'provider': 'env_probe', 'config': {},
+                               'input': [{'lane': 'text', 'from': 'webhook_1'}]})
+    base['components'].append({'id': 'resp_env', 'provider': 'response_text',
+                               'config': {'laneName': 'envprobe'},
+                               'input': [{'lane': 'text', 'from': 'envprobe_1'}]})
+    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+    out = GENERATED_DIR / f'video_envprobe_{os.getpid()}.pipe'
+    out.write_text(json.dumps(base, indent=1))
+    return out
+
+
+async def rr_readback(port: int) -> dict:
+    from rocketride import RocketRide
+    pipe = generate_envprobe_pipe()
+    client = RocketRide(uri=f'ws://127.0.0.1:{port}/task/service', apikey='local-dev')
+    await client.connect()
+    try:
+        started = await client.use(filepath=str(pipe), ttl=600)
+        result = await client.send(started['token'], 'readback probe',
+                                   mimetype='text/plain')
+        texts = (result or {}).get('envprobe') or []
+        info = json.loads(texts[0]) if texts else {}
+    finally:
+        await client.disconnect()
+    return info
+
+
+async def li_readbacks(arm: LIArm, timeout_s: float = 120) -> Dict[str, dict]:
+    """Sample /health until every declared worker pid has answered (or timeout —
+    which is an ABSENCE failure downstream, never a shrug)."""
+    per_worker: Dict[str, dict] = {}
+    declared = arm.declared_workers or 0
+    deadline = time.monotonic() + timeout_s
+    while len(per_worker) < declared and time.monotonic() < deadline:
+        h = await arm.health()
+        per_worker[f'li_worker_{h["pid"]}'] = {
+            'env': h.get('thread_env') or {},
+            'torch_num_threads': h.get('torch_num_threads'),
+            'detect_impl': h.get('detect_impl'),
+            'versions': h.get('versions') or {},
+        }
+    return per_worker
+
+
+def docker_inspect(container: str, fmt: str) -> Optional[str]:
+    try:
+        out = subprocess.run(['docker', 'inspect', '-f', fmt, container],
+                             capture_output=True, text=True, timeout=15)
+        return out.stdout.strip() if out.returncode == 0 else None
+    except Exception:
+        return None
+
+
+def preflight_containers(rr_container: Optional[str], li_container: Optional[str]) -> List[str]:
+    """No cpuset on either arm this phase, no CFS quota ever (rule C1), and the
+    RR container must BE the patched Phase 2 image — the box still carries the
+    Phase 1 rr/li containers (2 days up, WITH cpuset), so name collisions fail
+    here instead of contaminating a leg."""
+    problems = []
+    for c in filter(None, [rr_container, li_container]):
+        cpuset = docker_inspect(c, '{{.HostConfig.CpusetCpus}}')
+        nano = docker_inspect(c, '{{.HostConfig.NanoCpus}}')
+        if cpuset is None:
+            problems.append(f'{c}: docker inspect failed')
+            continue
+        if cpuset != '':
+            problems.append(f'{c}: cpuset set ({cpuset}) — this phase runs uncpuset '
+                            f'(a Phase 1 leftover container?)')
+        if nano not in ('0', None):
+            problems.append(f'{c}: NanoCpus={nano} — --cpus must never be set (rule C1)')
+    if rr_container:
+        patched = docker_inspect(
+            rr_container,
+            '{{index .Config.Labels "benchmark.rocketride.duplication_patch_applied"}}')
+        if patched != '1':
+            problems.append(f'{rr_container}: duplication_patch_applied label is '
+                            f'{patched!r}, not "1" — wrong image (label is an assertion; '
+                            f'the PDF fixture in the held smoke is the measurement)')
+    return problems
+
+
+async def preflight(args, arm, rr_arm_active: bool) -> dict:
+    say('preflight: manifest')
+    meta, rows = load_manifest(Path(args.manifest))
+    bad = verify_corpus(rows, Path(args.corpus_dir))
+    if bad:
+        raise SystemExit('NOT DONE — corpus does not match manifest:\n  ' + '\n  '.join(bad))
+
+    say('preflight: container flags')
+    problems = preflight_containers(args.rr_container if rr_arm_active else None,
+                                    args.li_container if not rr_arm_active else None)
+    if problems:
+        raise SystemExit('NOT DONE — container flags:\n  ' + '\n  '.join(problems))
+
+    say('preflight: read-backs (absence fails before agreement)')
+    readbacks: Dict[str, dict] = {}
+    identity: Dict[str, Any] = {}
+    if rr_arm_active:
+        info = await rr_readback(args.rr_port)
+        readbacks['rr_task'] = {'env': info.get('env') or {},
+                                'torch_num_threads': info.get('torch_num_threads')}
+        identity['rr'] = {'rfdetr_import_ok': info.get('rfdetr_import_ok'),
+                          'versions': info.get('package_versions') or {}}
+        if info.get('rfdetr_import_ok') is not True:
+            raise SystemExit('NOT DONE — RR task process cannot import rfdetr '
+                             f'({info.get("rfdetr_import_error")!r}): the engine would '
+                             'silently serve RT-DETR, a different model. Refusing to run.')
+    else:
+        per_worker = await li_readbacks(arm)
+        if len(per_worker) < (arm.declared_workers or 1):
+            raise SystemExit(f'NOT DONE — only {len(per_worker)}/{arm.declared_workers} LI '
+                             'workers answered /health: absent workers fail before agreement.')
+        readbacks.update({k: {'env': v['env'], 'torch_num_threads': v['torch_num_threads']}
+                          for k, v in per_worker.items()})
+        impls = {v['detect_impl'] for v in per_worker.values()}
+        identity['li'] = {'detect_impl': sorted(impls),
+                          'versions': next(iter(per_worker.values()))['versions']}
+        if impls != {'rfdetr'}:
+            raise SystemExit(f'NOT DONE — LI detect_impl read back as {impls}, not rfdetr.')
+
+    pins = gs.thread_pin_parity(readbacks)
+    if pins['PASS'] is not True:
+        raise SystemExit(f'NOT DONE — thread pins: {json.dumps(pins)}')
+
+    return {'manifest_meta': meta, 'rows': rows, 'readbacks': readbacks,
+            'identity': identity, 'thread_pin_parity': pins,
+            'pipe_sha256': sha256_bytes(PIPE_PATH.read_bytes()),
+            'manifest_sha256': sha256_bytes(Path(args.manifest).read_bytes())}
+
+
+# ---------------------------------------------------------------------------
+# Legs — one submit path; stamps per #29
+# ---------------------------------------------------------------------------
+
+async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
+                  corpus_dir: Path, writer: JsonlWriter, done: set,
+                  interval_s: int) -> dict:
+    sem = asyncio.Semaphore(1 if leg == 'sequential' else concurrency)
+    consecutive_failures = 0
+    stop = asyncio.Event()
+
+    async def one(row):
+        nonlocal consecutive_failures
+        if row['file'] in done or stop.is_set():
+            return
+        blob = (corpus_dir / row['file']).read_bytes()
+        enqueue_ns = time.monotonic_ns()          # stamped BEFORE admission (#29)
+        async with sem:
+            if stop.is_set():
+                return
+            admit_ns = time.monotonic_ns()        # stamped at admission (#29)
+            rec = {'video': row['file'], 'role': row['role'],
+                   'submitted_sha256': sha256_bytes(blob), 'bytes': len(blob),
+                   'expected_frames': expected_frames(row, interval_s),
+                   'enqueue_ns': enqueue_ns, 'admit_ns': admit_ns}
+            try:
+                body = await arm.process(blob, row['file'])
+                rec.update(body)
+                rec['done_ns'] = time.monotonic_ns()
+                rec['wall_s'] = round((rec['done_ns'] - admit_ns) / 1e9, 2)
+                consecutive_failures = 0
+            except Exception as exc:  # noqa: BLE001 — recorded, never masked
+                rec['error'] = repr(exc)
+                rec['done_ns'] = time.monotonic_ns()
+                consecutive_failures += 1
+                say(f'FAIL {row["file"]}: {exc!r} ({consecutive_failures} consecutive)')
+                if consecutive_failures >= BREAKER_K:
+                    say(f'breaker: {BREAKER_K} consecutive failures — aborting leg (#32)')
+                    stop.set()
+            writer.write(rec)
+
+    if leg == 'sequential':
+        for row in rows:
+            await one(row)
+    else:
+        await asyncio.gather(*[one(row) for row in rows])
+    return {'aborted_by_breaker': stop.is_set()}
+
+
+def leg_gates(records: List[dict], rows: List[dict], arm_name: str,
+              interval_s: int) -> dict:
+    ok_records = [r for r in records if 'error' not in r]
+    expected = {r['file']: expected_frames(r, interval_s) for r in rows}
+    gates: Dict[str, Any] = {}
+    if not records:
+        gates['frames_census'] = gs.not_run('frames_census', offered=len(rows),
+                                            reason='leg produced no records file')
+    else:
+        gates['frames_census'] = gs.frames_census(ok_records, expected, arm_name)
+        gates['errors'] = {'PASS': len(ok_records) == len(records),
+                           'n_errors': len(records) - len(ok_records)}
+        dup_rows = [gs.self_duplication([{'doc': r['video'],
+                                          'chunk_sha256': r.get('chunk_sha256') or []}])
+                    for r in ok_records]
+        gates['self_duplication_any'] = {
+            'PASS': not any(r.get('whole_list_doubled') is True for r in ok_records),
+            'doubled_videos': [r['video'] for r in ok_records
+                               if r.get('whole_list_doubled') is True] or None,
+            'indeterminate_videos': [r['video'] for r in ok_records
+                                     if r.get('whole_list_doubled') is None] or None,
+            'detector_rows': len(dup_rows)}
+        eligible = [r for r in ok_records if (r.get('n_chunks') or 0) >= 64]
+        if not eligible:
+            gates['duplication_trigger'] = gs.not_run(
+                'duplication_trigger', offered=len(ok_records),
+                reason='no record reached the 64-chunk flush threshold organically '
+                       '(approved: NOT RUN, never PASS)')
+        else:
+            gates['duplication_trigger'] = {
+                'PASS': not any(r.get('whole_list_doubled') is True for r in eligible),
+                'n_trigger_eligible': len(eligible),
+                'n_indeterminate': sum(1 for r in eligible
+                                       if r.get('whole_list_doubled') is None)}
+        gates['chunkid_monotone'] = {
+            'PASS': all(r.get('chunkid_monotone') for r in ok_records),
+            'violations': [r['video'] for r in ok_records if not r.get('chunkid_monotone')] or None}
+    return gates
+
+
+# ---------------------------------------------------------------------------
+# Cross-arm mode
+# ---------------------------------------------------------------------------
+
+def cross_gates(rr_path: Path, li_path: Path, tol: float) -> dict:
+    rr, _, _ = read_completed(rr_path, key='video')
+    li, _, _ = read_completed(li_path, key='video')
+    rr_ok = [r for r in rr if 'error' not in r]
+    li_ok = [r for r in li if 'error' not in r]
+    li_by = {r['video']: r for r in li_ok}
+    pairs = [{'video': r['video'], 'rr_chars': r.get('sum_chunk_chars'),
+              'li_chars': (li_by.get(r['video']) or {}).get('sum_chunk_chars')}
+             for r in rr_ok if r['video'] in li_by]
+    out = {
+        'char_conservation': (gs.char_conservation_parity(pairs, tol=tol) if pairs
+                              else gs.not_run('char_conservation',
+                                              reason='no overlapping videos')),
+        'chunk_count_ratio': gs.chunk_count_ratio(rr_ok, li_ok),
+        'n_rr': len(rr_ok), 'n_li': len(li_ok), 'n_paired': len(pairs),
+    }
+    # Provenance chunk config FROM RECORDS, never the config literal (approved).
+    for label, recs in (('rr', rr_ok), ('li', li_ok)):
+        lens = [c for r in recs for c in (r.get('chunk_chars') or [])]
+        out[f'{label}_chunk_config_measured'] = (
+            {'chunk_size_max_observed': max(lens), 'chunk_chars_median': sorted(lens)[len(lens) // 2]}
+            if lens else None)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# main
+# ---------------------------------------------------------------------------
+
+async def amain() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--arm', choices=['rocketride', 'llamaindex'])
+    ap.add_argument('--posture', choices=['default', 'parity'], default='default',
+                    help='RocketRide only; Crossroad 9 runs BOTH, one at a time')
+    ap.add_argument('--leg', choices=['sequential', 'blast'])
+    ap.add_argument('--n', type=int, help='measured videos (prefix of manifest measured rows)')
+    ap.add_argument('--blast-concurrency', type=int)
+    ap.add_argument('--tokens', type=int, help='parity posture M (default: LI declared_workers)')
+    ap.add_argument('--threads', type=int, help='parity posture per-token threads= (default: unset)')
+    ap.add_argument('--manifest', default=str(MANIFEST_DEFAULT))
+    ap.add_argument('--corpus-dir', default=str(ROOT / 'corpus' / 'ami' / 'video'))
+    ap.add_argument('--interval-s', type=int, default=15)
+    ap.add_argument('--rr-port', type=int, default=5565)
+    ap.add_argument('--li-port', type=int, default=8802)
+    ap.add_argument('--rr-container', default='rr')
+    ap.add_argument('--li-container', default='li_video')
+    ap.add_argument('--out-dir', default=None)
+    ap.add_argument('--skip-cache-drop', action='store_true',
+                    help='wiring tests only — measured runs must evict and prove it')
+    ap.add_argument('--skip-warmup', action='store_true',
+                    help='resume aid ONLY — a fresh container without warm-up is not measurable')
+    ap.add_argument('--no-collector', action='store_true')
+    ap.add_argument('--char-tol', type=float, default=0.02)
+    ap.add_argument('--cross', nargs=2, metavar=('RR_JSONL', 'LI_JSONL'),
+                    help='cross-arm gates over two completed record files; no run')
+    args = ap.parse_args()
+
+    if args.cross:
+        out = cross_gates(Path(args.cross[0]), Path(args.cross[1]), args.char_tol)
+        print(json.dumps(out, indent=1))
+        ok = out['char_conservation'].get('PASS')
+        return 0 if (ok is True or out['char_conservation'].get('verdict') == 'NOT RUN') else 1
+
+    if not (args.arm and args.leg and args.n):
+        ap.error('--arm, --leg and --n are required for a run (or use --cross)')
+    if args.leg == 'blast' and not args.blast_concurrency:
+        ap.error('--blast-concurrency is required for the blast leg (run plan sets it; '
+                 'this driver refuses to invent it)')
+
+    out_dir = Path(args.out_dir or (ROOT / 'working' / 'video' / 'results' /
+                                    time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())))
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # ---- arm + posture ----------------------------------------------------
+    li_probe = LIArm(args.li_port)
+    if args.arm == 'llamaindex':
+        arm = li_probe
+        await arm.start()
+        posture = Posture('workers', arm.declared_workers or 1, None)
+    else:
+        # Parity M defaults to the LI service's declared workers — the whole
+        # point of the posture. If LI is not up to answer, --tokens is required.
+        if args.posture == 'parity':
+            m = args.tokens
+            if m is None:
+                try:
+                    await li_probe.start()
+                    m = li_probe.declared_workers
+                except Exception:
+                    m = None
+                if not m:
+                    raise SystemExit('NOT DONE — parity posture needs M: LI /health is not '
+                                     'answering and --tokens was not given.')
+            posture = Posture('parity', m, args.threads)
+        else:
+            posture = Posture('default', 1, None)
+        arm = RRArm(args.rr_port, posture, PIPE_PATH)
+
+    pf = await preflight(args, arm if args.arm == 'llamaindex' else li_probe,
+                         rr_arm_active=(args.arm == 'rocketride'))
+    rows_all = pf['rows']
+    measured = [r for r in rows_all if r['role'] == 'measured'][:args.n]
+    warm = [r for r in rows_all if r['role'] == 'warm']
+    if len(measured) < args.n:
+        raise SystemExit(f'NOT DONE — manifest has {len(measured)} measured rows, --n {args.n}')
+
+    if args.arm == 'rocketride':
+        await arm.start()
+        if posture.name == 'parity' and len(warm) < posture.tokens:
+            raise SystemExit(f'NOT DONE — {len(warm)} warm rows < {posture.tokens} tokens: '
+                             'every token must see at least one warm item.')
+
+    (out_dir / 'preflight.json').write_text(json.dumps(
+        {k: v for k, v in pf.items() if k != 'rows'} | {'posture': posture.label()}, indent=1))
+    say(f'preflight PASSED — {arm.name} {posture.label()} leg={args.leg} n={args.n}')
+
+    # ---- page cache: evict corpus before the arm (settled decision 4) -----
+    # fadvise(DONTNEED) + behavioral proof — works without sudo (box ssm-user
+    # sudo is unverified). --skip-cache-drop exists for wiring tests only.
+    if not args.skip_cache_drop:
+        helper = ROOT / 'working' / 'video' / 'probe' / 'drop_cache_fadvise.py'
+        files = [str(Path(args.corpus_dir) / r['file']) for r in rows_all]
+        r = subprocess.run([sys.executable, str(helper), *files],
+                           capture_output=True, text=True)
+        say(f'cache eviction: rc={r.returncode} {r.stdout.strip().splitlines()[-1] if r.stdout else ""}')
+        if r.returncode != 0:
+            raise SystemExit('NOT DONE — corpus page-cache eviction not proven '
+                             f'(rc={r.returncode}): {r.stderr.strip() or r.stdout.strip()}')
+
+    # ---- warm-up: driver-side, disjoint (role=warm), coverage proven ------
+    if not args.skip_warmup:
+        say(f'warm-up: {len(warm)} disjoint items')
+        seen_pids, seen_tokens = set(), set()
+        conc = posture.tokens if args.arm == 'rocketride' else (arm.declared_workers or 1)
+        sem = asyncio.Semaphore(max(1, conc))
+
+        async def warm_one(row):
+            async with sem:
+                blob = (Path(args.corpus_dir) / row['file']).read_bytes()
+                try:
+                    rec = await arm.process(blob, row['file'])
+                    if rec.get('serving_pid'):
+                        seen_pids.add(rec['serving_pid'])
+                    if rec.get('token_index') is not None:
+                        seen_tokens.add(rec['token_index'])
+                except Exception as exc:  # noqa: BLE001
+                    say(f'warm-up failure on {row["file"]}: {exc!r} (recorded, continuing)')
+
+        await asyncio.gather(*[warm_one(r) for r in warm])
+        if args.arm == 'rocketride' and len(seen_tokens) < posture.tokens:
+            raise SystemExit(f'NOT DONE — warm-up touched {len(seen_tokens)}/{posture.tokens} '
+                             'tokens; every instance must be warm before timing.')
+        if args.arm == 'llamaindex' and len(seen_pids) < (arm.declared_workers or 1):
+            raise SystemExit(f'NOT DONE — warm-up observed {len(seen_pids)}/{arm.declared_workers} '
+                             'worker pids serving (#21-class): unwarmed workers would serve '
+                             'measured traffic cold.')
+        say(f'warm-up complete: tokens={sorted(seen_tokens) or "n/a"} '
+            f'worker_pids={len(seen_pids) or "n/a"}')
+
+    # ---- the leg, under the collector -------------------------------------
+    rec_path = out_dir / f'records_{arm.name}_{posture.name}_{args.leg}.jsonl'
+    prior, done_keys, torn = read_completed(rec_path, key='video')
+    if prior:
+        say(f'resume: {len(done_keys)} videos already recorded'
+            + (f' (torn last line tolerated: {torn})' if torn else ''))
+
+    collector = None
+    if not args.no_collector:
+        from harness.collector_proc import ProcessCollector
+        container = args.rr_container if args.arm == 'rocketride' else args.li_container
+        root_pid = docker_inspect(container, '{{.State.Pid}}')
+        roles = {'driver': {'pids': [os.getpid()]}}
+        if root_pid and root_pid.isdigit():
+            roles['service'] = {'pids': [int(root_pid)]}
+        else:
+            raise SystemExit(f'NOT DONE — cannot resolve container root pid for {container!r}; '
+                             'the collector must sample the service or nothing is quotable.')
+        collector = ProcessCollector(out_dir / f'collector_{arm.name}_{args.leg}.jsonl',
+                                     roles, interval_s=0.5)
+        collector.start()
+
+    t_leg0 = time.monotonic()
+    dr0 = resource.getrusage(resource.RUSAGE_SELF)
+    with JsonlWriter(rec_path) as writer:
+        leg_meta = await run_leg(arm, measured, args.leg,
+                                 args.blast_concurrency or 1,
+                                 Path(args.corpus_dir), writer, done_keys,
+                                 args.interval_s)
+    leg_wall = time.monotonic() - t_leg0
+    dr1 = resource.getrusage(resource.RUSAGE_SELF)
+    if collector:
+        collector.stop()
+    await arm.stop()
+
+    # ---- gates + export ---------------------------------------------------
+    records, _, _ = read_completed(rec_path, key='video')
+    gates = leg_gates(records, measured, arm.name, args.interval_s)
+    driver_cpu_s = (dr1.ru_utime + dr1.ru_stime) - (dr0.ru_utime + dr0.ru_stime)
+    driver_share = driver_cpu_s / leg_wall / (os.cpu_count() or 32) if leg_wall else None
+
+    ok_records = [r for r in records if 'error' not in r]
+    lens = [c for r in ok_records for c in (r.get('chunk_chars') or [])]
+    measured_chunk_size = max(lens) if lens else None
+    prov = pvl.build(
+        arm=arm.name, mode=args.leg, corpus_sha=pf['manifest_sha256'],
+        corpus_n=len(measured),
+        offered_concurrency=(args.blast_concurrency if args.leg == 'blast' else 1),
+        configured_concurrency=(posture.tokens if args.arm == 'rocketride'
+                                else (arm.declared_workers or None)),
+        warmup_policy=f'driver-side, {len(warm)} disjoint manifest warm rows, '
+                      f'coverage proven per instance',
+        timeout_s=7200,
+        parser=f'ffmpeg fps=1/{args.interval_s} + rfdetr(RF-DETR base, thr 0.3)',
+        chunk_size=measured_chunk_size or -1,   # FROM RECORDS; -1 = no records, unmissable
+        chunk_overlap=0,
+        embedding_model=EMBED_MODEL,
+        container=(args.rr_container if args.arm == 'rocketride' else args.li_container),
+        splitter=('RecursiveCharacterTextSplitter' if args.arm == 'rocketride'
+                  else 'SentenceSplitter(native, char length function supplied)'),
+    )
+    export = {
+        'arm': arm.name, 'posture': posture.label(), 'leg': args.leg,
+        'n_offered': len(measured), 'n_records': len(records),
+        'n_errors': len(records) - len(ok_records),
+        'leg_wall_s': round(leg_wall, 1),
+        'aborted_by_breaker': leg_meta['aborted_by_breaker'],
+        'wall_s_order_stats': sorted(round(r['wall_s'], 1) for r in ok_records
+                                     if r.get('wall_s') is not None),
+        'driver_cpu': {'cpu_s': round(driver_cpu_s, 1),
+                       'share_of_box': round(driver_share, 4) if driver_share else None,
+                       'over_1pct': (driver_share or 0) > 0.01},
+        'gates': gates,
+        'provenance_leela': prov,
+        'provenance_video': {
+            'pipe_sha256': pf['pipe_sha256'],
+            'manifest_sha256': pf['manifest_sha256'],
+            'posture': {'name': posture.name, 'tokens': posture.tokens,
+                        'threads_config': posture.threads,
+                        'threads_note': ('unset -> engine CONST_DEFAULT_MAX_THREADS=64 '
+                                         '(constants.py:48)' if posture.threads is None else
+                                         'explicit use(threads=)')},
+            'identity_readback': pf['identity'],
+            'thread_pin_parity': pf['thread_pin_parity'],
+            'interval_s': args.interval_s,
+            'frames_observed_method': ('bracket-count' if args.arm == 'rocketride'
+                                       else 'extractor-count'),
+            'chunk_config_source': 'measured from records (config literal never exported)',
+        },
+    }
+    export_path = out_dir / f'export_{arm.name}_{posture.name}_{args.leg}.json'
+    export_path.write_text(json.dumps(export, indent=1))
+    say(f'export: {export_path}')
+    if driver_share and driver_share > 0.01:
+        say(f'WARNING: driver CPU share {driver_share:.1%} > 1% — report it; '
+            'pinning gets reinstated if this holds (environment rule)')
+
+    hard = [k for k, g in gates.items()
+            if isinstance(g, dict) and g.get('PASS') is False]
+    if hard:
+        say(f'GATES FAILED: {hard}')
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(asyncio.run(amain()))

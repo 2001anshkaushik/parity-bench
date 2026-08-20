@@ -598,3 +598,163 @@ def three_verdicts(shashi_checks: Dict[str, Dict], leela_checks: Dict[str, Dict]
                           "gates are excluded from the conjunction and listed, never "
                           "counted as failures"},
     }
+
+
+# =============================================================================
+# Phase 2 (video) extensions — approved 2026-08-20.
+#
+# WHAT CHANGED AND WHY (the reuse rule requires this note):
+#   * chunk_config_parity is RETIRED for Phase 2 (it asserted config as
+#     evidence — the class this project keeps catching). Its replacement is
+#     char_conservation_parity below: a MEASURED workload-parity gate on the
+#     sum of chunk characters per document, both arms. Tolerance 2% covers
+#     each splitter's own separator stripping (measured: RecursiveCharacter
+#     drops ~1 whitespace char per chunk seam, ~0.2% of a detect-JSON blob).
+#   * frames_census: the per-video emitted-unit census for the video phase.
+#     Records are many-per-input, so Phase 1's one-record-per-item censuses
+#     do not carry; the frame count is manifest-derivable and exact.
+#   * thread_pin_parity: defect #37's fix as ONE function fed by both arms —
+#     absence fails BEFORE agreement is checked, always.
+#   * chunk_count_ratio: REPORTED, never gated in the first runs (approved) —
+#     the two arms use different splitter algorithms by design, so the
+#     natural spread must be observed before a band is proposed.
+# Nothing above this block changed.
+# =============================================================================
+
+
+def char_conservation_parity(pairs: Sequence[Dict[str, Any]],
+                             tol: float = 0.02) -> Dict[str, Any]:
+    """Measured workload parity: per-document sum-of-chunk-characters ratio.
+
+    `pairs` rows: {"video": str, "rr_chars": int|None, "li_chars": int|None}.
+    A missing side is an ABSENCE failure for that row (absence fails before
+    agreement); zero rows is the caller's NOT-RUN case (use not_run()).
+    Gate input is sum(chunk lengths) on BOTH arms — not the pre-split blob —
+    so both splitters' separator losses sit inside the tolerance symmetrically.
+    """
+    if not pairs:
+        return {"PASS": False, "reason": "zero pairs — if the leg did not run, "
+                                         "report not_run() instead", "tol": tol}
+    rows, worst = [], 0.0
+    ok = True
+    for p in pairs:
+        rr, li = p.get("rr_chars"), p.get("li_chars")
+        if not rr or not li:  # None or 0 — a zero-char document cannot pass parity
+            rows.append({"video": p.get("video"), "PASS": False,
+                         "reason": f"absent side rr={rr!r} li={li!r}"})
+            ok = False
+            continue
+        ratio = rr / li
+        dev = abs(ratio - 1.0)
+        worst = max(worst, dev)
+        row_ok = dev <= tol
+        ok = ok and row_ok
+        rows.append({"video": p.get("video"), "PASS": row_ok,
+                     "ratio_rr_over_li": round(ratio, 4)})
+    return {"PASS": ok is True, "tol": tol, "n_pairs": len(pairs),
+            "worst_abs_deviation": round(worst, 4), "rows": rows}
+
+
+def frames_census(records: Sequence[Dict[str, Any]],
+                  expected_by_video: Dict[str, int],
+                  arm: str) -> Dict[str, Any]:
+    """Per-video frame census: observed (read back from the arm's own records)
+    vs expected (manifest-derived, exact). Absence of an observed count FAILS
+    the row — an arm that cannot report what it extracted cannot pass a census.
+    Empty `records` returns PASS=False (a leg that ran and produced zero is a
+    FAIL); a leg that did not run is the caller's not_run() case (#38 rule).
+    """
+    if not records:
+        return {"PASS": False, "arm": arm, "reason": "zero records"}
+    rows, ok = [], True
+    seen = set()
+    for r in records:
+        vid, obs = r.get("video"), r.get("frames_observed")
+        seen.add(vid)
+        exp = expected_by_video.get(vid)
+        if obs is None or exp is None:
+            rows.append({"video": vid, "PASS": False,
+                         "reason": f"absent observed={obs!r} expected={exp!r}"})
+            ok = False
+        elif obs != exp:
+            rows.append({"video": vid, "PASS": False, "observed": obs, "expected": exp})
+            ok = False
+        else:
+            rows.append({"video": vid, "PASS": True, "frames": obs})
+    missing = sorted(set(expected_by_video) - seen)
+    if missing:
+        ok = False
+    return {"PASS": ok is True, "arm": arm, "n_records": len(records),
+            "missing_videos": missing or None, "rows": rows}
+
+
+def thread_pin_parity(readbacks: Dict[str, Dict[str, Any]],
+                      keys: Sequence[str] = ("OMP_NUM_THREADS", "MKL_NUM_THREADS",
+                                             "OPENBLAS_NUM_THREADS", "VECLIB_MAXIMUM_THREADS",
+                                             "NUMEXPR_NUM_THREADS", "TORCH_NUM_THREADS")) -> Dict[str, Any]:
+    """One check, both arms (#24/#25/#37 class): every reader (RR task process,
+    each LI worker) must report ALL six variables plus torch_num_threads, and
+    every reported value must agree across readers. ABSENCE FAILS FIRST: a
+    missing reader, variable, or torch count fails before any agreement is
+    examined — two unpinned arms agreeing is exactly the defect.
+    """
+    if not readbacks:
+        return {"PASS": False, "reason": "no readbacks — absent fails before agreement"}
+    absent = []
+    for label, rb in readbacks.items():
+        env = (rb or {}).get("env") or {}
+        for k in keys:
+            if env.get(k) in (None, ""):
+                absent.append(f"{label}:{k}")
+        if (rb or {}).get("torch_num_threads") is None:
+            absent.append(f"{label}:torch_num_threads")
+    if absent:
+        return {"PASS": False, "absent": absent,
+                "reason": "absent pins fail before agreement is checked"}
+    values = {k: {label: rb["env"][k] for label, rb in readbacks.items()} for k in keys}
+    values["torch_num_threads"] = {label: rb["torch_num_threads"]
+                                   for label, rb in readbacks.items()}
+    disagree = {k: v for k, v in values.items() if len(set(v.values())) > 1}
+    return {"PASS": not disagree, "readers": sorted(readbacks),
+            "disagreements": disagree or None, "values_agreed":
+                {k: next(iter(v.values())) for k, v in values.items()} if not disagree else None}
+
+
+def chunk_count_ratio(rr_records: Sequence[Dict[str, Any]],
+                      li_records: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    """REPORTED, not gated (approved 2026-08-20): the arms split with different
+    native algorithms, so the count ratio measures splitter semantics, not
+    loss. A gated band gets proposed from the observed spread, not assumed.
+    """
+    rr = {r.get("video"): r.get("n_chunks") for r in rr_records}
+    li = {r.get("video"): r.get("n_chunks") for r in li_records}
+    ratios = {v: round(rr[v] / li[v], 3) for v in rr
+              if v in li and rr[v] and li[v]}
+    vals = sorted(ratios.values())
+    return {"gated": False, "n_pairs": len(vals),
+            "ratio_min_median_max": ([vals[0], vals[len(vals) // 2], vals[-1]]
+                                     if vals else None),
+            "per_video": ratios or None}
+
+
+def whole_list_doubled(hashes: Sequence[str]) -> Optional[bool]:
+    """The stock-engine flush-defect signature: the ENTIRE chunk list emitted
+    twice ([A..Z,A..Z], repeat_factor 2 over the whole record).
+
+    Returns None — indeterminate, never a verdict — when the list is too
+    uniform to carry the signature: if every hash in the half is identical,
+    [A,A] == [A,A] holds for organic reasons (a fully static scene can emit
+    identical detection JSON per frame), and doubling cannot be distinguished
+    from content. Callers report None as 'indeterminate' and lean on the
+    trigger-eligibility count; they never fold None into a FAIL or a PASS.
+    Discovered by a driver self-test on uniform synthetic chunks, 2026-08-20.
+    """
+    n = len(hashes)
+    if n == 0 or n % 2:
+        return False
+    half = hashes[:n // 2]
+    if list(half) != list(hashes[n // 2:]):
+        return False
+    if len(set(half)) < 2:
+        return None
+    return True

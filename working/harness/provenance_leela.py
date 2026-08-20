@@ -103,10 +103,18 @@ def build(*, arm: str, mode: str, corpus_sha: str, corpus_n: int,
           warmup_policy: str, timeout_s: Optional[float],
           parser: str, chunk_size: int, chunk_overlap: int,
           embedding_model: str, container: Optional[str] = None,
-          run_id: Optional[str] = None) -> Dict[str, Any]:
-    """One arm's block. `arm` selects which framework_version is meaningful."""
+          run_id: Optional[str] = None,
+          splitter: str = "RecursiveCharacterTextSplitter") -> Dict[str, Any]:
+    """One arm's block. `arm` selects which framework_version is meaningful.
+
+    Phase 2 (video) extension, 2026-08-20: `splitter` is a parameter because the
+    LlamaIndex video arm uses its native SentenceSplitter (approved decision) —
+    hardcoding RecursiveCharacterTextSplitter here would be confidently wrong
+    provenance for that arm, the exact defect class this field survived once
+    already. Default preserves every Phase 1 call site byte-for-byte.
+    """
     chunk_config = {"chunk_size": chunk_size, "chunk_overlap": chunk_overlap,
-                    "splitter": "RecursiveCharacterTextSplitter",
+                    "splitter": splitter,
                     "input_transform": "text + '\\n'"}
     block: Dict[str, Any] = {
         "run_id": run_id or f"{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}-{os.getpid()}",
