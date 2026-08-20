@@ -1,0 +1,89 @@
+# ---------------------------------------------------------------------------------------------
+# WS-1 Phase 2 (video/detect) — LlamaIndex arm image. NEW file: the Phase 1
+# Dockerfile.llamaindex is untouched (its image is still the Phase 1 artifact).
+#
+# PARITY RULE THIS FILE EXISTS TO ENFORCE: the model stack is installed at the
+# EXACT versions the rr image's constraints compile resolved — rfdetr, torch,
+# transformers etc. are UNPINNED in the engine's requirements, resolution
+# freezes at rr image build, and current PyPI has a live conflict
+# (rfdetr>=1.9 needs transformers>=5.1; engine pins 4.53.3), so the resolved
+# rfdetr version is unknowable from source. Run
+#     working/video/li_video/extract_engine_pins.sh rr:patched
+# FIRST; it writes working/video/li_video/engine_pins.txt and this build
+# fails without it. Identity is then read back at runtime (/health), never
+# assumed from this file.
+#
+# Carried from the Phase 1 LI image (same lessons, same shape):
+#   * pinned python:3.12-slim digest (same base as Dockerfile.llamaindex)
+#   * LLAMA_INDEX_CACHE_DIR bake — HuggingFaceEmbedding ignores HF_HOME (#20)
+#   * offline load proof as the RUNTIME user with a hermetic HOME
+#   * thread variables deliberately NOT baked — the harness sets and reads them back
+#   * WS1V_WORKERS is a PARAMETER echoed by /health; measured-run value comes
+#     from the probe's token-topology census, not from this file
+# ---------------------------------------------------------------------------------------------
+FROM python:3.12-slim@sha256:229a2c5bfa27522db7815ea81f9bed70af17ccb9de9fc7ad142b1877b5830d36
+
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
+    TOKENIZERS_PARALLELISM=false \
+    LLAMA_INDEX_CACHE_DIR=/opt/li-cache \
+    HF_HOME=/opt/hf \
+    RFDETR_CACHE=/opt/rfdetr-cache
+
+# Model-stack pins extracted from the built rr image (build fails without the file).
+COPY working/video/li_video/engine_pins.txt /tmp/engine_pins.txt
+RUN pip install --no-cache-dir -r /tmp/engine_pins.txt
+
+# Service stack (Phase 1's uvicorn lane: uvloop/httptools installed explicitly so a
+# silent fallback to asyncio/h11 cannot hide behind a declared loop) + LlamaIndex.
+RUN pip install --no-cache-dir \
+      fastapi uvicorn uvloop httptools anyio \
+      llama-index-core llama-index-embeddings-huggingface
+
+# --- bake 1: miniLM via the loader the SERVICE uses (LLAMA_INDEX_CACHE_DIR, #20) ---
+RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 python -c "\
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding; \
+e = HuggingFaceEmbedding(model_name='sentence-transformers/multi-qa-MiniLM-L6-cos-v1', device='cpu'); \
+v = e.get_text_embedding_batch(['bake'])[0]; \
+assert len(v) == 384, f'expected 384 dims, got {len(v)}'; \
+print('miniLM baked, dim', len(v))" \
+ && chmod -R a+rX /opt/li-cache /opt/hf
+
+# --- bake 2: RF-DETR base checkpoint. rfdetr writes its .pth into the cwd
+# (engine source detection.py:132-134 note), so chdir into the cache dir.
+RUN mkdir -p "$RFDETR_CACHE" && cd "$RFDETR_CACHE" && python -c "\
+import sys, types; \
+sys.modules.setdefault('matplotlib.pyplot', types.ModuleType('matplotlib.pyplot')); \
+from rfdetr import RFDETRBase; \
+m = RFDETRBase(); \
+import glob; \
+pths = glob.glob('*.pth') + glob.glob('**/*.pth', recursive=True); \
+assert pths, 'no checkpoint materialised in the rfdetr cache dir — inspect rfdetr download path for the pinned version'; \
+print('rfdetr baked:', pths)" \
+ && chmod -R a+rX "$RFDETR_CACHE"
+
+RUN useradd -m -u 10002 ws1v && mkdir -p /app && chown -R ws1v /app
+COPY --chown=ws1v working/video/li_video /app/li_video
+ENV PYTHONPATH=/app
+USER ws1v
+WORKDIR $RFDETR_CACHE
+
+# BUILD-TIME PROOF the bakes load as the RUNTIME user with a hermetic HOME and
+# offline HF. Honest limit: rfdetr fetches over plain HTTPS, not the HF hub, so
+# HF_HUB_OFFLINE cannot forbid its download — this step proves the checkpoint
+# is PRESENT and loads from the baked path; the true no-network proof is the
+# box smoke (container run with --network none).
+RUN HOME=/tmp/hermetic HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python -c "\
+import sys, types; \
+sys.modules.setdefault('matplotlib.pyplot', types.ModuleType('matplotlib.pyplot')); \
+from rfdetr import RFDETRBase; RFDETRBase(); print('rfdetr loads as ws1v'); \
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding; \
+e = HuggingFaceEmbedding(model_name='sentence-transformers/multi-qa-MiniLM-L6-cos-v1', device='cpu'); \
+assert len(e.get_text_embedding_batch(['offline check'])[0]) == 384; \
+print('OFFLINE CACHE OK: both models load as ws1v, hermetic HOME')" \
+ && rm -rf /tmp/hermetic
+
+ENV WS1V_WORKERS=1 WS1V_INTERVAL_S=15 WS1V_THRESHOLD=0.3 \
+    WS1V_CHUNK_SIZE=512 WS1V_CHUNK_OVERLAP=0 WS1V_SPLIT_UNIT=chars \
+    WS1V_DEVICE=cpu HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+EXPOSE 8802
+ENTRYPOINT ["sh", "-c", "rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers ${WS1V_WORKERS:-1} --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30"]
