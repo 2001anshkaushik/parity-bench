@@ -329,6 +329,37 @@ taskset -c 24-31 python3 working/scripts/<driver>.py
 wiring validation or pre-stamp laptop probes. `publishable/RUN_INVENTORY.md` states this at the
 top of its section 2. The quotable Phase 1 artifacts live on the box and in S3.
 
+### Correction, 2026-08-20 — Section D described the laptop's tree, not the campaign
+
+This section was written from the tree reachable at `17f77aa`. The box's `main` carried a
+commit that never reached origin — `88eeef7` ("phase 2: 10k per-doc blast + batched + seq200,
+run inventory"), diverged from `0a117e3` — recovered on 2026-08-20 via
+`s3://rocketride-benchmark-data/ansh/rescue-20260820/parity-bench-all-88eeef7.bundle`
+(bundle verified: complete history) and merged to `origin/main` as `c06673a`
+(128 files added, `publishable/RUN_INVENTORY.md` regenerated; the divergence's origin side had
+touched only the tickets file, so the merge is conflict-free by construction). Rescue ref:
+`origin/rescue/box-main-20260820`. Three rows above are corrected by its contents:
+
+* **"Batched-arm 10k … No 10k. No result JSON in this repo"** — now false on `main`:
+  `working/results/exp_batched_blast__20260818T150551Z__373adce246fc.json` is the batched arm
+  over 9,975 (operator-reported spans: blast_batchpos 5967.518 s vs per-doc 3578.954 s), beside
+  the per-doc 10k blast `smoke50_parser_in__20260818T094225Z__a5fd8e2033b7.json` (9,975,
+  workers=24 threads=1 C=32, LI blast span 2381.162 s).
+* **"Pinned sequential 10k — UNKNOWN … no speedup or parallel-efficiency figure exists"** — a
+  pinned sequential run EXISTS at n=200:
+  `smoke50_parser_in__20260818T155557Z__4c468512ae75.json` (complete, 198/200 ok on both arms,
+  workers=24 threads=1 C=4; operator-reported spans RR 925.333 s vs LI 408.007 s). Still true:
+  no sequential at 10k. The speedup divisor Phase 2's LEGS section wants does exist at n=200.
+* **"No result JSON in this repository is quotable"** — true of the laptop tree when written;
+  false of `main` since `c06673a`, which carries the box-run JSONs stamped Linux/x86_64 and
+  inventoried as publishable-platform rows in the regenerated `RUN_INVENTORY.md`.
+* Also stale in this section's table: **"S3 artifact listing from this machine — UNKNOWN
+  (NoCredentials)"** — the laptop reads the bucket via `AWS_PROFILE=rocketride` (SSO) as of
+  2026-08-20; the default profile remains credential-less.
+
+The claims above the correction are left as written (this file does not rewrite its own
+history); read them as "true of the laptop's view on 2026-08-19."
+
 ---
 
 ## E. Directory hygiene
