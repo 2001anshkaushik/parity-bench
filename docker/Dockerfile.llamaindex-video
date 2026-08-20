@@ -83,7 +83,7 @@ print('OFFLINE CACHE OK: both models load as ws1v, hermetic HOME')" \
  && rm -rf /tmp/hermetic
 
 ENV WS1V_WORKERS=1 WS1V_INTERVAL_S=15 WS1V_THRESHOLD=0.3 \
-    WS1V_CHUNK_SIZE=512 WS1V_CHUNK_OVERLAP=0 WS1V_SPLIT_UNIT=chars \
+    WS1V_CHUNK_SIZE=4000 WS1V_CHUNK_OVERLAP=200 WS1V_SPLIT_UNIT=chars \
     WS1V_DEVICE=cpu HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 EXPOSE 8802
 ENTRYPOINT ["sh", "-c", "rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers ${WS1V_WORKERS:-1} --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30"]

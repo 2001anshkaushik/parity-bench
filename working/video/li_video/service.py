@@ -33,8 +33,11 @@ from .schema import ErrorResponse, HealthResponse, ProcessVideoResponse
 EMBED_MODEL = os.environ.get('WS1V_MODEL', 'sentence-transformers/multi-qa-MiniLM-L6-cos-v1')
 INTERVAL_S = int(os.environ.get('WS1V_INTERVAL_S', '15'))
 THRESHOLD = float(os.environ.get('WS1V_THRESHOLD', '0.3'))
-CHUNK_SIZE = int(os.environ.get('WS1V_CHUNK_SIZE', '512'))
-CHUNK_OVERLAP = int(os.environ.get('WS1V_CHUNK_OVERLAP', '0'))
+# 4000/200 matches MEASURED engine behaviour (re-ruled 2026-08-20): the
+# engine's own chunk-size config is inert (kwargs-filter bug) and its splitter
+# runs at LangChain library defaults. We benchmark what the engine DOES.
+CHUNK_SIZE = int(os.environ.get('WS1V_CHUNK_SIZE', '4000'))
+CHUNK_OVERLAP = int(os.environ.get('WS1V_CHUNK_OVERLAP', '200'))
 SPLIT_UNIT = os.environ.get('WS1V_SPLIT_UNIT', 'chars')  # 'chars' matches engine strlen; see pipeline.py
 DEVICE = os.environ.get('WS1V_DEVICE', 'cpu')
 WORKERS = int(os.environ.get('WS1V_WORKERS', '1'))

@@ -1,4 +1,4 @@
-# RocketRide Engine — Two Tickets
+# RocketRide Engine — Three Tickets
 
 Drafted from the WS-1 cross-team benchmark campaign, 14–18 August 2026.
 Three independent harnesses — each comparing RocketRide against a different framework
@@ -349,3 +349,95 @@ ordering and granularity:
 | Measurement | kernel cgroup counters via container PID · client-observed clocks · fail-closed gates · no framework self-reporting |
 | Full reports | Per-harness benchmark reports and run specifications, published alongside the artifacts |
 | Artifacts | `s3://rocketride-benchmark-data/` |
+
+
+---
+
+# TICKET 3 — `BUG_CHUNK_CONFIG_IGNORED`
+
+**Title:** `preprocessor_langchain` silently discards its entire chunk-size configuration — `_filter_kwargs_for` strips `**kwargs`-routed constructor parameters, so every pipeline chunks at LangChain library defaults (4000 chars / 200 overlap)
+
+**Type:** Bug · **Severity:** High (silent configuration no-op affecting every text pipeline) · **Component:** `nodes/preprocessor_langchain`
+
+**Affects:** `langchain.py` is **byte-identical at `server-v3.3.1` and current `HEAD` (`1138936`)** — unfixed at HEAD today. (Older tags not checked for this file.)
+
+**Found by:** a benchmark harness whose source-derived chunk-size prediction (512) lost to its own record measurements (≈4000); the discrepancy was traced to this mechanism and reproduced.
+
+## Summary
+
+The node reads its chunking configuration correctly — `strlen` (default 512, and 512 in every
+shipped profile), `mode`, `tokens` — and then loses ALL of it before the splitter is built.
+`_getSplitter()` assembles `base_kwargs = dict(chunk_overlap=0, chunk_size=<strlen>,
+length_function=<mode-aware>)` and passes them through `_filter_kwargs_for()`, which keeps only
+kwargs **named in the target constructor's signature** (`langchain.py:96-99`):
+
+```python
+params = set(inspect.signature(cls.__init__).parameters.keys())
+params.discard('self')
+return {k: v for k, v in kwargs.items() if k in params}
+```
+
+LangChain's `RecursiveCharacterTextSplitter.__init__` names only `separators`,
+`keep_separator`, `is_separator_regex` — `chunk_size`, `chunk_overlap` and `length_function`
+are consumed by the `TextSplitter` base class via `**kwargs`. The filter therefore reduces the
+engine's settings to `{}`, and the constructor runs at **LangChain's library defaults:
+`chunk_size=4000, chunk_overlap=200`** — regardless of any value the operator configures.
+
+## Operator-visible symptom
+
+Configured values have **no effect and no warning is emitted**. The UI offers `strlen`
+(default 512); output chunks are ~4000 characters with 200-character overlap. `tokens` mode is
+doubly wrong: the token-aware length function is also dropped, so "512 tokens" silently
+becomes "4000 characters" (the post-split `_split_safely_by_tokens` safety net still caps
+model-limit overflow, but the configured chunk size is never honoured). The **only** knob that
+survives the filter is `separators`.
+
+## Affected splitter classes
+
+- `RecursiveCharacterTextSplitter` — **executed and confirmed** (see reproduction).
+- `CharacterTextSplitter`, `MarkdownTextSplitter`, `LatexTextSplitter`, `NLTKTextSplitter`,
+  `SpacyTextSplitter` — **inferred, not executed**: the same LangChain `**kwargs` constructor
+  shape applies; each named-parameter set excludes the size kwargs.
+
+## Reproduction
+
+```python
+import inspect
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+params = set(inspect.signature(RecursiveCharacterTextSplitter.__init__).parameters); params.discard('self')
+base = dict(chunk_overlap=0, chunk_size=512, length_function=len)   # the engine's base_kwargs
+filtered = {k: v for k, v in base.items() if k in params}           # the engine's filter
+sp = RecursiveCharacterTextSplitter(**filtered)
+print(filtered, sp._chunk_size, sp._chunk_overlap)                  # {} 4000 200
+```
+
+Confirmed on `langchain-text-splitters` **0.3.8 and 1.1.2** (both ends of the plausible
+resolution range — the node's requirements leave the package unpinned, so any resolved version
+in that range behaves identically).
+
+## Evidence — production-scale records
+
+19,080+ per-document records across two independent 10k-document benchmark runs and one
+n=200 sequential run (engine 3.3.1, response documents read straight off the pipeline):
+mean chunk length 3375–3468 characters, **maximum 3983–3993** — the 4000 ceiling with
+separator losses — against a configured/profiled `strlen` of 512.
+
+## Proposed fix
+
+Filter against the **union of the MRO's constructor signatures** (the base `TextSplitter`
+names `chunk_size`, `chunk_overlap`, `length_function` explicitly), or explicitly allowlist
+those three; and **emit a warning naming any kwarg the filter drops** — a silently discarded
+configuration value is the defect class here, independent of which kwargs it hits next.
+
+## Acceptance criteria
+
+1. A pipeline configured `strlen=512` produces no chunk longer than 512 characters.
+2. `tokens` mode measures length with the token-aware function it configures.
+3. Any constructor kwarg dropped by filtering produces a visible warning at pipeline load.
+
+## Impact
+
+Every RocketRide text pipeline using this node — the default RAG ingest path — chunks at
+4000/200 no matter what the operator sets. Retrieval-granularity tuning silently no-ops;
+any documentation or benchmark that states a configured chunk size for this node describes
+values that were never in effect.

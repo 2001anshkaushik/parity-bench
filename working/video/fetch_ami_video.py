@@ -48,6 +48,36 @@ VIEW_PREFERENCE = ['Corner', 'Overhead']  # selection rule; fallback recorded pe
 N_MEASURED = 48
 N_WARM = 16
 
+# Planning-column assumptions (approved 2026-08-20, ruling 5). The engine's
+# splitter runs at LangChain LIBRARY DEFAULTS 4000/200 (its own size config is
+# inert — see the 2026-08-20 adjudication), so net new chars per chunk ~= 3800.
+# Chars/frame from detect JSON: ~185 chars/detection, assumed 5/10/15
+# detections per frame for low/mid/high. These are PLANNING ESTIMATES ONLY:
+# the duplication gate uses MEASURED n_chunks, and the run plan should
+# re-derive eligibility from the probe's measured chars/frame + these
+# durations rather than refetching.
+INTERVAL_S = 15
+CHUNK_STRIDE = 4000 - 200
+CHARS_PER_FRAME = {'low': 900, 'mid': 1850, 'high': 2800}
+DUP_TRIGGER_CHUNKS = 64
+
+
+def derived_columns(video_s: float) -> dict:
+    """Planning columns from duration alone. expected_frames_15s is EXACT
+    (frames at t = 0, 15, ... strictly below duration — same formula as
+    driver_video.expected_frames, pinned by the probe at 84 on ES2002a);
+    chunk counts are banded estimates under the module-level assumptions."""
+    frames = int(video_s // INTERVAL_S) + (1 if video_s % INTERVAL_S else 0)
+    est = {band: -(-frames * cpf // CHUNK_STRIDE)  # ceil
+           for band, cpf in CHARS_PER_FRAME.items()}
+    return {
+        'expected_frames_15s': frames,
+        'est_chunks_low': est['low'],
+        'est_chunks_mid': est['mid'],
+        'est_chunks_high': est['high'],
+        'dup_trigger_eligible_est': est['mid'] >= DUP_TRIGGER_CHUNKS,
+    }
+
 
 def scenario_meeting_ids() -> list[str]:
     """The deterministic candidate order: scenario series, sorted."""
@@ -171,6 +201,7 @@ def build_mode(n_measured: int, n_warm: int) -> int:
             'streams': hdr.get('streams'),
             'role': 'measured' if len(rows) < n_measured else 'warm',
         }
+        row.update(derived_columns(hdr.get('video_s') or 0.0))
         rows.append(row)
         print(f'  [{len(rows)}/{need}] {fname} {row["bytes"]/1e6:.1f}MB '
               f'{row["video_s"]}s {row["role"]}' + (' (fallback view)' if row['view_fallback'] else ''),
@@ -188,6 +219,18 @@ def build_mode(n_measured: int, n_warm: int) -> int:
                            f'next {n_warm} = warm (disjoint); unavailable meetings skipped and recorded'),
         'n_measured': n_measured, 'n_warm': n_warm,
         'mux': 'none — fetched as shipped (video-only AVIs; audio out of scope this phase)',
+        'planning_columns': {
+            'interval_s': INTERVAL_S,
+            'chunk_stride': CHUNK_STRIDE,
+            'chars_per_frame_assumed': CHARS_PER_FRAME,
+            'dup_trigger_chunks': DUP_TRIGGER_CHUNKS,
+            'note': ('est_chunks_* and dup_trigger_eligible_est are PLANNING '
+                     'estimates from duration under the stated assumptions; the '
+                     'duplication gate uses MEASURED n_chunks (NOT-RUN below 64, '
+                     'approved rule), and eligibility should be re-derived from '
+                     'the probe\'s measured chars/frame before the run plan '
+                     'fixes leg composition.'),
+        },
         'skipped': skips,
     }}
     with MANIFEST.open('w') as fh:

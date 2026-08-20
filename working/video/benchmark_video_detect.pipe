@@ -79,8 +79,7 @@
         "profile": "default",
         "default": {
           "splitter": "RecursiveCharacterTextSplitter",
-          "mode": "strlen",
-          "strlen": 512
+          "mode": "strlen"
         }
       },
       "ui": {
@@ -147,7 +146,7 @@
     }
   ],
   "source": "webhook_1",
-  "project_id": "32cba807-f5a8-4a6d-a362-baa649f597ae",
+  "project_id": "83c1a876-ce20-4216-9031-85baed132263",
   "version": 1,
   "isLocked": false,
   "snapToGrid": true,

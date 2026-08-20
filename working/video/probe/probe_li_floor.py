@@ -10,8 +10,11 @@ parameters (verified against engine 3.3.1 source):
   text:    per-frame json.dumps([{label,score,box,centroid}]) accumulated
            with '\n' joins, split ONCE          (detect/IInstance.py:79 +
                                                  preprocessor IInstance closing())
-  split:   RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=0,
-           length_function=len)                 (langchain.py:167-168,314)
+  split:   RecursiveCharacterTextSplitter() at LANGCHAIN LIBRARY DEFAULTS
+           4000/200 — the ENGINE-REAL construction: its own size config is
+           stripped by _filter_kwargs_for (adjudicated 2026-08-20), so the
+           floor constructs with no kwargs, exactly like the engine does
+           effectively
   embed:   sentence-transformers multi-qa-MiniLM-L6-cos-v1
            (embedding_transformer services.json miniLM profile)
 
@@ -151,8 +154,9 @@ def main() -> int:
     report['total_chars'] = len(blob)
     from langchain_text_splitters import RecursiveCharacterTextSplitter
     t0 = time.monotonic()
-    chunks = RecursiveCharacterTextSplitter(
-        chunk_size=512, chunk_overlap=0, length_function=len).split_text(blob)
+    # No kwargs ON PURPOSE: mirrors the engine's effective construction
+    # (kwargs-filtered -> library defaults 4000/200).
+    chunks = RecursiveCharacterTextSplitter().split_text(blob)
     report['stage_s']['split'] = round(time.monotonic() - t0, 2)
     lens = [len(c) for c in chunks]
     report['n_chunks'] = len(chunks)
