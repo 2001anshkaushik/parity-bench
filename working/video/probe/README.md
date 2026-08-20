@@ -21,7 +21,11 @@ and a mux step. All three are gone. The probe pipe is now THE pipe under test,
    trusting anything else.
 3. **Chunks produced** = `len(response['documents'])` on the RR arm, plus
    `metadata.chunkId` monotonicity (proves accumulate-then-split, one split
-   per video). Expected order of magnitude ~300 at 512/0.
+   per video). Expected ~45-60 for a 21-min video: the engine's chunk-size
+   config is INERT (_filter_kwargs_for strips **kwargs-routed params — box
+   records adjudicated 2026-08-20), so splitting runs at LangChain library
+   defaults 4000/200 regardless of any strlen setting. max chunk chars must
+   sit in (512, 4000].
 4. **Duplication signature.** On `rr:patched`: none. On stock the whole chunk
    list would appear twice ([A..Z,A..Z]). Organic exact-duplicate chunks
    (static scenes) are counted separately and are NOT the defect signature.
@@ -58,5 +62,7 @@ O_DIRECT parallel-read test still gives a device ceiling without sudo.
 
 ## Expected values (assumptions to be replaced, not trusted)
 
-frames=84; chunks≈150–460; detections/frame≈5–15; whole-list duplication only
-on stock; cpu_util well under 1.0 at threads=1.
+frames=84; chunks≈45–60 (4000/200 library defaults); detections/frame≈5–15;
+whole-list duplication only on stock, and only on records with >=64 chunks —
+which a 21-min video does NOT reach at 4000-char chunks (~29+ min meetings
+do); cpu_util well under 1.0 at threads=1.

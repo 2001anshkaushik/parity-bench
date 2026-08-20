@@ -130,6 +130,28 @@ def verify_corpus(rows: List[dict], corpus_dir: Path) -> List[str]:
 # Record derivation — one shape, both arms
 # ---------------------------------------------------------------------------
 
+def frames_from_chunks(contents: List[str], max_k: int = 400) -> int:
+    """Count frames from returned chunks, stripping the splitter's overlap.
+
+    For each adjacent pair, drop the LONGEST prefix of the next chunk that is
+    a suffix of the previous one (the text LangChain's 200-char overlap window
+    duplicated — always whole short pieces), then count '[' over the join.
+    max_k bounds the search above the overlap size; min match is 1 char
+    because real duplicated pieces can be as short as '[]' (measured k=2).
+    """
+    if not contents:
+        return 0
+    parts = [contents[0]]
+    for prev, cur in zip(contents, contents[1:]):
+        k_found = 0
+        for k in range(min(max_k, len(prev), len(cur)), 0, -1):
+            if prev.endswith(cur[:k]):
+                k_found = k
+                break
+        parts.append(cur[k_found:])
+    return ''.join(parts).count('[')
+
+
 def record_from_rr(result: dict) -> dict:
     docs = (result or {}).get('documents') or []
     contents = [d.get('page_content') or '' for d in docs]
@@ -146,12 +168,20 @@ def record_from_rr(result: dict) -> dict:
         'chunk_chars': lens,
         'chunk_sha256': hashes,
         'sum_chunk_chars': sum(lens),
-        # Frame read-back: the detection schema has NO nested arrays, so '['
-        # occurs exactly once per frame's JSON. Splitter seams drop only
-        # whitespace (measured: '\n'/' ' only), so the bracket count survives
-        # chunking exactly. Method recorded because it differs from LI's.
-        'frames_observed': sum(c.count('[') for c in contents) if n else None,
-        'frames_observed_method': 'bracket-count',
+        # Frame read-back (overlap-aware). The detection schema has no nested
+        # arrays, so '[' occurs once per frame's JSON — but the engine's
+        # splitter runs at LANGCHAIN LIBRARY DEFAULTS 4000/200 (its own size
+        # config is stripped by _filter_kwargs_for; proven 2026-08-20 against
+        # box records: means ~3400, max 3993), and overlap DUPLICATES short
+        # trailing pieces into the next chunk. frames_from_chunks strips the
+        # duplicated suffix/prefix before counting; verified exact at 84 and
+        # 250 frames under real 4000/200 splits. Residual ambiguity: runs of
+        # byte-identical short frames straddling a boundary (content cannot
+        # distinguish overlap-copy from real neighbour) — absent on real
+        # footage; if it occurs the census FAILS loudly, never clamps.
+        'frames_observed': frames_from_chunks(contents) if n else None,
+        'frames_observed_naive_upper_bound': sum(c.count('[') for c in contents) if n else None,
+        'frames_observed_method': 'bracket-count-overlap-stripped',
         'chunkid_monotone': all(isinstance(i, int) for i in ids) and ids == sorted(ids),
         'whole_list_doubled': doubled,
         'n_detections': None,      # not recoverable client-side on this arm; honest None

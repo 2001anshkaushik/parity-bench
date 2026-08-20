@@ -139,8 +139,29 @@ def analyse_documents(docs: list[dict]) -> dict:
         'chunkid_first_last': [chunk_ids[0], chunk_ids[-1]] if n else None,
         'whole_list_doubled': doubled,           # the defect signature
         'organic_duplicate_chunks': n - len(set(hashes)) if not doubled else None,
-        'max_chunk_over_512': max(lens) > 512 if n else None,   # chunking read-back
+        # Engine chunking read-back: the node's size config is INERT
+        # (_filter_kwargs_for strips **kwargs-routed params), so chunks run at
+        # LangChain library defaults 4000/200 — max must sit in (512, 4000].
+        'max_chunk_chars': max(lens) if n else None,
+        'consistent_with_langchain_defaults_4000': (512 < max(lens) <= 4000) if n else None,
+        # Overlap-aware frame count (mirror of driver frames_from_chunks):
+        # strip the longest duplicated suffix/prefix per seam, then count '['.
+        'frames_from_chunks': _frames_overlap_stripped(contents),
     }
+
+
+def _frames_overlap_stripped(contents: list[str], max_k: int = 400) -> int:
+    if not contents:
+        return 0
+    parts = [contents[0]]
+    for prev, cur in zip(contents, contents[1:]):
+        k_found = 0
+        for k in range(min(max_k, len(prev), len(cur)), 0, -1):
+            if prev.endswith(cur[:k]):
+                k_found = k
+                break
+        parts.append(cur[k_found:])
+    return ''.join(parts).count('[')
 
 
 async def one_send(client, token, blob, name):
