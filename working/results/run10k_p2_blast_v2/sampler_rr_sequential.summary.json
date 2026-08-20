@@ -1,0 +1,34 @@
+{
+  "roles": {
+    "service": {
+      "peak_rss_bytes": 3227201536,
+      "peak_rss_mb": 3077.7,
+      "peak_vms_bytes": 30665752576,
+      "peak_uss_bytes": null,
+      "peak_pss_bytes": null,
+      "peak_pss_mb": null,
+      "peak_process_count": 2,
+      "peak_thread_count": 245,
+      "peak_cgroup_anon_mb": 2555.06,
+      "peak_cgroup_current_mb": 10459.43,
+      "peak_cgroup_tasks": 245,
+      "cgroup_path": "/sys/fs/cgroup/system.slice/docker-e3752682e8f35689af43817c205bfc20f9a830377943cbcd8dce0b8dbdd906e2.scope",
+      "cgroup_samples": 1851,
+      "peak_fd_count": 0,
+      "distinct_pids_seen": 2,
+      "total_cpu_seconds": 32710.09,
+      "ctx_switches_voluntary": 1408245,
+      "ctx_switches_involuntary": 138435,
+      "samples": 1851,
+      "oom_events": 0,
+      "rss_leak_slope_bytes_per_s": 194903.15,
+      "rss_final_over_initial": 1.1257
+    }
+  },
+  "system": {
+    "compressor_delta_bytes": 0,
+    "swapouts_delta": 0,
+    "compressions_delta": 0,
+    "peak_system_mem_percent": 30.8
+  }
+}

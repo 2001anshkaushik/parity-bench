@@ -1,0 +1,206 @@
+{
+ "_meta": {
+  "name": "exp_batched_blast",
+  "written_utc": "20260818T051318Z",
+  "payload_sha256_12": "cf4ea7674609",
+  "host": "ip-172-31-13-86",
+  "user": "ssm-user",
+  "pid": 1139969,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "experiment": "batched_blast",
+  "arm": "rocketride_batched",
+  "method_source": "send_files whole-corpus batch (Shashi rr_app.py:179, Leela rr_driver.py:331); basename attribution Leela rr_driver.py:91-93; basis-field pattern Shashi rr_app.py:181-188",
+  "submission_shape": {
+   "calls": 1,
+   "documents": 1000,
+   "client_concurrency": null,
+   "client_concurrency_note": "send_files(files, token) takes no concurrency argument \u2014 the SDK docstring says 'Server handles queuing automatically'. C is not a client variable on this arm; the engine's pool decides and is not observable from here."
+  },
+  "corpus": {
+   "source": "govdocs1",
+   "glob": "*.pdf",
+   "n": 1000,
+   "sha256": "7448825c71e626339f9a2c3c51ace96e0a27810c9584474f5c00c6ce626a4fbb",
+   "first": "000_000009.pdf",
+   "last": "003_003978.pdf"
+  },
+  "warm_up": {
+   "docs": 25,
+   "seconds": 30.14,
+   "disjoint_from_measured": true,
+   "policy": "driver-side, 25 disjoint, excluded (Leela WARM=25)"
+  },
+  "throughput": {
+   "wall_s": 569.096,
+   "documents_ok": 988,
+   "documents_total": 1000,
+   "chunks": 18801,
+   "docs_per_s": 1.7361,
+   "chunks_per_s": 33.0366,
+   "basis": "MEASURED \u2014 one call, one return, wall clock around it"
+  },
+  "time_to_first_result": {
+   "value": 569.096,
+   "basis": "batch websocket API \u2014 send_files returns all documents at once, so the first observable result IS the batch completion (Shashi rr_app.py:186-188)",
+   "measured": false
+  },
+  "latency_per_document": {
+   "client_observed": {
+    "value": null,
+    "basis": "NOT AVAILABLE. One submit, one return: per-document client instants do not exist under a batched send.",
+    "measured": false
+   },
+   "upload_time_derived": {
+    "value": {
+     "n": 988,
+     "sum_s": 159642.652,
+     "p50": 163.2607,
+     "p90": 313.0398,
+     "p95": 327.4358,
+     "p99": 341.2399,
+     "max": 569.0816,
+     "mean": 161.5816
+    },
+    "basis": "BATCH-POSITION latency: upload_time classified as a completion OFFSET from batch open, so these percentiles INCLUDE queue wait inside the batch. Comparable with Leela's derived column (his completion_ns = t0 + upload_time is the same reading); NOT service latency and NOT comparable with the per-document arm's measured column.",
+    "measured": false
+   }
+  },
+  "achieved_parallelism": {
+   "engine_side_concurrency": {
+    "value": null,
+    "basis": "sum(upload_time)/wall, valid ONLY under duration semantics. Classification: offset \u2014 fits offset only at seconds (SDK data.py docstring: '{upload_time:.2f}s'): max ~= wall (last completion is the batch return) while sum exceeds the pool ceiling",
+    "measured": false
+   },
+   "upload_time_semantics": {
+    "n": 988,
+    "semantics": "offset",
+    "scale": 1.0,
+    "evidence": {
+     "scale_tried": "seconds (SDK data.py docstring: '{upload_time:.2f}s')",
+     "max_s": 569.082,
+     "sum_s": 159642.7,
+     "wall_s": 569.1,
+     "sum_over_wall": 280.52,
+     "max_over_wall": 1.0,
+     "threads": 24
+    },
+    "reason": "fits offset only at seconds (SDK data.py docstring: '{upload_time:.2f}s'): max ~= wall (last completion is the batch return) while sum exceeds the pool ceiling"
+   },
+   "effective_cores": 12.697453505208259,
+   "cpu_s": 7226.07,
+   "cpu_s_per_chunk": 0.3843449816499122,
+   "cpu_utilization": {
+    "cpu_utilization": 0.5291,
+    "cpu_utilization_valid": true,
+    "available_cpus": 24
+   },
+   "available_cpus": 24,
+   "available_cpus_source": "cgroup cpuset.cpus.effective of container 'rr' (pid 22219) = '0-23' \u2014 MEASURED",
+   "cost_note": null
+  },
+  "attribution": {
+   "method": "filepath basename (Leela rr_driver.py:91-93), never list position",
+   "returned_items": 1000,
+   "attributed": 1000,
+   "unattributed": []
+  },
+  "gates": {
+   "self_duplication": {
+    "checked": 988,
+    "duplicated_docs": 0,
+    "factors": [],
+    "docs": {},
+    "duplicated_frac": 0.0,
+    "PASS": true,
+    "vacuous": false
+   },
+   "census": {
+    "offered": 1000,
+    "records": 1000,
+    "silent": 0,
+    "duplicate_docs": [],
+    "missing_docs": null,
+    "unexpected_docs": null,
+    "completed": 988,
+    "failed_by_reason": {
+     "no_documents": 12
+    },
+    "unexpected_failures": 0,
+    "unexpected_failure_docs": [],
+    "PASS": true
+   },
+   "census_policy": {
+    "policy": "report",
+    "source": "Shashi bench.py:412-435 (CENSUS_EMPTY_POLICY=report for GovDocs)",
+    "empty_documents": 12,
+    "empty_named": {
+     "000_000164.pdf": "pypdf extracted 12 chars \u2014 Tika-side extraction disagreement",
+     "000_000357.pdf": "pypdf extracted 1 chars \u2014 Tika-side extraction disagreement",
+     "001_001657.pdf": "pypdf extracted 8 chars \u2014 Tika-side extraction disagreement",
+     "002_002014.pdf": "pypdf extracted 70 chars \u2014 Tika-side extraction disagreement",
+     "002_002103.pdf": "pypdf extracted 55 chars \u2014 Tika-side extraction disagreement",
+     "002_002189.pdf": "pypdf extracted 4 chars \u2014 Tika-side extraction disagreement",
+     "002_002472.pdf": "pypdf extracted 15 chars \u2014 Tika-side extraction disagreement",
+     "002_002477.pdf": "defeats pypdf too (0 chars in manifest) \u2014 empty on both parsers",
+     "002_002978.pdf": "pypdf extracted 10 chars \u2014 Tika-side extraction disagreement",
+     "003_003010.pdf": "pypdf extracted 10 chars \u2014 Tika-side extraction disagreement",
+     "003_003113.pdf": "pypdf extracted 6 chars \u2014 Tika-side extraction disagreement",
+     "003_003358.pdf": "pypdf extracted 72 chars \u2014 Tika-side extraction disagreement"
+    },
+    "subset_basis": "throughput and gates rest on the 988-document extracted subset; 12 empty documents are reported, not failures",
+    "hard_loss_note": "no_response_for_file and transport errors fail REGARDLESS of policy \u2014 lost work always fails"
+   }
+  },
+  "provenance": {
+   "pipeline": {
+    "file": "product_pdf.pipe",
+    "nodes": [
+     "webhook",
+     "parse",
+     "preprocessor_langchain",
+     "embedding_transformer",
+     "response_documents"
+    ],
+    "sha256_raw": "bd775051ff5e43453dd4c0e4e1db465b34467cc3645047e077e75d0b262c823c",
+    "sha256_canonical": "f61165f7cf7ab1dbb30e0cc145d34dcdcbdc048fc90c3756d570fa217faa584b"
+   },
+   "platform": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "publishable": true
+   },
+   "engine": {
+    "duplication_patch_applied": true,
+    "duplication_patch_id": "preventDefault-after-embedding-flush",
+    "label_raw": "1",
+    "note": "measured exposure on stock 3.3.1, our corpus: 5/199 documents at repeat_factor 2. self_duplication must read 0 on a patched build."
+   },
+   "mode": {
+    "external": true,
+    "li_container": "li",
+    "rr_container": "rr",
+    "port": 8801
+   },
+   "image_digests": {
+    "llamaindex": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f|ws1-llamaindex:x86_64|2026-08-18T02:21:01.448021556Z",
+    "rocketride": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90|rr:patched|2026-08-18T03:53:16.364543576Z"
+   },
+   "threads_requested": 24,
+   "threads_observed": null,
+   "threads_note": "threads_requested is what use() was ASKED for; the engine's realised pool size is not observable from the client. Requested != activated != effective cores \u2014 the last of those is measured from the CPU sampler and reported under achieved_parallelism.",
+   "ttl_s": 7200,
+   "warm_up_policy_open_question": "OPEN FOR THE GROUP, not resolved here. Leela warms 25 documents taken from BEYOND the measured set (matched_run.sh WARM=25, rr_driver.py:244 all_pdfs[n:n+warm_docs]). Shashi warms max(4, 2*threads) for blast and 2 for sequential, on files[:warm_n] \u2014 i.e. the FIRST MEASURED DOCUMENTS, which are then measured cache-hot while their peers are cold. The policies differ in COUNT and in DISJOINTNESS. We use Leela's 25 disjoint because disjointness is a correctness property while the count is a tuning knob, but this is a divergence neither teammate has flagged and it needs a group decision."
+  },
+  "projection_to_10k": {
+   "value": 5760.1,
+   "basis": "linear extrapolation from n=1000 at 569.1s (0.576s/doc). OPTIMISTIC: assumes the batch scheduler does not degrade with queue depth. Compare against SMOKE_BATCH_TIMEOUT_S=36000s.",
+   "measured": false,
+   "fits_in_timeout": true,
+   "headroom_x": 6.25
+  },
+  "PASS": true,
+  "failed_checks": []
+ }
+}
