@@ -492,7 +492,25 @@ same-architecture pairs; finding branch fires). **CAVEAT for tonight: the
 sweep already climbing runs the OLD knee code — its knee_W /
 efficiency_vs_linear fields are old-rule; the points array is
 rule-independent, so apply the W>=2 rule to the recorded points when the
-curve lands.** NEXT: curve lands → LI_WORKERS + LI_THREADS_ENV refine pass
+curve lands.**
+
+**Crossroad 27 (2026-08-21): above ~1000 videos the DEFAULT posture runs a
+STATED SUBSET (proposed >=500, or the full set when smaller — the
+out-of-box finding is a ratio); parity always runs the full set. WIRED:
+DEFAULT_N required+validated in run_plan (<= MEASURED_N; dry pass clamps to
+1; recorded in run_manifest), default-posture blast uses it. cross_gates
+pairs on the video-name intersection and reports n_paired — a subset
+compares honestly. At 44-scale set DEFAULT_N=44.** Schedule estimate at
+M=W=C=8 (anchors: 0.207 s/frame RR t8, 0.295 LI floor t8, mean ~127
+frames): total ≈ 75 min wall, dominated by the RR default legs (~38 min
+incl. two 7-min conc-1 warm-ups); parity+LI legs ~5 min each; the 48-min
+video is a ~40 s (RR) / ~57 s (LI) service item whose drain tail costs the
+SPAN ~15–20 s and is excluded from the steady window by construction
+(window_n ≈ 33–36 at C=8). Corpus-swap cost memo:
+**working/video/CORPUS_SWAP_COST.md** (what travels, what re-derives, the
+three silent-if-skipped values: dpf/chars-per-det, LIVENESS_MIN, GATE3 id).
+
+NEXT: curve lands → LI_WORKERS + LI_THREADS_ENV refine pass
 → RR concurrency sweep (threads-env 8) → dry pass.
 
 **Crossroad 26 (2026-08-21): WARM-UP.** WARM_N >= max(M_TOKENS, LI_WORKERS)

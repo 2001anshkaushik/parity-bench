@@ -16,6 +16,15 @@
 #                  (Crossroad 17: same sweep matrix both arms, per-arm optimum;
 #                  values published beside the full matrix; declared==measured
 #                  enforced per arm; cross-arm difference recorded, never failed)
+#   DEFAULT_N      Crossroad 27: videos in the DEFAULT-posture blast leg.
+#                  At today's 44-corpus scale set it to MEASURED_N (full set).
+#                  Above ~1000 videos the default posture runs a STATED
+#                  SUBSET (proposed: >=500, or the full set when smaller) —
+#                  the out-of-box finding is a RATIO and does not need 5000
+#                  samples; 5000 videos at 1 token is ~36 h re-proving what
+#                  500 show. Parity always runs the full measured set.
+#                  cross_gates pairs on the video-name INTERSECTION and
+#                  reports n_paired, so a subset compares honestly.
 #   LIVENESS_MIN   gate-5 minimum non-empty-frame fraction (from the probe's
 #                  measured Corner-view distribution)
 #   GATE3_RUN_ID   the probe run whose ES2002a comparison confirmed strict
@@ -49,6 +58,7 @@ cd "$(dirname "$0")/../.."   # repo root
 : "${LIVENESS_MIN:?LIVENESS_MIN unset — from probe detections distribution}"
 : "${GATE3_RUN_ID:?GATE3_RUN_ID unset — probe run id that confirmed ES2002a agreement}"
 : "${BLAST_C:?BLAST_C unset — blast concurrency}"
+: "${DEFAULT_N:?DEFAULT_N unset — Crossroad 27: default-posture blast size (full set at 44-scale; stated subset >=500 above ~1000)}"
 SEQ_N="${SEQ_N:-5}"
 PASSES="${PASSES:-1}"
 # Register entry 8 (2026-08-21): presence is not plausibility. The :? checks
@@ -65,6 +75,7 @@ require_pos_int M_TOKENS "$M_TOKENS";   require_pos_int LI_WORKERS "$LI_WORKERS"
 require_pos_int WARM_N "$WARM_N";       require_pos_int RR_THREADS_ENV "$RR_THREADS_ENV"
 require_pos_int LI_THREADS_ENV "$LI_THREADS_ENV"; require_pos_int BLAST_C "$BLAST_C"
 require_pos_int SEQ_N "$SEQ_N";         require_pos_int PASSES "$PASSES"
+require_pos_int DEFAULT_N "$DEFAULT_N"
 "$PY" - "$LIVENESS_MIN" <<'EOF' || exit 1
 import sys
 raw = sys.argv[1]
@@ -140,10 +151,13 @@ DRIVER=("$PY" working/video/driver_video.py
         --liveness-min-fraction "$LIVENESS_MIN"
         --out-dir "$OUT")
 MEASURED_N=$((60 - WARM_N))
+[ "$DEFAULT_N" -le "$MEASURED_N" ] || {
+  echo "NOT DONE — DEFAULT_N=$DEFAULT_N > MEASURED_N=$MEASURED_N (Crossroad 27: the default"
+  echo "posture runs a subset of the measured set, never more than it)"; exit 1; }
 SMOKE_EXTRA=()
 if [ "$DRY_PASS" = "1" ]; then
   echo "=== DRY PASS — wiring only; every knob clamped; nothing here is a measurement ===" | tee -a "$LOG"
-  SEQ_N=1; PASSES=1; MEASURED_N=1; BLAST_C=1
+  SEQ_N=1; PASSES=1; MEASURED_N=1; BLAST_C=1; DEFAULT_N=1
   DRIVER+=(--skip-warmup)
   SMOKE_EXTRA=(--skip-fixture --write-golden --golden "$OUT/dry_golden.json")
 fi
@@ -166,6 +180,7 @@ cat > "$OUT/run_manifest.json" <<MANIFEST
   "LIVENESS_MIN": $LIVENESS_MIN,
   "GATE3_RUN_ID": "$GATE3_RUN_ID",
   "BLAST_C": $BLAST_C,
+  "DEFAULT_N": $DEFAULT_N,
   "SEQ_N": $SEQ_N,
   "PASSES": $PASSES,
   "MEASURED_N": $MEASURED_N
@@ -200,7 +215,9 @@ echo "--- 2. RocketRide DEFAULT posture (1 token, threads unset = engine 64) ---
 # fail-closed preflight — no || true anywhere in this file.
 run "${DRIVER[@]}" --arm rocketride --posture default --leg sequential --n "$SEQ_N"
 for pass in $(seq 1 "$PASSES"); do
-  run "${DRIVER[@]}" --arm rocketride --posture default --leg blast --n "$MEASURED_N" \
+  # Crossroad 27: the default-posture blast runs DEFAULT_N (a stated subset at
+  # scale — the out-of-box finding is a ratio); parity runs the full set.
+  run "${DRIVER[@]}" --arm rocketride --posture default --leg blast --n "$DEFAULT_N" \
       --blast-concurrency "$BLAST_C"
 done
 
