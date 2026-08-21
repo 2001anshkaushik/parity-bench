@@ -459,6 +459,7 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
                          f'(quiet-box gate; a background hog contaminated the 18-Aug runs). '
                          f'Find and kill it, or override with --allow-noisy-box (recorded).')
     say(f'preflight: quiet box (load1={load1:.2f})')
+    pf_extra = {'preleg_load1': round(load1, 2)}
 
     say('preflight: read-backs (absence fails before agreement)')
     readbacks: Dict[str, dict] = {}
@@ -490,7 +491,7 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
     if pins['PASS'] is not True:
         raise SystemExit(f'NOT DONE — thread pins: {json.dumps(pins)}')
 
-    return {'manifest_meta': meta, 'rows': rows, 'readbacks': readbacks,
+    return pf_extra | {'manifest_meta': meta, 'rows': rows, 'readbacks': readbacks,
             'identity': identity, 'thread_pin_parity': pins,
             'pipe_sha256': sha256_bytes(PIPE_PATH.read_bytes()),
             'manifest_sha256': sha256_bytes(Path(args.manifest).read_bytes())}
@@ -581,8 +582,8 @@ def leg_gates(records: List[dict], rows: List[dict], arm_name: str,
                                             reason='leg produced no records file')
     else:
         gates['frames_census'] = gs.frames_census(ok_records, expected, arm_name)
-        gates['errors'] = {'PASS': len(ok_records) == len(records),
-                           'n_errors': len(records) - len(ok_records)}
+        n_err = sum(1 for r in records if 'error' in r)
+        gates['errors'] = {'PASS': n_err == 0, 'n_errors': n_err}
         dup_rows = [gs.self_duplication([{'doc': r['video'],
                                           'chunk_sha256': r.get('chunk_sha256') or []}])
                     for r in ok_records]
@@ -982,6 +983,7 @@ async def amain() -> int:
         'aborted_by_breaker': leg_meta['aborted_by_breaker'],
         'wall_s_order_stats': sorted(round(r['wall_s'], 1) for r in ok_records
                                      if r.get('wall_s') is not None),
+        'preleg_load1': pf.get('preleg_load1'),
         'quiet_box_override': args.allow_noisy_box or None,
         'driver_cpu': {'cpu_s': round(driver_cpu_s, 1),
                        'share_of_box': round(driver_share, 4) if driver_share else None,

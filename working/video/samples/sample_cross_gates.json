@@ -1,0 +1,161 @@
+{
+ "cross_detection_agreement": {
+  "PASS": true,
+  "armed_by_probe_run": "probe_20260821TXXXXXX",
+  "n_videos": 10,
+  "failing": null,
+  "per_video": {
+   "ES2002a.Corner.avi": {
+    "PASS": true,
+    "n_frames": 84,
+    "diverging_frames": null,
+    "n_diverging": 0
+   },
+   "ES2002b.Corner.avi": {
+    "PASS": true,
+    "n_frames": 152,
+    "diverging_frames": null,
+    "n_diverging": 0
+   },
+   "ES2002c.Corner.avi": {
+    "PASS": true,
+    "n_frames": 160,
+    "diverging_frames": null,
+    "n_diverging": 0
+   },
+   "ES2005a.Corner.avi": {
+    "PASS": true,
+    "n_frames": 32,
+    "diverging_frames": null,
+    "n_diverging": 0
+   },
+   "ES2014d.Corner.avi": {
+    "PASS": true,
+    "n_frames": 194,
+    "diverging_frames": null,
+    "n_diverging": 0
+   },
+   "ES2006b.Corner.avi": {
+    "PASS": true,
+    "n_frames": 121,
+    "diverging_frames": null,
+    "n_diverging": 0
+   },
+   "ES2007c.Corner.avi": {
+    "PASS": true,
+    "n_frames": 94,
+    "diverging_frames": null,
+    "n_diverging": 0
+   },
+   "ES2008a.Corner.avi": {
+    "PASS": true,
+    "n_frames": 67,
+    "diverging_frames": null,
+    "n_diverging": 0
+   },
+   "ES2009d.Corner.avi": {
+    "PASS": true,
+    "n_frames": 174,
+    "diverging_frames": null,
+    "n_diverging": 0
+   },
+   "ES2010b.Corner.avi": {
+    "PASS": true,
+    "n_frames": 77,
+    "diverging_frames": null,
+    "n_diverging": 0
+   }
+  }
+ },
+ "char_conservation": {
+  "PASS": true,
+  "tol": 0.02,
+  "n_pairs": 10,
+  "worst_abs_deviation": 0.0049,
+  "rows": [
+   {
+    "video": "ES2002a.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 1.0007
+   },
+   {
+    "video": "ES2002b.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 0.9998
+   },
+   {
+    "video": "ES2002c.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 0.9992
+   },
+   {
+    "video": "ES2005a.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 1.0049
+   },
+   {
+    "video": "ES2014d.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 1.0037
+   },
+   {
+    "video": "ES2006b.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 1.0021
+   },
+   {
+    "video": "ES2007c.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 0.9978
+   },
+   {
+    "video": "ES2008a.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 0.9982
+   },
+   {
+    "video": "ES2009d.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 1.0007
+   },
+   {
+    "video": "ES2010b.Corner.avi",
+    "PASS": true,
+    "ratio_rr_over_li": 0.998
+   }
+  ]
+ },
+ "chunk_count_ratio": {
+  "gated": false,
+  "n_pairs": 10,
+  "ratio_min_median_max": [
+   0.982,
+   1.013,
+   1.062
+  ],
+  "per_video": {
+   "ES2002a.Corner.avi": 1.0,
+   "ES2002b.Corner.avi": 1.014,
+   "ES2002c.Corner.avi": 1.013,
+   "ES2005a.Corner.avi": 1.062,
+   "ES2014d.Corner.avi": 0.989,
+   "ES2006b.Corner.avi": 0.982,
+   "ES2007c.Corner.avi": 1.025,
+   "ES2008a.Corner.avi": 1.0,
+   "ES2009d.Corner.avi": 0.988,
+   "ES2010b.Corner.avi": 1.029
+  }
+ },
+ "n_rr": 10,
+ "n_li": 10,
+ "n_paired": 10,
+ "rr_chunk_config_measured": {
+  "chunk_size_max_observed": 4000,
+  "chunk_chars_median": 3697
+ },
+ "li_chunk_config_measured": {
+  "chunk_size_max_observed": 4000,
+  "chunk_chars_median": 3697
+ },
+ "_SAMPLE": "SYNTHETIC \u2014 shape review only"
+}
