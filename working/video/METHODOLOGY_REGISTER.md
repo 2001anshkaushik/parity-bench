@@ -202,3 +202,20 @@ than rewritten from memory, which is entry 2's point in miniature.
 > tree attached — the failing run carries its own fix. Kin to entry 4's
 > family, with the inversion made explicit: an obvious zero invites exactly
 > the fix that installs the plausible wrong number.
+>
+> **Addendum, same day — the lesson recurred inside its own fix.** The
+> replacement predicate was pinned against the measured W=2 tree
+> ('spawn_main' children of pid 1) and the very next run, at W=1, the blind
+> branch fired again: the response pid was 1 — the master (hypothesis,
+> pending the W=1 tree dump: uvicorn with --workers 1 serves in-process
+> without spawning). One configuration's measurement is not a predicate for
+> all configurations. The pattern approach was retired outright (reviewer's
+> ruling, agent concurring): serving is now DEFINED by measured behavior —
+> the processes that burned CPU during the batch — anchored by ground truth:
+> every response pid must appear among the burners, a deliberately
+> non-trivial membership check (against the burner set, never the
+> everything set) so the instrument still self-verifies. argv strings remain
+> as attribution text on each process, never as a predicate. The RR census
+> keeps its pattern, stated as the honest asymmetry: it was
+> execution-verified in its actual configuration, and RR responses carry no
+> pid, so no ground-truth anchor exists there to invert onto.

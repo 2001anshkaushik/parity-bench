@@ -51,28 +51,24 @@ def sh(cmd: list[str], timeout: int = 600) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
 
-def worker_census(container: str) -> tuple[list[dict], list[dict]]:
-    """(matched, all_procs) via /proc DIRECTLY — python:3.12-slim ships no
-    procps, so the original `docker exec ps` returned empty stdout and an
-    empty census read as 'zero workers serving' (2026-08-21 W=1 incident:
-    idle_cores measured fine over the same window because that path uses
-    `cat`, which exists; the census used `ps`, which does not). /proc always
-    exists. MATCH PREDICATE — MEASURED against the live W=2 tree (2026-08-21):
-        1  ppid=0  python -m uvicorn ... --workers 2   <- master, serves nothing
-        8  ppid=1  multiprocessing.resource_tracker    <- not serving
-        9  ppid=1  multiprocessing.spawn_main          <- worker
-        10 ppid=1  multiprocessing.spawn_main          <- worker (= /health pid)
-    Serving workers are CHILDREN OF PID 1 whose cmdline contains 'spawn_main',
-    excluding resource_tracker. 'uvicorn' appears in exactly ONE argv — the
-    master — so the old filter would have counted 1 at every W even with ps
-    installed: a plausible wrong number, worse than the zero (register entry
-    10). The response-pid membership check below verifies the predicate
-    independently on every run; the blind branch records the full tree."""
+def worker_census(container: str) -> list[dict]:
+    """ALL container processes via /proc directly (python:3.12-slim ships no
+    procps — `docker exec ps` returned empty and read as zero serving,
+    2026-08-21). NO SERVING PREDICATE LIVES HERE ANY MORE. The argv pattern
+    was wrong twice in two shapes the same day: 'uvicorn' matches only the
+    non-serving master at W>=2, and the replacement pinned against the W=2
+    tree ('spawn_main' children of pid 1) was wrong at W=1, where the
+    response pid IS 1 — one configuration's measurement is not a predicate
+    for all configurations (register entry 10 addendum). Serving is now
+    defined by MEASURED BEHAVIOR in measure_w: processes that burned CPU
+    during the batch, anchored by the ground truth that every RESPONSE pid
+    must appear among the burners. argv is recorded per process as
+    attribution text only, never as a predicate."""
     raw = sh(['docker', 'exec', container, 'sh', '-c',
               'for d in /proc/[0-9]*; do s=$(cat "$d/stat" 2>/dev/null) || continue; '
               'c=$(tr "\\0" " " < "$d/cmdline" 2>/dev/null); '
               'printf "%s\\t%s\\n" "$s" "$c"; done']).stdout
-    all_procs, matched = [], []
+    all_procs = []
     for line in raw.splitlines():
         stat_part, _, cmd = line.partition('\t')
         head, sep, tail = stat_part.rpartition(')')
@@ -85,12 +81,9 @@ def worker_census(container: str) -> tuple[list[dict], list[dict]]:
             rss_kb = int(f[21]) * 4   # rss pages -> KiB at 4096-byte pages
         except (ValueError, IndexError):
             continue
-        proc = {'pid': pid, 'ppid': ppid, 'rss_kb': rss_kb, 'args': cmd.strip()[:200]}
-        all_procs.append(proc)
-        if (proc['ppid'] == 1 and 'spawn_main' in proc['args']
-                and 'resource_tracker' not in proc['args']):
-            matched.append(proc)
-    return matched, all_procs
+        all_procs.append({'pid': pid, 'ppid': ppid, 'rss_kb': rss_kb,
+                          'args': cmd.strip()[:200]})
+    return all_procs
 
 
 def start_container(image: str, workers: int, threads_env: int) -> dict:
@@ -137,8 +130,8 @@ def post_video(blob: bytes) -> dict:
 
 
 async def measure_w(w: int, blob: bytes) -> dict:
-    census, all_procs = worker_census(CONTAINER)
-    pids = [p['pid'] for p in census]
+    all_procs = worker_census(CONTAINER)
+    pids = [p['pid'] for p in all_procs]   # sample EVERYTHING; behavior decides
 
     idle_window_s = 6.0
     cg0 = cgroup_snapshot(CONTAINER)
@@ -170,22 +163,23 @@ async def measure_w(w: int, blob: bytes) -> dict:
     per_proc = {pid: round(((ticks_b1.get(pid) or 0) - (ticks_b0.get(pid) or 0)) / 100, 1)
                 for pid in pids if ticks_b0.get(pid) is not None}
     serving_cpu = sorted(pid for pid, s in per_proc.items() if s > 5.0)
-    # STRUCTURAL BLINDNESS DETECTION (2026-08-21, ruled): every response
-    # carries its serving pid — ground truth the census must contain. A
-    # missing response pid means "my filter matched nothing that serves",
-    # which must NEVER present as "no workers serving". The blind branch
-    # records the FULL process tree, so the failing run IS the measurement
-    # that fixes the predicate.
+    # SERVING = MEASURED BEHAVIOR, anchored by ground truth (2026-08-21,
+    # inversion ruling): serving processes are the CPU BURNERS during the
+    # batch — no argv predicate — and every RESPONSE pid must appear among
+    # them. The membership check is deliberately against the BURNER set, not
+    # the all-procs set (which would be trivially true): a responder that the
+    # attribution cannot see burning is an instrument failure — threshold or
+    # tick sampling — and must never present as a serving result.
     resp_pids = {r['pid'] for r in ok if r.get('pid') is not None}
-    blind = sorted(resp_pids - {p['pid'] for p in census})
+    blind = sorted(resp_pids - set(serving_cpu))
     return {
         'W': w,
         'declared_workers': w,
-        'worker_processes': len(census),
-        'census_matched': len(census),
+        'n_container_procs': len(all_procs),
         'response_pids': sorted(resp_pids),
+        'cpu_burner_pids': serving_cpu,
         'census_blind_pids': blind or None,
-        'census_all_procs': all_procs if blind else None,
+        'census_all_procs': all_procs,
         'idle_cores_after_warm_workers': idle_cores,
         'idle_cores_per_process': idle_per_proc,
         'distinct_response_pids': len({r['pid'] for r in ok}),
@@ -252,12 +246,12 @@ async def amain() -> int:
                            'idle_cores_after_warm_workers', 'batch_wall_s',
                            'throughput_videos_per_s', 'cpu_util_of_32')}), flush=True)
         if point.get('census_blind_pids'):
-            print(f'CENSUS BLIND at W={w}: filter matched {point["census_matched"]} '
-                  f'process(es) but response pid(s) {point["census_blind_pids"]} are '
-                  f'absent from the census — the predicate cannot see the serving '
-                  f'processes. Full /proc tree recorded in the point '
-                  f'(census_all_procs); fix the predicate from IT, then re-run. '
-                  f'This is instrument blindness, NOT a serving result.', flush=True)
+            print(f'ATTRIBUTION BLIND at W={w}: response pid(s) '
+                  f'{point["census_blind_pids"]} answered but do not appear among the '
+                  f'CPU burners {point["cpu_burner_pids"]} — the per-process '
+                  f'attribution (threshold or tick sampling) cannot see a process that '
+                  f'demonstrably served. Full /proc tree + per-process CPU recorded in '
+                  f'the point. Instrument failure, NOT a serving result.', flush=True)
             census_blind = True
             break
         if point['errors'] or point['serving_by_cpu_delta'] < w:

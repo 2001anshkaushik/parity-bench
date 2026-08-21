@@ -449,8 +449,25 @@ last measured peak exceeds 0.9× the limit (an estimate from measured
 inputs, so it REFUSES rather than decides; --allow-memory-overshoot
 overrides, recorded). At current numbers W=16 proceeds (37 < 52.2).
 **Both team drafts APPROVED and sent as written, draft 1 leading; the
-ES2002a sha goes out from the manifest row, not a fresh hash. NEXT: Ansh
-re-runs the LI worker sweep.**
+ES2002a sha goes out from the manifest row, not a fresh hash.**
+
+**SECOND BLIND FIRE (2026-08-21, working as designed) → PREDICATE RETIRED:**
+at W=1 the response pid was **1 — the master** (the standalone tree was
+W=2; we generalized from one configuration — entry 10 addendum). Hypothesis
+pending Ansh's W=1 tree dump: uvicorn --workers 1 serves in-process.
+**INVERSION LANDED (reviewer's ruling, agent concurring):** no argv
+predicate anywhere on LI — serving = CPU burners during the measured batch,
+anchored by response pids ⊆ burners (membership deliberately against the
+BURNER set, never all-procs, so the check stays non-trivial —
+ATTRIBUTION BLIND if a responder is invisible to per-process CPU). All
+three shapes executed-verified: W=1 master-serves → serving [1] PASS; W=2
+spawn → [9,10] PASS; responder-not-burning → blind fires. Fields:
+n_container_procs / response_pids / cpu_burner_pids / census_all_procs
+(always recorded — argv is attribution text now). RR census keeps its
+pattern — execution-verified at its configuration, and RR responses carry
+no pid to anchor an inversion (stated asymmetry). Memory-guard call
+APPROVED by the operator as implemented. **NEXT: Ansh re-runs the LI
+worker sweep — correct at every W by construction now.**
 
 **Crossroad 26 (2026-08-21): WARM-UP.** WARM_N >= max(M_TOKENS, LI_WORKERS)
 plus margin, drawn from the 16 disjoint warm rows, never the measured 44.
