@@ -142,7 +142,8 @@ bundles its own OpenMP; the staged gate-3 comparison is the measurement).
 - **Black fixture:** generated box-side by make_black_fixture.sh; sha relayed
   2026-08-21 as `8ea9be50…` (prefix; the sidecar at
   `working/video/probe/media/black_60s_352x288.avi.sha256.txt` ON THE BOX
-  remains the full authority). ffmpeg 7.0.2-static. Disk: 48 G free.
+  remains the full authority). ffmpeg 7.0.2-static. Disk: 30 G free
+  (2026-08-21 post-LI-build; a builder prune reclaimed 7 GB).
 - Image labels confirmed: duplication_patch_applied=1,
   patch_id=preventDefault-after-embedding-flush, engine_version=3.3.1.
 - 8x md5sum keep-alive (team's own): 18-Aug 02:15:20 → 21-Aug 01:18, killed.
@@ -247,11 +248,35 @@ BUILD (from repo root; no build-args; base digest-pinned; network needed):
 `.dockerignore` added at repo root — context was 7.3 GB (corpus+engine+.git),
 now ~working/+docker/ only; audited: no Dockerfile COPYs anything excluded.
 
-**NEXT (operator's order, 2026-08-21): ~~bake retry~~ GREEN → LI image build
-(after the box byte-check above) → freeze snapshot (canonical copy committed)
-→ box-side four-check sweep against the fixed tree → kill keepalive →
-probe_run.sh (probe_disk is the only EBS number we get).** Then dry pass,
-sweeps. Crossroad 21 is STILL unrelayed — ASK, do not invent.
+**LI BUILD GREEN (2026-08-21, relayed):** all three build proofs fired —
+rf-detr baked (the package's own downloader logged "MD5 validation
+successful"), rfdetr loads as the ws1v user, OFFLINE CACHE OK with the
+384-dim assertion under HF_HUB_OFFLINE=1. **Both arms are up with identical
+pinned model stacks and independently verified weights.** The ENTRYPOINT
+discrepancy is CLOSED by the green build — the repo file was correct; the
+cause of the quoted missing-space variant was never relayed (presumed a
+stale read of another copy).
+
+**Freeze snapshot: captured BOX-SIDE, 149 packages, at
+`working/video/li_video/li_image_freeze.txt` — NOT YET IN THE REPO** (the
+laptop holds only the relayed excerpt; the box must commit+push the file, or
+paste it verbatim — never reconstruct it from the excerpt). Serving stack as
+shipped: anyio==4.14.2, fastapi==0.141.1, httptools==0.8.0,
+llama-index-core==0.14.24, llama-index-embeddings-huggingface==0.7.0,
+uvicorn==0.52.4, uvloop==0.22.1. **First catch of exactly the drift the
+snapshot exists to surface: LI uvicorn 0.52.4 vs the rr image's
+constraints-resolved 0.52.3** — a patch apart, not gate-relevant
+(RocketRide's uvicorn does not serve the measured path). Dockerfile pinning
+to these resolved versions: FLAGGED RULING FOR 2026-08-22, still open.
+Box after build: builder prune reclaimed 7 GB → 30 GB free; keep-alive
+killed; instance stopping; nothing running.
+
+**NEXT session picks up at: box-side four-check sweep against the fixed tree
+→ probe_run.sh with the keep-alive dead (probe_disk is the only EBS number
+we get). The census argv filter is the LAST unexecuted piece — it first runs
+there.** Then dry pass, sweeps. Also: land the freeze file in the repo (box
+push or verbatim paste). Crossroad 21 is STILL unrelayed — ASK, do not
+invent.
 
 ## What a fresh session gets wrong without being told
 
