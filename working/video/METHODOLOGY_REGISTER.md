@@ -109,3 +109,18 @@ than rewritten from memory, which is entry 2's point in miniature.
 > use, fed by the same pipe the arms use; formulas survive only as labeled
 > planning estimates. Kin to entry 1: a derivation is a trace through
 > idealized semantics — and the semantics are an environment too.
+
+## 6. A provenance change follows the value to every consumer (added 2026-08-21)
+
+> The manifest already carried an expected-frames column when Crossroad 23
+> made expectations measured — and the driver never read it. It recomputed
+> the same formula from the duration, privately; the old fetch docstring even
+> NAMED the twin ("same formula as driver_video.expected_frames") — the two
+> copies were kept consistent by comment, not by reference. Fixing the
+> producer alone would have changed nothing: the wrong arithmetic would have
+> kept running inside the consumer, wearing the manifest's new authority.
+> **When a value's provenance changes — derived → measured, assumed → read
+> back — every consumer is audited for a private copy of the old
+> derivation; the grep is part of the change, not a follow-up.** Kin to
+> entry 2: the second copy was perfectly self-consistent with the first, and
+> nothing ever looked.

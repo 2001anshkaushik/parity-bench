@@ -52,6 +52,14 @@ using it.
   SDK connect() retry with deadline, LI = /health JSON (+warm_workers==W) —
   one helper, `working/video/probe/wait_ready.py`, everywhere a container
   starts.
+- **Crossroad 24 (2026-08-21): re-run the t32 point ALONE (two sends) before
+  it sets RR_THREADS_ENV.** t32 is the only point where send 2 exceeds send 1
+  ("32 threads is 2x worse" ends up in front of the engine team — two minutes
+  on the baked image against a number nobody can retract). PROBE_MATRIX=32 is
+  NOT the invocation (it drags disk/identity/LI-floor/census AND overwrites
+  probe_rr_t32.json, the original evidence); the extracted sequence lives in
+  the PROBE GREEN block below. If send 2 elevates again, --sends 3 (+~36 s)
+  distinguishes persistent state from a one-off event.
 - **Crossroad 23 (2026-08-21): DELETE THE FORMULA, MEASURE THE COLUMN.**
   fps=1/15 emits t=0,15,…,1230 on a 1248.3 s stream — 83 frames;
   floor(d/15)+1 said 84. NO corrected formula (fitting the check to one
@@ -313,14 +321,30 @@ C=32 demand ~458 MB/s vs 941 ceiling; cold-vs-warm decode 10.05 s vs 9.62 s
 (3.8× for 1→8, 1.16× for 8→32); **LI_THREADS_ENV must NOT default to 32.**
 Measured dpf 26.0 (assumed 5–15) and 166 chunks on a 21-min video — the
 duplication gate arms ORGANICALLY at every duration.
-**RR thread curve "missing" — diagnosed as a SCHEMA MISMATCH, not missing
-data:** the queried keys (total_s/send1_s/cpu_cores/peak_anon_mb) do not
-exist in probe_rr's schema; gate-3 staging PASSED by reading
-sends[-1].documents from those same files, which proves the sends are there.
-`probe/summarize_probe_rr.py` prints the real curve AND the two re-cut
-inputs (--measured-dpf / --measured-chars-per-det). Awaiting the key dump to
-confirm nothing else is missing.
-**RR frame-count log-level call (2026-08-21):** do NOT raise the container
+**RR thread curve — the "missing" data was a SCHEMA MISMATCH (confirmed),
+recovered from the log (2026-08-21):**
+  t1: send1 85.3 s, send2 89.6 s, cpu_util 0.072 · t8: 16.0 s / 17.2 s,
+  0.265 · t32: 15.0 s / **35.9 s**, 0.464 → 0.181. **RR KNEE AT 8.** The t32
+  anomaly is contention, not work: cpu_util×32×wall ≈ 223 CPU-s (send1) vs
+  208 CPU-s (send2) — same total work, doubled wall — while t8 steady does
+  the video in ~146 CPU-s (oversubscription burns ~40% extra CPU even before
+  parallelism collapses). Hypothesis: one detector behind device_lock + BLAS
+  oversubscription underneath. Crossroad 24 rechecks t32 before it can set
+  RR_THREADS_ENV. Recheck invocation (probe dir, floor venv; preserves the
+  original probe_rr_t32.json):
+    docker rm -f rrprobe; docker run -d --name rrprobe --memory 58g \
+      -e OMP_NUM_THREADS=32 (…all six vars=32…) --network host rr:patched-video
+    wait_ready.py --arm rr --port 5565 --deadline 1800 --container rrprobe
+    probe_rr.py --video media/ES2002a.Corner.avi --sends 2 \
+      --container rrprobe --out probe_rr_t32_recheck.json
+    docker logs rrprobe > rrprobe_t32_recheck.dockerlog; docker rm -f rrprobe
+**FIRST HEAD-TO-HEAD (noted, NOT a result):** RR t8 steady 17.2 s vs LI
+floor t8 24.5 s, same video — single-video, single-token, floor-vs-engine;
+the first time the two arms produced comparable numbers.
+`probe/summarize_probe_rr.py` prints the full curve AND the two re-cut
+inputs (--measured-dpf / --measured-chars-per-det) from the probe files.
+**RR frame-count log-level call (2026-08-21, ACCEPTED by the operator):** do
+NOT raise the container
 log level for measured legs — debug lines are attribution, and logging
 inside the measured span is the same perturbation class as the declined
 per-record PNG hashing. The counting truth is census-vs-MEASURED-expectation
@@ -328,11 +352,13 @@ per-record PNG hashing. The counting truth is census-vs-MEASURED-expectation
 the staged cross-arm agreement. If gate 1 ever fires, re-run that one video
 at raised log level as a diagnostic, outside any measured span.
 
-**NEXT: RE-CUT THE MANIFEST FIRST** (Crossroad 23: fetch_ami_video
---build-manifest with --measured-dpf/--measured-chars-per-det from
-summarize_probe_rr.py; ~12 min, fetched=0 reuse proof) → dry pass →
-RR concurrency sweep (probe_concurrency) → LI worker sweep → thresholds land
-→ smoke --write-golden → full run_plan.
+**NEXT (operator's order, 2026-08-21 late): manifest re-cut (measured
+column, ~12 min, fetched=0 reuse proof; build args from
+summarize_probe_rr.py) → t32 recheck (Crossroad 24, invocation above) → LI
+worker sweep → RR concurrency sweep → dry pass** → thresholds land → smoke
+--write-golden → full run_plan. The register gained entry 6 (a provenance
+change follows the value to every consumer — the driver's private second
+copy of the deleted formula is the underlined finding of the C23 batch).
 
 ## What a fresh session gets wrong without being told
 
