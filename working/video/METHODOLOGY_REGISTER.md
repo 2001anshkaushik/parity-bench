@@ -1,7 +1,8 @@
 # Methodology register — DRAFT (placement is Ansh's, per the 2026-08-20 ruling)
 
-Three entries, one lesson from three directions: in each, the thing consulted
-was upstream of the thing that runs. Entry 1 is reproduced VERBATIM from the
+Entries 1–3: one lesson from three directions — in each, the thing consulted
+was upstream of the thing that runs. Entry 4 is a different failure mode with
+the same generalization. Entry 1 is reproduced VERBATIM from the
 session record where it was drafted — recovered from the transcript rather
 than rewritten from memory, which is entry 2's point in miniature.
 
@@ -75,3 +76,15 @@ than rewritten from memory, which is entry 2's point in miniature.
 > measured latency, and Phase 1 comparability allows no silent deviation),
 > read back fail-closed at preflight and recorded in provenance, never
 > implied by the flag that requested it.
+
+## 4. An unexecuted string (added 2026-08-21)
+
+> Not an identity claim — just a string: a Dockerfile ENTRYPOINT is a shell
+> command inside a JSON array inside a Dockerfile, three quoting layers deep,
+> and none of them executes before the first build. `bash -n` cannot see
+> inside a JSON array; **first build is first execution**. The generalization
+> is entry 2's — nothing that has never run is verified — and the shipped
+> check is smoke section 0b: shlex-parse every ENTRYPOINT/CMD sh string,
+> every flag and constrained value against an allowlist measured from
+> uvicorn's own CLI source, mid-word `--` flagged as a missing space,
+> null-controlled.

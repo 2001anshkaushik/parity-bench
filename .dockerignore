@@ -1,0 +1,15 @@
+# Build-context hygiene (2026-08-21). Every Dockerfile COPY/ADD in this repo
+# sources only docker/ and working/ (audited across all six Dockerfiles that
+# session); the repo carries ~6 GB — corpus, an extracted engine tree, probe
+# media — that no build uses, and without this file `docker build .` tars all
+# of it into the daemon per build. Nothing here is referenced by any COPY.
+.git
+corpus/
+engine/
+working/results/
+working/video/results/
+working/video/probe/media/
+**/__pycache__/
+*.avi
+benchmark-A.backup*/
+reference*/

@@ -66,6 +66,74 @@ def fail(msg: str) -> None:
 
 
 # ------------------------------------------------------------------ 0. static
+# Dockerfile ENTRYPOINT/CMD audit (register entry 4, 2026-08-21): a shell
+# string inside a JSON array inside a Dockerfile is three quoting layers and
+# NONE of them executes before the first build — bash -n cannot see inside a
+# JSON array. Flag/value allowlists measured against uvicorn's own CLI source
+# (main.py click options; config.py LOG_LEVELS/LOOP_FACTORIES/HTTP_PROTOCOLS,
+# read 2026-08-21).
+UVICORN_FLAGS = {'--host', '--port', '--workers', '--loop', '--http',
+                 '--no-access-log', '--log-level', '--timeout-keep-alive'}
+UVICORN_VALUES = {'--log-level': {'critical', 'error', 'warning', 'info', 'debug', 'trace'},
+                  '--loop': {'none', 'auto', 'asyncio', 'uvloop'},
+                  '--http': {'auto', 'h11', 'httptools', 'zttp'}}
+
+
+def _shell_string_problems(cmd: str, label: str) -> list:
+    import shlex
+    problems = []
+    for part in cmd.split(';'):
+        try:
+            toks = shlex.split(part)
+        except ValueError as exc:
+            problems.append(f'{label}: unparseable shell string ({exc})')
+            continue
+        is_uvicorn = 'uvicorn' in toks
+        for i, t in enumerate(toks):
+            if t.startswith('--'):
+                if is_uvicorn and t not in UVICORN_FLAGS:
+                    problems.append(f'{label}: unknown uvicorn flag {t!r} — extend the '
+                                    'allowlist WITH EVIDENCE or fix the flag')
+                if t in UVICORN_VALUES:
+                    val = toks[i + 1] if i + 1 < len(toks) else None
+                    if val not in UVICORN_VALUES[t]:
+                        problems.append(f'{label}: {t} value {val!r} not in '
+                                        f'{sorted(UVICORN_VALUES[t])}')
+            elif '--' in t and not t.startswith('-'):
+                problems.append(f"{label}: token {t!r} has '--' mid-word — missing space?")
+    return problems
+
+
+def check_entrypoints() -> dict:
+    say('\n0b. Dockerfile ENTRYPOINT/CMD shell strings (never executed before '
+        'first build; bash -n is blind here)')
+    null = _shell_string_problems(
+        'exec python -m uvicorn app --log-level warning--timeout-keep-alive 30 '
+        '--bogus-flag x', '<null>')
+    if len(null) < 2:
+        fail(f'entrypoint audit NULL CONTROL failed to fire ({null!r})')
+        return {'null_control': 'BROKEN', 'problems': None}
+    dockerfile = ROOT / 'docker' / 'Dockerfile.llamaindex-video'
+    problems, audited = [], 0
+    for line in dockerfile.read_text().splitlines():
+        if not line.startswith(('ENTRYPOINT', 'CMD')):
+            continue
+        audited += 1
+        try:
+            arr = json.loads(line.split(None, 1)[1])
+        except (ValueError, IndexError) as exc:
+            problems.append(f'{line[:50]}…: not a parseable JSON array ({exc})')
+            continue
+        if isinstance(arr, list) and len(arr) == 3 and arr[:2] == ['sh', '-c']:
+            problems += _shell_string_problems(arr[2], f'{dockerfile.name} {line.split()[0]}')
+    for p in problems:
+        fail(f'entrypoint audit: {p}')
+    if not problems:
+        say(f'  PASS  {audited} ENTRYPOINT/CMD line(s), all tokens inside the measured '
+            'uvicorn surface (null control fired)')
+    return {'null_control': 'fired', 'lines_audited': audited, 'problems': problems or None}
+
+
 def check_static() -> dict:
     say('\n0. static gate — undefined names in any branch (#36 class)')
     targets = [ROOT / 'working' / 'video' / n
@@ -348,6 +416,7 @@ def main() -> int:
     t0 = time.time()
     out: dict = {}
     out['static'] = check_static()
+    out['entrypoints'] = check_entrypoints()
 
     if args.skip_fixture:
         say('\nA. image identity — SKIPPED (--skip-fixture: wiring test only)')

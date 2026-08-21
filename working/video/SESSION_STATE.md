@@ -225,11 +225,33 @@ helper), network mode fail-closed in preflight_containers + recorded in
 provenance and every probe point, and the bake traps EXIT to remove
 rrbake/rrbake2 so a failed attempt cannot leave a half-booted container.
 
-**NEXT (operator's order, 2026-08-21): bake retry — the first execution —
-→ LI image build → freeze snapshot (canonical copy committed) → box-side
-four-check sweep against the fixed tree → kill keepalive → probe_run.sh
-(probe_disk is the only EBS number we get).** Then dry pass, sweeps.
-Crossroad 21 is STILL unrelayed — ASK, do not invent.
+**BAKE GREEN (2026-08-21, relayed):** rr:patched-video 15 GB; post-bake
+use() 8 s; zero install lines; wait_ready ready_wall_s 5.0 over host
+networking; rf-detr md5 verified; sdk_identity null_control fired 2/2. That
+means the **dist-info read-back (b) is CONFIRMED on a real container**; the
+census argv filter remains the one unexecuted watch item (first runs at
+probe_run/driver). Box: disk 35 GB free, no containers running, quiet.
+
+**LI build staging (2026-08-21):** the operator quoted ENTRYPOINT line 93
+with a missing space (`warning--timeout-keep-alive`). The repo file at HEAD
+DOES have the space — measured: grep counts 1/0, file untouched since
+50bd47d, sha256 `3e50b24a856f990cb435c81dfc839d880fdf2bb6758520082e3533a20e15d9a8`.
+Box must byte-check ITS copy before building (grep -c for both variants +
+compare sha). Full ENTRYPOINT audited mechanically: shlex-clean, 8/8 flags +
+log-level/loop/http values verified against uvicorn's own CLI source; module
+path consistent with PYTHONPATH=/app; `${WS1V_WORKERS:-1}` valid under sh -c.
+Shipped: smoke section 0b (check_entrypoints, null-controlled) + register
+entry 4 ("an unexecuted string — first build is first execution").
+BUILD (from repo root; no build-args; base digest-pinned; network needed):
+`docker build -f docker/Dockerfile.llamaindex-video -t li:video .`
+`.dockerignore` added at repo root — context was 7.3 GB (corpus+engine+.git),
+now ~working/+docker/ only; audited: no Dockerfile COPYs anything excluded.
+
+**NEXT (operator's order, 2026-08-21): ~~bake retry~~ GREEN → LI image build
+(after the box byte-check above) → freeze snapshot (canonical copy committed)
+→ box-side four-check sweep against the fixed tree → kill keepalive →
+probe_run.sh (probe_disk is the only EBS number we get).** Then dry pass,
+sweeps. Crossroad 21 is STILL unrelayed — ASK, do not invent.
 
 ## What a fresh session gets wrong without being told
 
