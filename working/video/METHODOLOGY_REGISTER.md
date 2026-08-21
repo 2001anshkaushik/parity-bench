@@ -185,3 +185,20 @@ than rewritten from memory, which is entry 2's point in miniature.
 > register has that these rules must be structural — in parsers, in
 > preserve(), in read-backs — rather than remembered by anyone, reviewer or
 > agent.
+
+## 10. A broken tool masked a broken predicate (added 2026-08-21)
+
+> The LI worker census returned zero because its `docker exec ps` found no
+> ps — python:3.12-slim ships no procps. Behind that loud zero sat a second,
+> quieter defect: the census filtered argv for `uvicorn`, and the measured
+> tree shows that string appears in exactly ONE process — the non-serving
+> master; the workers are multiprocessing `spawn_main` children. **Fixing
+> only the tool would have produced serving=1 at every W: a plausible wrong
+> number, worse than the obvious zero.** Layered failures order themselves
+> by loudness, and the first one found is not the last one there. The cure
+> that survives is not sequential debugging but an independent ground truth
+> inside the loop: every response carries its serving pid, and the census
+> must contain it or the run reports CENSUS BLIND with the full process
+> tree attached — the failing run carries its own fix. Kin to entry 4's
+> family, with the inversion made explicit: an obvious zero invites exactly
+> the fix that installs the plausible wrong number.

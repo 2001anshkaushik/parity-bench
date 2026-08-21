@@ -44,6 +44,7 @@ from argtypes import positive_int  # noqa: E402 — register entry 8
 
 CONTAINER = 'liconc'
 PORT = 8802
+MEM_LIMIT_BYTES = 58 * (1 << 30)   # the --memory value below; ONE constant, both uses
 
 
 def sh(cmd: list[str], timeout: int = 600) -> subprocess.CompletedProcess:
@@ -56,9 +57,17 @@ def worker_census(container: str) -> tuple[list[dict], list[dict]]:
     empty census read as 'zero workers serving' (2026-08-21 W=1 incident:
     idle_cores measured fine over the same window because that path uses
     `cat`, which exists; the census used `ps`, which does not). /proc always
-    exists. The MATCH PREDICATE ('uvicorn' in cmdline) is unchanged pending
-    the measured process tree; returning all_procs beside the match makes a
-    blind predicate self-diagnosing — the blind branch records the full tree."""
+    exists. MATCH PREDICATE — MEASURED against the live W=2 tree (2026-08-21):
+        1  ppid=0  python -m uvicorn ... --workers 2   <- master, serves nothing
+        8  ppid=1  multiprocessing.resource_tracker    <- not serving
+        9  ppid=1  multiprocessing.spawn_main          <- worker
+        10 ppid=1  multiprocessing.spawn_main          <- worker (= /health pid)
+    Serving workers are CHILDREN OF PID 1 whose cmdline contains 'spawn_main',
+    excluding resource_tracker. 'uvicorn' appears in exactly ONE argv — the
+    master — so the old filter would have counted 1 at every W even with ps
+    installed: a plausible wrong number, worse than the zero (register entry
+    10). The response-pid membership check below verifies the predicate
+    independently on every run; the blind branch records the full tree."""
     raw = sh(['docker', 'exec', container, 'sh', '-c',
               'for d in /proc/[0-9]*; do s=$(cat "$d/stat" 2>/dev/null) || continue; '
               'c=$(tr "\\0" " " < "$d/cmdline" 2>/dev/null); '
@@ -78,7 +87,8 @@ def worker_census(container: str) -> tuple[list[dict], list[dict]]:
             continue
         proc = {'pid': pid, 'ppid': ppid, 'rss_kb': rss_kb, 'args': cmd.strip()[:200]}
         all_procs.append(proc)
-        if 'uvicorn' in proc['args']:
+        if (proc['ppid'] == 1 and 'spawn_main' in proc['args']
+                and 'resource_tracker' not in proc['args']):
             matched.append(proc)
     return matched, all_procs
 
@@ -93,7 +103,8 @@ def start_container(image: str, workers: int, threads_env: int) -> dict:
     # already the real one — it moves into the shared helper unchanged, and the
     # network mode becomes a read-back, not an implied flag. Under host mode
     # the service must bind 8802 itself (PORT stays 8802, no mapping).
-    r = sh(['docker', 'run', '-d', '--name', CONTAINER, '--memory', '58g',
+    r = sh(['docker', 'run', '-d', '--name', CONTAINER,
+            '--memory', f'{MEM_LIMIT_BYTES >> 30}g',
             *env_args, '-e', f'WS1V_WORKERS={workers}',
             '--network', 'host', image])
     if r.returncode != 0:
@@ -201,11 +212,35 @@ async def amain() -> int:
     ap.add_argument('--threads-env', type=positive_int('threads-env', 256), default=1,
                     help='the six vars on the LI container for this sweep (its own matrix)')
     ap.add_argument('--out', default=str(Path(__file__).parent / 'probe_li_workers_out.json'))
+    ap.add_argument('--allow-memory-overshoot', action='store_true',
+                    help='override the memory-ascent stop; the override is recorded')
     args = ap.parse_args()
 
     blob = Path(args.video).read_bytes()
-    points, knee, census_blind = [], None, False
+    points, knee, census_blind, mem_stop = [], None, False, None
     for w in args.sweep:
+        # MEMORY ASCENT GUARD (2026-08-21): W=1 peaked at 2.34 GB -> W=16
+        # projects ~37 GB against the 58 GiB limit — survivable but tight,
+        # and an OOM at the top of the ascent kills a worker mid-batch and
+        # hangs the point to its deadline. A human watching numbers scroll is
+        # not a check (register entries 9/10). Linear projection from the
+        # LAST MEASURED point; an estimate from measured inputs (entry 5),
+        # so it REFUSES loudly rather than deciding — override is recorded.
+        if points and not args.allow_memory_overshoot:
+            last = points[-1]
+            peak = last.get('memory_peak_bytes') or 0
+            projected = peak * (w / last['W'])
+            if projected > 0.9 * MEM_LIMIT_BYTES:
+                mem_stop = {'before_W': w, 'measured_W': last['W'],
+                            'measured_peak_bytes': peak,
+                            'projected_bytes': int(projected),
+                            'limit_bytes': MEM_LIMIT_BYTES}
+                print(f'MEMORY ASCENT STOP before W={w}: peak at W={last["W"]} = '
+                      f'{peak / 2**30:.1f} GiB; linear projection for W={w} = '
+                      f'{projected / 2**30:.1f} GiB > 0.9 x {MEM_LIMIT_BYTES >> 30} GiB '
+                      f'container limit. Override with --allow-memory-overshoot '
+                      f'(recorded).', flush=True)
+                break
         print(f'== W={w}: fresh container ==', flush=True)
         start_info = start_container(args.image, w, args.threads_env)
         point = await measure_w(w, blob)
@@ -245,6 +280,8 @@ async def amain() -> int:
     report = {'sweep': args.sweep, 'threads_env': args.threads_env, 'points': points,
               'idle_cores_by_W': {p['W']: p.get('idle_cores_after_warm_workers') for p in points},
               'knee_W': knee,
+              'memory_ascent_stop': mem_stop,
+              'memory_overshoot_override': args.allow_memory_overshoot or None,
               'rule': 'LI_WORKERS sits AT the knee, never past it — measured the same way '
                       'M_TOKENS is (no handicaps, no derived values)'}
     Path(args.out).write_text(json.dumps(report, indent=1))

@@ -434,11 +434,23 @@ rsplit-')' trick, comm-with-spaces case executed-verified); (2) STRUCTURAL
 blindness detector — every response pid must appear in the census, else
 "CENSUS BLIND: filter matched N, response pid X absent" + the FULL /proc
 tree recorded in the point + rc=2 (distinct from findings) — a blind
-filter can never again present as "no workers serving". The match
-predicate ('uvicorn' in cmdline) is UNCHANGED pending the measured tree —
-and the next W=1 run IS that measurement: either it passes (ps was the
-whole story) or the blind branch fires carrying the tree that fixes it.
-The sweep can re-run NOW.
+filter can never again present as "no workers serving". **RESOLVED (2026-08-21): the tree was measured and BOTH layers were real**
+— ps absent was the immediate cause AND 'uvicorn' matches only the master
+(pid 1; workers are spawn_main children; /health pid 10 = a spawn_main
+child, clinching it). Fixing only the tool would have yielded serving=1 at
+every W — a plausible wrong number, worse than the zero (register entry
+10). **Predicate LANDED, measured-derived: children of pid 1 with
+'spawn_main' in cmdline, excluding resource_tracker** (the tree is quoted
+in worker_census's docstring); the response-pid membership check verifies
+it independently every run. **Memory ascent guard LANDED:** W=1 peaked at
+2.34 GB → W=16 projects ~37 GB vs the 58 GiB limit — survivable but tight;
+the sweep now hard-stops before any W whose linear projection from the
+last measured peak exceeds 0.9× the limit (an estimate from measured
+inputs, so it REFUSES rather than decides; --allow-memory-overshoot
+overrides, recorded). At current numbers W=16 proceeds (37 < 52.2).
+**Both team drafts APPROVED and sent as written, draft 1 leading; the
+ES2002a sha goes out from the manifest row, not a fresh hash. NEXT: Ansh
+re-runs the LI worker sweep.**
 
 **Crossroad 26 (2026-08-21): WARM-UP.** WARM_N >= max(M_TOKENS, LI_WORKERS)
 plus margin, drawn from the 16 disjoint warm rows, never the measured 44.
