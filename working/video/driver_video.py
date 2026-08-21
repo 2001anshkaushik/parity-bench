@@ -448,6 +448,18 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
     if problems:
         raise SystemExit('NOT DONE — container flags:\n  ' + '\n  '.join(problems))
 
+    # Quiet-box gate — born from the 18-Aug finding: every sampler that day
+    # carried a rock-steady +8 load1 floor from an unpinned background loop
+    # (detected after the fact via system_tick.load1). Refuse to start a leg
+    # on a box that is already busy; the collector still samples load1
+    # throughout as the in-run detector.
+    load1 = os.getloadavg()[0]
+    if load1 > args.max_preleg_load1 and not args.allow_noisy_box:
+        raise SystemExit(f'NOT DONE — pre-leg load1={load1:.1f} > {args.max_preleg_load1} '
+                         f'(quiet-box gate; a background hog contaminated the 18-Aug runs). '
+                         f'Find and kill it, or override with --allow-noisy-box (recorded).')
+    say(f'preflight: quiet box (load1={load1:.2f})')
+
     say('preflight: read-backs (absence fails before agreement)')
     readbacks: Dict[str, dict] = {}
     identity: Dict[str, Any] = {}
@@ -508,6 +520,7 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
             rec = {'video': row['file'], 'role': row['role'],
                    'submitted_sha256': sha256_bytes(blob), 'bytes': len(blob),
                    'expected_frames': expected_frames(row, interval_s),
+                   'video_s_manifest': row.get('video_s'),
                    'enqueue_ns': enqueue_ns, 'admit_ns': admit_ns}
             try:
                 body = await arm.process(blob, row['file'])
@@ -633,6 +646,43 @@ def leg_gates(records: List[dict], rows: List[dict], arm_name: str,
 # Cross-arm mode
 # ---------------------------------------------------------------------------
 
+def steady_window(records: List[dict], concurrency: int) -> dict:
+    """In-flight window metrics — ALWAYS present in exports (defined: false
+    with a reason when not computable). Load-bearing at 6x duration spread:
+    one 48-min video holds the total span open, so span throughput and
+    window throughput are different quantities and both get labelled.
+    window_n rides in the same dict so it cannot be omitted separately."""
+    ok = [r for r in records if 'error' not in r and r.get('admit_ns') and r.get('done_ns')
+          and '::repeat' not in str(r.get('video'))]
+    if concurrency <= 1:
+        return {'defined': False, 'reason': 'sequential leg — no saturation window'}
+    if len(ok) < concurrency:
+        return {'defined': False,
+                'reason': f'{len(ok)} records < concurrency {concurrency} — never saturated'}
+    events = sorted([(r['admit_ns'], 1) for r in ok] + [(r['done_ns'], -1) for r in ok])
+    inflight = 0
+    t_first = t_last = None
+    for t, d in events:
+        inflight += d
+        if inflight >= concurrency:
+            if t_first is None:
+                t_first = t
+            t_last = t
+    if t_first is None or t_last is None or t_last <= t_first:
+        return {'defined': False, 'reason': 'saturation never reached or zero-width'}
+    inside = [r for r in ok if t_first <= r['done_ns'] <= t_last]
+    frames = sum(r.get('frames_observed') or 0 for r in inside)
+    video_s = sum(r.get('video_s_manifest') or 0 for r in inside)
+    wall = (t_last - t_first) / 1e9
+    return {'defined': True, 'window_start_ns': t_first, 'window_end_ns': t_last,
+            'window_wall_s': round(wall, 1),
+            'window_n': len(inside),
+            'window_frames': frames,
+            'window_frames_per_s': round(frames / wall, 3) if wall else None,
+            'window_realtime_factor': round(video_s / wall, 2) if wall and video_s else None,
+            'note': 'window = [first in-flight==C, last in-flight>=C]; completions inside'}
+
+
 def cross_gates(rr_path: Path, li_path: Path, tol: float,
                 gate3_armed: Optional[str] = None) -> dict:
     rr, _, _ = read_completed(rr_path, key='video')
@@ -717,6 +767,11 @@ async def amain() -> int:
                     help='resume aid ONLY — a fresh container without warm-up is not measurable')
     ap.add_argument('--no-collector', action='store_true')
     ap.add_argument('--char-tol', type=float, default=0.02)
+    ap.add_argument('--max-preleg-load1', type=float, default=2.0,
+                    help='quiet-box gate: refuse to start with load1 above this '
+                         '(hygiene bound, not probe-derived — idle box is <1)')
+    ap.add_argument('--allow-noisy-box', action='store_true',
+                    help='override the quiet-box gate; the override is recorded in the export')
     ap.add_argument('--liveness-min-fraction', type=float, default=None,
                     help='gate 5 threshold — PROBE-DERIVED, no default; absent = gate NOT RUN')
     ap.add_argument('--gate3-armed', default=None, metavar='PROBE_RUN_ID',
@@ -905,14 +960,29 @@ async def amain() -> int:
         splitter=('RecursiveCharacterTextSplitter' if args.arm == 'rocketride'
                   else 'SentenceSplitter(native, char length function supplied)'),
     )
+    window = steady_window(records, args.blast_concurrency or 1)
+    ok_frames = sum(r.get('frames_observed') or 0 for r in ok_records)
+    ok_video_s = sum(r.get('video_s_manifest') or 0 for r in ok_records)
     export = {
         'arm': arm.name, 'posture': posture.label(), 'leg': args.leg,
+        'submission_order': ('manifest-seq: deterministic by meeting id, identical both '
+                             'arms; NOT longest-first — sorting to shorten the drain tail '
+                             'would benchmark our scheduler, not the frameworks '
+                             '(ruling 2026-08-20)'),
+        'throughput': {
+            'total_span_s': round(leg_wall, 1),
+            'total_frames': ok_frames,
+            'total_frames_per_s': round(ok_frames / leg_wall, 3) if leg_wall else None,
+            'total_realtime_factor': round(ok_video_s / leg_wall, 2) if leg_wall else None,
+            'steady_window': window,
+        },
         'n_offered': len(measured), 'n_records': len(records),
         'n_errors': len(records) - len(ok_records),
         'leg_wall_s': round(leg_wall, 1),
         'aborted_by_breaker': leg_meta['aborted_by_breaker'],
         'wall_s_order_stats': sorted(round(r['wall_s'], 1) for r in ok_records
                                      if r.get('wall_s') is not None),
+        'quiet_box_override': args.allow_noisy_box or None,
         'driver_cpu': {'cpu_s': round(driver_cpu_s, 1),
                        'share_of_box': round(driver_share, 4) if driver_share else None,
                        'over_1pct': (driver_share or 0) > 0.01},
@@ -934,6 +1004,10 @@ async def amain() -> int:
             'chunk_config_source': 'measured from records (config literal never exported)',
         },
     }
+    # Structural guard: a blast export without window_n must be impossible.
+    assert 'steady_window' in export['throughput'] and (
+        export['throughput']['steady_window'].get('defined') is False
+        or 'window_n' in export['throughput']['steady_window']), 'window_n missing'
     export_path = out_dir / f'export_{arm.name}_{posture.name}_{args.leg}.json'
     export_path.write_text(json.dumps(export, indent=1))
     say(f'export: {export_path}')

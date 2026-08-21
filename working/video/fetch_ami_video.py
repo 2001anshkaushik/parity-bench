@@ -161,6 +161,7 @@ def build_mode(n_measured: int, n_warm: int) -> int:
           f'(views tried in order {VIEW_PREFERENCE}). This downloads everything once.', flush=True)
     CORPUS.mkdir(parents=True, exist_ok=True)
     rows, skips = [], []
+    reused = fetched = 0
     need = n_measured + n_warm
     for mid in scenario_meeting_ids():
         if len(rows) >= need:
@@ -170,7 +171,12 @@ def build_mode(n_measured: int, n_warm: int) -> int:
             fname = f'{mid}.{view}.avi'
             url = f'{MIRROR}/{mid}/video/{fname}'
             dest = CORPUS / fname
-            if dest.exists() or fetch_url(url, dest):
+            if dest.exists():
+                reused += 1
+                picked = (view, fname, url, dest)
+                break
+            if fetch_url(url, dest):
+                fetched += 1
                 picked = (view, fname, url, dest)
                 break
         if picked is None:
@@ -239,6 +245,8 @@ def build_mode(n_measured: int, n_warm: int) -> int:
             fh.write(json.dumps(r) + '\n')
     total_gb = sum(r['bytes'] for r in rows) / 1e9
     print(f'manifest written: {MANIFEST} ({len(rows)} rows, {total_gb:.2f} GB, {len(skips)} skips)', flush=True)
+    print(f'REUSE PROOF: {reused} files reused from disk, {fetched} downloaded '
+          f'(a re-cut over an existing corpus must show fetched=0)', flush=True)
     print('Re-run without --build-manifest to verify; DONE only comes from manifest mode.', flush=True)
     return 0
 
