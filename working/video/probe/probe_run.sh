@@ -27,15 +27,14 @@ thread_env_args() {
 
 start_rr() { # threads
   docker rm -f rrprobe >/dev/null 2>&1 || true
+  # Crossroad 22: --network host (Phase 1 section C parity; docker-proxy both
+  # adds a userspace hop to latency and defeats TCP readiness — instance seven).
   # shellcheck disable=SC2046
-  docker run -d --name rrprobe --memory 58g $(thread_env_args "$1") -p 5565:5565 "$IMAGE" >/dev/null
+  docker run -d --name rrprobe --memory 58g $(thread_env_args "$1") --network host "$IMAGE" >/dev/null
   # First boot with the baked constraints cache is minutes; 10-30 min at
   # near-zero CPU on a cache miss is NORMAL, not a hang (carryover section C).
-  for _ in $(seq 1 360); do
-    if "$PY" -c "import socket; socket.create_connection(('127.0.0.1',5565),2).close()" 2>/dev/null; then return 0; fi
-    sleep 5
-  done
-  echo "engine never listened on 5565"; docker logs rrprobe | tail -40; return 1
+  # Readiness = a real SDK connect (wait_ready prints the log tail on failure).
+  "$PY" wait_ready.py --arm rr --port 5565 --deadline 1800 --container rrprobe || return 1
 }
 
 stop_rr() {

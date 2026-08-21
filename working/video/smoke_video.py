@@ -220,6 +220,11 @@ def check_readbacks(args) -> dict:
     problems = drv.preflight_containers(args.rr_container, args.li_container)
     for p in problems:
         fail(p)
+    # Crossroad 22: mode recorded as a value (the host-mode CHECK lives in
+    # preflight_containers above, fail-closed — instance seven).
+    network_mode = {c: drv.docker_inspect(c, '{{.HostConfig.NetworkMode}}')
+                    for c in (args.rr_container, args.li_container)}
+    say(f'  network mode: {network_mode} (Crossroad 22: host, both arms)')
     r = subprocess.run([sys.executable, str(ROOT / 'working' / 'video' / 'fetch_ami_video.py'),
                         '--manifest', args.manifest, '--corpus-dir', args.corpus_dir],
                        capture_output=True, text=True)
@@ -266,7 +271,7 @@ def check_readbacks(args) -> dict:
         fail(str(exc))
     return {'container_problems': problems or None, 'preleg_load1': round(load1, 2),
             'container_idle_cores': baselines, 'foreign_excess': round(excess, 2),
-            'interpreter': interp, 'sdk': sdk}
+            'interpreter': interp, 'sdk': sdk, 'network_mode': network_mode}
 
 
 # ------------------------------------------------------------- D. thread pins

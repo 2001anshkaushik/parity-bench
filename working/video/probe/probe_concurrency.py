@@ -40,6 +40,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from probe_rr import (cgroup_snapshot, cleanup_tokens, fresh_project_pipe,  # noqa: E402
                       one_send, proc_cpu_ticks, task_process_census)
 from sdk_identity import assert_unique_project_ids  # noqa: E402
+from wait_ready import assert_host_network, wait_rr_ready  # noqa: E402
 
 CONTAINER = 'rrconc'
 
@@ -48,24 +49,22 @@ def sh(cmd: list[str], timeout: int = 600) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
 
-def start_container(image: str, threads_env: int) -> None:
+async def start_container(image: str, threads_env: int) -> dict:
     sh(['docker', 'rm', '-f', CONTAINER])
     env_args = []
     for k in ['OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS',
               'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS', 'TORCH_NUM_THREADS']:
         env_args += ['-e', f'{k}={threads_env}']
+    # Crossroad 22: --network host; readiness = a real SDK connect, never TCP
+    # (docker-proxy binds published ports before the engine listens — instance
+    # seven). Mode read back and recorded, not implied by the flag.
     r = sh(['docker', 'run', '-d', '--name', CONTAINER, '--memory', '58g',
-            *env_args, '-p', '5565:5565', image])
+            *env_args, '--network', 'host', image])
     if r.returncode != 0:
         raise SystemExit(f'docker run failed: {r.stderr}')
-    import socket
-    for _ in range(360):
-        try:
-            socket.create_connection(('127.0.0.1', 5565), 2).close()
-            return
-        except OSError:
-            time.sleep(5)
-    raise SystemExit('engine never listened on 5565')
+    net = assert_host_network(CONTAINER)
+    ready = await wait_rr_ready(port=5565, deadline_s=1800, container=CONTAINER)
+    return {'network_mode': net, **ready}
 
 
 async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict:
@@ -184,8 +183,10 @@ async def amain() -> int:
     points, knee, hidden_serialization = [], None, False
     for m in args.sweep:
         print(f'== M={m}: fresh container ==', flush=True)
-        start_container(args.image, args.threads_env)
+        start_info = await start_container(args.image, args.threads_env)
         point = await measure_m(m, blob, args.pipe, args.threads)
+        point['network_mode'] = start_info['network_mode']
+        point['ready_wall_s'] = start_info['wall_s']
         points.append(point)
         print(json.dumps({k: point[k] for k in
                           ('M', 'serving_count', 'idle_cores_after_use', 'batch_wall_s',

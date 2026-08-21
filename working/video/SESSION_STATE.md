@@ -38,6 +38,16 @@ using it.
   Everything semantic is box-side.
 - **Crossroad 21: NOT IN THIS SESSION'S TRANSCRIPT.** The operator's final
   message implies it exists ("Crossroads 15-21"). ASK; do not invent it.
+- **Crossroad 22 (2026-08-21): both arms run `--network host`**, matching
+  Phase 1 carryover section C. Reasons: docker-proxy inserts a userspace hop
+  into every message (latency is a measured quantity), and a silent deviation
+  from the configuration Phase 1's numbers came from breaks cross-phase
+  comparability for no gain. Arms run one at a time, so no port conflict.
+  The mode is a RECORDED provenance value with a fail-closed preflight check,
+  never an implicit flag. Readiness is never TCP (instance seven): RR = real
+  SDK connect() retry with deadline, LI = /health JSON (+warm_workers==W) —
+  one helper, `working/video/probe/wait_ready.py`, everywhere a container
+  starts.
 - **Gate rulings:** gate 1 frames-census is THE dropped-frame detector; log
   scrape is ATTRIBUTION only, fail-closed on its own channel liveness. Gate 3
   STRICT zero tolerance, armed only via --gate3-armed <probe_run_id> after the
@@ -91,7 +101,13 @@ lesson beyond the fix: N self-consistent copies of one memory are ONE
 observation — `working/video/sdk_identity.py` now owns the verified surface
 (names + PARAMETERS, null-controlled) and its `--scan` breaks the pattern
 statically before first execution. The wheel's use() carries `team_id` which
-the dev checkout lacks — checkout != wheel, proven.
+the dev checkout lacks — checkout != wheel, proven;
+(7) **readiness predicate under a changed network mode (2026-08-21, operator-
+diagnosed):** the TCP port check was MEASURED meaningful in Phase 1 under
+`--network host`; carried into `-p 5565:5565` it silently measured
+docker-proxy instead of the engine (the proxy binds the published port the
+instant docker run returns). A measurement is bound to the conditions it was
+taken under. Fixed by Crossroad 22 + wait_ready.py; register entry 3.
 
 Known still-unmeasured sameness claims: LI image python micro version
 (read-back lands at first /health); floor-vs-engine ffmpeg build strings
@@ -200,9 +216,20 @@ legitimate SDK-surface extensions is ACCEPTED — the right trade against a
 fabricated surface surviving eight copies. Both canonized sentences + the
 recovered source-trace entry: `working/video/METHODOLOGY_REGISTER.md`.
 
-**NEXT: the bake retry is the FIRST EXECUTION of any of this**, then LI image
-build (+ canonical freeze), probe_run.sh, dry pass, sweeps. Crossroad 21 is
-STILL unrelayed — ASK, do not invent.
+**Bake failure #2 (2026-08-21, diagnosed by the operator — the SDK batch was
+vindicated):** the TCP readiness check passed against docker-proxy before the
+engine listened (instance seven above). Fixed: Crossroad 22 host networking
+across ALL SIX container starts (bake x2, run_plan x2, probe_run, both
+sweeps), readiness via wait_ready.py (real SDK connect / health JSON, one
+helper), network mode fail-closed in preflight_containers + recorded in
+provenance and every probe point, and the bake traps EXIT to remove
+rrbake/rrbake2 so a failed attempt cannot leave a half-booted container.
+
+**NEXT (operator's order, 2026-08-21): bake retry — the first execution —
+→ LI image build → freeze snapshot (canonical copy committed) → box-side
+four-check sweep against the fixed tree → kill keepalive → probe_run.sh
+(probe_disk is the only EBS number we get).** Then dry pass, sweeps.
+Crossroad 21 is STILL unrelayed — ASK, do not invent.
 
 ## What a fresh session gets wrong without being told
 

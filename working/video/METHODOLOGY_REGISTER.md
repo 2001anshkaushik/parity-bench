@@ -1,9 +1,9 @@
 # Methodology register — DRAFT (placement is Ansh's, per the 2026-08-20 ruling)
 
-Two entries, one lesson from two directions (operator's framing, 2026-08-21).
-Entry 1 is reproduced VERBATIM from the session record where it was drafted —
-recovered from the transcript rather than rewritten from memory, which is
-entry 2's point in miniature.
+Three entries, one lesson from three directions: in each, the thing consulted
+was upstream of the thing that runs. Entry 1 is reproduced VERBATIM from the
+session record where it was drafted — recovered from the transcript rather
+than rewritten from memory, which is entry 2's point in miniature.
 
 ## 1. A source trace is not a measurement (drafted 2026-08-20/21)
 
@@ -47,3 +47,31 @@ entry 2's point in miniature.
 > existed for them to disagree with. Decision recorded (2026-08-21): the
 > two-step cost this imposes on legitimate surface extensions is accepted —
 > the right trade against a fabricated API surviving eight copies.
+
+## 3. A measurement is bound to the conditions it was taken under (instance seven, added 2026-08-21)
+
+> The bake's readiness check — `socket.create_connection(('127.0.0.1',5565))`
+> — was a real measurement once. Under Phase 1's `--network host` (carryover
+> section C), a TCP accept could only come from the engine, and the predicate
+> was measured meaningful there. The video tree started containers with
+> `-p 5565:5565`, where docker-proxy binds the published port the instant
+> `docker run` returns: the same line kept passing while measuring the
+> FORWARDER's readiness, not the engine's ("stream ends after 0 bytes, before
+> end of line" — the websocket handshake hit a forwarder with nothing behind
+> it). **Nothing about it looked like an assumption — it had been a
+> measurement.** The condition it depended on (network mode) traveled out
+> from under it silently, and it became an assumption again without a single
+> character changing.
+>
+> Beside entries 1 and 2: a citation chain is not a record; a chain of
+> self-copies is not observations; and a past record is not a present one
+> when its conditions have moved. Two rules shipped (2026-08-21): **measure
+> the thing you need, not a proxy for it** (operator's phrasing — readiness
+> for SDK traffic is a real SDK `connect()`, which no network topology can
+> fake; `working/video/probe/wait_ready.py`, one helper everywhere a
+> container starts), and a condition a measurement depends on becomes a
+> RECORDED, checked value the moment the measurement is reused — Crossroad
+> 22: `--network host` on both arms (docker-proxy is a userspace hop inside
+> measured latency, and Phase 1 comparability allows no silent deviation),
+> read back fail-closed at preflight and recorded in provenance, never
+> implied by the flag that requested it.

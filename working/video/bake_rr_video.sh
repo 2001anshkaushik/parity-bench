@@ -27,6 +27,10 @@ PINS="working/video/li_video/engine_pins.txt"
 FIXTURE="working/video/probe/media/black_60s_352x288.avi"
 RFDETR_MD5_EXPECTED="b4d3ce46099eaed50626ede388caf979"   # rfdetr 1.5.2 assets/model_weights.py:192-196 (rf-detr-base-coco.pth)
 C=rrbake
+# A failed bake must not leave a half-booted container for the next attempt to
+# inherit (2026-08-21). Idempotent: on success both are already removed.
+cleanup() { docker rm -f "$C" "${C}2" >/dev/null 2>&1 || true; }
+trap cleanup EXIT
 
 [ -f "$PINS" ] || { echo "NOT DONE — $PINS missing (extract_engine_pins.sh first)"; exit 1; }
 [ -f "$FIXTURE" ] || { echo "NOT DONE — $FIXTURE missing (make_black_fixture.sh first; it exercises the full path in seconds)"; exit 1; }
@@ -39,11 +43,15 @@ echo "== 0. SDK identity (instance six): entry points vs the INSTALLED wheel, th
 
 echo "== 1. fresh container from $SRC_IMAGE; ONE pipe load pulls deps + weights =="
 docker rm -f "$C" 2>/dev/null || true
-docker run -d --name "$C" --memory 58g -p 5565:5565 "$SRC_IMAGE" >/dev/null
-for _ in $(seq 1 360); do
-  "$PY" -c "import socket; socket.create_connection(('127.0.0.1',5565),2).close()" 2>/dev/null && break
-  sleep 5
-done
+# Crossroad 22: --network host, matching Phase 1 section C — docker-proxy adds
+# a userspace hop AND binds the published port before the engine listens,
+# which is exactly what broke the old TCP readiness check (instance seven).
+docker run -d --name "$C" --memory 58g --network host "$SRC_IMAGE" >/dev/null
+# Readiness = a real SDK connect (one helper, everywhere); asserts host
+# networking first and prints the log tail on failure. Engine first boot
+# installs deps via uv — minutes at low CPU is normal.
+"$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container "$C" || {
+  echo "NOT DONE — engine never became SDK-connectable (see log tail above)"; exit 1; }
 
 T0=$(date +%s)
 "$PY" - "$FIXTURE" <<'EOF'
@@ -144,11 +152,9 @@ EOF
 
 echo "== 4. no-install proof: fresh container from the bake must be ready FAST and pull NOTHING =="
 docker rm -f "${C}2" 2>/dev/null || true
-docker run -d --name "${C}2" --memory 58g -p 5565:5565 "$OUT_IMAGE" >/dev/null
-for _ in $(seq 1 120); do
-  "$PY" -c "import socket; socket.create_connection(('127.0.0.1',5565),2).close()" 2>/dev/null && break
-  sleep 2
-done
+docker run -d --name "${C}2" --memory 58g --network host "$OUT_IMAGE" >/dev/null
+"$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 600 --container "${C}2" || {
+  echo "NOT DONE — baked image never became SDK-connectable"; exit 1; }
 T0=$(date +%s)
 "$PY" - <<'EOF'
 import asyncio, os, time

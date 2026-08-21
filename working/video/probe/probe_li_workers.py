@@ -38,6 +38,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from probe_rr import cgroup_snapshot, proc_cpu_ticks  # noqa: E402
+from wait_ready import assert_host_network, wait_li_ready  # noqa: E402
 
 CONTAINER = 'liconc'
 PORT = 8802
@@ -58,27 +59,25 @@ def worker_census(container: str) -> list[dict]:
     return procs
 
 
-def start_container(image: str, workers: int, threads_env: int) -> None:
+def start_container(image: str, workers: int, threads_env: int) -> dict:
     sh(['docker', 'rm', '-f', CONTAINER])
     env_args = []
     for k in ['OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS',
               'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS', 'TORCH_NUM_THREADS']:
         env_args += ['-e', f'{k}={threads_env}']
+    # Crossroad 22: --network host both arms; the warm_workers==W predicate was
+    # already the real one — it moves into the shared helper unchanged, and the
+    # network mode becomes a read-back, not an implied flag. Under host mode
+    # the service must bind 8802 itself (PORT stays 8802, no mapping).
     r = sh(['docker', 'run', '-d', '--name', CONTAINER, '--memory', '58g',
             *env_args, '-e', f'WS1V_WORKERS={workers}',
-            '-p', f'{PORT}:8802', image])
+            '--network', 'host', image])
     if r.returncode != 0:
         raise SystemExit(f'docker run failed: {r.stderr}')
-    deadline = time.monotonic() + 900   # W model loads can be slow; bounded, never silent
-    while time.monotonic() < deadline:
-        try:
-            h = json.load(urllib.request.urlopen(f'http://127.0.0.1:{PORT}/health', timeout=10))
-            if h.get('warm_workers') == workers and h.get('warm'):
-                return
-        except Exception:
-            pass
-        time.sleep(5)
-    raise SystemExit(f'li container never reached warm_workers=={workers}')
+    net = assert_host_network(CONTAINER)
+    ready = wait_li_ready(port=PORT, deadline_s=900, workers=workers,
+                          container=CONTAINER)
+    return {'network_mode': net, **ready}
 
 
 def post_video(blob: bytes) -> dict:
@@ -163,8 +162,10 @@ async def amain() -> int:
     points, knee = [], None
     for w in args.sweep:
         print(f'== W={w}: fresh container ==', flush=True)
-        start_container(args.image, w, args.threads_env)
+        start_info = start_container(args.image, w, args.threads_env)
         point = await measure_w(w, blob)
+        point['network_mode'] = start_info['network_mode']
+        point['ready_wall_s'] = start_info['wall_s']
         points.append(point)
         print(json.dumps({k: point[k] for k in
                           ('W', 'serving_by_cpu_delta', 'distinct_response_pids',

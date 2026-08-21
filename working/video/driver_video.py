@@ -568,6 +568,14 @@ def preflight_containers(rr_container: Optional[str], li_container: Optional[str
                             f'(a Phase 1 leftover container?)')
         if nano not in ('0', None):
             problems.append(f'{c}: NanoCpus={nano} — --cpus must never be set (rule C1)')
+        # Crossroad 22 (instance seven): both arms run --network host —
+        # docker-proxy inserts a userspace hop into every message (latency is
+        # a measured quantity) and silently defeats TCP readiness checks. A
+        # bridged container here would deviate from the configuration Phase
+        # 1's numbers came from; the mode is measured, never trusted.
+        net = docker_inspect(c, '{{.HostConfig.NetworkMode}}')
+        if net != 'host':
+            problems.append(f"{c}: NetworkMode={net!r}, not 'host' (Crossroad 22)")
     if rr_container:
         patched = docker_inspect(
             rr_container,
@@ -591,6 +599,12 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
                                     args.li_container if not rr_arm_active else None)
     if problems:
         raise SystemExit('NOT DONE — container flags:\n  ' + '\n  '.join(problems))
+    # Crossroad 22: network mode is a RECORDED value in provenance, not an
+    # implicit flag (the check itself is in preflight_containers, fail-closed).
+    active_container = args.rr_container if rr_arm_active else args.li_container
+    network_mode = {active_container:
+                    docker_inspect(active_container, '{{.HostConfig.NetworkMode}}')}
+    say(f'preflight: network mode {network_mode} (Crossroad 22: host, both arms)')
 
     # Quiet-box gate — born from the 18-Aug finding: every sampler that day
     # carried a rock-steady +8 load1 floor from an unpinned background loop
@@ -682,6 +696,7 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
 
     return pf_extra | {'manifest_meta': meta, 'rows': rows, 'readbacks': readbacks,
             'identity': identity, 'thread_pin_parity': pins,
+            'network_mode': network_mode,
             'pipe_sha256': sha256_bytes(PIPE_PATH.read_bytes()),
             'manifest_sha256': sha256_bytes(Path(args.manifest).read_bytes())}
 
@@ -1235,6 +1250,7 @@ async def amain() -> int:
             'identity_readback': pf['identity'],
             'thread_pins_by_arm': pf['thread_pin_parity'],
             'task_census': pf.get('task_census'),
+            'network_mode': pf.get('network_mode'),
             'interval_s': args.interval_s,
             'frames_observed_method': ('bracket-count' if args.arm == 'rocketride'
                                        else 'extractor-count'),

@@ -79,34 +79,32 @@ thread_env_args() {
 
 start_rr() {
   docker rm -f rr 2>/dev/null || true
+  # Crossroad 22: --network host both arms (Phase 1 section C parity; no
+  # docker-proxy hop in measured latency; TCP-check trap = instance seven).
   # shellcheck disable=SC2046
   run docker run -d --name rr --memory 58g $(thread_env_args "$RR_THREADS_ENV") \
-      --log-opt max-size=200m -p 5565:5565 "$RR_IMAGE"
-  for _ in $(seq 1 360); do
-    "$PY" -c "import socket; socket.create_connection(('127.0.0.1',5565),2).close()" 2>/dev/null && return 0
-    sleep 5
-  done
-  echo "rr never listened" | tee -a "$LOG"; exit 1
+      --log-opt max-size=200m --network host "$RR_IMAGE"
+  # Readiness = a real SDK connect (one helper everywhere); asserts host mode
+  # and records it in the log via run().
+  run "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
 }
 
 start_li() {
   docker rm -f li_video 2>/dev/null || true
+  # Crossroad 22: --network host (see start_rr).
   # shellcheck disable=SC2046
   run docker run -d --name li_video --memory 58g $(thread_env_args "$LI_THREADS_ENV") \
-      -e WS1V_WORKERS="$LI_WORKERS" --log-opt max-size=200m -p 8802:8802 "$LI_IMAGE"
-  for _ in $(seq 1 120); do
-    if curl -sf "http://127.0.0.1:8802/health" >/dev/null 2>&1; then
-      # D7 read-back (2026-08-21): the LI image's serving stack is UNPINNED at
-      # build (fastapi/uvicorn/llama-index float) — snapshot the resolved
-      # versions per run so the measured latency's substrate is on record.
-      # Dockerfile pinning is a flagged follow-up ruling, not done here.
-      docker exec li_video python -m pip freeze > "$OUT/li_image_freeze.txt" 2>>"$LOG" \
-        || echo "li_image_freeze snapshot FAILED (recorded)" | tee -a "$LOG"
-      return 0
-    fi
-    sleep 5
-  done
-  echo "li_video never became healthy" | tee -a "$LOG"; exit 1
+      -e WS1V_WORKERS="$LI_WORKERS" --log-opt max-size=200m --network host "$LI_IMAGE"
+  # Readiness = /health 200 + warm_workers == LI_WORKERS (the real predicate,
+  # not liveness); asserts host mode; deadline covers W model loads.
+  run "$PY" working/video/probe/wait_ready.py --arm li --port 8802 \
+      --deadline 900 --workers "$LI_WORKERS" --container li_video
+  # D7 read-back (2026-08-21): the LI image's serving stack is UNPINNED at
+  # build (fastapi/uvicorn/llama-index float) — snapshot the resolved
+  # versions per run so the measured latency's substrate is on record.
+  # Dockerfile pinning is a flagged follow-up ruling, not done here.
+  docker exec li_video python -m pip freeze > "$OUT/li_image_freeze.txt" 2>>"$LOG" \
+    || echo "li_image_freeze snapshot FAILED (recorded)" | tee -a "$LOG"
 }
 
 stop_arm() { docker logs "$1" > "$OUT/dockerlog_$1_final.txt" 2>&1 || true; docker rm -f "$1" >/dev/null 2>&1 || true; }
