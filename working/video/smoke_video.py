@@ -47,8 +47,10 @@ sys.path.insert(0, str(ROOT / 'working' / 'video'))
 sys.path.insert(0, str(ROOT))
 
 from harness import gates_shared as gs                      # noqa: E402
+from harness import rr_credentials                          # noqa: E402
 from harness.static_names import check_files                # noqa: E402
 import driver_video as drv                                  # noqa: E402
+import sdk_identity                                         # noqa: E402
 
 SHA_INDEX_CACHE = ROOT / 'working' / 'results' / '.pdf_fixture_index.json'
 _fails: list[str] = []
@@ -79,7 +81,18 @@ def check_static() -> dict:
             fail(f"undefined name {x['name']!r} in {Path(f).name}")
     if not bad:
         say(f'  PASS  {len(targets)} files, no undefined names')
-    return {'files_checked': len(targets), 'findings': {k: len(v) for k, v in bad.items()}}
+    # SDK static scan (instance six's breaker): every rocketride import and
+    # client call in the tree must be inside the verified surface — catches N
+    # self-consistent copies of one wrong memory BEFORE first execution.
+    scan = sdk_identity.scan_tree(ROOT / 'working' / 'video')
+    if not scan['ok']:
+        for p in scan['problems']:
+            fail(f'SDK static scan: {p}')
+    else:
+        say(f"  PASS  SDK static scan — {scan['files_scanned']} files inside the "
+            f"verified surface (null control fired)")
+    return {'files_checked': len(targets), 'findings': {k: len(v) for k, v in bad.items()},
+            'sdk_scan': scan}
 
 
 # ------------------------------------------------------------- A. image identity
@@ -148,14 +161,28 @@ def check_image_identity(rr_container: str, pdf_corpus: Path) -> dict:
 
 # ------------------------------------------------------------- B. golden record
 async def _send_video(video: Path, port: int) -> dict:
-    from rocketride import RocketRide
-    client = RocketRide(uri=f'ws://127.0.0.1:{port}/task/service', apikey='local-dev')
-    await client.connect()
+    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-22); fresh
+    # project_id via the driver's own minter (D3 — the measured pipe's fixed
+    # id shares a derived task token with any concurrently live leg task).
+    from rocketride import RocketRideClient
+    os.environ['ROCKETRIDE_URI'] = f'http://127.0.0.1:{port}'
+    rr_credentials.resolve(strict=True)
+    pipe, _project_id = drv.generate_task_pipe('smoke-golden')
+    client = RocketRideClient()
+    await client.connect(timeout=60000)
+    token = None
     try:
-        started = await client.use(filepath=str(drv.PIPE_PATH), ttl=3600)
-        result = await client.send(started['token'], video.read_bytes(),
+        started = await client.use(filepath=str(pipe), ttl=3600)
+        token = started['token']
+        result = await client.send(token, video.read_bytes(),
                                    objinfo={'name': video.name}, mimetype='video/x-msvideo')
     finally:
+        if token:
+            try:  # terminate BEFORE disconnect: a leaked golden task (ttl 3600)
+                  # would collide with step-2 legs if the LI legs finish first
+                await asyncio.wait_for(client.terminate(token), timeout=60)
+            except Exception as exc:  # noqa: BLE001
+                say(f'  golden terminate: {exc!r} (recorded; ttl reaps)')
         await client.disconnect()
     return drv.record_from_rr(result)
 
@@ -227,9 +254,19 @@ def check_readbacks(args) -> dict:
              'the box system python lacks the harness deps; use the Phase 1 venv')
     else:
         say(f'  PASS  interpreter {sys.executable} (venv)')
+    # SDK identity read-back (instance six): names AND parameters verified
+    # against the INSTALLED wheel, null-controlled — an SDK bump fails here,
+    # not mid-leg.
+    try:
+        sdk = sdk_identity.readback(strict=True)
+        say(f"  PASS  SDK rocketride {sdk['package_version']} at {sdk['module_path']} "
+            f"(entry points verified, null control fired)")
+    except RuntimeError as exc:
+        sdk = {'error': str(exc)}
+        fail(str(exc))
     return {'container_problems': problems or None, 'preleg_load1': round(load1, 2),
             'container_idle_cores': baselines, 'foreign_excess': round(excess, 2),
-            'interpreter': interp}
+            'interpreter': interp, 'sdk': sdk}
 
 
 # ------------------------------------------------------------- D. thread pins

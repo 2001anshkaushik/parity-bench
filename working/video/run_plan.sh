@@ -95,7 +95,15 @@ start_li() {
   run docker run -d --name li_video --memory 58g $(thread_env_args "$LI_THREADS_ENV") \
       -e WS1V_WORKERS="$LI_WORKERS" --log-opt max-size=200m -p 8802:8802 "$LI_IMAGE"
   for _ in $(seq 1 120); do
-    curl -sf "http://127.0.0.1:8802/health" >/dev/null 2>&1 && return 0
+    if curl -sf "http://127.0.0.1:8802/health" >/dev/null 2>&1; then
+      # D7 read-back (2026-08-22): the LI image's serving stack is UNPINNED at
+      # build (fastapi/uvicorn/llama-index float) — snapshot the resolved
+      # versions per run so the measured latency's substrate is on record.
+      # Dockerfile pinning is a flagged follow-up ruling, not done here.
+      docker exec li_video python -m pip freeze > "$OUT/li_image_freeze.txt" 2>>"$LOG" \
+        || echo "li_image_freeze snapshot FAILED (recorded)" | tee -a "$LOG"
+      return 0
+    fi
     sleep 5
   done
   echo "li_video never became healthy" | tee -a "$LOG"; exit 1
@@ -180,26 +188,40 @@ done
 stop_arm rr
 
 echo "--- 4. cross-arm gates (gate 3 armed by $GATE3_RUN_ID, then char conservation) ---" | tee -a "$LOG"
+# D6 fix (2026-08-22): the old `cmd; rc=$?` form was dead code under set -e —
+# a failing --cross aborted the script BEFORE rc was read, leaving the manifest
+# completed:false and later combos unevaluated. `if ! cmd` is set-e-exempt:
+# every combo runs, failures are recorded, and the script exits non-zero at
+# the END so the boundary stays fail-closed.
+CROSS_FAIL=0
 for leg in sequential blast; do
   for posture in default parity; do
     RRJ="$OUT/records_rocketride_video_${posture}_${leg}.jsonl"
     LIJ="$OUT/records_llamaindex_video_workers_${leg}.jsonl"
     if [ -f "$RRJ" ] && [ -f "$LIJ" ]; then
       echo "cross: $posture/$leg" | tee -a "$LOG"
-      "$PY" working/video/driver_video.py --cross "$RRJ" "$LIJ" \
-        --gate3-armed "$GATE3_RUN_ID" > "$OUT/cross_${posture}_${leg}.json" 2>>"$LOG"
-      rc=$?
+      if "$PY" working/video/driver_video.py --cross "$RRJ" "$LIJ" \
+          --gate3-armed "$GATE3_RUN_ID" > "$OUT/cross_${posture}_${leg}.json" 2>>"$LOG"; then
+        echo "cross gates PASS: $posture/$leg" | tee -a "$LOG"
+      else
+        CROSS_FAIL=1
+        echo "CROSS GATES FAILED: $posture/$leg" | tee -a "$LOG"
+      fi
       cat "$OUT/cross_${posture}_${leg}.json" >> "$LOG"
-      [ "$rc" = "0" ] || echo "CROSS GATES FAILED: $posture/$leg (rc=$rc)" | tee -a "$LOG"
     fi
   done
 done
 
-"$PY" - "$OUT/run_manifest.json" <<'PYDONE'
+"$PY" - "$OUT/run_manifest.json" "$CROSS_FAIL" <<'PYDONE'
 import json, sys, time
 m = json.load(open(sys.argv[1]))
 m['completed'] = True
+m['cross_gates_failed'] = sys.argv[2] == '1'
 m['completed_utc'] = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
 json.dump(m, open(sys.argv[1], 'w'), indent=1)
 PYDONE
+if [ "$CROSS_FAIL" = "1" ]; then
+  echo "=== RUN PLAN COMPLETE — CROSS GATES FAILED (see cross_*.json under $OUT) ===" | tee -a "$LOG"
+  exit 1
+fi
 echo "=== RUN PLAN COMPLETE — everything under $OUT ===" | tee -a "$LOG"

@@ -36,7 +36,10 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from probe_rr import cgroup_snapshot, one_send, proc_cpu_ticks, task_process_census  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from probe_rr import (cgroup_snapshot, cleanup_tokens, fresh_project_pipe,  # noqa: E402
+                      one_send, proc_cpu_ticks, task_process_census)
+from sdk_identity import assert_unique_project_ids  # noqa: E402
 
 CONTAINER = 'rrconc'
 
@@ -66,16 +69,33 @@ def start_container(image: str, threads_env: int) -> None:
 
 
 async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict:
-    from rocketride import RocketRide
-    client = RocketRide(uri='ws://127.0.0.1:5565/task/service', apikey='local-dev')
-    await client.connect()
-    tokens = []
+    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-22):
+    # RocketRideClient bare, credentials via env, connect(timeout=60000).
+    import os
+    os.environ.setdefault('ROCKETRIDE_URI', 'http://127.0.0.1:5565')
+    os.environ.setdefault('ROCKETRIDE_APIKEY', 'local-dev')
+    from rocketride import RocketRideClient
+    client = RocketRideClient()
+    await client.connect(timeout=60000)
+    tokens, project_ids = [], []
     t0 = time.monotonic()
-    for _ in range(m):
-        kwargs = dict(filepath=pipe, ttl=7200)
-        if threads is not None:
-            kwargs['threads'] = threads
-        tokens.append((await client.use(**kwargs))['token'])
+    try:
+        for i in range(m):
+            # D3: one fresh project_id per token — the engine derives the task
+            # token from it; M use() on one id would be ONE task, and this
+            # sweep would measure a queue at every M.
+            cfg = fresh_project_pipe(pipe, f'conc-m{m}-tok{i}')
+            gp = Path(__file__).parent / f'generated_conc_m{m}_tok{i}.pipe'
+            gp.write_text(json.dumps(cfg, indent=1))
+            project_ids.append(cfg['project_id'])
+            kwargs = dict(filepath=str(gp), ttl=7200)
+            if threads is not None:
+                kwargs['threads'] = threads
+            tokens.append((await client.use(**kwargs))['token'])
+        assert_unique_project_ids([(f'tok{i}', p) for i, p in enumerate(project_ids)])
+    except BaseException:
+        await cleanup_tokens(client, tokens)
+        raise
     use_wall = time.monotonic() - t0
 
     census = task_process_census(CONTAINER)
@@ -104,8 +124,12 @@ async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict
     cg0 = cgroup_snapshot(CONTAINER)
 
     # Warm each token once so measurement is steady-state, not first-inference.
-    await asyncio.gather(*[one_send(client, tok, blob, f'warm_{i}')
-                           for i, tok in enumerate(tokens)])
+    try:
+        await asyncio.gather(*[one_send(client, tok, blob, f'warm_{i}')
+                               for i, tok in enumerate(tokens)])
+    except BaseException:
+        await cleanup_tokens(client, tokens)   # warm failure must not leak M tokens
+        raise
 
     cg1 = cgroup_snapshot(CONTAINER)
     t0 = time.monotonic()
@@ -115,7 +139,7 @@ async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict
     batch_wall = time.monotonic() - t0
     cg2 = cgroup_snapshot(CONTAINER)
     ticks1 = {pid: proc_cpu_ticks(CONTAINER, pid) for pid in pids}
-    await client.disconnect()
+    await cleanup_tokens(client, tokens)
 
     errors = [repr(r) for r in results if isinstance(r, Exception)]
     walls = [round(r[0], 1) for r in results if not isinstance(r, Exception)]
@@ -124,6 +148,7 @@ async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict
     serving = sorted(pid for pid, s in per_proc.items() if s > 5.0)
     return {
         'M': m,
+        'project_ids': project_ids,
         'use_wall_s': round(use_wall, 1),
         'idle_cores_after_use': idle_cores,
         'idle_cores_per_process': idle_per_proc,

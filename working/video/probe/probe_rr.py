@@ -27,10 +27,12 @@ import argparse
 import asyncio
 import hashlib
 import json
+import os
 import resource
 import subprocess
 import sys
 import time
+import uuid
 from pathlib import Path
 
 # rocketride imports lazily in main(): the census/analysis helpers here are
@@ -91,6 +93,22 @@ def task_process_census(container: str) -> list[dict]:
             procs.append({'pid': int(pid), 'ppid': int(ppid),
                           'rss_kb': int(rss), 'args': args[:200]})
     return procs
+
+
+def fresh_project_pipe(pipe_path, tag: str) -> dict:
+    """Load a .pipe and stamp a FRESH project_id (uuid5 — Phase 1's pattern,
+    minimal/rr/client.py and smoke_phase2.py). The engine derives the task
+    token from (userId, project_id, source) when none is given
+    (task_server.py:1074, pinned 3.3.1 source), so a reused project_id on a
+    live task is 'Pipeline is already running.' — or, under use_existing, a
+    silent handle to the EXISTING task (M parity tokens sharing one instance,
+    D3). Every use() in the video tree loads a pipe minted here except the
+    bake's (sequential, fresh container, nothing concurrent);
+    sdk_identity.assert_unique_project_ids keeps the property true per run."""
+    base = json.loads(Path(pipe_path).read_text())
+    base['project_id'] = str(uuid.uuid5(uuid.NAMESPACE_DNS,
+                                        f'{tag}-{os.getpid()}-{time.time_ns()}'))
+    return base
 
 
 def proc_cpu_ticks(container: str, pid: int):
@@ -199,6 +217,20 @@ def frame_arrays(contents: list[str]) -> list | None:
     return arrays
 
 
+async def cleanup_tokens(client, tokens):
+    """Phase 1 pattern: terminate BEFORE disconnect, per token, contained — a
+    leaked ttl=7200 token idle-spins ~1 core (Ticket 4) until the ttl reaps."""
+    for tok in tokens:
+        try:
+            await asyncio.wait_for(client.terminate(tok), timeout=60)
+        except Exception as exc:  # noqa: BLE001 — recorded, never masks
+            print(f'terminate {str(tok)[:16]}: {exc!r} (recorded; ttl reaps)')
+    try:
+        await client.disconnect()
+    except Exception as exc:  # noqa: BLE001
+        print(f'disconnect: {exc!r} (recorded)')
+
+
 async def one_send(client, token, blob, name):
     t0 = time.monotonic()
     result = await client.send(token, blob, objinfo={'name': name},
@@ -222,17 +254,37 @@ async def main() -> int:
               'pipe': args.pipe, 'tokens': args.tokens, 'sends': [], 'rc': 0}
     print(f'video {len(blob)} bytes, pipe {args.pipe}')
 
-    from rocketride import RocketRide
-    client = RocketRide(uri=f'ws://127.0.0.1:{args.port}/task/service', apikey='local-dev')
-    await client.connect()
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from sdk_identity import assert_unique_project_ids
+    # Measured surface (Phase 1 + installed-wheel signature paste, 2026-08-22):
+    # RocketRideClient, bare constructor, credentials via env — never kwargs.
+    os.environ['ROCKETRIDE_URI'] = f'http://127.0.0.1:{args.port}'
+    os.environ.setdefault('ROCKETRIDE_APIKEY', 'local-dev')
+    from rocketride import RocketRideClient
+    client = RocketRideClient()
+    await client.connect(timeout=60000)
 
     census_before = task_process_census(args.container)
-    tokens = []
+    tokens, project_ids = [], []
     t0 = time.monotonic()
-    for i in range(args.tokens):
-        started = await client.use(filepath=args.pipe, ttl=7200)
-        tokens.append(started['token'])
-        print(f'use() #{i + 1}: {time.monotonic() - t0:.1f}s cumulative')
+    try:
+        for i in range(args.tokens):
+            # One fresh project_id per token (D3): the engine derives the task
+            # token from it, so M use() calls on one id are one task, not M.
+            cfg = fresh_project_pipe(args.pipe, f'probe-rr-tok{i}')
+            gp = Path(__file__).parent / f'generated_probe_rr_{os.getpid()}_tok{i}.pipe'
+            gp.write_text(json.dumps(cfg, indent=1))
+            project_ids.append(cfg['project_id'])
+            started = await client.use(filepath=str(gp), ttl=7200)
+            tokens.append(started['token'])
+            print(f'use() #{i + 1}: {time.monotonic() - t0:.1f}s cumulative')
+        assert_unique_project_ids([(f'tok{i}', p) for i, p in enumerate(project_ids)])
+    except BaseException:
+        # A half-built token set must not outlive the probe (send failures are
+        # caught in the branches below; this covers the use()/assert window).
+        await cleanup_tokens(client, tokens)
+        raise
+    report['project_ids'] = project_ids
     census_after_use = task_process_census(args.container)
     report['census'] = {
         'task_procs_before_use': len(census_before),
@@ -315,7 +367,7 @@ async def main() -> int:
         if len(serving) < args.tokens or errors:
             report['rc'] = 1
 
-    await client.disconnect()
+    await cleanup_tokens(client, tokens)
     Path(args.out).write_text(json.dumps(report, indent=1))
     print(f'wrote {args.out}')
     return report['rc']

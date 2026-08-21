@@ -31,6 +31,12 @@ C=rrbake
 [ -f "$PINS" ] || { echo "NOT DONE — $PINS missing (extract_engine_pins.sh first)"; exit 1; }
 [ -f "$FIXTURE" ] || { echo "NOT DONE — $FIXTURE missing (make_black_fixture.sh first; it exercises the full path in seconds)"; exit 1; }
 
+echo "== 0. SDK identity (instance six): entry points vs the INSTALLED wheel, then the static scan =="
+"$PY" working/video/sdk_identity.py --json | tee working/video/bake_sdk_identity.json || {
+  echo "NOT DONE — SDK identity read-back failed (names/params vs installed rocketride)"; exit 1; }
+"$PY" working/video/sdk_identity.py --scan working/video >/dev/null || {
+  echo "NOT DONE — static SDK scan found an import/call outside the verified surface"; exit 1; }
+
 echo "== 1. fresh container from $SRC_IMAGE; ONE pipe load pulls deps + weights =="
 docker rm -f "$C" 2>/dev/null || true
 docker run -d --name "$C" --memory 58g -p 5565:5565 "$SRC_IMAGE" >/dev/null
@@ -41,20 +47,30 @@ done
 
 T0=$(date +%s)
 "$PY" - "$FIXTURE" <<'EOF'
-import asyncio, sys, time
-from rocketride import RocketRide
+import asyncio, os, sys, time
+os.environ.setdefault('ROCKETRIDE_URI', 'http://127.0.0.1:5565')
+os.environ.setdefault('ROCKETRIDE_APIKEY', 'local-dev')
+from rocketride import RocketRideClient
 async def main():
-    c = RocketRide(uri='ws://127.0.0.1:5565/task/service', apikey='local-dev')
-    await c.connect()
+    # The RAW measured pipe, fixed project_id and all — the ONLY use() in the
+    # tree allowed to skip a fresh project_id: sequential, in a fresh container,
+    # nothing concurrent to collide with, and 'the exact measured pipe loads
+    # and installs its deps' is the property being baked.
+    client = RocketRideClient()
+    await client.connect(timeout=60000)
     t0 = time.monotonic()
-    tok = (await c.use(filepath='working/video/benchmark_video_detect.pipe', ttl=3600))['token']
+    tok = (await client.use(filepath='working/video/benchmark_video_detect.pipe', ttl=3600))['token']
     print(f'use() [installs deps + downloads weights]: {time.monotonic()-t0:.0f}s')
-    t0 = time.monotonic()
-    r = await c.send(tok, open(sys.argv[1],'rb').read(), objinfo={'name':'bake.avi'},
-                     mimetype='video/x-msvideo')
-    docs = (r or {}).get('documents')
-    print(f'send(black fixture): {time.monotonic()-t0:.0f}s, documents={"present" if docs is not None else "ABSENT"}')
-    await c.disconnect()
+    try:
+        t0 = time.monotonic()
+        r = await client.send(tok, open(sys.argv[1],'rb').read(), objinfo={'name':'bake.avi'},
+                              mimetype='video/x-msvideo')
+        docs = (r or {}).get('documents')
+        print(f'send(black fixture): {time.monotonic()-t0:.0f}s, documents={"present" if docs is not None else "ABSENT"}')
+    finally:
+        # terminate BEFORE the commit: the baked image must not carry a live task
+        await asyncio.wait_for(client.terminate(tok), timeout=120)
+        await client.disconnect()
 asyncio.run(main())
 EOF
 echo "bake load total: $(( $(date +%s) - T0 ))s"
@@ -75,17 +91,16 @@ echo "labels: patch=$L1 id=$L2 engine=$L3"
 
 # (b) pinned vision packages INSIDE the baked image, versions vs engine_pins.txt
 # (c) weights present in the engine cache, rf-detr md5 vs the package registry
+# No embedded-python execution: the engine ships NO python binary FILE — the
+# interpreter is inside the ELF (CPython 3.12.13, confirmed from the pinned
+# binary AND the box's own find). Versions come from the dist-info directory
+# names in site-packages, which is pure filesystem truth and needs no
+# interpreter at all (the first bake attempt's find for bin/python3* could
+# never have worked here).
 docker run --rm "$OUT_IMAGE" sh -c '
-  EPY=$(find /opt/rocketride/engine -maxdepth 3 -name "python3*" -type f 2>/dev/null | head -1)
-  [ -n "$EPY" ] || EPY=$(find /opt/rocketride/engine -maxdepth 4 -path "*bin/python3*" | head -1)
-  echo "embedded_python=$EPY"
-  "$EPY" - <<PYEOF
-from importlib.metadata import version, PackageNotFoundError
-for p in ("rfdetr","torch","torchvision","transformers","supervision","timm",
-          "imageio-ffmpeg","sentence-transformers","langchain-text-splitters"):
-    try: print(f"pkg {p}=={version(p)}")
-    except PackageNotFoundError: print(f"pkg {p}==ABSENT")
-PYEOF
+  SP=$(find /opt/rocketride/engine -maxdepth 4 -type d -name site-packages 2>/dev/null | head -1)
+  echo "site_packages=$SP"
+  [ -n "$SP" ] && ls "$SP" | grep -E "\.dist-info$" | sed "s/\.dist-info$//"
   find /opt/rocketride/engine/cache -name "*.pth" -exec md5sum {} \; 2>/dev/null
   find /opt/rocketride/engine/cache -iname "*minilm*" -maxdepth 6 -type d 2>/dev/null | head -3
   ls /root/.cache/huggingface 2>/dev/null | head -3 || true
@@ -97,14 +112,20 @@ pins = {}
 for line in open(sys.argv[1]):
     line = line.strip()
     if line and not line.startswith('#') and '==' in line:
-        n, v = line.split('=='); pins[n.strip().lower()] = v.strip()
+        n, v = line.split('==')
+        pins[n.strip().lower().replace('_', '-')] = v.strip()
 inside, pth = {}, {}
 for line in open(sys.argv[2]):
     line = line.strip()
-    if line.startswith('pkg ') and '==' in line:
-        n, v = line[4:].split('=='); inside[n.strip().lower()] = v.strip()
-    elif line.endswith('.pth') and len(line.split()) == 2:
+    if line.endswith('.pth') and len(line.split()) == 2:
         h, path = line.split(); pth[path] = h
+    elif ('-' in line and ' ' not in line
+          and not line.startswith(('site_packages=', '/'))):
+        # dist-info stem: {name}-{version}; wheel-normalized names use '_',
+        # local versions use '+' (never '-'), so the LAST hyphen splits them.
+        n, _, v = line.rpartition('-')
+        if n and v[:1].isdigit():
+            inside[n.lower().replace('_', '-')] = v
 bad = {n: (pins.get(n), inside.get(n)) for n in pins
        if n in inside and inside[n] != pins[n]}
 absent = [n for n in ('rfdetr', 'torch', 'transformers', 'supervision', 'timm')
@@ -130,15 +151,18 @@ for _ in $(seq 1 120); do
 done
 T0=$(date +%s)
 "$PY" - <<'EOF'
-import asyncio, time
-from rocketride import RocketRide
+import asyncio, os, time
+os.environ.setdefault('ROCKETRIDE_URI', 'http://127.0.0.1:5565')
+os.environ.setdefault('ROCKETRIDE_APIKEY', 'local-dev')
+from rocketride import RocketRideClient
 async def main():
-    c = RocketRide(uri='ws://127.0.0.1:5565/task/service', apikey='local-dev')
-    await c.connect()
+    client = RocketRideClient()
+    await client.connect(timeout=60000)
     t0 = time.monotonic()
-    await c.use(filepath='working/video/benchmark_video_detect.pipe', ttl=600)
+    tok = (await client.use(filepath='working/video/benchmark_video_detect.pipe', ttl=600))['token']
     print(f'use() on the BAKED image: {time.monotonic()-t0:.0f}s')
-    await c.disconnect()
+    await asyncio.wait_for(client.terminate(tok), timeout=60)
+    await client.disconnect()
 asyncio.run(main())
 EOF
 READY=$(( $(date +%s) - T0 ))
@@ -148,4 +172,5 @@ echo "no-install proof: use()=${READY}s, download/install log lines=${DLLINES}"
 if [ "$READY" -gt 180 ] || [ "$DLLINES" -gt 0 ]; then
   echo "NOT DONE — baked image still installs at load (ready=${READY}s, dl_lines=${DLLINES})"; exit 1
 fi
-echo "DONE — $OUT_IMAGE baked and verified (labels, pins, weights md5, no-install). Read-back: $RB"
+echo "DONE — $OUT_IMAGE baked and verified (SDK identity, labels, pins, weights md5, no-install)."
+echo "Read-backs: $RB + working/video/bake_sdk_identity.json"

@@ -35,9 +35,14 @@ from pathlib import Path
 
 PIPE_SRC = Path(__file__).resolve().parent.parent / 'benchmark_video_detect.pipe'
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from probe_rr import fresh_project_pipe  # noqa: E402
+
 
 def generate_pipe() -> Path:
-    base = json.loads(PIPE_SRC.read_text())
+    # Fresh project_id (D3): the engine derives the task token from it, so a
+    # copied id would collide with any live measured-pipe task on this engine.
+    base = fresh_project_pipe(PIPE_SRC, 'frame-identity')
     base['components'].append({
         'id': 'resp_frames', 'provider': 'response_documents',
         'config': {'laneName': 'frames'},
@@ -69,18 +74,28 @@ async def main() -> int:
     floor = json.load(open(floor_path)) if floor_path else {}
     li_hashes = floor.get('frame_png_sha16') or []
 
-    from rocketride import RocketRide
+    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-22).
+    os.environ['ROCKETRIDE_URI'] = f'http://127.0.0.1:{args.port}'
+    os.environ.setdefault('ROCKETRIDE_APIKEY', 'local-dev')
+    from rocketride import RocketRideClient
     pipe = generate_pipe()
-    client = RocketRide(uri=f'ws://127.0.0.1:{args.port}/task/service', apikey='local-dev')
-    await client.connect()
+    client = RocketRideClient()
+    await client.connect(timeout=60000)
+    token = None
     try:
         started = await client.use(filepath=str(pipe), ttl=3600)
+        token = started['token']
         t0 = time.monotonic()
-        result = await client.send(started['token'], Path(args.video).read_bytes(),
+        result = await client.send(token, Path(args.video).read_bytes(),
                                    objinfo={'name': Path(args.video).name},
                                    mimetype='video/x-msvideo')
         wall = time.monotonic() - t0
     finally:
+        if token:
+            try:  # terminate BEFORE disconnect (Ticket 4: a leaked token idle-spins)
+                await asyncio.wait_for(client.terminate(token), timeout=60)
+            except Exception as exc:  # noqa: BLE001
+                print(f'terminate: {exc!r} (recorded; ttl reaps)')
         await client.disconnect()
 
     frame_docs = (result or {}).get('frames') or []

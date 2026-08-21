@@ -73,11 +73,18 @@ Instances so far: (1) push surface (commits reported done but never pushed);
 (3) venv creator (python3 -m venv assumed; ensurepip stripped);
 (4) interpreter version ("both arms are 3.12" argued from prose — engine
 embeds its own CPython, resolved from the pinned binary);
-(5) **SDK — NAMED BY THE OPERATOR as a fifth instance; the specific incident
-was NOT relayed to this session. ASK what it was before reasoning about it.**
-Also: the ten-minute sweep caught the CHECKER's own shell 3x (this laptop's
-Bash tool runs **zsh — unquoted $VAR does NOT word-split**; bit me twice, plus
-a stray file named `"` from a broken heredoc).
+(5) checker's own shell (this laptop's Bash tool runs **zsh — unquoted $VAR
+does NOT word-split**; bit the ten-minute sweep 3x);
+(6) **SDK import surface (RESOLVED 2026-08-22, the sharpest yet):** every
+video-tree file imported `RocketRide`, a class in NO generation of the SDK —
+eight sites, six files, perfectly self-consistent, none executed. The bake
+died on the first import ever attempted. Measured surface: `RocketRideClient`
+(Phase 1's 40+ sites + the installed wheel's inspect.signature paste). The
+lesson beyond the fix: N self-consistent copies of one memory are ONE
+observation — `working/video/sdk_identity.py` now owns the verified surface
+(names + PARAMETERS, null-controlled) and its `--scan` breaks the pattern
+statically before first execution. The wheel's use() carries `team_id` which
+the dev checkout lacks — checkout != wheel, proven.
 
 Known still-unmeasured sameness claims: LI image python micro version
 (read-back lands at first /health); floor-vs-engine ffmpeg build strings
@@ -109,9 +116,10 @@ bundles its own OpenMP; the staged gate-3 comparison is the measurement).
   SDK/bootcheck only, never runs node code. 3.12.13 == ~/.venv == floor.
 - **Engine idle spin: 1.002 cores** measured, box otherwise idle (Ticket 4).
   Whether it scales per token = probe_concurrency's idle-at-M answers.
-- **Black fixture:** generated box-side by make_black_fixture.sh; sha sidecar
-  at `working/video/probe/media/black_60s_352x288.avi.sha256.txt` ON THE BOX.
-  **Value UNRELAYED — read the sidecar, never assume.**
+- **Black fixture:** generated box-side by make_black_fixture.sh; sha relayed
+  2026-08-22 as `8ea9be50…` (prefix; the sidecar at
+  `working/video/probe/media/black_60s_352x288.avi.sha256.txt` ON THE BOX
+  remains the full authority). ffmpeg 7.0.2-static. Disk: 48 G free.
 - Image labels confirmed: duplication_patch_applied=1,
   patch_id=preventDefault-after-embedding-flush, engine_version=3.3.1.
 - 8x md5sum keep-alive (team's own): 18-Aug 02:15:20 → 21-Aug 01:18, killed.
@@ -132,7 +140,8 @@ bake_rr_video.sh; Dockerfile.llamaindex-video + li_video skeleton;
 samples + reviewer README; query_phase1_chunks (box-run, adjudicated);
 Ticket 3 + Ticket 4 drafted; carryover corrections #1+#2 appended.
 
-PENDING, box-side, in order: **bake (OPEN FAILURE — below)** → LI image build
+PENDING, box-side, in order: **bake retry (failure RESOLVED — below; this is
+the first execution of the fixed SDK batch)** → LI image build
 → probe_run.sh (incl. identity load-proof FIRST, staged gate-3, frame-count
 84 check) → dry pass (DRY_PASS=1) → RR concurrency sweep → LI worker sweep →
 thresholds land (M_TOKENS, LI_WORKERS, RR/LI_THREADS_ENV, LIVENESS_MIN,
@@ -141,21 +150,45 @@ full smoke → run_plan.sh. HELD until sweeps: the eight numbers. Monday
 deliverables drafted (lead paragraph, methodology register entry — placement
 is Ansh's).
 
-## OPEN: the bake failure
+## RESOLVED (2026-08-22): the bake failure — and the audit it opened
 
-The operator's final message says there IS an open bake failure and a
-question about it was incoming. **Nothing about it — error text, stage,
-symptom — was relayed to this session.** Candidate weak joints flagged in
-advance (from the bake commit's own self-review): the embedded-interpreter
-finder in read-back (b) (`find` for bin/python3* — Phase 1 noted "bin layout
-differs"; the engine has NO python binary file, so that find comes back EMPTY
-and read-back (b) may fail on discovery, not on truth — the embedded
-interpreter is inside the ELF; packages land in
-/opt/rocketride/engine/lib/python3.12/site-packages, so the fix is likely
-"read versions via the site-packages path or the engine's own execpython",
-not via a bin/ binary); `docker commit` duration on a ~10 GB layer;
-`sh -c` dash-isms. DO NOT guess — ask for the failure output first, then
-check those in that order.
+The failure was `ImportError: cannot import name 'RocketRide' from
+'rocketride'` — MY OWN invented class name, in every video-tree SDK site
+(instance six above). NOT the pre-flagged joints, though joint (b) WAS also
+real and is now fixed (dist-info listing, no interpreter needed — the engine
+ships no python binary file). The full audit found and the batch fixed:
+
+- **D1** all 8 import sites -> `RocketRideClient()` BARE + env credentials
+  (driver/smoke via `rr_credentials.resolve(strict=True)`; probes/bake via
+  explicit env), `connect(timeout=60000)` (Phase 1's measured pattern).
+- **D2** `terminate()` was absent EVERYWHERE -> now in every finally/stop()
+  (Ticket 4: a leaked ttl=7200 token idle-spins ~1 core in the cgroup the
+  next leg's collector reads; run_plan keeps rr up across postures).
+- **D3 — the finding of the night:** the engine derives the task token from
+  (userId, project_id, source) (task_server.py:1074), so M use() calls on the
+  measured pipe's FIXED project_id are ONE task — the parity posture would
+  have silently collapsed to a queue ("RocketRide doesn't scale" from our own
+  driver). Fixed: every use() loads a fresh-uuid5 variant
+  (probe_rr.fresh_project_pipe, one minter); driver asserts M NEW task
+  processes via settled census (fail-closed, ruling: stays regardless of
+  use_existing semantics); sdk_identity.assert_unique_project_ids per run.
+- **D4** bare connect() -> timeout=60000. **D5** bake read-back (b) rewritten.
+- **D6** run_plan cross-gate rc capture was dead under set -e -> if ! form,
+  all combos evaluated, manifest records cross_gates_failed, exit 1 at end.
+- **D7** LI image serving stack (fastapi/uvicorn/uvloop/httptools/anyio/
+  llama-index-*) is UNPINNED at build. Per-run `pip freeze` snapshot lands in
+  $OUT/li_image_freeze.txt (run_plan start_li). CANONICAL copy still to take
+  once the image is built:
+  `docker run --rm li:video python -m pip freeze > working/video/li_video/li_image_freeze.txt`
+  (commit it). **Dockerfile pinning = FLAGGED RULING FOR TOMORROW, not done.**
+
+New file `working/video/sdk_identity.py`: readback (names+params vs installed
+wheel, null-controlled) wired into driver preflight, smoke C, bake stage 0;
+--scan (static surface check, laptop-safe) wired into smoke 0 + bake stage 0.
+
+**NEXT: the bake retry is the FIRST EXECUTION of any of this**, then LI image
+build (+ canonical freeze), probe_run.sh, dry pass, sweeps. Crossroad 21 is
+STILL unrelayed — ASK, do not invent.
 
 ## What a fresh session gets wrong without being told
 
@@ -183,5 +216,12 @@ check those in that order.
     ONE AT A TIME. Absence fails before agreement. Impossible values are
     never clamped. One check, one function, fed by both arms.
 11. Memory file exists at the Claude project level
-    (phase2-video-bench-state.md) — terser than this file; this file wins on
+    (phase2-video-bench-state.md) — since 2026-08-22 the CURRENT copy lives in
+    the `-benchmark-A` project's memory dir (the cwd changed projects); an
+    older copy at the parent-dir project is superseded. This file wins on
     conflict for session facts.
+12. **The SDK exports `RocketRideClient` — nothing else from rocketride is
+    verified.** `working/video/sdk_identity.py` owns the verified surface
+    (five methods, parameter-level). Any new SDK call must extend
+    REQUIRED_METHOD_PARAMS with evidence (measured, not docs) or the smoke's
+    static scan and the bake's stage 0 will fail it — by design.

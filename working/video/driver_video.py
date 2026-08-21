@@ -57,10 +57,18 @@ from typing import Any, Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'working'))
+sys.path.insert(0, str(ROOT / 'working' / 'video'))
+sys.path.insert(0, str(ROOT / 'working' / 'video' / 'probe'))
 
 from harness import gates_shared as gs                 # noqa: E402
 from harness import provenance_leela as pvl            # noqa: E402
+from harness import rr_credentials                     # noqa: E402
 from harness.jsonl_stream import JsonlWriter, read_completed  # noqa: E402
+import sdk_identity                                    # noqa: E402
+# One census, one minter — the probes' own functions (stdlib-only module):
+# the driver and probe_rr must count task processes and stamp project_ids the
+# same way, or 'declared==measured' means different things per tool.
+from probe_rr import fresh_project_pipe, task_process_census  # noqa: E402
 
 PIPE_PATH = ROOT / 'working' / 'video' / 'benchmark_video_detect.pipe'
 MANIFEST_DEFAULT = ROOT / 'working' / 'video' / 'ami_video_manifest.jsonl'
@@ -274,20 +282,41 @@ class RRArm:
         self.pipe_path = pipe_path
         self.client = None
         self.tokens: List[str] = []
+        self.project_ids: List[str] = []
         self._rr = 0
 
     async def start(self):
-        from rocketride import RocketRide
-        self.client = RocketRide(uri=f'ws://127.0.0.1:{self.port}/task/service',
-                                 apikey='local-dev')
-        await self.client.connect()
-        for _ in range(self.posture.tokens):
-            kwargs: Dict[str, Any] = dict(filepath=str(self.pipe_path), ttl=7200)
-            if self.posture.threads is not None:
-                kwargs['threads'] = self.posture.threads
-            started = await self.client.use(**kwargs)
-            self.tokens.append(started['token'])
-        say(f'RR: {len(self.tokens)} token(s) live, posture {self.posture.label()}')
+        # Measured surface (Phase 1's 40+ sites + the installed wheel's
+        # signature paste, 2026-08-22): RocketRideClient BARE — credentials via
+        # the harness resolver (env route, loopback-strict, provenance of the
+        # source). The CLI port is operator intent, so it overrides env.
+        from rocketride import RocketRideClient
+        os.environ['ROCKETRIDE_URI'] = f'http://127.0.0.1:{self.port}'
+        rr_credentials.resolve(strict=True)
+        self.client = RocketRideClient()
+        await self.client.connect(timeout=60000)
+        try:
+            for i in range(self.posture.tokens):
+                # D3: one generated pipe with a FRESH project_id per token — the
+                # engine derives the task token from (userId, project_id, source)
+                # (task_server.py:1074), so M use() calls on the measured pipe's
+                # fixed id are ONE task ('Pipeline is already running.' loudly,
+                # or one shared instance silently). The census in amain proves
+                # M distinct task processes; config is never the evidence.
+                path, project_id = generate_task_pipe(f'{self.posture.name}-tok{i}')
+                kwargs: Dict[str, Any] = dict(filepath=str(path), ttl=7200)
+                if self.posture.threads is not None:
+                    kwargs['threads'] = self.posture.threads
+                started = await self.client.use(**kwargs)
+                self.tokens.append(started['token'])
+                self.project_ids.append(project_id)
+            sdk_identity.assert_unique_project_ids(
+                [(f'tok{i}', p) for i, p in enumerate(self.project_ids)])
+        except BaseException:
+            await self.stop()   # a half-built token set must not outlive the failure
+            raise
+        say(f'RR: {len(self.tokens)} token(s) live, posture {self.posture.label()}, '
+            f'{len(set(self.project_ids))} distinct project_id(s)')
 
     def _next_token(self) -> tuple[int, str]:
         i = self._rr % len(self.tokens)
@@ -303,8 +332,24 @@ class RRArm:
         return rec
 
     async def stop(self):
-        if self.client:
+        if not self.client:
+            return
+        # Phase 1 pattern: terminate BEFORE disconnect, per token, contained.
+        # Not optional (ruling 2026-08-22): a leaked ttl=7200 token idle-spins
+        # ~1 core (Ticket 4) inside the same cgroup the collector reads for
+        # the NEXT leg's utilization denominators — run_plan keeps the rr
+        # container up across both postures.
+        for tok in self.tokens:
+            try:
+                await asyncio.wait_for(self.client.terminate(tok), timeout=120)
+            except Exception as exc:  # noqa: BLE001 — recorded, never masks the leg
+                say(f'terminate {str(tok)[:16]}: {exc!r} (recorded; ttl reaps)')
+        self.tokens = []
+        try:
             await self.client.disconnect()
+        except Exception as exc:  # noqa: BLE001
+            say(f'disconnect: {exc!r} (recorded)')
+        self.client = None
 
 
 class LIArm:
@@ -349,11 +394,25 @@ class LIArm:
 # Read-backs (preflight; fail-closed, absence first)
 # ---------------------------------------------------------------------------
 
-def generate_envprobe_pipe() -> Path:
+def generate_task_pipe(tag: str) -> tuple[Path, str]:
+    """Measured pipe + a FRESH project_id, nothing else changed (Phase 1's
+    pattern — minimal/rr/client.py, smoke_phase2.py; the why lives on
+    probe_rr.fresh_project_pipe). The measured identity stays PIPE_PATH's
+    sha256; the per-token project_id is recorded in provenance."""
+    cfg = fresh_project_pipe(PIPE_PATH, f'video-{tag}')
+    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+    out = GENERATED_DIR / f'video_task_{tag}_{os.getpid()}.pipe'
+    out.write_text(json.dumps(cfg, indent=1))
+    return out, cfg['project_id']
+
+
+def generate_envprobe_pipe() -> tuple[Path, str]:
     """Measured pipe + env_probe + response_text (a3_env_torch pattern).
     Same task process as the loaded video nodes, so the rfdetr import predicate
-    and the thread pins are read where they matter. Measured pipe untouched."""
-    base = json.loads(PIPE_PATH.read_text())
+    and the thread pins are read where they matter. Fresh project_id (D3):
+    smoke_phase2:318 always re-stamped it; the first video version copied the
+    base id, which shares a derived task token with the leg's own use()."""
+    base = fresh_project_pipe(PIPE_PATH, 'envprobe')
     base['components'].append({'id': 'envprobe_1', 'provider': 'env_probe', 'config': {},
                                'input': [{'lane': 'text', 'from': 'webhook_1'}]})
     base['components'].append({'id': 'resp_env', 'provider': 'response_text',
@@ -362,22 +421,34 @@ def generate_envprobe_pipe() -> Path:
     GENERATED_DIR.mkdir(parents=True, exist_ok=True)
     out = GENERATED_DIR / f'video_envprobe_{os.getpid()}.pipe'
     out.write_text(json.dumps(base, indent=1))
-    return out
+    return out, base['project_id']
 
 
 async def rr_readback(port: int) -> dict:
-    from rocketride import RocketRide
-    pipe = generate_envprobe_pipe()
-    client = RocketRide(uri=f'ws://127.0.0.1:{port}/task/service', apikey='local-dev')
-    await client.connect()
+    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-22).
+    from rocketride import RocketRideClient
+    os.environ['ROCKETRIDE_URI'] = f'http://127.0.0.1:{port}'
+    rr_credentials.resolve(strict=True)
+    pipe, project_id = generate_envprobe_pipe()
+    client = RocketRideClient()
+    await client.connect(timeout=60000)
+    token = None
     try:
         started = await client.use(filepath=str(pipe), ttl=600)
-        result = await client.send(started['token'], 'readback probe',
+        token = started['token']
+        result = await client.send(token, 'readback probe',
                                    mimetype='text/plain')
         texts = (result or {}).get('envprobe') or []
         info = json.loads(texts[0]) if texts else {}
     finally:
+        if token:
+            try:  # terminate: the envprobe task must be GONE before the leg's
+                  # own use() and before the census baseline (Ticket 4 + D3)
+                await asyncio.wait_for(client.terminate(token), timeout=60)
+            except Exception as exc:  # noqa: BLE001
+                say(f'envprobe terminate: {exc!r} (recorded; ttl=600 reaps)')
         await client.disconnect()
+    info['_envprobe_project_id'] = project_id
     return info
 
 
@@ -421,6 +492,21 @@ def container_idle_cores(container: str, sample_s: float = 4.0) -> Optional[floa
     if b is None:
         return None
     return round((b - a) / 1e6 / sample_s, 3)
+
+
+def settled_census(container: str, tries: int = 10, interval_s: float = 3.0) -> list:
+    """probe_rr.task_process_census, once STABLE (two consecutive equal counts).
+    The engine reaps a terminated task's subprocess asynchronously, and
+    preflight's envprobe was terminated moments before the census baseline —
+    an instant snapshot could still see the corpse and shift the delta."""
+    prev = task_process_census(container)
+    for _ in range(tries):
+        time.sleep(interval_s)
+        cur = task_process_census(container)
+        if len(cur) == len(prev):
+            return cur
+        prev = cur
+    return prev
 
 
 # rfdetr 1.5.2 assets/model_weights.py:192-196 — RFDETRBase's default weights
@@ -540,7 +626,13 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
     readbacks: Dict[str, dict] = {}
     identity: Dict[str, Any] = {}
     if rr_arm_active:
+        # SDK identity FIRST (instance six): names AND parameters verified
+        # against the installed wheel before anything calls them. Null-controlled.
+        identity['sdk'] = sdk_identity.readback(strict=True)
+        say(f"preflight: SDK rocketride {identity['sdk']['package_version']} at "
+            f"{identity['sdk']['module_path']} — entry points verified, null control fired")
         info = await rr_readback(args.rr_port)
+        identity['envprobe_project_id'] = info.get('_envprobe_project_id')
         readbacks['rr_task'] = {'env': info.get('env') or {},
                                 'torch_num_threads': info.get('torch_num_threads')}
         identity['rr'] = {'rfdetr_import_ok': info.get('rfdetr_import_ok'),
@@ -558,6 +650,7 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
             raise SystemExit(f'NOT DONE — RR rf-detr-base.pth md5 {md5!r} != registry '
                              f'{RFDETR_BASE_MD5} (rfdetr 1.5.2 lineage): wrong or absent weights.')
     else:
+        identity['sdk'] = {'skipped': 'LI leg — the rocketride SDK is not on this path'}
         per_worker = await li_readbacks(arm)
         if len(per_worker) < (arm.declared_workers or 1):
             raise SystemExit(f'NOT DONE — only {len(per_worker)}/{arm.declared_workers} LI '
@@ -933,10 +1026,33 @@ async def amain() -> int:
         raise SystemExit(f'NOT DONE — manifest has {len(measured)} measured rows, --n {args.n}')
 
     if args.arm == 'rocketride':
-        await arm.start()
         if posture.name == 'parity' and len(warm) < posture.tokens:
             raise SystemExit(f'NOT DONE — {len(warm)} warm rows < {posture.tokens} tokens: '
                              'every token must see at least one warm item.')
+        # CENSUS ASSERTION (D3, ruling 2026-08-22: goes in regardless of how
+        # use_existing reads). M tokens declared -> M NEW task processes
+        # measured, or the leg refuses: a parity posture whose tokens share a
+        # task is a queue wearing a parity label. Config is never the evidence.
+        census_before = settled_census(args.rr_container)
+        await arm.start()
+        census_after = task_process_census(args.rr_container)
+        before_pids = {p['pid'] for p in census_before}
+        new_procs = [p for p in census_after if p['pid'] not in before_pids]
+        if len(new_procs) != posture.tokens:
+            await arm.stop()
+            raise SystemExit(
+                f'NOT DONE — declared {posture.tokens} token(s) but measured '
+                f'{len(new_procs)} NEW task process(es) in {args.rr_container} '
+                f'(census {len(census_before)} -> {len(census_after)}, new pids '
+                f'{[p["pid"] for p in new_procs]}). Tokens sharing a task process '
+                f'would make every parity number a queue measurement (D3).')
+        pf['task_census'] = {
+            'declared_tokens': posture.tokens,
+            'census_before': len(census_before), 'census_after': len(census_after),
+            'new_task_pids': [p['pid'] for p in new_procs],
+            'project_ids': arm.project_ids}
+        say(f'census: {posture.tokens} token(s) -> {len(new_procs)} new task '
+            f'process(es) {[p["pid"] for p in new_procs]} (declared==measured)')
 
     (out_dir / 'preflight.json').write_text(json.dumps(
         {k: v for k, v in pf.items() if k != 'rows'} | {'posture': posture.label()}, indent=1))
@@ -1009,16 +1125,21 @@ async def amain() -> int:
 
     t_leg0 = time.monotonic()
     dr0 = resource.getrusage(resource.RUSAGE_SELF)
-    with JsonlWriter(rec_path) as writer:
-        leg_meta = await run_leg(arm, measured, args.leg,
-                                 args.blast_concurrency or 1,
-                                 Path(args.corpus_dir), writer, done_keys,
-                                 args.interval_s)
-    leg_wall = time.monotonic() - t_leg0
-    dr1 = resource.getrusage(resource.RUSAGE_SELF)
-    if collector:
-        collector.stop()
-    await arm.stop()
+    try:
+        with JsonlWriter(rec_path) as writer:
+            leg_meta = await run_leg(arm, measured, args.leg,
+                                     args.blast_concurrency or 1,
+                                     Path(args.corpus_dir), writer, done_keys,
+                                     args.interval_s)
+        leg_wall = time.monotonic() - t_leg0
+        dr1 = resource.getrusage(resource.RUSAGE_SELF)
+    finally:
+        # stop() terminates every token BEFORE disconnect (Ticket 4): a leg
+        # that dies mid-flight must not leave ttl=7200 tokens idle-spinning in
+        # the cgroup the next leg's collector and quiet-box baseline read.
+        if collector:
+            collector.stop()
+        await arm.stop()
 
     # ---- gates + export ---------------------------------------------------
     records, _, _ = read_completed(rec_path, key='video')
@@ -1113,6 +1234,7 @@ async def amain() -> int:
                                          'explicit use(threads=)')},
             'identity_readback': pf['identity'],
             'thread_pins_by_arm': pf['thread_pin_parity'],
+            'task_census': pf.get('task_census'),
             'interval_s': args.interval_s,
             'frames_observed_method': ('bracket-count' if args.arm == 'rocketride'
                                        else 'extractor-count'),
