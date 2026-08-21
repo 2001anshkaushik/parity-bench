@@ -77,6 +77,9 @@ using it.
   and the log — so the summarizer never presents one run as two. probe_run.sh
   now has preserve(): existing outputs move to `*.prev_<ts>` before any
   write; the quotable command can no longer destroy evidence.
+  **RESTORE DONE AND VERIFIED (2026-08-21):** probe_rr_t32.json printed
+  [16.17, 38.24] before the rename; now probe_rr_t32_recheck.json with the
+  CLOBBERED sidecar beside it.
 - **Crossroad 23 (2026-08-21): DELETE THE FORMULA, MEASURE THE COLUMN.**
   fps=1/15 emits t=0,15,…,1230 on a 1248.3 s stream — 83 frames;
   floor(d/15)+1 said 84. NO corrected formula (fitting the check to one
@@ -410,11 +413,34 @@ re-run clobbered its own t32 JSON; both staged confirmations passed, one id
 points at one specific log. Second of the eight numbers landed
 (RR_THREADS_ENV=8 was first).
 
-**NEXT (2026-08-21 late): adjudicate the manifest meta dump (above) →
-t32 restore/rename (Crossroad 24 block) → LI worker sweep (threads-env
-decided by it; NOT 32) → RR concurrency sweep (container thread env = 8) →
-dry pass** → remaining thresholds → smoke --write-golden → full run_plan.
-Register entries 6, 7, 8 in; Ticket 5 drafted beside 3 and 4.
+**NEXT (2026-08-21 late): adjudicate the manifest meta dump (targeted dump +
+git status on fetch_ami_video.py incoming; the first dump TRUNCATED at 900
+chars and a no-match query printed the meta row twice — entry 9's genus) →
+then the sweeps. THE SWEEPS DO NOT NEED THE MANIFEST** (they take the probe
+video directly) — they can run while adjudication pends. Invocations (box,
+probe dir, floor venv; output names carry the config per entry 7):
+
+LI worker sweep FIRST (decides LI_WORKERS and informs LI_THREADS_ENV):
+  ~/.venv-floor/bin/python probe_li_workers.py \
+    --video media/ES2002a.Corner.avi --sweep 1 2 4 8 16 --image li:video \
+    --threads-env 1 --out probe_li_workers_T1.json
+  (threads-env 1 isolates the WORKER axis; after the knee shows, refine the
+  joint W x T point with a second pass at the knee W and threads-env {2,4} —
+  W x T must respect 32 cores, and the floor curve says single-process
+  inference wants ~8 threads, so small-W points are where T > 1 can pay.
+  Warm deadline now scales: max(900, 150*W) s — and read memory_peak at W=8
+  before waiting on W=16; ~58g ceiling, one model stack per worker.)
+
+RR concurrency sweep SECOND (M tokens at the landed thread env):
+  ~/.venv-floor/bin/python probe_concurrency.py \
+    --video media/ES2002a.Corner.avi --sweep 1 2 4 8 16 \
+    --image rr:patched-video --threads-env 8 --out probe_concurrency_T8.json
+  (threads-env 8 = RR_THREADS_ENV, the landed optimum; use(threads=) stays
+  unset = engine default, per the posture rulings. Fresh container per M,
+  idle-at-M measured, knee<0.7 rule, serving<M stops the sweep.)
+
+Then: dry pass → remaining thresholds → smoke --write-golden → full
+run_plan. Register entries 6, 7, 8, 9 in; Ticket 5 drafted beside 3 and 4.
 
 ## What a fresh session gets wrong without being told
 

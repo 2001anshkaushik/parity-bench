@@ -77,8 +77,16 @@ def start_container(image: str, workers: int, threads_env: int) -> dict:
     if r.returncode != 0:
         raise SystemExit(f'docker run failed: {r.stderr}')
     net = assert_host_network(CONTAINER)
-    ready = wait_li_ready(port=PORT, deadline_s=900, workers=workers,
-                          container=CONTAINER)
+    # Warm deadline scales with W (2026-08-21, never-run instrument hardening):
+    # the arithmetic says W=16 cold warms in ~2-4 min (concurrent CPU-bound
+    # model loads; disk reads share the page cache at a measured 558 MB/s
+    # cold), so 900 s should hold — but the payoff is asymmetric: a generous
+    # deadline costs nothing when healthy (returns at warm), a short one
+    # aborts the sweep's last point after the investment. NOTE: if W nears
+    # the 58g ceiling no deadline saves it — read memory_peak at W=8 before
+    # waiting on W=16.
+    ready = wait_li_ready(port=PORT, deadline_s=max(900.0, 150.0 * workers),
+                          workers=workers, container=CONTAINER)
     return {'network_mode': net, **ready}
 
 

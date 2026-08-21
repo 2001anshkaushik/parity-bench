@@ -162,3 +162,26 @@ than rewritten from memory, which is entry 2's point in miniature.
 > reproduction itself donated a specimen: the checker printed `$?` after a
 > pipe and displayed tail's success for every case — `${PIPESTATUS[0]}`, the
 > campaign's oldest defect, caught live in the checker's own frame.
+
+## 9. The reading is not the artifact (the reviewer's own entry, drafted in their name as ruled, added 2026-08-21)
+
+> Three wrong diagnoses in two days, mine, all by the same mechanism: I read
+> a terminal rendering and reported it as the artifact. The Dockerfile
+> ENTRYPOINT "missing space" — the repo file had the space; byte-level greps
+> and a green build adjudicated. The RR thread curve "produced nothing" — my
+> query used key names that do not exist in the probe's schema; the same
+> files were simultaneously passing gate-3 staging. The argparse guard
+> "defeated by a missing space with rc=0" — the relayed line reproduces as
+> REJECTED by the committed parser; the plausible culprit was a different
+> line the parser quietly auto-completed. Each time the reading felt
+> sufficient; each time the agent reproduced against the code or the box and
+> the reading lost. **The operating rule: when the advisor has a hypothesis
+> about what a command DID, the adjudicator is the code or the box — never
+> the reading.** Scrollback is a rendering: it truncates, stitches, wraps,
+> and duplicates, and it does so without marking where. The same day, the
+> agent's own reproduction harness printed `$?` after a pipe and displayed
+> success for every failing case — the campaign's oldest defect, live inside
+> the checker built to adjudicate my error. That is the best argument this
+> register has that these rules must be structural — in parsers, in
+> preserve(), in read-backs — rather than remembered by anyone, reviewer or
+> agent.
