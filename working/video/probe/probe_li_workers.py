@@ -63,7 +63,10 @@ def worker_census(container: str) -> list[dict]:
     defined by MEASURED BEHAVIOR in measure_w: processes that burned CPU
     during the batch, anchored by the ground truth that every RESPONSE pid
     must appear among the burners. argv is recorded per process as
-    attribution text only, never as a predicate."""
+    attribution text only, never as a predicate. Known artifact: this
+    census's own `sh -c` reader appears in the tree it captures (pid
+    varies) — it burns nothing, so the burner anchor ignores it; expected,
+    not an anomaly."""
     raw = sh(['docker', 'exec', container, 'sh', '-c',
               'for d in /proc/[0-9]*; do s=$(cat "$d/stat" 2>/dev/null) || continue; '
               'c=$(tr "\\0" " " < "$d/cmdline" 2>/dev/null); '
@@ -258,7 +261,17 @@ async def amain() -> int:
             print(f'STOP at W={w}: serving={point["serving_by_cpu_delta"]} '
                   f'errors={point["errors"]} — investigate before going wider', flush=True)
             break
-        if len(points) >= 2 and points[-2]['throughput_videos_per_s'] and point['throughput_videos_per_s']:
+        # Architecture label, MEASURED (2026-08-21, confirmed both ways):
+        # uvicorn --workers 1 serves IN-PROCESS (tree = pid 1 only, health
+        # pid 1); --workers >= 2 spawns workers. Two topologies from one flag.
+        point['architecture'] = 'in-process' if w == 1 else 'spawned'
+        # KNEE over W>=2 ONLY: the knee is a same-architecture scaling
+        # statement, and the 1->2 step conflates +1 worker with the topology
+        # switch — a knee "at 2" computed across that boundary could encode
+        # spawn overhead as scaling falloff. W=1 is reported as the
+        # in-process baseline, not a curve point.
+        if (len(points) >= 2 and points[-2]['W'] >= 2
+                and points[-2]['throughput_videos_per_s'] and point['throughput_videos_per_s']):
             marginal = ((point['throughput_videos_per_s'] / points[-2]['throughput_videos_per_s'])
                         / (w / points[-2]['W']))
             point['marginal_efficiency'] = round(marginal, 3)
@@ -267,17 +280,37 @@ async def amain() -> int:
                 print(f'KNEE at W={w}: marginal efficiency {marginal:.2f} < 0.7', flush=True)
     sh(['docker', 'rm', '-f', CONTAINER])
 
-    base = points[0]['throughput_videos_per_s'] if points else None
+    # Linear-efficiency baseline anchored in the SPAWNED architecture (the one
+    # being scaled): per-worker throughput at the smallest W>=2 point. The
+    # in-process W=1 point carries no efficiency_vs_linear.
+    spawned = [p for p in points if p['W'] >= 2 and p['throughput_videos_per_s']]
+    per_worker_base = (spawned[0]['throughput_videos_per_s'] / spawned[0]['W']) if spawned else None
     for p in points:
-        if base and p['throughput_videos_per_s']:
-            p['efficiency_vs_linear'] = round(p['throughput_videos_per_s'] / (p['W'] * base), 3)
+        if per_worker_base and p['W'] >= 2 and p['throughput_videos_per_s']:
+            p['efficiency_vs_linear'] = round(
+                p['throughput_videos_per_s'] / (p['W'] * per_worker_base), 3)
+    # W=1 keeps a DECISION role, not a footnote: if spawning costs more than
+    # the second worker gains, that is a loud finding and W=1 is a legitimate
+    # LI_WORKERS candidate on its own architecture.
+    w1 = next((p for p in points if p['W'] == 1), None)
+    w2 = next((p for p in points if p['W'] == 2), None)
+    if (w1 and w2 and w1.get('throughput_videos_per_s') and w2.get('throughput_videos_per_s')
+            and w2['throughput_videos_per_s'] < w1['throughput_videos_per_s']):
+        print(f'FINDING: throughput(W=2)={w2["throughput_videos_per_s"]} < '
+              f'throughput(W=1)={w1["throughput_videos_per_s"]} — spawning cost exceeds '
+              f'the second worker\'s gain; the in-process baseline beats the smallest '
+              f'spawned point and belongs in the LI_WORKERS decision.', flush=True)
     report = {'sweep': args.sweep, 'threads_env': args.threads_env, 'points': points,
               'idle_cores_by_W': {p['W']: p.get('idle_cores_after_warm_workers') for p in points},
               'knee_W': knee,
               'memory_ascent_stop': mem_stop,
               'memory_overshoot_override': args.allow_memory_overshoot or None,
               'rule': 'LI_WORKERS sits AT the knee, never past it — measured the same way '
-                      'M_TOKENS is (no handicaps, no derived values)'}
+                      'M_TOKENS is (no handicaps, no derived values). Knee computed over '
+                      'W>=2 only: uvicorn --workers 1 serves IN-PROCESS (different '
+                      'architecture, confirmed 2026-08-21) and is reported as the '
+                      'baseline, with the W=1-vs-W=2 comparison surfaced for the '
+                      'LI_WORKERS decision.'}
     Path(args.out).write_text(json.dumps(report, indent=1))
     print(f'wrote {args.out}')
     return 2 if census_blind else 0   # 2 = instrument blindness, distinct from findings

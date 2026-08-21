@@ -466,8 +466,34 @@ n_container_procs / response_pids / cpu_burner_pids / census_all_procs
 (always recorded — argv is attribution text now). RR census keeps its
 pattern — execution-verified at its configuration, and RR responses carry
 no pid to anchor an inversion (stated asymmetry). Memory-guard call
-APPROVED by the operator as implemented. **NEXT: Ansh re-runs the LI
-worker sweep — correct at every W by construction now.**
+APPROVED by the operator as implemented.
+
+**CONFIRMED BOTH WAYS (2026-08-21): uvicorn --workers 1 serves IN-PROCESS**
+(W=1 standalone tree = pid 1 only, health pid 1; the sweep's recorded
+census_all_procs agrees exactly). Two topologies from one flag; the
+predicate had only ever been measured against the second. The burner-anchor
+refinement is ON THE RECORD as beating the superset proposal (operator:
+membership against all-procs would be trivially true — the blind detector
+would have died with the predicate it guarded; the burner anchor kept it
+non-trivial AND made the fix safe to land before the dump). Known census
+artifact: its own `sh -c` reader appears in the tree it captures — burns
+nothing, ignored by the anchor, noted in the docstring.
+
+**KNEE RULING (2026-08-21, agent's call at the operator's invitation):
+W=1 is EXCLUDED from the knee — reported as the in-process BASELINE; knee
+computed over W>=2 only** (the knee is a same-architecture scaling
+statement; the 1→2 step conflates +1 worker with the topology switch, so a
+knee "at 2" could encode spawn overhead as scaling falloff).
+efficiency_vs_linear rebases to W=2's per-worker throughput; and W=1 keeps
+a decision role: if throughput(2) < throughput(1), the sweep prints the
+finding loudly and W=1 is a legitimate LI_WORKERS candidate on its own
+architecture. All three contracts executed (no 1→2 marginal; knee from
+same-architecture pairs; finding branch fires). **CAVEAT for tonight: the
+sweep already climbing runs the OLD knee code — its knee_W /
+efficiency_vs_linear fields are old-rule; the points array is
+rule-independent, so apply the W>=2 rule to the recorded points when the
+curve lands.** NEXT: curve lands → LI_WORKERS + LI_THREADS_ENV refine pass
+→ RR concurrency sweep (threads-env 8) → dry pass.
 
 **Crossroad 26 (2026-08-21): WARM-UP.** WARM_N >= max(M_TOKENS, LI_WORKERS)
 plus margin, drawn from the 16 disjoint warm rows, never the measured 44.
