@@ -261,25 +261,15 @@ discrepancy is CLOSED by the green build — the repo file was correct; the
 cause of the quoted missing-space variant was never relayed (presumed a
 stale read of another copy).
 
-**Freeze snapshot: captured BOX-SIDE, 149 packages, at
-`working/video/li_video/li_image_freeze.txt` — STILL NOT IN THE REPO
-(2026-08-21 evening):** the box committed it locally as `0e47b2f` but cannot
-push (no GitHub credentials); the relay to the laptop arrived with the paste
-placeholder UNFILLED. Never reconstruct it from the excerpt. Landing paths,
-any one of: (a) paste the 149 lines verbatim → laptop commits; (b) even after
-the box is reset to origin, the bytes survive in its object store —
-`git show 0e47b2f:working/video/li_video/li_image_freeze.txt`; (c) re-measure
-from the immutable image itself: `docker run --rm li:video python -m pip
-freeze` (a fresh read-back of an unchanged artifact is re-measurement, not
-reconstruction); (d) S3 relay: `s3://rocketride-benchmark-data/ansh/
-li_image_freeze.txt`, **md5 e196031c68e2021fbc8abf12a1fc277a** (== box commit
-0e47b2f == fresh image freeze — the relayed paste had scrollback-stitched
-duplicate lines, so md5 is the only accepted authenticity check). CHECKED
-2026-08-21 from the laptop: object NOT in the bucket (exact-key 404;
-whole-bucket 'freeze' search finds only Leela's Phase 1 pip_freeze_lg.txt;
-no ansh/ uploads today) — the upload has not landed. When it does: pull to
-scratchpad → md5 must equal e196031c… → commit verbatim → report computed
-md5 beside the sha. Serving stack as
+**Freeze snapshot: LANDED (commit `5c029b3`, 2026-08-21).** 149 packages,
+2911 bytes, **md5 `e196031c68e2021fbc8abf12a1fc277a` at every link**: box
+commit 0e47b2f == fresh `pip freeze` off the immutable image == S3 object ==
+laptop download == repo file (recomputed before AND after the commit). Chain:
+image → box object store → S3 → repo, no human-readable step in the middle —
+the one attempted paste had scrollback-stitched duplicate lines and was
+refused. The first S3 upload silently no-op'd (`aws s3 cp <(git show …)`
+warns "Skipping file /dev/fd/63" and EXITS ZERO — register entry 4
+companion); caught by searching the bucket, not by the exit code. Serving stack as
 shipped: anyio==4.14.2, fastapi==0.141.1, httptools==0.8.0,
 llama-index-core==0.14.24, llama-index-embeddings-huggingface==0.7.0,
 uvicorn==0.52.4, uvloop==0.22.1. **First catch of exactly the drift the

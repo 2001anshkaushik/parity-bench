@@ -88,3 +88,11 @@ than rewritten from memory, which is entry 2's point in miniature.
 > every flag and constrained value against an allowlist measured from
 > uvicorn's own CLI source, mid-word `--` flagged as a missing space,
 > null-controlled.
+>
+> Companion (2026-08-21): **a command that warns and exits zero is a failure
+> wearing a success's clothes.** `aws s3 cp <(git show …)` printed "Skipping
+> file /dev/fd/63" and returned 0, so the `&&` chain sailed on and the upload
+> looked done; the same day, a `head`-truncated bucket listing nearly read as
+> "no files here". Both caught the same way: by re-measuring the outcome
+> (does the object exist? what does the FULL listing say?), never by reading
+> the exit code.
