@@ -422,6 +422,26 @@ def container_idle_cores(container: str, sample_s: float = 4.0) -> Optional[floa
     return round((b - a) / 1e6 / sample_s, 3)
 
 
+# rfdetr 1.5.2 assets/model_weights.py:192-196 — RFDETRBase's default weights
+# 'rf-detr-base.pth' download from storage.googleapis.com/rfdetr/rf-detr-base-coco.pth,
+# md5-validated by the package itself. This constant IS the pinned weight lineage;
+# the read-back below proves the bytes each arm serves match it.
+RFDETR_BASE_MD5 = 'b4d3ce46099eaed50626ede388caf979'
+RFDETR_PATHS = {'rr': '/opt/rocketride/engine/cache', 'li': '/opt/rfdetr-cache'}
+
+
+def rfdetr_checkpoint_md5(container: str, search_root: str) -> Optional[str]:
+    """md5 of rf-detr-base.pth inside a running container; None if absent."""
+    try:
+        out = subprocess.run(
+            ['docker', 'exec', container, 'sh', '-c',
+             f"find {search_root} -name 'rf-detr-base*.pth' -exec md5sum {{}} \\; | head -1"],
+            capture_output=True, text=True, timeout=60).stdout.strip()
+        return out.split()[0] if out else None
+    except Exception:
+        return None
+
+
 def container_declared_threads(container: str) -> Dict[str, str]:
     """The six variables as DECLARED on the container (docker inspect env) —
     the 'declared' side of Crossroad 17's declared-vs-measured check."""
@@ -528,6 +548,12 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
             raise SystemExit('NOT DONE — RR task process cannot import rfdetr '
                              f'({info.get("rfdetr_import_error")!r}): the engine would '
                              'silently serve RT-DETR, a different model. Refusing to run.')
+        md5 = rfdetr_checkpoint_md5(args.rr_container, RFDETR_PATHS['rr'])
+        identity['rr']['rfdetr_checkpoint_md5'] = md5
+        identity['rr']['rfdetr_checkpoint_md5_ok'] = md5 == RFDETR_BASE_MD5
+        if md5 != RFDETR_BASE_MD5:
+            raise SystemExit(f'NOT DONE — RR rf-detr-base.pth md5 {md5!r} != registry '
+                             f'{RFDETR_BASE_MD5} (rfdetr 1.5.2 lineage): wrong or absent weights.')
     else:
         per_worker = await li_readbacks(arm)
         if len(per_worker) < (arm.declared_workers or 1):
@@ -540,6 +566,12 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
                           'versions': next(iter(per_worker.values()))['versions']}
         if impls != {'rfdetr'}:
             raise SystemExit(f'NOT DONE — LI detect_impl read back as {impls}, not rfdetr.')
+        md5 = rfdetr_checkpoint_md5(args.li_container, RFDETR_PATHS['li'])
+        identity['li']['rfdetr_checkpoint_md5'] = md5
+        identity['li']['rfdetr_checkpoint_md5_ok'] = md5 == RFDETR_BASE_MD5
+        if md5 != RFDETR_BASE_MD5:
+            raise SystemExit(f'NOT DONE — LI rf-detr-base.pth md5 {md5!r} != registry '
+                             f'{RFDETR_BASE_MD5}: wrong or absent weights.')
 
     # Crossroad 17: per-arm declared-vs-measured; asymmetry across arms is a
     # recorded value, never a failure. Undeclared drift (#37) still fails.

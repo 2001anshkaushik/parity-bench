@@ -13,7 +13,7 @@ cd "$(dirname "$0")"
 
 VIDEO="media/ES2002a.Corner.avi"
 [ -f "$VIDEO" ] || { echo "run ./probe_fetch.sh first"; exit 1; }
-IMAGE="${RR_IMAGE:-rr:patched}"
+IMAGE="${RR_IMAGE:-rr:patched-video}"   # Crossroad 18: the BAKED image; rr:patched would reinstall 3-4.5GB per container
 MATRIX="${PROBE_MATRIX:-1 8 32}"
 CENSUS_TOKENS="${PROBE_TOKENS:-2}"
 LOG="probe_$(date +%Y%m%d_%H%M%S).log"

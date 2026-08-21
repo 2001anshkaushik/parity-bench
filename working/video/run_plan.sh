@@ -58,7 +58,7 @@ PASSES="${PASSES:-1}"
 # PDF fixture and warm-up, writes a THROWAWAY golden. Retires the wiring risk
 # in ~minutes; NO number from a dry pass is a measurement.
 DRY_PASS="${DRY_PASS:-0}"
-RR_IMAGE="${RR_IMAGE:-rr:patched}"
+RR_IMAGE="${RR_IMAGE:-rr:patched-video}"   # Crossroad 18: baked image (bake_rr_video.sh)
 LI_IMAGE="${LI_IMAGE:-li:video}"
 OUT="working/video/results/mainrun_$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$OUT"

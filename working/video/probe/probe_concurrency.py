@@ -146,7 +146,8 @@ async def amain() -> int:
     ap.add_argument('--video', required=True)
     ap.add_argument('--pipe', default=str(Path(__file__).parent.parent / 'benchmark_video_detect.pipe'))
     ap.add_argument('--sweep', type=int, nargs='+', default=[1, 2, 4, 8, 16])
-    ap.add_argument('--image', default='rr:patched')
+    ap.add_argument('--image', default='rr:patched-video',
+                    help='Crossroad 18: the BAKED image — a fresh container per M with the unbaked image reinstalls 3-4.5GB each')
     ap.add_argument('--threads-env', type=int, default=1,
                     help='the six BLAS/OMP vars on the container (same value the LI arm gets)')
     ap.add_argument('--threads', type=int, default=None,

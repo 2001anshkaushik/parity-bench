@@ -265,8 +265,17 @@ async def check_pins(args) -> dict:
     else:
         say(f'  PASS  per-arm pins declared==measured; cross-arm values '
             f'{pins["cross_arm_values"]} (recorded, per-arm optima)')
+    ck = {arm: drv.rfdetr_checkpoint_md5(c, drv.RFDETR_PATHS[arm])
+          for arm, c in (('rr', args.rr_container), ('li', args.li_container))}
+    for arm, md5 in ck.items():
+        if md5 != drv.RFDETR_BASE_MD5:
+            fail(f'{arm} rf-detr-base.pth md5 {md5!r} != registry {drv.RFDETR_BASE_MD5} '
+                 f'(rfdetr 1.5.2 lineage) — wrong or absent weights')
+    if all(m == drv.RFDETR_BASE_MD5 for m in ck.values()):
+        say(f'  PASS  rf-detr-base.pth md5 matches the 1.5.2 registry on BOTH arms')
     return {'pins': pins, 'rr_versions': info.get('package_versions'),
-            'li_detect_impl': sorted(impls) if impls else None}
+            'li_detect_impl': sorted(impls) if impls else None,
+            'rfdetr_checkpoint_md5': ck}
 
 
 def main() -> int:

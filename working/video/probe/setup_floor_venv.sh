@@ -39,8 +39,16 @@ python3 -m venv "$FLOOR"
 "$FLOOR/bin/pip" install --quiet --upgrade pip
 echo "installing engine pins (expect a multi-GB torch wheel; this is the point):"
 grep -v '^#' "$PINS"
-"$FLOOR/bin/pip" install -r "$PINS"
-"$FLOOR/bin/pip" install "rocketride==1.3.0" "psutil==$PSUTIL_PIN" "langchain-text-splitters"
+# torch/torchvision pin LOCAL versions (+cu128) which plain PyPI does not host;
+# the PyTorch CUDA index supplies them and --extra-index-url lets everything
+# else resolve from PyPI at the same pinned versions in one pass.
+"$FLOOR/bin/pip" install -r "$PINS" --extra-index-url https://download.pytorch.org/whl/cu128
+"$FLOOR/bin/pip" install "rocketride==1.3.0" "psutil==$PSUTIL_PIN"
+# langchain-text-splitters normally arrives pinned via engine_pins.txt; if an
+# older pins file predates its addition to the REQUIRED list, install the
+# box-extracted pin (1.1.2, 2026-08-21) rather than whatever PyPI resolves.
+"$FLOOR/bin/python" -c "import langchain_text_splitters" 2>/dev/null || \
+  "$FLOOR/bin/pip" install "langchain-text-splitters==1.1.2"
 
 echo "== read-back: floor venv versions vs pins =="
 "$FLOOR/bin/python" - "$PINS" <<'EOF'

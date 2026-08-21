@@ -22,7 +22,7 @@ if ! docker run --rm "$IMAGE" cat "$CONSTRAINTS_PATH" > /tmp/rr_constraints.txt 
   exit 1
 fi
 
-REQUIRED="rfdetr torch torchvision transformers supervision timm pillow numpy imageio-ffmpeg sentence-transformers"
+REQUIRED="rfdetr torch torchvision transformers supervision timm pillow numpy imageio-ffmpeg sentence-transformers langchain-text-splitters"
 {
   echo "# Resolved pins read from $IMAGE:$CONSTRAINTS_PATH on $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "# by extract_engine_pins.sh — the LlamaIndex video image installs exactly these."

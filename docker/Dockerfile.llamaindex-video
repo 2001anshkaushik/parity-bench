@@ -31,7 +31,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
 
 # Model-stack pins extracted from the built rr image (build fails without the file).
 COPY working/video/li_video/engine_pins.txt /tmp/engine_pins.txt
-RUN pip install --no-cache-dir -r /tmp/engine_pins.txt
+# +cu128 local versions live on the PyTorch index, not PyPI (matching the
+# engine's exact wheel is deliberate: gate 3 is zero-tolerance and a cpu-only
+# wheel with different bundled kernels is the likeliest benign strict failure).
+RUN pip install --no-cache-dir -r /tmp/engine_pins.txt \
+      --extra-index-url https://download.pytorch.org/whl/cu128
 
 # Service stack (Phase 1's uvicorn lane: uvloop/httptools installed explicitly so a
 # silent fallback to asyncio/h11 cannot hide behind a declared loop) + LlamaIndex.
