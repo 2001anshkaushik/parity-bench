@@ -539,10 +539,36 @@ hide a worker — teeth kept; executed contracts: default 2 rows (was 16),
 parity/LI-8 unchanged 16, W=4-with-hidden-worker tops up). **DEFAULT_N
 ruling marked RULED in run_plan.**
 
-NEXT: W=8 recheck answer → LI_WORKERS settles → refine pass at knee W with
---threads-env {2,4} (+ W=1 at T={2,4,8} if the in-process baseline is
-competitive) → RR concurrency sweep (threads-env 8) → DRY PASS → 44-video
-campaign tonight (DEFAULT_N=44).
+**Register entry 11 (2026-08-21, operator-ruled):** check the benign
+explanation against the points already in hand — iid routing predicted
+5.25-of-8 AND 2.7-of-4; W=4's measured 4-of-4 falsified it at zero cost.
+**Ticket-4 headline LANDED in probe_concurrency:** idle-vs-M slope fitted
+over the sweep points, verdict PER-TOKEN (>=0.7 c/tok) / PER-SERVER
+(<=0.15) / PARTIAL, printed as a banner AND as the FIRST key of the report
+JSON with the consequence spelled out (per-token at M=8 = ~8 cores burned
+doing nothing — it changes what the parity posture means). Classifier
+executed on all three synthetic curve shapes.
+
+**SHASHI MESSAGE FRAME (send the moment the recheck lands, outcome slotted;
+Ansh's voice):** our W=8 measured 6/8 serving — same shape as your
+"15 of 32 pids served"; our gate refuses to emit a number in that state; we
+ran a 4x-posts discriminator (a worker drawing zero of 32 offered ≈ 1.4%
+under any routing that offers it work). Result: [OUTCOME a/b/c]. AND — this
+holds regardless of our outcome — **entry 11 applied to HIS number: iid
+routing at 50 posts on 32 workers expects ~25.5 occupied (32×(1−(31/32)^50));
+he observed 15, far BELOW routing luck** — so "scheduling" cannot explain
+his 15/32 either: it is non-iid pile-up (async multi-accept behind long
+videos) or workers dead in rotation. The 5-minute check on his rig: post
+4× worker count, count distinct serving pids. Outcome inserts staged:
+(a) all-8 + marginal recovers → ours was small-batch starvation, knee→8;
+(b) all-8 but marginal <0.7 → knee 4 real, non-CPU bottleneck (86% idle),
+per-worker stage_s next; (c) <8 at 32 posts → dead-in-rotation, defect.
+
+NEXT: W=8 recheck answer → LI_WORKERS settles → **RR concurrency sweep
+(threads-env 8; the Ticket-4 idle-vs-M banner is the headline output)** →
+refine pass at knee W with --threads-env {2,4} (+ W=1 at T={2,4,8} if the
+in-process baseline is competitive) → DRY PASS → 44-video campaign tonight
+(DEFAULT_N=44; ~62 min estimated).
 
 **Crossroad 26 (2026-08-21): WARM-UP.** WARM_N >= max(M_TOKENS, LI_WORKERS)
 plus margin, drawn from the 16 disjoint warm rows, never the measured 44.

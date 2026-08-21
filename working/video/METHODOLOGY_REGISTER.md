@@ -219,3 +219,19 @@ than rewritten from memory, which is entry 2's point in miniature.
 > keeps its pattern, stated as the honest asymmetry: it was
 > execution-verified in its actual configuration, and RR responses carry no
 > pid, so no ground-truth anchor exists there to invert onto.
+
+## 11. Check the benign explanation against the points already in hand (added 2026-08-21)
+
+> Six of eight workers serving looked like accept-routing luck — and the iid
+> arithmetic even agreed: 8 posts into 8 workers expects ~5.25 occupied. But
+> the SAME mechanism predicts ~2.7 of 4, and W=4 had served 4-of-4 in the
+> same sweep. The benign explanation was inconsistent with data already
+> collected — falsified before a single new run was spent on it. The method,
+> stated as one: **when an anomaly has a plausible benign explanation, first
+> check that explanation's predictions against every point you already
+> hold — the cheapest experiment is the one already run.** The discriminator
+> still runs: falsifying "benign routing" does not by itself prove "dead
+> workers"; it narrows the hypothesis space and re-prices the follow-up.
+> Kin to entry 1: a plausible mechanism is an assertion until a record
+> agrees with it — including the records already sitting in the output
+> directory.

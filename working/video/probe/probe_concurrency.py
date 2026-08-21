@@ -216,7 +216,53 @@ async def amain() -> int:
     for p in points:
         if base and p['throughput_videos_per_s']:
             p['efficiency_vs_linear'] = round(p['throughput_videos_per_s'] / (p['M'] * base), 3)
-    report = {'sweep': args.sweep, 'threads_env': args.threads_env,
+
+    # TICKET 4 ANSWER — headline, never a buried field (ruling 2026-08-21):
+    # a single-token engine idles at ~1.002 cores; whether that spin is PER
+    # TOKEN or per server has been open since. At M=8 the answer is the
+    # difference between 8 usable cores and 8 burned ones — it changes what
+    # the parity posture even means, so it leads the report and the stdout.
+    idle_pts = [(p['M'], p['idle_cores_after_use']) for p in points
+                if p.get('idle_cores_after_use') is not None]
+    if len(idle_pts) >= 2:
+        ms = [m for m, _ in idle_pts]
+        ys = [y for _, y in idle_pts]
+        mb, yb = sum(ms) / len(ms), sum(ys) / len(ys)
+        slope = (sum((m - mb) * (y - yb) for m, y in idle_pts)
+                 / max(1e-9, sum((m - mb) ** 2 for m in ms)))
+        verdict = ('PER-TOKEN' if slope >= 0.7 else
+                   'PER-SERVER' if slope <= 0.15 else 'PARTIAL')
+        top_m = max(ms)
+        top_idle = dict(idle_pts)[top_m]
+        consequence = {
+            'PER-TOKEN': (f'each token carries its own ~{slope:.2f}-core spin: at M={top_m} '
+                          f'the engine burns ~{top_idle:.1f} cores doing NOTHING between '
+                          f'sends — the parity posture pays for its instances in idle '
+                          f'burn, and that cost belongs in every parity number'),
+            'PER-SERVER': (f'the spin is a server constant (~{yb:.1f} cores regardless of '
+                           f'M) — the parity posture carries NO extra idle burn; '
+                           f'Ticket 4 stays a one-core server finding'),
+            'PARTIAL': (f'idle grows ~{slope:.2f} cores/token — between the clean cases; '
+                        f'at M={top_m} that is ~{top_idle:.1f} idle cores; report the '
+                        f'curve, not a verdict'),
+        }[verdict]
+        ticket4 = {'idle_cores_by_M': dict(idle_pts), 'slope_cores_per_token': round(slope, 3),
+                   'verdict': verdict, 'consequence': consequence}
+        print('=' * 70, flush=True)
+        print(f'TICKET 4 ANSWER — idle spin vs tokens (open since the 1.002-core '
+              f'measurement):\n  idle cores by M: '
+              + ' · '.join(f'M={m}: {y:.2f}' for m, y in idle_pts)
+              + f'\n  slope ≈ {slope:.2f} cores/token → {verdict}\n  CONSEQUENCE: '
+              + consequence, flush=True)
+        print('=' * 70, flush=True)
+    else:
+        ticket4 = {'verdict': 'NOT MEASURED',
+                   'reason': f'only {len(idle_pts)} idle point(s) — the sweep stopped '
+                             'before a slope exists; the question stays OPEN'}
+        print(f'TICKET 4: {ticket4["reason"]}', flush=True)
+
+    report = {'ticket4_idle_answer': ticket4,
+              'sweep': args.sweep, 'threads_env': args.threads_env,
               'use_threads': args.threads, 'points': points,
               'idle_cores_by_M': {p['M']: p.get('idle_cores_after_use') for p in points},
               'knee_M': knee, 'hidden_serialization': hidden_serialization,
