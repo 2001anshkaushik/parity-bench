@@ -393,6 +393,7 @@ async def li_readbacks(arm: LIArm, timeout_s: float = 120) -> Dict[str, dict]:
             'env': h.get('thread_env') or {},
             'torch_num_threads': h.get('torch_num_threads'),
             'detect_impl': h.get('detect_impl'),
+            'python_version': h.get('python_version'),
             'versions': h.get('versions') or {},
         }
     return per_worker
@@ -543,6 +544,8 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
         readbacks['rr_task'] = {'env': info.get('env') or {},
                                 'torch_num_threads': info.get('torch_num_threads')}
         identity['rr'] = {'rfdetr_import_ok': info.get('rfdetr_import_ok'),
+                          'python_version': info.get('python_version'),
+                          'python_executable': info.get('python_executable'),
                           'versions': info.get('package_versions') or {}}
         if info.get('rfdetr_import_ok') is not True:
             raise SystemExit('NOT DONE — RR task process cannot import rfdetr '
@@ -563,6 +566,7 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
                           for k, v in per_worker.items()})
         impls = {v['detect_impl'] for v in per_worker.values()}
         identity['li'] = {'detect_impl': sorted(impls),
+                          'python_version': next(iter(per_worker.values())).get('python_version'),
                           'versions': next(iter(per_worker.values()))['versions']}
         if impls != {'rfdetr'}:
             raise SystemExit(f'NOT DONE — LI detect_impl read back as {impls}, not rfdetr.')
@@ -805,6 +809,10 @@ def cross_gates(rr_path: Path, li_path: Path, tol: float,
         if agreement['failing']:
             # Diagnostic triage only — never a verdict (only a human downgrades,
             # in writing, with the reason; first hypothesis is a REAL difference).
+            # ON DIVERGENCE, CHECK THE RECORDED VALUES IN THIS ORDER: the arms'
+            # interpreter versions (identity_readback.*.python_version — the
+            # engine embeds its own CPython, distinct from the container's PATH
+            # python), then rfdetr/torch versions, then checkpoint md5.
             v = agreement['failing'][0]
             r = next(x for x in rr_ok if x['video'] == v)
             m = li_by[v]

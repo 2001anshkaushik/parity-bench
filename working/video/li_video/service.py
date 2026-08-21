@@ -118,6 +118,7 @@ async def health() -> HealthResponse:
         model_names=ident['model_names'],
         versions=_versions(),
         torch_num_threads=_torch_threads(),
+        python_version=__import__('sys').version.split()[0],
         thread_env={k: os.environ.get(k) for k in THREAD_ENV_KEYS},
         split_unit=SPLIT_UNIT,
         chunk_size=CHUNK_SIZE,

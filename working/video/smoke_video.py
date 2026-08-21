@@ -273,9 +273,15 @@ async def check_pins(args) -> dict:
                  f'(rfdetr 1.5.2 lineage) — wrong or absent weights')
     if all(m == drv.RFDETR_BASE_MD5 for m in ck.values()):
         say(f'  PASS  rf-detr-base.pth md5 matches the 1.5.2 registry on BOTH arms')
+    pyvers = {'rr_task': info.get('python_version'),
+              'li_workers': sorted({v.get('python_version') for v in per_worker.values()})}
+    say(f'  interpreter versions (declared, per arm): {pyvers} '
+        f'(engine embeds its own CPython — the container PATH python is a different '
+        f'interpreter that never runs node code)')
     return {'pins': pins, 'rr_versions': info.get('package_versions'),
             'li_detect_impl': sorted(impls) if impls else None,
-            'rfdetr_checkpoint_md5': ck}
+            'rfdetr_checkpoint_md5': ck,
+            'interpreter_versions': pyvers}
 
 
 def main() -> int:

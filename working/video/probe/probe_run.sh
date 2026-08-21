@@ -131,6 +131,9 @@ if div:
               for p, q in zip(sorted(fa), sorted(fb))]
     print(f'gate-3 staging: DIVERGES on {len(div)}/{len(a)} frames (first: {div[:5]}).')
     print('FIRST HYPOTHESIS IS A REAL DIFFERENCE — model swap, resize path, version drift.')
+    print('CHECK RECORDED VALUES IN THIS ORDER: interpreter versions per arm (the engine')
+    print('embeds its own CPython, distinct from the container PATH python), then')
+    print('rfdetr/torch versions, then checkpoint md5, then PNG byte identity (gate 4).')
     print(f'score triage (diagnostic only): max paired delta = {max(deltas) if deltas else None}')
     print('Gate 3 stays UNARMED. Only a human downgrades, in writing, with the reason.')
     sys.exit(1)

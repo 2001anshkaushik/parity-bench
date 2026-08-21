@@ -29,11 +29,19 @@ class IInstance(IInstanceBase):
         self.preventDefault()
 
     def closing(self):
+        import sys
         info = {
             "pid": os.getpid(),
             "env": {k: os.environ.get(k) for k in KEYS},
             "os_cpu_count": os.cpu_count(),
             "threads_alive": threading.active_count(),
+            # Interpreter identity read-back (2026-08-21): the container carries
+            # TWO pythons (apt 3.10 on PATH for SDK/bootcheck; CPython embedded
+            # in the engine ELF running all node code). This reports the one
+            # that MATTERS, from inside it. Cross-arm version goes in
+            # provenance as a DECLARED value, never discovered.
+            "python_version": sys.version.split()[0],
+            "python_executable": sys.executable,
         }
         # torch is the one that actually matters: it decides intra-op parallelism for the
         # embedding forward pass. Import it the same way the embedding node does.

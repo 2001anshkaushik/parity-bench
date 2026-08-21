@@ -50,6 +50,7 @@ class HealthResponse(BaseModel):
     model_names: dict[str, str]
     versions: dict[str, str | None]
     torch_num_threads: int
+    python_version: str                   # interpreter identity — declared cross-arm, never discovered
     thread_env: dict[str, str | None]     # the six variables, as this process sees them
     split_unit: str                       # 'chars' | 'tokens' — the splitter length semantics
     chunk_size: int
