@@ -36,7 +36,9 @@ from pathlib import Path
 PIPE_SRC = Path(__file__).resolve().parent.parent / 'benchmark_video_detect.pipe'
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from probe_rr import fresh_project_pipe  # noqa: E402
+from argtypes import positive_int  # noqa: E402 — register entry 8
 
 
 def generate_pipe() -> Path:
@@ -53,11 +55,11 @@ def generate_pipe() -> Path:
 
 
 async def main() -> int:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(allow_abbrev=False)
     ap.add_argument('--video', required=True)
     ap.add_argument('--floor-json', default=None,
                     help='LI floor output with frame_png_sha16 (default: newest probe_li_floor_t*.json)')
-    ap.add_argument('--port', type=int, default=5565)
+    ap.add_argument('--port', type=positive_int('port', 65535), default=5565)
     ap.add_argument('--null-flip', action='store_true',
                     help="control: corrupt one engine PNG before hashing — comparison MUST fail")
     ap.add_argument('--no-floor-ok', action='store_true',

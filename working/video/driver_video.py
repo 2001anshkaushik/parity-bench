@@ -65,6 +65,7 @@ from harness import provenance_leela as pvl            # noqa: E402
 from harness import rr_credentials                     # noqa: E402
 from harness.jsonl_stream import JsonlWriter, read_completed  # noqa: E402
 import sdk_identity                                    # noqa: E402
+from argtypes import bounded_float, positive_int, run_id  # noqa: E402 — entry 8
 # One census, one minter — the probes' own functions (stdlib-only module):
 # the driver and probe_rr must count task processes and stamp project_ids the
 # same way, or 'declared==measured' means different things per tool.
@@ -962,20 +963,26 @@ def cross_gates(rr_path: Path, li_path: Path, tol: float,
 # ---------------------------------------------------------------------------
 
 async def amain() -> int:
-    ap = argparse.ArgumentParser()
+    # allow_abbrev=False + value-validated types (register entry 8): a guard
+    # that checks presence rather than plausibility cannot fail for the case
+    # it was built for.
+    ap = argparse.ArgumentParser(allow_abbrev=False)
     ap.add_argument('--arm', choices=['rocketride', 'llamaindex'])
     ap.add_argument('--posture', choices=['default', 'parity'], default='default',
                     help='RocketRide only; Crossroad 9 runs BOTH, one at a time')
     ap.add_argument('--leg', choices=['sequential', 'blast'])
-    ap.add_argument('--n', type=int, help='measured videos (prefix of manifest measured rows)')
-    ap.add_argument('--blast-concurrency', type=int)
-    ap.add_argument('--tokens', type=int, help='parity posture M (default: LI declared_workers)')
-    ap.add_argument('--threads', type=int, help='parity posture per-token threads= (default: unset)')
+    ap.add_argument('--n', type=positive_int('n', 10000),
+                    help='measured videos (prefix of manifest measured rows)')
+    ap.add_argument('--blast-concurrency', type=positive_int('blast-concurrency', 4096))
+    ap.add_argument('--tokens', type=positive_int('tokens', 64),
+                    help='parity posture M (default: LI declared_workers)')
+    ap.add_argument('--threads', type=positive_int('threads', 256),
+                    help='parity posture per-token threads= (default: unset)')
     ap.add_argument('--manifest', default=str(MANIFEST_DEFAULT))
     ap.add_argument('--corpus-dir', default=str(ROOT / 'corpus' / 'ami' / 'video'))
-    ap.add_argument('--interval-s', type=int, default=15)
-    ap.add_argument('--rr-port', type=int, default=5565)
-    ap.add_argument('--li-port', type=int, default=8802)
+    ap.add_argument('--interval-s', type=positive_int('interval-s', 3600), default=15)
+    ap.add_argument('--rr-port', type=positive_int('rr-port', 65535), default=5565)
+    ap.add_argument('--li-port', type=positive_int('li-port', 65535), default=8802)
     ap.add_argument('--rr-container', default='rr')
     ap.add_argument('--li-container', default='li_video')
     ap.add_argument('--out-dir', default=None)
@@ -984,15 +991,19 @@ async def amain() -> int:
     ap.add_argument('--skip-warmup', action='store_true',
                     help='resume aid ONLY — a fresh container without warm-up is not measurable')
     ap.add_argument('--no-collector', action='store_true')
-    ap.add_argument('--char-tol', type=float, default=0.02)
-    ap.add_argument('--max-preleg-load1', type=float, default=2.0,
+    ap.add_argument('--char-tol', type=bounded_float('char-tol', 1e-6, 0.5), default=0.02)
+    ap.add_argument('--max-preleg-load1', type=bounded_float('max-preleg-load1', 0.1, 64.0),
+                    default=2.0,
                     help='quiet-box gate: refuse to start with load1 above this '
                          '(hygiene bound, not probe-derived — idle box is <1)')
     ap.add_argument('--allow-noisy-box', action='store_true',
                     help='override the quiet-box gate; the override is recorded in the export')
-    ap.add_argument('--liveness-min-fraction', type=float, default=None,
-                    help='gate 5 threshold — PROBE-DERIVED, no default; absent = gate NOT RUN')
-    ap.add_argument('--gate3-armed', default=None, metavar='PROBE_RUN_ID',
+    ap.add_argument('--liveness-min-fraction',
+                    type=bounded_float('liveness-min-fraction', 1e-9, 1.0), default=None,
+                    help='gate 5 threshold — PROBE-DERIVED, no default; absent = gate NOT RUN; '
+                         'a fraction, so (0, 1] — impossible values are refused, never clamped')
+    ap.add_argument('--gate3-armed', type=run_id('gate3-armed'), default=None,
+                    metavar='PROBE_RUN_ID',
                     help='arm strict cross-arm detection agreement; the id names the probe '
                          'run whose ES2002a comparison confirmed — absent = gate NOT RUN')
     ap.add_argument('--cross', nargs=2, metavar=('RR_JSONL', 'LI_JSONL'),

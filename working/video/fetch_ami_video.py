@@ -39,6 +39,9 @@ import urllib.request
 import urllib.error
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from argtypes import bounded_float, positive_int  # noqa: E402 — register entry 8
+
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / 'working' / 'video' / 'ami_video_manifest.jsonl'
 CORPUS = ROOT / 'corpus' / 'ami' / 'video'
@@ -327,20 +330,26 @@ def manifest_mode(verify_sha: bool) -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
+    # allow_abbrev=False: an abbreviated flag is an unmeasured identity claim
+    # (register entry 8 — `--measured-chars` silently matched the full name).
+    ap = argparse.ArgumentParser(allow_abbrev=False)
     ap.add_argument('--build-manifest', action='store_true',
                     help='discovery: construct the manifest (run ONCE, on the box)')
     ap.add_argument('--verify', action='store_true', help='manifest mode: sha256 every file')
-    ap.add_argument('--n-measured', type=int, default=N_MEASURED)
-    ap.add_argument('--n-warm', type=int, default=N_WARM)
+    ap.add_argument('--n-measured', type=positive_int('n-measured', 500), default=N_MEASURED)
+    ap.add_argument('--n-warm', type=positive_int('n-warm', 500), default=N_WARM)
     ap.add_argument('--manifest', default=None, help='override manifest path (wiring tests)')
     ap.add_argument('--corpus-dir', default=None, help='override corpus dir (wiring tests)')
-    ap.add_argument('--measured-dpf', type=float, default=None,
+    ap.add_argument('--measured-dpf', type=bounded_float('measured-dpf', 0.1, 500.0),
+                    default=None,
                     help='build: probe-measured detections/frame (summarize_probe_rr.py '
-                         'prints it) — REQUIRED for --build-manifest, never defaulted')
-    ap.add_argument('--measured-chars-per-det', type=float, default=None,
-                    help='build: probe-measured chars/detection — REQUIRED for '
-                         '--build-manifest, never defaulted')
+                         'prints it; 25.95 measured 2026-08-21) — REQUIRED for '
+                         '--build-manifest, never defaulted; value validated, not just present')
+    ap.add_argument('--measured-chars-per-det',
+                    type=bounded_float('measured-chars-per-det', 0.1, 10000.0),
+                    default=None,
+                    help='build: probe-measured chars/detection (230.4 measured 2026-08-21) '
+                         '— REQUIRED for --build-manifest, never defaulted; value validated')
     args = ap.parse_args()
     global MANIFEST, CORPUS
     if args.manifest:

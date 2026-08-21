@@ -43,6 +43,10 @@ import subprocess
 import sys
 import time
 import urllib.request
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from argtypes import bounded_float, positive_int  # noqa: E402 — register entry 8
 
 
 def _docker(args: list, timeout: int = 30) -> str:
@@ -147,15 +151,16 @@ def wait_li_ready(port: int = 8802, deadline_s: float = 600, interval_s: float =
 
 def main() -> int:
     ap = argparse.ArgumentParser(
+        allow_abbrev=False,
         description='Readiness = the real predicate (SDK connect / health JSON), '
                     'never TCP. With --container, first read back NetworkMode and '
                     'refuse anything but host (Crossroad 22).')
     ap.add_argument('--arm', choices=['rr', 'li'], required=True)
-    ap.add_argument('--port', type=int, default=None,
+    ap.add_argument('--port', type=positive_int('port', 65535), default=None,
                     help='default: 5565 (rr) / 8802 (li)')
-    ap.add_argument('--deadline', type=float, default=None,
+    ap.add_argument('--deadline', type=bounded_float('deadline', 1.0, 86400.0), default=None,
                     help='seconds; default: 1800 (rr) / 600 (li)')
-    ap.add_argument('--workers', type=int, default=None,
+    ap.add_argument('--workers', type=positive_int('workers', 256), default=None,
                     help='li only: require warm_workers == N (not just liveness)')
     ap.add_argument('--container', default=None,
                     help='enables the host-network read-back and a log tail on failure')

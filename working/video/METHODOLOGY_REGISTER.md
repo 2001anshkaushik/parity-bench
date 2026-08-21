@@ -139,3 +139,26 @@ than rewritten from memory, which is entry 2's point in miniature.
 > safe: probe_run now moves any existing output aside as `*.prev_<ts>`
 > before writing (a name no `*.json` glob reads), so the quotable command
 > can no longer destroy evidence when — not if — it gets quoted.
+
+## 8. A guard that checks presence rather than plausibility cannot fail for the case it was built for (added 2026-08-21)
+
+> The probe-derived build arguments refused to DEFAULT — and bounded nothing
+> about what a present flag could carry. The trigger was a relayed
+> missing-space line (`25.95--measured-chars-per-det … rc=0, manifest
+> written`); reproduced against the committed code, argparse's `type=float`
+> in fact REJECTS that exact string — but the reproduction surfaced what the
+> parser quietly accepts instead: **prefix abbreviation** (`--measured-chars`
+> silently matched `--measured-chars-per-det`), which fits the observed
+> rc=0-with-60-rows — with CORRECT values — better than the relayed line;
+> the manifest meta adjudicates. Either way the class is real: nothing
+> validated ranges (2595.0 would have sailed through where 25.95 was meant),
+> and an abbreviated flag is an unmeasured identity claim. Fixed as a class:
+> every numeric argument in the video tree parses through validated types
+> (range + '--'-in-value rejected naming the missing-space hypothesis;
+> null-controlled self-test in argtypes.py), every parser sets
+> `allow_abbrev=False`, and run_plan's eight env vars are number-validated
+> after their presence checks. Kin to entry 4's companion — failures wearing
+> a success's clothes, at the argument parser instead of the shell. The
+> reproduction itself donated a specimen: the checker printed `$?` after a
+> pipe and displayed tail's success for every case — `${PIPESTATUS[0]}`, the
+> campaign's oldest defect, caught live in the checker's own frame.

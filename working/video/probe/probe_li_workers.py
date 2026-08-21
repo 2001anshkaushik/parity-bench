@@ -37,8 +37,10 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from probe_rr import cgroup_snapshot, proc_cpu_ticks  # noqa: E402
 from wait_ready import assert_host_network, wait_li_ready  # noqa: E402
+from argtypes import positive_int  # noqa: E402 — register entry 8
 
 CONTAINER = 'liconc'
 PORT = 8802
@@ -149,11 +151,12 @@ async def measure_w(w: int, blob: bytes) -> dict:
 
 
 async def amain() -> int:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(allow_abbrev=False)
     ap.add_argument('--video', required=True)
-    ap.add_argument('--sweep', type=int, nargs='+', default=[1, 2, 4, 8, 16])
+    ap.add_argument('--sweep', type=positive_int('sweep', 256), nargs='+',
+                    default=[1, 2, 4, 8, 16])
     ap.add_argument('--image', default='li:video')
-    ap.add_argument('--threads-env', type=int, default=1,
+    ap.add_argument('--threads-env', type=positive_int('threads-env', 256), default=1,
                     help='the six vars on the LI container for this sweep (its own matrix)')
     ap.add_argument('--out', default=str(Path(__file__).parent / 'probe_li_workers_out.json'))
     args = ap.parse_args()

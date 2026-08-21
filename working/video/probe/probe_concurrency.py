@@ -41,6 +41,7 @@ from probe_rr import (cgroup_snapshot, cleanup_tokens, fresh_project_pipe,  # no
                       one_send, proc_cpu_ticks, task_process_census)
 from sdk_identity import assert_unique_project_ids  # noqa: E402
 from wait_ready import assert_host_network, wait_rr_ready  # noqa: E402
+from argtypes import positive_int  # noqa: E402 — register entry 8
 
 CONTAINER = 'rrconc'
 
@@ -166,15 +167,16 @@ async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict
 
 
 async def amain() -> int:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(allow_abbrev=False)
     ap.add_argument('--video', required=True)
     ap.add_argument('--pipe', default=str(Path(__file__).parent.parent / 'benchmark_video_detect.pipe'))
-    ap.add_argument('--sweep', type=int, nargs='+', default=[1, 2, 4, 8, 16])
+    ap.add_argument('--sweep', type=positive_int('sweep', 64), nargs='+',
+                    default=[1, 2, 4, 8, 16])
     ap.add_argument('--image', default='rr:patched-video',
                     help='Crossroad 18: the BAKED image — a fresh container per M with the unbaked image reinstalls 3-4.5GB each')
-    ap.add_argument('--threads-env', type=int, default=1,
+    ap.add_argument('--threads-env', type=positive_int('threads-env', 256), default=1,
                     help='the six BLAS/OMP vars on the container (same value the LI arm gets)')
-    ap.add_argument('--threads', type=int, default=None,
+    ap.add_argument('--threads', type=positive_int('threads', 256), default=None,
                     help='use(threads=) per token; default unset (engine default 64)')
     ap.add_argument('--out', default=str(Path(__file__).parent / 'probe_concurrency_out.json'))
     args = ap.parse_args()

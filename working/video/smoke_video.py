@@ -395,7 +395,7 @@ async def check_pins(args) -> dict:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(allow_abbrev=False)
     ap.add_argument('--golden', default=str(ROOT / 'working' / 'video' / 'golden_video_record.json'))
     ap.add_argument('--write-golden', action='store_true',
                     help='create the golden (once, after the probe has confirmed the pipe)')
@@ -406,9 +406,10 @@ def main() -> int:
     ap.add_argument('--pdf-corpus', default=str(ROOT / 'corpus' / 'govdocs1' / 'pdfs'))
     ap.add_argument('--rr-container', default='rr')
     ap.add_argument('--li-container', default='li_video')
-    ap.add_argument('--rr-port', type=int, default=5565)
-    ap.add_argument('--li-port', type=int, default=8802)
-    ap.add_argument('--max-preleg-load1', type=float, default=2.0)
+    ap.add_argument('--rr-port', type=drv.positive_int('rr-port', 65535), default=5565)
+    ap.add_argument('--li-port', type=drv.positive_int('li-port', 65535), default=8802)
+    ap.add_argument('--max-preleg-load1',
+                    type=drv.bounded_float('max-preleg-load1', 0.1, 64.0), default=2.0)
     ap.add_argument('--skip-fixture', action='store_true',
                     help='wiring tests only — a measured run never skips image identity')
     args = ap.parse_args()

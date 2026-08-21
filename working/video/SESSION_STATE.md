@@ -383,14 +383,38 @@ per-record PNG hashing. The counting truth is census-vs-MEASURED-expectation
 the staged cross-arm agreement. If gate 1 ever fires, re-run that one video
 at raised log level as a diagnostic, outside any measured span.
 
-**NEXT (2026-08-21 late): manifest re-cut RUNNING (inputs MEASURED:
-`--measured-dpf 25.95 --measured-chars-per-det 230.4`; fetched=0 reuse
-proof) → t32 restore/rename (Crossroad 24 block above) → LI worker sweep
-(threads-env decided by it; NOT 32) → RR concurrency sweep (container
-thread env = 8, the landed optimum) → dry pass** → remaining thresholds →
-smoke --write-golden → full run_plan. Register entries 6 (provenance change
-follows the value to every consumer) and 7 (a disqualified command that
-stays quotable will get quoted) are in; Ticket 5 drafted beside 3 and 4.
+**ARG-GUARD INCIDENT (2026-08-21, register entry 8; adjudication PENDING the
+meta dump):** the re-cut reportedly ran with a missing-space arg and rc=0.
+Reproduced against the committed code: the relayed line is REJECTED
+(`argument --measured-dpf: invalid float value:
+'25.95--measured-chars-per-det'`) — it cannot have written the manifest. The
+rc=0-consistent candidate is argparse PREFIX ABBREVIATION
+(`--measured-chars 230.4` silently matches the full flag) — which lands BOTH
+values CORRECTLY. **If the meta dump shows measured_dpf=25.95 and
+measured_chars_per_det=230.4, the manifest STANDS and no re-cut is needed.**
+If values are wrong: re-run the full build (~12 min) — frame decodes are
+reusable in principle (sha-keyed reuse of expected_frames_measured is a
+valid identity-pinned measurement reuse, the freeze-file precedent) but not
+worth new code tonight; the measured column itself is real either way
+(63/55/142/157/194 across the range, fetched=0). Class fix DELIVERED:
+`working/video/argtypes.py` (validated types: range + '--' rejection naming
+the missing-space hypothesis; null-controlled self-test), wired into fetch /
+driver / smoke / wait_ready / all four probes, `allow_abbrev=False` on every
+parser, and run_plan's eight env vars number-validated after their presence
+checks.
+
+**GATE3_RUN_ID CHOSEN (2026-08-21): the ORIGINAL probe run —
+`probe_20260821_195214` (names phase2_logs/probe_20260821_195214.log).**
+Reason recorded: its full artifacts survive intact, while the accidental
+re-run clobbered its own t32 JSON; both staged confirmations passed, one id
+points at one specific log. Second of the eight numbers landed
+(RR_THREADS_ENV=8 was first).
+
+**NEXT (2026-08-21 late): adjudicate the manifest meta dump (above) →
+t32 restore/rename (Crossroad 24 block) → LI worker sweep (threads-env
+decided by it; NOT 32) → RR concurrency sweep (container thread env = 8) →
+dry pass** → remaining thresholds → smoke --write-golden → full run_plan.
+Register entries 6, 7, 8 in; Ticket 5 drafted beside 3 and 4.
 
 ## What a fresh session gets wrong without being told
 

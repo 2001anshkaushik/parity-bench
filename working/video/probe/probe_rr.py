@@ -37,6 +37,8 @@ from pathlib import Path
 
 # rocketride imports lazily in main(): the census/analysis helpers here are
 # imported by probe_concurrency.py and unit checks on machines without the SDK.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from argtypes import positive_int  # noqa: E402 — register entry 8 (stdlib-only)
 
 
 def sh(cmd: list[str]) -> str:
@@ -239,13 +241,13 @@ async def one_send(client, token, blob, name):
 
 
 async def main() -> int:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(allow_abbrev=False)
     ap.add_argument('--video', required=True)
     ap.add_argument('--pipe', default=str(Path(__file__).parent.parent / 'benchmark_video_detect.pipe'))
     ap.add_argument('--container', default='rrprobe')
-    ap.add_argument('--sends', type=int, default=2)
-    ap.add_argument('--tokens', type=int, default=1)
-    ap.add_argument('--port', type=int, default=5565)
+    ap.add_argument('--sends', type=positive_int('sends', 100), default=2)
+    ap.add_argument('--tokens', type=positive_int('tokens', 64), default=1)
+    ap.add_argument('--port', type=positive_int('port', 65535), default=5565)
     ap.add_argument('--out', default=str(Path(__file__).parent / 'probe_rr_out.json'))
     args = ap.parse_args()
 

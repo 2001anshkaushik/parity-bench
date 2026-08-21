@@ -46,14 +46,41 @@ cd "$(dirname "$0")/../.."   # repo root
 : "${WARM_N:?WARM_N unset — >= max(M_TOKENS, LI_WORKERS)}"
 : "${RR_THREADS_ENV:?RR_THREADS_ENV unset — the RR-arm optimum from the matrix}"
 : "${LI_THREADS_ENV:?LI_THREADS_ENV unset — the LI-arm optimum from the matrix}"
-if [ "$WARM_N" -lt "$M_TOKENS" ] || [ "$WARM_N" -lt "$LI_WORKERS" ]; then
-  echo "NOT DONE — WARM_N=$WARM_N < max(M_TOKENS=$M_TOKENS, LI_WORKERS=$LI_WORKERS): every serving instance must see a warm item"; exit 1
-fi
 : "${LIVENESS_MIN:?LIVENESS_MIN unset — from probe detections distribution}"
 : "${GATE3_RUN_ID:?GATE3_RUN_ID unset — probe run id that confirmed ES2002a agreement}"
 : "${BLAST_C:?BLAST_C unset — blast concurrency}"
 SEQ_N="${SEQ_N:-5}"
 PASSES="${PASSES:-1}"
+# Register entry 8 (2026-08-21): presence is not plausibility. The :? checks
+# above prove the eight EXIST; these prove they are NUMBERS in range before a
+# single container starts. A guard that checks presence rather than
+# plausibility cannot fail for the case it was built for.
+require_pos_int() {
+  case "$2" in ''|*[!0-9]*)
+    echo "NOT DONE — $1='$2' is not a positive integer (missing space in the command?)"; exit 1;;
+  esac
+  [ "$2" -ge 1 ] || { echo "NOT DONE — $1=$2 must be >= 1"; exit 1; }
+}
+require_pos_int M_TOKENS "$M_TOKENS";   require_pos_int LI_WORKERS "$LI_WORKERS"
+require_pos_int WARM_N "$WARM_N";       require_pos_int RR_THREADS_ENV "$RR_THREADS_ENV"
+require_pos_int LI_THREADS_ENV "$LI_THREADS_ENV"; require_pos_int BLAST_C "$BLAST_C"
+require_pos_int SEQ_N "$SEQ_N";         require_pos_int PASSES "$PASSES"
+"$PY" - "$LIVENESS_MIN" <<'EOF' || exit 1
+import sys
+raw = sys.argv[1]
+try:
+    v = float(raw)
+except ValueError:
+    raise SystemExit(f'NOT DONE — LIVENESS_MIN={raw!r} is not a number')
+if not (0.0 < v <= 1.0):
+    raise SystemExit(f'NOT DONE — LIVENESS_MIN={v} must be a fraction in (0, 1]')
+EOF
+case "$GATE3_RUN_ID" in
+  -*|*--*) echo "NOT DONE — GATE3_RUN_ID='$GATE3_RUN_ID' looks like a flag or a missing-space typo, not a probe run id"; exit 1;;
+esac
+if [ "$WARM_N" -lt "$M_TOKENS" ] || [ "$WARM_N" -lt "$LI_WORKERS" ]; then
+  echo "NOT DONE — WARM_N=$WARM_N < max(M_TOKENS=$M_TOKENS, LI_WORKERS=$LI_WORKERS): every serving instance must see a warm item"; exit 1
+fi
 # DRY_PASS=1: composition proof ONLY — clamps everything to one item, skips the
 # PDF fixture and warm-up, writes a THROWAWAY golden. Retires the wiring risk
 # in ~minutes; NO number from a dry pass is a measurement.
