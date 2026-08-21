@@ -161,7 +161,7 @@ def check_image_identity(rr_container: str, pdf_corpus: Path) -> dict:
 
 # ------------------------------------------------------------- B. golden record
 async def _send_video(video: Path, port: int) -> dict:
-    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-22); fresh
+    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-21); fresh
     # project_id via the driver's own minter (D3 — the measured pipe's fixed
     # id shares a derived task token with any concurrently live leg task).
     from rocketride import RocketRideClient

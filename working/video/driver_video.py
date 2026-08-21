@@ -287,7 +287,7 @@ class RRArm:
 
     async def start(self):
         # Measured surface (Phase 1's 40+ sites + the installed wheel's
-        # signature paste, 2026-08-22): RocketRideClient BARE — credentials via
+        # signature paste, 2026-08-21): RocketRideClient BARE — credentials via
         # the harness resolver (env route, loopback-strict, provenance of the
         # source). The CLI port is operator intent, so it overrides env.
         from rocketride import RocketRideClient
@@ -335,7 +335,7 @@ class RRArm:
         if not self.client:
             return
         # Phase 1 pattern: terminate BEFORE disconnect, per token, contained.
-        # Not optional (ruling 2026-08-22): a leaked ttl=7200 token idle-spins
+        # Not optional (ruling 2026-08-21): a leaked ttl=7200 token idle-spins
         # ~1 core (Ticket 4) inside the same cgroup the collector reads for
         # the NEXT leg's utilization denominators — run_plan keeps the rr
         # container up across both postures.
@@ -425,7 +425,7 @@ def generate_envprobe_pipe() -> tuple[Path, str]:
 
 
 async def rr_readback(port: int) -> dict:
-    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-22).
+    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-21).
     from rocketride import RocketRideClient
     os.environ['ROCKETRIDE_URI'] = f'http://127.0.0.1:{port}'
     rr_credentials.resolve(strict=True)
@@ -1029,7 +1029,7 @@ async def amain() -> int:
         if posture.name == 'parity' and len(warm) < posture.tokens:
             raise SystemExit(f'NOT DONE — {len(warm)} warm rows < {posture.tokens} tokens: '
                              'every token must see at least one warm item.')
-        # CENSUS ASSERTION (D3, ruling 2026-08-22: goes in regardless of how
+        # CENSUS ASSERTION (D3, ruling 2026-08-21: goes in regardless of how
         # use_existing reads). M tokens declared -> M NEW task processes
         # measured, or the leg refuses: a parity posture whose tokens share a
         # task is a queue wearing a parity label. Config is never the evidence.

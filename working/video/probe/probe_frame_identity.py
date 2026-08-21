@@ -74,7 +74,7 @@ async def main() -> int:
     floor = json.load(open(floor_path)) if floor_path else {}
     li_hashes = floor.get('frame_png_sha16') or []
 
-    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-22).
+    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-21).
     os.environ['ROCKETRIDE_URI'] = f'http://127.0.0.1:{args.port}'
     os.environ.setdefault('ROCKETRIDE_APIKEY', 'local-dev')
     from rocketride import RocketRideClient

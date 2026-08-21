@@ -68,6 +68,13 @@ measurement before it bears load; repeated load → standing read-back.**
 Environment identities get the model-identity treatment (we md5 weights; the
 same rigor now applies to interpreters, creators, delivery surfaces).
 
+Canonized 2026-08-21 (read these before writing many call sites again):
+**"Eight self-consistent sites are one observation, not eight."** and
+**"The check has to cross an independence boundary"** — execution, or an
+artifact your writing didn't produce. Same lesson as "a source trace is not a
+measurement", from two directions; both entries live side by side in
+`working/video/METHODOLOGY_REGISTER.md` (draft — placement is Ansh's).
+
 Instances so far: (1) push surface (commits reported done but never pushed);
 (2) interpreter (bare python3 in scripts; box python3=3.10 no psutil);
 (3) venv creator (python3 -m venv assumed; ensurepip stripped);
@@ -75,7 +82,7 @@ Instances so far: (1) push surface (commits reported done but never pushed);
 embeds its own CPython, resolved from the pinned binary);
 (5) checker's own shell (this laptop's Bash tool runs **zsh — unquoted $VAR
 does NOT word-split**; bit the ten-minute sweep 3x);
-(6) **SDK import surface (RESOLVED 2026-08-22, the sharpest yet):** every
+(6) **SDK import surface (RESOLVED 2026-08-21, the sharpest yet):** every
 video-tree file imported `RocketRide`, a class in NO generation of the SDK —
 eight sites, six files, perfectly self-consistent, none executed. The bake
 died on the first import ever attempted. Measured surface: `RocketRideClient`
@@ -117,7 +124,7 @@ bundles its own OpenMP; the staged gate-3 comparison is the measurement).
 - **Engine idle spin: 1.002 cores** measured, box otherwise idle (Ticket 4).
   Whether it scales per token = probe_concurrency's idle-at-M answers.
 - **Black fixture:** generated box-side by make_black_fixture.sh; sha relayed
-  2026-08-22 as `8ea9be50…` (prefix; the sidecar at
+  2026-08-21 as `8ea9be50…` (prefix; the sidecar at
   `working/video/probe/media/black_60s_352x288.avi.sha256.txt` ON THE BOX
   remains the full authority). ffmpeg 7.0.2-static. Disk: 48 G free.
 - Image labels confirmed: duplication_patch_applied=1,
@@ -150,7 +157,7 @@ full smoke → run_plan.sh. HELD until sweeps: the eight numbers. Monday
 deliverables drafted (lead paragraph, methodology register entry — placement
 is Ansh's).
 
-## RESOLVED (2026-08-22): the bake failure — and the audit it opened
+## RESOLVED (2026-08-21): the bake failure — and the audit it opened
 
 The failure was `ImportError: cannot import name 'RocketRide' from
 'rocketride'` — MY OWN invented class name, in every video-tree SDK site
@@ -172,6 +179,9 @@ ships no python binary file). The full audit found and the batch fixed:
   (probe_rr.fresh_project_pipe, one minter); driver asserts M NEW task
   processes via settled census (fail-closed, ruling: stays regardless of
   use_existing semantics); sdk_identity.assert_unique_project_ids per run.
+  Wheel-confirmed 2026-08-21: `use_existing` defaults to **None — falsy — so
+  the LOUD variant is live** (a colliding token raises rather than silently
+  sharing); the census assertion is belt-and-braces by construction, kept.
 - **D4** bare connect() -> timeout=60000. **D5** bake read-back (b) rewritten.
 - **D6** run_plan cross-gate rc capture was dead under set -e -> if ! form,
   all combos evaluated, manifest records cross_gates_failed, exit 1 at end.
@@ -185,6 +195,10 @@ ships no python binary file). The full audit found and the batch fixed:
 New file `working/video/sdk_identity.py`: readback (names+params vs installed
 wheel, null-controlled) wired into driver preflight, smoke C, bake stage 0;
 --scan (static surface check, laptop-safe) wired into smoke 0 + bake stage 0.
+Decision recorded (2026-08-21): REQUIRED_METHOD_PARAMS' two-step cost on
+legitimate SDK-surface extensions is ACCEPTED — the right trade against a
+fabricated surface surviving eight copies. Both canonized sentences + the
+recovered source-trace entry: `working/video/METHODOLOGY_REGISTER.md`.
 
 **NEXT: the bake retry is the FIRST EXECUTION of any of this**, then LI image
 build (+ canonical freeze), probe_run.sh, dry pass, sweeps. Crossroad 21 is
@@ -216,7 +230,7 @@ STILL unrelayed — ASK, do not invent.
     ONE AT A TIME. Absence fails before agreement. Impossible values are
     never clamped. One check, one function, fed by both arms.
 11. Memory file exists at the Claude project level
-    (phase2-video-bench-state.md) — since 2026-08-22 the CURRENT copy lives in
+    (phase2-video-bench-state.md) — since 2026-08-21 the CURRENT copy lives in
     the `-benchmark-A` project's memory dir (the cwd changed projects); an
     older copy at the parent-dir project is superseded. This file wins on
     conflict for session facts.

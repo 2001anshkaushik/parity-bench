@@ -69,7 +69,7 @@ def start_container(image: str, threads_env: int) -> None:
 
 
 async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict:
-    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-22):
+    # Measured surface (Phase 1 + installed-wheel paste, 2026-08-21):
     # RocketRideClient bare, credentials via env, connect(timeout=60000).
     import os
     os.environ.setdefault('ROCKETRIDE_URI', 'http://127.0.0.1:5565')

@@ -96,7 +96,7 @@ start_li() {
       -e WS1V_WORKERS="$LI_WORKERS" --log-opt max-size=200m -p 8802:8802 "$LI_IMAGE"
   for _ in $(seq 1 120); do
     if curl -sf "http://127.0.0.1:8802/health" >/dev/null 2>&1; then
-      # D7 read-back (2026-08-22): the LI image's serving stack is UNPINNED at
+      # D7 read-back (2026-08-21): the LI image's serving stack is UNPINNED at
       # build (fastapi/uvicorn/llama-index float) — snapshot the resolved
       # versions per run so the measured latency's substrate is on record.
       # Dockerfile pinning is a flagged follow-up ruling, not done here.
@@ -188,7 +188,7 @@ done
 stop_arm rr
 
 echo "--- 4. cross-arm gates (gate 3 armed by $GATE3_RUN_ID, then char conservation) ---" | tee -a "$LOG"
-# D6 fix (2026-08-22): the old `cmd; rc=$?` form was dead code under set -e —
+# D6 fix (2026-08-21): the old `cmd; rc=$?` form was dead code under set -e —
 # a failing --cross aborted the script BEFORE rc was read, leaving the manifest
 # completed:false and later combos unevaluated. `if ! cmd` is set-e-exempt:
 # every combo runs, failures are recorded, and the script exits non-zero at

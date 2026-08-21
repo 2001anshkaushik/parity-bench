@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """SDK identity read-back — instance six of the environment-identity class.
 
-THE INCIDENT (2026-08-22): every video-tree file imported `RocketRide`, a class
+THE INCIDENT (2026-08-21): every video-tree file imported `RocketRide`, a class
 that exists in NO generation of the SDK surface — not the installed wheel, not
 the docs, not the dev checkout. Eight sites across six files, perfectly
 self-consistent, none executed: consistency across one author's output had been
 read as evidence. The bake died on the first import ever attempted. The fix
 template was Phase 1's measured usage (40+ sites of `RocketRideClient`, bare
 constructor, env-resolved credentials), confirmed against the installed wheel's
-own inspect.signature output (box paste, 2026-08-22).
+own inspect.signature output (box paste, 2026-08-21).
 
 What this module keeps true from now on:
 
@@ -37,7 +37,7 @@ What this module keeps true from now on:
 Importing this module needs stdlib only (rocketride imports lazily inside
 readback), so make_sample_export and laptop syntax checks stay SDK-free. Runs
 under either venv contract (~/.venv or ~/.venv-floor; both pin
-rocketride==1.3.0, export lists measured identical 2026-08-22).
+rocketride==1.3.0, export lists measured identical 2026-08-21).
 """
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ import sys
 from pathlib import Path
 
 # The measured surface. Evidence, in order of authority:
-#   1. installed wheel, box, 2026-08-22: inspect.signature paste for these
+#   1. installed wheel, box, 2026-08-21: inspect.signature paste for these
 #      five methods; export list contains RocketRideClient (never `RocketRide`);
 #   2. Phase 1 usage: 40+ sites `from rocketride import RocketRideClient`.
 # Parameters listed are the ones the video tree actually passes. The wheel's

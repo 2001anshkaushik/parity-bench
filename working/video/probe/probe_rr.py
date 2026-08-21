@@ -256,7 +256,7 @@ async def main() -> int:
 
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from sdk_identity import assert_unique_project_ids
-    # Measured surface (Phase 1 + installed-wheel signature paste, 2026-08-22):
+    # Measured surface (Phase 1 + installed-wheel signature paste, 2026-08-21):
     # RocketRideClient, bare constructor, credentials via env — never kwargs.
     os.environ['ROCKETRIDE_URI'] = f'http://127.0.0.1:{args.port}'
     os.environ.setdefault('ROCKETRIDE_APIKEY', 'local-dev')
