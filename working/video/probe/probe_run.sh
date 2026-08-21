@@ -25,6 +25,18 @@ thread_env_args() {
        -e VECLIB_MAXIMUM_THREADS=$n -e NUMEXPR_NUM_THREADS=$n -e TORCH_NUM_THREADS=$n"
 }
 
+preserve() {  # Evidence is never overwritten (register entry 7: the Crossroad 24
+  # recheck ran as PROBE_MATRIX=32 and clobbered the original t32 JSON — the
+  # disqualified form of a command stays quotable, so the script itself must
+  # make it safe). Existing outputs move aside; *.prev_<ts> matches no *.json
+  # glob, so the summarizer and gates never read a superseded run as current.
+  if [ -f "$1" ]; then
+    local dest="$1.prev_$(date +%Y%m%dT%H%M%S)"
+    mv "$1" "$dest"
+    echo "preserved existing $1 -> $dest" | tee -a "$LOG"
+  fi
+}
+
 start_rr() { # threads
   docker rm -f rrprobe >/dev/null 2>&1 || true
   # Crossroad 22: --network host (Phase 1 section C parity; docker-proxy both
@@ -46,6 +58,7 @@ echo "== disk numbers first (they need the quietest machine) ==" | tee -a "$LOG"
 ./probe_disk.sh "$VIDEO" 2>&1 | tee -a "$LOG"
 
 echo "== VERIFICATION PIPE LOAD-PROOF (gates 2c/4 pipe; two minutes, fail cheap) ==" | tee -a "$LOG"
+preserve probe_frame_identity_early.json
 start_rr 8
 "$PY" probe_frame_identity.py --video "$VIDEO" --no-floor-ok \
   --out probe_frame_identity_early.json 2>&1 | tee -a "$LOG"
@@ -55,6 +68,7 @@ stop_rr "identity"
 
 for N in $MATRIX; do
   echo "== RR arm, threads=$N ==" | tee -a "$LOG"
+  preserve "probe_rr_t${N}.json"
   start_rr "$N"
   "$PY" probe_rr.py --video "$VIDEO" --sends 2 \
     --out "probe_rr_t${N}.json" 2>&1 | tee -a "$LOG"
@@ -63,6 +77,7 @@ for N in $MATRIX; do
   [ "$RC" = "0" ] || { echo "RR probe failed at threads=$N (rc=$RC)" | tee -a "$LOG"; exit "$RC"; }
 
   echo "== LI floor, threads=$N ==" | tee -a "$LOG"
+  preserve "probe_li_floor_t${N}.json"
   env OMP_NUM_THREADS="$N" MKL_NUM_THREADS="$N" OPENBLAS_NUM_THREADS="$N" \
       VECLIB_MAXIMUM_THREADS="$N" NUMEXPR_NUM_THREADS="$N" TORCH_NUM_THREADS="$N" \
       PROBE_THREADS="$N" \
@@ -72,6 +87,7 @@ for N in $MATRIX; do
 done
 
 echo "== token-topology census: $CENSUS_TOKENS tokens, threads=8, concurrent sends ==" | tee -a "$LOG"
+preserve "probe_rr_census_m${CENSUS_TOKENS}.json"
 start_rr 8
 "$PY" probe_rr.py --video "$VIDEO" --tokens "$CENSUS_TOKENS" \
   --out "probe_rr_census_m${CENSUS_TOKENS}.json" 2>&1 | tee -a "$LOG"

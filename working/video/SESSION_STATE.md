@@ -52,14 +52,31 @@ using it.
   SDK connect() retry with deadline, LI = /health JSON (+warm_workers==W) —
   one helper, `working/video/probe/wait_ready.py`, everywhere a container
   starts.
-- **Crossroad 24 (2026-08-21): re-run the t32 point ALONE (two sends) before
-  it sets RR_THREADS_ENV.** t32 is the only point where send 2 exceeds send 1
-  ("32 threads is 2x worse" ends up in front of the engine team — two minutes
-  on the baked image against a number nobody can retract). PROBE_MATRIX=32 is
-  NOT the invocation (it drags disk/identity/LI-floor/census AND overwrites
-  probe_rr_t32.json, the original evidence); the extracted sequence lives in
-  the PROBE GREEN block below. If send 2 elevates again, --sends 3 (+~36 s)
-  distinguishes persistent state from a one-off event.
+- **Crossroad 24 (2026-08-21): CLOSED — REPRODUCED.** Recheck (fresh
+  container): send1 16.2 s @ 0.4683, send2 38.2 s @ 0.1814, vs original
+  15.0/35.9 @ 0.4638/0.1805. Two runs, same shape, same magnitude — the t32
+  steady-state regression is REAL. **RR KNEE = 8; RR_THREADS_ENV = 8 (the
+  first of the eight run-plan numbers, LANDED).** LI_THREADS_ENV is NOT 32
+  either (knee between 8 and 32, closer to 8) — the worker sweep decides it,
+  since workers and threads compete for the same 32 cores. **Ticket 5
+  drafted** (working/upstream/RocketRide_Engine_Tickets.md) with the
+  CPU-seconds arithmetic: identical workload (83 frames / 2,154 dets / 166
+  chunks) at ≈146 CPU-s (t8 steady) vs ≈207–222 (t32 steady) across 2.1×
+  the wall — architecture, not noise.
+  **CLOBBER INCIDENT (register entry 7):** the recheck was run as
+  `PROBE_MATRIX=32 probe_run.sh` — the disqualified form — overwriting the
+  original probe_rr_t32.json (also re-ran li_floor_t32 / identity_early /
+  census_m2: equivalent-config re-measurements, acceptable). Original t32
+  full JSON is UNRECOVERABLE; headline numbers survive in
+  phase2_logs/probe_20260821_195214.log and here. RESTORE (box, probe dir):
+  verify the current file IS the recheck (`python -c "import json;
+  print([s['wall_s'] for s in json.load(open('probe_rr_t32.json'))['sends']])"`
+  → expect ≈[16.2, 38.2]), then `mv probe_rr_t32.json
+  probe_rr_t32_recheck.json`, and drop a non-JSON sidecar
+  `probe_rr_t32.CLOBBERED.txt` naming the incident, the preserved numbers,
+  and the log — so the summarizer never presents one run as two. probe_run.sh
+  now has preserve(): existing outputs move to `*.prev_<ts>` before any
+  write; the quotable command can no longer destroy evidence.
 - **Crossroad 23 (2026-08-21): DELETE THE FORMULA, MEASURE THE COLUMN.**
   fps=1/15 emits t=0,15,…,1230 on a 1248.3 s stream — 83 frames;
   floor(d/15)+1 said 84. NO corrected formula (fitting the check to one
@@ -341,6 +358,20 @@ recovered from the log (2026-08-21):**
 **FIRST HEAD-TO-HEAD (noted, NOT a result):** RR t8 steady 17.2 s vs LI
 floor t8 24.5 s, same video — single-video, single-token, floor-vs-engine;
 the first time the two arms produced comparable numbers.
+**Float-repr drift vs gate 3 (2026-08-21, confirmed from code, not
+assumed):** total_chars differs by 69 across thread counts (496315 at t1/t8,
+496246 at t32; same 83 frames, same 2,154 detections) — float repr variation
+in score/box strings from nondeterministic reduction order. Gate 3 is immune
+BY CONSTRUCTION: every label path (probe analyse_documents, driver
+record_from_rr, LI pipeline) extracts `str(label)` only and sorts; scores
+route to score_triage, which has no PASS key. Frame counts immune too:
+detection dicts hold objects, never arrays, so '[' stays once per frame, and
+raw_decode parses any float repr. Char conservation: 69/496315 = 0.014% <<
+±2%. The one REAL risk is not repr but a borderline score flipping across
+the 0.3 threshold under different reduction orders — that would be a genuine
+detection difference and gate 3/census SHOULD fire loudly on it; measured
+here it did not occur (2,154 identical at t1/t8/t32), and gate 3 compares
+cross-ARM at fixed per-arm thread configs, never across thread counts.
 `probe/summarize_probe_rr.py` prints the full curve AND the two re-cut
 inputs (--measured-dpf / --measured-chars-per-det) from the probe files.
 **RR frame-count log-level call (2026-08-21, ACCEPTED by the operator):** do
@@ -352,13 +383,14 @@ per-record PNG hashing. The counting truth is census-vs-MEASURED-expectation
 the staged cross-arm agreement. If gate 1 ever fires, re-run that one video
 at raised log level as a diagnostic, outside any measured span.
 
-**NEXT (operator's order, 2026-08-21 late): manifest re-cut (measured
-column, ~12 min, fetched=0 reuse proof; build args from
-summarize_probe_rr.py) → t32 recheck (Crossroad 24, invocation above) → LI
-worker sweep → RR concurrency sweep → dry pass** → thresholds land → smoke
---write-golden → full run_plan. The register gained entry 6 (a provenance
-change follows the value to every consumer — the driver's private second
-copy of the deleted formula is the underlined finding of the C23 batch).
+**NEXT (2026-08-21 late): manifest re-cut RUNNING (inputs MEASURED:
+`--measured-dpf 25.95 --measured-chars-per-det 230.4`; fetched=0 reuse
+proof) → t32 restore/rename (Crossroad 24 block above) → LI worker sweep
+(threads-env decided by it; NOT 32) → RR concurrency sweep (container
+thread env = 8, the landed optimum) → dry pass** → remaining thresholds →
+smoke --write-golden → full run_plan. Register entries 6 (provenance change
+follows the value to every consumer) and 7 (a disqualified command that
+stays quotable will get quoted) are in; Ticket 5 drafted beside 3 and 4.
 
 ## What a fresh session gets wrong without being told
 

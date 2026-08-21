@@ -124,3 +124,18 @@ than rewritten from memory, which is entry 2's point in miniature.
 > derivation; the grep is part of the change, not a follow-up.** Kin to
 > entry 2: the second copy was perfectly self-consistent with the first, and
 > nothing ever looked.
+
+## 7. A disqualified command that stays quotable will get quoted (added 2026-08-21)
+
+> The Crossroad 24 recheck ruling disqualified `PROBE_MATRIX=32 probe_run.sh`
+> by name — it drags four other stages along and overwrites the original
+> evidence — and supplied a safe extracted sequence instead. Hours later the
+> disqualified form was relayed and run, and the original t32 JSON was
+> clobbered by the very run meant to confirm it. The disqualification lived
+> in one report; the familiar, quotable command lived in another — **the
+> correction and the thing corrected were in different places, kept aligned
+> by nobody** (entry 6's shape, at the level of operations instead of code).
+> The durable cure is not a louder warning but making the dangerous form
+> safe: probe_run now moves any existing output aside as `*.prev_<ts>`
+> before writing (a name no `*.json` glob reads), so the quotable command
+> can no longer destroy evidence when — not if — it gets quoted.

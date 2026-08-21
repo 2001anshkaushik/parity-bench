@@ -1,6 +1,6 @@
-# RocketRide Engine — Four Tickets
+# RocketRide Engine — Five Tickets
 
-Drafted from the WS-1 cross-team benchmark campaign, 14–18 August 2026.
+Drafted from the WS-1 cross-team benchmark campaign, 14–21 August 2026.
 Three independent harnesses — each comparing RocketRide against a different framework
 (LangGraph, Haystack, LlamaIndex) — three separately built corpora, three separate
 c7i.8xlarge hosts. Harnesses are identified below by the framework they measured against;
@@ -495,3 +495,104 @@ echo "idle cores: $(( (B - A) / 30 ))e-6"    # observed: ~1.002
 
 1. An idle engine (booted, listening, zero pipelines) consumes < 0.05 cores sustained.
 2. Idle consumption does not scale with the number of loaded-but-idle pipelines.
+
+
+---
+
+# TICKET 5 — Intra-op threads above the knee: constant work costs 40–50% more CPU, then steady-state wall collapses behind the detect device lock
+
+**Type:** Performance / Architecture · **Severity:** Medium-High (the pathological region includes plausible default configurations; no guidance or clamp ships) · **Component:** `nodes/detect` under BLAS/OMP intra-op threading
+
+**Affects:** engine 3.3.1 (patched build `rr:patched-video`; independent of Tickets 1 and 3). Measured 2026-08-21.
+
+**Found by:** the Phase 2 video harness's per-thread-count probe; **reproduced in a second, fresh container the same day (Crossroad 24)** before this ticket was drafted.
+
+## Summary
+
+With the six BLAS/OMP variables (`OMP_NUM_THREADS` … `TORCH_NUM_THREADS`) set to 32 on a
+32-vCPU host, a single-token engine processing a **byte-identical workload** (one video →
+83 frames → 2,154 detections → 166 chunks, identical at every thread count):
+
+1. **burns 40–50% more CPU-seconds than at 8 threads for the same work**, and then
+2. **collapses to ~2.1× the wall time in steady state** (the send *after* first use of the
+   loaded model), while still burning that CPU.
+
+Detect inference is serialized by a per-process device lock, so intra-op threads are the
+node's *only* parallelism — and past the knee they invert: more threads, more CPU, more wall.
+
+## Measured — two independent runs, identical workload
+
+Wall and `cpu.stat`-derived utilisation are per send; CPU-seconds = util × 32 × wall.
+Send 1 = first use of the loaded model; send 2 = steady state. Same video, same 83/2,154/166
+workload at every point (counts read back from the responses, not assumed).
+
+| point | send 1 wall | send 2 wall | util (of 32) | send 1 CPU-s | send 2 CPU-s |
+|---|---:|---:|---:|---:|---:|
+| t1 | 85.3 s | 89.6 s | 0.072 | ≈197 | ≈206 |
+| **t8** | **16.0 s** | **17.2 s** | 0.265 | ≈136 | **≈146** |
+| t32, run 1 | 15.0 s | **35.9 s** | 0.4638 → 0.1805 | ≈223 | ≈207 |
+| t32, run 2 (fresh container) | 16.2 s | **38.2 s** | 0.4683 → 0.1814 | ≈243 | ≈222 |
+
+Two runs, same shape, same magnitude. The CPU-seconds framing is the point: **t32's steady
+send does the identical work as t8's in ≈207–222 CPU-s against t8's ≈146 — 40–50% more CPU —
+across 2.1× the wall.** Utilisation *fell* (0.46 → 0.18) while wall doubled: contention, not
+work. Subtracting the constant ~1.0-core idle spin (Ticket 4) from every cell does not change
+the shape — t32 steady remains ≈33–43% above t8 steady, and the send-1 gap widens.
+
+## Mechanism — what is verified vs. left open
+
+**Source-verified (pinned 3.3.1 tarball; a source trace, labeled as such):** detect inference
+runs under a per-process device lock (`make_device_lock`, vision model base), so a task's
+detections execute one frame at a time regardless of task-level concurrency; intra-op BLAS/OMP
+threading inside each locked call is the only parallelism on this path. The engine ships **no
+guidance, default, or clamp** for these variables on detect-bearing pipelines: they were set
+explicitly on the container in these runs, and unset they fall to the BLAS/torch library
+defaults — which on this host class resolve above the measured knee (a Phase-1 in-process
+read-back on the same instance type measured unpinned torch at 16 intra-op threads).
+
+**Deliberately left open rather than answered wrongly:**
+
+1. Why send 1 escapes the regression in both runs (15–16 s at t32, comparable to t8) while
+   every subsequent send pays 2.1× — allocator state, thread-pool re-spawn, and interop
+   spin-wait growth are candidates; not attributed here.
+2. Whether the task-level thread parameter (`use(threads=)`, default 64) interacts — these
+   runs used the default.
+3. Whether the library-default point (~16 on this host class) sits on the flat or the cliff —
+   the sweep measured 1/8/32; 16 is untested.
+
+## Reproduction
+
+Baked 3.3.1 image, host networking, single token, any real video (~20 min of 25 fps footage
+shows it clearly). Two sends minimum — **the regression only appears from send 2 onward**:
+
+```bash
+docker run -d --name rrprobe --memory 58g \
+  -e OMP_NUM_THREADS=32 -e MKL_NUM_THREADS=32 -e OPENBLAS_NUM_THREADS=32 \
+  -e VECLIB_MAXIMUM_THREADS=32 -e NUMEXPR_NUM_THREADS=32 -e TORCH_NUM_THREADS=32 \
+  --network host rr:patched-video
+# wait for readiness (a real SDK connect, not TCP), then send the same video twice
+# through one pipeline token and read wall + cgroup cpu.stat per send.
+# Harness form: working/video/probe/probe_rr.py --video <avi> --sends 2
+```
+
+Compare against the same commands with the six variables at 8: send 2 wall ≈17 s vs ≈36–38 s.
+
+## Impact
+
+* Operators who pin "all the cores" — or leave the variables unset on hosts where library
+  defaults land high — pay ~40–50% extra CPU per unit of detect work and then lose ~2× wall in
+  sustained operation, silently. Nothing in the engine warns that the detect path's lock makes
+  intra-op threading past the knee strictly harmful.
+* Benchmark handling: this harness sets the per-arm thread values from a measured sweep
+  (knee = 8 on this host) and reads them back in-process per run; results published from this
+  campaign do not include the pathological region on the RocketRide arm.
+
+## Acceptance criteria
+
+1. Documented intra-op threading guidance (or an engine-set default/clamp relative to
+   available cores) for detect-bearing pipelines.
+2. On the reference workload, no supported thread configuration shows steady-state wall
+   > 1.5× first-use wall on constant per-send work — or the configuration is rejected/warned
+   at pipeline load.
+3. At the guidance configuration, steady-state CPU-seconds per unit work within 15% of the
+   measured knee point.
