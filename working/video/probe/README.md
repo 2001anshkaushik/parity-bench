@@ -39,6 +39,18 @@ and a mux step. All three are gone. The probe pipe is now THE pipe under test,
 7. **Token topology census** (`probe_rr.py --tokens M`): proves how many
    distinct detector instances actually serve, per arm — process census +
    per-process CPU deltas during concurrent sends, not config inference.
+8. **Model identity, bytes-level, both arms.** Four read-backs, none of them
+   a config echo: the rfdetr IMPORT PREDICATE from inside the task process
+   (env_probe — detection.py's silent RT-DETR fallback is exactly this
+   import failing) with package versions; the **rf-detr-base checkpoint md5
+   hashed inside each running container** and compared to the rfdetr-1.5.2
+   registry value (b4d3ce46099eaed50626ede388caf979 — the pinned weight
+   lineage; smoke checks both arms, driver preflight refuses to run on
+   mismatch); per-frame PNG byte identity engine-vs-floor
+   (probe_frame_identity, gate 4, with a --null-flip control that must
+   fire); and the staged gate-3 label comparison on ES2002a that arms the
+   strict cross-arm agreement gate. Identity here means: same weights by
+   hash, same frames by bytes, same labels by value — before any leg runs.
 
 ## What it is NOT
 

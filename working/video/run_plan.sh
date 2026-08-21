@@ -115,6 +115,34 @@ if [ "$DRY_PASS" = "1" ]; then
   SMOKE_EXTRA=(--skip-fixture --write-golden --golden "$OUT/dry_golden.json")
 fi
 
+# Run-level manifest: all eight numbers + context in ONE machine-readable
+# artifact, not only interleaved in run_plan.log. Written before anything
+# runs; completion status flipped at the end.
+cat > "$OUT/run_manifest.json" <<MANIFEST
+{
+ "run_dir": "$OUT",
+ "started_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+ "git_sha": "$(git rev-parse HEAD 2>/dev/null || echo unknown)",
+ "dry_pass": $([ "$DRY_PASS" = "1" ] && echo true || echo false),
+ "numbers": {
+  "M_TOKENS": $M_TOKENS,
+  "LI_WORKERS": $LI_WORKERS,
+  "WARM_N": $WARM_N,
+  "RR_THREADS_ENV": $RR_THREADS_ENV,
+  "LI_THREADS_ENV": $LI_THREADS_ENV,
+  "LIVENESS_MIN": $LIVENESS_MIN,
+  "GATE3_RUN_ID": "$GATE3_RUN_ID",
+  "BLAST_C": $BLAST_C,
+  "SEQ_N": $SEQ_N,
+  "PASSES": $PASSES,
+  "MEASURED_N": $MEASURED_N
+ },
+ "images": {"rr": "$RR_IMAGE", "li": "$LI_IMAGE"},
+ "completed": false
+}
+MANIFEST
+echo "run manifest: $OUT/run_manifest.json" | tee -a "$LOG"
+
 echo "=== RUN PLAN: M=$M_TOKENS li_workers=$LI_WORKERS warm=$WARM_N \
 rr_threads=$RR_THREADS_ENV li_threads=$LI_THREADS_ENV liveness>=$LIVENESS_MIN \
 gate3=$GATE3_RUN_ID C=$BLAST_C seq_n=$SEQ_N passes=$PASSES -> $OUT ===" | tee -a "$LOG"
@@ -167,4 +195,11 @@ for leg in sequential blast; do
   done
 done
 
+"$PY" - "$OUT/run_manifest.json" <<'PYDONE'
+import json, sys, time
+m = json.load(open(sys.argv[1]))
+m['completed'] = True
+m['completed_utc'] = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+json.dump(m, open(sys.argv[1], 'w'), indent=1)
+PYDONE
 echo "=== RUN PLAN COMPLETE — everything under $OUT ===" | tee -a "$LOG"
