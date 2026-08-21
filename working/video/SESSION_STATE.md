@@ -421,17 +421,24 @@ closed at W=1: serving_by_cpu_delta=0 while distinct_response_pids=1 and
 ~73 CPU-s of real work landed (0.03×32×76.2; 76.2 s sits beside the floor's
 93.8 s t1). The service served; the census counted nothing — the LI twin of
 the RR argv filter (which passed and so got the scrutiny this one missed).
-HYPOTHESIS (held — fix predicate gets MEASURED against Ansh's W=2 process
-tree, not reasoned from uvicorn): worker_census filters argv for 'uvicorn',
-which matches the MASTER; uvicorn workers spawn via multiprocessing with
-spawn_main argv carrying no 'uvicorn' string → census sees only the
-non-serving supervisor. CLASS FIX (design, to implement with the measured
-predicate): (1) census predicate pinned against the live tree; (2)
-structural blindness detection — every response carries its serving pid,
-and every response pid MUST appear in the census, else the result is
-"CENSUS BLIND: filter matched N processes but response pid X absent" —
-never zero. "No workers serving" and "my filter matched nothing" must be
-distinguishable outputs.
+HYPOTHESES RE-RANKED after the operator's own ps probe failed
+(python:3.12-slim ships NO procps): **primary — the census itself execs
+`ps` inside that same container**, so its stdout was empty and an empty
+census read as zero serving. The data pattern confirms the ranking:
+idle_cores measured fine over the same window (that path uses `cat`, which
+exists) while the ps-based census read nothing. Secondary (still held for
+the tree): the 'uvicorn' argv predicate may match only the master once ps
+data exists (multiprocessing spawn_main workers). FIXES LANDED 2026-08-21:
+(1) census reads /proc DIRECTLY (always exists; stat parsed with the
+rsplit-')' trick, comm-with-spaces case executed-verified); (2) STRUCTURAL
+blindness detector — every response pid must appear in the census, else
+"CENSUS BLIND: filter matched N, response pid X absent" + the FULL /proc
+tree recorded in the point + rc=2 (distinct from findings) — a blind
+filter can never again present as "no workers serving". The match
+predicate ('uvicorn' in cmdline) is UNCHANGED pending the measured tree —
+and the next W=1 run IS that measurement: either it passes (ps was the
+whole story) or the blind branch fires carrying the tree that fixes it.
+The sweep can re-run NOW.
 
 **Crossroad 26 (2026-08-21): WARM-UP.** WARM_N >= max(M_TOKENS, LI_WORKERS)
 plus margin, drawn from the 16 disjoint warm rows, never the measured 44.

@@ -50,15 +50,37 @@ def sh(cmd: list[str], timeout: int = 600) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
 
-def worker_census(container: str) -> list[dict]:
-    raw = sh(['docker', 'exec', container, 'ps', '-eo', 'pid,ppid,rss,args']).stdout
-    procs = []
-    for line in raw.splitlines()[1:]:
-        parts = line.split(None, 3)
-        if len(parts) == 4 and 'uvicorn' in parts[3]:
-            procs.append({'pid': int(parts[0]), 'ppid': int(parts[1]),
-                          'rss_kb': int(parts[2])})
-    return procs
+def worker_census(container: str) -> tuple[list[dict], list[dict]]:
+    """(matched, all_procs) via /proc DIRECTLY — python:3.12-slim ships no
+    procps, so the original `docker exec ps` returned empty stdout and an
+    empty census read as 'zero workers serving' (2026-08-21 W=1 incident:
+    idle_cores measured fine over the same window because that path uses
+    `cat`, which exists; the census used `ps`, which does not). /proc always
+    exists. The MATCH PREDICATE ('uvicorn' in cmdline) is unchanged pending
+    the measured process tree; returning all_procs beside the match makes a
+    blind predicate self-diagnosing — the blind branch records the full tree."""
+    raw = sh(['docker', 'exec', container, 'sh', '-c',
+              'for d in /proc/[0-9]*; do s=$(cat "$d/stat" 2>/dev/null) || continue; '
+              'c=$(tr "\\0" " " < "$d/cmdline" 2>/dev/null); '
+              'printf "%s\\t%s\\n" "$s" "$c"; done']).stdout
+    all_procs, matched = [], []
+    for line in raw.splitlines():
+        stat_part, _, cmd = line.partition('\t')
+        head, sep, tail = stat_part.rpartition(')')
+        if not sep:
+            continue
+        try:
+            pid = int(stat_part.split(' ', 1)[0])
+            f = tail.split()          # fields from `state` onward
+            ppid = int(f[1])
+            rss_kb = int(f[21]) * 4   # rss pages -> KiB at 4096-byte pages
+        except (ValueError, IndexError):
+            continue
+        proc = {'pid': pid, 'ppid': ppid, 'rss_kb': rss_kb, 'args': cmd.strip()[:200]}
+        all_procs.append(proc)
+        if 'uvicorn' in proc['args']:
+            matched.append(proc)
+    return matched, all_procs
 
 
 def start_container(image: str, workers: int, threads_env: int) -> dict:
@@ -104,7 +126,7 @@ def post_video(blob: bytes) -> dict:
 
 
 async def measure_w(w: int, blob: bytes) -> dict:
-    census = worker_census(CONTAINER)
+    census, all_procs = worker_census(CONTAINER)
     pids = [p['pid'] for p in census]
 
     idle_window_s = 6.0
@@ -137,10 +159,22 @@ async def measure_w(w: int, blob: bytes) -> dict:
     per_proc = {pid: round(((ticks_b1.get(pid) or 0) - (ticks_b0.get(pid) or 0)) / 100, 1)
                 for pid in pids if ticks_b0.get(pid) is not None}
     serving_cpu = sorted(pid for pid, s in per_proc.items() if s > 5.0)
+    # STRUCTURAL BLINDNESS DETECTION (2026-08-21, ruled): every response
+    # carries its serving pid — ground truth the census must contain. A
+    # missing response pid means "my filter matched nothing that serves",
+    # which must NEVER present as "no workers serving". The blind branch
+    # records the FULL process tree, so the failing run IS the measurement
+    # that fixes the predicate.
+    resp_pids = {r['pid'] for r in ok if r.get('pid') is not None}
+    blind = sorted(resp_pids - {p['pid'] for p in census})
     return {
         'W': w,
         'declared_workers': w,
         'worker_processes': len(census),
+        'census_matched': len(census),
+        'response_pids': sorted(resp_pids),
+        'census_blind_pids': blind or None,
+        'census_all_procs': all_procs if blind else None,
         'idle_cores_after_warm_workers': idle_cores,
         'idle_cores_per_process': idle_per_proc,
         'distinct_response_pids': len({r['pid'] for r in ok}),
@@ -170,7 +204,7 @@ async def amain() -> int:
     args = ap.parse_args()
 
     blob = Path(args.video).read_bytes()
-    points, knee = [], None
+    points, knee, census_blind = [], None, False
     for w in args.sweep:
         print(f'== W={w}: fresh container ==', flush=True)
         start_info = start_container(args.image, w, args.threads_env)
@@ -182,6 +216,15 @@ async def amain() -> int:
                           ('W', 'serving_by_cpu_delta', 'distinct_response_pids',
                            'idle_cores_after_warm_workers', 'batch_wall_s',
                            'throughput_videos_per_s', 'cpu_util_of_32')}), flush=True)
+        if point.get('census_blind_pids'):
+            print(f'CENSUS BLIND at W={w}: filter matched {point["census_matched"]} '
+                  f'process(es) but response pid(s) {point["census_blind_pids"]} are '
+                  f'absent from the census — the predicate cannot see the serving '
+                  f'processes. Full /proc tree recorded in the point '
+                  f'(census_all_procs); fix the predicate from IT, then re-run. '
+                  f'This is instrument blindness, NOT a serving result.', flush=True)
+            census_blind = True
+            break
         if point['errors'] or point['serving_by_cpu_delta'] < w:
             print(f'STOP at W={w}: serving={point["serving_by_cpu_delta"]} '
                   f'errors={point["errors"]} — investigate before going wider', flush=True)
@@ -206,7 +249,7 @@ async def amain() -> int:
                       'M_TOKENS is (no handicaps, no derived values)'}
     Path(args.out).write_text(json.dumps(report, indent=1))
     print(f'wrote {args.out}')
-    return 0
+    return 2 if census_blind else 0   # 2 = instrument blindness, distinct from findings
 
 
 if __name__ == '__main__':
