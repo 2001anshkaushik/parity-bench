@@ -4,6 +4,11 @@
 # Arms strictly ONE AT A TIME. No cpuset on either arm (Phase 2 environment);
 # the six thread variables are exported the SAME on both arms per matrix point.
 set -euo pipefail
+# Interpreter contract (box trap: system "$PY" lacks psutil/rfdetr/imageio_ffmpeg):
+# every python here is the FLOOR venv. Override with PYBIN.
+PY="${PYBIN:-$HOME/.venv-floor/bin/python}"
+[ -x "$PY" ] || { echo "NOT DONE — $PY missing; run working/video/probe/setup_floor_venv.sh first"; exit 1; }
+
 cd "$(dirname "$0")"
 
 VIDEO="media/ES2002a.Corner.avi"
@@ -27,7 +32,7 @@ start_rr() { # threads
   # First boot with the baked constraints cache is minutes; 10-30 min at
   # near-zero CPU on a cache miss is NORMAL, not a hang (carryover section C).
   for _ in $(seq 1 360); do
-    if python3 -c "import socket; socket.create_connection(('127.0.0.1',5565),2).close()" 2>/dev/null; then return 0; fi
+    if "$PY" -c "import socket; socket.create_connection(('127.0.0.1',5565),2).close()" 2>/dev/null; then return 0; fi
     sleep 5
   done
   echo "engine never listened on 5565"; docker logs rrprobe | tail -40; return 1
@@ -43,7 +48,7 @@ echo "== disk numbers first (they need the quietest machine) ==" | tee -a "$LOG"
 
 echo "== VERIFICATION PIPE LOAD-PROOF (gates 2c/4 pipe; two minutes, fail cheap) ==" | tee -a "$LOG"
 start_rr 8
-python3 probe_frame_identity.py --video "$VIDEO" --no-floor-ok \
+"$PY" probe_frame_identity.py --video "$VIDEO" --no-floor-ok \
   --out probe_frame_identity_early.json 2>&1 | tee -a "$LOG"
 IDENT_RC=${PIPESTATUS[0]}
 stop_rr "identity"
@@ -52,7 +57,7 @@ stop_rr "identity"
 for N in $MATRIX; do
   echo "== RR arm, threads=$N ==" | tee -a "$LOG"
   start_rr "$N"
-  python3 probe_rr.py --video "$VIDEO" --sends 2 \
+  "$PY" probe_rr.py --video "$VIDEO" --sends 2 \
     --out "probe_rr_t${N}.json" 2>&1 | tee -a "$LOG"
   RC=${PIPESTATUS[0]}
   stop_rr "$N"
@@ -62,21 +67,21 @@ for N in $MATRIX; do
   env OMP_NUM_THREADS="$N" MKL_NUM_THREADS="$N" OPENBLAS_NUM_THREADS="$N" \
       VECLIB_MAXIMUM_THREADS="$N" NUMEXPR_NUM_THREADS="$N" TORCH_NUM_THREADS="$N" \
       PROBE_THREADS="$N" \
-      python3 probe_li_floor.py --video "$VIDEO" 2>&1 | tee -a "$LOG"
+      "$PY" probe_li_floor.py --video "$VIDEO" 2>&1 | tee -a "$LOG"
   RC=${PIPESTATUS[0]}
   [ "$RC" = "0" ] || { echo "LI floor failed at threads=$N (rc=$RC)" | tee -a "$LOG"; exit "$RC"; }
 done
 
 echo "== token-topology census: $CENSUS_TOKENS tokens, threads=8, concurrent sends ==" | tee -a "$LOG"
 start_rr 8
-python3 probe_rr.py --video "$VIDEO" --tokens "$CENSUS_TOKENS" \
+"$PY" probe_rr.py --video "$VIDEO" --tokens "$CENSUS_TOKENS" \
   --out "probe_rr_census_m${CENSUS_TOKENS}.json" 2>&1 | tee -a "$LOG"
 RC=${PIPESTATUS[0]}
 stop_rr "census"
 [ "$RC" = "0" ] || echo "census flagged rc=$RC — read probe_rr_census_m${CENSUS_TOKENS}.json before any comparative run" | tee -a "$LOG"
 
 echo "== GATE 4: engine-vs-floor PNG hashes (from the early identity run, no resend) ==" | tee -a "$LOG"
-python3 - <<'EOF4' | tee -a "$LOG"
+"$PY" - <<'EOF4' | tee -a "$LOG"
 import glob, json, sys
 try:
     ident = json.load(open('probe_frame_identity_early.json'))
@@ -99,7 +104,7 @@ G4_RC=${PIPESTATUS[0]}
 [ "$G4_RC" = "0" ] || echo "gate 4 failed (rc=$G4_RC) — investigate before any measured run" | tee -a "$LOG"
 
 echo "== GATE-3 STAGED CONFIRMATION: cross-arm label multisets on ES2002a ==" | tee -a "$LOG"
-python3 - <<'EOF3' | tee -a "$LOG"
+"$PY" - <<'EOF3' | tee -a "$LOG"
 import glob, json, sys
 # Latest RR probe steady-state send vs LI floor, same video, same threads point.
 rr_files = sorted(glob.glob('probe_rr_t*.json'))
@@ -136,7 +141,7 @@ GATE3_RC=${PIPESTATUS[0]}
 [ "$GATE3_RC" = "0" ] || echo "gate-3 staging failed (rc=$GATE3_RC) — investigate BEFORE any measured run" | tee -a "$LOG"
 
 echo "== frame-count agreement (settled decision 2 verification) ==" | tee -a "$LOG"
-python3 - <<'EOF' | tee -a "$LOG"
+"$PY" - <<'EOF' | tee -a "$LOG"
 import glob, json
 li = sorted(glob.glob('probe_li_floor_t*.json'))
 rr = sorted(glob.glob('probe_rr_t*.json'))

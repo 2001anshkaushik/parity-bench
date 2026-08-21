@@ -3,6 +3,13 @@
 # phase; the AVI ships video-only). DONE means verified; any mismatch exits
 # non-zero and names the file.
 set -euo pipefail
+# stdlib-only script, but the interpreter contract is uniform: PYBIN everywhere.
+PY="${PYBIN:-$HOME/.venv-floor/bin/python}"
+if [ ! -x "$PY" ]; then
+  echo "note: $PY missing — probe_fetch is stdlib-only, degrading to system python3"
+  PY=python3
+fi
+
 
 DIR="${PROBE_MEDIA_DIR:-$(dirname "$0")/media}"
 mkdir -p "$DIR"
@@ -22,7 +29,7 @@ echo "$V_SHA  $DIR/$V" | sha256sum -c - || { echo "NOT DONE — sha mismatch: $V
 
 # Report the stream layout from the container header itself (python RIFF parse,
 # no ffprobe dependency): stream types, fourcc, dims, fps, frame count.
-python3 - "$DIR/$V" <<'EOF'
+"$PY" - "$DIR/$V" <<'EOF'
 import struct, sys
 data = open(sys.argv[1], 'rb').read(2_000_000)
 assert data[:4] == b'RIFF' and data[8:12] == b'AVI ', 'not an AVI'

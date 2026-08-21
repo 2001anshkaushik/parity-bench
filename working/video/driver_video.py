@@ -422,6 +422,19 @@ def container_idle_cores(container: str, sample_s: float = 4.0) -> Optional[floa
     return round((b - a) / 1e6 / sample_s, 3)
 
 
+def container_declared_threads(container: str) -> Dict[str, str]:
+    """The six variables as DECLARED on the container (docker inspect env) —
+    the 'declared' side of Crossroad 17's declared-vs-measured check."""
+    raw = docker_inspect(container, '{{range .Config.Env}}{{println .}}{{end}}') or ''
+    out = {}
+    for line in raw.splitlines():
+        if '=' in line:
+            k, v = line.split('=', 1)
+            if k in THREAD_KEYS:
+                out[k] = v
+    return out
+
+
 def docker_inspect(container: str, fmt: str) -> Optional[str]:
     try:
         out = subprocess.run(['docker', 'inspect', '-f', fmt, container],
@@ -528,9 +541,15 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
         if impls != {'rfdetr'}:
             raise SystemExit(f'NOT DONE — LI detect_impl read back as {impls}, not rfdetr.')
 
-    pins = gs.thread_pin_parity(readbacks)
+    # Crossroad 17: per-arm declared-vs-measured; asymmetry across arms is a
+    # recorded value, never a failure. Undeclared drift (#37) still fails.
+    arm_label = 'rr' if rr_arm_active else 'li'
+    container = args.rr_container if rr_arm_active else args.li_container
+    pins = gs.thread_pins_by_arm({arm_label: readbacks},
+                                 {arm_label: container_declared_threads(container)})
     if pins['PASS'] is not True:
-        raise SystemExit(f'NOT DONE — thread pins: {json.dumps(pins)}')
+        raise SystemExit(f'NOT DONE — thread pins (declared vs measured, per arm): '
+                         f'{json.dumps(pins)}')
 
     return pf_extra | {'manifest_meta': meta, 'rows': rows, 'readbacks': readbacks,
             'identity': identity, 'thread_pin_parity': pins,
@@ -1053,7 +1072,7 @@ async def amain() -> int:
                                          '(constants.py:48)' if posture.threads is None else
                                          'explicit use(threads=)')},
             'identity_readback': pf['identity'],
-            'thread_pin_parity': pf['thread_pin_parity'],
+            'thread_pins_by_arm': pf['thread_pin_parity'],
             'interval_s': args.interval_s,
             'frames_observed_method': ('bracket-count' if args.arm == 'rocketride'
                                        else 'extractor-count'),

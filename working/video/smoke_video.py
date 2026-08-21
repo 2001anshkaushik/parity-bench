@@ -216,8 +216,20 @@ def check_readbacks(args) -> dict:
     else:
         say(f'  PASS  quiet box (load1={load1:.2f}, container idle {attributed:.2f}, '
             f'foreign excess {excess:.2f})')
+    # Interpreter read-back — the bare-python3 trap made structural: the smoke
+    # records WHICH python ran it and whether it is a venv, so an interpreter
+    # drift shows in the artifact, not in a stack trace mid-leg.
+    interp = {'executable': sys.executable,
+              'is_venv': sys.prefix != sys.base_prefix,
+              'version': sys.version.split()[0]}
+    if not interp['is_venv']:
+        fail(f'smoke is running under a NON-venv interpreter ({sys.executable}) — '
+             'the box system python lacks the harness deps; use the Phase 1 venv')
+    else:
+        say(f'  PASS  interpreter {sys.executable} (venv)')
     return {'container_problems': problems or None, 'preleg_load1': round(load1, 2),
-            'container_idle_cores': baselines, 'foreign_excess': round(excess, 2)}
+            'container_idle_cores': baselines, 'foreign_excess': round(excess, 2),
+            'interpreter': interp}
 
 
 # ------------------------------------------------------------- D. thread pins
@@ -239,14 +251,20 @@ async def check_pins(args) -> dict:
     impls = {v.get('detect_impl') for v in per_worker.values()}
     if impls and impls != {'rfdetr'}:
         fail(f'LI detect_impl read back as {impls}, not rfdetr')
-    readbacks.update({k: {'env': v['env'], 'torch_num_threads': v['torch_num_threads']}
-                      for k, v in per_worker.items()})
-    pins = gs.thread_pin_parity(readbacks)
+    li_readbacks_map = {k: {'env': v['env'], 'torch_num_threads': v['torch_num_threads']}
+                        for k, v in per_worker.items()}
+    # Crossroad 17: per-arm optima — each arm checked against its OWN declared
+    # container values; the cross-arm difference is recorded, never failed.
+    pins = gs.thread_pins_by_arm(
+        {'rr': readbacks, 'li': li_readbacks_map},
+        {'rr': drv.container_declared_threads(args.rr_container),
+         'li': drv.container_declared_threads(args.li_container)})
     if pins['PASS'] is not True:
-        fail(f'thread pins: {json.dumps({k: pins[k] for k in pins if k != "PASS"})}')
+        fail(f'thread pins (per-arm declared vs measured): '
+             f'{json.dumps({k: pins[k] for k in pins if k != "PASS"})}')
     else:
-        say(f'  PASS  {len(readbacks)} readers agree: '
-            f'{pins["values_agreed"]}')
+        say(f'  PASS  per-arm pins declared==measured; cross-arm values '
+            f'{pins["cross_arm_values"]} (recorded, per-arm optima)')
     return {'pins': pins, 'rr_versions': info.get('package_versions'),
             'li_detect_impl': sorted(impls) if impls else None}
 

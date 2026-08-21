@@ -3,6 +3,9 @@
 # Cold-cache runs need sudo for drop_caches; without sudo the script SAYS SO,
 # labels those rows cache=warm-only, and still produces the O_DIRECT ceiling.
 set -uo pipefail
+PY="${PYBIN:-$HOME/.venv-floor/bin/python}"
+[ -x "$PY" ] || { echo "NOT DONE — $PY missing; run setup_floor_venv.sh first"; exit 1; }
+
 cd "$(dirname "$0")"
 
 VIDEO="${1:-media/ES2002a.Corner.avi}"
@@ -17,7 +20,7 @@ echo "video=$VIDEO bytes=$BYTES -> $LOG"
 # both arms receive the video as streamed/posted BYTES and decode from memory.
 # So host-side cold read + decode is exactly the I/O surface under test, and
 # the binary is the same imageio-ffmpeg build family both arms use.
-FFMPEG=$(python3 -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())" 2>/dev/null || command -v ffmpeg)
+FFMPEG=$("$PY" -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())" 2>/dev/null || command -v ffmpeg)
 [ -n "$FFMPEG" ] || { echo "NOT DONE — no ffmpeg (pip install imageio-ffmpeg)"; exit 1; }
 
 HAVE_SUDO=0
@@ -26,7 +29,7 @@ FADVISE="$(dirname "$0")/drop_cache_fadvise.py"
 drop_caches() {
   if [ "$HAVE_SUDO" = "1" ]; then
     sync; echo 3 | sudo tee /proc/sys/vm/drop_caches >/dev/null; echo cold
-  elif python3 "$FADVISE" "$VIDEO" >/dev/null 2>&1; then
+  elif "$PY" "$FADVISE" "$VIDEO" >/dev/null 2>&1; then
     # No sudo: per-file fadvise(DONTNEED) with a behavioral read-back proving
     # eviction (sample read must run at device speed, not cache speed).
     echo cold-fadvise
@@ -46,7 +49,7 @@ run_timed() { # label cmd...
   "$@" >/dev/null 2>>"$LOG"
   local rc=$?
   t1=$(date +%s.%N); r1=$(disk_read_bytes)
-  python3 - "$label" "$cache" "$t0" "$t1" "$r0" "$r1" "$BYTES" "$rc" <<'EOF' | tee -a "$LOG"
+  "$PY" - "$label" "$cache" "$t0" "$t1" "$r0" "$r1" "$BYTES" "$rc" <<'EOF' | tee -a "$LOG"
 import sys
 label, cache, t0, t1, r0, r1, size, rc = sys.argv[1:9]
 wall = float(t1) - float(t0); rb = int(r1) - int(r0)
@@ -75,12 +78,12 @@ for i in 0 1 2 3 4 5 6 7; do
 done
 wait
 t1=$(date +%s.%N)
-python3 -c "
+"$PY" -c "
 w=float('$t1')-float('$t0'); total=8*$CHUNK*1048576
 print(f'parallel_direct: wall={w:.2f}s aggregate={total/1e6:.0f}MB ({total/w/1e6:.0f} MB/s device ceiling estimate)')" | tee -a "$LOG"
 
 echo "== 5. blast extrapolation ==" | tee -a "$LOG"
-python3 -c "
+"$PY" -c "
 print('at C=32 cold starts, aggregate demand ~= 32 x file_size over the decode window;')
 print('compare row 4 ceiling vs (32 x row-1 single-stream rate needed). Decision rule:')
 print('ceiling > demand -> storage is NOT the bottleneck; no upgrade on assumption.')" | tee -a "$LOG"

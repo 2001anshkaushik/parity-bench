@@ -904,3 +904,46 @@ def log_attribution(log_text: Optional[str], liveness_marker: str,
             "liveness_marker": liveness_marker,
             "drop_warnings": drops[:20] or (None if alive else None),
             "n_drop_warnings": len(drops) if alive else None}
+
+
+def thread_pins_by_arm(readbacks_by_arm: Dict[str, Dict[str, Dict[str, Any]]],
+                       declared_by_arm: Dict[str, Dict[str, Any]],
+                       keys: Sequence[str] = ("OMP_NUM_THREADS", "MKL_NUM_THREADS",
+                                              "OPENBLAS_NUM_THREADS", "VECLIB_MAXIMUM_THREADS",
+                                              "NUMEXPR_NUM_THREADS", "TORCH_NUM_THREADS")) -> Dict[str, Any]:
+    """Crossroad 17 (2026-08-21): thread values are per-arm optima, NOT forced
+    equal across arms. Defect #37 was UNDECLARED asymmetry; measured-and-
+    published asymmetry is its opposite. Per arm, fail-closed:
+      * absence fails first (every reader reports all keys + torch count);
+      * all readers WITHIN the arm must agree;
+      * measured must equal the arm's DECLARED container values.
+    Across arms: the difference is RECORDED (cross_arm_values), never failed.
+    thread_pin_parity() above remains for symmetric-by-choice callers.
+    """
+    if not readbacks_by_arm or not declared_by_arm:
+        return {"PASS": False, "reason": "absent arm groups — absence fails before agreement"}
+    arms_out: Dict[str, Any] = {}
+    ok = True
+    for arm, readers in readbacks_by_arm.items():
+        within = thread_pin_parity(readers, keys=keys)
+        declared = declared_by_arm.get(arm) or {}
+        entry: Dict[str, Any] = {"within_arm": within, "declared": declared}
+        if within["PASS"] is not True:
+            ok = False
+        else:
+            measured = within["values_agreed"]
+            mismatch = {k: {"declared": declared.get(k), "measured": measured.get(k)}
+                        for k in keys
+                        if str(declared.get(k)) != str(measured.get(k))}
+            if not declared:
+                entry["declared_absent"] = True
+                mismatch = {"_all": "declared values unreadable"}
+            entry["declared_vs_measured_mismatch"] = mismatch or None
+            if mismatch:
+                ok = False
+        arms_out[arm] = entry
+    cross = {arm: (e["within_arm"].get("values_agreed") or {}).get("TORCH_NUM_THREADS")
+             for arm, e in arms_out.items()}
+    return {"PASS": ok is True, "arms": arms_out,
+            "cross_arm_values": cross,
+            "cross_arm_note": "per-arm optima; difference recorded, never failed (Crossroad 17)"}
