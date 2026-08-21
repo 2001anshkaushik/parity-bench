@@ -142,8 +142,12 @@ bundles its own OpenMP; the staged gate-3 comparison is the measurement).
 - **Black fixture:** generated box-side by make_black_fixture.sh; sha relayed
   2026-08-21 as `8ea9be50…` (prefix; the sidecar at
   `working/video/probe/media/black_60s_352x288.avi.sha256.txt` ON THE BOX
-  remains the full authority). ffmpeg 7.0.2-static. Disk: 30 G free
-  (2026-08-21 post-LI-build; a builder prune reclaimed 7 GB).
+  remains the full authority). ffmpeg 7.0.2-static.
+- **THE 1 TB LANDED (2026-08-21, relayed): nvme0n1 1000G, partition+fs already
+  extended, / at 969G with 902 GB free — disk is NO LONGER A CONSTRAINT** (no
+  pruning, no two-pass concerns, no retention limits). Survived the stop: all
+  six images incl. li:video + rr:patched-video, no containers, load 0.23,
+  keepalive dead, box repo at 53aa368.
 - Image labels confirmed: duplication_patch_applied=1,
   patch_id=preventDefault-after-embedding-flush, engine_version=3.3.1.
 - 8x md5sum keep-alive (team's own): 18-Aug 02:15:20 → 21-Aug 01:18, killed.
@@ -258,9 +262,16 @@ cause of the quoted missing-space variant was never relayed (presumed a
 stale read of another copy).
 
 **Freeze snapshot: captured BOX-SIDE, 149 packages, at
-`working/video/li_video/li_image_freeze.txt` — NOT YET IN THE REPO** (the
-laptop holds only the relayed excerpt; the box must commit+push the file, or
-paste it verbatim — never reconstruct it from the excerpt). Serving stack as
+`working/video/li_video/li_image_freeze.txt` — STILL NOT IN THE REPO
+(2026-08-21 evening):** the box committed it locally as `0e47b2f` but cannot
+push (no GitHub credentials); the relay to the laptop arrived with the paste
+placeholder UNFILLED. Never reconstruct it from the excerpt. Landing paths,
+any one of: (a) paste the 149 lines verbatim → laptop commits; (b) even after
+the box is reset to origin, the bytes survive in its object store —
+`git show 0e47b2f:working/video/li_video/li_image_freeze.txt`; (c) re-measure
+from the immutable image itself: `docker run --rm li:video python -m pip
+freeze` (a fresh read-back of an unchanged artifact is re-measurement, not
+reconstruction). Serving stack as
 shipped: anyio==4.14.2, fastapi==0.141.1, httptools==0.8.0,
 llama-index-core==0.14.24, llama-index-embeddings-huggingface==0.7.0,
 uvicorn==0.52.4, uvloop==0.22.1. **First catch of exactly the drift the
@@ -271,11 +282,17 @@ to these resolved versions: FLAGGED RULING FOR 2026-08-22, still open.
 Box after build: builder prune reclaimed 7 GB → 30 GB free; keep-alive
 killed; instance stopping; nothing running.
 
-**NEXT session picks up at: box-side four-check sweep against the fixed tree
-→ probe_run.sh with the keep-alive dead (probe_disk is the only EBS number
-we get). The census argv filter is the LAST unexecuted piece — it first runs
-there.** Then dry pass, sweeps. Also: land the freeze file in the repo (box
-push or verbatim paste). Crossroad 21 is STILL unrelayed — ASK, do not
+**Team docs (2026-08-21): `DATAFLOW_PLAN.md` written** (journey per arm,
+measurement-source map, wire contract, postures as dataflow, identity chain —
+descriptive; reasons stay in samples/README.md + register). metrics.md ruled
+against as a separate file: samples/README.md IS that document (one source,
+no drift; package it under whatever filename at delivery).
+
+**NEXT: box-side four-check sweep against the fixed tree → probe_run.sh with
+the keep-alive dead (probe_disk is the only EBS number we get — note the 1 TB
+is now live, so re-baseline there). The census argv filter is the LAST
+unexecuted piece — it first runs there.** Then dry pass, sweeps. Also: land
+the freeze file (paths above). Crossroad 21 is STILL unrelayed — ASK, do not
 invent.
 
 ## What a fresh session gets wrong without being told
