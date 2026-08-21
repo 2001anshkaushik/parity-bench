@@ -57,7 +57,11 @@
   "n": 10,
   "percentile_policy": "p50/max/n only below n=50 (no dressed percentiles)"
  },
- "preleg_load1": 0.42,
+ "preleg_load1": 1.42,
+ "preleg_container_idle_cores": {
+  "rr": 1.002
+ },
+ "preleg_foreign_excess": 0.42,
  "quiet_box_override": null,
  "driver_cpu": {
   "cpu_s": 41.2,
@@ -231,9 +235,9 @@
   }
  },
  "provenance_leela": {
-  "run_id": "20260821T020800Z-32670",
-  "timestamp_utc": "2026-08-21T02:08:00Z",
-  "git_commit": "e0d6f4bedf23b0f4fd79020ea6ed9854b45e678a-dirty",
+  "run_id": "20260821T020910Z-32790",
+  "timestamp_utc": "2026-08-21T02:09:10Z",
+  "git_commit": "b45c08bc352ffa60503a2c85b2c93c94c4665442-dirty",
   "image_digest": null,
   "framework_version": null,
   "instance_type": null,
@@ -295,9 +299,5 @@
   "interval_s": 15,
   "frames_observed_method": "bracket-count-overlap-stripped",
   "chunk_config_source": "measured from records (config literal never exported)"
- },
- "preleg_container_idle_cores": {
-  "rr": 1.002
- },
- "preleg_foreign_excess": 0.12
+ }
 }
