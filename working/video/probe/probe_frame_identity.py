@@ -55,14 +55,18 @@ async def main() -> int:
     ap.add_argument('--port', type=int, default=5565)
     ap.add_argument('--null-flip', action='store_true',
                     help="control: corrupt one engine PNG before hashing — comparison MUST fail")
+    ap.add_argument('--no-floor-ok', action='store_true',
+                    help='early load-proof mode: run gate 2c + save engine hashes even when no '
+                         'LI floor json exists yet; gate 4 comparison defers to the post-matrix step')
     ap.add_argument('--out', default=str(Path(__file__).parent / 'probe_frame_identity_out.json'))
     args = ap.parse_args()
 
     floor_path = args.floor_json or (sorted(glob.glob(str(Path(__file__).parent / 'probe_li_floor_t*.json'))) or [None])[-1]
-    if not floor_path:
-        print('NOT DONE — no LI floor json (run probe_run.sh first)')
+    if not floor_path and not args.no_floor_ok:
+        print('NOT DONE — no LI floor json (run the matrix first, or pass --no-floor-ok '
+              'for the early load-proof)')
         return 1
-    floor = json.load(open(floor_path))
+    floor = json.load(open(floor_path)) if floor_path else {}
     li_hashes = floor.get('frame_png_sha16') or []
 
     from rocketride import RocketRide
@@ -108,17 +112,25 @@ async def main() -> int:
         engine_pngs[0] = bytes(b)
     engine_hashes = [hashlib.sha256(p).hexdigest()[:16] for p in engine_pngs]
 
-    match = engine_hashes == li_hashes
-    mismatches = [i for i, (a, b) in enumerate(zip(engine_hashes, li_hashes)) if a != b]
+    if not li_hashes:
+        gate4 = {'PASS': None, 'deferred': True,
+                 'reason': 'no floor hashes yet — engine hashes saved; the post-matrix '
+                           'compare step finishes gate 4 from this file without a resend'}
+        match, mismatches = None, []
+    else:
+        match = engine_hashes == li_hashes
+        mismatches = [i for i, (a, b) in enumerate(zip(engine_hashes, li_hashes)) if a != b]
+        gate4 = {'PASS': match and len(engine_hashes) == len(li_hashes),
+                 'n_engine': len(engine_hashes), 'n_li': len(li_hashes),
+                 'first_mismatches': mismatches[:5] or None}
     report = {
         'video': args.video, 'wall_s': round(wall, 1),
         'floor_json': floor_path, 'null_flip': args.null_flip,
         'gate2c_index_completeness': {'PASS': bool(idx_ok), 'n': len(indices),
                                       'gaps': gaps or None, 'duplicates': dupes or None,
                                       'first': indices[0] if indices else None},
-        'gate4_decode_identity': {'PASS': match and len(engine_hashes) == len(li_hashes),
-                                  'n_engine': len(engine_hashes), 'n_li': len(li_hashes),
-                                  'first_mismatches': mismatches[:5] or None},
+        'gate4_decode_identity': gate4,
+        'engine_frame_png_sha16': engine_hashes,
         'timestamps_first_last': [indexed[0][1], indexed[-1][1]] if indexed else None,
     }
     Path(args.out).write_text(json.dumps(report, indent=1))
@@ -130,6 +142,8 @@ async def main() -> int:
             return 3
         print('null control fired: corrupted PNG detected as mismatch')
         return 0
+    if report['gate4_decode_identity'].get('deferred'):
+        return 0 if idx_ok else 1
     return 0 if (idx_ok and report['gate4_decode_identity']['PASS']) else 1
 
 

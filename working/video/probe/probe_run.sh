@@ -41,6 +41,14 @@ stop_rr() {
 echo "== disk numbers first (they need the quietest machine) ==" | tee -a "$LOG"
 ./probe_disk.sh "$VIDEO" 2>&1 | tee -a "$LOG"
 
+echo "== VERIFICATION PIPE LOAD-PROOF (gates 2c/4 pipe; two minutes, fail cheap) ==" | tee -a "$LOG"
+start_rr 8
+python3 probe_frame_identity.py --video "$VIDEO" --no-floor-ok \
+  --out probe_frame_identity_early.json 2>&1 | tee -a "$LOG"
+IDENT_RC=${PIPESTATUS[0]}
+stop_rr "identity"
+[ "$IDENT_RC" = "0" ] || { echo "verification pipe FAILED to load/serve (rc=$IDENT_RC) — gates 2c and 4 stand on it; investigate before spending the probe window" | tee -a "$LOG"; exit "$IDENT_RC"; }
+
 for N in $MATRIX; do
   echo "== RR arm, threads=$N ==" | tee -a "$LOG"
   start_rr "$N"
@@ -66,6 +74,29 @@ python3 probe_rr.py --video "$VIDEO" --tokens "$CENSUS_TOKENS" \
 RC=${PIPESTATUS[0]}
 stop_rr "census"
 [ "$RC" = "0" ] || echo "census flagged rc=$RC — read probe_rr_census_m${CENSUS_TOKENS}.json before any comparative run" | tee -a "$LOG"
+
+echo "== GATE 4: engine-vs-floor PNG hashes (from the early identity run, no resend) ==" | tee -a "$LOG"
+python3 - <<'EOF4' | tee -a "$LOG"
+import glob, json, sys
+try:
+    ident = json.load(open('probe_frame_identity_early.json'))
+except FileNotFoundError:
+    print('gate 4: early identity output missing'); sys.exit(1)
+floors = sorted(glob.glob('probe_li_floor_t*.json'))
+if not floors:
+    print('gate 4: no floor json produced by the matrix'); sys.exit(1)
+li = json.load(open(floors[-1])).get('frame_png_sha16') or []
+eng = ident.get('engine_frame_png_sha16') or []
+if not eng or not li:
+    print(f'gate 4: absent hashes (engine={len(eng)} li={len(li)}) — absence fails first'); sys.exit(1)
+if eng == li:
+    print(f'gate 4 PASS: {len(eng)} frames byte-identical across arms'); sys.exit(0)
+mism = [i for i, (a, b) in enumerate(zip(eng, li)) if a != b]
+print(f'gate 4 FAIL: n_engine={len(eng)} n_li={len(li)} first mismatches {mism[:5]} — '
+      'decode paths differ; REAL-DIFFERENCE hypothesis first'); sys.exit(1)
+EOF4
+G4_RC=${PIPESTATUS[0]}
+[ "$G4_RC" = "0" ] || echo "gate 4 failed (rc=$G4_RC) — investigate before any measured run" | tee -a "$LOG"
 
 echo "== GATE-3 STAGED CONFIRMATION: cross-arm label multisets on ES2002a ==" | tee -a "$LOG"
 python3 - <<'EOF3' | tee -a "$LOG"
