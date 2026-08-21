@@ -36,7 +36,10 @@ VIDEOS = [('ES2002a.Corner.avi', 1248.3), ('ES2002b.Corner.avi', 2266.1),
 
 
 def synth_record(i, name, dur, t0_ns, concurrency=4):
-    frames = dv.expected_frames({'video_s': dur, 'fps': 25.0}, 15)
+    # Synthetic frame count for sample SHAPE only. Real rows carry the
+    # MEASURED 'expected_frames_measured' column (Crossroad 23) — the driver's
+    # expected_frames() refuses rows without it, so samples set it explicitly.
+    frames = int(dur // 15)
     det_pf = [random.randint(4, 15) for _ in range(frames)]
     chars = sum(d * 185 + 4 for d in det_pf)
     n_chunks = max(1, -(-chars // 3800))
@@ -70,7 +73,9 @@ def synth_record(i, name, dur, t0_ns, concurrency=4):
 
 def main():
     t0 = 1_000_000 * NS
-    rows = [{'file': n, 'video_s': d, 'fps': 25.0, 'role': 'measured'} for n, d in VIDEOS]
+    rows = [{'file': n, 'video_s': d, 'fps': 25.0, 'role': 'measured',
+             'expected_frames_measured': int(d // 15)}   # synthetic (Crossroad 23 column)
+            for n, d in VIDEOS]
     records = [synth_record(i, n, d, t0) for i, (n, d) in enumerate(VIDEOS)]
     # make one duplication-trigger-eligible record show the gate armed side
     # (>=64 chunks happens organically on long meetings)

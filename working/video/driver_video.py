@@ -113,14 +113,23 @@ def load_manifest(path: Path) -> tuple[dict, List[dict]]:
 
 
 def expected_frames(row: dict, interval_s: int = 15) -> Optional[int]:
-    """Manifest-derived expectation for `-vf fps=1/interval`: frames at
-    t = 0, interval, 2*interval, ... strictly below the video duration.
-    The PROBE pins this formula against reality (84 on ES2002a.Corner)
-    before any gate consumes it."""
-    dur, fps = row.get('video_s'), row.get('fps')
-    if not dur or not fps:
-        return None
-    return int(dur // interval_s) + 1 if dur % interval_s else int(dur // interval_s)
+    """Crossroad 23 (2026-08-21): the expectation is a MEASURED manifest
+    column, never arithmetic. The old formula floor(d/15)+1 predicted 84
+    where the arms' ffmpeg emitted 83 (the t=1245 slot never fires on a
+    1248.3 s stream) — the duration was measured, the frame count was not.
+    fetch_ami_video --build-manifest measures fps=1/15 through the same
+    imageio-ffmpeg binary the arms use, per row. No fallback formula here by
+    ruling: a manifest without the column predates the ruling and fails
+    loudly. (interval_s kept for signature stability; the measurement fixed
+    the interval at build time.)"""
+    v = row.get('expected_frames_measured')
+    if v is None:
+        raise SystemExit(
+            f"NOT DONE — manifest row {row.get('file')!r} lacks "
+            "'expected_frames_measured': the manifest predates Crossroad 23. "
+            'Re-cut with fetch_ami_video.py --build-manifest (measures fps=1/15 '
+            "through the arms' own ffmpeg; ~12 min for 60 rows).")
+    return int(v)
 
 
 def verify_corpus(rows: List[dict], corpus_dir: Path) -> List[str]:

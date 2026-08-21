@@ -36,8 +36,12 @@ using it.
 - **Crossroad 20:** local verification is bounded to SYNTAX AND ARGUMENT
   CONTRACTS. No mocks of engine or LI service — a mock tests the mock.
   Everything semantic is box-side.
-- **Crossroad 21: NOT IN THIS SESSION'S TRANSCRIPT.** The operator's final
-  message implies it exists ("Crossroads 15-21"). ASK; do not invent it.
+- **Crossroad 21 (relayed 2026-08-21): keep-alive policy.** REQUIRED during
+  downloads and builds; FORBIDDEN during probe_disk, the probe, both sweeps,
+  and every measured leg. Bounded by `timeout` so it cannot outlive its
+  purpose, and greppable by its own command string — the old one showed in ps
+  only as `-bash`, which is why it hid for three days and contaminated every
+  18-Aug run.
 - **Crossroad 22 (2026-08-21): both arms run `--network host`**, matching
   Phase 1 carryover section C. Reasons: docker-proxy inserts a userspace hop
   into every message (latency is a measured quantity), and a silent deviation
@@ -48,6 +52,15 @@ using it.
   SDK connect() retry with deadline, LI = /health JSON (+warm_workers==W) —
   one helper, `working/video/probe/wait_ready.py`, everywhere a container
   starts.
+- **Crossroad 23 (2026-08-21): DELETE THE FORMULA, MEASURE THE COLUMN.**
+  fps=1/15 emits t=0,15,…,1230 on a 1248.3 s stream — 83 frames;
+  floor(d/15)+1 said 84. NO corrected formula (fitting the check to one
+  observation is reverse-engineering). `expected_frames_measured` is counted
+  at manifest build through the arms' own imageio-ffmpeg via pipe:0
+  (fetch_ami_video --build-manifest, ~12 s/video); the driver REFUSES rows
+  without the column. est_chunks columns re-derived from probe-measured
+  dpf + chars/det (REQUIRED build args; probe/summarize_probe_rr.py prints
+  both). Gate 1 keeps full force. Register entry 5.
 - **Gate rulings:** gate 1 frames-census is THE dropped-frame detector; log
   scrape is ATTRIBUTION only, fail-closed on its own channel liveness. Gate 3
   STRICT zero tolerance, armed only via --gate3-armed <probe_run_id> after the
@@ -286,12 +299,40 @@ descriptive; reasons stay in samples/README.md + register). metrics.md ruled
 against as a separate file: samples/README.md IS that document (one source,
 no drift; package it under whatever filename at delivery).
 
-**NEXT: box-side four-check sweep against the fixed tree → probe_run.sh with
-the keep-alive dead (probe_disk is the only EBS number we get — note the 1 TB
-is now live, so re-baseline there). The census argv filter is the LAST
-unexecuted piece — it first runs there.** Then dry pass, sweeps. Also: land
-the freeze file (paths above). Crossroad 21 is STILL unrelayed — ASK, do not
-invent.
+**PROBE GREEN (2026-08-21, relayed):** token-topology census 2 tokens → 2
+task processes, both >5 s CPU — **the census argv filter WORKS (last
+unexecuted piece, now executed)**; gate 2c index completeness PASS n=83;
+gate 4 PASS 83 frames byte-identical across arms; **gate 3 staged EXACT
+label-multiset agreement on 83 frames — zero tolerance achievable, the
+phase's biggest open risk retired**; ready_wall_s 5.0.
+**Disk (Crossroad 5 CLOSED, no upgrade):** cold raw 558 MB/s, O_DIRECT 8-way
+ceiling 941 MB/s, cold decode 14.3 MB/s (decode is CPU-bound, not I/O);
+C=32 demand ~458 MB/s vs 941 ceiling; cold-vs-warm decode 10.05 s vs 9.62 s
+(<5%). **LI floor thread curve:** t1 93.8 s (inference 81.2%), t8 24.5 s
+(51.4%), t32 21.1 s (44.5%) — knee between 8 and 32, much closer to 8
+(3.8× for 1→8, 1.16× for 8→32); **LI_THREADS_ENV must NOT default to 32.**
+Measured dpf 26.0 (assumed 5–15) and 166 chunks on a 21-min video — the
+duplication gate arms ORGANICALLY at every duration.
+**RR thread curve "missing" — diagnosed as a SCHEMA MISMATCH, not missing
+data:** the queried keys (total_s/send1_s/cpu_cores/peak_anon_mb) do not
+exist in probe_rr's schema; gate-3 staging PASSED by reading
+sends[-1].documents from those same files, which proves the sends are there.
+`probe/summarize_probe_rr.py` prints the real curve AND the two re-cut
+inputs (--measured-dpf / --measured-chars-per-det). Awaiting the key dump to
+confirm nothing else is missing.
+**RR frame-count log-level call (2026-08-21):** do NOT raise the container
+log level for measured legs — debug lines are attribution, and logging
+inside the measured span is the same perturbation class as the declined
+per-record PNG hashing. The counting truth is census-vs-MEASURED-expectation
+(independent axes: manifest-time ffmpeg vs chunk-derived observation) plus
+the staged cross-arm agreement. If gate 1 ever fires, re-run that one video
+at raised log level as a diagnostic, outside any measured span.
+
+**NEXT: RE-CUT THE MANIFEST FIRST** (Crossroad 23: fetch_ami_video
+--build-manifest with --measured-dpf/--measured-chars-per-det from
+summarize_probe_rr.py; ~12 min, fetched=0 reuse proof) → dry pass →
+RR concurrency sweep (probe_concurrency) → LI worker sweep → thresholds land
+→ smoke --write-golden → full run_plan.
 
 ## What a fresh session gets wrong without being told
 
@@ -328,3 +369,9 @@ invent.
     (five methods, parameter-level). Any new SDK call must extend
     REQUIRED_METHOD_PARAMS with evidence (measured, not docs) or the smoke's
     static scan and the bake's stage 0 will fail it — by design.
+13. **`expected_frames` is a MEASURED manifest column** (Crossroad 23:
+    `expected_frames_measured`, counted through the arms' own ffmpeg at
+    manifest build). Never recompute it from duration — floor(d/15)+1 is
+    WRONG (83 ≠ 84 on ES2002a) and deliberately has no corrected
+    replacement. A manifest lacking the column must be re-cut before any
+    leg; the driver refuses it loudly.

@@ -48,35 +48,55 @@ VIEW_PREFERENCE = ['Corner', 'Overhead']  # selection rule; fallback recorded pe
 N_MEASURED = 48
 N_WARM = 16
 
-# Planning-column assumptions (approved 2026-08-20, ruling 5). The engine's
-# splitter runs at LangChain LIBRARY DEFAULTS 4000/200 (its own size config is
-# inert — see the 2026-08-20 adjudication), so net new chars per chunk ~= 3800.
-# Chars/frame from detect JSON: ~185 chars/detection, assumed 5/10/15
-# detections per frame for low/mid/high. These are PLANNING ESTIMATES ONLY:
-# the duplication gate uses MEASURED n_chunks, and the run plan should
-# re-derive eligibility from the probe's measured chars/frame + these
-# durations rather than refetching.
+# Crossroad 23 (2026-08-21): the expected-frame column is MEASURED, never
+# derived. floor(d/15)+1 predicted 84 on ES2002a; the arms' ffmpeg emitted 83
+# (the t=1245 slot never fires on a 1248.3 s stream). NO corrected formula —
+# a replacement fitted to one observation on one file would reverse-engineer
+# the check from the result, which is what gate 1 exists to prevent. Instead
+# --build-manifest runs fps=1/15 through the SAME imageio-ffmpeg binary both
+# arms use and counts emissions per row (~10-12 s/video). Register entry 5.
 INTERVAL_S = 15
-CHUNK_STRIDE = 4000 - 200
-CHARS_PER_FRAME = {'low': 900, 'mid': 1850, 'high': 2800}
+CHUNK_STRIDE = 4000 - 200      # LangChain library defaults 4000/200 (engine config inert)
 DUP_TRIGGER_CHUNKS = 64
+PNG_SIG = b'\x89PNG\r\n\x1a\n'
 
 
-def derived_columns(video_s: float) -> dict:
-    """Planning columns from duration alone. expected_frames_15s is EXACT
-    (frames at t = 0, 15, ... strictly below duration — same formula as
-    driver_video.expected_frames, pinned by the probe at 84 on ES2002a);
-    chunk counts are banded estimates under the module-level assumptions."""
-    frames = int(video_s // INTERVAL_S) + (1 if video_s % INTERVAL_S else 0)
-    est = {band: -(-frames * cpf // CHUNK_STRIDE)  # ceil
-           for band, cpf in CHARS_PER_FRAME.items()}
-    return {
-        'expected_frames_15s': frames,
-        'est_chunks_low': est['low'],
-        'est_chunks_mid': est['mid'],
-        'est_chunks_high': est['high'],
-        'dup_trigger_eligible_est': est['mid'] >= DUP_TRIGGER_CHUNKS,
-    }
+def measure_frames_ffmpeg(path: Path, interval_s: int = INTERVAL_S) -> int:
+    """Count fps=1/interval emissions through the arms' own ffmpeg. The
+    command AND the pipe:0 input mirror li_video/pipeline._extract_frames
+    byte for byte (the measured exemplar — a file input is seekable where the
+    arms' pipe is not, and conditions travel with measurements)."""
+    import subprocess
+    try:
+        import imageio_ffmpeg
+    except ImportError:
+        raise SystemExit("NOT DONE — --build-manifest measures frames through the arms' "
+                         'ffmpeg and needs imageio-ffmpeg: run under ~/.venv-floor '
+                         '(the probe venv with the engine pins).')
+    exe = imageio_ffmpeg.get_ffmpeg_exe()
+    cmd = [exe, '-nostdin', '-loglevel', 'error', '-i', 'pipe:0',
+           '-vf', f'fps=1/{interval_s}', '-f', 'image2pipe',
+           '-fps_mode', 'passthrough', '-vcodec', 'png', '-']
+    raw = subprocess.run(cmd, input=path.read_bytes(), check=True,
+                         capture_output=True).stdout
+    return raw.count(PNG_SIG)
+
+
+def _ffmpeg_provenance() -> dict:
+    """The measuring instrument, recorded into the manifest meta."""
+    import imageio_ffmpeg
+    return {'imageio_ffmpeg_version': getattr(imageio_ffmpeg, '__version__', '?'),
+            'exe': imageio_ffmpeg.get_ffmpeg_exe()}
+
+
+def est_columns_from_measured(frames: int, dpf: float, chars_per_det: float) -> dict:
+    """Planning estimate from three MEASURED inputs: the per-row frame count
+    above, plus detections/frame and chars/detection from the probe
+    (summarize_probe_rr.py prints both). Still an ESTIMATE and labeled so —
+    the duplication gate uses measured n_chunks at run time."""
+    est = -(-int(frames * dpf * chars_per_det) // CHUNK_STRIDE)  # ceil
+    return {'est_chunks_from_measured': est,
+            'dup_trigger_eligible_from_measured': est >= DUP_TRIGGER_CHUNKS}
 
 
 def scenario_meeting_ids() -> list[str]:
@@ -156,9 +176,17 @@ def load_manifest():
     return meta, [r for r in rows if '_meta' not in r]
 
 
-def build_mode(n_measured: int, n_warm: int) -> int:
+def build_mode(n_measured: int, n_warm: int,
+               dpf: float | None, chars_per_det: float | None) -> int:
+    if dpf is None or chars_per_det is None:
+        print('NOT DONE — --build-manifest needs --measured-dpf and --measured-chars-per-det '
+              '(probe-measured; probe/summarize_probe_rr.py prints both from the probe '
+              'outputs). Refusing to invent planning inputs.')
+        return 1
     print(f'BUILD MODE: constructing {MANIFEST.name} for {n_measured} measured + {n_warm} warm '
-          f'(views tried in order {VIEW_PREFERENCE}). This downloads everything once.', flush=True)
+          f'(views tried in order {VIEW_PREFERENCE}). This downloads everything once, and '
+          f'MEASURES fps=1/{INTERVAL_S} per row through the arms\' ffmpeg (~10-12 s/video).',
+          flush=True)
     CORPUS.mkdir(parents=True, exist_ok=True)
     rows, skips = [], []
     reused = fetched = 0
@@ -207,10 +235,15 @@ def build_mode(n_measured: int, n_warm: int) -> int:
             'streams': hdr.get('streams'),
             'role': 'measured' if len(rows) < n_measured else 'warm',
         }
-        row.update(derived_columns(hdr.get('video_s') or 0.0))
+        t_measure = time.monotonic()
+        row['expected_frames_measured'] = measure_frames_ffmpeg(dest)
+        row.update(est_columns_from_measured(row['expected_frames_measured'],
+                                             dpf, chars_per_det))
         rows.append(row)
         print(f'  [{len(rows)}/{need}] {fname} {row["bytes"]/1e6:.1f}MB '
-              f'{row["video_s"]}s {row["role"]}' + (' (fallback view)' if row['view_fallback'] else ''),
+              f'{row["video_s"]}s frames_measured={row["expected_frames_measured"]} '
+              f'({time.monotonic()-t_measure:.0f}s) {row["role"]}'
+              + (' (fallback view)' if row['view_fallback'] else ''),
               flush=True)
 
     if len(rows) < need:
@@ -225,17 +258,21 @@ def build_mode(n_measured: int, n_warm: int) -> int:
                            f'next {n_warm} = warm (disjoint); unavailable meetings skipped and recorded'),
         'n_measured': n_measured, 'n_warm': n_warm,
         'mux': 'none — fetched as shipped (video-only AVIs; audio out of scope this phase)',
-        'planning_columns': {
+        'measured_columns': {
             'interval_s': INTERVAL_S,
+            'expected_frames_method': ('MEASURED at build (Crossroad 23): fps=1/15 through '
+                                       "the arms' own imageio-ffmpeg binary via pipe:0, PNG "
+                                       'emissions counted. No formula — arithmetic from a '
+                                       'measured duration is still an assertion.'),
+            'ffmpeg': _ffmpeg_provenance(),
+            'measured_dpf': dpf,
+            'measured_chars_per_det': chars_per_det,
             'chunk_stride': CHUNK_STRIDE,
-            'chars_per_frame_assumed': CHARS_PER_FRAME,
             'dup_trigger_chunks': DUP_TRIGGER_CHUNKS,
-            'note': ('est_chunks_* and dup_trigger_eligible_est are PLANNING '
-                     'estimates from duration under the stated assumptions; the '
-                     'duplication gate uses MEASURED n_chunks (NOT-RUN below 64, '
-                     'approved rule), and eligibility should be re-derived from '
-                     'the probe\'s measured chars/frame before the run plan '
-                     'fixes leg composition.'),
+            'note': ('est_chunks_from_measured derives from three measured inputs '
+                     '(per-row frames, probe dpf, probe chars/det) and is STILL an '
+                     'estimate, planning only; the duplication gate uses MEASURED '
+                     'n_chunks at run time (NOT-RUN below 64, approved rule).'),
         },
         'skipped': skips,
     }}
@@ -298,6 +335,12 @@ def main() -> int:
     ap.add_argument('--n-warm', type=int, default=N_WARM)
     ap.add_argument('--manifest', default=None, help='override manifest path (wiring tests)')
     ap.add_argument('--corpus-dir', default=None, help='override corpus dir (wiring tests)')
+    ap.add_argument('--measured-dpf', type=float, default=None,
+                    help='build: probe-measured detections/frame (summarize_probe_rr.py '
+                         'prints it) — REQUIRED for --build-manifest, never defaulted')
+    ap.add_argument('--measured-chars-per-det', type=float, default=None,
+                    help='build: probe-measured chars/detection — REQUIRED for '
+                         '--build-manifest, never defaulted')
     args = ap.parse_args()
     global MANIFEST, CORPUS
     if args.manifest:
@@ -305,7 +348,8 @@ def main() -> int:
     if args.corpus_dir:
         CORPUS = Path(args.corpus_dir)
     if args.build_manifest:
-        return build_mode(args.n_measured, args.n_warm)
+        return build_mode(args.n_measured, args.n_warm,
+                          args.measured_dpf, args.measured_chars_per_det)
     return manifest_mode(args.verify)
 
 

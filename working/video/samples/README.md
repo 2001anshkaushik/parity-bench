@@ -77,7 +77,7 @@ not a control.
 
 | Gate | Proves | Null control | NOT RUN when |
 |---|---|---|---|
-| `frames_census` | frames extracted == manifest-derived expectation, per video, both arms — the silent-frame-loss detector | observed 83 vs expected 84 fires | leg never ran (a leg that ran and produced zero records is a FAIL) |
+| `frames_census` | frames extracted == the manifest's MEASURED expectation (counted through the arms' own ffmpeg at manifest build, not derived from duration), per video, both arms — the silent-frame-loss detector | observed N−1 vs measured N fires | leg never ran (a leg that ran and produced zero records is a FAIL) |
 | `errors` | every offered video produced a record without error | an error row fires | — |
 | `chunkid_monotone` | the engine's accumulate-then-split emitted one ordered split per video | out-of-order ids fire | — |
 | `self_duplication_any` + `duplication_trigger` | the chunk-duplication engine defect (whole list emitted twice) did not occur. Tri-state: uniform-content records read *indeterminate*, never PASS or FAIL, because a static scene can produce identical chunks organically | doubled list fires; uniform list reads indeterminate | `duplication_trigger`: no record reached the 64-chunk flush threshold organically — eligibility is duration-dependent (~29+ min meetings) and declared in the corpus manifest in advance |

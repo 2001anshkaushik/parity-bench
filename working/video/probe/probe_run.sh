@@ -142,17 +142,27 @@ EOF3
 GATE3_RC=${PIPESTATUS[0]}
 [ "$GATE3_RC" = "0" ] || echo "gate-3 staging failed (rc=$GATE3_RC) — investigate BEFORE any measured run" | tee -a "$LOG"
 
-echo "== frame-count agreement (settled decision 2 verification) ==" | tee -a "$LOG"
+echo "== frame-count cross-method agreement (Crossroad 23: measured vs measured, no formula) ==" | tee -a "$LOG"
 "$PY" - <<'EOF' | tee -a "$LOG"
 import glob, json
+# The old check asserted li_frames == {84} — a formula's product. It fired on
+# the probe (ffmpeg emits 83: the final slot never opens) and Crossroad 23
+# deleted the formula. The check's real job survives: every MEASURED count —
+# LI extractor, RR rawdecode, RR overlap-stripped bracket — must be ONE value.
 li = sorted(glob.glob('probe_li_floor_t*.json'))
 rr = sorted(glob.glob('probe_rr_t*.json'))
 li_frames = {json.load(open(f))['n_frames'] for f in li}
-rr_lines = {json.load(open(f))['sends'][-1]['frames'].get('frame_debug_lines') for f in rr if json.load(open(f)).get('sends')}
-print(f'LI-floor frame counts (independent ffmpeg count): {sorted(li_frames)} — expected {{84}}')
-print(f'RR detect debug-line counts (None = log level hid them): {sorted(rr_lines, key=str)}')
-ok = li_frames == {84}
-print('INTERVAL SEMANTICS:', 'CONFIRMED (84 frames at fps=1/15 on 1248.3s)' if ok else f'NOT CONFIRMED — got {li_frames}, investigate before trusting any number')
+rr_counts = set()
+for f in rr:
+    for s in json.load(open(f)).get('sends', []):
+        d = s.get('documents') or {}
+        rr_counts |= {d.get('frames_rawdecode'), d.get('frames_from_chunks')}
+rr_counts.discard(None)
+print(f'LI-floor extractor counts: {sorted(li_frames)}')
+print(f'RR chunk-derived counts (rawdecode + bracket): {sorted(rr_counts)}')
+ok = len(li_frames) == 1 and li_frames == rr_counts
+print('FRAME AGREEMENT:', (f'CONFIRMED — one value, all methods: {sorted(li_frames)}' if ok
+      else 'NOT CONFIRMED — methods disagree; investigate before trusting any count'))
 raise SystemExit(0 if ok else 1)
 EOF
 RC=${PIPESTATUS[0]}

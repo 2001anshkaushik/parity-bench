@@ -1,8 +1,8 @@
 # Methodology register — DRAFT (placement is Ansh's, per the 2026-08-20 ruling)
 
-Entries 1–3: one lesson from three directions — in each, the thing consulted
-was upstream of the thing that runs. Entry 4 is a different failure mode with
-the same generalization. Entry 1 is reproduced VERBATIM from the
+Entries 1–3 and 5: one lesson from four directions — in each, the thing
+consulted was upstream of the thing that runs. Entry 4 is a different failure
+mode with the same generalization. Entry 1 is reproduced VERBATIM from the
 session record where it was drafted — recovered from the transcript rather
 than rewritten from memory, which is entry 2's point in miniature.
 
@@ -96,3 +96,16 @@ than rewritten from memory, which is entry 2's point in miniature.
 > "no files here". Both caught the same way: by re-measuring the outcome
 > (does the object exist? what does the FULL listing say?), never by reading
 > the exit code.
+
+## 5. Arithmetic from a measured input is still an assertion (Crossroad 23, added 2026-08-21)
+
+> floor(duration/15)+1 said 84; the arms' ffmpeg emitted 83 — the t=1245 slot
+> never fires on a 1248.3 s stream. **The duration was measured; the frame
+> count was not** — the formula encoded our model of `fps=1/interval`, not
+> ffmpeg's. And no corrected formula replaces it: a replacement
+> reverse-engineered from one observation on one file would fit the check to
+> the result, which is what the gate exists to prevent. The expectation
+> column is now MEASURED at manifest build, through the same binary the arms
+> use, fed by the same pipe the arms use; formulas survive only as labeled
+> planning estimates. Kin to entry 1: a derivation is a trace through
+> idealized semantics — and the semantics are an environment too.
