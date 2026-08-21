@@ -119,6 +119,7 @@ def frames_from_logs(container: str, since: str) -> dict:
 
 def analyse_documents(docs: list[dict]) -> dict:
     contents = [d.get('page_content') or '' for d in docs]
+    arrays = frame_arrays(contents)
     hashes = [hashlib.sha256(c.encode()).hexdigest()[:16] for c in contents]
     n = len(hashes)
     chunk_ids = [(d.get('metadata') or {}).get('chunkId') for d in docs]
@@ -147,12 +148,22 @@ def analyse_documents(docs: list[dict]) -> dict:
         # Overlap-aware frame count (mirror of driver frames_from_chunks):
         # strip the longest duplicated suffix/prefix per seam, then count '['.
         'frames_from_chunks': _frames_overlap_stripped(contents),
+        # Gate-3 staged-confirmation inputs, recovered from the response:
+        'frames_rawdecode': (len(arrays) if arrays is not None else None),
+        'frame_label_multisets': ([sorted(str(d.get('label')) for d in fr) for fr in arrays]
+                                  if arrays is not None else None),
+        'frame_scores': ([[float(d.get('score', 0.0)) for d in fr] for fr in arrays]
+                         if arrays is not None else None),
     }
 
 
 def _frames_overlap_stripped(contents: list[str], max_k: int = 400) -> int:
     if not contents:
         return 0
+    return ''.join(_stripped_parts(contents, max_k)).count('[')
+
+
+def _stripped_parts(contents: list[str], max_k: int = 400) -> list[str]:
     parts = [contents[0]]
     for prev, cur in zip(contents, contents[1:]):
         k_found = 0
@@ -161,7 +172,31 @@ def _frames_overlap_stripped(contents: list[str], max_k: int = 400) -> int:
                 k_found = k
                 break
         parts.append(cur[k_found:])
-    return ''.join(parts).count('[')
+    return parts
+
+
+def frame_arrays(contents: list[str]) -> list | None:
+    """Mirror of driver_video.frame_arrays_from_chunks (probe is harness-free):
+    overlap-strip join + sequential raw_decode; None on any decode failure."""
+    if not contents:
+        return []
+    blob = ''.join(_stripped_parts(contents))
+    dec = json.JSONDecoder()
+    arrays, i, n = [], 0, len(blob)
+    try:
+        while i < n:
+            while i < n and blob[i] in ' \t\r\n':
+                i += 1
+            if i >= n:
+                break
+            obj, end = dec.raw_decode(blob, i)
+            if not isinstance(obj, list):
+                return None
+            arrays.append(obj)
+            i = end
+    except json.JSONDecodeError:
+        return None
+    return arrays
 
 
 async def one_send(client, token, blob, name):

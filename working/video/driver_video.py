@@ -152,6 +152,42 @@ def frames_from_chunks(contents: List[str], max_k: int = 400) -> int:
     return ''.join(parts).count('[')
 
 
+def frame_arrays_from_chunks(contents: List[str], max_k: int = 400) -> Optional[List[list]]:
+    """Per-frame detection ARRAYS from returned chunks: overlap-strip join,
+    then sequential json raw_decode (arrays are self-delimiting, so seams that
+    ate '\n' separators do not matter). Verified exact — counts, label
+    multisets AND scores — across six real-shaped scenarios under engine-real
+    4000/200 splits (2026-08-20). Returns None on any decode failure: an
+    unparseable stream is reported, never guessed at."""
+    if not contents:
+        return []
+    parts = [contents[0]]
+    for prev, cur in zip(contents, contents[1:]):
+        k_found = 0
+        for k in range(min(max_k, len(prev), len(cur)), 0, -1):
+            if prev.endswith(cur[:k]):
+                k_found = k
+                break
+        parts.append(cur[k_found:])
+    blob = ''.join(parts)
+    dec = json.JSONDecoder()
+    arrays, i, n = [], 0, len(blob)
+    try:
+        while i < n:
+            while i < n and blob[i] in ' \t\r\n':
+                i += 1
+            if i >= n:
+                break
+            obj, end = dec.raw_decode(blob, i)
+            if not isinstance(obj, list):
+                return None
+            arrays.append(obj)
+            i = end
+    except json.JSONDecodeError:
+        return None
+    return arrays
+
+
 def record_from_rr(result: dict) -> dict:
     docs = (result or {}).get('documents') or []
     contents = [d.get('page_content') or '' for d in docs]
@@ -159,6 +195,7 @@ def record_from_rr(result: dict) -> dict:
     hashes = [sha256_bytes(c.encode()) for c in contents]
     ids = [(d.get('metadata') or {}).get('chunkId') for d in docs]
     n = len(docs)
+    arrays = frame_arrays_from_chunks(contents) if n else []
     # gs.whole_list_doubled: True = defect signature, False = clean, None =
     # indeterminate (uniform content — a static scene can produce identical
     # chunks organically; never folded into PASS or FAIL).
@@ -182,6 +219,19 @@ def record_from_rr(result: dict) -> dict:
         'frames_observed': frames_from_chunks(contents) if n else None,
         'frames_observed_naive_upper_bound': sum(c.count('[') for c in contents) if n else None,
         'frames_observed_method': 'bracket-count-overlap-stripped',
+        # Gate-3 inputs, recovered from the measured response itself (proven
+        # exact): per-frame label multisets + scores; rawdecode count is the
+        # independent second method — disagreement with the bracket count is
+        # flagged, never averaged.
+        'frames_observed_rawdecode': (len(arrays) if arrays is not None else None),
+        'frame_count_methods_agree': (arrays is not None and len(arrays) == frames_from_chunks(contents)) if n else None,
+        'frame_label_multisets': ([sorted(str(d.get('label')) for d in fr) for fr in arrays]
+                                  if arrays is not None else None),
+        'frame_scores': ([[float(d.get('score', 0.0)) for d in fr] for fr in arrays]
+                         if arrays is not None else None),
+        'embed_dim': (len(docs[0].get('embedding') or []) or None) if n else None,
+        'embedding_norms': ([round(sum(x * x for x in (d.get('embedding') or [])) ** 0.5, 6)
+                             if d.get('embedding') else None for d in docs] if n else None),
         'chunkid_monotone': all(isinstance(i, int) for i in ids) and ids == sorted(ids),
         'whole_list_doubled': doubled,
         'n_detections': None,      # not recoverable client-side on this arm; honest None
@@ -201,6 +251,11 @@ def record_from_li(body: dict) -> dict:
         'chunkid_monotone': True,   # LI chunks arrive ordered by construction
         'whole_list_doubled': gs.whole_list_doubled(body.get('chunk_sha256') or []),
         'n_detections': body.get('n_detections'),
+        'detections_per_frame': body.get('detections_per_frame'),
+        'frame_label_multisets': body.get('frame_labels'),
+        'frame_scores': body.get('frame_scores'),
+        'embed_dim': body.get('embed_dim'),
+        'embedding_norms': body.get('embedding_norms'),
         'stage_s': body.get('stage_s'),
         'serving_pid': body.get('pid'),
     }
@@ -473,14 +528,39 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
     if leg == 'sequential':
         for row in rows:
             await one(row)
+        # Gate 8: resend the first measured video once; recorded under
+        # '<file>::repeat' so resume-by-key cannot collide with the original.
+        if rows and not stop.is_set():
+            rep = dict(rows[0])
+            rep_key = f"{rep['file']}::repeat"
+            if rep_key not in done:
+                blob = (corpus_dir / rep['file']).read_bytes()
+                enqueue_ns = time.monotonic_ns()
+                async with sem:
+                    admit_ns = time.monotonic_ns()
+                    rec = {'video': rep_key, 'role': 'determinism_repeat',
+                           'submitted_sha256': sha256_bytes(blob), 'bytes': len(blob),
+                           'expected_frames': expected_frames(rep, interval_s),
+                           'enqueue_ns': enqueue_ns, 'admit_ns': admit_ns}
+                    try:
+                        rec.update(await arm.process(blob, rep['file']))
+                        rec['done_ns'] = time.monotonic_ns()
+                        rec['wall_s'] = round((rec['done_ns'] - admit_ns) / 1e9, 2)
+                    except Exception as exc:  # noqa: BLE001
+                        rec['error'] = repr(exc)
+                        rec['done_ns'] = time.monotonic_ns()
+                    writer.write(rec)
     else:
         await asyncio.gather(*[one(row) for row in rows])
     return {'aborted_by_breaker': stop.is_set()}
 
 
 def leg_gates(records: List[dict], rows: List[dict], arm_name: str,
-              interval_s: int) -> dict:
-    ok_records = [r for r in records if 'error' not in r]
+              interval_s: int, liveness_min_fraction: Optional[float] = None) -> dict:
+    ok_records = [r for r in records if 'error' not in r
+                  and '::repeat' not in str(r.get('video'))]
+    repeats = {str(r['video']).replace('::repeat', ''): r
+               for r in records if '::repeat' in str(r.get('video')) and 'error' not in r}
     expected = {r['file']: expected_frames(r, interval_s) for r in rows}
     gates: Dict[str, Any] = {}
     if not records:
@@ -515,6 +595,37 @@ def leg_gates(records: List[dict], rows: List[dict], arm_name: str,
         gates['chunkid_monotone'] = {
             'PASS': all(r.get('chunkid_monotone') for r in ok_records),
             'violations': [r['video'] for r in ok_records if not r.get('chunkid_monotone')] or None}
+        # Gate 5 — threshold is probe-derived and REQUIRED; absent -> NOT RUN,
+        # never a guessed default (ruling 2026-08-20).
+        if liveness_min_fraction is None:
+            gates['detection_liveness'] = gs.not_run(
+                'detection_liveness', offered=len(ok_records),
+                reason='--liveness-min-fraction not provided; value comes from probe data')
+        else:
+            gates['detection_liveness'] = gs.detection_liveness(ok_records, liveness_min_fraction)
+        # Gate 7 — embed integrity over every vector in the leg.
+        dims = [r.get('embed_dim') for r in ok_records for _ in (r.get('embedding_norms') or [None])]
+        norms = [x for r in ok_records for x in (r.get('embedding_norms') or [None])]
+        gates['embed_integrity'] = gs.embed_integrity(dims, norms)
+        # Gate 8 — determinism repeat (sequential leg sends measured[0] twice).
+        if repeats:
+            first_by = {r['video']: r for r in ok_records}
+            checks = {v: gs.determinism_repeat((first_by.get(v) or {}).get('chunk_sha256') or [],
+                                               rep.get('chunk_sha256') or [])
+                      for v, rep in repeats.items()}
+            gates['determinism_repeat'] = {
+                'PASS': all(c['PASS'] is True for c in checks.values()), 'per_video': checks}
+        else:
+            gates['determinism_repeat'] = gs.not_run(
+                'determinism_repeat', reason='no ::repeat record in this leg '
+                '(sequential legs produce one; blast legs report NOT RUN)')
+        # RR frame-count method cross-check: two independent recoveries must agree.
+        method_flags = [r.get('frame_count_methods_agree') for r in ok_records]
+        if any(f is not None for f in method_flags):
+            gates['frame_count_methods_agree'] = {
+                'PASS': all(f is not False for f in method_flags),
+                'disagreeing': [r['video'] for r in ok_records
+                                if r.get('frame_count_methods_agree') is False] or None}
     return gates
 
 
@@ -522,16 +633,47 @@ def leg_gates(records: List[dict], rows: List[dict], arm_name: str,
 # Cross-arm mode
 # ---------------------------------------------------------------------------
 
-def cross_gates(rr_path: Path, li_path: Path, tol: float) -> dict:
+def cross_gates(rr_path: Path, li_path: Path, tol: float,
+                gate3_armed: Optional[str] = None) -> dict:
     rr, _, _ = read_completed(rr_path, key='video')
     li, _, _ = read_completed(li_path, key='video')
-    rr_ok = [r for r in rr if 'error' not in r]
-    li_ok = [r for r in li if 'error' not in r]
+    rr_ok = [r for r in rr if 'error' not in r and '::repeat' not in str(r.get('video'))]
+    li_ok = [r for r in li if 'error' not in r and '::repeat' not in str(r.get('video'))]
     li_by = {r['video']: r for r in li_ok}
     pairs = [{'video': r['video'], 'rr_chars': r.get('sum_chunk_chars'),
               'li_chars': (li_by.get(r['video']) or {}).get('sum_chunk_chars')}
              for r in rr_ok if r['video'] in li_by]
+    # Gate 3 first (priority order, ruling 2026-08-20): STRICT label-multiset
+    # agreement, armed ONLY once the probe's ES2002a comparison confirmed —
+    # the arming argument carries the probe run id into provenance.
+    if gate3_armed:
+        per_video = {}
+        for r in rr_ok:
+            mate = li_by.get(r['video'])
+            if not mate:
+                continue
+            per_video[r['video']] = gs.label_multiset_agreement(
+                r.get('frame_label_multisets') or [], mate.get('frame_label_multisets') or [])
+        agreement = {'PASS': bool(per_video) and all(v['PASS'] is True for v in per_video.values()),
+                     'armed_by_probe_run': gate3_armed,
+                     'n_videos': len(per_video),
+                     'failing': [v for v, g in per_video.items() if g['PASS'] is not True] or None,
+                     'per_video': per_video}
+        if agreement['failing']:
+            # Diagnostic triage only — never a verdict (only a human downgrades,
+            # in writing, with the reason; first hypothesis is a REAL difference).
+            v = agreement['failing'][0]
+            r = next(x for x in rr_ok if x['video'] == v)
+            m = li_by[v]
+            agreement['score_triage_first_failure'] = gs.score_triage(
+                r.get('frame_scores') or [], m.get('frame_scores') or [])
+    else:
+        agreement = gs.not_run(
+            'cross_detection_agreement',
+            reason='awaiting probe confirmation — pass --gate3-armed <probe_run_id> '
+                   'after the staged ES2002a comparison passes')
     out = {
+        'cross_detection_agreement': agreement,
         'char_conservation': (gs.char_conservation_parity(pairs, tol=tol) if pairs
                               else gs.not_run('char_conservation',
                                               reason='no overlapping videos')),
@@ -575,12 +717,18 @@ async def amain() -> int:
                     help='resume aid ONLY — a fresh container without warm-up is not measurable')
     ap.add_argument('--no-collector', action='store_true')
     ap.add_argument('--char-tol', type=float, default=0.02)
+    ap.add_argument('--liveness-min-fraction', type=float, default=None,
+                    help='gate 5 threshold — PROBE-DERIVED, no default; absent = gate NOT RUN')
+    ap.add_argument('--gate3-armed', default=None, metavar='PROBE_RUN_ID',
+                    help='arm strict cross-arm detection agreement; the id names the probe '
+                         'run whose ES2002a comparison confirmed — absent = gate NOT RUN')
     ap.add_argument('--cross', nargs=2, metavar=('RR_JSONL', 'LI_JSONL'),
                     help='cross-arm gates over two completed record files; no run')
     args = ap.parse_args()
 
     if args.cross:
-        out = cross_gates(Path(args.cross[0]), Path(args.cross[1]), args.char_tol)
+        out = cross_gates(Path(args.cross[0]), Path(args.cross[1]), args.char_tol,
+                          gate3_armed=args.gate3_armed)
         print(json.dumps(out, indent=1))
         ok = out['char_conservation'].get('PASS')
         return 0 if (ok is True or out['char_conservation'].get('verdict') == 'NOT RUN') else 1
@@ -718,7 +866,22 @@ async def amain() -> int:
 
     # ---- gates + export ---------------------------------------------------
     records, _, _ = read_completed(rec_path, key='video')
-    gates = leg_gates(records, measured, arm.name, args.interval_s)
+    gates = leg_gates(records, measured, arm.name, args.interval_s,
+                      liveness_min_fraction=args.liveness_min_fraction)
+    # Gate 2 attribution (RR): capture the container log and scrape for the
+    # detect node's drop warning — with a channel-liveness marker so a dead
+    # log can never read as 'no drops'. Detector = gate 1; this ATTRIBUTES.
+    if args.arm == 'rocketride':
+        log_file = out_dir / f'dockerlog_{args.rr_container}_{args.leg}.txt'
+        try:
+            log_text = subprocess.run(['docker', 'logs', args.rr_container],
+                                      capture_output=True, text=True, timeout=60
+                                      ).stdout or ''
+        except Exception:
+            log_text = ''
+        log_file.write_text(log_text[-2_000_000:])
+        gates['dropped_frame_attribution'] = gs.log_attribution(
+            log_text, '[entrypoint] RocketRide engine')
     driver_cpu_s = (dr1.ru_utime + dr1.ru_stime) - (dr0.ru_utime + dr0.ru_stime)
     driver_share = driver_cpu_s / leg_wall / (os.cpu_count() or 32) if leg_wall else None
 

@@ -23,6 +23,9 @@ class ProcessVideoResponse(BaseModel):
     chunk_sha256: list[str]               # per-chunk content hashes (per-arm gates only;
     #                                       cross-arm hash equality stays DECLINED, Phase 1 rule)
     embed_dim: int
+    embedding_norms: list[float]          # gate 7: unit-norm within NORM_TOL, both arms
+    frame_labels: list[list[str]]         # gate 3: per-frame label multisets (sorted)
+    frame_scores: list[list[float]]       # gate 3 triage input (diagnostic only)
     frame_png_sha16: list[str]            # cross-arm frame identity (byte-equal ffmpeg output)
 
     # --- timings (probe + driver read these) -----------------------------

@@ -758,3 +758,149 @@ def whole_list_doubled(hashes: Sequence[str]) -> Optional[bool]:
     if len(set(half)) < 2:
         return None
     return True
+
+
+# =============================================================================
+# Phase 2 (video) gate helpers, batch 2 — rulings of 2026-08-20 (gates 2,3,5,7,8
+# + log-scrape attribution). Every threshold that comes from probe data is a
+# REQUIRED argument with no default: nothing silently runs at a guessed value.
+# =============================================================================
+
+
+def index_completeness(indices: Sequence[int], expected_n: Optional[int] = None) -> Dict[str, Any]:
+    """Gate 2 (LI-side / probe-depth): frame indices must be gapless and
+    duplicate-free, and match expected_n when given. Empty input FAILS (a leg
+    that ran and produced zero is a FAIL; not_run() is the caller's case)."""
+    if not indices:
+        return {"PASS": False, "reason": "zero indices"}
+    seen = list(indices)
+    dupes = sorted({i for i in seen if seen.count(i) > 1})
+    lo, hi = min(seen), max(seen)
+    gaps = sorted(set(range(lo, hi + 1)) - set(seen))
+    ok = not dupes and not gaps and lo == 0 and (expected_n is None or len(seen) == expected_n)
+    return {"PASS": ok, "n": len(seen), "first": lo, "last": hi,
+            "gaps": gaps or None, "duplicates": dupes or None,
+            "expected_n": expected_n}
+
+
+def detection_liveness(records: Sequence[Dict[str, Any]],
+                       min_nonempty_fraction: float) -> Dict[str, Any]:
+    """Gate 5: minimum fraction of frames with >=1 detection, per leg.
+
+    min_nonempty_fraction is REQUIRED — its value comes from probe data
+    (Corner-view measured distribution), never a guess. A record without
+    per-frame data is an ABSENCE failure. The black-frame fixture is this
+    gate's null control: it must produce ~all-empty frames and FAIL here.
+    """
+    if min_nonempty_fraction is None:  # defensive: callers must not pass None
+        raise ValueError("min_nonempty_fraction is required (probe-derived; no default)")
+    if not records:
+        return {"PASS": False, "reason": "zero records"}
+    total = nonempty = 0
+    ok = True
+    rows = []
+    for r in records:
+        per = r.get("detections_per_frame")
+        if per is None and r.get("frame_label_multisets") is not None:
+            per = [len(f) for f in r["frame_label_multisets"]]
+        if per is None:
+            rows.append({"video": r.get("video"), "PASS": False, "reason": "absent per-frame data"})
+            ok = False
+            continue
+        ne = sum(1 for c in per if c > 0)
+        frac = ne / len(per) if per else 0.0
+        row_ok = frac >= min_nonempty_fraction
+        ok = ok and row_ok
+        rows.append({"video": r.get("video"), "PASS": row_ok,
+                     "nonempty_fraction": round(frac, 4)})
+        total += len(per)
+        nonempty += ne
+    return {"PASS": ok is True, "min_nonempty_fraction": min_nonempty_fraction,
+            "aggregate_fraction": round(nonempty / total, 4) if total else None,
+            "rows": rows}
+
+
+def label_multiset_agreement(frames_a: Sequence[Sequence[str]],
+                             frames_b: Sequence[Sequence[str]]) -> Dict[str, Any]:
+    """Gate 3: STRICT, zero tolerance (ruling 2026-08-20). Per-frame label
+    multisets must be identical across arms — frame count and content. Any
+    divergence is first a REAL difference (model swap, resize path, version
+    drift); 'the tolerance is too tight' is not a hypothesis this gate knows.
+    score_triage() below is diagnostic only and never produces a verdict.
+    """
+    if not frames_a or not frames_b:
+        return {"PASS": False, "reason": f"absent side a={len(frames_a or [])} "
+                                         f"b={len(frames_b or [])} — absence fails first"}
+    if len(frames_a) != len(frames_b):
+        return {"PASS": False, "frame_count_a": len(frames_a),
+                "frame_count_b": len(frames_b), "reason": "frame count differs"}
+    diverging = [i for i, (a, b) in enumerate(zip(frames_a, frames_b))
+                 if sorted(a) != sorted(b)]
+    return {"PASS": not diverging, "n_frames": len(frames_a),
+            "diverging_frames": diverging[:50] or None,
+            "n_diverging": len(diverging)}
+
+
+def score_triage(scores_a: Sequence[Sequence[float]],
+                 scores_b: Sequence[Sequence[float]],
+                 eps: float = 1e-4) -> Dict[str, Any]:
+    """DIAGNOSTIC ONLY — never a verdict, never folded into a gate. When gate 3
+    fails, this separates threshold-boundary flapping (score deltas < eps with
+    count off by the flapped detections) from wholesale mismatch (a different
+    model). Only a human downgrades gate 3, in writing, with the reason."""
+    paired = [(a, b) for a, b in zip(scores_a, scores_b) if len(a) == len(b)]
+    deltas = [abs(x - y) for a, b in paired for x, y in zip(sorted(a), sorted(b))]
+    return {"diagnostic_only": True, "eps": eps,
+            "n_frames_compared": len(paired),
+            "n_frames_count_mismatch": len(scores_a) - len(paired)
+            if len(scores_a) == len(scores_b) else None,
+            "max_paired_delta": max(deltas) if deltas else None,
+            "all_paired_within_eps": (max(deltas) < eps) if deltas else None}
+
+
+def embed_integrity(dims: Sequence[Optional[int]], norms: Sequence[Optional[float]],
+                    expected_dim: int = 384, tol: float = NORM_TOL) -> Dict[str, Any]:
+    """Gate 7 (Phase 1 continuity): every vector has the expected dimension and
+    unit norm within NORM_TOL. Absent dims/norms FAIL — an arm that cannot
+    report its vectors cannot pass an integrity gate."""
+    if not dims or not norms:
+        return {"PASS": False, "reason": "absent dims or norms"}
+    bad_dim = [i for i, d in enumerate(dims) if d != expected_dim]
+    bad_norm = [i for i, x in enumerate(norms)
+                if x is None or abs(x - 1.0) > tol]
+    return {"PASS": not bad_dim and not bad_norm, "n": len(norms),
+            "expected_dim": expected_dim, "tol": tol,
+            "bad_dim_idx": bad_dim[:20] or None, "bad_norm_idx": bad_norm[:20] or None}
+
+
+def determinism_repeat(hashes_first: Sequence[str],
+                       hashes_repeat: Sequence[str]) -> Dict[str, Any]:
+    """Gate 8: same video sent twice through the same arm must produce the
+    identical chunk-hash list — nothing in this pipeline samples. Strict."""
+    if not hashes_first or not hashes_repeat:
+        return {"PASS": False, "reason": "absent side — a repeat that did not run cannot pass"}
+    equal = list(hashes_first) == list(hashes_repeat)
+    first_div = next((i for i, (a, b) in enumerate(zip(hashes_first, hashes_repeat))
+                      if a != b), None)
+    return {"PASS": equal, "n_first": len(hashes_first), "n_repeat": len(hashes_repeat),
+            "first_divergence_index": first_div if not equal else None}
+
+
+def log_attribution(log_text: Optional[str], liveness_marker: str,
+                    drop_pattern: str = "dropping frame") -> Dict[str, Any]:
+    """Gate 2 ATTRIBUTION (ruling: gate 1 is the detector; this attributes).
+
+    Fail-closed on its own channel: if liveness_marker is absent from the log,
+    the log channel is dead or mis-leveled and the result is UNKNOWN — a
+    scrape that can only find nothing must never read as 'no drops'."""
+    if not log_text:
+        return {"channel_alive": False, "attribution": "UNKNOWN — no log captured",
+                "drop_warnings": None}
+    alive = liveness_marker in log_text
+    drops = [l.strip()[:200] for l in log_text.splitlines() if drop_pattern in l]
+    return {"channel_alive": alive,
+            "attribution": (("dropped-frame warnings found" if drops else "no drop warnings")
+                            if alive else "UNKNOWN — log channel dead (liveness marker absent)"),
+            "liveness_marker": liveness_marker,
+            "drop_warnings": drops[:20] or (None if alive else None),
+            "n_drop_warnings": len(drops) if alive else None}

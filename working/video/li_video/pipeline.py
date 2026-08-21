@@ -55,6 +55,9 @@ class VideoPipelineResult:
     n_frames: int = 0
     n_detections: int = 0
     detections_per_frame: list[int] = field(default_factory=list)
+    frame_labels: list[list[str]] = field(default_factory=list)
+    frame_scores: list[list[float]] = field(default_factory=list)
+    embedding_norms: list[float] = field(default_factory=list)
     total_chars: int = 0
     n_chunks: int = 0
     chunk_chars: list[int] = field(default_factory=list)
@@ -185,6 +188,8 @@ class LlamaIndexVideoPipeline:
             for png in frames:
                 dets = self._detect_frame(png)
                 r.detections_per_frame.append(len(dets))
+                r.frame_labels.append(sorted(d['label'] for d in dets))
+                r.frame_scores.append([d['score'] for d in dets])
                 per_frame_json.append(json.dumps(dets))
         r.stage_s['detect'] = round(time.monotonic() - t0, 2)
         r.n_detections = sum(r.detections_per_frame)
@@ -205,4 +210,5 @@ class LlamaIndexVideoPipeline:
                 if chunks else []
         r.stage_s['embed'] = round(time.monotonic() - t0, 2)
         r.embed_dim = len(vectors[0]) if vectors else 0
+        r.embedding_norms = [round(sum(x * x for x in v) ** 0.5, 6) for v in vectors]
         return r

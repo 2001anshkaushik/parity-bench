@@ -67,6 +67,43 @@ RC=${PIPESTATUS[0]}
 stop_rr "census"
 [ "$RC" = "0" ] || echo "census flagged rc=$RC — read probe_rr_census_m${CENSUS_TOKENS}.json before any comparative run" | tee -a "$LOG"
 
+echo "== GATE-3 STAGED CONFIRMATION: cross-arm label multisets on ES2002a ==" | tee -a "$LOG"
+python3 - <<'EOF3' | tee -a "$LOG"
+import glob, json, sys
+# Latest RR probe steady-state send vs LI floor, same video, same threads point.
+rr_files = sorted(glob.glob('probe_rr_t*.json'))
+fl_files = sorted(glob.glob('probe_li_floor_t*.json'))
+if not rr_files or not fl_files:
+    print('gate-3 staging: missing probe outputs — cannot confirm'); sys.exit(1)
+rr = json.load(open(rr_files[-1]))
+fl = json.load(open(fl_files[-1]))
+sends = [s for s in rr.get('sends', []) if 'documents' in s]
+if not sends:
+    print('gate-3 staging: no RR send analysis'); sys.exit(1)
+a = sends[-1]['documents'].get('frame_label_multisets')
+b = fl.get('frame_label_multisets')
+if a is None or b is None:
+    print('gate-3 staging: absent label multisets (rawdecode failed?) — absence fails first'); sys.exit(1)
+if len(a) != len(b):
+    print(f'gate-3 staging: FRAME COUNT DIFFERS rr={len(a)} li={len(b)} — REAL-DIFFERENCE '
+          'hypothesis first (model swap / resize path / version drift), never tolerance'); sys.exit(1)
+div = [i for i, (x, y) in enumerate(zip(a, b)) if sorted(x) != sorted(y)]
+if div:
+    ra = sends[-1]['documents'].get('frame_scores') or []
+    rb = fl.get('frame_scores') or []
+    deltas = [abs(p - q) for fa, fb in zip(ra, rb) if len(fa) == len(fb)
+              for p, q in zip(sorted(fa), sorted(fb))]
+    print(f'gate-3 staging: DIVERGES on {len(div)}/{len(a)} frames (first: {div[:5]}).')
+    print('FIRST HYPOTHESIS IS A REAL DIFFERENCE — model swap, resize path, version drift.')
+    print(f'score triage (diagnostic only): max paired delta = {max(deltas) if deltas else None}')
+    print('Gate 3 stays UNARMED. Only a human downgrades, in writing, with the reason.')
+    sys.exit(1)
+print(f'gate-3 staging: EXACT agreement on {len(a)} frames — arm the gate with '
+      f'--gate3-armed <this probe run id> in the driver')
+EOF3
+GATE3_RC=${PIPESTATUS[0]}
+[ "$GATE3_RC" = "0" ] || echo "gate-3 staging failed (rc=$GATE3_RC) — investigate BEFORE any measured run" | tee -a "$LOG"
+
 echo "== frame-count agreement (settled decision 2 verification) ==" | tee -a "$LOG"
 python3 - <<'EOF' | tee -a "$LOG"
 import glob, json

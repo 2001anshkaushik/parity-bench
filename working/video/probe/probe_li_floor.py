@@ -145,6 +145,9 @@ def main() -> int:
         per_frame_json.append(json.dumps(dets))
     report['stage_s']['detect'] = round(time.monotonic() - t0, 1)
     report['n_detections'] = n_detections
+    report['frame_label_multisets'] = [sorted(d['label'] for d in json.loads(fj))
+                                       for fj in per_frame_json]
+    report['frame_scores'] = [[d['score'] for d in json.loads(fj)] for fj in per_frame_json]
     report['detections_per_frame'] = round(n_detections / len(frames), 1) if frames else None
     print(f'detect: {n_detections} detections over {len(frames)} frames '
           f'in {report["stage_s"]["detect"]}s')
