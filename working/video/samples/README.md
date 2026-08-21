@@ -80,7 +80,7 @@ not a control.
 | `frames_census` | frames extracted == the manifest's MEASURED expectation (counted through the arms' own ffmpeg at manifest build, not derived from duration), per video, both arms — the silent-frame-loss detector | observed N−1 vs measured N fires | leg never ran (a leg that ran and produced zero records is a FAIL) |
 | `errors` | every offered video produced a record without error | an error row fires | — |
 | `chunkid_monotone` | the engine's accumulate-then-split emitted one ordered split per video | out-of-order ids fire | — |
-| `self_duplication_any` + `duplication_trigger` | the chunk-duplication engine defect (whole list emitted twice) did not occur. Tri-state: uniform-content records read *indeterminate*, never PASS or FAIL, because a static scene can produce identical chunks organically | doubled list fires; uniform list reads indeterminate | `duplication_trigger`: no record reached the 64-chunk flush threshold organically — eligibility is duration-dependent (~29+ min meetings) and declared in the corpus manifest in advance |
+| `self_duplication_any` + `duplication_trigger` | the chunk-duplication engine defect (whole list emitted twice) did not occur. Tri-state: uniform-content records read *indeterminate*, never PASS or FAIL, because a static scene can produce identical chunks organically | doubled list fires; uniform list reads indeterminate | `duplication_trigger`: no record reached the 64-chunk flush threshold organically. Per-video eligibility is declared in the manifest in advance (`est_chunks_from_measured`, an estimate built from probe-measured detection density — 26.0 detections/frame, 230.4 chars/detection; a 21-min meeting estimates ~131 chunks, so most of the corpus clears 64 and only the shortest meetings may not). Measured `n_chunks` decides at run time; the estimate only plans |
 | `detection_liveness` | a minimum fraction of frames produced ≥1 detection (a model serving garbage detects nothing) | a generated black video MUST fail this gate | threshold not yet supplied — it is probe-measured, and the code refuses to invent it |
 | `embed_integrity` | every vector is 384-d and unit-norm within 1e-3, both arms | a 0.9 norm fires | — |
 | `determinism_repeat` | the same video sent twice yields identical chunk hashes — nothing in this pipeline samples | one perturbed hash fires | blast legs (sequential legs produce the repeat) |
@@ -95,9 +95,13 @@ not a control.
   containers), byte-identical frames (probe-verified), same threshold, same
   package versions — so fp32 CPU inference should agree exactly, and any
   tolerance wide enough to absorb real divergence would also absorb a silent
-  model swap, which is what this gate exists to catch. It **arms only after a
-  staged one-video confirmation on the probe** (the arming run id is recorded);
-  unarmed it reports NOT RUN naming what arms it. `score_triage` accompanies
+  model swap, which is what this gate exists to catch. **Measured, it does
+  agree: the staged one-video confirmation found EXACT per-frame
+  label-multiset agreement on all 83 frames, reproduced in a second
+  independent container the same day — zero tolerance is
+  measured-achievable, not argued.** The gate arms via the recorded probe
+  run id (`probe_20260821_195214`); unarmed it reports NOT RUN naming what
+  arms it. `score_triage` accompanies
   failures as diagnostics — it deliberately **has no PASS key**, so it cannot
   become a verdict; only a human downgrades this gate, in writing.
 - **`char_conservation` (±2%)** — measured workload parity: per-video sum of

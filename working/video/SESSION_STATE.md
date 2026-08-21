@@ -340,7 +340,10 @@ C=32 demand ~458 MB/s vs 941 ceiling; cold-vs-warm decode 10.05 s vs 9.62 s
 (51.4%), t32 21.1 s (44.5%) — knee between 8 and 32, much closer to 8
 (3.8× for 1→8, 1.16× for 8→32); **LI_THREADS_ENV must NOT default to 32.**
 Measured dpf 26.0 (assumed 5–15) and 166 chunks on a 21-min video — the
-duplication gate arms ORGANICALLY at every duration.
+duplication gate arms organically across MOST of the corpus (per-row
+est_chunks_from_measured declares eligibility; the shortest ~8-min meetings
+estimate near/below 64 — measured n_chunks decides at run time; "every
+duration" was an extrapolation, corrected 2026-08-21 per entry 5's own rule).
 **RR thread curve — the "missing" data was a SCHEMA MISMATCH (confirmed),
 recovered from the log (2026-08-21):**
   t1: send1 85.3 s, send2 89.6 s, cpu_util 0.072 · t8: 16.0 s / 17.2 s,
