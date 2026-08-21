@@ -19,7 +19,8 @@
 #   DEFAULT_N      Crossroad 27: videos in the DEFAULT-posture blast leg.
 #                  At today's 44-corpus scale set it to MEASURED_N (full set).
 #                  Above ~1000 videos the default posture runs a STATED
-#                  SUBSET (proposed: >=500, or the full set when smaller) —
+#                  SUBSET (RULED 2026-08-21: >=500, manifest-order prefix,
+#                  stated in the export; or the full set when smaller) —
 #                  the out-of-box finding is a RATIO and does not need 5000
 #                  samples; 5000 videos at 1 token is ~36 h re-proving what
 #                  500 show. Parity always runs the full measured set.

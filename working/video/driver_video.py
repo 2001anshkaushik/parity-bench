@@ -1125,7 +1125,32 @@ async def amain() -> int:
                 except Exception as exc:  # noqa: BLE001
                     say(f'warm-up failure on {row["file"]}: {exc!r} (recorded, continuing)')
 
-        await asyncio.gather(*[warm_one(r) for r in warm])
+        # Warm-consumption ruling (2026-08-21): min(WARM_N, 2 x instances) per
+        # leg. Crossroad 26 governs the VALUE of WARM_N; consuming all 16
+        # rows through ONE serial token warms nothing the second item didn't
+        # (~14 min/run of redundant service at 44-scale). Coverage keeps
+        # C26's teeth: RR round-robins tokens so 2x covers by construction;
+        # LI accept routing is not round-robin (#21), so if the first batch
+        # leaves a declared worker unseen, remaining warm rows are spent one
+        # at a time until every instance served or rows run out — then the
+        # absence asserts below fail exactly as before.
+        conc_i = max(1, conc)
+        first_batch = warm[:min(len(warm), 2 * conc_i)]
+        await asyncio.gather(*[warm_one(r) for r in first_batch])
+        used = len(first_batch)
+
+        def _covered() -> bool:
+            if args.arm == 'rocketride':
+                return len(seen_tokens) >= posture.tokens
+            return len(seen_pids) >= (arm.declared_workers or 1)
+
+        for row in warm[len(first_batch):]:
+            if _covered():
+                break
+            await warm_one(row)
+            used += 1
+        say(f'warm-up consumed {used}/{len(warm)} warm rows '
+            f'(ruling: 2 x instances + coverage top-up)')
         if args.arm == 'rocketride' and len(seen_tokens) < posture.tokens:
             raise SystemExit(f'NOT DONE — warm-up touched {len(seen_tokens)}/{posture.tokens} '
                              'tokens; every instance must be warm before timing.')

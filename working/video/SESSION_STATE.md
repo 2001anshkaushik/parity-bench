@@ -510,8 +510,39 @@ SPAN ~15–20 s and is excluded from the steady window by construction
 **working/video/CORPUS_SWAP_COST.md** (what travels, what re-derives, the
 three silent-if-skipped values: dpf/chars-per-det, LIVENESS_MIN, GATE3 id).
 
-NEXT: curve lands → LI_WORKERS + LI_THREADS_ENV refine pass
-→ RR concurrency sweep (threads-env 8) → dry pass.
+**LI CURVE LANDED (2026-08-21, T=1; census caught a real one):** W=1
+0.0131 (in-process baseline, serving 1) · W=2 0.0259 (2) · W=4 0.0480 (4)
+· **W=8 0.0554, serving 6 of 8 → STOP**. W≥2-rule numbers (the emitted
+knee_W is old-rule — recompute from points): per-worker 0.0130/0.0120/
+0.0069, marginals 1.00/0.93/0.53 → **KNEE AT 4, PROVISIONAL**. cpu_util
+0.137 at W=8 — 86% idle while throughput stalls: not a CPU limit.
+**LI_WORKERS = 4 PENDING the W=8 recheck.** Routing arithmetic that makes
+the recheck genuine, not a formality: 6/8 at 8 posts ≈ iid-routing
+expectation (~5.25 occupied), but W=4's 4/4 at 4 posts CONTRADICTS iid
+(~2.7 expected) — routing is not iid, so "benign scheduling" is not a safe
+default. distinct_response_pids=6 says the two never ANSWERED (not
+attribution blindness). **Discriminator landed: --posts-per-worker** (posts
+= W×ppw; P(worker draws zero of 32 offered) ≈ 1.4%). MATCHED-LOAD rule:
+marginals only between points at the same ppw. Recheck invocation:
+  ~/.venv-floor/bin/python probe_li_workers.py \
+    --video media/ES2002a.Corner.avi --sweep 4 8 --image li:video \
+    --threads-env 1 --posts-per-worker 4 --out probe_li_workers_T1_ppw4.json
+Outcomes: (a) serving 8/8 AND 4→8 matched marginal ≥0.7 → knee moves to 8,
+LI_WORKERS=8; (b) serving 8/8 but marginal still <0.7 → knee 4 stands
+(saturation is real and NOT CPU — lock/IO territory, report); (c) serving
+<8 at 32 posts → two workers genuinely dead → defect finding. EITHER WAY
+the finding goes to Shashi (he published "15 of 32 pids served" as
+scaling; our gate refuses it) — draft after the recheck lands.
+**WARM RULING LANDED:** min(WARM_N, 2×instances) per leg + coverage top-up
+one row at a time (RR round-robin covers by construction; LI routing may
+hide a worker — teeth kept; executed contracts: default 2 rows (was 16),
+parity/LI-8 unchanged 16, W=4-with-hidden-worker tops up). **DEFAULT_N
+ruling marked RULED in run_plan.**
+
+NEXT: W=8 recheck answer → LI_WORKERS settles → refine pass at knee W with
+--threads-env {2,4} (+ W=1 at T={2,4,8} if the in-process baseline is
+competitive) → RR concurrency sweep (threads-env 8) → DRY PASS → 44-video
+campaign tonight (DEFAULT_N=44).
 
 **Crossroad 26 (2026-08-21): WARM-UP.** WARM_N >= max(M_TOKENS, LI_WORKERS)
 plus margin, drawn from the 16 disjoint warm rows, never the measured 44.

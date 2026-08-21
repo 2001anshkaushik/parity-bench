@@ -132,7 +132,7 @@ def post_video(blob: bytes) -> dict:
             'n_frames': body.get('n_frames'), 'n_chunks': body.get('n_chunks')}
 
 
-async def measure_w(w: int, blob: bytes) -> dict:
+async def measure_w(w: int, blob: bytes, ppw: int = 1) -> dict:
     all_procs = worker_census(CONTAINER)
     pids = [p['pid'] for p in all_procs]   # sample EVERYTHING; behavior decides
 
@@ -154,8 +154,18 @@ async def measure_w(w: int, blob: bytes) -> dict:
 
     ticks_b0 = {pid: proc_cpu_ticks(CONTAINER, pid) for pid in pids}
     cg_b0 = cgroup_snapshot(CONTAINER)
+    # posts = w x ppw. ppw=1 is the standard curve. ppw>1 exists for the
+    # routing-vs-dead-worker discriminator (2026-08-21): at 8 posts on 8
+    # workers, 6/8 serving matches iid accept-routing arithmetic (expected
+    # ~5.25 occupied) — but W=4 served 4/4 where iid expects ~2.7, so routing
+    # is NOT iid and the question needs load, not assumption. At 4x posts a
+    # worker drawing zero is (1-1/8)^32 ~ 1.4% under any routing that offers
+    # it work at all. MATCHED-LOAD marginals only: compare points at the SAME
+    # ppw.
+    n_posts = w * ppw
     t0 = time.monotonic()
-    results = await asyncio.gather(*[asyncio.to_thread(post_video, blob) for _ in range(w)],
+    results = await asyncio.gather(*[asyncio.to_thread(post_video, blob)
+                                     for _ in range(n_posts)],
                                    return_exceptions=True)
     batch_wall = time.monotonic() - t0
     cg_b1 = cgroup_snapshot(CONTAINER)
@@ -178,6 +188,8 @@ async def measure_w(w: int, blob: bytes) -> dict:
     return {
         'W': w,
         'declared_workers': w,
+        'posts_per_worker': ppw,
+        'n_posts': n_posts,
         'n_container_procs': len(all_procs),
         'response_pids': sorted(resp_pids),
         'cpu_burner_pids': serving_cpu,
@@ -192,7 +204,7 @@ async def measure_w(w: int, blob: bytes) -> dict:
         'per_post_wall_s': sorted(r['wall_s'] for r in ok),
         'frames_check': sorted({r['n_frames'] for r in ok}),
         'errors': errors or None,
-        'throughput_videos_per_s': round(w / batch_wall, 4) if batch_wall and not errors else None,
+        'throughput_videos_per_s': round(n_posts / batch_wall, 4) if batch_wall and not errors else None,
         'cpu_util_of_32': (round((cg_b1['usage_usec'] - cg_b0['usage_usec']) / 1e6 / batch_wall / 32, 3)
                            if cg_b0['usage_usec'] is not None and cg_b1['usage_usec'] is not None else None),
         'anon_bytes_after_warm': cg_b0['anon_bytes'],
@@ -211,6 +223,11 @@ async def amain() -> int:
     ap.add_argument('--out', default=str(Path(__file__).parent / 'probe_li_workers_out.json'))
     ap.add_argument('--allow-memory-overshoot', action='store_true',
                     help='override the memory-ascent stop; the override is recorded')
+    ap.add_argument('--posts-per-worker', type=positive_int('posts-per-worker', 64),
+                    default=1,
+                    help='posts per point = W x this (default 1 = standard curve). '
+                         'The routing-vs-dead-worker discriminator; matched-load '
+                         'marginals require the SAME value on compared points')
     args = ap.parse_args()
 
     blob = Path(args.video).read_bytes()
@@ -240,7 +257,7 @@ async def amain() -> int:
                 break
         print(f'== W={w}: fresh container ==', flush=True)
         start_info = start_container(args.image, w, args.threads_env)
-        point = await measure_w(w, blob)
+        point = await measure_w(w, blob, ppw=args.posts_per_worker)
         point['network_mode'] = start_info['network_mode']
         point['ready_wall_s'] = start_info['wall_s']
         points.append(point)
