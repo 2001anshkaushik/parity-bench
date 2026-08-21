@@ -398,6 +398,30 @@ async def li_readbacks(arm: LIArm, timeout_s: float = 120) -> Dict[str, dict]:
     return per_worker
 
 
+def container_idle_cores(container: str, sample_s: float = 4.0) -> Optional[float]:
+    """The arm's OWN idle CPU burn, measured from its cgroup over a short
+    window (usage_usec delta / wall). Exists because the engine idles at ~1.002
+    cores (measured 2026-08-21, box otherwise idle) — an absolute load gate
+    would trip on the system under test by existing. Returns None when the
+    cgroup is unreadable; the caller treats None as zero-attributed (foreign
+    excess then reads HIGH, which fails closed in the right direction)."""
+    def usage_usec() -> Optional[int]:
+        try:
+            out = subprocess.run(['docker', 'exec', container, 'cat', '/sys/fs/cgroup/cpu.stat'],
+                                 capture_output=True, text=True, timeout=15).stdout
+            return int([l for l in out.splitlines() if l.startswith('usage_usec')][0].split()[1])
+        except Exception:
+            return None
+    a = usage_usec()
+    if a is None:
+        return None
+    time.sleep(sample_s)
+    b = usage_usec()
+    if b is None:
+        return None
+    return round((b - a) / 1e6 / sample_s, 3)
+
+
 def docker_inspect(container: str, fmt: str) -> Optional[str]:
     try:
         out = subprocess.run(['docker', 'inspect', '-f', fmt, container],
@@ -453,13 +477,30 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
     # (detected after the fact via system_tick.load1). Refuse to start a leg
     # on a box that is already busy; the collector still samples load1
     # throughout as the in-run detector.
+    # Gate on EXCESS over the arms' own measured idle baselines, never an
+    # absolute: the engine idles at ~1 core by existing (Ticket 4), and a
+    # parity posture with live tokens may legitimately idle higher. Foreign
+    # load = load1 minus what our containers' cgroups account for.
+    baselines = {}
+    for c in filter(None, [args.rr_container if rr_arm_active else None,
+                           args.rr_container if not rr_arm_active else None,
+                           args.li_container]):
+        if c not in baselines and docker_inspect(c, '{{.State.Running}}') == 'true':
+            baselines[c] = container_idle_cores(c)
+    attributed = sum(v for v in baselines.values() if v is not None)
     load1 = os.getloadavg()[0]
-    if load1 > args.max_preleg_load1 and not args.allow_noisy_box:
-        raise SystemExit(f'NOT DONE — pre-leg load1={load1:.1f} > {args.max_preleg_load1} '
-                         f'(quiet-box gate; a background hog contaminated the 18-Aug runs). '
-                         f'Find and kill it, or override with --allow-noisy-box (recorded).')
-    say(f'preflight: quiet box (load1={load1:.2f})')
-    pf_extra = {'preleg_load1': round(load1, 2)}
+    excess = load1 - attributed
+    if excess > args.max_preleg_load1 and not args.allow_noisy_box:
+        raise SystemExit(f'NOT DONE — pre-leg FOREIGN load {excess:.1f} '
+                         f'(load1={load1:.1f} minus container idle {attributed:.1f} '
+                         f'{baselines}) > {args.max_preleg_load1}. A background hog '
+                         f'contaminated the 18-Aug runs; find and kill it, or override '
+                         f'with --allow-noisy-box (recorded).')
+    say(f'preflight: quiet box (load1={load1:.2f}, container idle {attributed:.2f} '
+        f'{baselines}, foreign excess {excess:.2f})')
+    pf_extra = {'preleg_load1': round(load1, 2),
+                'preleg_container_idle_cores': baselines,
+                'preleg_foreign_excess': round(excess, 2)}
 
     say('preflight: read-backs (absence fails before agreement)')
     readbacks: Dict[str, dict] = {}
@@ -983,7 +1024,20 @@ async def amain() -> int:
         'aborted_by_breaker': leg_meta['aborted_by_breaker'],
         'wall_s_order_stats': sorted(round(r['wall_s'], 1) for r in ok_records
                                      if r.get('wall_s') is not None),
+        'latency_normalized': (lambda ln: {
+            'wall_s_per_video_minute': ln,
+            'note': 'raw per-video wall_s and video_s_manifest are in every record; '
+                    'this normalization keeps the 6x duration confound visible',
+            'p50': ln[len(ln) // 2] if ln else None,
+            'max': ln[-1] if ln else None,
+            'n': len(ln),
+            'percentile_policy': 'p50/max/n only below n=50 (no dressed percentiles)',
+        })(sorted(round(r['wall_s'] / (r['video_s_manifest'] / 60), 2)
+                  for r in ok_records
+                  if r.get('wall_s') is not None and r.get('video_s_manifest'))),
         'preleg_load1': pf.get('preleg_load1'),
+        'preleg_container_idle_cores': pf.get('preleg_container_idle_cores'),
+        'preleg_foreign_excess': pf.get('preleg_foreign_excess'),
         'quiet_box_override': args.allow_noisy_box or None,
         'driver_cpu': {'cpu_s': round(driver_cpu_s, 1),
                        'share_of_box': round(driver_share, 4) if driver_share else None,

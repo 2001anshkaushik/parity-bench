@@ -1,4 +1,4 @@
-# RocketRide Engine — Three Tickets
+# RocketRide Engine — Four Tickets
 
 Drafted from the WS-1 cross-team benchmark campaign, 14–18 August 2026.
 Three independent harnesses — each comparing RocketRide against a different framework
@@ -441,3 +441,57 @@ Every RocketRide text pipeline using this node — the default RAG ingest path �
 4000/200 no matter what the operator sets. Retrieval-granularity tuning silently no-ops;
 any documentation or benchmark that states a configured chunk size for this node describes
 values that were never in effect.
+
+
+---
+
+# TICKET 4 — Idle engine consumes one full CPU core continuously
+
+**Title:** The engine burns ~1.0 core busy-waiting with zero pipelines loaded and zero work submitted — measured 1.002 cores by `/proc` stat delta on an otherwise idle host
+
+**Type:** Performance · **Severity:** Medium (constant resource drain; measurement bias in any CPU-accounted deployment) · **Component:** engine core (attribution to eaas server vs task subprocess pending — see Open questions)
+
+**Affects:** engine 3.3.1 (release binary, Linux x64), measured 2026-08-21. Not source-diffed across versions (the spin is in compiled code or the served python's event loop; the reproduction is behavioural).
+
+## Summary
+
+A freshly started engine container (`engine ai/eaas.py --host --port`, no `use()` issued, no
+data submitted) consumes a steady **1.002 cores**. Measurement: host `/proc` stat delta over an
+idle window on a box whose only other activity floors load1 at ~0; box load1 with the idle
+engine present reads 1.00 flat. The container cgroup's `cpu.stat usage_usec` delta over the
+same window attributes the burn to the engine's cgroup, not to any host process.
+
+## Reproduction
+
+```bash
+docker run -d --name rr -p 5565:5565 <engine-3.3.1 image>   # boot, then wait for the listener
+A=$(docker exec rr cat /sys/fs/cgroup/cpu.stat | awk '/usage_usec/{print $2}'); sleep 30
+B=$(docker exec rr cat /sys/fs/cgroup/cpu.stat | awk '/usage_usec/{print $2}')
+echo "idle cores: $(( (B - A) / 30 ))e-6"    # observed: ~1.002
+```
+
+## Impact — measured, not hypothetical
+
+* **Deployment:** one core of every host running an idle or lightly-loaded engine is spent on
+  nothing. On small instances this is a material fraction of capacity.
+* **Benchmark bias, Phase 1 (PDF campaign):** the engine ran under `--cpuset-cpus 0-23`; the
+  spin means RocketRide had **23 effective working cores against LlamaIndex's 24**, and every
+  cgroup-CPU-based figure for the engine carried a constant ~one-core inflation — a bias
+  **AGAINST RocketRide on both throughput and CPU-efficiency**, present in every leg.
+* **Benchmark handling, Phase 2:** hygiene gates that bound host load had to move from absolute
+  thresholds to excess-over-measured-baseline, because the system under test violates any
+  absolute bound by existing.
+
+## Open questions (deliberately left to the engine team rather than answered wrongly)
+
+1. **Where is the spin?** Candidates: a polling loop in the C++ core, the embedded python
+   server's event loop, or a timer with a zero/short period. Not attributed here.
+2. **Does it scale with task subprocesses?** Each `use()` spawns an isolated task process; if
+   each carries its own spin, an engine serving M pipelines idles at ~M cores. (The Phase 2
+   harness measures idle cores as a function of token count; the number can be supplied on
+   request once that sweep runs.)
+
+## Acceptance criteria
+
+1. An idle engine (booted, listening, zero pipelines) consumes < 0.05 cores sustained.
+2. Idle consumption does not scale with the number of loaded-but-idle pipelines.

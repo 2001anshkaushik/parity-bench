@@ -80,6 +80,26 @@ async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict
 
     census = task_process_census(CONTAINER)
     pids = [p['pid'] for p in census]
+
+    # IDLE-AT-M (2026-08-21): the engine burns ~1.002 cores doing nothing —
+    # measure whether that spin SCALES PER TOKEN. Sample the container cgroup
+    # AND per-process ticks over a quiet window AFTER use() x M, BEFORE any
+    # work. If idle cores ~ M, the parity posture is structurally broken
+    # (M=16 burns half the box on nothing) — a finding that reshapes the run
+    # plan, not a nuisance. Per-process deltas attribute the spin: eaas
+    # server vs task subprocesses.
+    idle_window_s = 6.0
+    cg_i0 = cgroup_snapshot(CONTAINER)
+    ticks_i0 = {pid: proc_cpu_ticks(CONTAINER, pid) for pid in pids}
+    await asyncio.sleep(idle_window_s)
+    cg_i1 = cgroup_snapshot(CONTAINER)
+    ticks_i1 = {pid: proc_cpu_ticks(CONTAINER, pid) for pid in pids}
+    idle_cores = (round((cg_i1['usage_usec'] - cg_i0['usage_usec']) / 1e6 / idle_window_s, 3)
+                  if cg_i0['usage_usec'] is not None and cg_i1['usage_usec'] is not None else None)
+    idle_per_proc = {pid: round(((ticks_i1.get(pid) or 0) - (ticks_i0.get(pid) or 0)) / 100
+                                / idle_window_s, 3)
+                     for pid in pids if ticks_i0.get(pid) is not None}
+
     ticks0 = {pid: proc_cpu_ticks(CONTAINER, pid) for pid in pids}
     cg0 = cgroup_snapshot(CONTAINER)
 
@@ -105,6 +125,8 @@ async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict
     return {
         'M': m,
         'use_wall_s': round(use_wall, 1),
+        'idle_cores_after_use': idle_cores,
+        'idle_cores_per_process': idle_per_proc,
         'task_processes': len(census),
         'serving_count': len(serving),
         'per_process_cpu_s': per_proc,
@@ -140,8 +162,12 @@ async def amain() -> int:
         point = await measure_m(m, blob, args.pipe, args.threads)
         points.append(point)
         print(json.dumps({k: point[k] for k in
-                          ('M', 'serving_count', 'batch_wall_s',
+                          ('M', 'serving_count', 'idle_cores_after_use', 'batch_wall_s',
                            'throughput_videos_per_s', 'cpu_util_of_32')}), flush=True)
+        if point['idle_cores_after_use'] is not None and point['idle_cores_after_use'] > m * 0.8 + 1.5:
+            print(f'IDLE SPIN SCALES WITH M: {point["idle_cores_after_use"]} cores at idle '
+                  f'with M={m} tokens — parity posture structurally suspect; '
+                  f'per-process attribution: {point["idle_cores_per_process"]}', flush=True)
         if point['errors'] or point['serving_count'] < m:
             hidden_serialization = point['serving_count'] < m
             print(f'STOP at M={m}: serving={point["serving_count"]} errors={point["errors"]}'
@@ -163,6 +189,7 @@ async def amain() -> int:
             p['efficiency_vs_linear'] = round(p['throughput_videos_per_s'] / (p['M'] * base), 3)
     report = {'sweep': args.sweep, 'threads_env': args.threads_env,
               'use_threads': args.threads, 'points': points,
+              'idle_cores_by_M': {p['M']: p.get('idle_cores_after_use') for p in points},
               'knee_M': knee, 'hidden_serialization': hidden_serialization,
               'rule': 'parity posture M sits AT the knee, never past it; '
                       'serving<M anywhere is a finding and blocks the run plan'}

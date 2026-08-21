@@ -200,13 +200,24 @@ def check_readbacks(args) -> dict:
         fail(f'corpus-vs-manifest: {(r.stdout or r.stderr).strip().splitlines()[-1]}')
     else:
         say(f'  PASS  {r.stdout.strip().splitlines()[-1]}')
+    # EXCESS over the arms' own idle baselines, never an absolute — the engine
+    # idles at ~1.002 cores by existing (Ticket 4), so an absolute gate is a
+    # tripwire pointed at ourselves. Both numbers recorded.
+    baselines = {c: drv.container_idle_cores(c)
+                 for c in (args.rr_container, args.li_container)
+                 if drv.docker_inspect(c, '{{.State.Running}}') == 'true'}
+    attributed = sum(v for v in baselines.values() if v is not None)
     load1 = os.getloadavg()[0]
-    if load1 > args.max_preleg_load1:
-        fail(f'quiet-box: load1={load1:.2f} > {args.max_preleg_load1} — find the hog '
-             '(the 18-Aug lesson); the smoke records the VALUE either way')
+    excess = load1 - attributed
+    if excess > args.max_preleg_load1:
+        fail(f'quiet-box: FOREIGN load {excess:.2f} (load1={load1:.2f} minus container '
+             f'idle {attributed:.2f} {baselines}) > {args.max_preleg_load1} — find the hog '
+             '(the 18-Aug lesson); values recorded either way')
     else:
-        say(f'  PASS  quiet box (load1={load1:.2f})')
-    return {'container_problems': problems or None, 'preleg_load1': round(load1, 2)}
+        say(f'  PASS  quiet box (load1={load1:.2f}, container idle {attributed:.2f}, '
+            f'foreign excess {excess:.2f})')
+    return {'container_problems': problems or None, 'preleg_load1': round(load1, 2),
+            'container_idle_cores': baselines, 'foreign_excess': round(excess, 2)}
 
 
 # ------------------------------------------------------------- D. thread pins

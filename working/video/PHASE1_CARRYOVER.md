@@ -360,6 +360,19 @@ touched only the tickets file, so the merge is conflict-free by construction). R
 The claims above the correction are left as written (this file does not rewrite its own
 history); read them as "true of the laptop's view on 2026-08-19."
 
+### Correction #2, 2026-08-21 — a pinned sequential 10k DOES exist
+
+The 2026-08-20 correction's sentence "Still true: no sequential at 10k" is itself wrong.
+`smoke50_parser_in__20260816T220254Z__4151041d3ea9.json` is a **sequential leg at n=10,000**
+(`legs_run: ["sequential"]`, workers=32 threads=1), with thread pins **read back in-artifact on
+both arms** (`pinned.torch_threads_measured`: env_probe in-task on RR, per-worker `/health` on
+LI, all six variables = 1, torch intra = 1). It is **partial — the defect #32 casualty**: the
+leg died at ~doc 9,629 (9,540 usable records of 9,628 written; the 371-contiguous-failure
+signature in Section A's register row #32 is this run). Its own sampler
+(`run10k/sampler_rr_sequential.jsonl`) predates the collector's `system_tick` channel, so its
+load cleanliness rests on process forensics (the background loop's parent shell started
+2026-08-18 02:15:20; this ran 2026-08-16), not on in-artifact load samples.
+
 ---
 
 ## E. Directory hygiene
