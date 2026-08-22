@@ -156,6 +156,44 @@ video per leg; the gate-3 staged run's records give ES2002a both arms):**
   → the fraction of frames with ≥1 detection per video; the threshold sits
   below the minimum observed with a margin (Corner view is dense — expect ~1.0)
   and the black-fixture null must still FAIL it. Ansh's number, not mine.
+**▶ FIRST LEG FAILURE (2026-08-22) — THE COLLECTOR'S PATHS, FIXED.** The dry
+pass's smoke PASSED (0 failures) and the driver died right after preflight with
+rc=1. Cause, found by `find`: `ProcessCollector` starts its child with
+`cwd=<repo>/working` and passed the (relative) out-dir string; the child
+resolved it there and wrote **`working/working/video/results/.../collector_*.ready`**
+— it started, sampled and published readiness — while the parent polled the
+same relative string from the repo root and timed out. **The child succeeded;
+the parent watched the wrong path.** Phase 1 never hit it because its drivers
+ran FROM `working/`, so both cwds agreed (entry 3's shape: nothing changed, the
+conditions moved). FIXED in `ProcessCollector.__init__` — `Path(out_path).resolve()`
+before either side uses it, so correctness cannot depend on the caller's cwd
+(fixing it by changing the driver's cwd would have encoded the bug). Both
+failure messages now name the resolved path and the child's cwd, so the next
+one is diagnosable from the traceback alone. Reproduced and verified locally:
+pre-fix the child's target was byte-identical to the stray file on the box.
+**AUDIT (ordered with the fix): in the video path this was the ONLY relative
+path crossing a boundary.** Every `docker exec` path is absolute in-container
+(`/proc/…`, `/sys/fs/cgroup/…`); every `use(filepath=)` in the video tree is
+ROOT-derived; the driver's own constants are all ROOT-derived. Two sites
+FLAGGED, not changed: `working/handoff/tree_collector.py:617` is a Phase 1 copy
+of the same `cwd=root` pattern (not on the video path), and
+`bake_rr_video.sh` passes `filepath='working/video/…pipe'` relative to the SDK
+— resolved client-side, proven working by every bake, but the same class.
+**BOX CLEANUP (look before deleting):**
+  cd ~/parity-bench && find working/working -type f | head -20   # expect ONLY collector_* from the failed dry pass
+  rm -rf working/working                                          # only if that is all it holds
+**ALSO FIXED with it:** the LI arm's provenance no longer carries
+`threads_note: "unset -> engine CONST_DEFAULT_MAX_THREADS=64 (constants.py:48)"`
+— an RR constant with an RR source citation inside a LlamaIndex record. The
+posture block is arm-aware: RR keeps threads_config/threads_note; LI reports
+`declared_workers` + the measured per-worker torch and states plainly that
+those RR fields do not exist on that arm. `Posture.label()` likewise renders
+`workers[declared_workers=8]` instead of RR vocabulary.
+**AND:** `--no-collector` is now LOUD — `collector_status` is a first-class
+export field (`DISABLED` / `ERROR` / `EMPTY` / `ok`), a WARNING line is printed,
+and the status rides in `at_a_glance` (`| COLLECTOR ok`). A null summary beside
+nine passing gates was the last silent degradation of its kind.
+
 **▶ THE GATE WOULD HAVE ABORTED THE CAMPAIGN AT LEG 2 — found answering the
 settle question, fixed 2026-08-22.** `load1` is a ~60 s exponentially-damped
 average, so it reports HISTORY, and our own history dominates it: a blast leg

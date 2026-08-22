@@ -99,6 +99,12 @@ class Posture:
     threads: Optional[int]    # RR use(threads=); None = UNSET (engine default 64)
 
     def label(self) -> str:
+        # ARM-AWARE (2026-08-22). 'workers' is the LlamaIndex arm, where this
+        # dataclass is bookkeeping only: there is no use(threads=) and no
+        # engine default of 64, so rendering RR vocabulary there states
+        # something false about the arm being described.
+        if self.name == 'workers':
+            return f'workers[declared_workers={self.tokens}]'
         t = 'unset(engine-default-64)' if self.threads is None else str(self.threads)
         return f'{self.name}[tokens={self.tokens},threads={t}]'
 
@@ -159,7 +165,8 @@ def at_a_glance_line(export: Dict[str, Any]) -> str:
             f"(beside, never subtracted)"
             f" | thread env expected {t_exp} / in-process torch {t_meas}"
             f" | gates PASS {n_pass} · NOT RUN {n_notrun} · FAIL {n_fail}"
-            f" | efficiency valid={eff.get('valid')}")
+            f" | efficiency valid={eff.get('valid')}"
+            f" | COLLECTOR {str(export.get('collector_status', 'unknown')).split(':')[0]}")
 
 
 # ---------------------------------------------------------------------------
@@ -1695,6 +1702,20 @@ async def amain() -> int:
         await arm.stop()
     service_cpu_s = ((cg_leg1 - cg_leg0) / 1e6
                      if cg_leg0 is not None and cg_leg1 is not None else None)
+    # Collector health as a first-class, LOUD value (ruling 2026-08-22).
+    if args.no_collector:
+        collector_status = ('DISABLED (--no-collector): NO per-role resource sampling in '
+                            'this leg — every memory/CPU-by-role figure is ABSENT, not zero')
+        collector_summary = {'DISABLED': collector_status}
+        say(f'WARNING: {collector_status}')
+    elif isinstance(collector_summary, dict) and collector_summary.get('error'):
+        collector_status = f'ERROR: {collector_summary["error"]}'
+        say(f'WARNING: collector {collector_status}')
+    elif not (isinstance(collector_summary, dict) and collector_summary.get('roles')):
+        collector_status = 'EMPTY: collector ran but recorded no roles'
+        say(f'WARNING: collector {collector_status}')
+    else:
+        collector_status = 'ok'
 
     # ---- gates + export ---------------------------------------------------
     records, _, _ = read_completed(rec_path, key='video')
@@ -1757,6 +1778,12 @@ async def amain() -> int:
         # idle burden with instances live — beside, never subtracted.
         'efficiency': efficiency_block(service_cpu_s, leg_wall, ok_frames, ok_video_s,
                                        len(ok_records), pf.get('idle_burden'), ncpu),
+        # A leg with no per-role sampling is DEGRADED, not merely quiet: every
+        # memory/CPU-by-role figure is ABSENT, and a null summary beside nine
+        # passing gates is the silent degradation this campaign has spent two
+        # days deleting everywhere else. Say it in the record and in the
+        # one-line summary (ruling 2026-08-22).
+        'collector_status': collector_status,
         'collector_summary': collector_summary,
         'n_offered': len(measured), 'n_records': len(records),
         'n_errors': len(records) - len(ok_records),
@@ -1787,19 +1814,35 @@ async def amain() -> int:
         'provenance_video': {
             'pipe_sha256': pf['pipe_sha256'],
             'manifest_sha256': pf['manifest_sha256'],
-            'posture': {'name': posture.name, 'tokens': posture.tokens,
-                        'threads_config': posture.threads,
-                        'threads_note': ('unset -> engine CONST_DEFAULT_MAX_THREADS=64 '
-                                         '(constants.py:48)' if posture.threads is None else
-                                         'explicit use(threads=)'),
-                        # Ruling 2026-08-21: the six-var env is per POSTURE —
-                        # expected by the operator, read back declared and
-                        # in-process; 'unset' = the engine default a user gets.
-                        'threads_env_expected': (args.rr_threads_env
-                                                 if args.arm == 'rocketride' else None),
-                        'threads_env_in_process_torch': (
-                            (pf['thread_pin_parity'].get('cross_arm_values') or {}).get(
-                                'rr' if args.arm == 'rocketride' else 'li'))},
+            # ARM-AWARE (2026-08-22): threads_config / threads_note describe
+            # RocketRide's use(threads=) and its engine default. Emitting them
+            # on a LlamaIndex leg put an RR constant WITH AN RR SOURCE CITATION
+            # (constants.py:48) into that arm's provenance — false about the
+            # thing it describes, and exactly what makes a reviewer stop
+            # trusting the rest of the record. The LI arm reports what it
+            # actually has: declared uvicorn workers and the measured
+            # per-worker torch count.
+            'posture': ({'name': posture.name, 'tokens': posture.tokens,
+                         'threads_config': posture.threads,
+                         'threads_note': ('unset -> engine CONST_DEFAULT_MAX_THREADS=64 '
+                                          '(constants.py:48)' if posture.threads is None else
+                                          'explicit use(threads=)'),
+                         # Ruling 2026-08-21: the six-var env is per POSTURE —
+                         # expected by the operator, read back declared and
+                         # in-process; 'unset' = the engine default a user gets.
+                         'threads_env_expected': args.rr_threads_env,
+                         'threads_env_in_process_torch': (
+                             (pf['thread_pin_parity'].get('cross_arm_values') or {}).get('rr')),
+                         } if args.arm == 'rocketride' else {
+                         'name': posture.name,
+                         'declared_workers': posture.tokens,
+                         'threads_env_in_process_torch': (
+                             (pf['thread_pin_parity'].get('cross_arm_values') or {}).get('li')),
+                         'note': ('LlamaIndex arm: uvicorn worker PROCESSES. No use(threads=) '
+                                  'and no engine thread default exist here — the thread '
+                                  'configuration is the six BLAS/OMP variables, read back '
+                                  'in-process from every worker; threads_config/threads_note '
+                                  'are RocketRide fields and are deliberately absent.')}),
             'identity_readback': pf['identity'],
             'thread_pins_by_arm': pf['thread_pin_parity'],
             'task_census': pf.get('task_census'),

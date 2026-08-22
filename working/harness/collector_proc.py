@@ -107,7 +107,22 @@ class ProcessCollector:
         want_uss: bool = False,
         python: str | None = None,
     ):
-        self.out_path = Path(out_path)
+        # ABSOLUTE, resolved HERE, before either side uses them (2026-08-22).
+        # start() runs the child with cwd=<repo>/working, and these paths are
+        # passed to it as strings. A RELATIVE out_path therefore resolved
+        # against a different directory in each process: the child wrote
+        # working/working/video/results/.../collector_*.ready and sampled
+        # happily, while the parent polled the same relative string from the
+        # repo root and timed out after 30s. The child had succeeded; the
+        # parent was watching the wrong path — a readiness timeout that meant
+        # "your paths disagree", not "the child is dead", which is why raising
+        # the timeout would have been precisely the wrong fix. Phase 1 never
+        # hit it because its drivers ran FROM working/, so both cwds agreed;
+        # the video driver runs from the repo root. Entry 3 exactly: nothing
+        # about the collector changed, the conditions moved out from under it.
+        # Resolving here makes correctness independent of the caller's cwd —
+        # fixing it by changing the caller's cwd would encode the bug.
+        self.out_path = Path(out_path).resolve()
         self.summary_path = self.out_path.with_suffix(".summary.json")
         self.ready_path = self.out_path.with_suffix(".ready")
         self.roles_spec = roles_spec
@@ -163,10 +178,20 @@ class ProcessCollector:
                 return
             if self._proc.poll() is not None:
                 err = (self._proc.stderr.read() or b"").decode()[-800:]
-                raise RuntimeError(f"collector process died on startup: {err}")
+                raise RuntimeError(
+                    f"collector process died on startup (watching {self.ready_path}, "
+                    f"child cwd {root}): {err}")
             time.sleep(0.02)
         self._proc.kill()
-        raise RuntimeError("collector process did not become ready within 30s")
+        # The watched path goes in the message: when this fired for real, the
+        # child was alive and writing — to a different absolute path — and the
+        # traceback said only "within 30s", which is diagnosable only by
+        # finding the stray file. Name what we watched and where the child ran.
+        raise RuntimeError(
+            f"collector process did not become ready within 30s (watching "
+            f"{self.ready_path}; child cwd {root}, out {self.out_path}). If that file "
+            f"exists somewhere else on disk, the parent and child resolved a relative "
+            f"path against different directories.")
 
     def stop(self, timeout: float = 15.0) -> dict:
         if self._proc is None:

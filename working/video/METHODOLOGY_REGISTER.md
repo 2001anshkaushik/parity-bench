@@ -76,6 +76,28 @@ than rewritten from memory, which is entry 2's point in miniature.
 > measured latency, and Phase 1 comparability allows no silent deviation),
 > read back fail-closed at preflight and recorded in provenance, never
 > implied by the flag that requested it.
+>
+> **Addendum, 2026-08-22 — a relative path is a shared assumption about cwd,
+> and it crosses process boundaries silently.** `ProcessCollector` passed the
+> caller's (relative) output path to a child it starts with
+> `cwd=<repo>/working`. Phase 1's drivers ran FROM `working/`, so both sides
+> resolved it identically and the code was correct for a whole phase. The video
+> driver runs from the repo root: the child resolved the same string against
+> `working/`, wrote `working/working/video/results/.../collector_*.ready`, and
+> sampled happily — while the parent polled the original string and timed out.
+> **The readiness timeout meant "your paths disagree", not "the child is
+> dead"**, which makes both obvious fixes wrong: raising the timeout waits
+> longer for a file that will never appear, and changing the caller's cwd makes
+> the collector's correctness depend on who called it — which IS the bug. The
+> fix is to resolve to absolute in `__init__`, before either side can use the
+> value. Two rules: **a path handed across a process boundary is absolute or it
+> is a bug waiting for the cwds to differ**; and **an error message must name
+> what it was watching** — "did not become ready within 30s" was diagnosable
+> only by finding the stray file on disk, so it now prints the resolved path
+> and the child's cwd. Audited the same day: in the video path this was the
+> only relative path crossing a boundary (every `docker exec` path is absolute
+> in-container, every `use(filepath=)` is ROOT-derived; the only other `cwd=`
+> override is a Phase 1 handoff copy of this same class, flagged not changed).
 
 ## 4. An unexecuted string (added 2026-08-21)
 

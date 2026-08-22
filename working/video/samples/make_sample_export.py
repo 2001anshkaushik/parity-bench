@@ -142,6 +142,7 @@ def main():
                               'cores/token at T=8, PARTIAL — probe_concurrency '
                               'ticket4_idle_answer is the curve')},
             ncpu=32),
+        'collector_status': 'ok',
         'collector_summary': {'_SAMPLE': 'the collector subprocess summary rides here'},
         'n_offered': len(records), 'n_records': len(all_records), 'n_errors': 0,
         'leg_wall_s': round(leg_wall, 1), 'aborted_by_breaker': False,
@@ -164,6 +165,9 @@ def main():
         'provenance_video': {
             'pipe_sha256': 'SAMPLE' + '0' * 58,
             'manifest_sha256': 'SAMPLE' + '0' * 58,
+            # RR arm: threads_config/threads_note are RocketRide fields and
+            # belong here. On an LI leg the driver emits declared_workers +
+            # the measured per-worker torch instead (2026-08-22).
             'posture': {'name': 'parity', 'tokens': 4, 'threads_config': 1,
                         'threads_note': 'explicit use(threads=)',
                         'threads_env_expected': 1,
