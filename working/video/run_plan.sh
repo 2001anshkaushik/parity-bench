@@ -9,8 +9,10 @@
 #                  (from probe_concurrency: at the knee, never past it)
 #   LI_WORKERS     LlamaIndex uvicorn workers — its own evidence-derived optimum
 #                  (Crossroad 17: leaving the default 1 is a real handicap)
-#   WARM_N         warm items (>= max(M_TOKENS, LI_WORKERS); manifest re-cut
-#                  supplies the split: measured = 60 - WARM_N)
+#   WARM_N         warm items; the manifest re-cut supplies the split
+#                  (measured = 60 - WARM_N). Crossroad 32 (2026-08-21): need
+#                  NOT exceed the instance count — warm rows may be re-sent;
+#                  the driver gates every instance observed serving.
 #   RR_THREADS_ENV six BLAS/OMP vars on the RR container for the PARITY
 #                  posture ONLY — the measured optimum, set WITH M_TOKENS by
 #                  the M x T refine (Crossroads 29/30: the winning product sets
@@ -46,7 +48,8 @@
 #   SEQ_N=5        sequential leg size (uncontended latency + determinism +
 #                  speedup divisor)
 #   PASSES=1       2 = run the measured set twice in the blast legs (the
-#                  thin-window alternative — decide from the sweep numbers)
+#                  thin-window alternative). RULED 2 for the 44-video campaign
+#                  at C=16 (Crossroad 32) — export PASSES=2 on the real run.
 #
 # Standing rules enforced by structure: arms run ONE AT A TIME (this script is
 # strictly sequential); submission order is manifest-seq on both arms (driver
@@ -66,7 +69,17 @@ cd "$(dirname "$0")/../.."   # repo root
 : "${WARM_N:?WARM_N unset — >= max(M_TOKENS, LI_WORKERS)}"
 : "${RR_THREADS_ENV:?RR_THREADS_ENV unset — the RR-arm optimum from the matrix}"
 : "${LI_THREADS_ENV:?LI_THREADS_ENV unset — the LI-arm optimum from the matrix}"
-: "${LIVENESS_MIN:?LIVENESS_MIN unset — from probe detections distribution}"
+DRY_PASS="${DRY_PASS:-0}"
+# LIVENESS_MIN (gate 5) is probe-derived and has NO default. A DRY pass may
+# omit it — the driver then records gate 5 as NOT RUN (first-class verdict,
+# never PASS) and nothing from a dry pass is a measurement anyway. A real run
+# refuses without it.
+if [ "$DRY_PASS" != "1" ]; then
+  # No quotes or parentheses inside a :? message — bash 3.2 treats a quote in
+  # the word as opening one and the parse error surfaces lines later.
+  : "${LIVENESS_MIN:?LIVENESS_MIN unset — gate 5 threshold from the measured detections distribution; only DRY_PASS=1 may omit it}"
+fi
+LIVENESS_MIN="${LIVENESS_MIN:-}"
 : "${GATE3_RUN_ID:?GATE3_RUN_ID unset — probe run id that confirmed ES2002a agreement}"
 : "${BLAST_C:?BLAST_C unset — blast concurrency}"
 : "${DEFAULT_N:?DEFAULT_N unset — Crossroad 27: default-posture blast size (full set at 44-scale; stated subset >=500 above ~1000)}"
@@ -87,6 +100,7 @@ require_pos_int WARM_N "$WARM_N";       require_pos_int RR_THREADS_ENV "$RR_THRE
 require_pos_int LI_THREADS_ENV "$LI_THREADS_ENV"; require_pos_int BLAST_C "$BLAST_C"
 require_pos_int SEQ_N "$SEQ_N";         require_pos_int PASSES "$PASSES"
 require_pos_int DEFAULT_N "$DEFAULT_N"
+if [ -n "$LIVENESS_MIN" ]; then
 "$PY" - "$LIVENESS_MIN" <<'EOF' || exit 1
 import sys
 raw = sys.argv[1]
@@ -97,11 +111,17 @@ except ValueError:
 if not (0.0 < v <= 1.0):
     raise SystemExit(f'NOT DONE — LIVENESS_MIN={v} must be a fraction in (0, 1]')
 EOF
+fi
 case "$GATE3_RUN_ID" in
   -*|*--*) echo "NOT DONE — GATE3_RUN_ID='$GATE3_RUN_ID' looks like a flag or a missing-space typo, not a probe run id"; exit 1;;
 esac
+# Crossroad 32 (2026-08-21): WARM_N need not exceed the instance count — a
+# warm row MAY be re-sent to cover more than one token; the disjointness that
+# matters is warm-vs-MEASURED (the manifest split), not warm-vs-warm; a token
+# warmed twice is no less warm. The driver GATES on every instance observed
+# serving during warm-up. Recorded here, never refused.
 if [ "$WARM_N" -lt "$M_TOKENS" ] || [ "$WARM_N" -lt "$LI_WORKERS" ]; then
-  echo "NOT DONE — WARM_N=$WARM_N < max(M_TOKENS=$M_TOKENS, LI_WORKERS=$LI_WORKERS): every serving instance must see a warm item"; exit 1
+  echo "note — WARM_N=$WARM_N < max(M_TOKENS=$M_TOKENS, LI_WORKERS=$LI_WORKERS): warm rows will be re-sent until every instance has served (Crossroad 32; the driver gates coverage)"
 fi
 # DRY_PASS=1: composition proof ONLY — clamps everything to one item, skips the
 # PDF fixture and warm-up, writes a THROWAWAY golden. Retires the wiring risk
@@ -170,9 +190,12 @@ stop_arm() {  # $2 = optional lifetime tag (rr now has two lifetimes — logs mu
   docker rm -f "$1" >/dev/null 2>&1 || true
 }
 
-DRIVER=("$PY" working/video/driver_video.py
-        --liveness-min-fraction "$LIVENESS_MIN"
-        --out-dir "$OUT")
+DRIVER=("$PY" working/video/driver_video.py --out-dir "$OUT")
+if [ -n "$LIVENESS_MIN" ]; then
+  DRIVER+=(--liveness-min-fraction "$LIVENESS_MIN")
+else
+  echo "gate 5 (detection_liveness): LIVENESS_MIN not supplied — NOT RUN on every leg (dry pass only)" | tee -a "$LOG"
+fi
 MEASURED_N=$((60 - WARM_N))
 [ "$DEFAULT_N" -le "$MEASURED_N" ] || {
   echo "NOT DONE — DEFAULT_N=$DEFAULT_N > MEASURED_N=$MEASURED_N (Crossroad 27: the default"
@@ -202,7 +225,7 @@ cat > "$OUT/run_manifest.json" <<MANIFEST
   "RR_THREADS_ENV_applies_to": "parity posture only — rr restarted between postures (ruling 2026-08-21)",
   "RR_DEFAULT_THREADS_ENV": "unset (engine default: what a user gets; read back in-process per leg)",
   "LI_THREADS_ENV": $LI_THREADS_ENV,
-  "LIVENESS_MIN": $LIVENESS_MIN,
+  "LIVENESS_MIN": ${LIVENESS_MIN:-null},
   "GATE3_RUN_ID": "$GATE3_RUN_ID",
   "BLAST_C": $BLAST_C,
   "DEFAULT_N": $DEFAULT_N,
@@ -211,6 +234,11 @@ cat > "$OUT/run_manifest.json" <<MANIFEST
   "MEASURED_N": $MEASURED_N
  },
  "images": {"rr": "$RR_IMAGE", "li": "$LI_IMAGE"},
+ "decisions": {
+  "ruled_values": "Crossroads 31/32 (2026-08-21): M_TOKENS=16, RR_THREADS_ENV=2 (parity; default posture unset), LI_WORKERS=8, LI_THREADS_ENV=1, WARM_N=16, BLAST_C=16, DEFAULT_N=44, PASSES=2 — if the numbers above differ, this run is NOT the ruled campaign",
+  "M_TOKENS_rationale": "working/video/RR_PARITY_CURVE.md — the full M x T curve including the faster M=32 we DECLINED (+3.3% throughput for 31% of the box idle and 32 model stacks); idle burden is reported beside every parity number, never subtracted",
+  "WARM_N_rationale": "Crossroad 32: warm rows may be re-sent across instances; warm-vs-measured disjointness is the invariant; the driver gates every instance observed serving"
+ },
  "completed": false
 }
 MANIFEST
@@ -218,7 +246,7 @@ echo "run manifest: $OUT/run_manifest.json" | tee -a "$LOG"
 
 echo "=== RUN PLAN: M=$M_TOKENS li_workers=$LI_WORKERS warm=$WARM_N \
 rr_threads(parity)=$RR_THREADS_ENV rr_threads(default)=unset li_threads=$LI_THREADS_ENV \
-liveness>=$LIVENESS_MIN gate3=$GATE3_RUN_ID C=$BLAST_C seq_n=$SEQ_N passes=$PASSES -> $OUT ===" | tee -a "$LOG"
+liveness>=${LIVENESS_MIN:-NOT_RUN} gate3=$GATE3_RUN_ID C=$BLAST_C seq_n=$SEQ_N passes=$PASSES -> $OUT ===" | tee -a "$LOG"
 
 echo "--- 0. manifest re-cut check (re-cut is a REUSE: fetched must be 0) ---" | tee -a "$LOG"
 run "$PY" working/video/fetch_ami_video.py --verify

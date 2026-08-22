@@ -1205,8 +1205,12 @@ async def amain() -> int:
 
     if args.arm == 'rocketride':
         if posture.name == 'parity' and len(warm) < posture.tokens:
-            raise SystemExit(f'NOT DONE — {len(warm)} warm rows < {posture.tokens} tokens: '
-                             'every token must see at least one warm item.')
+            # Crossroad 32 (2026-08-21): not a refusal. Warm rows may be
+            # re-sent across tokens — warm-vs-MEASURED disjointness is the
+            # invariant, not warm-vs-warm — and coverage (every token observed
+            # serving) is gated below, where it always was.
+            say(f'warm rows ({len(warm)}) < tokens ({posture.tokens}): rows will be re-sent '
+                'until every token has served (Crossroad 32; coverage gated)')
         # CENSUS ASSERTION (D3, ruling 2026-08-21: goes in regardless of how
         # use_existing reads). M tokens declared -> M NEW task processes
         # measured, or the leg refuses: a parity posture whose tokens share a
@@ -1329,13 +1333,20 @@ async def amain() -> int:
                 return len(seen_tokens) >= posture.tokens
             return len(seen_pids) >= (arm.declared_workers or 1)
 
-        for row in warm[len(first_batch):]:
-            if _covered():
-                break
-            await warm_one(row)
-            used += 1
-        say(f'warm-up consumed {used}/{len(warm)} warm rows '
-            f'(ruling: 2 x instances + coverage top-up)')
+        # Crossroad 32: top up until every instance has served, RE-SENDING
+        # warm rows when they run out (measured rows are never touched here).
+        # Bounded, so an instance that never rotates in fails the coverage
+        # assert below instead of spinning forever.
+        budget = 2 * max(conc_i, len(warm))
+        extra, pos = 0, len(first_batch)
+        while warm and not _covered() and extra < budget:
+            await warm_one(warm[pos % len(warm)])
+            pos += 1
+            extra += 1
+        used = len(first_batch) + extra
+        say(f'warm-up consumed {used} send(s) over {len(warm)} warm rows '
+            f'({len(first_batch)} first batch + {extra} top-up; rows re-sent when '
+            f'exhausted — Crossroad 32; 2 x instances + coverage)')
         if args.arm == 'rocketride' and len(seen_tokens) < posture.tokens:
             raise SystemExit(f'NOT DONE — warm-up touched {len(seen_tokens)}/{posture.tokens} '
                              'tokens; every instance must be warm before timing.')

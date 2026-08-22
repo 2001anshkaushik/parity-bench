@@ -9,6 +9,60 @@ using it.
 
 ## ▶ COMPACTION BRIEFING — state as of late 2026-08-21 (THIS BLOCK WINS on conflict with the chronological blocks below)
 
+**▶▶ THE EIGHT NUMBERS — COMPLETE (Crossroads 31/32, late 2026-08-21) — and the NINTH that is not:**
+  M_TOKENS=16 · RR_THREADS_ENV=2 (PARITY posture; default posture UNSET) ·
+  LI_WORKERS=8 · LI_THREADS_ENV=1 · WARM_N=16 · BLAST_C=16 ·
+  GATE3_RUN_ID=probe_20260821_195214 · DEFAULT_N=44 · PASSES=2 (ruled)
+  **LIVENESS_MIN — NOT LANDED.** run_plan requires it (gate 5, probe-derived,
+  the driver refuses to default it). It is absent from the repo. A DRY pass may
+  omit it (gate 5 = NOT RUN; allowed only under DRY_PASS=1 since this commit);
+  the REAL run refuses without it. Derive it on the box from measured
+  non-empty-frame fractions (recipe below) — Ansh sets the number.
+**Crossroad 30 result:** M=32 × T=1 = 0.1602 videos/s, cpu 0.875, **idle
+10.04 cores (31%)**; M=16 × T=1 = 0.1345 (T=1 is past the useful floor).
+16→32 buys +3.3% for double the tokens and double the idle.
+**Crossroad 31:** M_TOKENS=16, parity T=2. **M=32 is measurably faster and we
+DECLINED it** — 3.3% does not justify 31% of the box idle and 32 model stacks.
+Full curve published: `working/video/RR_PARITY_CURVE.md` (the run_manifest
+`decisions` block points at it). That sentence travels with every parity number.
+**Crossroad 32:** WARM_N=16, 44 measured retained. A warm row MAY cover more
+than one token; the invariant is warm-vs-MEASURED disjointness, and the driver
+gates every instance observed serving (it always did). IMPLEMENTED: the
+`len(warm) < tokens` refusal is now a recorded note; the top-up loop re-sends
+warm rows (bounded 2×max(instances, rows)) until covered; run_plan's WARM_N
+refusal is a note. PASSES=2 so the C=16 blast has real waves.
+**DRY PASS (first — the composition has never run), box, repo root:**
+  cd ~/parity-bench && git pull --ff-only origin video-bench && git rev-parse HEAD
+  DRY_PASS=1 M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=1 \
+    WARM_N=16 BLAST_C=16 GATE3_RUN_ID=probe_20260821_195214 DEFAULT_N=44 \
+    bash working/video/run_plan.sh 2>&1 | tee working/video/dry_console_$(date -u +%Y%m%dT%H%M%SZ).log; \
+    echo "run_plan rc=${PIPESTATUS[0]}"
+  (LIVENESS_MIN omitted → gate 5 NOT RUN on every dry leg, by design.)
+**LIVENESS_MIN recipe (box; from any records jsonl — dry-pass records give one
+video per leg; the gate-3 staged run's records give ES2002a both arms):**
+  for f in working/video/results/mainrun_*/records_*.jsonl; do ~/.venv/bin/python - "$f" <<'EOF'
+  import json, sys
+  for l in open(sys.argv[1]):
+      r = json.loads(l); d = r.get('detections_per_frame') or []
+      if d: print(sys.argv[1].rsplit('/',1)[-1], r.get('video'), f'{sum(1 for x in d if x > 0)/len(d):.3f}', len(d))
+  EOF
+  done
+  → the fraction of frames with ≥1 detection per video; the threshold sits
+  below the minimum observed with a margin (Corner view is dense — expect ~1.0)
+  and the black-fixture null must still FAIL it. Ansh's number, not mine.
+**REAL RUN (after a green dry pass; ~80–90 min estimate at PASSES=2, labeled
+an estimate), nohup so an SSH drop cannot kill a measured leg; NO keep-alive
+(Crossroad 21 forbids it during measured legs):**
+  cd ~/parity-bench && mkdir -p working/video/results && \
+  M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=1 WARM_N=16 BLAST_C=16 \
+  GATE3_RUN_ID=probe_20260821_195214 DEFAULT_N=44 PASSES=2 LIVENESS_MIN=<ASK> \
+  nohup bash working/video/run_plan.sh > working/video/results/console_$(date -u +%Y%m%dT%H%M%SZ).log 2>&1 &
+  then: tail -f working/video/results/console_*.log ; at the end:
+  grep -n "AT A GLANCE\|NOT DONE\|STEP FAILED\|GATES FAILED\|CROSS GATES\|completed" working/video/results/console_*.log
+**Sent-samples correction:** drafted as message #5 in
+`team_docs_sent/MESSAGES_2026-08-21.md` — CONDITIONAL on Ansh confirming the
+JSONs went out; unsent.
+
 **▶ TICKET 4 ANSWERED — RR concurrency sweep, T=8 (landed late 2026-08-21;
 RELAYED values — the box JSON, `probe_concurrency_T8.json` per the invocation,
 is authoritative and its `ticket4_idle_answer` key holds the fitted verdict):**
@@ -99,6 +153,7 @@ prose teaches the right number and the JSON, if sent, the deleted formula.
 Whether the JSONs were sent is NOT in the repo — ASK; if yes, the one-line
 correction is owed now.
 
+**[SUPERSEDED by the ▶▶ block above — all eight ruled (C31/C32); LIVENESS_MIN is the open ninth.]**
 **THE RUN-PLAN NUMBERS — two landed, one ruled constant, the rest open:**
 - `GATE3_RUN_ID = probe_20260821_195214` — LANDED (the ORIGINAL probe run, artifacts intact)
 - `LI_WORKERS = 8` — LANDED (matched-load curve below; W=16 is past the knee)
@@ -178,10 +233,11 @@ each carry a minutes-long check and no verdict.
   `ticket4_idle_answer` (verify the slope against 0.26) and the per-process
   attribution `idle_cores_per_process` (eaas server vs task subprocesses —
   Ticket 4 open question 1). ASK before citing the split.
-- C29 refine landed (relayed): 8×4 = 0.1417 (cpu 0.863); 16×2 = 0.1551 (cpu
-  0.867, idle 5.24). **Crossroad 30 in flight: `--sweep 16 32 --threads-env 1`**
-  — M=32 × T=1 decides M_TOKENS and the parity T (filenames unrelayed; the
-  idle at M=32 is a PROJECTION, ~9.4–9.9 cores, until measured). ASK for it.
+- C29/C30 LANDED (relayed): 8×4 0.1417 · 16×2 0.1551 (idle 5.24) · 16×1
+  0.1345 · 32×1 0.1602 (idle 10.04, cpu 0.875). M_TOKENS=16, T=2 ruled (C31).
+  JSON filenames for the T=4/T=2/T=1 refines unrelayed — ASK before citing
+  anything beyond `RR_PARITY_CURVE.md`.
+- **LIVENESS_MIN is not landed** — the real run cannot start without it. ASK.
 - Whether the 08-20 sample JSONs (84 on ES2002a) were SENT beside
   METRICS_AND_GATES.md is not in the repo — the sent doc addresses reviewers
   of those two files by name. ASK; if sent, the one-line correction is owed.
@@ -314,7 +370,19 @@ each carry a minutes-long check and no verdict.
   campaign, as ruled.
 - **Ruling 2 (2026-08-21): the stale sample JSONs were possibly SENT** —
   answer in the briefing (no JSON in team_docs_sent; the sent doc names the
-  files; 08-20 versions carry 84; whether they went out is an ASK).
+  files; 08-20 versions carry 84; whether they went out is an ASK). Correction
+  drafted as message #5 (conditional, unsent).
+- **Crossroad 31 (2026-08-21): M_TOKENS = 16, RR_THREADS_ENV = 2 (parity).**
+  M=32×T=1 = 0.1602 (idle 10.04 cores = 31%), M=16×T=2 = 0.1551 (idle 5.24):
+  16→32 buys 3.3% for double the tokens and double the idle; M=16×T=1 = 0.1345
+  (T=1 past the useful floor). We DECLINE the faster configuration and say so:
+  full curve in `working/video/RR_PARITY_CURVE.md`, pointed at by the
+  run_manifest `decisions` block.
+- **Crossroad 32 (2026-08-21): WARM_N = 16, 44 measured retained; PASSES = 2.**
+  A warm row may cover more than one token provided every token is observed
+  serving (the driver's existing gate); the disjointness that matters is
+  warm-vs-measured. Refusals relaxed to that condition (driver + run_plan);
+  warm top-up re-sends rows, bounded.
 - **Gate rulings:** gate 1 frames-census is THE dropped-frame detector; log
   scrape is ATTRIBUTION only, fail-closed on its own channel liveness. Gate 3
   STRICT zero tolerance, armed only via --gate3-armed <probe_run_id> after the

@@ -473,8 +473,9 @@ and NO work submitted, the container cgroup's idle burn over a 6 s quiet window 
 | 4 | 2.02 | 0.24 |
 | 8 | 3.04 | 0.26 |
 | 16 | 5.25 | 0.28 |
+| 32 (six variables at 1) | 10.04 | 0.30 |
 
-Least-squares over the five points: **slope 0.26 cores per pipeline, intercept 0.99 cores** — the
+Least-squares over the five points at 8 threads: **slope 0.26 cores per pipeline, intercept 0.99 cores** — the
 fit's intercept recovers the single-engine measurement. The spin is **partial**: neither a
 server constant (would be flat ~1.0) nor one full core per pipeline (would be ~M). At M=4 the
 engine burns 2.02 cores — **6.3% of a 32-core host — before any work is submitted**; at M=16,
