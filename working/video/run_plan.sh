@@ -311,8 +311,17 @@ for leg in sequential blast; do
       LIJ="$OUT/records_llamaindex_video_workers_${leg}${sfx}.jsonl"
       [ -f "$LIJ" ] || { echo "cross: $posture/$leg$sfx — no LI counterpart ($LIJ); skipped" | tee -a "$LOG"; continue; }
       echo "cross: $posture/$leg$sfx" | tee -a "$LOG"
+      # Ruling 2026-08-21: the DEFAULT posture is an RR-internal out-of-box
+      # ratio (Crossroad 27), so its cross file is equal-work gates ONLY —
+      # NOT a cross-arm performance comparison. Stamp the basis into the file.
+      if [ "$posture" = "default" ]; then
+        CROSS_LABEL="equal-work gates ONLY — the RR default (out-of-box) posture is an RR-internal ratio (Crossroad 27), not a cross-arm performance comparison"
+      else
+        CROSS_LABEL="parity posture — cross-arm comparison (matched instances)"
+      fi
       if "$PY" working/video/driver_video.py --cross "$RRJ" "$LIJ" \
-          --gate3-armed "$GATE3_RUN_ID" > "$OUT/cross_${posture}_${leg}${sfx}.json" 2>>"$LOG"; then
+          --gate3-armed "$GATE3_RUN_ID" --cross-label "$CROSS_LABEL" \
+          > "$OUT/cross_${posture}_${leg}${sfx}.json" 2>>"$LOG"; then
         echo "cross gates PASS: $posture/$leg$sfx" | tee -a "$LOG"
       else
         CROSS_FAIL=1

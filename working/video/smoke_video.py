@@ -347,11 +347,16 @@ async def check_pins(args) -> dict:
     say('\nD. thread pins — BOTH arms, in-process; absence fails before agreement')
     readbacks = {}
     info = await drv.rr_readback(args.rr_port)
+    # Absence fails before agreement (2026-08-22): a stale baked node emits an
+    # older field set; a missing field is a broken-instrument verdict distinct
+    # from a negative one. Raises SystemExit with the rebuild fix if stale.
+    drv.assert_envprobe_complete(info, 'RR task (smoke)')
     readbacks['rr_task'] = {'env': info.get('env') or {},
                             'torch_num_threads': info.get('torch_num_threads')}
-    if info.get('rfdetr_import_ok') is not True:
-        fail(f'RR task process cannot import rfdetr ({info.get("rfdetr_import_error")!r}) '
-             '— the engine would silently serve RT-DETR')
+    if info['rfdetr_import_ok'] is not True:   # present-and-False = a REAL import failure
+        fail(f'RR task reports rfdetr_import_ok={info["rfdetr_import_ok"]!r} '
+             f'({info.get("rfdetr_import_error")!r}) — a real import failure (field '
+             'present); the engine would silently serve RT-DETR')
     li = drv.LIArm(args.li_port)
     await li.start()
     per_worker = await drv.li_readbacks(li)

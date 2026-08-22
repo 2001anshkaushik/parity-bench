@@ -215,6 +215,29 @@ def main():
     from harness import gates_shared as gs
     gs.thread_pins_self_test()
     print('thread_pins_self_test fired: value mode (3 cases) + unset mode (5 cases)')
+    assert 16 == gs.thread_pins_by_arm(
+        {'rr': {'rr_task': {'env': {}, 'torch_num_threads': 16}}},
+        {'rr': {}}, expected_by_arm={'rr': 'unset'})['cross_arm_values']['rr']
+
+    # env_probe completeness null control (2026-08-22): a STALE node (old field
+    # set / low schema) MUST raise, distinct from a complete-but-negative
+    # response which must NOT raise on the completeness check.
+    complete = {'env_probe_schema': 2, 'env': {}, 'torch_num_threads': 16,
+                'rfdetr_import_ok': True, 'python_version': '3.12.13',
+                'package_versions': {'rfdetr': '1.5.2'}}
+    dv.assert_envprobe_complete(complete, 'test')          # must NOT raise
+    neg = dict(complete, rfdetr_import_ok=False, rfdetr_import_error='ImportError: x')
+    dv.assert_envprobe_complete(neg, 'test')               # present-and-False is NOT stale
+    fired = 0
+    for bad in ({}, {k: complete[k] for k in ('env', 'torch_num_threads')},  # empty; pre-2026-08-20 field set
+                dict(complete, env_probe_schema=1)):                          # low schema version
+        try:
+            dv.assert_envprobe_complete(bad, 'test')
+        except SystemExit:
+            fired += 1
+    assert fired == 3, f'stale-node null control did not fire on all 3 planted cases ({fired}/3)'
+    print('assert_envprobe_complete null control fired: 3 stale/empty/low-schema raise, '
+          'complete + present-negative pass')
 
     (OUT_DIR / 'sample_export_blast.json').write_text(json.dumps(export, indent=1))
 

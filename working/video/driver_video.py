@@ -493,6 +493,43 @@ def generate_envprobe_pipe() -> tuple[Path, str]:
     return out, base['project_id']
 
 
+# The env_probe response contract (2026-08-22). A field the current node
+# emits but a STALE baked node does not is an ABSENT read-back — a broken
+# instrument — which must be a different, louder verdict than a field the
+# node set to a negative value (rfdetr_import_ok=False = a real import
+# failure). `.get()` collapses the two to None, and `None is not True` reads
+# absence AS failure today and is one config change from reading it as
+# success. Same class as the census blindness, one layer down.
+ENVPROBE_SCHEMA_MIN = 2
+ENVPROBE_REQUIRED = ('env_probe_schema', 'env', 'torch_num_threads',
+                     'rfdetr_import_ok', 'python_version', 'package_versions')
+
+
+def assert_envprobe_complete(info: dict, source: str) -> None:
+    """Absence fails before any value is read (register: absence fails before
+    agreement). Raises SystemExit naming the missing fields and the fix; the
+    caller may then trust every required key is PRESENT, so a later
+    `rfdetr_import_ok is not True` genuinely means False, never absent."""
+    if not isinstance(info, dict) or not info:
+        raise SystemExit(f'NOT DONE — {source} env_probe returned no data (empty '
+                         'response): the node did not run, or the response lane is wrong.')
+    missing = [k for k in ENVPROBE_REQUIRED if k not in info]
+    ver = info.get('env_probe_schema')
+    stale = missing or (isinstance(ver, int) and ver < ENVPROBE_SCHEMA_MIN)
+    if stale:
+        raise SystemExit(
+            f'NOT DONE — {source} env_probe is a STALE INSTRUMENT, not a negative '
+            f'read-back: missing {missing or "no keys"}, schema {ver!r} '
+            f'(need >= {ENVPROBE_SCHEMA_MIN}); present {sorted(info)}. The node that '
+            'ran predates these fields — the baked image carries an old '
+            'working/nodes/env_probe. Rebuild rr:patched (docker/Dockerfile.rocketride '
+            'COPYs the node) THEN re-bake rr:patched-video, and confirm the node inside '
+            'the image matches the repo: '
+            "docker run --rm rr:patched-video sh -c 'md5sum "
+            "/opt/rocketride/engine/nodes/env_probe/IInstance.py' vs md5sum on the repo file. "
+            'A missing field read as a value is one config change from reading as success.')
+
+
 async def rr_readback(port: int) -> dict:
     # Measured surface (Phase 1 + installed-wheel paste, 2026-08-21).
     from rocketride import RocketRideClient
@@ -777,16 +814,24 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
         say(f"preflight: SDK rocketride {identity['sdk']['package_version']} at "
             f"{identity['sdk']['module_path']} — entry points verified, null control fired")
         info = await rr_readback(args.rr_port)
+        # Absence fails before agreement: a missing field is a stale-node
+        # verdict, distinct from a field the node set to a negative value.
+        assert_envprobe_complete(info, 'RR task')
         identity['envprobe_project_id'] = info.get('_envprobe_project_id')
+        identity['env_probe_schema'] = info.get('env_probe_schema')
         readbacks['rr_task'] = {'env': info.get('env') or {},
                                 'torch_num_threads': info.get('torch_num_threads')}
         identity['rr'] = {'rfdetr_import_ok': info.get('rfdetr_import_ok'),
                           'python_version': info.get('python_version'),
                           'python_executable': info.get('python_executable'),
                           'versions': info.get('package_versions') or {}}
-        if info.get('rfdetr_import_ok') is not True:
-            raise SystemExit('NOT DONE — RR task process cannot import rfdetr '
-                             f'({info.get("rfdetr_import_error")!r}): the engine would '
+        # PRESENT-and-not-True now genuinely means False (a real import
+        # failure), never absent — assert_envprobe_complete guaranteed presence.
+        if info['rfdetr_import_ok'] is not True:
+            raise SystemExit('NOT DONE — RR task process reports rfdetr_import_ok='
+                             f'{info["rfdetr_import_ok"]!r} '
+                             f'({info.get("rfdetr_import_error")!r}): a REAL import '
+                             'failure (the field is present) — the engine would '
                              'silently serve RT-DETR, a different model. Refusing to run.')
         md5 = rfdetr_checkpoint_md5(args.rr_container, RFDETR_PATHS['rr'])
         identity['rr']['rfdetr_checkpoint_md5'] = md5
@@ -1152,6 +1197,10 @@ async def amain() -> int:
                     metavar='PROBE_RUN_ID',
                     help='arm strict cross-arm detection agreement; the id names the probe '
                          'run whose ES2002a comparison confirmed — absent = gate NOT RUN')
+    ap.add_argument('--cross-label', default=None,
+                    help='basis string stamped into the cross output (e.g. the default '
+                         'posture is equal-work gates only, not a cross-arm performance '
+                         'comparison — Crossroad 27 / ruling 2026-08-21)')
     ap.add_argument('--cross', nargs=2, metavar=('RR_JSONL', 'LI_JSONL'),
                     help='cross-arm gates over two completed record files; no run')
     args = ap.parse_args()
@@ -1163,6 +1212,13 @@ async def amain() -> int:
     if args.cross:
         out = cross_gates(Path(args.cross[0]), Path(args.cross[1]), args.char_tol,
                           gate3_armed=args.gate3_armed)
+        if args.cross_label:
+            # Ruling 2026-08-21: the DEFAULT posture is an RR-internal ratio
+            # (Crossroad 27), not a cross-arm performance comparison; its cross
+            # file carries equal-work gates only. Stamp the basis so the
+            # artifact says which it is — a reader can't mistake a gates file
+            # for a performance claim.
+            out = {'basis': args.cross_label} | out
         print(json.dumps(out, indent=1))
         ok = out['char_conservation'].get('PASS')
         return 0 if (ok is True or out['char_conservation'].get('verdict') == 'NOT RUN') else 1

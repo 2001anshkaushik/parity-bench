@@ -150,6 +150,25 @@ if bad or absent or not rf_ok:
 print('read-back (b)+(c) PASS: packages at pinned versions, rf-detr-base md5 matches the 1.5.2 registry')
 EOF
 
+# (d) the env_probe node INSIDE the image must be byte-identical to the repo
+# (2026-08-22). The bake commits whatever rr:patched was built with; a stale
+# node there rides silently into rr:patched-video and reports an old field
+# set, which the driver used to read as None. Compare image-vs-repo md5 —
+# self-updating, no constant to drift. The runtime assert (assert_envprobe_
+# complete) is the second net; this refuses to ship the bad image at all.
+NODE_REPO="working/nodes/env_probe/IInstance.py"
+NODE_IN_IMG="/opt/rocketride/engine/nodes/env_probe/IInstance.py"
+REPO_MD5=$(md5sum "$NODE_REPO" 2>/dev/null | awk '{print $1}' || md5 -q "$NODE_REPO")
+IMG_MD5=$(docker run --rm "$OUT_IMAGE" sh -c "md5sum '$NODE_IN_IMG' 2>/dev/null | awk '{print \$1}'")
+echo "env_probe node md5: repo=$REPO_MD5 image=$IMG_MD5"
+if [ -z "$IMG_MD5" ]; then
+  echo "NOT DONE — env_probe node ABSENT inside $OUT_IMAGE ($NODE_IN_IMG): the base image never got it (docker/Dockerfile.rocketride COPYs it into rr:patched)."; exit 1
+fi
+if [ "$REPO_MD5" != "$IMG_MD5" ]; then
+  echo "NOT DONE — env_probe node inside $OUT_IMAGE ($IMG_MD5) != repo ($REPO_MD5): a STALE node emitting an old field set. Rebuild rr:patched from the current repo, then re-bake."; exit 1
+fi
+echo "read-back (d) PASS: env_probe node inside the image is byte-identical to the repo (schema current)"
+
 echo "== 4. no-install proof: fresh container from the bake must be ready FAST and pull NOTHING =="
 docker rm -f "${C}2" 2>/dev/null || true
 docker run -d --name "${C}2" --memory 58g --network host "$OUT_IMAGE" >/dev/null

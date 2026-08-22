@@ -97,7 +97,47 @@ LlamaIndex is a library — an "out-of-box" LI leg would measure OUR serving
 scaffold's defaults, not LlamaIndex's; the default posture is an RR-internal
 ratio (C27), never a cross-arm headline. Pending Ansh.
 **Monday disclosure (Phase 1 tuning symmetry):** PHASE1_CARRYOVER.md
-Correction #3 — first-person, stated first.
+Correction #3 — first-person, stated first. Operator approved "send as written".
+
+**DRY PASS #1 — REACHED THE SMOKE (wait_ready PASSED: rr 5.0s, li 15.0s,
+warm_workers 8). Two smoke failures, both instructive:**
+1. Quiet-box gate fired: FOREIGN load 10.11 > 2.0 — Ansh's keep-alive during
+   the smoke. The gate did its job. Killed; load 1.14. **Standing rule
+   reaffirmed: keep-alive OFF for anything that measures (Crossroad 21).**
+2. **`FAIL RR task process cannot import rfdetr (None)` — a DEFECT IN OUR
+   INSTRUMENT, now fixed.** The field was None, not False: the env_probe node
+   that ran emitted an OLD field set (env + torch present — pins passed at
+   torch=16 — but rfdetr_import_ok and python_version ABSENT; both are
+   2026-08-20 node additions). Leading hypothesis: **a STALE env_probe node
+   baked into rr:patched-video** (the bake commits whatever rr:patched carried;
+   nothing checked the node). Ansh proved rfdetr imports in the engine
+   interpreter — consistent: the package is fine, the NODE is old.
+   **CLASS FIX (2026-08-22): absence of a read-back is now distinct from a
+   negative one, everywhere env_probe reports.** Node emits `env_probe_schema`
+   (=2); `driver_video.assert_envprobe_complete()` asserts every required field
+   is PRESENT and schema >= 2 BEFORE any value is read, raising a loud
+   stale-node "rebuild" verdict — so `rfdetr_import_ok is not True` now only
+   fires for a REAL import failure (present-and-False). Driver + smoke both
+   call it; null control fires (3 stale/empty/low-schema raise, complete +
+   present-negative pass). Structural prevention: the bake now refuses to ship
+   an image whose env_probe md5 != the repo (read-back (d), self-updating).
+   **BOX ACTION: rebuild rr:patched (docker/Dockerfile.rocketride COPYs the
+   node) THEN re-bake rr:patched-video** — the node changed (md5
+   0a2850a0da3201ca741c74b59b1fcf92) so a rebuild is required regardless. Verify:
+   `docker run --rm rr:patched-video sh -c 'grep -c env_probe_schema /opt/rocketride/engine/nodes/env_probe/IInstance.py'` → 1.
+3. **First measurement of the default posture's unset thread count: torch
+   resolves to 16 on this host** (`cross-arm in-process torch {'rr': 16}`) —
+   Ticket 5 open question 3, the point the M=1 curve never measured. Type bug
+   caught alongside: rr was int 16, li was string '1' — cross_arm_values
+   preferred the declared env string when present. FIXED: cross_arm_values is
+   now the MEASURED torch count, int, both arms (null control asserts int
+   consistency).
+
+**cross_default labeling (approved, done):** `--cross-label` stamps a `basis`
+into every cross file; run_plan gives the default posture "equal-work gates
+ONLY … not a cross-arm performance comparison (Crossroad 27)", parity gets the
+comparison label. So a reader cannot mistake a default-posture gates file for
+a performance claim.
 
 **▶ TICKET 4 ANSWERED — RR concurrency sweep, T=8 (landed late 2026-08-21;
 RELAYED values — the box JSON, `probe_concurrency_T8.json` per the invocation,

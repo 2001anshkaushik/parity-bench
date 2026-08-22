@@ -31,6 +31,13 @@ class IInstance(IInstanceBase):
     def closing(self):
         import sys
         info = {
+            # Schema version (2026-08-22): a STALE baked node emits an older
+            # field set; a consumer that reads a missing field with .get()
+            # cannot tell absence from a negative value. Every consumer asserts
+            # this key is present and >= its required version BEFORE reading any
+            # field, so a stale instrument fails loud with "rebuild", never
+            # silently as None. Bump when the emitted field set changes.
+            "env_probe_schema": 2,
             "pid": os.getpid(),
             "env": {k: os.environ.get(k) for k in KEYS},
             "os_cpu_count": os.cpu_count(),

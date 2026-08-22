@@ -1016,13 +1016,25 @@ def thread_pins_by_arm(readbacks_by_arm: Dict[str, Dict[str, Dict[str, Any]]],
                 if off:
                     ok = False
         arms_out[arm] = entry
+    # cross_arm_values is the MEASURED torch thread count (torch.get_num_threads
+    # inside each process), coerced to int, for BOTH arms — never the declared
+    # env string. The old form preferred the env key "TORCH_NUM_THREADS" when
+    # present, so a pinned arm reported the string '1' while an unset arm
+    # reported the measured int 16: a type AND semantic mismatch in a field
+    # compared across arms (found 2026-08-22). The measured count is the honest
+    # cross-arm quantity — what each process actually uses.
     cross = {}
     for arm, e in arms_out.items():
         agreed = (e.get("within_arm") or {}).get("values_agreed") or {}
-        cross[arm] = agreed.get("TORCH_NUM_THREADS", agreed.get("torch_num_threads"))
+        raw = agreed.get("torch_num_threads", agreed.get("TORCH_NUM_THREADS"))
+        try:
+            cross[arm] = int(raw) if raw is not None else None
+        except (TypeError, ValueError):
+            cross[arm] = raw   # non-numeric: recorded as-is, never coerced to a lie
     return {"PASS": ok is True, "arms": arms_out,
             "cross_arm_values": cross,
-            "cross_arm_note": "per-arm optima; difference recorded, never failed (Crossroad 17)"}
+            "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm "
+                              "optima, difference recorded never failed (Crossroad 17)"}
 
 
 def thread_pins_self_test() -> None:
@@ -1043,6 +1055,17 @@ def thread_pins_self_test() -> None:
     clean = thread_pins_by_arm(rb_unset, {"rr": {}}, expected_by_arm={"rr": "unset"})
     assert clean["PASS"] is True and clean["arms"]["rr"]["out_of_box_torch_num_threads"] == 16, clean
     assert clean["cross_arm_values"]["rr"] == 16, clean
+    # cross-arm type consistency (2026-08-22): unset RR (measured int 16) beside
+    # pinned LI (env string '1' but MEASURED int 1) — both must read as int, so
+    # a cross-arm comparison never straddles int and str.
+    mixed = thread_pins_by_arm(
+        {"rr": {"rr_task": {"env": {}, "torch_num_threads": 16}},
+         "li": {"li_0": {"env": {k: "1" for k in keys}, "torch_num_threads": 1}}},
+        {"rr": {}, "li": {k: "1" for k in keys}},
+        expected_by_arm={"rr": "unset", "li": 1})
+    cav = mixed["cross_arm_values"]
+    assert cav == {"rr": 16, "li": 1}, cav
+    assert all(isinstance(v, int) for v in cav.values()), cav
     leaked = thread_pins_by_arm({"rr": {"rr_task": {"env": {"OMP_NUM_THREADS": "8"},
                                                     "torch_num_threads": 8}}},
                                 {"rr": {}}, expected_by_arm={"rr": "unset"})
