@@ -311,15 +311,16 @@ def check_readbacks(args) -> dict:
     qb = drv.quiet_box([args.rr_container, args.li_container], args.max_preleg_load1)
     baselines = qb['container_idle_cores']
     load1, excess = qb['load1'], qb['foreign_excess']
+    # ONE formatter for both branches and both callers (drv.quiet_box_line):
+    # the previous pair of hand-rolled f-strings drifted from the producer and
+    # crashed the PASS path on a KeyError while the FAIL path stayed correct.
     if not qb['PASS']:
-        fail(f'quiet-box: FOREIGN load {excess:.2f} > {args.max_preleg_load1} after '
-             f'{qb["n_readings"]} reading(s) over {qb["settle_wall_s"]:.0f}s, trend '
-             f'{qb["trend"]} — {json.dumps(qb["readings"])}. Ours is already subtracted '
-             '(containers + this process tree), so find the hog: ps aux --sort=-%cpu | head')
+        fail(f'quiet-box: {drv.quiet_box_line(qb)} — readings '
+             f'{json.dumps(qb["readings"])}. Ours is already subtracted (containers + '
+             'this process tree); a DECAYING trend is a tail, SUSTAINED is a hog: '
+             'ps aux --sort=-%cpu | head')
     else:
-        say(f'  PASS  quiet box (load1={load1:.2f} − containers '
-            f'{qb["container_attributed"]:.2f} − ours {qb["own_process_cores"]:.2f} = '
-            f'foreign {excess:.2f}; {qb["n_readings"]} reading(s), trend {qb["trend"]})')
+        say(f'  PASS  quiet box {drv.quiet_box_line(qb)}')
     # Interpreter read-back — the bare-python3 trap made structural: the smoke
     # records WHICH python ran it and whether it is a venv, so an interpreter
     # drift shows in the artifact, not in a stack trace mid-leg.

@@ -266,6 +266,14 @@ rr_threads(parity)=$RR_THREADS_ENV rr_threads(default)=unset li_threads=$LI_THRE
 liveness>=${LIVENESS_MIN:-NOT_RUN} gate3=$GATE3_RUN_ID C=$BLAST_C seq_n=$SEQ_N passes=$PASSES -> $OUT ===" | tee -a "$LOG"
 
 echo "--- 0. manifest re-cut check (re-cut is a REUSE: fetched must be 0) ---" | tee -a "$LOG"
+# NOTE (2026-08-22): --verify sha256s the WHOLE corpus — roughly one core for
+# tens of seconds. It is OURS, and it used to show up in the next quiet-box
+# check as "foreign load" because that gate read load1 (a ~60 s lagging
+# average) and subtracted only containers. The gate is now instantaneous
+# (/proc/stat busy − our containers − our own process tree), so this
+# verification's tail no longer inflates it and no leg systematically settles
+# because of it. If a quiet-box check DOES settle now, something is burning
+# CPU at that moment — read the trend: DECAYING is a transient, SUSTAINED is a hog.
 run "$PY" working/video/fetch_ami_video.py --verify
 
 echo "--- 1. LlamaIndex arm (both containers up for smoke read-backs; RR idles at the DEFAULT config) ---" | tee -a "$LOG"

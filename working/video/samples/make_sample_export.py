@@ -219,6 +219,23 @@ def main():
         {'rr': {'rr_task': {'env': {}, 'torch_num_threads': 16}}},
         {'rr': {}}, expected_by_arm={'rr': 'unset'})['cross_arm_values']['rr']
 
+    # quiet_box producer+CONSUMER exercise (2026-08-22). The formatter is what
+    # broke: quiet_box's return shape changed and both callers kept formatting
+    # the old keys in their PASS branch, so the happy path raised KeyError while
+    # the failure path stayed correct. Calling the producer and the one shared
+    # formatter together means a future key change breaks HERE, not at 2 a.m.
+    # in leg four of an 80-minute run. No containers -> no sleeps, milliseconds.
+    _qb = dv.quiet_box([], max_foreign=999.0, sample_s=0.1, settle_deadline_s=0)
+    _line = dv.quiet_box_line(_qb)           # KeyError here if a key drifts
+    for _k in ('load1', 'container_attributed', 'container_idle_cores',
+               'own_process_cores', 'foreign_excess', 'trend', 'n_readings',
+               'settle_wall_s', 'threshold', 'PASS', 'readings'):
+        assert _k in _qb, f'quiet_box lost the key {_k!r} its consumers format'
+    assert 'foreign' in _line and 'trend' in _line, _line
+    _qb_fail = dv.quiet_box([], max_foreign=-1.0, sample_s=0.1, settle_deadline_s=0)
+    assert _qb_fail['PASS'] is False and dv.quiet_box_line(_qb_fail).startswith('FAIL')
+    print('quiet_box producer+formatter exercised (both branches):', _line)
+
     # env_probe completeness null control (2026-08-22): a STALE node (old field
     # set / low schema) MUST raise, distinct from a complete-but-negative
     # response which must NOT raise on the completeness check.

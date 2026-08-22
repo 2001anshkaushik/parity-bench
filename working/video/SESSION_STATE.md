@@ -156,6 +156,31 @@ video per leg; the gate-3 staged run's records give ES2002a both arms):**
   → the fraction of frames with ≥1 detection per video; the threshold sits
   below the minimum observed with a margin (Corner view is dense — expect ~1.0)
   and the black-fixture null must still FAIL it. Ansh's number, not mine.
+**▶ THE GATE WOULD HAVE ABORTED THE CAMPAIGN AT LEG 2 — found answering the
+settle question, fixed 2026-08-22.** `load1` is a ~60 s exponentially-damped
+average, so it reports HISTORY, and our own history dominates it: a blast leg
+runs the box at ~23 of 32 cores, and after it ends load1 needs **~150 s** to
+fall under the 2.0 threshold (23·e^(−t/60)) while the next leg's preflight
+reads it **~15 s** later with a 90 s settle budget. Legs 2–9 would each have
+failed a gate whose purpose is catching someone ELSE's hog. **No dry pass could
+ever have caught this** — a dry pass clamps every leg to n=1 and an n=1 leg
+leaves no tail; the failure needs exactly what a rehearsal removes.
+**FIXED — the gated number is now INSTANTANEOUS:** host busy cores (/proc/stat
+over the same window) − our containers' cgroup rate − our own process tree's
+rate. No history, no decay, no self-inflicted failure. `foreign_by_load1` is
+still computed and recorded beside it (it is what Phase 1 published and what
+caught the 18-Aug hog) and becomes the gate only where /proc/stat is unreadable
+(macOS syntax checks). Verified both paths: fallback on this laptop, and the
+/proc/stat arithmetic against injected ticks (planted 8.0 cores → measured
+7.97). Register entry 13 DRAFTED for Ansh's ruling.
+**ANSWER TO THE SETTLE QUESTION, therefore: NO.** The first leg does NOT
+systematically eat 30–60 s. Step 0's full-corpus sha256 has EXITED by the time
+the smoke reads, so it contributes nothing to an instantaneous measure — and
+neither does the previous leg's tail. If a quiet-box check settles now,
+something is burning CPU *at that moment*; the trend says whether it is a
+transient (DECAYING) or a hog (SUSTAINED). Noted in run_plan step 0 so nobody
+reads a settle as normal at 2 a.m.
+
 **RULING ANSWERED (2026-08-22) — THE GATE SUBTRACTED ONLY CONTAINERS, AND THAT
 WAS WRONG.** Answer to the question as asked: the driver was **NOT** attributed.
 `attributed = sum(container_idle_cores(c))` and nothing else, so the driver, the

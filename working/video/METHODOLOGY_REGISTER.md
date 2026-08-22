@@ -124,6 +124,19 @@ than rewritten from memory, which is entry 2's point in miniature.
 > derivation; the grep is part of the change, not a follow-up.** Kin to
 > entry 2: the second copy was perfectly self-consistent with the first, and
 > nothing ever looked.
+>
+> **Addendum (reviewer's, 2026-08-22) — the second copy is not always in
+> another file.** The quiet-box gate's return shape changed and both callers
+> kept formatting the old keys — in their *PASS branch* each — so the happy
+> path died on a KeyError while the failure path stayed correct, inside the very
+> commit that was fixing an attribution bug. **Sometimes the stale copy is the
+> other BRANCH of the same feature**: it does not run when the change is
+> tested, so the change cannot break it visibly, and it waits for the first run
+> that takes the other path — here, leg four of an 80-minute campaign at 2 a.m.
+> The cure is the usual one applied a level up: not "fix both copies" but *have
+> one copy* — a single `quiet_box_line()` shared by driver and smoke across
+> both verdicts, plus a self-test that calls producer and formatter together so
+> a key change breaks a test rather than a run.
 
 ## 7. A disqualified command that stays quotable will get quoted (added 2026-08-21)
 
@@ -299,3 +312,33 @@ than rewritten from memory, which is entry 2's point in miniature.
 > both: `/proc/environ` proves the variables reached the process, not that
 > torch read them — only an in-process `torch.get_num_threads()` (the
 > env_probe node, run by the driver's preflight every leg) closes that.
+
+## 13. The instrument reported our own history as somebody else's present (DRAFTED 2026-08-22 — placement is Ansh's)
+
+> The quiet-box gate asked "is foreign work running on this box?" and answered
+> it with `load1`, a ~60-second exponentially-damped average. That was a real
+> measurement in Phase 1, where nothing of ours ran between legs. Phase 2 chains
+> nine legs back to back, and a blast leg runs the box at ~23 of 32 cores: when
+> it ends, load1 needs **~150 s** to decay under the 2.0 threshold
+> (23·e^(−t/60)), while the next leg's preflight reads it ~15 s later. **Legs
+> 2–9 would each have failed a gate whose entire purpose is catching somebody
+> else's hog** — aborting the campaign at leg two, in the name of a hog that was
+> our own previous leg.
+>
+> Two things made it invisible. First, entry 3's mechanism: nothing about the
+> gate changed, the conditions moved out from under it — our own workload grew
+> until it dominated the instrument's memory. Second, **no dry pass could ever
+> catch it**: a dry pass clamps every leg to n=1, and an n=1 leg leaves no tail.
+> The failure requires exactly the thing a rehearsal removes.
+>
+> The rule: **an instrument that averages over time cannot gate an interval
+> shorter than its own time constant** — and when the thing you are excluding
+> is your own recent work, a lagging instrument will always find it. Gate on the
+> instantaneous quantity (host busy cores from /proc/stat, minus our containers'
+> cgroup rate, minus our own process tree, all over one window); keep the
+> lagging one recorded beside it, because load1 is what caught the 18-Aug hog
+> and what Phase 1 published. Related: entry 3 (a measurement is bound to its
+> conditions) and the same day's finding that the gate subtracted only
+> containers, so every process of OURS on the host — driver, smoke, `docker`
+> calls, the console tee, and run_plan's own full-corpus sha256 — was charged
+> to a hog.

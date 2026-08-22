@@ -614,10 +614,46 @@ def own_cores_recent(window_s: float = 60.0) -> float:
     return max(0.0, (cpu - ref[1]) / dt) if dt > 0.5 else 0.0
 
 
+def _host_cpu_snapshot():
+    """(total_ticks, idle_ticks) from /proc/stat's aggregate cpu line, or None
+    where unreadable (macOS syntax checks, an unexpected format). idle counts
+    idle+iowait: a box blocked on I/O is not a box competing for our cores."""
+    try:
+        with open('/proc/stat') as fh:
+            parts = fh.readline().split()
+        if not parts or parts[0] != 'cpu':
+            return None
+        vals = [int(x) for x in parts[1:]]
+        return sum(vals), vals[3] + (vals[4] if len(vals) > 4 else 0)
+    except Exception:  # noqa: BLE001 — absence degrades to the load1 basis, recorded
+        return None
+
+
 def quiet_box(containers: List[str], max_foreign: float,
               settle_deadline_s: float = 90.0, sample_s: float = 4.0) -> dict:
-    """Foreign load = load1 − our containers' measured rate − our own process
-    tree's recent rate. One reader for the driver and the smoke.
+    """Is FOREIGN work running on this box RIGHT NOW? One reader for the driver
+    and the smoke.
+
+    **load1 is the wrong instrument for that question and this gate used to ask
+    it anyway** (found 2026-08-22, before the first multi-leg run). load1 is a
+    ~60 s exponentially-damped average, so it reports history, and OUR OWN
+    history dominates it: a blast leg runs the box at ~23 of 32 cores, and
+    after it ends load1 needs ~150 s to decay under 2.0 (23·e^(−t/60)). The next
+    leg's preflight reads it ~15 s later. Legs 2–9 of the campaign would each
+    have failed a gate whose whole purpose is catching someone ELSE's hog —
+    aborting an 80-minute run at leg two, on a path no dry pass exercises
+    because a dry pass has no leg big enough to leave a tail.
+
+    So the gated number is INSTANTANEOUS: host busy cores (from /proc/stat over
+    the same window) minus our containers' cgroup rate minus our own process
+    tree's rate. No history, no decay, no self-inflicted failure. The
+    load1-based figure is still computed and recorded beside it (`foreign_by_load1`)
+    because it is what Phase 1 recorded and what caught the 18-Aug hog, and it
+    becomes the gate only where /proc/stat cannot be read.
+
+    A snapshot still cannot tell a transient burst from a sustained hog, so a
+    first reading over threshold triggers a bounded re-read loop and the record
+    carries the SEQUENCE plus a trend — DECAYING / SUSTAINED / RISING.
 
     A SNAPSHOT CANNOT TELL A TAIL FROM A HOG, so this does not take one. When
     the first reading is over the threshold it re-reads on a bounded settle
@@ -628,20 +664,50 @@ def quiet_box(containers: List[str], max_foreign: float,
     it instead of arguing it). Costs nothing on a quiet box: the loop is only
     entered when the gate would otherwise fail."""
     readings: List[dict] = []
+    ncpu = os.cpu_count() or 32
 
     def take() -> dict:
-        base = {}
-        for c in containers:
-            if docker_inspect(c, '{{.State.Running}}') == 'true':
-                base[c] = container_idle_cores(c, sample_s=sample_s)
+        # ONE window for every source, so the three rates are subtractable.
+        running = [c for c in containers
+                   if docker_inspect(c, '{{.State.Running}}') == 'true']
+        t0 = time.monotonic()
+        c0 = {c: container_cpu_usage_usec(c) for c in running}
+        h0, o0 = _host_cpu_snapshot(), _total_own_cpu_s()
+        time.sleep(sample_s)
+        t1 = time.monotonic()
+        c1 = {c: container_cpu_usage_usec(c) for c in running}
+        h1, o1 = _host_cpu_snapshot(), _total_own_cpu_s()
+        dt = max(t1 - t0, 1e-6)
+        per_c = {}
+        for c in running:
+            a, b = c0.get(c), c1.get(c)
+            per_c[c] = (round((b - a) / 1e6 / dt, 3)
+                        if a is not None and b is not None else None)
+        attributed = sum(v for v in per_c.values() if v is not None)
+        own_now = (o1 - o0) / dt
+        host_busy = None
+        if h0 and h1:
+            hz = os.sysconf('SC_CLK_TCK') or 100
+            busy = ((h1[0] - h0[0]) - (h1[1] - h0[1])) / hz / dt
+            if -0.5 <= busy <= ncpu * 1.5:      # implausible -> unavailable, never clamped
+                host_busy = round(busy, 2)
         load1 = os.getloadavg()[0]
-        attributed = sum(v for v in base.values() if v is not None)
-        own = own_cores_recent()
+        foreign_now = (round(host_busy - attributed - own_now, 2)
+                       if host_busy is not None else None)
+        foreign_load1 = round(load1 - attributed - own_cores_recent(), 2)
         r = {'load1': round(load1, 2),
-             'container_idle_cores': base,
+             'host_busy_cores': host_busy,
+             'container_idle_cores': per_c,        # current rate, not a historical idle
              'container_attributed': round(attributed, 2),
-             'own_process_cores': round(own, 2),
-             'foreign_excess': round(load1 - attributed - own, 2)}
+             'own_process_cores': round(own_now, 3),
+             'foreign_now': foreign_now,
+             'foreign_by_load1': foreign_load1,
+             # THE GATED NUMBER: instantaneous when /proc/stat is readable,
+             # load1-based only as a fallback.
+             'foreign_excess': foreign_now if foreign_now is not None else foreign_load1,
+             'basis': ('instantaneous (/proc/stat busy − containers − ours)'
+                       if foreign_now is not None
+                       else 'load1 − containers − ours (LAGGING ~60s; /proc/stat unreadable)')}
         readings.append(r)
         return r
 
@@ -662,13 +728,35 @@ def quiet_box(containers: List[str], max_foreign: float,
     return {'PASS': last <= max_foreign, 'threshold': max_foreign,
             'readings': readings, 'n_readings': len(readings),
             'trend': trend, 'settle_wall_s': round(time.monotonic() - t0, 1),
-            'load1': readings[-1]['load1'],
-            'container_idle_cores': readings[-1]['container_idle_cores'],
-            'own_process_cores': readings[-1]['own_process_cores'],
-            'foreign_excess': last,
+            # Last reading promoted to the top level — EVERY field of it, so a
+            # consumer never has to reach into readings[-1] for one stray key.
+            **{k: v for k, v in readings[-1].items()},
             'note': ('foreign = load1 minus our containers minus our own process tree; '
                      'own_process_cores is CPU-seconds/window (a lower bound — load1 '
                      'also counts uninterruptible sleep)')}
+
+
+def quiet_box_line(qb: dict) -> str:
+    """THE one-and-only formatter for a quiet_box result — driver and smoke,
+    pass and fail (2026-08-22).
+
+    Born from its own defect: quiet_box's return shape changed and TWO callers
+    kept formatting the old keys, in the PASS branch each, so the happy path
+    crashed on a KeyError while the failure path stayed fine. That is entry 6
+    (a provenance change follows the value to every consumer) with the twist
+    that the second copy was not in another file — it was the OTHER BRANCH of
+    the same feature, which the change that broke it never ran. The cure is
+    structural: one formatter, so there is no second copy to drift, and a
+    self-test that calls producer and formatter together (make_sample_export)
+    so a future key change breaks a test rather than a 2 a.m. leg."""
+    verdict = 'PASS' if qb.get('PASS') else 'FAIL'
+    return (f'{verdict} foreign {qb.get("foreign_excess")} vs threshold '
+            f'{qb.get("threshold")} — host busy {qb.get("host_busy_cores")} − containers '
+            f'{qb.get("container_attributed")} {qb.get("container_idle_cores")} − ours '
+            f'{qb.get("own_process_cores")} [{qb.get("basis")}]; load1 {qb.get("load1")} '
+            f'(lagging, by-load1 foreign {qb.get("foreign_by_load1")}); '
+            f'{qb.get("n_readings")} reading(s) over {qb.get("settle_wall_s")}s, '
+            f'trend {qb.get("trend")}')
 
 
 def container_cpu_usage_usec(container: str, timeout_s: int = 15) -> Optional[int]:
@@ -917,18 +1005,13 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
                    args.max_preleg_load1)
     if not qb['PASS'] and not args.allow_noisy_box:
         raise SystemExit(
-            f'NOT DONE — pre-leg FOREIGN load {qb["foreign_excess"]:.2f} > '
-            f'{args.max_preleg_load1} after {qb["n_readings"]} reading(s) over '
-            f'{qb["settle_wall_s"]:.0f}s, trend {qb["trend"]}. '
-            f'{json.dumps(qb["readings"])}. Foreign = load1 minus our containers minus '
-            f'our own process tree, so this is NOT our harness tail (run_plan step 0 '
-            f'--verify sha256s the corpus; that is attributed). A background hog '
-            f'contaminated the 18-Aug runs; find it (ps aux --sort=-%cpu | head) or '
-            f'override with --allow-noisy-box (recorded).')
-    say(f'preflight: quiet box PASS (load1={qb["load1"]:.2f} − containers '
-        f'{qb["container_attributed"]:.2f} − ours {qb["own_process_cores"]:.2f} = '
-        f'foreign {qb["foreign_excess"]:.2f}; {qb["n_readings"]} reading(s), '
-        f'trend {qb["trend"]})')
+            f'NOT DONE — pre-leg quiet box {quiet_box_line(qb)}\n'
+            f'  readings: {json.dumps(qb["readings"])}\n'
+            f'  A DECAYING trend means a tail (run_plan step 0 --verify sha256s the '
+            f'corpus in a SIBLING process we cannot attribute — see the settle note); '
+            f'SUSTAINED or RISING means a real hog: ps aux --sort=-%cpu | head. '
+            f'Override with --allow-noisy-box (recorded).')
+    say(f'preflight: quiet box {quiet_box_line(qb)}')
     pf_extra = {'preleg_load1': qb['load1'],
                 'preleg_container_idle_cores': qb['container_idle_cores'],
                 'preleg_own_process_cores': qb['own_process_cores'],
