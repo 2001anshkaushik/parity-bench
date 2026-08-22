@@ -7,6 +7,86 @@ using it.
 
 ---
 
+## ▶ COMPACTION BRIEFING — state as of late 2026-08-21 (THIS BLOCK WINS on conflict with the chronological blocks below)
+
+**THE EIGHT RUN-PLAN NUMBERS — three landed, five open:**
+- `RR_THREADS_ENV = 8` (RR thread curve, knee at 8; t32 regression reproduced twice — Ticket 5)
+- `GATE3_RUN_ID = probe_20260821_195214` (the ORIGINAL probe run, artifacts intact)
+- `LI_WORKERS = 8` ← settled this turn (matched-load curve below; W=16 is past the knee)
+- OPEN: `M_TOKENS` (RR concurrency sweep — NEXT box step), `LI_THREADS_ENV`
+  (refine pass at W=8 with --threads-env {2,4}), `WARM_N` (≥ max(M, 8) plus
+  margin, from the 16 warm rows; 16 provisional), `BLAST_C` (wave arithmetic
+  with the sweeps), `DEFAULT_N` (ruled = 44 at this scale; not yet exported).
+
+**THE LI CURVE (T=1, matched-load ppw=4 — the JSON on the box is authoritative;
+an earlier relay read W=8 as 0.0871):**
+  W=4  0.0459 videos/s  serving 4/4   cpu_util_of_32 0.110
+  W=8  0.0882           serving 8/8   cpu_util 0.219   marginal 4→8 = 0.95
+  W=16 0.0704           serving 16/16 cpu_util 0.177   batch wall 363 s → 909 s
+**W=16 is past the knee: every worker alive, throughput DOWN, CPU DOWN, wall
+2.5×.** That is the same contention signature RR showed at t32 (same work,
+doubled wall, utilisation falling) — **two independent stacks exhibiting it
+points at the shared substrate (host/BLAS/kernel scheduling), not at either
+framework.** Worth its own line in the Monday material. Standard curve (ppw=1)
+for the record: W=1 0.0131 (in-process baseline) · 2 0.0259 · 4 0.0480 ·
+8 0.0554 with 6/8 serving — the 6/8 resolved to routing luck (outcome a) once
+4× posts were offered; routing is NOT iid (W=4 served 4/4 where iid expects
+~2.7 — register entry 11).
+
+**ARCHITECTURE FACTS THAT CHANGE HOW NUMBERS ARE READ:**
+- uvicorn `--workers 1` serves IN-PROCESS (tree = pid 1 only; health pid 1);
+  `--workers ≥2` spawns `spawn_main` children. Two topologies from one flag →
+  **W=1 is EXCLUDED from the knee** (reported as the in-process baseline;
+  knee over W≥2 only; efficiency rebased to W=2 per-worker; a W2<W1 finding
+  keeps W=1 in the LI_WORKERS decision).
+- **The LI serving census is INVERTED — no argv predicate anywhere**: serving
+  = processes that burned CPU during the batch, anchored by response pids ⊆
+  burners (non-trivial; ATTRIBUTION BLIND otherwise, rc=2, full /proc tree
+  recorded). argv predicates were retired after being wrong in two shapes the
+  same day (`uvicorn` matches only the master; `spawn_main` children miss
+  W=1). RR's census keeps its argv pattern — execution-verified at its
+  configuration, and RR responses carry no pid to anchor an inversion.
+- python:3.12-slim has no procps — never `docker exec ps` in the LI image;
+  read /proc.
+
+**RULINGS SINCE THE LAST BRIEFING (all in the rulings list below, one line each):**
+C22 host networking + wait_ready; C23 measured frame column (formula deleted);
+C24 t32 recheck (reproduced); C25 docs to the team; C26 warm-up value rule;
+**C27** DEFAULT_N: default posture runs a stated subset ≥500 above ~1000
+videos, manifest-order prefix, 44 now (wired, validated); **C28** all three
+tracks run the full AMI corpus and THE RR ARM MUST BE IDENTICAL across them —
+alignment is a PREREQUISITE to full-corpus runs; tonight's 44-video campaign
+still banks real numbers first.
+
+**THE ALIGNMENT — governing posture (Ansh): WE ARE THE JUNIOR ARM. FOLLOW or
+VERIFY; never assume newer-instrument = better.** `RR_ARM_ALIGNMENT.md` sits
+under Shashi's own three-track contract and his §15 checklist (PASS 7 /
+CHANGE 8 / CONTESTED 3). **The eight FOLLOW changes are sized but
+deliberately NOT implemented** pending Ansh's negotiation (his field names,
+TTFR+basis, coverage summary, INSUFFICIENT_REPS label, his bands as gates,
+detection_ratio + Jaccard, his frame_law value beside ours, the corpus). The
+three CONTESTED rows (split_overlap — two seniors' contradictory byte-level
+claims, we contribute seam evidence + a two-minute check, we do NOT
+adjudicate; omp_num_threads — we measured 2.3→8.5 cores across BLAS 1→8 and
+can FOLLOW OMP=1 reporting both; frame_law — 83 measured vs 84 predicted)
+each carry a minutes-long check and no verdict.
+
+**ASK — DO NOT INVENT (held by this session, not by the repo):**
+- The RR concurrency sweep has NOT RUN at compaction — its Ticket-4
+  idle-vs-M banner is the headline the operator wants FIRST. ASK for output.
+- W=16 raw JSON and the refine-pass results live on the box (filenames
+  unrelayed); the numbers above are relayed values. ASK before citing beyond them.
+- Messages to Leela/Shashi: the approved texts are preserved in
+  `team_docs_sent/MESSAGES_2026-08-21.md`; whether they were sent verbatim and
+  ANY REPLIES are unknown here. ASK.
+- The alignment negotiation has not happened. ASK for its outcome before
+  implementing any FOLLOW change.
+- Operator rulings are recorded in paraphrase; ASK if verbatim wording is needed.
+- Box state at compaction (relayed): W=16 done, RR sweep next, box up,
+  ~62-min campaign after the dry pass. Verify, don't assume.
+
+---
+
 ## Rulings this session (operator = the reviewer relaying Ansh's decisions)
 
 - **Crossroad 15:** corpus re-cut to **44 measured + 16 warm** over the 60 ES
@@ -516,7 +596,8 @@ three silent-if-skipped values: dpf/chars-per-det, LIVENESS_MIN, GATE3 id).
 knee_W is old-rule — recompute from points): per-worker 0.0130/0.0120/
 0.0069, marginals 1.00/0.93/0.53 → **KNEE AT 4, PROVISIONAL**. cpu_util
 0.137 at W=8 — 86% idle while throughput stalls: not a CPU limit.
-**LI_WORKERS = 4 PENDING the W=8 recheck.** Routing arithmetic that makes
+**[SUPERSEDED — see the compaction briefing at the top: LI_WORKERS = 8.]
+LI_WORKERS = 4 PENDING the W=8 recheck.** Routing arithmetic that makes
 the recheck genuine, not a formality: 6/8 at 8 posts ≈ iid-routing
 expectation (~5.25 occupied), but W=4's 4/4 at 4 posts CONTRADICTS iid
 (~2.7 expected) — routing is not iid, so "benign scheduling" is not a safe
@@ -647,7 +728,9 @@ contradict EACH OTHER on RR storage retention (Leela ENOSPC-grade
 retention, Shashi net 0.0) and we hold no data — three questions for Ansh
 at the file's end.
 
-**NEXT (2026-08-21 late): adjudicate the manifest meta dump (targeted dump +
+**[SUPERSEDED NEXT — manifest adjudicated (abbreviation, values correct, no
+re-cut); LI sweep done; the RR sweep invocation below is still the live one.]
+NEXT (2026-08-21 late): adjudicate the manifest meta dump (targeted dump +
 git status on fetch_ami_video.py incoming; the first dump TRUNCATED at 900
 chars and a no-match query printed the meta row twice — entry 9's genus) →
 then the sweeps. THE SWEEPS DO NOT NEED THE MANIFEST** (they take the probe
