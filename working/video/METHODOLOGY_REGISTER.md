@@ -277,3 +277,25 @@ than rewritten from memory, which is entry 2's point in miniature.
 > (INCOMPLETE/DISAGREE/MISMATCH/OK, all four exercised). A sweep that cannot
 > prove its own configuration landed is measuring an unknown configuration —
 > and it was about to set a run-plan number.
+>
+> **Addendum (reviewer's, 2026-08-22) — the class, counted.** Config asserted
+> as evidence has now been found in five places: in the harness
+> (`chunk_config_parity` reporting a configured pair as measured, entry 1); in
+> the engine (Ticket 3 — a chunk config that is accepted and silently
+> discarded); in the census (declared workers taken for serving workers, entry
+> 10); in `env_probe` (a field absent from a stale node, read as a value,
+> 2026-08-22); and now in `probe_li_workers` and `probe_concurrency` — code we
+> wrote THIS WEEK, while auditing two teammates for exactly this. **The rule
+> that follows is not "be careful."** It is: *any value that sets a run
+> parameter must have a read-back before it is quotable, and the read-back is
+> part of the probe, not a follow-up.* A probe that emits a number it cannot
+> also prove the conditions of has not finished; the read-back is not
+> instrumentation around the measurement, it is half of the measurement.
+> Shipped on both sides the same day: `wait_ready.li_worker_thread_readback()`
+> (every LI worker's in-process torch count) and
+> `probe_rr.verify_task_thread_env()` (every RR task process's own
+> `/proc/<pid>/environ`), each refusing the point rather than recording it at
+> an unknown configuration, each null-controlled. Honest boundary, stated in
+> both: `/proc/environ` proves the variables reached the process, not that
+> torch read them — only an in-process `torch.get_num_threads()` (the
+> env_probe node, run by the driver's preflight every leg) closes that.

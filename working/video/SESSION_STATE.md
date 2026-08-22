@@ -28,8 +28,58 @@ discrepancy that moves no decision. The box JSON is authoritative.)
 UNVERIFIED.** `probe_li_workers` set the six env vars on the container and
 recorded NOTHING about what the workers got, so the three budget JSONs cannot
 prove T=4 landed in all 8 workers (`wait_li_ready` returned only warm_workers
-and one arbitrary pid). FIXED as a class (see below); confirm before the
-campaign with the 2-minute check in the box-command block.
+and one arbitrary pid). **Same gap found in `probe_concurrency`, which set
+M_TOKENS=16 AND the parity T=2.** Both FIXED as a class (register entry 12
+addendum): `li_worker_thread_readback()` (every LI worker's in-process torch
+count) and `probe_rr.verify_task_thread_env()` (every RR task process's own
+`/proc/<pid>/environ`), each REFUSING the point rather than recording it at an
+unknown configuration, each null-controlled. Confirm with the 2-minute check
+in the box-command block before the number is set.
+
+**IF THE LI READ-BACK RETURNS MISMATCH — cost, and what else is suspect:**
+- **Re-running the three budget points ≈ 18–20 min** (batch walls implied by
+  the relayed throughputs at ppw=4: 16/0.1123 = 143 s, 32/0.1340 = 239 s,
+  64/0.1187 = 539 s ≈ 15.3 min, plus three container starts + warms + the new
+  read-backs). **But a re-run is worthless until the mechanism is fixed** — the
+  same flags through the same path reproduce the same failure, so the first
+  cost is DIAGNOSIS (does the service sanitise its env? does torch import
+  before the env is set? does uvicorn spawn workers with a stripped
+  environment?), and the 20 minutes is only the re-measurement after it.
+- **Is the earlier W=8/T=1 point suspect too? Formally yes — same probe, same
+  gap. But the records already in hand argue strongly that the flags DO land**
+  (entry 11's method — check the benign explanation against points already
+  held). At the SAME W=8, the declared T=1 run measured cpu_util 0.219 (7.0 of
+  32 cores ≈ the 8 declared threads) and the declared T=4 run measured 0.723
+  (23.1 cores ≈ 32 declared threads): **3.3× the CPU and 54% more throughput
+  from changing nothing but the declared thread env.** If the flags never
+  reached the workers, both runs would have been the same configuration and
+  would have measured the same. They did not. Also: had T=1 failed to land,
+  8 workers × torch's default (~16 on this host) = 128 threads on 32 cores
+  would have pegged utilisation near 1.0, not 0.219. The read-back still runs —
+  it converts a strong inference into proof for 2 minutes of box time.
+
+**THE 0.0871 vs 0.0882 DISCREPANCY — name ONE number before the campaign.**
+Both are relays of the SAME quantity: the W=8 point at threads_env=1, ppw=4,
+`throughput_videos_per_s` — recorded here as 0.0882 (compaction briefing) and
+relayed as 0.0871 twice (once before that briefing, once in the budget-line
+message as the T=1 comparison row). Candidate files: the matched-load recheck
+`probe_li_workers_T1_ppw4.json`, and — UNKNOWN, filename never relayed — the
+W=16 extension run, which may ALSO carry a W=8 point. Resolve by listing every
+point in every file (box, probe dir):
+  cd ~/parity-bench/working/video/probe && for f in probe_li_workers*.json; do
+    python3 - "$f" <<'PYEOF'
+  import json, sys
+  d = json.load(open(sys.argv[1]))
+  for p in d.get('points', []):
+      print(f"{sys.argv[1]:42s} T={d.get('threads_env')} ppw={p.get('posts_per_worker')} "
+            f"W={p.get('W')} thr={p.get('throughput_videos_per_s')} cpu={p.get('cpu_util_of_32')}")
+  PYEOF
+  done
+ONE matching point → the other value was a transcription slip; the record takes
+the file's value and drops the other. TWO matching points with different values
+→ they are two REPS, 1.3% apart, and that is the only rep-spread datum the LI
+arm has — keep it as that, do not average or discard. Either way the record
+then names one number with its file.
   **LIVENESS_MIN — NOT LANDED.** run_plan requires it (gate 5, probe-derived,
   the driver refuses to default it). It is absent from the repo. A DRY pass may
   omit it (gate 5 = NOT RUN; allowed only under DRY_PASS=1 since this commit);
@@ -73,6 +123,17 @@ throughout; fresh containers (`docker rm -f rr li_video` first).**
     echo "run_plan rc=${PIPESTATUS[0]}"
   (LIVENESS_MIN omitted → gate 5 NOT RUN on every dry leg, by design. PASSES
   defaults to 2 under DRY_PASS=1 so the pass mechanism is exercised.)
+**LIVENESS_MIN — THIN FROM THE DRY PASS ALONE, and that matters.** DRY_PASS=1
+clamps every leg to n=1, so the dry records hold ONE video per leg (the first
+manifest row, the same file on every leg) — one video's non-empty-frame
+fraction is a sample of size one for a gate that must hold across a 6× duration
+spread and 44 videos. Compute it from EVERY record available (dry-pass records
+AND the probe/gate-3 staged outputs, which carry per-frame detections for
+ES2002a on both arms), take the MINIMUM observed, and set the threshold below
+it with margin — then the black-fixture null control must still FAIL the gate,
+or the threshold is decorative. If the only data is one video, say so in the
+export: a threshold from n=1 is a stated assumption, not a measurement.
+
 **LIVENESS_MIN recipe (box; from any records jsonl — dry-pass records give one
 video per leg; the gate-3 staged run's records give ES2002a both arms):**
   for f in working/video/results/mainrun_*/records_*.jsonl; do ~/.venv/bin/python - "$f" <<'EOF'

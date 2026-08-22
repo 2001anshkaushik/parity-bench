@@ -113,6 +113,62 @@ def fresh_project_pipe(pipe_path, tag: str) -> dict:
     return base
 
 
+THREAD_ENV_KEYS = ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS',
+                   'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS', 'TORCH_NUM_THREADS')
+
+
+def task_thread_env(container: str, pid: int) -> dict:
+    """The six thread variables as THE TASK PROCESS ITSELF sees them, read from
+    /proc/<pid>/environ inside the container (2026-08-22).
+
+    Why: the probes set `-e OMP_NUM_THREADS=N` on the container and recorded
+    NOTHING about what the processes got — config asserted as evidence, in the
+    instruments that set M_TOKENS and both thread numbers. This is the cheap
+    in-process half of the check and needs no node: it proves the variables
+    reached the task process's environment. It does NOT prove torch read them —
+    torch caches its count at import, so only an in-process
+    `torch.get_num_threads()` (the env_probe node, which the driver's preflight
+    runs every leg) closes that last gap. Reported as what it is."""
+    raw = sh(['docker', 'exec', container, 'cat', f'/proc/{pid}/environ'])
+    if raw.startswith('<failed'):
+        return {}
+    out = {}
+    for item in raw.split('\0'):
+        if '=' in item:
+            k, v = item.split('=', 1)
+            if k in THREAD_ENV_KEYS:
+                out[k] = v
+    return out
+
+
+def verify_task_thread_env(container: str, pids: list, expect: int) -> dict:
+    """declared==measured across every task process. Verdicts mirror the LI
+    side: INCOMPLETE (a process reported none of the six — absence fails before
+    agreement), MISMATCH (a value != declared), OK."""
+    by_pid = {pid: task_thread_env(container, pid) for pid in pids}
+    missing = [pid for pid, env in by_pid.items()
+               if not env or any(k not in env for k in THREAD_ENV_KEYS)]
+    bad = {pid: env for pid, env in by_pid.items()
+           if env and any(env.get(k) != str(expect) for k in THREAD_ENV_KEYS)}
+    out = {'expect': expect, 'by_pid': by_pid, 'n_processes': len(pids),
+           'source': '/proc/<pid>/environ inside the container',
+           'proves': 'the six variables reached the task process environment',
+           'does_not_prove': ('that torch read them — torch caches at import; the '
+                              'in-process torch count comes from the env_probe node')}
+    if not pids:
+        out['verdict'] = 'INCOMPLETE'
+        out['reason'] = 'no task processes to read'
+    elif missing:
+        out['verdict'] = 'INCOMPLETE'
+        out['reason'] = f'task pids {missing} reported none/some of the six variables'
+    elif bad:
+        out['verdict'] = 'MISMATCH'
+        out['reason'] = f'declared {expect} but task processes carry {bad}'
+    else:
+        out['verdict'] = 'OK'
+    return out
+
+
 def proc_cpu_ticks(container: str, pid: int):
     raw = sh(['docker', 'exec', container, 'cat', f'/proc/{pid}/stat'])
     try:

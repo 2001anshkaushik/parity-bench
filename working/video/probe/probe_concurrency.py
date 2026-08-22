@@ -38,7 +38,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from probe_rr import (cgroup_snapshot, cleanup_tokens, fresh_project_pipe,  # noqa: E402
-                      one_send, proc_cpu_ticks, task_process_census)
+                      one_send, proc_cpu_ticks, task_process_census,
+                      verify_task_thread_env)
 from sdk_identity import assert_unique_project_ids  # noqa: E402
 from wait_ready import assert_host_network, wait_rr_ready  # noqa: E402
 from argtypes import positive_int  # noqa: E402 — register entry 8
@@ -68,7 +69,8 @@ async def start_container(image: str, threads_env: int) -> dict:
     return {'network_mode': net, **ready}
 
 
-async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict:
+async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None,
+                    threads_env: int = 1) -> dict:
     # Measured surface (Phase 1 + installed-wheel paste, 2026-08-21):
     # RocketRideClient bare, credentials via env, connect(timeout=60000).
     import os
@@ -100,6 +102,21 @@ async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict
 
     census = task_process_census(CONTAINER)
     pids = [p['pid'] for p in census]
+
+    # THREAD READ-BACK PER TASK PROCESS (2026-08-22). This probe set six env
+    # vars on the container and recorded nothing about what the task processes
+    # got — the same gap found in probe_li_workers the same day, in the
+    # instrument that sets M_TOKENS and the parity thread env. A point whose
+    # declared configuration cannot be read back is measuring an unknown
+    # configuration, so it refuses rather than recording a number at an
+    # unknown thread count.
+    tenv = verify_task_thread_env(CONTAINER, pids, threads_env)
+    if tenv['verdict'] != 'OK':
+        await cleanup_tokens(client, tokens)
+        raise SystemExit(
+            f'NOT DONE — M={m} threads_env={threads_env}: task thread read-back '
+            f'{tenv["verdict"]} — {tenv.get("reason")}. The point is refused rather '
+            'than recorded at an unknown thread count.')
 
     # IDLE-AT-M (2026-08-21): the engine burns ~1.002 cores doing nothing —
     # measure whether that spin SCALES PER TOKEN. Sample the container cgroup
@@ -149,6 +166,7 @@ async def measure_m(m: int, blob: bytes, pipe: str, threads: int | None) -> dict
     return {
         'M': m,
         'project_ids': project_ids,
+        'task_thread_env_readback': tenv,
         'use_wall_s': round(use_wall, 1),
         'idle_cores_after_use': idle_cores,
         'idle_cores_per_process': idle_per_proc,
@@ -186,7 +204,8 @@ async def amain() -> int:
     for m in args.sweep:
         print(f'== M={m}: fresh container ==', flush=True)
         start_info = await start_container(args.image, args.threads_env)
-        point = await measure_m(m, blob, args.pipe, args.threads)
+        point = await measure_m(m, blob, args.pipe, args.threads,
+                                threads_env=args.threads_env)
         point['network_mode'] = start_info['network_mode']
         point['ready_wall_s'] = start_info['wall_s']
         points.append(point)
