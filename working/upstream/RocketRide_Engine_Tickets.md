@@ -445,13 +445,13 @@ values that were never in effect.
 
 ---
 
-# TICKET 4 — Idle engine consumes one full CPU core continuously
+# TICKET 4 — Idle engine burns ~1 core continuously, plus ~0.26 cores per loaded-but-idle pipeline
 
-**Title:** The engine burns ~1.0 core busy-waiting with zero pipelines loaded and zero work submitted — measured 1.002 cores by `/proc` stat delta on an otherwise idle host
+**Title:** The engine busy-waits at ~1.0 core with zero pipelines loaded and zero work submitted (measured 1.002 cores by cgroup `cpu.stat` delta on an otherwise idle host) — and every additional loaded, idle pipeline adds ~0.26 cores: measured 1.28 → 5.25 idle cores across 1 → 16 tokens
 
-**Type:** Performance · **Severity:** Medium (constant resource drain; measurement bias in any CPU-accounted deployment) · **Component:** engine core (attribution to eaas server vs task subprocess pending — see Open questions)
+**Type:** Performance · **Severity:** Medium, rising with multiplexing (the idle cost scales with the number of loaded pipelines; measurement bias in any CPU-accounted deployment) · **Component:** engine core + task subprocess (the split between eaas server and task processes is in the sweep's per-process deltas — see Open questions)
 
-**Affects:** engine 3.3.1 (release binary, Linux x64), measured 2026-08-21. Not source-diffed across versions (the spin is in compiled code or the served python's event loop; the reproduction is behavioural).
+**Affects:** engine 3.3.1 (release binary, Linux x64), measured 2026-08-21 twice: single-engine idle (1.002 cores) and the Phase 2 concurrency sweep (M = 1/2/4/8/16 loaded pipelines, the six BLAS/OMP variables at 8). Not source-diffed across versions (the spin is in compiled code or the served python's event loop; the reproduction is behavioural).
 
 ## Summary
 
@@ -460,6 +460,26 @@ data submitted) consumes a steady **1.002 cores**. Measurement: host `/proc` sta
 idle window on a box whose only other activity floors load1 at ~0; box load1 with the idle
 engine present reads 1.00 flat. The container cgroup's `cpu.stat usage_usec` delta over the
 same window attributes the burn to the engine's cgroup, not to any host process.
+
+**Second measurement, same day — the spin scales with loaded pipelines.** With M pipelines
+loaded via `use()` (one fresh project_id per token, so M distinct task processes — census-verified)
+and NO work submitted, the container cgroup's idle burn over a 6 s quiet window after the last
+`use()` and before any send:
+
+| M (loaded, idle pipelines) | idle cores | marginal cores per added pipeline |
+|---:|---:|---:|
+| 1 | 1.28 | — |
+| 2 | 1.54 | 0.26 |
+| 4 | 2.02 | 0.24 |
+| 8 | 3.04 | 0.26 |
+| 16 | 5.25 | 0.28 |
+
+Least-squares over the five points: **slope 0.26 cores per pipeline, intercept 0.99 cores** — the
+fit's intercept recovers the single-engine measurement. The spin is **partial**: neither a
+server constant (would be flat ~1.0) nor one full core per pipeline (would be ~M). At M=4 the
+engine burns 2.02 cores — **6.3% of a 32-core host — before any work is submitted**; at M=16,
+16.4%. (Values as relayed from the sweep's stdout; the sweep JSON's `ticket4_idle_answer` key
+carries the fitted verdict and `idle_cores_per_process` carries the per-process attribution.)
 
 ## Reproduction
 
@@ -470,31 +490,50 @@ B=$(docker exec rr cat /sys/fs/cgroup/cpu.stat | awk '/usage_usec/{print $2}')
 echo "idle cores: $(( (B - A) / 30 ))e-6"    # observed: ~1.002
 ```
 
+M-dependence: load M pipelines with `use()` — a FRESH project_id per call, because the engine
+derives the task token from `{userId, project_id, source}` and M calls on one pipe id are ONE
+task — wait ~6 s, read the same cgroup delta again. Harness form:
+
+```bash
+working/video/probe/probe_concurrency.py --video <avi> --sweep 1 2 4 8 16 \
+  --image rr:patched-video --threads-env 8 --out probe_concurrency_T8.json
+# stdout leads with the "TICKET 4 ANSWER" banner; JSON key ticket4_idle_answer
+```
+
 ## Impact — measured, not hypothetical
 
 * **Deployment:** one core of every host running an idle or lightly-loaded engine is spent on
   nothing. On small instances this is a material fraction of capacity.
+* **Multiplexed deployments:** an engine holding M loaded pipelines idles at ≈ 1.0 + 0.26·M
+  cores. Sixteen loaded pipelines idle at 5.25 cores; by extrapolation ~120 would idle a full
+  32-core host with nothing submitted. (Extrapolation labeled as such; measured to M=16.)
 * **Benchmark bias, Phase 1 (PDF campaign):** the engine ran under `--cpuset-cpus 0-23`; the
   spin means RocketRide had **23 effective working cores against LlamaIndex's 24**, and every
   cgroup-CPU-based figure for the engine carried a constant ~one-core inflation — a bias
   **AGAINST RocketRide on both throughput and CPU-efficiency**, present in every leg.
 * **Benchmark handling, Phase 2:** hygiene gates that bound host load had to move from absolute
   thresholds to excess-over-measured-baseline, because the system under test violates any
-  absolute bound by existing.
+  absolute bound by existing. The parity posture (M tokens) now measures its own idle burn with
+  every instance live, before any work, and every leg export carries it in the `efficiency`
+  block beside the CPU figures — reported, never subtracted, because whether the spin is
+  additive under load is unmeasured.
 
 ## Open questions (deliberately left to the engine team rather than answered wrongly)
 
 1. **Where is the spin?** Candidates: a polling loop in the C++ core, the embedded python
-   server's event loop, or a timer with a zero/short period. Not attributed here.
-2. **Does it scale with task subprocesses?** Each `use()` spawns an isolated task process; if
-   each carries its own spin, an engine serving M pipelines idles at ~M cores. (The Phase 2
-   harness measures idle cores as a function of token count; the number can be supplied on
-   request once that sweep runs.)
+   server's event loop, or a timer with a zero/short period. Not attributed here. The sweep's
+   per-process CPU deltas (`idle_cores_per_process`) split the idle burn between the eaas server
+   and each task subprocess; that split has not yet been read into this ticket.
+2. **Does it scale with task subprocesses?** — **ANSWERED 2026-08-21: partially.** ~0.26 cores
+   per loaded, idle pipeline on top of the ~1.0-core server spin (table above), linear to M=16.
+3. **Is the per-pipeline ~0.26 inside the task subprocess (a spin per task) or in the server's
+   per-token bookkeeping?** Same data as (1) decides it.
 
 ## Acceptance criteria
 
 1. An idle engine (booted, listening, zero pipelines) consumes < 0.05 cores sustained.
-2. Idle consumption does not scale with the number of loaded-but-idle pipelines.
+2. Idle consumption does not scale with the number of loaded-but-idle pipelines (measured
+   today: +0.26 cores per pipeline).
 
 
 ---
@@ -536,8 +575,10 @@ workload at every point (counts read back from the responses, not assumed).
 Two runs, same shape, same magnitude. The CPU-seconds framing is the point: **t32's steady
 send does the identical work as t8's in ≈207–222 CPU-s against t8's ≈146 — 40–50% more CPU —
 across 2.1× the wall.** Utilisation *fell* (0.46 → 0.18) while wall doubled: contention, not
-work. Subtracting the constant ~1.0-core idle spin (Ticket 4) from every cell does not change
-the shape — t32 steady remains ≈33–43% above t8 steady, and the send-1 gap widens.
+work. Subtracting the idle spin (Ticket 4: ~1.0 core server-constant; 1.28 cores measured at this
+run's configuration, one token at the six variables = 8, once the per-token ~0.26 is included)
+from every cell does not change the shape — t32 steady remains ≈30–43% above t8 steady (33–43%
+subtracting 1.0 core, 30–40% subtracting 1.28), and the send-1 gap widens.
 
 ## Mechanism — what is verified vs. left open
 

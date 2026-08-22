@@ -64,6 +64,23 @@ that question. The gate refuses to start a leg when foreign load (load1 minus
 what our own containers account for — the engine idles at ~1 core by itself)
 exceeds 2.0. `driver_cpu` shows the driver's own share stayed negligible.
 
+**`efficiency` — the CPU family, with the idle burden beside it.**
+`service_cpu_s` is the service container's own cgroup CPU (`cpu.stat
+usage_usec`) bracketed around the leg — the same reader the probes use, so a
+leg figure and a sweep point are one quantity; from it `effective_cores`,
+`cpu_util_of_box`, `cpu_s_per_footage_min`, `cpu_s_per_frame`,
+`cpu_s_per_video`. **`idle_burden`** is the Ticket-4 finding made a per-leg
+measurement: the engine idles at ~1.0 core plus ~0.26 cores per live token
+(measured 2026-08-21, M = 1…16 — neither a server constant nor a full core per
+token), so the driver samples idle cores *with every instance live, before any
+work* (`idle_cores_with_instances_live`, `idle_share_of_box` — at M=4 that was
+2.02 cores, 6.3% of the box) and records it next to every efficiency figure.
+It is **reported, never subtracted**: whether the spin is additive under load is
+unmeasured, and the two `_if_additive` values say so in their names. `valid` is
+false — and the leg fails — when a CPU read was absent or `effective_cores`
+exceeds the box (flagged, not clamped). `collector_summary` is the sampling
+subprocess's own per-role summary, carried unchanged.
+
 ---
 
 ## 2. Gates — what each proves, its null control, and NOT RUN vs FAIL

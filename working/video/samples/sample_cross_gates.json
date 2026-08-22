@@ -7,31 +7,31 @@
   "per_video": {
    "ES2002a.Corner.avi": {
     "PASS": true,
-    "n_frames": 84,
+    "n_frames": 83,
     "diverging_frames": null,
     "n_diverging": 0
    },
    "ES2002b.Corner.avi": {
     "PASS": true,
-    "n_frames": 152,
+    "n_frames": 151,
     "diverging_frames": null,
     "n_diverging": 0
    },
    "ES2002c.Corner.avi": {
     "PASS": true,
-    "n_frames": 160,
+    "n_frames": 159,
     "diverging_frames": null,
     "n_diverging": 0
    },
    "ES2005a.Corner.avi": {
     "PASS": true,
-    "n_frames": 32,
+    "n_frames": 31,
     "diverging_frames": null,
     "n_diverging": 0
    },
    "ES2014d.Corner.avi": {
     "PASS": true,
-    "n_frames": 194,
+    "n_frames": 193,
     "diverging_frames": null,
     "n_diverging": 0
    },
@@ -43,25 +43,25 @@
    },
    "ES2007c.Corner.avi": {
     "PASS": true,
-    "n_frames": 94,
+    "n_frames": 93,
     "diverging_frames": null,
     "n_diverging": 0
    },
    "ES2008a.Corner.avi": {
     "PASS": true,
-    "n_frames": 67,
+    "n_frames": 66,
     "diverging_frames": null,
     "n_diverging": 0
    },
    "ES2009d.Corner.avi": {
     "PASS": true,
-    "n_frames": 174,
+    "n_frames": 173,
     "diverging_frames": null,
     "n_diverging": 0
    },
    "ES2010b.Corner.avi": {
     "PASS": true,
-    "n_frames": 77,
+    "n_frames": 76,
     "diverging_frames": null,
     "n_diverging": 0
    }
@@ -71,57 +71,57 @@
   "PASS": true,
   "tol": 0.02,
   "n_pairs": 10,
-  "worst_abs_deviation": 0.0049,
+  "worst_abs_deviation": 0.0044,
   "rows": [
    {
     "video": "ES2002a.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 1.0007
+    "ratio_rr_over_li": 1.0034
    },
    {
     "video": "ES2002b.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 0.9998
+    "ratio_rr_over_li": 0.996
    },
    {
     "video": "ES2002c.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 0.9992
+    "ratio_rr_over_li": 1.0032
    },
    {
     "video": "ES2005a.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 1.0049
+    "ratio_rr_over_li": 0.9959
    },
    {
     "video": "ES2014d.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 1.0037
+    "ratio_rr_over_li": 1.0
    },
    {
     "video": "ES2006b.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 1.0021
+    "ratio_rr_over_li": 1.0007
    },
    {
     "video": "ES2007c.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 0.9978
+    "ratio_rr_over_li": 0.9974
    },
    {
     "video": "ES2008a.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 0.9982
+    "ratio_rr_over_li": 1.0001
    },
    {
     "video": "ES2009d.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 1.0007
+    "ratio_rr_over_li": 0.9959
    },
    {
     "video": "ES2010b.Corner.avi",
     "PASS": true,
-    "ratio_rr_over_li": 0.998
+    "ratio_rr_over_li": 1.0044
    }
   ]
  },
@@ -129,20 +129,20 @@
   "gated": false,
   "n_pairs": 10,
   "ratio_min_median_max": [
-   0.982,
-   1.013,
-   1.062
+   0.976,
+   1.015,
+   1.077
   ],
   "per_video": {
-   "ES2002a.Corner.avi": 1.0,
-   "ES2002b.Corner.avi": 1.014,
-   "ES2002c.Corner.avi": 1.013,
-   "ES2005a.Corner.avi": 1.062,
-   "ES2014d.Corner.avi": 0.989,
-   "ES2006b.Corner.avi": 0.982,
-   "ES2007c.Corner.avi": 1.025,
-   "ES2008a.Corner.avi": 1.0,
-   "ES2009d.Corner.avi": 0.988,
+   "ES2002a.Corner.avi": 0.976,
+   "ES2002b.Corner.avi": 1.015,
+   "ES2002c.Corner.avi": 0.987,
+   "ES2005a.Corner.avi": 1.077,
+   "ES2014d.Corner.avi": 1.011,
+   "ES2006b.Corner.avi": 1.018,
+   "ES2007c.Corner.avi": 0.978,
+   "ES2008a.Corner.avi": 1.036,
+   "ES2009d.Corner.avi": 1.013,
    "ES2010b.Corner.avi": 1.029
   }
  },
@@ -150,12 +150,12 @@
  "n_li": 10,
  "n_paired": 10,
  "rr_chunk_config_measured": {
-  "chunk_size_max_observed": 4000,
-  "chunk_chars_median": 3697
+  "chunk_size_max_observed": 3999,
+  "chunk_chars_median": 3712
  },
  "li_chunk_config_measured": {
-  "chunk_size_max_observed": 4000,
-  "chunk_chars_median": 3697
+  "chunk_size_max_observed": 3999,
+  "chunk_chars_median": 3712
  },
  "_SAMPLE": "SYNTHETIC \u2014 shape review only"
 }

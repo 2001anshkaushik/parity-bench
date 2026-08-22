@@ -9,14 +9,70 @@ using it.
 
 ## ▶ COMPACTION BRIEFING — state as of late 2026-08-21 (THIS BLOCK WINS on conflict with the chronological blocks below)
 
-**THE EIGHT RUN-PLAN NUMBERS — three landed, five open:**
-- `RR_THREADS_ENV = 8` (RR thread curve, knee at 8; t32 regression reproduced twice — Ticket 5)
+**▶ TICKET 4 ANSWERED — RR concurrency sweep, T=8 (landed late 2026-08-21;
+RELAYED values — the box JSON, `probe_concurrency_T8.json` per the invocation,
+is authoritative and its `ticket4_idle_answer` key holds the fitted verdict):**
+  M=1   0.0688 videos/s   wall  14.5 s   cpu_util_of_32 0.262   idle 1.28 cores
+  M=2   0.1006            wall  19.9 s   0.477                   idle 1.54   (1→2 marginal 0.73)
+  M=4   0.1179            wall  33.9 s   0.853                   idle 2.02   (2→4 marginal 0.59)
+  M=8   0.0246            wall 325.6 s   0.976                   idle 3.04   (4→8 COLLAPSES 4.8×)
+  M=16  0.0187            wall 856.8 s   0.985                   idle 5.25   (8→16 marginal 0.38)
+**Verdict: PARTIAL, ≈0.26 cores/token.** Least-squares over the five relayed
+points: slope 0.264, intercept 0.99 — the fit's intercept IS the 1.002-core
+single-engine measurement; per-step marginals 0.26/0.24/0.26/0.28, linear. Not
+PER-SERVER (flat ~1.0), not PER-TOKEN (~1.0 each). At M=4 that is 2.02 idle
+cores = **6.3% of the 32-core box burned before any work**; at M=16, 16.4%.
+Ticket 4 updated with the curve. The driver now measures the same quantity per
+leg (idle cores with every instance live, same cgroup reader, both arms) and
+every export's `efficiency` block carries it BESIDE the CPU figures — reported,
+never subtracted (additivity under load is unmeasured).
+**The M=8 collapse is a DIFFERENT failure from t32 (Ticket 5).** There the box
+was IDLE while wall grew (util 0.46 → 0.18: lock contention). Here CPU is
+PEGGED (0.976) while wall grows 9.6×: M×T oversubscription — 8 tokens × 8
+intra-op threads = 64 threads on 32 cores. CPU-s per video from the relayed
+values (util × 32 × wall ÷ M): 122 · 152 · 231 · 1,271 · 1,688 — identical work
+costing 5.5× the CPU at M=8 vs M=4. (Whether that becomes a Ticket 6 is
+Ansh's call; not drafted.)
+
+**THE CROSS-ARM SENTENCE — worth its own line in the report:** both stacks
+degrade past their knee, and they degrade DIFFERENTLY. LlamaIndex at W=16 goes
+wall-up / CPU-DOWN (0.219 → 0.177) with all 16 workers alive — STARVED.
+RocketRide at M=8 goes wall-up / CPU-PEGGED (0.976) — OVERSUBSCRIBED. Same box,
+two ceilings, two mechanisms. That is a better finding than either arm's peak
+throughput. (Note on the "shared substrate" line in the LI-curve paragraph
+below: it matched LI W=16 against RR's THREAD axis — t32, util falling. The RR
+TOKEN axis fails by the opposite signature on the same box, so "shared
+substrate" is one hypothesis, not a finding; the sentence above is the measured
+statement.)
+
+**CROSSROAD 29 (2026-08-21): REFINE IS MANDATORY BEFORE EITHER NUMBER IS SET.**
+M_TOKENS=4 was measured at T=8: 4×8 = 32 threads on 32 cores, exactly
+saturated. M=8 × T=4 is also 32 and may scale better — tokens parallelize where
+threads queue behind the device lock. Both sweeps held the other axis fixed at
+a value chosen before the interaction was visible. Ansh is running
+`probe_concurrency.py --sweep 4 8 --threads-env 4` now; **whichever M×T product
+wins sets BOTH numbers** (M_TOKENS and the parity posture's thread env).
+**FLAG — not ruled, ASK before the campaign:** run_plan starts the `rr`
+container ONCE (step 1, a single `thread_env_args "$RR_THREADS_ENV"`) and holds
+it up through BOTH postures (stop_arm rr after step 3). A T=4 winner therefore
+also puts the DEFAULT posture (1 token) at T=4 — a point the M=1 thread curve
+never measured (1/8/32 only; knee 8). Either the container restarts between
+postures with a per-posture T (small run_plan change: `start_rr "$T"` before
+step 3 + an `RR_PARITY_THREADS_ENV` var, both read back), or one T serves both
+and the default posture runs off its measured optimum. Sized, NOT implemented.
+
+**THE EIGHT RUN-PLAN NUMBERS — three landed, one provisional, four open:**
+- `RR_THREADS_ENV = 8` — LANDED from the M=1 thread curve (knee at 8; t32
+  regression reproduced twice — Ticket 5). Under C29 the PARITY posture's T is
+  set jointly with M by the refine pass; see the flag above.
 - `GATE3_RUN_ID = probe_20260821_195214` (the ORIGINAL probe run, artifacts intact)
-- `LI_WORKERS = 8` ← settled this turn (matched-load curve below; W=16 is past the knee)
-- OPEN: `M_TOKENS` (RR concurrency sweep — NEXT box step), `LI_THREADS_ENV`
-  (refine pass at W=8 with --threads-env {2,4}), `WARM_N` (≥ max(M, 8) plus
-  margin, from the 16 warm rows; 16 provisional), `BLAST_C` (wave arithmetic
-  with the sweeps), `DEFAULT_N` (ruled = 44 at this scale; not yet exported).
+- `LI_WORKERS = 8` (matched-load curve below; W=16 is past the knee)
+- `M_TOKENS = 4` **PROVISIONAL at T=8** (2→4 marginal 0.59; 4→8 collapses
+  4.8×). C29: the refine pass decides between 4×8 and 8×4 — not set until it lands.
+- OPEN: `LI_THREADS_ENV` (refine pass at W=8 with --threads-env {2,4}), `WARM_N`
+  (≥ max(M, 8) plus margin, from the 16 warm rows; 16 provisional), `BLAST_C`
+  (wave arithmetic with the sweeps), `DEFAULT_N` (ruled = 44 at this scale; not
+  yet exported).
 
 **THE LI CURVE (T=1, matched-load ppw=4 — the JSON on the box is authoritative;
 an earlier relay read W=8 as 0.0871):**
@@ -72,9 +128,15 @@ can FOLLOW OMP=1 reporting both; frame_law — 83 measured vs 84 predicted)
 each carry a minutes-long check and no verdict.
 
 **ASK — DO NOT INVENT (held by this session, not by the repo):**
-- The RR concurrency sweep has NOT RUN at compaction — its Ticket-4
-  idle-vs-M banner is the headline the operator wants FIRST. ASK for output.
-- W=16 raw JSON and the refine-pass results live on the box (filenames
+- The RR concurrency sweep (T=8) HAS RUN — the five points above are RELAYED;
+  the JSON is expected at `probe_concurrency_T8.json` per the invocation
+  (filename unconfirmed). NOT relayed: the JSON's own fitted
+  `ticket4_idle_answer` (verify the slope against 0.26) and the per-process
+  attribution `idle_cores_per_process` (eaas server vs task subprocesses —
+  Ticket 4 open question 1). ASK before citing the split.
+- The C29 refine pass (`--sweep 4 8 --threads-env 4`) was IN FLIGHT at this
+  writing; output filename unrelayed. It sets M_TOKENS and the parity T. ASK.
+- W=16 raw JSON and the LI refine-pass results live on the box (filenames
   unrelayed); the numbers above are relayed values. ASK before citing beyond them.
 - Messages to Leela/Shashi: the approved texts are preserved in
   `team_docs_sent/MESSAGES_2026-08-21.md`; whether they were sent verbatim and
@@ -82,8 +144,9 @@ each carry a minutes-long check and no verdict.
 - The alignment negotiation has not happened. ASK for its outcome before
   implementing any FOLLOW change.
 - Operator rulings are recorded in paraphrase; ASK if verbatim wording is needed.
-- Box state at compaction (relayed): W=16 done, RR sweep next, box up,
-  ~62-min campaign after the dry pass. Verify, don't assume.
+- Box state (relayed, late 2026-08-21): W=16 done, RR T=8 sweep done, C29
+  refine (M∈{4,8} × T=4) in flight, then the LI refine pass, the dry pass, and
+  the ~62-min campaign. Verify, don't assume.
 
 ---
 
@@ -169,6 +232,19 @@ each carry a minutes-long check and no verdict.
   without the column. est_chunks columns re-derived from probe-measured
   dpf + chars/det (REQUIRED build args; probe/summarize_probe_rr.py prints
   both). Gate 1 keeps full force. Register entry 5.
+- **Crossroad 29 (2026-08-21): REFINE IS MANDATORY BEFORE EITHER NUMBER IS
+  SET.** The RR concurrency sweep at T=8 gave M_TOKENS=4 (2→4 marginal 0.59,
+  4→8 collapse 4.8× with CPU pegged at 0.976 — M×T oversubscription, 64 threads
+  on 32 cores; a different failure from t32's idle-box lock contention). But
+  4×8 = 32 is exactly saturated and 8×4 = 32 may scale better, and each sweep
+  held the other axis at a value chosen before the interaction was visible.
+  Ansh runs `--sweep 4 8 --threads-env 4`; the winning M×T product sets BOTH
+  M_TOKENS and the parity thread env. Ticket 4 answered by the same sweep:
+  PARTIAL, ≈0.26 cores/token on top of the ~1.0-core server spin (M=4 idles
+  2.02 cores = 6.3% of the box before any work); the driver carries the
+  measured idle burden in every export's `efficiency` block, beside the CPU
+  figures, never subtracted. Open flag: one container thread env serves both
+  postures in run_plan (see the briefing).
 - **Gate rulings:** gate 1 frames-census is THE dropped-frame detector; log
   scrape is ATTRIBUTION only, fail-closed on its own channel liveness. Gate 3
   STRICT zero tolerance, armed only via --gate3-armed <probe_run_id> after the
@@ -695,6 +771,9 @@ rig so the contract picks its value with the curve in view. Shashi message
 EDITED: the closing line about FULL50's figures dividing by the wrong W is
 REMOVED — the arithmetic implies it; he draws it himself.
 
+**[SUPERSEDED — W=16 landed (LI_WORKERS=8); RR T=8 sweep landed (Ticket 4
+PARTIAL ≈0.26 cores/token; M_TOKENS=4 provisional); Crossroad 29 refine
+(M∈{4,8} × T=4) in flight — see the briefing at the top.]**
 NEXT: W=16 extension lands → refine pass at knee W with --threads-env {2,4}
 → RR concurrency sweep (threads-env 8; **the Ticket-4 idle-vs-M banner is
 the headline the operator wants FIRST when it lands**) → DRY PASS →

@@ -122,6 +122,26 @@ def main():
             'total_realtime_factor': round(ok_video_s / leg_wall, 2),
             'steady_window': window,
         },
+        # Ticket 4 (2026-08-21): the efficiency family with the measured idle
+        # burden beside it — the same driver function the box uses. Synthetic
+        # inputs: ~26 effective cores over the leg, a 4-token parity posture
+        # idling at 2.02 cores (the probe's M=4 point) over a 1.002 baseline.
+        'efficiency': dv.efficiency_block(
+            service_cpu_s=round(leg_wall * 26.0, 1), leg_wall_s=leg_wall,
+            ok_frames=ok_frames, ok_video_s=ok_video_s, n_ok=len(records),
+            idle_burden={
+                'instances': 4, 'instance_kind': 'rr_tokens',
+                'idle_cores_before_instances': 1.002,
+                'idle_cores_with_instances_live': 2.02, 'sample_s': 6.0,
+                'idle_share_of_box': 0.0631, 'box_cpus': 32,
+                'marginal_cores_per_instance': 0.255,
+                'baseline_note': ('RR: before = server only (tokens not yet created); '
+                                  'LI: workers already live in both samples'),
+                'reference': ('Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 '
+                              'cores/token at T=8, PARTIAL — probe_concurrency '
+                              'ticket4_idle_answer is the curve')},
+            ncpu=32),
+        'collector_summary': {'_SAMPLE': 'the collector subprocess summary rides here'},
         'n_offered': len(records), 'n_records': len(all_records), 'n_errors': 0,
         'leg_wall_s': round(leg_wall, 1), 'aborted_by_breaker': False,
         'wall_s_order_stats': sorted(round(r['wall_s'], 1) for r in records),
@@ -162,6 +182,23 @@ def main():
     ln = export['latency_normalized']['wall_s_per_video_minute']
     export['latency_normalized']['p50'] = ln[len(ln) // 2]
     export['latency_normalized']['max'] = ln[-1]
+
+    # Null controls for the efficiency block (absence fails before agreement;
+    # impossible values flagged, never clamped): an absent CPU read, an absent
+    # idle sample, and a >box effective-cores figure must each read valid=False.
+    assert export['efficiency']['valid'] is True, export['efficiency']
+    absent_cpu = dv.efficiency_block(None, leg_wall, ok_frames, ok_video_s, len(records),
+                                     export['efficiency']['idle_burden'], 32)
+    assert absent_cpu['valid'] is False and absent_cpu['absent'] == ['service_cpu_s'], absent_cpu
+    absent_idle = dv.efficiency_block(100.0, leg_wall, ok_frames, ok_video_s, len(records),
+                                      None, 32)
+    assert absent_idle['valid'] is False and absent_idle['absent'] == [
+        'idle_cores_with_instances_live'], absent_idle
+    impossible = dv.efficiency_block(leg_wall * 40.0, leg_wall, ok_frames, ok_video_s,
+                                     len(records), export['efficiency']['idle_burden'], 32)
+    assert impossible['valid'] is False and 'impossible_value' in impossible, impossible
+    assert impossible['effective_cores'] == 40.0, impossible   # flagged, NOT clamped
+    print('efficiency_block null controls fired: absent cpu, absent idle, impossible value')
 
     (OUT_DIR / 'sample_export_blast.json').write_text(json.dumps(export, indent=1))
 

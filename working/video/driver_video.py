@@ -480,28 +480,90 @@ async def li_readbacks(arm: LIArm, timeout_s: float = 120) -> Dict[str, dict]:
     return per_worker
 
 
+def container_cpu_usage_usec(container: str, timeout_s: int = 15) -> Optional[int]:
+    """The container cgroup's OWN CPU accounting (cpu.stat usage_usec) — the
+    one reader behind the quiet-box idle baseline, the idle-with-instances-live
+    sample (Ticket 4 burden) and the per-leg CPU bracket (#34: utilisation
+    denominators come from the container, never the driver; the probes read
+    this same file the same way, so leg figures and sweep points are one
+    quantity). None when unreadable — each caller decides whether absence
+    fails; none of them dresses None as 0."""
+    try:
+        out = subprocess.run(['docker', 'exec', container, 'cat', '/sys/fs/cgroup/cpu.stat'],
+                             capture_output=True, text=True, timeout=timeout_s).stdout
+        return int([l for l in out.splitlines() if l.startswith('usage_usec')][0].split()[1])
+    except Exception:
+        return None
+
+
 def container_idle_cores(container: str, sample_s: float = 4.0) -> Optional[float]:
     """The arm's OWN idle CPU burn, measured from its cgroup over a short
     window (usage_usec delta / wall). Exists because the engine idles at ~1.002
     cores (measured 2026-08-21, box otherwise idle) — an absolute load gate
     would trip on the system under test by existing. Returns None when the
-    cgroup is unreadable; the caller treats None as zero-attributed (foreign
-    excess then reads HIGH, which fails closed in the right direction)."""
-    def usage_usec() -> Optional[int]:
-        try:
-            out = subprocess.run(['docker', 'exec', container, 'cat', '/sys/fs/cgroup/cpu.stat'],
-                                 capture_output=True, text=True, timeout=15).stdout
-            return int([l for l in out.splitlines() if l.startswith('usage_usec')][0].split()[1])
-        except Exception:
-            return None
-    a = usage_usec()
+    cgroup is unreadable; the quiet-box caller treats None as zero-attributed
+    (foreign excess then reads HIGH, which fails closed in the right
+    direction); the idle-burden caller refuses the leg."""
+    a = container_cpu_usage_usec(container)
     if a is None:
         return None
     time.sleep(sample_s)
-    b = usage_usec()
+    b = container_cpu_usage_usec(container)
     if b is None:
         return None
     return round((b - a) / 1e6 / sample_s, 3)
+
+
+def efficiency_block(service_cpu_s: Optional[float], leg_wall_s: float,
+                     ok_frames: int, ok_video_s: float, n_ok: int,
+                     idle_burden: Optional[dict], ncpu: int) -> dict:
+    """The CPU-efficiency family for one leg from the container cgroup bracket
+    — with the Ticket-4 idle burden BESIDE it. Measured 2026-08-21 (RR
+    concurrency sweep, T=8): the engine idles at ~1.0 core + ~0.26 cores per
+    live token (PARTIAL — neither per-server nor per-token); at M=4 that is
+    2.02 cores, 6.3% of the box, before any work. The burden is REPORTED next
+    to every figure and never subtracted: whether the spin is additive under
+    load is unmeasured, and a subtracted figure would be arithmetic wearing a
+    measurement's clothes (register entry 5). The two `_if_additive` values are
+    labeled as exactly that. `valid` is False whenever a read was absent or a
+    value is impossible — absence fails before agreement; nothing is clamped
+    (#34)."""
+    have_cpu = service_cpu_s is not None and leg_wall_s > 0
+    idle_live = (idle_burden or {}).get('idle_cores_with_instances_live')
+    eff_cores = (service_cpu_s / leg_wall_s) if have_cpu else None
+    blk: Dict[str, Any] = {
+        'valid': bool(have_cpu and idle_live is not None),
+        'source': ('container cgroup cpu.stat usage_usec bracketed around the leg — the '
+                   'same reader as the probes (#34: denominators from the container, '
+                   'never the driver)'),
+        'service_cpu_s': round(service_cpu_s, 1) if have_cpu else None,
+        'effective_cores': round(eff_cores, 3) if eff_cores is not None else None,
+        'cpu_util_of_box': (round(eff_cores / ncpu, 4)
+                            if eff_cores is not None and ncpu else None),
+        'box_cpus': ncpu,
+        'cpu_s_per_footage_min': (round(service_cpu_s / (ok_video_s / 60), 3)
+                                  if have_cpu and ok_video_s else None),
+        'cpu_s_per_frame': (round(service_cpu_s / ok_frames, 3)
+                            if have_cpu and ok_frames else None),
+        'cpu_s_per_video': (round(service_cpu_s / n_ok, 1)
+                            if have_cpu and n_ok else None),
+        'idle_burden': dict(idle_burden) if idle_burden else None,
+        'policy': ('idle_burden is reported beside every figure above and never '
+                   'subtracted — additivity under load is unmeasured (Ticket 4)'),
+    }
+    if eff_cores is not None and ncpu and eff_cores > ncpu:
+        blk['impossible_value'] = (f'effective_cores {eff_cores:.2f} > box_cpus {ncpu}: '
+                                   'flagged, never clamped (#34)')
+        blk['valid'] = False
+    if idle_live is not None and have_cpu:
+        blk['idle_burden']['idle_cpu_s_over_leg_if_additive'] = round(idle_live * leg_wall_s, 1)
+        blk['idle_burden']['idle_share_of_service_cpu_if_additive'] = (
+            round(idle_live * leg_wall_s / service_cpu_s, 4) if service_cpu_s else None)
+    if not blk['valid'] and 'impossible_value' not in blk:
+        blk['absent'] = [k for k, v in (('service_cpu_s', service_cpu_s),
+                                        ('idle_cores_with_instances_live', idle_live))
+                         if v is None]
+    return blk
 
 
 def settled_census(container: str, tries: int = 10, interval_s: float = 3.0) -> list:
@@ -1089,6 +1151,48 @@ async def amain() -> int:
         say(f'census: {posture.tokens} token(s) -> {len(new_procs)} new task '
             f'process(es) {[p["pid"] for p in new_procs]} (declared==measured)')
 
+    # TICKET 4 BURDEN (2026-08-21): the engine idles at ~1.0 core + ~0.26 cores
+    # per live token (PARTIAL; probe_concurrency T=8 sweep, M=1..16). The
+    # quiet-box baseline in preflight was sampled BEFORE arm.start() created
+    # the tokens, so for the parity posture it holds the server spin only.
+    # Sample the quantity the probe measured — idle cores with every instance
+    # live, before any work — through the same reader, both arms, and carry it
+    # into the export's efficiency block. An absent read refuses the leg: an
+    # efficiency figure that cannot name its idle burden is not quotable.
+    svc_container = args.rr_container if args.arm == 'rocketride' else args.li_container
+    instances = posture.tokens if args.arm == 'rocketride' else (arm.declared_workers or 1)
+    idle_sample_s = 6.0
+    idle_live = container_idle_cores(svc_container, sample_s=idle_sample_s)
+    if idle_live is None:
+        await arm.stop()
+        raise SystemExit(f'NOT DONE — cannot read {svc_container!r} cgroup cpu.stat for the '
+                         'idle-with-instances-live sample (Ticket 4 burden); the leg\'s '
+                         'efficiency figures would have no idle burden to carry.')
+    ncpu = os.cpu_count() or 32
+    idle_before = (pf.get('preleg_container_idle_cores') or {}).get(svc_container)
+    pf['idle_burden'] = {
+        'instances': instances,
+        'instance_kind': 'rr_tokens' if args.arm == 'rocketride' else 'li_workers',
+        'idle_cores_before_instances': idle_before,
+        'idle_cores_with_instances_live': idle_live,
+        'sample_s': idle_sample_s,
+        'idle_share_of_box': round(idle_live / ncpu, 4),
+        'box_cpus': ncpu,
+        # RR only: tokens were created between the two samples, so the
+        # difference per token is a marginal. LI workers pre-exist the driver
+        # (both samples see them live) — probe_li_workers holds LI's curve.
+        'marginal_cores_per_instance': (
+            round((idle_live - idle_before) / instances, 3)
+            if args.arm == 'rocketride' and idle_before is not None and instances else None),
+        'baseline_note': ('RR: before = server only (tokens not yet created); '
+                          'LI: workers already live in both samples'),
+        'reference': ('Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at '
+                      'T=8, PARTIAL — probe_concurrency ticket4_idle_answer is the curve'),
+    }
+    say(f'idle burden: {idle_live:.2f} cores with {instances} instance(s) live = '
+        f'{idle_live / ncpu:.1%} of the box before any work '
+        f'(pre-instance baseline {idle_before})')
+
     (out_dir / 'preflight.json').write_text(json.dumps(
         {k: v for k, v in pf.items() if k != 'rows'} | {'posture': posture.label()}, indent=1))
     say(f'preflight PASSED — {arm.name} {posture.label()} leg={args.leg} n={args.n}')
@@ -1183,6 +1287,13 @@ async def amain() -> int:
                                      roles, interval_s=0.5)
         collector.start()
 
+    # CPU bracket around the leg from the service container's own cgroup — the
+    # efficiency family's numerator, read by the same function as the idle
+    # samples and the probes. Read BEFORE arm.stop(): terminate() ends the
+    # tokens whose burn the bracket is measuring.
+    cg_leg1: Optional[int] = None
+    collector_summary: Optional[dict] = None
+    cg_leg0 = container_cpu_usage_usec(svc_container)
     t_leg0 = time.monotonic()
     dr0 = resource.getrusage(resource.RUSAGE_SELF)
     try:
@@ -1192,14 +1303,17 @@ async def amain() -> int:
                                      Path(args.corpus_dir), writer, done_keys,
                                      args.interval_s)
         leg_wall = time.monotonic() - t_leg0
+        cg_leg1 = container_cpu_usage_usec(svc_container)
         dr1 = resource.getrusage(resource.RUSAGE_SELF)
     finally:
         # stop() terminates every token BEFORE disconnect (Ticket 4): a leg
         # that dies mid-flight must not leave ttl=7200 tokens idle-spinning in
         # the cgroup the next leg's collector and quiet-box baseline read.
         if collector:
-            collector.stop()
+            collector_summary = collector.stop()   # its own summary, kept in the export
         await arm.stop()
+    service_cpu_s = ((cg_leg1 - cg_leg0) / 1e6
+                     if cg_leg0 is not None and cg_leg1 is not None else None)
 
     # ---- gates + export ---------------------------------------------------
     records, _, _ = read_completed(rec_path, key='video')
@@ -1258,6 +1372,11 @@ async def amain() -> int:
             'total_realtime_factor': round(ok_video_s / leg_wall, 2) if leg_wall else None,
             'steady_window': window,
         },
+        # Ticket 4 (2026-08-21): the efficiency family carries the measured
+        # idle burden with instances live — beside, never subtracted.
+        'efficiency': efficiency_block(service_cpu_s, leg_wall, ok_frames, ok_video_s,
+                                       len(ok_records), pf.get('idle_burden'), ncpu),
+        'collector_summary': collector_summary,
         'n_offered': len(measured), 'n_records': len(records),
         'n_errors': len(records) - len(ok_records),
         'leg_wall_s': round(leg_wall, 1),
@@ -1315,6 +1434,12 @@ async def amain() -> int:
 
     hard = [k for k, g in gates.items()
             if isinstance(g, dict) and g.get('PASS') is False]
+    if not export['efficiency']['valid']:
+        # The export is written (forensics) and the leg fails loudly: a CPU
+        # figure with an absent read or an impossible value is not quotable.
+        hard.append('efficiency(valid=False: '
+                    + (export['efficiency'].get('impossible_value')
+                       or f"absent {export['efficiency'].get('absent')}") + ')')
     if hard:
         say(f'GATES FAILED: {hard}')
         return 1

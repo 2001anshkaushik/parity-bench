@@ -6,8 +6,8 @@
  "submission_order": "manifest-seq: deterministic by meeting id, identical both arms; NOT longest-first \u2014 sorting to shorten the drain tail would benchmark our scheduler, not the frameworks (ruling 2026-08-20)",
  "throughput": {
   "total_span_s": 520.1,
-  "total_frames": 1155,
-  "total_frames_per_s": 2.221,
+  "total_frames": 1146,
+  "total_frames_per_s": 2.203,
   "total_realtime_factor": 33.14,
   "steady_window": {
    "defined": true,
@@ -15,11 +15,40 @@
    "window_end_ns": 1000340230769230,
    "window_wall_s": 337.2,
    "window_n": 6,
-   "window_frames": 475,
-   "window_frames_per_s": 1.409,
+   "window_frames": 470,
+   "window_frames_per_s": 1.394,
    "window_realtime_factor": 20.98,
    "note": "window = [first in-flight==C, last in-flight>=C]; completions inside"
   }
+ },
+ "efficiency": {
+  "valid": true,
+  "source": "container cgroup cpu.stat usage_usec bracketed around the leg \u2014 the same reader as the probes (#34: denominators from the container, never the driver)",
+  "service_cpu_s": 13523.2,
+  "effective_cores": 26.0,
+  "cpu_util_of_box": 0.8125,
+  "box_cpus": 32,
+  "cpu_s_per_footage_min": 47.075,
+  "cpu_s_per_frame": 11.8,
+  "cpu_s_per_video": 1352.3,
+  "idle_burden": {
+   "instances": 4,
+   "instance_kind": "rr_tokens",
+   "idle_cores_before_instances": 1.002,
+   "idle_cores_with_instances_live": 2.02,
+   "sample_s": 6.0,
+   "idle_share_of_box": 0.0631,
+   "box_cpus": 32,
+   "marginal_cores_per_instance": 0.255,
+   "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+   "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve",
+   "idle_cpu_s_over_leg_if_additive": 1050.6,
+   "idle_share_of_service_cpu_if_additive": 0.0777
+  },
+  "policy": "idle_burden is reported beside every figure above and never subtracted \u2014 additivity under load is unmeasured (Ticket 4)"
+ },
+ "collector_summary": {
+  "_SAMPLE": "the collector subprocess summary rides here"
  },
  "n_offered": 10,
  "n_records": 11,
@@ -78,27 +107,27 @@
     {
      "video": "ES2002a.Corner.avi",
      "PASS": true,
-     "frames": 84
+     "frames": 83
     },
     {
      "video": "ES2002b.Corner.avi",
      "PASS": true,
-     "frames": 152
+     "frames": 151
     },
     {
      "video": "ES2002c.Corner.avi",
      "PASS": true,
-     "frames": 160
+     "frames": 159
     },
     {
      "video": "ES2005a.Corner.avi",
      "PASS": true,
-     "frames": 32
+     "frames": 31
     },
     {
      "video": "ES2014d.Corner.avi",
      "PASS": true,
-     "frames": 194
+     "frames": 193
     },
     {
      "video": "ES2006b.Corner.avi",
@@ -108,22 +137,22 @@
     {
      "video": "ES2007c.Corner.avi",
      "PASS": true,
-     "frames": 94
+     "frames": 93
     },
     {
      "video": "ES2008a.Corner.avi",
      "PASS": true,
-     "frames": 67
+     "frames": 66
     },
     {
      "video": "ES2009d.Corner.avi",
      "PASS": true,
-     "frames": 174
+     "frames": 173
     },
     {
      "video": "ES2010b.Corner.avi",
      "PASS": true,
-     "frames": 77
+     "frames": 76
     }
    ]
   },
@@ -205,7 +234,7 @@
   },
   "embed_integrity": {
    "PASS": true,
-   "n": 544,
+   "n": 533,
    "expected_dim": 384,
    "tol": 0.001,
    "bad_dim_idx": null,
@@ -216,8 +245,8 @@
    "per_video": {
     "ES2002a.Corner.avi": {
      "PASS": true,
-     "n_first": 42,
-     "n_repeat": 42,
+     "n_first": 41,
+     "n_repeat": 41,
      "first_divergence_index": null
     }
    }
@@ -235,9 +264,9 @@
   }
  },
  "provenance_leela": {
-  "run_id": "20260821T020910Z-32790",
-  "timestamp_utc": "2026-08-21T02:09:10Z",
-  "git_commit": "b45c08bc352ffa60503a2c85b2c93c94c4665442-dirty",
+  "run_id": "20260822T042321Z-82106",
+  "timestamp_utc": "2026-08-22T04:23:21Z",
+  "git_commit": "a027922ac0c8989a4fee72ec1f3997d806db8393-dirty",
   "image_digest": null,
   "framework_version": null,
   "instance_type": null,
@@ -249,7 +278,7 @@
   "parser": "ffmpeg fps=1/15 + rfdetr(RF-DETR base, thr 0.3)",
   "parser_config_hash": "f16cb645f66726de",
   "chunk_config": {
-   "chunk_size": 4000,
+   "chunk_size": 3999,
    "chunk_overlap": 0,
    "splitter": "RecursiveCharacterTextSplitter",
    "input_transform": "text + '\\n'"
