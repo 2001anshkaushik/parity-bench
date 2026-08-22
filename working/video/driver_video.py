@@ -719,6 +719,41 @@ def docker_inspect(container: str, fmt: str) -> Optional[str]:
         return None
 
 
+def image_provenance(container: str, lineage: Optional[str]) -> dict:
+    """WHICH IMAGE this leg ran, as measured facts plus a declared lineage
+    (Crossroad 33, 2026-08-22). The tag is not the identity: `rr:patched-video`
+    now means "docker/Dockerfile.rocketride build PLUS one documented derived
+    layer" (the env_probe instrument fix), because a full rebuild would
+    re-resolve the floating ubuntu:22.04 base, the unpinned apt libs the engine
+    ELF links, and the bootcheck constraints cache — replacing the image every
+    RR number and gate 3's arming were measured on. A tag can be retagged; the
+    image ID and layer count cannot, so both are recorded, and the deviation
+    travels with every result rather than living only in a doc."""
+    image_id = docker_inspect(container, '{{.Image}}')
+    layers = None
+    if image_id:
+        try:
+            out = subprocess.run(['docker', 'image', 'inspect', '-f',
+                                  '{{len .RootFS.Layers}}', image_id],
+                                 capture_output=True, text=True, timeout=30)
+            if out.returncode == 0 and out.stdout.strip().isdigit():
+                layers = int(out.stdout.strip())
+        except Exception:  # noqa: BLE001 — recorded as None, never guessed
+            layers = None
+    return {
+        'container': container,
+        'requested_tag': docker_inspect(container, '{{.Config.Image}}'),
+        'image_id': image_id,
+        'rootfs_layer_count': layers,
+        'labels': docker_inspect(container, '{{json .Config.Labels}}'),
+        'lineage_declared': lineage,
+        'lineage_is_declared': lineage is not None,
+        'lineage_note': ('a declared string, not a measurement — it states how this image '
+                         'was produced; the image_id and layer count are the measured '
+                         'facts it must be read against'),
+    }
+
+
 def preflight_containers(rr_container: Optional[str], li_container: Optional[str]) -> List[str]:
     """No cpuset on either arm this phase, no CFS quota ever (rule C1), and the
     RR container must BE the patched Phase 2 image — the box still carries the
@@ -1197,6 +1232,11 @@ async def amain() -> int:
                     metavar='PROBE_RUN_ID',
                     help='arm strict cross-arm detection agreement; the id names the probe '
                          'run whose ES2002a comparison confirmed — absent = gate NOT RUN')
+    ap.add_argument('--image-lineage', default=None,
+                    help='Crossroad 33: how the active arm\'s image was produced, recorded '
+                         'VERBATIM in provenance beside the measured image id — e.g. the '
+                         'derived-layer deviation on rr:patched-video. A tag is not an '
+                         'identity.')
     ap.add_argument('--cross-label', default=None,
                     help='basis string stamped into the cross output (e.g. the default '
                          'posture is equal-work gates only, not a cross-arm performance '
@@ -1585,6 +1625,7 @@ async def amain() -> int:
             'thread_pins_by_arm': pf['thread_pin_parity'],
             'task_census': pf.get('task_census'),
             'network_mode': pf.get('network_mode'),
+            'image': image_provenance(svc_container, args.image_lineage),
             'interval_s': args.interval_s,
             'frames_observed_method': ('bracket-count' if args.arm == 'rocketride'
                                        else 'extractor-count'),

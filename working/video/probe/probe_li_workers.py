@@ -39,7 +39,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from probe_rr import cgroup_snapshot, proc_cpu_ticks  # noqa: E402
-from wait_ready import assert_host_network, wait_li_ready  # noqa: E402
+from wait_ready import (assert_host_network, li_worker_thread_readback,  # noqa: E402
+                        wait_li_ready)
 from argtypes import positive_int  # noqa: E402 — register entry 8
 
 CONTAINER = 'liconc'
@@ -116,7 +117,18 @@ def start_container(image: str, workers: int, threads_env: int) -> dict:
     # waiting on W=16.
     ready = wait_li_ready(port=PORT, deadline_s=max(900.0, 150.0 * workers),
                           workers=workers, container=CONTAINER)
-    return {'network_mode': net, **ready}
+    # THREAD READ-BACK PER WORKER (2026-08-22). This sweep set six env vars on
+    # the container and recorded NOTHING about what the worker processes got —
+    # config asserted as evidence, in the instrument that decides
+    # LI_THREADS_ENV. A point whose thread configuration cannot be read back
+    # from every worker is measuring an unknown configuration, so it refuses.
+    tr = li_worker_thread_readback(port=PORT, workers=workers, expect=threads_env)
+    if tr['verdict'] != 'OK':
+        raise SystemExit(
+            f'NOT DONE — W={workers} T={threads_env}: worker thread read-back '
+            f'{tr["verdict"]} — {tr.get("reason")}. Measured counts {tr["torch_counts"]}. '
+            'The point is refused rather than recorded at an unknown thread count.')
+    return {'network_mode': net, 'worker_thread_readback': tr, **ready}
 
 
 def post_video(blob: bytes) -> dict:
@@ -259,6 +271,8 @@ async def amain() -> int:
         start_info = start_container(args.image, w, args.threads_env)
         point = await measure_w(w, blob, ppw=args.posts_per_worker)
         point['network_mode'] = start_info['network_mode']
+        # Proof the point's declared thread env landed in every worker.
+        point['worker_thread_readback'] = start_info.get('worker_thread_readback')
         point['ready_wall_s'] = start_info['wall_s']
         points.append(point)
         print(json.dumps({k: point[k] for k in

@@ -235,3 +235,45 @@ than rewritten from memory, which is entry 2's point in miniature.
 > Kin to entry 1: a plausible mechanism is an assertion until a record
 > agrees with it — including the records already sitting in the output
 > directory.
+
+## 12. The asymmetry we audited in Phase 1 was reproducing in Phase 2 while we wrote the argument against it (added 2026-08-22)
+
+> The reviewer ordered a tuning-symmetry audit, our own arm first and
+> harshest. Phase 1's finding was bad enough: `FAIRNESS_BASIS.md` claims
+> best-to-best and discloses LlamaIndex's workers "tuned to a measured knee"
+> of 8, but that knee was measured on the laptop; the box ran 32, adopted from
+> a teammate's convention in answer to an exec's fairness objection, and
+> **neither arm was ever swept on the box**. We wrote that up as a correction
+> owed to Monday's report.
+>
+> Then the same audit turned on Phase 2 and found the defect still running.
+> The RocketRide arm had seven refine points and a full M×T budget line
+> (Crossroads 29–31); the LlamaIndex arm had two points at one worker count
+> and no budget line at all — the exact shape of the error Crossroad 30 had
+> just caught on the RR side. Forced onto the same method, the LI budget line
+> moved `LI_THREADS_ENV` from 1 to 4: **0.0871 → 0.1340 videos/s at the same
+> worker count, 54% of the arm's own measured throughput left on the table**,
+> and a real knee (W=8/T=4 turns over, unlike RR's). We were days from
+> publishing an argument about method symmetry while running the competitor
+> arm 54% below its measured optimum.
+>
+> Two rules. **A correction in one phase does not carry to the next**: the
+> asymmetry is not a mistake anyone made, it is the gradient the work sits
+> on — every one of the three benchmarking teams works for one of the two
+> vendors, so effort flows to the home arm by construction and reappears
+> wherever it is not actively opposed. **So the audit is scheduled, not
+> triggered by suspicion** — a suspicion-triggered audit only fires where
+> someone already doubts, which is never the arm nobody is defending. Kin to
+> entry 1 in the sharpest way available: "we run best-to-best" was an
+> assertion *about our own method*, and it survived two phases without a
+> record agreeing with it.
+>
+> Shipped with the finding, because the number itself was still unverified:
+> `probe_li_workers` set six thread variables on the container and recorded
+> nothing about what the workers got. `wait_ready.li_worker_thread_readback()`
+> now polls `/health` until EVERY worker pid has answered, reports each one's
+> in-process `torch.get_num_threads()`, and the sweep REFUSES a point whose
+> declared thread env cannot be read back from every worker
+> (INCOMPLETE/DISAGREE/MISMATCH/OK, all four exercised). A sweep that cannot
+> prove its own configuration landed is measuring an unknown configuration —
+> and it was about to set a run-plan number.

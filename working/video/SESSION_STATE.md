@@ -9,10 +9,27 @@ using it.
 
 ## ▶ COMPACTION BRIEFING — state as of late 2026-08-21 (THIS BLOCK WINS on conflict with the chronological blocks below)
 
-**▶▶ THE EIGHT NUMBERS — COMPLETE (Crossroads 31/32, late 2026-08-21) — and the NINTH that is not:**
+**▶▶ THE NINE NUMBERS (Crossroads 31/32/34, 2026-08-22):**
   M_TOKENS=16 · RR_THREADS_ENV=2 (PARITY posture; default posture UNSET) ·
-  LI_WORKERS=8 · LI_THREADS_ENV=1 · WARM_N=16 · BLAST_C=16 ·
+  LI_WORKERS=8 · **LI_THREADS_ENV=4** · WARM_N=16 · BLAST_C=16 ·
   GATE3_RUN_ID=probe_20260821_195214 · DEFAULT_N=44 · PASSES=2 (ruled)
+
+**THE LI BUDGET LINE (2026-08-22, ppw=4, relayed) — LI_THREADS_ENV moved 1 → 4:**
+  W=4  × T=8  (32)  0.1123 videos/s  cpu 0.612
+  W=8  × T=4  (32)  **0.1340**       cpu 0.723   ← knee: the curve TURNS OVER
+  W=16 × T=2  (32)  0.1187           cpu 0.474
+  W=8  × T=1        0.0871           cpu 0.219   ← what we were about to run
+**T=1 was leaving 54% on the table at the same worker count.** Unlike RR's
+budget line (monotonic in tokens to M=32), LI's has a real interior maximum.
+LI_WORKERS=8 confirmed. (Note: this W=8/T=1 point reads 0.0871; the earlier
+matched-load relay recorded 0.0882 at the same cpu 0.219 — a 1.3% relay
+discrepancy that moves no decision. The box JSON is authoritative.)
+**READ-BACK CAVEAT — the number is MEASURED but its configuration is
+UNVERIFIED.** `probe_li_workers` set the six env vars on the container and
+recorded NOTHING about what the workers got, so the three budget JSONs cannot
+prove T=4 landed in all 8 workers (`wait_li_ready` returned only warm_workers
+and one arbitrary pid). FIXED as a class (see below); confirm before the
+campaign with the 2-minute check in the box-command block.
   **LIVENESS_MIN — NOT LANDED.** run_plan requires it (gate 5, probe-derived,
   the driver refuses to default it). It is absent from the repo. A DRY pass may
   omit it (gate 5 = NOT RUN; allowed only under DRY_PASS=1 since this commit);
@@ -31,13 +48,31 @@ gates every instance observed serving (it always did). IMPLEMENTED: the
 `len(warm) < tokens` refusal is now a recorded note; the top-up loop re-sends
 warm rows (bounded 2×max(instances, rows)) until covered; run_plan's WARM_N
 refusal is a note. PASSES=2 so the C=16 blast has real waves.
-**DRY PASS (first — the composition has never run), box, repo root:**
+**BOX ORDER (2026-08-22): (1) node md5 fingerprint → (2) derived layer →
+(3) LI thread read-back check → (4) dry pass at PASSES=2. Keep-alive OFF
+throughout; fresh containers (`docker rm -f rr li_video` first).**
+
+**(3) LI THREAD READ-BACK — 2 minutes, confirms LI_THREADS_ENV=4 landed:**
+  docker rm -f li_video; docker run -d --name li_video --memory 58g \
+    -e OMP_NUM_THREADS=4 -e MKL_NUM_THREADS=4 -e OPENBLAS_NUM_THREADS=4 \
+    -e VECLIB_MAXIMUM_THREADS=4 -e NUMEXPR_NUM_THREADS=4 -e TORCH_NUM_THREADS=4 \
+    -e WS1V_WORKERS=8 --network host li:video
+  ~/.venv-floor/bin/python working/video/probe/wait_ready.py --arm li --port 8802 \
+    --workers 8 --container li_video --thread-readback --expect-threads 4
+  → verdict OK (8/8 pids answered, every one torch_num_threads=4) sets the
+  number. MISMATCH = the -e flags never reached the workers and the 0.1340
+  was measured at some OTHER thread count → LI_THREADS_ENV is NOT set until
+  re-measured. INCOMPLETE = fewer than 8 distinct pids answered. rc=1 on
+  anything but OK. Then `docker rm -f li_video` before the dry pass.
+
+**(4) DRY PASS (the composition has never completed), box, repo root:**
   cd ~/parity-bench && git pull --ff-only origin video-bench && git rev-parse HEAD
-  DRY_PASS=1 M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=1 \
+  DRY_PASS=1 M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=4 \
     WARM_N=16 BLAST_C=16 GATE3_RUN_ID=probe_20260821_195214 DEFAULT_N=44 \
     bash working/video/run_plan.sh 2>&1 | tee working/video/dry_console_$(date -u +%Y%m%dT%H%M%SZ).log; \
     echo "run_plan rc=${PIPESTATUS[0]}"
-  (LIVENESS_MIN omitted → gate 5 NOT RUN on every dry leg, by design.)
+  (LIVENESS_MIN omitted → gate 5 NOT RUN on every dry leg, by design. PASSES
+  defaults to 2 under DRY_PASS=1 so the pass mechanism is exercised.)
 **LIVENESS_MIN recipe (box; from any records jsonl — dry-pass records give one
 video per leg; the gate-3 staged run's records give ES2002a both arms):**
   for f in working/video/results/mainrun_*/records_*.jsonl; do ~/.venv/bin/python - "$f" <<'EOF'
@@ -54,7 +89,7 @@ video per leg; the gate-3 staged run's records give ES2002a both arms):**
 an estimate), nohup so an SSH drop cannot kill a measured leg; NO keep-alive
 (Crossroad 21 forbids it during measured legs):**
   cd ~/parity-bench && mkdir -p working/video/results && \
-  M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=1 WARM_N=16 BLAST_C=16 \
+  M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=4 WARM_N=16 BLAST_C=16 \
   GATE3_RUN_ID=probe_20260821_195214 DEFAULT_N=44 PASSES=2 LIVENESS_MIN=<ASK> \
   nohup bash working/video/run_plan.sh > working/video/results/console_$(date -u +%Y%m%dT%H%M%SZ).log 2>&1 &
   then: tail -f working/video/results/console_*.log ; at the end:
@@ -536,6 +571,24 @@ each carry a minutes-long check and no verdict.
   serving (the driver's existing gate); the disjointness that matters is
   warm-vs-measured. Refusals relaxed to that condition (driver + run_plan);
   warm top-up re-sends rows, bounded.
+- **Crossroad 33 (2026-08-22): DERIVED LAYER APPROVED, full rebuild DEFERRED
+  deliberately.** The invalidation analysis stands: a rebuild re-resolves the
+  floating `ubuntu:22.04`, the unpinned apt `libc++`/`libunwind` the engine ELF
+  links, and the bootcheck constraints cache — and the node COPY above the
+  bootcheck stage re-runs it even on a warm cache — replacing the image every
+  RR number and **gate 3's arming run** were measured on. The image is
+  "Dockerfile plus one documented layer" and that goes in the run provenance
+  VERBATIM: `--image-lineage` (driver) recorded beside the measured image id,
+  layer count and labels in `provenance_video.image`; run_plan supplies
+  `RR_IMAGE_LINEAGE` / `LI_IMAGE_LINEAGE` on every leg. PATH B after the
+  campaign, fingerprints both sides.
+- **Crossroad 34 (2026-08-22): LI_THREADS_ENV = 4, LI_WORKERS = 8 confirmed**
+  — from the LI budget line (see the briefing). The tuning-symmetry audit paid
+  for itself inside our own arm: T=1 was 54% below the LI arm's measured
+  optimum at the same worker count. **Register entry 12** records why (the
+  Phase 1 asymmetry was reproducing in Phase 2 while we drafted the argument
+  against it; audits are scheduled, not suspicion-triggered) and ships the
+  per-worker thread read-back that the sweep lacked.
 - **Gate rulings:** gate 1 frames-census is THE dropped-frame detector; log
   scrape is ATTRIBUTION only, fail-closed on its own channel liveness. Gate 3
   STRICT zero tolerance, armed only via --gate3-armed <probe_run_id> after the

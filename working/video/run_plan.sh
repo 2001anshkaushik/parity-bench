@@ -190,6 +190,20 @@ stop_arm() {  # $2 = optional lifetime tag (rr now has two lifetimes — logs mu
   docker rm -f "$1" >/dev/null 2>&1 || true
 }
 
+# Crossroad 33 (2026-08-22): the image lineage rides in every export's
+# provenance, verbatim — a tag is not an identity, and rr:patched-video is no
+# longer "what the Dockerfile builds".
+# NOT written as "${VAR:-long default}": inside a ${…:-word} expansion bash
+# parses quotes in the word, so ONE apostrophe (gate 3's) opens a quote and the
+# parse error surfaces lines later at an unrelated paren — the same 3.2 quirk
+# that bit the LIVENESS_MIN :? message this morning, walked into twice in one
+# day. The if-form takes an ordinary double-quoted string, where ' is literal.
+if [ -z "${RR_IMAGE_LINEAGE:-}" ]; then
+  RR_IMAGE_LINEAGE="Crossroad 33 (2026-08-22): rr:patched-video = a docker/Dockerfile.rocketride build PLUS one documented derived layer replacing working/nodes/env_probe (the instrument node; absent from the measured pipe, and carrying no requirements.txt so the engine constraints-cache key cannot move). A full rebuild was deliberately DEFERRED: it would re-resolve the floating ubuntu:22.04 base, the unpinned apt libc++/libunwind the engine ELF links, and the bootcheck constraints cache COPYed into the image, replacing the image that every RR probe number and the gate-3 arming run were measured on. PATH B re-baseline scheduled post-campaign with before/after fingerprints."
+fi
+if [ -z "${LI_IMAGE_LINEAGE:-}" ]; then
+  LI_IMAGE_LINEAGE="docker/Dockerfile.llamaindex-video, unmodified build, no derived layers; serving stack UNPINNED at build (per-run pip freeze snapshot in li_image_freeze.txt)."
+fi
 DRIVER=("$PY" working/video/driver_video.py --out-dir "$OUT")
 if [ -n "$LIVENESS_MIN" ]; then
   DRIVER+=(--liveness-min-fraction "$LIVENESS_MIN")
@@ -259,11 +273,12 @@ start_rr unset
 start_li
 run "$PY" working/video/smoke_video.py --rr-container rr --li-container li_video \
     --rr-threads-env unset "${SMOKE_EXTRA[@]}"
-run "${DRIVER[@]}" --arm llamaindex --leg sequential --n "$SEQ_N"
+run "${DRIVER[@]}" --arm llamaindex --leg sequential --n "$SEQ_N" \
+    --image-lineage "$LI_IMAGE_LINEAGE"
 for pass in $(seq 1 "$PASSES"); do
   echo "--- LI blast pass $pass/$PASSES ---" | tee -a "$LOG"
   run "${DRIVER[@]}" --arm llamaindex --leg blast --n "$MEASURED_N" --blast-concurrency "$BLAST_C" \
-      --pass "$pass"
+      --pass "$pass" --image-lineage "$LI_IMAGE_LINEAGE"
 done
 stop_arm li_video
 
@@ -273,23 +288,24 @@ echo "--- 2. RocketRide DEFAULT posture (1 token, use(threads=) unset = engine 6
 # fail-closed preflight — no || true anywhere in this file. Every RR leg
 # states its expected thread env; the driver reads it back (ruling 2026-08-21).
 run "${DRIVER[@]}" --arm rocketride --posture default --leg sequential --n "$SEQ_N" \
-    --rr-threads-env unset
+    --rr-threads-env unset --image-lineage "$RR_IMAGE_LINEAGE"
 for pass in $(seq 1 "$PASSES"); do
   # Crossroad 27: the default-posture blast runs DEFAULT_N (a stated subset at
   # scale — the out-of-box finding is a ratio); parity runs the full set.
   run "${DRIVER[@]}" --arm rocketride --posture default --leg blast --n "$DEFAULT_N" \
-      --blast-concurrency "$BLAST_C" --rr-threads-env unset --pass "$pass"
+      --blast-concurrency "$BLAST_C" --rr-threads-env unset --pass "$pass" \
+      --image-lineage "$RR_IMAGE_LINEAGE"
 done
 stop_arm rr default
 
 echo "--- 3. RocketRide PARITY posture (M=$M_TOKENS tokens, six-var env = $RR_THREADS_ENV; fresh rr lifetime) ---" | tee -a "$LOG"
 start_rr "$RR_THREADS_ENV"
 run "${DRIVER[@]}" --arm rocketride --posture parity --leg sequential --n "$SEQ_N" --tokens "$M_TOKENS" \
-    --rr-threads-env "$RR_THREADS_ENV"
+    --rr-threads-env "$RR_THREADS_ENV" --image-lineage "$RR_IMAGE_LINEAGE"
 for pass in $(seq 1 "$PASSES"); do
   run "${DRIVER[@]}" --arm rocketride --posture parity --leg blast --n "$MEASURED_N" \
       --blast-concurrency "$BLAST_C" --tokens "$M_TOKENS" --rr-threads-env "$RR_THREADS_ENV" \
-      --pass "$pass"
+      --pass "$pass" --image-lineage "$RR_IMAGE_LINEAGE"
 done
 stop_arm rr parity
 

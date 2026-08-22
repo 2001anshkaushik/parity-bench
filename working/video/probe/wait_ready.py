@@ -149,6 +149,57 @@ def wait_li_ready(port: int = 8802, deadline_s: float = 600, interval_s: float =
         + (f'\ncontainer log tail ({container}):\n{tail}' if tail else ''))
 
 
+def li_worker_thread_readback(port: int = 8802, workers: int = 1,
+                              expect: int | None = None, deadline_s: float = 180.0,
+                              interval_s: float = 0.5) -> dict:
+    """EVERY worker's IN-PROCESS thread configuration, read from /health until
+    every distinct worker pid has answered (2026-08-22).
+
+    Why this exists: a sweep point that cannot prove its own thread
+    configuration LANDED is measuring an unknown configuration. probe_li_workers
+    passed `-e OMP_NUM_THREADS=N` to docker and recorded nothing about what the
+    workers actually got — config asserted as evidence, the failure this
+    campaign exists to refuse. /health is answered by whichever worker uvicorn
+    routes to, so ONE 200 proves one worker; the loop collects distinct pids.
+
+    Verdicts: INCOMPLETE (fewer pids than declared — absence fails before
+    agreement), DISAGREE (workers report different counts), MISMATCH (a worker's
+    measured count != the declared `expect`), OK."""
+    seen: dict = {}
+    t0 = time.monotonic()
+    while len(seen) < workers and time.monotonic() - t0 < deadline_s:
+        try:
+            with urllib.request.urlopen(f'http://127.0.0.1:{port}/health', timeout=10) as resp:
+                h = json.load(resp)
+            pid = h.get('pid')
+            if pid is not None and pid not in seen:
+                seen[pid] = {'torch_num_threads': h.get('torch_num_threads'),
+                             'thread_env': h.get('thread_env') or {}}
+        except Exception:  # noqa: BLE001 — retried until the deadline
+            pass
+        time.sleep(interval_s)
+    counts = {p: v.get('torch_num_threads') for p, v in seen.items()}
+    out = {'declared_workers': workers, 'workers_answered': len(seen),
+           'expect_threads': expect, 'by_pid': seen,
+           'torch_counts': counts,
+           'wall_s': round(time.monotonic() - t0, 1)}
+    if len(seen) < workers:
+        out['verdict'] = 'INCOMPLETE'
+        out['reason'] = (f'only {len(seen)}/{workers} distinct worker pids answered '
+                         f'/health within {deadline_s:.0f}s — absence fails before '
+                         f'agreement; the unanswered workers\' configuration is UNKNOWN')
+    elif len(set(counts.values())) > 1:
+        out['verdict'] = 'DISAGREE'
+        out['reason'] = f'workers report different torch thread counts: {counts}'
+    elif expect is not None and any(c != expect for c in counts.values()):
+        out['verdict'] = 'MISMATCH'
+        out['reason'] = (f'declared threads_env={expect} but workers measured {counts} '
+                         '— the -e flags did not land in the worker processes')
+    else:
+        out['verdict'] = 'OK'
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         allow_abbrev=False,
@@ -164,6 +215,13 @@ def main() -> int:
                     help='li only: require warm_workers == N (not just liveness)')
     ap.add_argument('--container', default=None,
                     help='enables the host-network read-back and a log tail on failure')
+    ap.add_argument('--thread-readback', action='store_true',
+                    help='li only: after readiness, poll /health until EVERY worker pid has '
+                         'answered and report each one\'s in-process torch thread count '
+                         '(a configuration that cannot be read back did not land)')
+    ap.add_argument('--expect-threads', type=positive_int('expect-threads', 256), default=None,
+                    help='li only, with --thread-readback: the declared threads_env; any '
+                         'worker measuring something else is a MISMATCH and exits 1')
     args = ap.parse_args()
     out: dict = {}
     try:
@@ -177,10 +235,18 @@ def main() -> int:
             out |= wait_li_ready(
                 port=args.port or 8802, deadline_s=args.deadline or 600,
                 workers=args.workers, container=args.container)
+            if args.thread_readback:
+                out['worker_thread_readback'] = li_worker_thread_readback(
+                    port=args.port or 8802, workers=args.workers or 1,
+                    expect=args.expect_threads)
     except RuntimeError as exc:
         print(exc)
         return 1
-    print(json.dumps(out))
+    print(json.dumps(out, indent=1))
+    tr = out.get('worker_thread_readback')
+    if tr and tr['verdict'] != 'OK':
+        print(f'NOT DONE — worker thread read-back {tr["verdict"]}: {tr.get("reason")}')
+        return 1
     return 0
 
 
