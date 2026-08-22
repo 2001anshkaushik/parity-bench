@@ -146,9 +146,70 @@ video per leg; the gate-3 staged run's records give ES2002a both arms):**
   → the fraction of frames with ≥1 detection per video; the threshold sits
   below the minimum observed with a margin (Corner view is dense — expect ~1.0)
   and the black-fixture null must still FAIL it. Ansh's number, not mine.
-**REAL RUN (after a green dry pass; ~80–90 min estimate at PASSES=2, labeled
-an estimate), nohup so an SSH drop cannot kill a measured leg; NO keep-alive
-(Crossroad 21 forbids it during measured legs):**
+**LIVENESS_MIN — one command, all artifacts (2026-08-22):**
+  ~/.venv/bin/python working/video/probe/liveness_from_records.py \
+    working/video/results/mainrun_*/records_*.jsonl \
+    working/video/probe/probe_rr_t*.json working/video/probe/probe_li_floor_t*.json
+  Handles THREE schemas by TYPE, never by key name: LI records carry
+  `detections_per_frame` as a LIST; RR records carry `frame_label_multisets`
+  (the RR arm cannot recover n_detections client-side, so the multiset length
+  is the count); and `probe_li_floor_t*.json` carries `detections_per_frame`
+  as a FLOAT AVERAGE (probe_li_floor.py:151) — a name-based reader iterates it
+  and computes garbage silently, so it is refused, and the refusal is one of
+  the two null controls the script fires (the other: an all-zero black-fixture
+  video must read 0.000). Prints per-video fractions, the MINIMUM, and n —
+  and says plainly when n is small that the threshold is an assumption.
+  Expect ~1.0 on Corner (~26 det/frame); ~0.5 sits far below anything real and
+  still fails the black clip. The value is Ansh's ruling.
+
+**CAMPAIGN SCHEDULE — estimates, with each anchor named (2026-08-22).** Basis:
+44 measured videos × mean ~127 frames ≈ **5,590 frames**; 16 warm rows;
+measured aggregate rates RR parity 16×2 = **12.87 frames/s** (0.1551 videos/s ×
+83) and LI 8×4 = **11.12 frames/s** (0.1340 × 83); RR single-stream t8 = 4.83
+f/s, t32 = 2.31 f/s (probe_rr steady sends).
+| leg | warm | measured leg | anchor |
+|---|---|---|---|
+| setup: rr + li up, smoke | — | 6–8 min | dry-pass readiness 5.0 s / 15.0 s |
+| LI sequential (5 + repeat) | 3.1 | 4–5 min | LI single-request ~0.35 s/frame |
+| LI blast ×2 (44, C=16) | 3.1 ea | 8.4 min ea → **23 min** | 11.12 f/s MEASURED |
+| RR default seq (5 + repeat) | 1.0 | 3–6 min | bracketed, see below |
+| **RR default blast ×2 (44)** | 1.0 ea | **20–41 min ea → 40–82 min** | **UNMEASURED — see below** |
+| RR parity seq (5 + repeat) | 2.6 | 5–8.5 min + 3 min for 16×use() + 1.5 min terminate | T=2 single-stream UNMEASURED |
+| RR parity blast ×2 (44, C=16) | 2.6 ea | 7.2 min ea → **29 min** incl. use()/terminate | 12.87 f/s MEASURED |
+| cross gates | — | ~1 min | |
+**TOTAL ≈ 2.2–2.9 h.** Two honest gaps in that number:
+- **The default posture's thread count was never characterised.** It runs the
+  engine default (torch resolves to 16 on this host — first measured in the
+  failed dry pass) and the M=1 curve measured only 1/8/32, so its rate is
+  BRACKETED between t8 (4.83 f/s) and t32 (2.31 f/s). That single unknown is
+  ±20 min per pass and dominates the schedule (Ticket 5 open question 3).
+- **The parity SEQUENTIAL leg runs at T=2, below the knee** — single-stream
+  cost there is uncharacterised too (t1 = 0.93 f/s, t8 = 4.83; T=2 interpolates
+  to ~1.5–2.5). Aggregate parity throughput is unaffected; this is the per-stream
+  latency leg only.
+**SHARPEN BOTH FROM THE DRY PASS before launching** — it ran every leg at n=1,
+so it measured exactly these configurations once:
+  cd ~/parity-bench && for f in working/video/results/mainrun_*/records_*.jsonl; do \
+    python3 -c "
+  import json,sys
+  for line in open(sys.argv[1]):
+      r=json.loads(line)
+      if 'error' in r: continue
+      fo=r.get('frames_observed') or 0; w=r.get('wall_s') or 0
+      if fo and w: print(f\"{sys.argv[1].split('/')[-1]:50s} frames={fo:4d} wall={w:7.1f}s -> {fo/w:5.2f} f/s\")
+  " "$f"; done
+  → multiply each leg's f/s by 5,590 for that leg's blast wall. One video is
+  n=1 (label it), but it replaces a 2× bracket with a measurement.
+**SCHEDULE OPTION, not a ruling:** PASSES=2 was ruled so the C=16 blast has
+real waves — but the DEFAULT posture has ONE token, so it has no waves and its
+steady window is degenerate at any pass count. A second default-posture pass
+buys rep/determinism evidence, not window depth; running the default at
+PASSES=1 would save **20–41 min**. run_plan applies PASSES to all blast legs,
+so this needs a one-line change (a separate DEFAULT_PASSES) — Ansh's call, not
+made.
+
+**REAL RUN (after a green dry pass), nohup so an SSH drop cannot kill a
+measured leg; NO keep-alive (Crossroad 21 forbids it during measured legs):**
   cd ~/parity-bench && mkdir -p working/video/results && \
   M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=4 WARM_N=16 BLAST_C=16 \
   GATE3_RUN_ID=probe_20260821_195214 DEFAULT_N=44 PASSES=2 LIVENESS_MIN=<ASK> \
