@@ -203,7 +203,10 @@ MEASURED_N=$((60 - WARM_N))
 SMOKE_EXTRA=()
 if [ "$DRY_PASS" = "1" ]; then
   echo "=== DRY PASS — wiring only; every knob clamped; nothing here is a measurement ===" | tee -a "$LOG"
-  SEQ_N=1; PASSES=1; MEASURED_N=1; BLAST_C=1; DEFAULT_N=1
+  # PASSES=2 here on purpose (2026-08-21): a dry pass that clamps PASSES to 1
+  # was green while the second pass was a no-op resume — the composition
+  # must prove the pass mechanism, not skip it.
+  SEQ_N=1; PASSES=2; MEASURED_N=1; BLAST_C=1; DEFAULT_N=1
   DRIVER+=(--skip-warmup)
   SMOKE_EXTRA=(--skip-fixture --write-golden --golden "$OUT/dry_golden.json")
 fi
@@ -259,7 +262,8 @@ run "$PY" working/video/smoke_video.py --rr-container rr --li-container li_video
 run "${DRIVER[@]}" --arm llamaindex --leg sequential --n "$SEQ_N"
 for pass in $(seq 1 "$PASSES"); do
   echo "--- LI blast pass $pass/$PASSES ---" | tee -a "$LOG"
-  run "${DRIVER[@]}" --arm llamaindex --leg blast --n "$MEASURED_N" --blast-concurrency "$BLAST_C"
+  run "${DRIVER[@]}" --arm llamaindex --leg blast --n "$MEASURED_N" --blast-concurrency "$BLAST_C" \
+      --pass "$pass"
 done
 stop_arm li_video
 
@@ -274,7 +278,7 @@ for pass in $(seq 1 "$PASSES"); do
   # Crossroad 27: the default-posture blast runs DEFAULT_N (a stated subset at
   # scale — the out-of-box finding is a ratio); parity runs the full set.
   run "${DRIVER[@]}" --arm rocketride --posture default --leg blast --n "$DEFAULT_N" \
-      --blast-concurrency "$BLAST_C" --rr-threads-env unset
+      --blast-concurrency "$BLAST_C" --rr-threads-env unset --pass "$pass"
 done
 stop_arm rr default
 
@@ -284,7 +288,8 @@ run "${DRIVER[@]}" --arm rocketride --posture parity --leg sequential --n "$SEQ_
     --rr-threads-env "$RR_THREADS_ENV"
 for pass in $(seq 1 "$PASSES"); do
   run "${DRIVER[@]}" --arm rocketride --posture parity --leg blast --n "$MEASURED_N" \
-      --blast-concurrency "$BLAST_C" --tokens "$M_TOKENS" --rr-threads-env "$RR_THREADS_ENV"
+      --blast-concurrency "$BLAST_C" --tokens "$M_TOKENS" --rr-threads-env "$RR_THREADS_ENV" \
+      --pass "$pass"
 done
 stop_arm rr parity
 
@@ -295,21 +300,26 @@ echo "--- 4. cross-arm gates (gate 3 armed by $GATE3_RUN_ID, then char conservat
 # every combo runs, failures are recorded, and the script exits non-zero at
 # the END so the boundary stays fail-closed.
 CROSS_FAIL=0
+# Pass-aware (2026-08-21): pass 1 files carry the bare name, pass N>1 carry
+# _pN; each RR pass file pairs with the LI file of the SAME pass suffix.
 for leg in sequential blast; do
   for posture in default parity; do
-    RRJ="$OUT/records_rocketride_video_${posture}_${leg}.jsonl"
-    LIJ="$OUT/records_llamaindex_video_workers_${leg}.jsonl"
-    if [ -f "$RRJ" ] && [ -f "$LIJ" ]; then
-      echo "cross: $posture/$leg" | tee -a "$LOG"
+    for RRJ in "$OUT/records_rocketride_video_${posture}_${leg}.jsonl" \
+               "$OUT"/records_rocketride_video_${posture}_${leg}_p*.jsonl; do
+      [ -f "$RRJ" ] || continue
+      sfx="${RRJ##*/records_rocketride_video_${posture}_${leg}}"; sfx="${sfx%.jsonl}"
+      LIJ="$OUT/records_llamaindex_video_workers_${leg}${sfx}.jsonl"
+      [ -f "$LIJ" ] || { echo "cross: $posture/$leg$sfx — no LI counterpart ($LIJ); skipped" | tee -a "$LOG"; continue; }
+      echo "cross: $posture/$leg$sfx" | tee -a "$LOG"
       if "$PY" working/video/driver_video.py --cross "$RRJ" "$LIJ" \
-          --gate3-armed "$GATE3_RUN_ID" > "$OUT/cross_${posture}_${leg}.json" 2>>"$LOG"; then
-        echo "cross gates PASS: $posture/$leg" | tee -a "$LOG"
+          --gate3-armed "$GATE3_RUN_ID" > "$OUT/cross_${posture}_${leg}${sfx}.json" 2>>"$LOG"; then
+        echo "cross gates PASS: $posture/$leg$sfx" | tee -a "$LOG"
       else
         CROSS_FAIL=1
-        echo "CROSS GATES FAILED: $posture/$leg" | tee -a "$LOG"
+        echo "CROSS GATES FAILED: $posture/$leg$sfx" | tee -a "$LOG"
       fi
-      cat "$OUT/cross_${posture}_${leg}.json" >> "$LOG"
-    fi
+      cat "$OUT/cross_${posture}_${leg}${sfx}.json" >> "$LOG"
+    done
   done
 done
 

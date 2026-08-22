@@ -146,6 +146,7 @@ def at_a_glance_line(export: Dict[str, Any]) -> str:
     # repeat record on sequential legs, so a derived "ok/offered" would
     # read 6/5 and invite a false alarm.
     return (f"{export.get('arm')} {export.get('posture')} {export.get('leg')} "
+            f"pass {export.get('pass')} "
             f"records {export.get('n_records')} (errors {export.get('n_errors')}) / "
             f"offered {export.get('n_offered')}"
             f" | THROUGHPUT {thr.get('total_frames_per_s')} frames/s "
@@ -1103,6 +1104,12 @@ async def amain() -> int:
     ap.add_argument('--posture', choices=['default', 'parity'], default='default',
                     help='RocketRide only; Crossroad 9 runs BOTH, one at a time')
     ap.add_argument('--leg', choices=['sequential', 'blast'])
+    ap.add_argument('--pass', dest='pass_n', type=positive_int('pass', 100), default=1,
+                    help='blast pass number (run_plan PASSES). Pass >1 suffixes EVERY per-leg '
+                         'artifact (records, export, collector, docker log, preflight) with '
+                         '_p<N>: without it the second pass RESUMED from the first pass\'s '
+                         'records and measured nothing (found 2026-08-21; the dry pass now '
+                         'runs two passes so the composition proves it)')
     ap.add_argument('--n', type=positive_int('n', 10000),
                     help='measured videos (prefix of manifest measured rows)')
     ap.add_argument('--blast-concurrency', type=positive_int('blast-concurrency', 4096))
@@ -1278,8 +1285,15 @@ async def amain() -> int:
         f'{idle_live / ncpu:.1%} of the box before any work '
         f'(pre-instance baseline {idle_before})')
 
-    (out_dir / 'preflight.json').write_text(json.dumps(
-        {k: v for k, v in pf.items() if k != 'rows'} | {'posture': posture.label()}, indent=1))
+    # Per-(arm, posture, leg, pass) artifact names. Pass 1 keeps the bare
+    # name; pass N>1 gets _pN. Posture is in every name: collector and
+    # docker-log files used to be per leg only and the parity leg silently
+    # overwrote the default leg's (same class as the PASSES defect).
+    sfx = '' if args.pass_n == 1 else f'_p{args.pass_n}'
+    stem = f'{arm.name}_{posture.name}_{args.leg}{sfx}'
+    (out_dir / f'preflight_{stem}.json').write_text(json.dumps(
+        {k: v for k, v in pf.items() if k != 'rows'}
+        | {'posture': posture.label(), 'pass': args.pass_n}, indent=1))
     say(f'preflight PASSED — {arm.name} {posture.label()} leg={args.leg} n={args.n}')
 
     # ---- page cache: evict corpus before the arm (settled decision 4) -----
@@ -1358,7 +1372,7 @@ async def amain() -> int:
             f'worker_pids={len(seen_pids) or "n/a"}')
 
     # ---- the leg, under the collector -------------------------------------
-    rec_path = out_dir / f'records_{arm.name}_{posture.name}_{args.leg}.jsonl'
+    rec_path = out_dir / f'records_{stem}.jsonl'
     prior, done_keys, torn = read_completed(rec_path, key='video')
     if prior:
         say(f'resume: {len(done_keys)} videos already recorded'
@@ -1375,7 +1389,7 @@ async def amain() -> int:
         else:
             raise SystemExit(f'NOT DONE — cannot resolve container root pid for {container!r}; '
                              'the collector must sample the service or nothing is quotable.')
-        collector = ProcessCollector(out_dir / f'collector_{arm.name}_{args.leg}.jsonl',
+        collector = ProcessCollector(out_dir / f'collector_{stem}.jsonl',
                                      roles, interval_s=0.5)
         collector.start()
 
@@ -1415,7 +1429,7 @@ async def amain() -> int:
     # detect node's drop warning — with a channel-liveness marker so a dead
     # log can never read as 'no drops'. Detector = gate 1; this ATTRIBUTES.
     if args.arm == 'rocketride':
-        log_file = out_dir / f'dockerlog_{args.rr_container}_{args.leg}.txt'
+        log_file = out_dir / f'dockerlog_{args.rr_container}_{posture.name}_{args.leg}{sfx}.txt'
         try:
             log_text = subprocess.run(['docker', 'logs', args.rr_container],
                                       capture_output=True, text=True, timeout=60
@@ -1452,7 +1466,7 @@ async def amain() -> int:
     ok_frames = sum(r.get('frames_observed') or 0 for r in ok_records)
     ok_video_s = sum(r.get('video_s_manifest') or 0 for r in ok_records)
     export = {
-        'arm': arm.name, 'posture': posture.label(), 'leg': args.leg,
+        'arm': arm.name, 'posture': posture.label(), 'leg': args.leg, 'pass': args.pass_n,
         'submission_order': ('manifest-seq: deterministic by meeting id, identical both '
                              'arms; NOT longest-first — sorting to shorten the drain tail '
                              'would benchmark our scheduler, not the frameworks '
@@ -1529,7 +1543,7 @@ async def amain() -> int:
     assert 'steady_window' in export['throughput'] and (
         export['throughput']['steady_window'].get('defined') is False
         or 'window_n' in export['throughput']['steady_window']), 'window_n missing'
-    export_path = out_dir / f'export_{arm.name}_{posture.name}_{args.leg}.json'
+    export_path = out_dir / f'export_{stem}.json'
     export_path.write_text(json.dumps(export, indent=1))
     say(f'export: {export_path}')
     say(f'AT A GLANCE: {glance}')

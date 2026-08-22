@@ -61,7 +61,43 @@ an estimate), nohup so an SSH drop cannot kill a measured leg; NO keep-alive
   grep -n "AT A GLANCE\|NOT DONE\|STEP FAILED\|GATES FAILED\|CROSS GATES\|completed" working/video/results/console_*.log
 **Sent-samples correction:** drafted as message #5 in
 `team_docs_sent/MESSAGES_2026-08-21.md` — CONDITIONAL on Ansh confirming the
-JSONs went out; unsent.
+JSONs went out; unsent. Both .md files and the Shashi message WERE sent (relayed).
+
+**DRY PASS #1 — FAILED, rc=1 (late 2026-08-21), diagnosis PENDING the log tail
++ the rr image's `Config.Env`.** Relayed: `rr declared thread env (expected
+unset): ` (empty — correct for unset) then rc=1. The echo printed, so `docker
+run` and `docker inspect` both succeeded; the NEXT step is `wait_ready.py
+--arm rr`, whose three failure signatures are: `needs the rocketride SDK, not
+importable in this interpreter` (the ~/.venv interpreter; immediate),
+`NetworkMode` from assert_host_network (immediate), or `never became
+SDK-connectable … within 1800s` (30 min). The `run` wrapper prints `STEP
+FAILED rc=N: …wait_ready.py …` either way. Do NOT diagnose from the two
+relayed lines (register entry 9).
+
+**PASSES=2 DEFECT — FIXED (same evening):** the driver resumed pass 2 from
+pass 1's records and measured nothing; the dry pass clamped PASSES to 1 and
+was green while broken. Now `--pass N` suffixes every per-leg artifact with
+`_pN` (records, export, collector, docker log, preflight — collector and
+docker-log names also gained the posture; they were overwritten between
+postures before), run_plan passes it in all three blast loops, step 4 pairs
+RR and LI files of the same pass suffix, and the DRY pass runs PASSES=2.
+
+**LI BUDGET-LINE REFINE (ruled; before the campaign; ~30–40 min; box, probe
+dir, floor venv; arms one at a time — `docker rm -f rr li_video` first):**
+  ~/.venv-floor/bin/python probe_li_workers.py --video media/ES2002a.Corner.avi --sweep 4  --image li:video --threads-env 8 --posts-per-worker 4 --out probe_li_workers_T8_ppw4.json
+  ~/.venv-floor/bin/python probe_li_workers.py --video media/ES2002a.Corner.avi --sweep 8  --image li:video --threads-env 4 --posts-per-worker 4 --out probe_li_workers_T4_ppw4.json
+  ~/.venv-floor/bin/python probe_li_workers.py --video media/ES2002a.Corner.avi --sweep 16 --image li:video --threads-env 2 --posts-per-worker 4 --out probe_li_workers_T2_ppw4.json
+  Compare against the existing W=8×T=1 ppw=4 point (0.0882). Same shape as
+  the RR budget line (W×T=32). If 16×2 is still climbing, W=32×T=1 is the
+  fourth point (C30's lesson; the memory-ascent guard decides if it runs).
+  Outcome either confirms LI_WORKERS=8 / LI_THREADS_ENV=1 or moves them.
+**LI out-of-box leg:** operator leans best-to-best only on LI with the
+asymmetry stated; agent concurs with conditions (chat, 2026-08-21 late):
+LlamaIndex is a library — an "out-of-box" LI leg would measure OUR serving
+scaffold's defaults, not LlamaIndex's; the default posture is an RR-internal
+ratio (C27), never a cross-arm headline. Pending Ansh.
+**Monday disclosure (Phase 1 tuning symmetry):** PHASE1_CARRYOVER.md
+Correction #3 — first-person, stated first.
 
 **▶ TICKET 4 ANSWERED — RR concurrency sweep, T=8 (landed late 2026-08-21;
 RELAYED values — the box JSON, `probe_concurrency_T8.json` per the invocation,

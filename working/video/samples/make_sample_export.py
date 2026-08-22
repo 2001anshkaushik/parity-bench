@@ -111,6 +111,7 @@ def main():
                    'through the same driver functions the box uses. For team review of '
                    'the data flow only; no value here is a measurement.',
         'arm': 'rocketride_video', 'posture': 'parity[tokens=4,threads=1]', 'leg': 'blast',
+        'pass': 1,
         'submission_order': ('manifest-seq: deterministic by meeting id, identical both '
                              'arms; NOT longest-first — sorting to shorten the drain tail '
                              'would benchmark our scheduler, not the frameworks '

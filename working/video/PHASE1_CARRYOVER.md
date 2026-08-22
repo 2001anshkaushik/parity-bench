@@ -373,6 +373,30 @@ signature in Section A's register row #32 is this run). Its own sampler
 load cleanliness rests on process forensics (the background loop's parent shell started
 2026-08-18 02:15:20; this ran 2026-08-16), not on in-artifact load samples.
 
+### Correction #3, 2026-08-21 — the fairness document describes a laptop configuration the box never ran (goes in Monday's report, stated first, not footnoted)
+
+`publishable/FAIRNESS_BASIS.md` says we ran best-to-best, and discloses one residual asymmetry
+in LlamaIndex's favour: its workers tuned to a measured knee of 8 while RocketRide's pool width is
+not tunable (FAIRNESS_BASIS.md:43, :64, :88). That knee was measured on the laptop
+(`ws1_knee.json`, a laptop-era probe — RUN_INVENTORY.md:84). The box never ran it. On the box the
+LlamaIndex arm ran **32 workers** (RUN_ON_EC2.md:314, :507; STATE.md:103), adopted from Shashi's
+`RR_THREADS == HS_WORKERS` convention "as the answer to the recorded exec objection that our
+throughput edge came partly from more worker threads" (RUN_ON_EC2.md:328–330), and every thread
+variable was 1 on both arms — LlamaIndex's since the service was written (FAIRNESS_BASIS.md:22),
+RocketRide's after a two-point intervention, default versus 1, whose own write-up lists the optimum
+as "UNVERIFIED — sweep not run" (A3_SERIALIZATION_FINDING.md:146, :173). RocketRide's task-thread
+parameter was never passed and never swept (STATE.md:78–81). **So neither arm was swept on the
+box.** The gap exists because the equal-values convention answered a fairness objection at the
+time, and the fairness document was not re-read against the box configuration afterwards.
+
+What it means for the Phase 1 numbers: **they are a shared-convention basis — 32 workers against
+C=32, BLAS threads 1 on both arms — not per-arm measured optima, and RocketRide's own thread
+optimum was never found.** They stand as what they are. They are not "best-to-best", and we will
+not describe them that way. We found this auditing our own arm before the teammates', and the
+Phase 2 campaign is built so it cannot recur: each arm is swept by the same method and takes its
+own measured optimum (Crossroads 17, 29–31). The Phase 1 documents above the correction are left
+as written; read FAIRNESS_BASIS.md's disclosure as true of the laptop.
+
 ---
 
 ## E. Directory hygiene
