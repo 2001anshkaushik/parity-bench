@@ -54,3 +54,26 @@ larger corpus cost? Decision input, not a plan — nothing here is being done.
   re-stage ~30 min + golden/smoke ~10 min ≈ **half a day, mirror-bound**.
 - ~1000 videos: mirror dominates (day-scale unless mirrored to S3 first);
   decode ~3.5 h; everything else unchanged. Disk is a non-issue at 1 TB.
+
+## §C28 — re-priced for the teammates' actual sets (Crossroad 28, 2026-08-21)
+
+C28 rules we match THEIR corpus and report framing (view) as a per-row
+manifest dimension, never by exclusion. Complication first: **their two
+corpora differ from each other** (Leela: ami_full, 170 meetings, muxed
+audio, Closeup1, ~24 GB in her S3; Shashi: 50 full-length, no-mux,
+Closeup-first priority, 3.7 GB) — Shashi's own Tier A ("same manifest
+file") is currently violated between them; which manifest wins is Ansh's
+negotiation. Priced both ways:
+
+| path | download | decode (12 s/video) | re-derives (dpf/chars-det probe, LIVENESS_MIN, gate-3 restage, golden) | total |
+|---|---|---|---|---|
+| adopt **Leela's ami_full** (pull her S3 at her measured 158 MB/s) | ~24 GB ≈ **3–5 min** + our own sha re-pin ~15 min | 170 × 12 s ≈ **34 min** | ~40–60 min | **≈ 1.5–2 h, no mirror time** |
+| adopt **Shashi's 50-set** (re-fetch from mirror by his manifest shas) | 3.7 GB ≈ 10–15 min | 50 × 12 s ≈ 10 min | ~40–60 min | **≈ 1–1.5 h** |
+
+Notes that survive either path: her set is MUXED (an audio stream rides in
+every AVI — the decode path changes slightly; our measured frame column
+absorbs it, our pipe ignores the audio lane); the view column rides per row
+as C28 requires; and the three silent-if-skipped re-derivations from the
+table above apply IN FULL — Closeup density is not Corner density, so
+dpf/chars-per-det, LIVENESS_MIN, and the gate-3 arming id are all
+mandatory re-measurements, not options.

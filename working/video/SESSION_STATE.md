@@ -564,11 +564,42 @@ videos) or workers dead in rotation. The 5-minute check on his rig: post
 (b) all-8 but marginal <0.7 → knee 4 real, non-CPU bottleneck (86% idle),
 per-worker stage_s next; (c) <8 at 32 posts → dead-in-rotation, defect.
 
-NEXT: W=8 recheck answer → LI_WORKERS settles → **RR concurrency sweep
-(threads-env 8; the Ticket-4 idle-vs-M banner is the headline output)** →
-refine pass at knee W with --threads-env {2,4} (+ W=1 at T={2,4,8} if the
-in-process baseline is competitive) → DRY PASS → 44-video campaign tonight
-(DEFAULT_N=44; ~62 min estimated).
+**RECHECK OUTCOME (a) — 8/8 SERVING at 32 posts (2026-08-21):** matched-load
+W=4 0.0459 (4/4) · W=8 0.0871 (8/8), marginal 0.95, cpu 0.219. The two
+missing workers were routing luck; **KNEE NOT AT 4 — LI_WORKERS = 8, W=16
+extension running** (8 didn't saturate, CPU 22% of 32). Entry-11 paid
+twice: refused the assumption, then delivered the same conclusion as proof.
+Shashi message ASSEMBLED AND HANDED OVER (outcome a + his-15/32 iid
+arithmetic: 50 posts on 32 workers expects ~25.5 occupied; he saw 15 —
+below routing luck; the 4×-posts check transfers).
+
+**CROSSROAD 28 (2026-08-21, Ansh's ruling): all three tracks run the full
+AMI corpus and THE ROCKETRIDE ARM MUST BE IDENTICAL ACROSS ALL THREE — the
+ordering inverts: alignment before full-corpus runs.** Their new docs read
+(Leela RESULTS + SETUP_AND_RUN; Shashi VIDEO-BENCHMARK-SETUP with his OWN
+three-track contract in Part II — Tier A/B/C + checklist §15). Deliverable:
+**working/video/RR_ARM_ALIGNMENT.md** — blocking-first: B1 BLAS axis (their
+Tier B pins OMP=1 everywhere; our measured curve 2.3→8.5 cores is the knob
+neither swept), B2 threshold nesting (config.py:196 discard; ours nested,
+theirs unshown, pipe shas can't adjudicate — project_id churn), B3 corpus
+view (both teammates Closeup-first — the ×8 dpf hypothesis now covers all
+three datasets; C28 rules we adopt their corpus, framing per-row), B4 the
+CHUNK-OVERLAP CONTRADICTION (Leela 4000/0 "byte-exact" vs Shashi 4000/200
+"langchain defaults" vs our MEASURED seam-200 — two byte-level evidence
+chains that can't both be true; discriminator = captured chunks through our
+seam counter), B5 SDK version (his Tier A says 1.2.0; Leela + our md5'd
+wheel say 1.3.0), B6 posture/submission (their native send_files batch vs
+our per-video; our C=BLAST_C driver answers his open c<N> question).
+Aligned already: engine+patches, 15 s sampling, rfdetr 1.5.2 thr 0.3,
+miniLM, V-suite vocabulary. Swap re-priced both ways in CORPUS_SWAP_COST
+§C28 (~1–2 h either manifest; their two corpora differ from EACH OTHER —
+Tier A currently violated between them; Ansh's negotiation).
+
+NEXT: W=16 extension lands → refine pass at knee W with --threads-env {2,4}
+→ RR concurrency sweep (threads-env 8; Ticket-4 idle-vs-M banner is the
+headline) → DRY PASS → **44-video campaign TONIGHT (DEFAULT_N=44, ~62 min —
+banked before the corpus question resolves, per the ruling)** → alignment
+negotiation (Ansh, with RR_ARM_ALIGNMENT.md's three settle-first questions).
 
 **Crossroad 26 (2026-08-21): WARM-UP.** WARM_N >= max(M_TOKENS, LI_WORKERS)
 plus margin, drawn from the 16 disjoint warm rows, never the measured 44.
