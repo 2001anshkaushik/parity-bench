@@ -595,11 +595,31 @@ miniLM, V-suite vocabulary. Swap re-priced both ways in CORPUS_SWAP_COST
 §C28 (~1–2 h either manifest; their two corpora differ from EACH OTHER —
 Tier A currently violated between them; Ansh's negotiation).
 
+**GOVERNING STANCE FOR THE ALIGNMENT (Ansh, 2026-08-21): WE ARE THE JUNIOR
+ARM.** Where Leela or Shashi have a setup or a finding, we FOLLOW it or
+VERIFY it — never assume ours is better because the instrument is newer.
+Consequences applied: RR_ARM_ALIGNMENT.md RESTRUCTURED under Shashi's own
+contract (Tier A/B/C) and his §15 checklist as THE verification artifact —
+per box: PASS 7 / CHANGE 8 (all small, additive: his field names, TTFR +
+basis, coverage summary, INSUFFICIENT_REPS label, his bands as gates, the
+corpus) / CONTESTED 3 (split_overlap, omp_num_threads, frame_law) — each
+contested row in the one permitted voice: "we measured X; here is the
+check; one of us has something configured differently" — never a verdict
+on anyone's conclusion. B4 (overlap) says exactly: two seniors hold
+contradictory byte-level claims; we are NOT adjudicating; we contribute a
+measurement (seam duplication in our responses) and a two-minute check to a
+disagreement that is already theirs. B1 (BLAS): we can FOLLOW OMP=1 (two
+lines) and report both configurations; the check is one BLAS=8 video per
+rig so the contract picks its value with the curve in view. Shashi message
+EDITED: the closing line about FULL50's figures dividing by the wrong W is
+REMOVED — the arithmetic implies it; he draws it himself.
+
 NEXT: W=16 extension lands → refine pass at knee W with --threads-env {2,4}
-→ RR concurrency sweep (threads-env 8; Ticket-4 idle-vs-M banner is the
-headline) → DRY PASS → **44-video campaign TONIGHT (DEFAULT_N=44, ~62 min —
-banked before the corpus question resolves, per the ruling)** → alignment
-negotiation (Ansh, with RR_ARM_ALIGNMENT.md's three settle-first questions).
+→ RR concurrency sweep (threads-env 8; **the Ticket-4 idle-vs-M banner is
+the headline the operator wants FIRST when it lands**) → DRY PASS →
+**44-video campaign TONIGHT (DEFAULT_N=44, ~62 min — banked before the
+corpus question resolves)** → alignment negotiation (Ansh, using Shashi's
+checklist as the artifact).
 
 **Crossroad 26 (2026-08-21): WARM-UP.** WARM_N >= max(M_TOKENS, LI_WORKERS)
 plus margin, drawn from the 16 disjoint warm rows, never the measured 44.
