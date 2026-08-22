@@ -329,7 +329,18 @@ than rewritten from memory, which is entry 2's point in miniature.
 > gate changed, the conditions moved out from under it — our own workload grew
 > until it dominated the instrument's memory. Second, **no dry pass could ever
 > catch it**: a dry pass clamps every leg to n=1, and an n=1 leg leaves no tail.
-> The failure requires exactly the thing a rehearsal removes.
+>
+> **THE FAILURE REQUIRED EXACTLY WHAT THE REHEARSAL REMOVES** (reviewer's, and
+> the part that generalises furthest). This is a rule about rehearsals, not
+> about load averages. **A clamped rehearsal validates WIRING and is
+> structurally blind to anything that emerges from SCALE or SEQUENCE** — load
+> carried between legs, contention and queueing at real concurrency, memory
+> growth, drain tails, anything a second pass exercises. The very clamping that
+> makes a rehearsal cheap deletes the conditions the interesting failures need.
+> So a green dry pass is never evidence that the run will hold; it is evidence
+> that the wiring holds, and the two must be said differently. Written into
+> `run_plan.sh`'s header as an explicit can/cannot list, because the person
+> reading a green dry pass at 2 a.m. is the person most likely to over-read it.
 >
 > The rule: **an instrument that averages over time cannot gate an interval
 > shorter than its own time constant** — and when the thing you are excluding

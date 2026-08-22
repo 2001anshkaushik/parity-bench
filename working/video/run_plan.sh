@@ -55,6 +55,29 @@
 # strictly sequential); submission order is manifest-seq on both arms (driver
 # behaviour + recorded in every export); page cache evicted per arm (driver);
 # quiet-box gate before every leg (driver); ${PIPESTATUS[0]} never $?.
+#
+# -----------------------------------------------------------------------------
+# WHAT A DRY PASS PROVES — AND WHAT IT CANNOT (2026-08-22; register entry 13)
+#
+# DRY_PASS=1 clamps SEQ_N / MEASURED_N / DEFAULT_N / BLAST_C to 1 and skips
+# warm-up. It PROVES WIRING: every step runs in order, every flag parses, every
+# read-back and gate fires, artifacts land under the right names, both rr
+# lifetimes start, the pass mechanism produces distinct files, and the whole
+# composition returns 0.
+#
+# It CANNOT prove anything that emerges from SCALE or SEQUENCE:
+#   * the load the box carries BETWEEN legs — a clamped leg leaves no tail, so
+#     the quiet-box gate's 60 s-lagging load1 basis looked fine in rehearsal
+#     while it would have aborted legs 2-9 of the real campaign;
+#   * concurrency behaviour at C=16 — a one-video "blast" has no waves, so the
+#     steady window, queueing and contention are all untested;
+#   * memory growth, drain tails, resume-after-torn-record, and everything
+#     PASSES=2 exercises ACROSS passes;
+#   * per-leg wall times — an n=1 leg measures startup, not throughput.
+#
+# A GREEN DRY PASS IS NOT A GREEN CAMPAIGN. Read it as "the wiring holds",
+# never as "the run will hold". The failure modes that matter most require
+# exactly the conditions the rehearsal removes.
 # =============================================================================
 set -euo pipefail
 # Interpreter contract: driver/smoke import harness (psutil) + rocketride — the
