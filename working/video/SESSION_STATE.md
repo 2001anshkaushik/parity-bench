@@ -121,10 +121,87 @@ warm_workers 8). Two smoke failures, both instructive:**
    call it; null control fires (3 stale/empty/low-schema raise, complete +
    present-negative pass). Structural prevention: the bake now refuses to ship
    an image whose env_probe md5 != the repo (read-back (d), self-updating).
-   **BOX ACTION: rebuild rr:patched (docker/Dockerfile.rocketride COPYs the
-   node) THEN re-bake rr:patched-video** — the node changed (md5
-   0a2850a0da3201ca741c74b59b1fcf92) so a rebuild is required regardless. Verify:
-   `docker run --rm rr:patched-video sh -c 'grep -c env_probe_schema /opt/rocketride/engine/nodes/env_probe/IInstance.py'` → 1.
+   **STALE CONFIRMED FROM GIT (2026-08-22), not from behaviour:** the observed
+   field set (env ✓, torch_num_threads ✓ =16, rfdetr_import_ok ✗,
+   python_version ✗) is EXACTLY and ONLY the 2026-08-10 node a41e241; both
+   missing fields were added 2026-08-20 (56ee341 rfdetr, 2b1e969
+   python_version). Node md5 by revision — the DISCRIMINATING box test:
+     cba71b3595a173132c15b22624ab3c66  a41e241  2026-08-10  (stale: diagnosis right)
+     00676b0eb8a16050cdf2a727a7e47035  2b1e969  2026-08-20  (then the None came from the RESPONSE PATH, diagnosis wrong)
+     0a2850a0da3201ca741c74b59b1fcf92  b1efe1b  2026-08-22  (today, schema=2)
+   `docker run --rm rr:patched-video md5sum /opt/rocketride/engine/nodes/env_probe/IInstance.py`
+   (`grep -c env_probe_schema` returns 0 for BOTH stale candidates and cannot
+   tell them apart; the md5 can.)
+
+   **BOX ACTION — DERIVED LAYER, NOT A REBUILD (see the invalidation answer
+   below).** env_probe is NOT in the measured pipe (benchmark_video_detect.pipe
+   = webhook, frame_grabber, detect, preprocessor_langchain,
+   embedding_transformer, response_documents) — it is the INSTRUMENT, loaded
+   only by the generated envprobe pipe. It also has no requirements.txt, so
+   replacing it cannot touch the engine's constraints-cache key (keyed on
+   requirements files' path:size:mtime, Dockerfile:192).
+     docker tag rr:patched-video rr:patched-video.pre-node-fix   # preserve FIRST (entry 7)
+     docker build -t rr:patched-video -f - . <<'EOF'
+     FROM rr:patched-video.pre-node-fix
+     COPY working/nodes/env_probe /opt/rocketride/engine/nodes/env_probe
+     RUN rm -rf /opt/rocketride/engine/nodes/env_probe/__pycache__
+     EOF
+   Verify: node md5 = 0a2850a…; `grep -c env_probe_schema` = 1; labels still
+   duplication_patch_applied=1; and the PROOF that nothing beneath moved —
+     diff <(docker inspect -f '{{range .RootFS.Layers}}{{println .}}{{end}}' rr:patched-video.pre-node-fix) \
+          <(docker inspect -f '{{range .RootFS.Layers}}{{println .}}{{end}}' rr:patched-video)
+   → the old layer list must be a strict PREFIX (only 1–2 ADDED lines at the
+   end, nothing changed above). Record in provenance: this image is
+   "Dockerfile + one documented layer", a deviation to be retired by the
+   re-baseline. NOTE: rr:patched keeps the stale node; the bake's new
+   read-back (d) will REFUSE the next bake until rr:patched is rebuilt —
+   correct fail-closed behaviour, and the re-baseline's to-do.
+
+   **▶ THE INVALIDATION ANSWER (asked before rebuilding, answered before
+   rebuilding).** A full rebuild of rr:patched CANNOT be assumed byte-identical
+   in what the engine executes. Pinned and safe: the engine ELF (double
+   sha-pinned — tarball ENGINE_SHA256 + extracted ENGINE_BIN_SHA256, verified
+   with `sha256sum -c`, Dockerfile:64,65,79 — it is identical or the build
+   FAILS); the onnx and duplication patches (deterministic, guarded);
+   pypdf==6.15.0; rocketride==1.3.0 (apt python3.10 — the engine's node code
+   runs on the EMBEDDED CPython 3.12, so SDK dep drift is off the measured
+   path). **NOT pinned — three vectors into the execution path:**
+   (1) `FROM ubuntu:22.04` (Dockerfile:38) is a FLOATING tag → glibc/libc++/
+   libunwind can change, and the file's own header lists them as the engine
+   ELF's DT_NEEDED; (2) `apt-get install libc++1 libc++abi1 libunwind8 …`
+   (:46-49) is unpinned; (3) the bootcheck **constraints cache is COPYed into
+   the final image** (:226) and the Dockerfile itself says this "freezes
+   dependency RESOLUTION at image-build time… first-boot resolution floats with
+   PyPI state" — a rebuild re-resolves against TODAY's PyPI. Cache subtlety:
+   the node COPY at :176 invalidates everything below it, so **even a warm
+   build cache re-runs the bootcheck stage and re-resolves constraints**;
+   vectors 1–2 survive on a warm cache but Crossroad 19 had build cache being
+   reclaimed for disk, so it may be cold.
+   **What a changed image would invalidate — all measured on the CURRENT
+   rr:patched-video:** Ticket 5's thread curve (t1/t8/t32, two runs); Ticket 4's
+   idle curve M=1…16 and the 0.26 cores/token slope; the M×T refine (4×8, 8×4,
+   16×2, 32×1) and therefore **Crossroad 31's M_TOKENS=16 / T=2**;
+   measured_dpf 25.95 and chars-per-det 230.4 (the manifest's est columns);
+   gate 4's PNG frame-identity probe; and most sharply **GATE3_RUN_ID=
+   probe_20260821_195214** — gate 3 is STRICT zero-tolerance and armed by that
+   run id, so if anything in the detect path moves, the arming evidence
+   describes an image that no longer exists and gate 3 must be RE-STAGED.
+   Unaffected either way: the LI arm (li:video untouched), corpus sha pins,
+   `expected_frames_measured` (host-side ffmpeg at manifest build), the gates.
+   Partial guard if a rebuild does happen: the bake's read-back (b) compares the
+   vision stack against engine_pins.txt and (c) the rf-detr md5 — a drifted
+   resolution FAILS the bake rather than shipping silently (fail-closed, but it
+   can cost the night).
+   **RE-BASELINE (PATH B) — after the campaign, deliberately, never at 11pm.**
+   Preserve + fingerprint BEFORE (`docker tag` both images aside, then capture
+   engine ELF sha256, dpkg versions of libc6/libc++1/libc++abi1/libunwind8/
+   libgcc-s1, every site-packages dist-info listing, the constraints-cache file
+   count, node md5), `docker build -f docker/Dockerfile.rocketride -t rr:patched .`,
+   `bash working/video/bake_rr_video.sh`, capture the same fingerprint AFTER,
+   and `diff`. Any difference outside the node line = the probe numbers and the
+   gate-3 arming were taken on a different image; re-take them or run the
+   campaign on the preserved tag. Doing this on purpose retires a real unknown:
+   nobody currently knows what a rebuild of this Dockerfile produces.
 3. **First measurement of the default posture's unset thread count: torch
    resolves to 16 on this host** (`cross-arm in-process torch {'rr': 16}`) —
    Ticket 5 open question 3, the point the M=1 curve never measured. Type bug
