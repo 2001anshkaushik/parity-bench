@@ -11,7 +11,17 @@
 #                  (Crossroad 17: leaving the default 1 is a real handicap)
 #   WARM_N         warm items (>= max(M_TOKENS, LI_WORKERS); manifest re-cut
 #                  supplies the split: measured = 60 - WARM_N)
-#   RR_THREADS_ENV six BLAS/OMP vars on the RR container — RR's own optimum
+#   RR_THREADS_ENV six BLAS/OMP vars on the RR container for the PARITY
+#                  posture ONLY — the measured optimum, set WITH M_TOKENS by
+#                  the M x T refine (Crossroads 29/30: the winning product sets
+#                  both). RULING 2026-08-21: the DEFAULT posture runs the
+#                  engine default — nothing declared — because the out-of-box
+#                  posture must reflect what a user actually gets, and the
+#                  M=1 thread curve only ever measured 1/8/32. The rr
+#                  container is therefore started TWICE: unset for steps 1-2,
+#                  RR_THREADS_ENV for step 3; every leg states its expectation
+#                  (--rr-threads-env) and the driver reads it back declared +
+#                  in-process, fail-closed.
 #   LI_THREADS_ENV six BLAS/OMP vars on the LI container — LI's own optimum
 #                  (Crossroad 17: same sweep matrix both arms, per-arm optimum;
 #                  values published beside the full matrix; declared==measured
@@ -116,13 +126,22 @@ thread_env_args() {
        -e VECLIB_MAXIMUM_THREADS=$n -e NUMEXPR_NUM_THREADS=$n -e TORCH_NUM_THREADS=$n"
 }
 
-start_rr() {
+start_rr() {  # $1 = thread env for THIS lifetime: 'unset' (default posture) or N (parity)
+  local t="$1"
+  case "$t" in unset) ;; ''|*[!0-9]*) echo "NOT DONE — start_rr needs 'unset' or a positive int, got '$t'"; exit 1;; esac
   docker rm -f rr 2>/dev/null || true
   # Crossroad 22: --network host both arms (Phase 1 section C parity; no
   # docker-proxy hop in measured latency; TCP-check trap = instance seven).
-  # shellcheck disable=SC2046
-  run docker run -d --name rr --memory 58g $(thread_env_args "$RR_THREADS_ENV") \
+  # Ruling 2026-08-21: per-posture thread env — 'unset' passes NO -e (the
+  # engine default is what a user gets); N passes the six. Read back below.
+  local env_args=""
+  [ "$t" = "unset" ] || env_args="$(thread_env_args "$t")"
+  # shellcheck disable=SC2046,SC2086
+  run docker run -d --name rr --memory 58g $env_args \
       --log-opt max-size=200m --network host "$RR_IMAGE"
+  # Read-back of the DECLARED env on the container this lifetime (the
+  # in-process read-back is the driver's per-leg preflight).
+  echo "rr declared thread env (expected $t): $(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' rr | grep -E '^(OMP|MKL|OPENBLAS|VECLIB|NUMEXPR|TORCH)_' | tr '\n' ' ' || true)" | tee -a "$LOG"
   # Readiness = a real SDK connect (one helper everywhere); asserts host mode
   # and records it in the log via run().
   run "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
@@ -146,7 +165,10 @@ start_li() {
     || echo "li_image_freeze snapshot FAILED (recorded)" | tee -a "$LOG"
 }
 
-stop_arm() { docker logs "$1" > "$OUT/dockerlog_$1_final.txt" 2>&1 || true; docker rm -f "$1" >/dev/null 2>&1 || true; }
+stop_arm() {  # $2 = optional lifetime tag (rr now has two lifetimes — logs must not overwrite)
+  docker logs "$1" > "$OUT/dockerlog_$1${2:+_$2}_final.txt" 2>&1 || true
+  docker rm -f "$1" >/dev/null 2>&1 || true
+}
 
 DRIVER=("$PY" working/video/driver_video.py
         --liveness-min-fraction "$LIVENESS_MIN"
@@ -177,6 +199,8 @@ cat > "$OUT/run_manifest.json" <<MANIFEST
   "LI_WORKERS": $LI_WORKERS,
   "WARM_N": $WARM_N,
   "RR_THREADS_ENV": $RR_THREADS_ENV,
+  "RR_THREADS_ENV_applies_to": "parity posture only — rr restarted between postures (ruling 2026-08-21)",
+  "RR_DEFAULT_THREADS_ENV": "unset (engine default: what a user gets; read back in-process per leg)",
   "LI_THREADS_ENV": $LI_THREADS_ENV,
   "LIVENESS_MIN": $LIVENESS_MIN,
   "GATE3_RUN_ID": "$GATE3_RUN_ID",
@@ -193,16 +217,17 @@ MANIFEST
 echo "run manifest: $OUT/run_manifest.json" | tee -a "$LOG"
 
 echo "=== RUN PLAN: M=$M_TOKENS li_workers=$LI_WORKERS warm=$WARM_N \
-rr_threads=$RR_THREADS_ENV li_threads=$LI_THREADS_ENV liveness>=$LIVENESS_MIN \
-gate3=$GATE3_RUN_ID C=$BLAST_C seq_n=$SEQ_N passes=$PASSES -> $OUT ===" | tee -a "$LOG"
+rr_threads(parity)=$RR_THREADS_ENV rr_threads(default)=unset li_threads=$LI_THREADS_ENV \
+liveness>=$LIVENESS_MIN gate3=$GATE3_RUN_ID C=$BLAST_C seq_n=$SEQ_N passes=$PASSES -> $OUT ===" | tee -a "$LOG"
 
 echo "--- 0. manifest re-cut check (re-cut is a REUSE: fetched must be 0) ---" | tee -a "$LOG"
 run "$PY" working/video/fetch_ami_video.py --verify
 
-echo "--- 1. LlamaIndex arm (both containers up for smoke read-backs; RR idles) ---" | tee -a "$LOG"
-start_rr
+echo "--- 1. LlamaIndex arm (both containers up for smoke read-backs; RR idles at the DEFAULT config) ---" | tee -a "$LOG"
+start_rr unset
 start_li
-run "$PY" working/video/smoke_video.py --rr-container rr --li-container li_video "${SMOKE_EXTRA[@]}"
+run "$PY" working/video/smoke_video.py --rr-container rr --li-container li_video \
+    --rr-threads-env unset "${SMOKE_EXTRA[@]}"
 run "${DRIVER[@]}" --arm llamaindex --leg sequential --n "$SEQ_N"
 for pass in $(seq 1 "$PASSES"); do
   echo "--- LI blast pass $pass/$PASSES ---" | tee -a "$LOG"
@@ -210,25 +235,30 @@ for pass in $(seq 1 "$PASSES"); do
 done
 stop_arm li_video
 
-echo "--- 2. RocketRide DEFAULT posture (1 token, threads unset = engine 64) ---" | tee -a "$LOG"
+echo "--- 2. RocketRide DEFAULT posture (1 token, use(threads=) unset = engine 64, six-var env UNSET = engine default) ---" | tee -a "$LOG"
 # The full smoke ran once in step 1 with BOTH containers live; per-leg
 # re-verification (flags, pins, identity, quiet box) is the driver's own
-# fail-closed preflight — no || true anywhere in this file.
-run "${DRIVER[@]}" --arm rocketride --posture default --leg sequential --n "$SEQ_N"
+# fail-closed preflight — no || true anywhere in this file. Every RR leg
+# states its expected thread env; the driver reads it back (ruling 2026-08-21).
+run "${DRIVER[@]}" --arm rocketride --posture default --leg sequential --n "$SEQ_N" \
+    --rr-threads-env unset
 for pass in $(seq 1 "$PASSES"); do
   # Crossroad 27: the default-posture blast runs DEFAULT_N (a stated subset at
   # scale — the out-of-box finding is a ratio); parity runs the full set.
   run "${DRIVER[@]}" --arm rocketride --posture default --leg blast --n "$DEFAULT_N" \
-      --blast-concurrency "$BLAST_C"
+      --blast-concurrency "$BLAST_C" --rr-threads-env unset
 done
+stop_arm rr default
 
-echo "--- 3. RocketRide PARITY posture (M=$M_TOKENS tokens) ---" | tee -a "$LOG"
-run "${DRIVER[@]}" --arm rocketride --posture parity --leg sequential --n "$SEQ_N" --tokens "$M_TOKENS"
+echo "--- 3. RocketRide PARITY posture (M=$M_TOKENS tokens, six-var env = $RR_THREADS_ENV; fresh rr lifetime) ---" | tee -a "$LOG"
+start_rr "$RR_THREADS_ENV"
+run "${DRIVER[@]}" --arm rocketride --posture parity --leg sequential --n "$SEQ_N" --tokens "$M_TOKENS" \
+    --rr-threads-env "$RR_THREADS_ENV"
 for pass in $(seq 1 "$PASSES"); do
   run "${DRIVER[@]}" --arm rocketride --posture parity --leg blast --n "$MEASURED_N" \
-      --blast-concurrency "$BLAST_C" --tokens "$M_TOKENS"
+      --blast-concurrency "$BLAST_C" --tokens "$M_TOKENS" --rr-threads-env "$RR_THREADS_ENV"
 done
-stop_arm rr
+stop_arm rr parity
 
 echo "--- 4. cross-arm gates (gate 3 armed by $GATE3_RUN_ID, then char conservation) ---" | tee -a "$LOG"
 # D6 fix (2026-08-21): the old `cmd; rc=$?` form was dead code under set -e —

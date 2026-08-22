@@ -45,34 +45,78 @@ TOKEN axis fails by the opposite signature on the same box, so "shared
 substrate" is one hypothesis, not a finding; the sentence above is the measured
 statement.)
 
-**CROSSROAD 29 (2026-08-21): REFINE IS MANDATORY BEFORE EITHER NUMBER IS SET.**
-M_TOKENS=4 was measured at T=8: 4×8 = 32 threads on 32 cores, exactly
-saturated. M=8 × T=4 is also 32 and may scale better — tokens parallelize where
-threads queue behind the device lock. Both sweeps held the other axis fixed at
-a value chosen before the interaction was visible. Ansh is running
-`probe_concurrency.py --sweep 4 8 --threads-env 4` now; **whichever M×T product
-wins sets BOTH numbers** (M_TOKENS and the parity posture's thread env).
-**FLAG — not ruled, ASK before the campaign:** run_plan starts the `rr`
-container ONCE (step 1, a single `thread_env_args "$RR_THREADS_ENV"`) and holds
-it up through BOTH postures (stop_arm rr after step 3). A T=4 winner therefore
-also puts the DEFAULT posture (1 token) at T=4 — a point the M=1 thread curve
-never measured (1/8/32 only; knee 8). Either the container restarts between
-postures with a per-posture T (small run_plan change: `start_rr "$T"` before
-step 3 + an `RR_PARITY_THREADS_ENV` var, both read back), or one T serves both
-and the default posture runs off its measured optimum. Sized, NOT implemented.
+**CROSSROAD 29 (2026-08-21) — REFINE LANDED, CURVE STILL CLIMBING.** Both
+sweeps had held the other axis at a value chosen before the interaction was
+visible. The budget-32 points (M×T = 32 threads on 32 cores), relayed,
+MONOTONIC IN TOKENS:
+  M=4  × T=8   0.1179 videos/s   cpu 0.853
+  M=8  × T=4   0.1417            cpu 0.863
+  M=16 × T=2   0.1551            cpu 0.867   idle 5.24 cores   ← best yet, +9.5% over 8×4
+Tokens parallelize where threads queue behind the device lock. Idle at M=16
+is 5.24 at T=2 vs 5.25 at T=8: the per-token spin is T-independent (in Ticket 4).
+**CROSSROAD 30: test M=32 × T=1 before setting M_TOKENS** — stopping at the
+last point we happened to test is the error the refine just caught. Ansh is
+running `--sweep 16 32 --threads-env 1`. The trade is no longer free: 5.24
+idle cores at M=16 = 16.4% of the box; M=32 PROJECTS to ~9.4–9.9 cores (29–31%,
+by the fit's 0.26/token or the last marginal 0.28) — a projection, to be
+MEASURED by that sweep before it is quoted. **RULING: set M_TOKENS on measured
+throughput and report the idle burden BESIDE it — reported, never subtracted.**
+A config that wins on throughput while burning a third of the box idle is
+still the honest production answer if that is what the engine does;
+concealing the cost is the dishonest part. Built: `at_a_glance` is the FIRST
+key of every export and the driver's last stdout line — throughput, service
+CPU, idle burden with instances live, thread env expected/measured, gate
+counts, on one line (shared function, sample and box agree by construction).
 
-**THE EIGHT RUN-PLAN NUMBERS — three landed, one provisional, four open:**
-- `RR_THREADS_ENV = 8` — LANDED from the M=1 thread curve (knee at 8; t32
-  regression reproduced twice — Ticket 5). Under C29 the PARITY posture's T is
-  set jointly with M by the refine pass; see the flag above.
-- `GATE3_RUN_ID = probe_20260821_195214` (the ORIGINAL probe run, artifacts intact)
-- `LI_WORKERS = 8` (matched-load curve below; W=16 is past the knee)
-- `M_TOKENS = 4` **PROVISIONAL at T=8** (2→4 marginal 0.59; 4→8 collapses
-  4.8×). C29: the refine pass decides between 4×8 and 8×4 — not set until it lands.
-- OPEN: `LI_THREADS_ENV` (refine pass at W=8 with --threads-env {2,4}), `WARM_N`
-  (≥ max(M, 8) plus margin, from the 16 warm rows; 16 provisional), `BLAST_C`
-  (wave arithmetic with the sweeps), `DEFAULT_N` (ruled = 44 at this scale; not
-  yet exported).
+**RULING 1 (2026-08-21) — PER-POSTURE THREAD ENV, IMPLEMENTED:** the DEFAULT
+posture runs the ENGINE DEFAULT — the six BLAS/OMP vars NOT declared on the
+container ("what a user actually gets"); the PARITY posture runs the measured
+optimum (`RR_THREADS_ENV`, set with M by C29/C30). run_plan now starts `rr`
+TWICE (`start_rr unset` for steps 1–2, `stop_arm rr default`, `start_rr
+"$RR_THREADS_ENV"` for step 3, `stop_arm rr parity` — per-lifetime docker
+logs), every RR leg states `--rr-threads-env <int|unset>` (REQUIRED, never
+implied by the posture), and the driver/smoke read it back declared (docker
+inspect) and in-process (envprobe) through `gates_shared.thread_pins_by_arm(
+expected_by_arm=…)`: value mode = all six declared == expected == measured;
+**unset mode = none of the six declared AND none present in-process (a leaked
+in-process value is #37's class and FAILS), torch's own count still REQUIRED
+and agreed — recorded as the out-of-box value.** Null controls for both modes
+(`thread_pins_self_test`, 8 cases) fire at every preflight and in the smoke.
+Interpretation recorded: "threads unset" = the six env vars absent; on this
+host class the library default resolves to ~16 intra-op threads (Ticket 5
+OQ3 — the ONE point the M=1 curve never measured), so the default posture's
+thread count is characterised for the first time by the campaign's own
+read-back; `use(threads=)` stays unset (engine 64) as before.
+
+**RULING 2 (2026-08-21) — THE SENT SAMPLES:** no JSON lives in
+`team_docs_sent/` (three .md files). But `METRICS_AND_GATES.md` lines 3–4
+address "Shashi, Leela — reviewing `sample_export_blast.json` and
+`sample_cross_gates.json`", so if the JSONs went out beside it they went out
+as the 08-20 versions (bb7f426 / e0d6f4b), which carry **84** on ES2002a
+(`n_frames: 84`, `frames: 84` — the regenerated files say 83). The message to
+Shashi (#3) states "ffmpeg emits 83 where it predicts 84" in prose, so the
+prose teaches the right number and the JSON, if sent, the deleted formula.
+Whether the JSONs were sent is NOT in the repo — ASK; if yes, the one-line
+correction is owed now.
+
+**THE RUN-PLAN NUMBERS — two landed, one ruled constant, the rest open:**
+- `GATE3_RUN_ID = probe_20260821_195214` — LANDED (the ORIGINAL probe run, artifacts intact)
+- `LI_WORKERS = 8` — LANDED (matched-load curve below; W=16 is past the knee)
+- DEFAULT-posture RR thread env = **UNSET, by ruling** (Ruling 1 above). The
+  earlier "`RR_THREADS_ENV = 8` LANDED for the default posture" is SUPERSEDED:
+  `RR_THREADS_ENV` now means the PARITY posture's T only, set WITH M_TOKENS.
+- `M_TOKENS` + parity T — **OPEN pending Crossroad 30** (M=32 × T=1 in flight).
+  Provisional leader M=16 × T=2 (0.1551). Set on measured throughput; idle
+  burden beside it. (The earlier "M_TOKENS = 4 provisional at T=8" is superseded.)
+- OPEN: `LI_THREADS_ENV` (refine at W=8 with --threads-env {2,4}), `WARM_N`
+  (≥ max(M, 8) plus margin, drawn from the 16 warm rows — **FLAG: with M=16
+  the 16 rows give ZERO margin and with M=32 they cannot cover the tokens at
+  all; the driver refuses a parity leg with len(warm) < tokens. C26's rule
+  and the 44/16 re-cut collide above M=16 — Ansh's call: re-cut (e.g. 36
+  warm / 24 measured), or rule that a warm row may cover more than one token**),
+  `BLAST_C` (wave arithmetic; at M=16–32 a 44-video blast is 1–3 waves and the
+  steady window thins — PASSES=2 is the existing remedy in run_plan),
+  `DEFAULT_N` (ruled = 44 at this scale; not yet exported).
 
 **THE LI CURVE (T=1, matched-load ppw=4 — the JSON on the box is authoritative;
 an earlier relay read W=8 as 0.0871):**
@@ -134,8 +178,17 @@ each carry a minutes-long check and no verdict.
   `ticket4_idle_answer` (verify the slope against 0.26) and the per-process
   attribution `idle_cores_per_process` (eaas server vs task subprocesses —
   Ticket 4 open question 1). ASK before citing the split.
-- The C29 refine pass (`--sweep 4 8 --threads-env 4`) was IN FLIGHT at this
-  writing; output filename unrelayed. It sets M_TOKENS and the parity T. ASK.
+- C29 refine landed (relayed): 8×4 = 0.1417 (cpu 0.863); 16×2 = 0.1551 (cpu
+  0.867, idle 5.24). **Crossroad 30 in flight: `--sweep 16 32 --threads-env 1`**
+  — M=32 × T=1 decides M_TOKENS and the parity T (filenames unrelayed; the
+  idle at M=32 is a PROJECTION, ~9.4–9.9 cores, until measured). ASK for it.
+- Whether the 08-20 sample JSONs (84 on ES2002a) were SENT beside
+  METRICS_AND_GATES.md is not in the repo — the sent doc addresses reviewers
+  of those two files by name. ASK; if sent, the one-line correction is owed.
+- The default posture's thread env is now UNSET by ruling — the campaign's
+  first default leg is the first measurement of torch's own count on this
+  host (~16 expected from Ticket 5's read-back). Read it from the export's
+  `threads_env_in_process_torch`; do not quote "16" before then.
 - W=16 raw JSON and the LI refine-pass results live on the box (filenames
   unrelayed); the numbers above are relayed values. ASK before citing beyond them.
 - Messages to Leela/Shashi: the approved texts are preserved in
@@ -244,7 +297,24 @@ each carry a minutes-long check and no verdict.
   2.02 cores = 6.3% of the box before any work); the driver carries the
   measured idle burden in every export's `efficiency` block, beside the CPU
   figures, never subtracted. Open flag: one container thread env serves both
-  postures in run_plan (see the briefing).
+  postures in run_plan (see the briefing) — RESOLVED by Ruling 1 below.
+- **Crossroad 30 (2026-08-21): TEST M=32 × T=1 BEFORE SETTING M_TOKENS.** The
+  C29 refine showed the budget-32 curve still climbing in tokens (4×8 0.1179 →
+  8×4 0.1417 → 16×2 0.1551, cpu ~0.86 flat); stopping at the last point we
+  happened to test is the error the refine just caught. `--sweep 16 32
+  --threads-env 1` runs. RULING with it: M_TOKENS is set on MEASURED
+  THROUGHPUT; the idle burden (5.24 cores = 16.4% at M=16; M=32 projected
+  ~30%) is reported BESIDE it, never subtracted, legible at a glance in the
+  export (`at_a_glance`, first key + last stdout line).
+- **Ruling 1 (2026-08-21): per-posture thread env — IMPLEMENTED.** Default
+  posture = engine default (six vars undeclared; torch's count read back);
+  parity = the measured optimum (`RR_THREADS_ENV`). rr restarted between
+  postures; `--rr-threads-env <int|unset>` required per RR leg; declared +
+  in-process read-backs fail-closed; null controls both modes. Before the
+  campaign, as ruled.
+- **Ruling 2 (2026-08-21): the stale sample JSONs were possibly SENT** —
+  answer in the briefing (no JSON in team_docs_sent; the sent doc names the
+  files; 08-20 versions carry 84; whether they went out is an ASK).
 - **Gate rulings:** gate 1 frames-census is THE dropped-frame detector; log
   scrape is ATTRIBUTION only, fail-closed on its own channel liveness. Gate 3
   STRICT zero tolerance, armed only via --gate3-armed <probe_run_id> after the

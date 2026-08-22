@@ -481,6 +481,10 @@ engine burns 2.02 cores — **6.3% of a 32-core host — before any work is subm
 16.4%. (Values as relayed from the sweep's stdout; the sweep JSON's `ticket4_idle_answer` key
 carries the fitted verdict and `idle_cores_per_process` carries the per-process attribution.)
 
+**Independent of the intra-op thread count:** the M × T refine re-measured M=16 with the six
+variables at 2 and read 5.24 idle cores, against 5.25 at 8 — the per-pipeline spin is not a
+BLAS/OMP thread-pool effect. (Relayed, same day.)
+
 ## Reproduction
 
 ```bash

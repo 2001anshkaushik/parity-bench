@@ -103,6 +103,64 @@ class Posture:
         return f'{self.name}[tokens={self.tokens},threads={t}]'
 
 
+def threads_env_expectation(name: str):
+    """argparse type for the EXPECTED six-variable thread env on the RR
+    container for one leg (ruling 2026-08-21): a positive int — the parity
+    posture's measured optimum — or the literal 'unset' — the default posture,
+    where the run declares nothing and the engine/library default is what a
+    user gets. Read back declared (docker inspect) and in-process (envprobe),
+    fail-closed, in preflight. Never implied by which posture is running."""
+    as_int = positive_int(name, 256)
+
+    def conv(raw: str):
+        if raw == 'unset':
+            return 'unset'
+        return as_int(raw)
+    return conv
+
+
+def at_a_glance_line(export: Dict[str, Any]) -> str:
+    """ONE line that makes throughput and the idle burden legible together
+    (ruling 2026-08-21: M is set on measured throughput and the idle cost is
+    reported BESIDE it, never subtracted — concealing it is the dishonest
+    part). Built from the export itself so the sample and the box agree by
+    construction; first key of every export and the last stdout line."""
+    thr = export.get('throughput') or {}
+    eff = export.get('efficiency') or {}
+    burden = eff.get('idle_burden') or {}
+    win = thr.get('steady_window') or {}
+    gates = export.get('gates') or {}
+    verdicts = [g.get('PASS') for g in gates.values() if isinstance(g, dict) and 'PASS' in g]
+    n_pass = sum(1 for v in verdicts if v is True)
+    n_fail = sum(1 for v in verdicts if v is False)
+    n_notrun = sum(1 for v in verdicts if v is None)
+    posture = (export.get('provenance_video') or {}).get('posture') or {}
+    t_exp = posture.get('threads_env_expected')
+    t_meas = posture.get('threads_env_in_process_torch')
+    window = (f', steady window {win.get("window_frames_per_s")} frames/s (n={win.get("window_n")})'
+              if win.get('defined') else ', steady window undefined')
+
+    def pct(x):
+        return f'{x:.1%}' if isinstance(x, (int, float)) else 'n/a'
+    # Counts as recorded, no arithmetic: n_records includes any determinism-
+    # repeat record on sequential legs, so a derived "ok/offered" would
+    # read 6/5 and invite a false alarm.
+    return (f"{export.get('arm')} {export.get('posture')} {export.get('leg')} "
+            f"records {export.get('n_records')} (errors {export.get('n_errors')}) / "
+            f"offered {export.get('n_offered')}"
+            f" | THROUGHPUT {thr.get('total_frames_per_s')} frames/s "
+            f"({thr.get('total_realtime_factor')}x realtime){window}"
+            f" | SERVICE CPU {eff.get('effective_cores')} cores = {pct(eff.get('cpu_util_of_box'))} "
+            f"of {eff.get('box_cpus')}"
+            f" | IDLE BURDEN {burden.get('idle_cores_with_instances_live')} cores with "
+            f"{burden.get('instances')} {burden.get('instance_kind')} live = "
+            f"{pct(burden.get('idle_share_of_box'))} of the box before any work "
+            f"(beside, never subtracted)"
+            f" | thread env expected {t_exp} / in-process torch {t_meas}"
+            f" | gates PASS {n_pass} · NOT RUN {n_notrun} · FAIL {n_fail}"
+            f" | efficiency valid={eff.get('valid')}")
+
+
 # ---------------------------------------------------------------------------
 # Manifest
 # ---------------------------------------------------------------------------
@@ -758,13 +816,25 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
 
     # Crossroad 17: per-arm declared-vs-measured; asymmetry across arms is a
     # recorded value, never a failure. Undeclared drift (#37) still fails.
+    # Ruling 2026-08-21 (per-posture thread env): the RR leg states what it
+    # EXPECTS on the container — an int (parity: the measured optimum) or
+    # 'unset' (default posture: nothing declared, the engine default is what
+    # a user gets; torch's own count is read back and recorded). The null
+    # controls for both modes fire first, every preflight.
+    gs.thread_pins_self_test()
     arm_label = 'rr' if rr_arm_active else 'li'
     container = args.rr_container if rr_arm_active else args.li_container
+    expected = {'rr': args.rr_threads_env} if rr_arm_active else None
     pins = gs.thread_pins_by_arm({arm_label: readbacks},
-                                 {arm_label: container_declared_threads(container)})
+                                 {arm_label: container_declared_threads(container)},
+                                 expected_by_arm=expected)
     if pins['PASS'] is not True:
-        raise SystemExit(f'NOT DONE — thread pins (declared vs measured, per arm): '
-                         f'{json.dumps(pins)}')
+        raise SystemExit(f'NOT DONE — thread pins (declared vs measured vs expected '
+                         f'{expected}, per arm): {json.dumps(pins)}')
+    if rr_arm_active:
+        say(f"preflight: RR thread env expected {args.rr_threads_env!r} — declared "
+            f"{pins['arms']['rr'].get('declared')}, in-process torch "
+            f"{pins['cross_arm_values'].get('rr')} (read back, fail-closed)")
 
     return pf_extra | {'manifest_meta': meta, 'rows': rows, 'readbacks': readbacks,
             'identity': identity, 'thread_pin_parity': pins,
@@ -1038,6 +1108,13 @@ async def amain() -> int:
     ap.add_argument('--blast-concurrency', type=positive_int('blast-concurrency', 4096))
     ap.add_argument('--tokens', type=positive_int('tokens', 64),
                     help='parity posture M (default: LI declared_workers)')
+    ap.add_argument('--rr-threads-env', type=threads_env_expectation('rr-threads-env'),
+                    default=None,
+                    help='EXPECTED six-var BLAS/OMP env on the RR container for THIS leg: an '
+                         'int (parity posture: the measured optimum) or the literal "unset" '
+                         '(default posture: nothing declared — the engine default is what a '
+                         'user gets; ruling 2026-08-21). Required for --arm rocketride; read '
+                         'back declared + in-process, fail-closed, recorded in the export.')
     ap.add_argument('--threads', type=positive_int('threads', 256),
                     help='parity posture per-token threads= (default: unset)')
     ap.add_argument('--manifest', default=str(MANIFEST_DEFAULT))
@@ -1072,6 +1149,10 @@ async def amain() -> int:
                     help='cross-arm gates over two completed record files; no run')
     args = ap.parse_args()
 
+    if args.arm == 'rocketride' and args.rr_threads_env is None:
+        raise SystemExit('NOT DONE — --rr-threads-env is required for the rocketride arm '
+                         '(an int or "unset"): the thread env is a declared, read-back value '
+                         'per leg, never implied by the posture (ruling 2026-08-21).')
     if args.cross:
         out = cross_gates(Path(args.cross[0]), Path(args.cross[1]), args.char_tol,
                           gate3_armed=args.gate3_armed)
@@ -1410,7 +1491,15 @@ async def amain() -> int:
                         'threads_config': posture.threads,
                         'threads_note': ('unset -> engine CONST_DEFAULT_MAX_THREADS=64 '
                                          '(constants.py:48)' if posture.threads is None else
-                                         'explicit use(threads=)')},
+                                         'explicit use(threads=)'),
+                        # Ruling 2026-08-21: the six-var env is per POSTURE —
+                        # expected by the operator, read back declared and
+                        # in-process; 'unset' = the engine default a user gets.
+                        'threads_env_expected': (args.rr_threads_env
+                                                 if args.arm == 'rocketride' else None),
+                        'threads_env_in_process_torch': (
+                            (pf['thread_pin_parity'].get('cross_arm_values') or {}).get(
+                                'rr' if args.arm == 'rocketride' else 'li'))},
             'identity_readback': pf['identity'],
             'thread_pins_by_arm': pf['thread_pin_parity'],
             'task_census': pf.get('task_census'),
@@ -1421,6 +1510,10 @@ async def amain() -> int:
             'chunk_config_source': 'measured from records (config literal never exported)',
         },
     }
+    # Ruling 2026-08-21: throughput and idle burden legible TOGETHER, at a
+    # glance — first key of the export, last line of stdout.
+    glance = at_a_glance_line(export)
+    export = {'at_a_glance': glance} | export
     # Structural guard: a blast export without window_n must be impossible.
     assert 'steady_window' in export['throughput'] and (
         export['throughput']['steady_window'].get('defined') is False
@@ -1428,6 +1521,7 @@ async def amain() -> int:
     export_path = out_dir / f'export_{arm.name}_{posture.name}_{args.leg}.json'
     export_path.write_text(json.dumps(export, indent=1))
     say(f'export: {export_path}')
+    say(f'AT A GLANCE: {glance}')
     if driver_share and driver_share > 0.01:
         say(f'WARNING: driver CPU share {driver_share:.1%} > 1% — report it; '
             'pinning gets reinstated if this holds (environment rule)')

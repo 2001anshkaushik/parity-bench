@@ -81,6 +81,22 @@ false — and the leg fails — when a CPU read was absent or `effective_cores`
 exceeds the box (flagged, not clamped). `collector_summary` is the sampling
 subprocess's own per-role summary, carried unchanged.
 
+**`at_a_glance` — the first key of every export.** One line, built from the
+export itself, that puts throughput and the idle burden side by side (the
+2026-08-21 ruling: the parity token count is set on measured throughput and
+the idle cost is reported beside it, never subtracted — a configuration that
+wins on throughput while idling a third of the box is still the honest
+production answer if that is what the engine does; concealing the cost would
+be the dishonest part). The same line is the driver's last stdout line.
+
+**`provenance_video.posture.threads_env_expected` / `threads_env_in_process_torch`**
+— the six-variable BLAS/OMP env is per *posture*: the default posture runs
+with nothing declared (`"unset"` — the engine/library default is what a user
+gets, and torch's own in-process thread count is read back and recorded),
+the parity posture at the measured optimum. The operator states the
+expectation per leg; the driver reads it back on the container and in the
+task process, fail-closed, with null controls for both modes fired first.
+
 ---
 
 ## 2. Gates — what each proves, its null control, and NOT RUN vs FAIL

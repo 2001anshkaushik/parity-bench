@@ -164,7 +164,9 @@ def main():
             'pipe_sha256': 'SAMPLE' + '0' * 58,
             'manifest_sha256': 'SAMPLE' + '0' * 58,
             'posture': {'name': 'parity', 'tokens': 4, 'threads_config': 1,
-                        'threads_note': 'explicit use(threads=)'},
+                        'threads_note': 'explicit use(threads=)',
+                        'threads_env_expected': 1,
+                        'threads_env_in_process_torch': 1},
             'identity_readback': {
                 'rr': {'rfdetr_import_ok': True,
                        'versions': {'rfdetr': '<from constraints.txt>', 'torch': '<pinned>',
@@ -199,6 +201,19 @@ def main():
     assert impossible['valid'] is False and 'impossible_value' in impossible, impossible
     assert impossible['effective_cores'] == 40.0, impossible   # flagged, NOT clamped
     print('efficiency_block null controls fired: absent cpu, absent idle, impossible value')
+
+    # Ruling 2026-08-21: throughput and idle burden legible together — the
+    # same one-liner the driver emits, built from the export, as its first key.
+    sample_tag = export.pop('_SAMPLE')
+    export = {'_SAMPLE': sample_tag, 'at_a_glance': dv.at_a_glance_line(export)} | export
+    assert 'IDLE BURDEN 2.02 cores with 4 rr_tokens live = 6.3% of the box' in export['at_a_glance'], \
+        export['at_a_glance']
+    print('at a glance:', export['at_a_glance'])
+
+    # Thread-pin null controls, both modes (per-posture env, ruling 2026-08-21).
+    from harness import gates_shared as gs
+    gs.thread_pins_self_test()
+    print('thread_pins_self_test fired: value mode (3 cases) + unset mode (5 cases)')
 
     (OUT_DIR / 'sample_export_blast.json').write_text(json.dumps(export, indent=1))
 

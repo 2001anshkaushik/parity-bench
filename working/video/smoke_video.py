@@ -365,15 +365,22 @@ async def check_pins(args) -> dict:
                         for k, v in per_worker.items()}
     # Crossroad 17: per-arm optima — each arm checked against its OWN declared
     # container values; the cross-arm difference is recorded, never failed.
+    # Ruling 2026-08-21: the RR container's thread env is per POSTURE, so the
+    # smoke is told what to expect (--rr-threads-env: int or 'unset') rather
+    # than inferring it; null controls for both modes fire first.
+    gs.thread_pins_self_test()
     pins = gs.thread_pins_by_arm(
         {'rr': readbacks, 'li': li_readbacks_map},
         {'rr': drv.container_declared_threads(args.rr_container),
-         'li': drv.container_declared_threads(args.li_container)})
+         'li': drv.container_declared_threads(args.li_container)},
+        expected_by_arm={'rr': args.rr_threads_env})
     if pins['PASS'] is not True:
-        fail(f'thread pins (per-arm declared vs measured): '
+        fail(f'thread pins (per-arm declared vs measured; rr expected '
+             f'{args.rr_threads_env!r}): '
              f'{json.dumps({k: pins[k] for k in pins if k != "PASS"})}')
     else:
-        say(f'  PASS  per-arm pins declared==measured; cross-arm values '
+        say(f'  PASS  per-arm pins declared==measured (rr expected {args.rr_threads_env!r}: '
+            f'declared {pins["arms"]["rr"].get("declared")}); cross-arm in-process torch '
             f'{pins["cross_arm_values"]} (recorded, per-arm optima)')
     ck = {arm: drv.rfdetr_checkpoint_md5(c, drv.RFDETR_PATHS[arm])
           for arm, c in (('rr', args.rr_container), ('li', args.li_container))}
@@ -406,6 +413,11 @@ def main() -> int:
     ap.add_argument('--pdf-corpus', default=str(ROOT / 'corpus' / 'govdocs1' / 'pdfs'))
     ap.add_argument('--rr-container', default='rr')
     ap.add_argument('--li-container', default='li_video')
+    ap.add_argument('--rr-threads-env', type=drv.threads_env_expectation('rr-threads-env'),
+                    required=True,
+                    help='EXPECTED six-var thread env on the RR container right now: an int, '
+                         'or "unset" for the default-posture container (ruling 2026-08-21). '
+                         'Stated, never inferred.')
     ap.add_argument('--rr-port', type=drv.positive_int('rr-port', 65535), default=5565)
     ap.add_argument('--li-port', type=drv.positive_int('li-port', 65535), default=8802)
     ap.add_argument('--max-preleg-load1',

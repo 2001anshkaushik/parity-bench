@@ -906,11 +906,61 @@ def log_attribution(log_text: Optional[str], liveness_marker: str,
             "n_drop_warnings": len(drops) if alive else None}
 
 
+def _thread_pins_unset_mode(readers: Dict[str, Dict[str, Any]],
+                            declared: Dict[str, Any],
+                            keys: Sequence[str]) -> Dict[str, Any]:
+    """The OUT-OF-BOX posture (ruling 2026-08-21): the run declares NO thread
+    variables on the container, so the engine/library default is what a user
+    gets. Absence of the six is then the declared STATE, not a missing
+    measurement — what must NOT be absent is the reader itself and its torch
+    count, which is the out-of-box value this mode exists to record. Fails on:
+    a reader without a torch count; a variable present in-process that the
+    container did not declare (#37's class — pinned by something nobody
+    stated); declared-vs-in-process disagreement on any key; torch counts that
+    disagree across readers. Anything the IMAGE declares shows up on the
+    declared side and is recorded, not failed: that too is what a user gets."""
+    if not readers:
+        return {"PASS": False, "mode": "unset",
+                "reason": "no readbacks — absent fails before agreement"}
+    no_torch = [label for label, rb in readers.items()
+                if (rb or {}).get("torch_num_threads") is None]
+    if no_torch:
+        return {"PASS": False, "mode": "unset",
+                "absent": [f"{label}:torch_num_threads" for label in no_torch],
+                "reason": "reader answered without a torch count — the out-of-box value "
+                          "must be measured, not assumed"}
+    mismatch: Dict[str, Any] = {}
+    for k in keys:
+        d = declared.get(k)
+        for label, rb in readers.items():
+            m = ((rb or {}).get("env") or {}).get(k)
+            if str(d or "") != str(m or ""):
+                mismatch[f"{label}:{k}"] = {"declared": d, "measured_in_process": m}
+    torch = {label: rb["torch_num_threads"] for label, rb in readers.items()}
+    disagree = len(set(torch.values())) > 1
+    declared_present = {k: v for k, v in declared.items() if k in keys}
+    agreed = None if disagree else next(iter(torch.values()))
+    return {
+        "PASS": not mismatch and not disagree,
+        "mode": "unset",
+        "declared": declared_present,
+        "declared_note": ("none of the six declared on the container — the out-of-box state"
+                          if not declared_present else
+                          "declared by the IMAGE (the run passed none): what a user gets; recorded"),
+        "within_arm": {"PASS": not disagree, "readers": sorted(readers),
+                       "values_agreed": ({"torch_num_threads": agreed} if not disagree else None),
+                       "disagreements": ({"torch_num_threads": torch} if disagree else None)},
+        "declared_vs_measured_mismatch": mismatch or None,
+        "out_of_box_torch_num_threads": agreed,
+    }
+
+
 def thread_pins_by_arm(readbacks_by_arm: Dict[str, Dict[str, Dict[str, Any]]],
                        declared_by_arm: Dict[str, Dict[str, Any]],
                        keys: Sequence[str] = ("OMP_NUM_THREADS", "MKL_NUM_THREADS",
                                               "OPENBLAS_NUM_THREADS", "VECLIB_MAXIMUM_THREADS",
-                                              "NUMEXPR_NUM_THREADS", "TORCH_NUM_THREADS")) -> Dict[str, Any]:
+                                              "NUMEXPR_NUM_THREADS", "TORCH_NUM_THREADS"),
+                       expected_by_arm: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Crossroad 17 (2026-08-21): thread values are per-arm optima, NOT forced
     equal across arms. Defect #37 was UNDECLARED asymmetry; measured-and-
     published asymmetry is its opposite. Per arm, fail-closed:
@@ -919,14 +969,31 @@ def thread_pins_by_arm(readbacks_by_arm: Dict[str, Dict[str, Dict[str, Any]]],
       * measured must equal the arm's DECLARED container values.
     Across arms: the difference is RECORDED (cross_arm_values), never failed.
     thread_pin_parity() above remains for symmetric-by-choice callers.
+
+    Per-posture expectation (ruling 2026-08-21, extending Crossroad 17): when
+    `expected_by_arm[arm]` is given it is either a VALUE — every declared key
+    must equal it, or the run's `-e` did not land / the image overrode it —
+    or the literal 'unset': the out-of-box posture, checked by
+    _thread_pins_unset_mode (the container declares none of the six; the
+    in-process read-back shows the same absence; torch's own count is still
+    reported and agreed — recorded as what a user gets). The expectation is
+    an operator-stated, read-back value: never implied by which posture ran.
     """
     if not readbacks_by_arm or not declared_by_arm:
         return {"PASS": False, "reason": "absent arm groups — absence fails before agreement"}
     arms_out: Dict[str, Any] = {}
     ok = True
     for arm, readers in readbacks_by_arm.items():
-        within = thread_pin_parity(readers, keys=keys)
         declared = declared_by_arm.get(arm) or {}
+        expected = (expected_by_arm or {}).get(arm)
+        if expected == "unset":
+            entry = _thread_pins_unset_mode(readers, declared, keys)
+            entry["expected"] = "unset"
+            if entry["PASS"] is not True:
+                ok = False
+            arms_out[arm] = entry
+            continue
+        within = thread_pin_parity(readers, keys=keys)
         entry: Dict[str, Any] = {"within_arm": within, "declared": declared}
         if within["PASS"] is not True:
             ok = False
@@ -941,9 +1008,53 @@ def thread_pins_by_arm(readbacks_by_arm: Dict[str, Dict[str, Dict[str, Any]]],
             entry["declared_vs_measured_mismatch"] = mismatch or None
             if mismatch:
                 ok = False
+            if expected is not None:
+                entry["expected"] = expected
+                off = {k: declared.get(k) for k in keys
+                       if str(declared.get(k)) != str(expected)}
+                entry["declared_vs_expected_mismatch"] = off or None
+                if off:
+                    ok = False
         arms_out[arm] = entry
-    cross = {arm: (e["within_arm"].get("values_agreed") or {}).get("TORCH_NUM_THREADS")
-             for arm, e in arms_out.items()}
+    cross = {}
+    for arm, e in arms_out.items():
+        agreed = (e.get("within_arm") or {}).get("values_agreed") or {}
+        cross[arm] = agreed.get("TORCH_NUM_THREADS", agreed.get("torch_num_threads"))
     return {"PASS": ok is True, "arms": arms_out,
             "cross_arm_values": cross,
             "cross_arm_note": "per-arm optima; difference recorded, never failed (Crossroad 17)"}
+
+
+def thread_pins_self_test() -> None:
+    """Null controls for thread_pins_by_arm, BOTH modes — every detector ships
+    a control that must fire (planted faults FAIL, clean cases PASS). Called
+    at every preflight before the live check; raises AssertionError."""
+    keys = ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
+            "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS", "TORCH_NUM_THREADS")
+    full8 = {k: "8" for k in keys}
+    rb8 = {"rr": {"rr_task": {"env": full8, "torch_num_threads": 8}}}
+    # value mode
+    assert thread_pins_by_arm(rb8, {"rr": full8}, expected_by_arm={"rr": 8})["PASS"] is True
+    r = thread_pins_by_arm(rb8, {"rr": full8}, expected_by_arm={"rr": 4})
+    assert r["PASS"] is False and r["arms"]["rr"]["declared_vs_expected_mismatch"], r
+    assert thread_pins_by_arm(rb8, {"rr": {}}, expected_by_arm={"rr": 8})["PASS"] is False
+    # unset mode
+    rb_unset = {"rr": {"rr_task": {"env": {}, "torch_num_threads": 16}}}
+    clean = thread_pins_by_arm(rb_unset, {"rr": {}}, expected_by_arm={"rr": "unset"})
+    assert clean["PASS"] is True and clean["arms"]["rr"]["out_of_box_torch_num_threads"] == 16, clean
+    assert clean["cross_arm_values"]["rr"] == 16, clean
+    leaked = thread_pins_by_arm({"rr": {"rr_task": {"env": {"OMP_NUM_THREADS": "8"},
+                                                    "torch_num_threads": 8}}},
+                                {"rr": {}}, expected_by_arm={"rr": "unset"})
+    assert leaked["PASS"] is False and leaked["arms"]["rr"]["declared_vs_measured_mismatch"], leaked
+    image = thread_pins_by_arm({"rr": {"rr_task": {"env": {"OMP_NUM_THREADS": "4"},
+                                                   "torch_num_threads": 4}}},
+                               {"rr": {"OMP_NUM_THREADS": "4"}}, expected_by_arm={"rr": "unset"})
+    assert image["PASS"] is True and "IMAGE" in image["arms"]["rr"]["declared_note"], image
+    no_torch = thread_pins_by_arm({"rr": {"rr_task": {"env": {}, "torch_num_threads": None}}},
+                                  {"rr": {}}, expected_by_arm={"rr": "unset"})
+    assert no_torch["PASS"] is False and no_torch["arms"]["rr"].get("absent"), no_torch
+    split = thread_pins_by_arm({"rr": {"a": {"env": {}, "torch_num_threads": 16},
+                                       "b": {"env": {}, "torch_num_threads": 8}}},
+                               {"rr": {}}, expected_by_arm={"rr": "unset"})
+    assert split["PASS"] is False and split["arms"]["rr"]["within_arm"]["disagreements"], split
