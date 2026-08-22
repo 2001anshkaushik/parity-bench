@@ -58,6 +58,16 @@ in the box-command block before the number is set.
   would have pegged utilisation near 1.0, not 0.219. The read-back still runs —
   it converts a strong inference into proof for 2 minutes of box time.
 
+**RESOLVED 2026-08-22 — TWO REPS, NOT A SLIP.** The enumeration found the W=8
+T=1 ppw=4 point in TWO files: `probe_li_workers_T1_ppw4.json` **0.0871** and
+`probe_li_workers_..._w16.json` **0.0882**, both at cpu_util 0.219. These are
+**two independent repetitions 1.3% apart** — record them as a rep spread, never
+as one number with an erratum. **This is the only rep-spread datum the LI arm
+has**, so it is also the campaign's rough variance floor: a cross-arm
+difference of the same order as 1.3% is not distinguishable from repetition
+noise on this evidence. (PASSES=2 will give the campaign its own spread; until
+then this is what we have, from n=2.)
+[HISTORY — the question that produced it:]
 **THE 0.0871 vs 0.0882 DISCREPANCY — name ONE number before the campaign.**
 Both are relays of the SAME quantity: the W=8 point at threads_env=1, ppw=4,
 `throughput_videos_per_s` — recorded here as 0.0882 (compaction briefing) and
@@ -146,6 +156,30 @@ video per leg; the gate-3 staged run's records give ES2002a both arms):**
   → the fraction of frames with ≥1 detection per video; the threshold sits
   below the minimum observed with a margin (Corner view is dense — expect ~1.0)
   and the black-fixture null must still FAIL it. Ansh's number, not mine.
+**RULING ANSWERED (2026-08-22) — THE GATE SUBTRACTED ONLY CONTAINERS, AND THAT
+WAS WRONG.** Answer to the question as asked: the driver was **NOT** attributed.
+`attributed = sum(container_idle_cores(c))` and nothing else, so the driver, the
+smoke, every `docker` CLI call, the console tee, the operator's shell **and
+run_plan's own step 0 (`fetch_ami_video.py --verify` — a FULL-CORPUS sha256,
+~1 core for tens of seconds, finishing shortly before the first leg reads
+load1)** all counted as FOREIGN. The effective threshold was therefore tighter
+than 2.0 during real legs, exactly as suspected — and the harness was charging
+its own tail to a hog. FIXED: `driver_video.quiet_box()`, one reader for driver
+and smoke, computes **foreign = load1 − our containers − our own process tree**
+(`own_cores_recent()`, self+children rusage over load1's own ~60 s window,
+labelled a lower bound since load1 also counts uninterruptible sleep).
+**And a snapshot cannot tell a tail from a hog, so it no longer takes one:** a
+first reading over threshold triggers a bounded re-read loop (default 90 s,
+never overshooting) and the record carries the SEQUENCE plus a `trend` —
+DECAYING / SUSTAINED / RISING. Null-controlled (own CPU attributed, gate can
+still fail, settle loop re-reads).
+**ARITHMETIC ON THE 2.35, worth stating before Ansh diagnoses:** load1 is a
+~60 s-time-constant average, so a keep-alive killed **40 minutes** earlier
+contributes e^(−40) ≈ 10⁻¹⁸ — **decay from 40 min ago cannot explain 2.35.**
+The plausible contributors are the ones now attributed (step-0 sha256 tail, the
+smoke's own subprocesses) plus the enumeration shell — or a real hog. The
+re-read trend will say which without an argument.
+
 **LIVENESS_MIN — one command, all artifacts (2026-08-22):**
   ~/.venv/bin/python working/video/probe/liveness_from_records.py \
     working/video/results/mainrun_*/records_*.jsonl \

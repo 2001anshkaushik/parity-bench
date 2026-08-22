@@ -576,6 +576,101 @@ async def li_readbacks(arm: LIArm, timeout_s: float = 120) -> Dict[str, dict]:
     return per_worker
 
 
+def _total_own_cpu_s() -> float:
+    """CPU seconds burned by THIS process and every child it has reaped —
+    which includes the corpus verifier, every `docker` CLI call, and the
+    collector once stopped."""
+    s = resource.getrusage(resource.RUSAGE_SELF)
+    c = resource.getrusage(resource.RUSAGE_CHILDREN)
+    return s.ru_utime + s.ru_stime + c.ru_utime + c.ru_stime
+
+
+_CPU_SAMPLES: List[tuple] = [(time.monotonic(), _total_own_cpu_s())]
+
+
+def own_cores_recent(window_s: float = 60.0) -> float:
+    """OUR OWN contribution to load1, as cores, over the last `window_s` —
+    the same time constant load1 itself uses (2026-08-22).
+
+    Why this exists: the quiet-box gate subtracted the CONTAINERS' cgroup rate
+    and nothing else, so every process of ours on the host — this driver, the
+    smoke, `docker` invocations, the console tee, and above all run_plan's
+    step 0 `fetch_ami_video.py --verify` (a full-corpus sha256, ~1 core for
+    tens of seconds, finishing shortly before the first leg reads load1) —
+    registered as FOREIGN load. The gate was measuring our own tail and
+    charging it to a hog. Attributing what is ours makes 'foreign' mean
+    foreign. Approximation stated plainly: this is CPU-seconds/window, while
+    load1 also counts uninterruptible-sleep tasks, so it is a lower bound on
+    our contribution and never an exact subtraction."""
+    now, cpu = time.monotonic(), _total_own_cpu_s()
+    _CPU_SAMPLES.append((now, cpu))
+    cutoff, ref = now - window_s, _CPU_SAMPLES[0]
+    for sample in _CPU_SAMPLES:
+        if sample[0] <= cutoff:
+            ref = sample
+        else:
+            break
+    dt = now - ref[0]
+    return max(0.0, (cpu - ref[1]) / dt) if dt > 0.5 else 0.0
+
+
+def quiet_box(containers: List[str], max_foreign: float,
+              settle_deadline_s: float = 90.0, sample_s: float = 4.0) -> dict:
+    """Foreign load = load1 − our containers' measured rate − our own process
+    tree's recent rate. One reader for the driver and the smoke.
+
+    A SNAPSHOT CANNOT TELL A TAIL FROM A HOG, so this does not take one. When
+    the first reading is over the threshold it re-reads on a bounded settle
+    loop and records the sequence: **a decaying tail falls, a hog does not.**
+    That trend is the discriminator (load1's time constant is ~60 s, so a
+    process killed 40 minutes ago contributes e^-40 ≈ 0 — 'it is still
+    decaying' is only ever true of the last minute or two, and now we measure
+    it instead of arguing it). Costs nothing on a quiet box: the loop is only
+    entered when the gate would otherwise fail."""
+    readings: List[dict] = []
+
+    def take() -> dict:
+        base = {}
+        for c in containers:
+            if docker_inspect(c, '{{.State.Running}}') == 'true':
+                base[c] = container_idle_cores(c, sample_s=sample_s)
+        load1 = os.getloadavg()[0]
+        attributed = sum(v for v in base.values() if v is not None)
+        own = own_cores_recent()
+        r = {'load1': round(load1, 2),
+             'container_idle_cores': base,
+             'container_attributed': round(attributed, 2),
+             'own_process_cores': round(own, 2),
+             'foreign_excess': round(load1 - attributed - own, 2)}
+        readings.append(r)
+        return r
+
+    t0 = time.monotonic()
+    r = take()
+    while r['foreign_excess'] > max_foreign:
+        remaining = settle_deadline_s - (time.monotonic() - t0)
+        if remaining <= 0:
+            break
+        say(f'quiet-box: foreign {r["foreign_excess"]:.2f} > {max_foreign} — re-reading '
+            f'(a tail decays, a hog does not; {remaining:.0f}s of budget left)')
+        time.sleep(min(15.0, remaining))   # bounded: never overshoot the budget
+        r = take()
+    first, last = readings[0]['foreign_excess'], readings[-1]['foreign_excess']
+    trend = ('SINGLE READING' if len(readings) == 1 else
+             'DECAYING' if last < first - 0.15 else
+             'RISING' if last > first + 0.15 else 'SUSTAINED')
+    return {'PASS': last <= max_foreign, 'threshold': max_foreign,
+            'readings': readings, 'n_readings': len(readings),
+            'trend': trend, 'settle_wall_s': round(time.monotonic() - t0, 1),
+            'load1': readings[-1]['load1'],
+            'container_idle_cores': readings[-1]['container_idle_cores'],
+            'own_process_cores': readings[-1]['own_process_cores'],
+            'foreign_excess': last,
+            'note': ('foreign = load1 minus our containers minus our own process tree; '
+                     'own_process_cores is CPU-seconds/window (a lower bound — load1 '
+                     'also counts uninterruptible sleep)')}
+
+
 def container_cpu_usage_usec(container: str, timeout_s: int = 15) -> Optional[int]:
     """The container cgroup's OWN CPU accounting (cpu.stat usage_usec) — the
     one reader behind the quiet-box idle baseline, the idle-with-instances-live
@@ -818,26 +913,27 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
     # absolute: the engine idles at ~1 core by existing (Ticket 4), and a
     # parity posture with live tokens may legitimately idle higher. Foreign
     # load = load1 minus what our containers' cgroups account for.
-    baselines = {}
-    for c in filter(None, [args.rr_container if rr_arm_active else None,
-                           args.rr_container if not rr_arm_active else None,
-                           args.li_container]):
-        if c not in baselines and docker_inspect(c, '{{.State.Running}}') == 'true':
-            baselines[c] = container_idle_cores(c)
-    attributed = sum(v for v in baselines.values() if v is not None)
-    load1 = os.getloadavg()[0]
-    excess = load1 - attributed
-    if excess > args.max_preleg_load1 and not args.allow_noisy_box:
-        raise SystemExit(f'NOT DONE — pre-leg FOREIGN load {excess:.1f} '
-                         f'(load1={load1:.1f} minus container idle {attributed:.1f} '
-                         f'{baselines}) > {args.max_preleg_load1}. A background hog '
-                         f'contaminated the 18-Aug runs; find and kill it, or override '
-                         f'with --allow-noisy-box (recorded).')
-    say(f'preflight: quiet box (load1={load1:.2f}, container idle {attributed:.2f} '
-        f'{baselines}, foreign excess {excess:.2f})')
-    pf_extra = {'preleg_load1': round(load1, 2),
-                'preleg_container_idle_cores': baselines,
-                'preleg_foreign_excess': round(excess, 2)}
+    qb = quiet_box(list(dict.fromkeys(filter(None, [args.rr_container, args.li_container]))),
+                   args.max_preleg_load1)
+    if not qb['PASS'] and not args.allow_noisy_box:
+        raise SystemExit(
+            f'NOT DONE — pre-leg FOREIGN load {qb["foreign_excess"]:.2f} > '
+            f'{args.max_preleg_load1} after {qb["n_readings"]} reading(s) over '
+            f'{qb["settle_wall_s"]:.0f}s, trend {qb["trend"]}. '
+            f'{json.dumps(qb["readings"])}. Foreign = load1 minus our containers minus '
+            f'our own process tree, so this is NOT our harness tail (run_plan step 0 '
+            f'--verify sha256s the corpus; that is attributed). A background hog '
+            f'contaminated the 18-Aug runs; find it (ps aux --sort=-%cpu | head) or '
+            f'override with --allow-noisy-box (recorded).')
+    say(f'preflight: quiet box PASS (load1={qb["load1"]:.2f} − containers '
+        f'{qb["container_attributed"]:.2f} − ours {qb["own_process_cores"]:.2f} = '
+        f'foreign {qb["foreign_excess"]:.2f}; {qb["n_readings"]} reading(s), '
+        f'trend {qb["trend"]})')
+    pf_extra = {'preleg_load1': qb['load1'],
+                'preleg_container_idle_cores': qb['container_idle_cores'],
+                'preleg_own_process_cores': qb['own_process_cores'],
+                'preleg_foreign_excess': qb['foreign_excess'],
+                'preleg_quiet_box': qb}
 
     say('preflight: read-backs (absence fails before agreement)')
     readbacks: Dict[str, dict] = {}

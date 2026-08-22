@@ -266,9 +266,9 @@
   }
  },
  "provenance_leela": {
-  "run_id": "20260822T103954Z-91961",
-  "timestamp_utc": "2026-08-22T10:39:54Z",
-  "git_commit": "41ad0a68368a3743c57826418a5bd6db7d81537b-dirty",
+  "run_id": "20260822T110628Z-93705",
+  "timestamp_utc": "2026-08-22T11:06:28Z",
+  "git_commit": "4116ceac4e534b5eb979409a02f9b46ea0be584a-dirty",
   "image_digest": null,
   "framework_version": null,
   "instance_type": null,

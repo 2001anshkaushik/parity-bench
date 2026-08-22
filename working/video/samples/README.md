@@ -56,13 +56,24 @@ order, deterministic by meeting id, identical on both arms — *not*
 longest-first, because sorting to shorten the drain tail would benchmark our
 scheduler rather than the frameworks.
 
-**`preleg_load1` / `preleg_container_idle_cores` / `preleg_foreign_excess`** —
-the quiet-box record. Values, not booleans: a background CPU hog contaminated
-one day of Phase 1 runs and was caught **two days later** only because the
-collector had recorded load numbers; a pass/fail bit could not have answered
-that question. The gate refuses to start a leg when foreign load (load1 minus
-what our own containers account for — the engine idles at ~1 core by itself)
-exceeds 2.0. `driver_cpu` shows the driver's own share stayed negligible.
+**`preleg_load1` / `preleg_container_idle_cores` / `preleg_own_process_cores` /
+`preleg_foreign_excess` / `preleg_quiet_box`** — the quiet-box record. Values,
+not booleans: a background CPU hog contaminated one day of Phase 1 runs and was
+caught **two days later** only because the collector had recorded load numbers;
+a pass/fail bit could not have answered that question. The gate refuses to start
+a leg when **foreign** load exceeds 2.0, and foreign now means foreign:
+`load1 − our containers' measured rate − our own process tree's recent rate`.
+The harness is on the same host as the thing it measures — this driver, the
+smoke, every `docker` call, and run_plan's step-0 full-corpus sha256 all enter
+load1, and subtracting only containers charged our own tail to a hog
+(2026-08-22). `preleg_quiet_box.readings` is a *sequence*, because a snapshot
+cannot tell a decaying tail from a sustained hog: a first reading over
+threshold triggers a bounded re-read loop and `trend` reports DECAYING /
+SUSTAINED / RISING. (load1's time constant is ~60 s, so "it is still decaying"
+is only ever true of the last minute or two — now measured, not argued.)
+`own_process_cores` is CPU-seconds/window, a lower bound, since load1 also
+counts uninterruptible sleep. `driver_cpu` separately shows the driver's share
+of the box during the timed leg.
 
 **`efficiency` — the CPU family, with the idle burden beside it.**
 `service_cpu_s` is the service container's own cgroup CPU (`cpu.stat

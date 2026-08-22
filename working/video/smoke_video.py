@@ -303,19 +303,23 @@ def check_readbacks(args) -> dict:
     # EXCESS over the arms' own idle baselines, never an absolute — the engine
     # idles at ~1.002 cores by existing (Ticket 4), so an absolute gate is a
     # tripwire pointed at ourselves. Both numbers recorded.
-    baselines = {c: drv.container_idle_cores(c)
-                 for c in (args.rr_container, args.li_container)
-                 if drv.docker_inspect(c, '{{.State.Running}}') == 'true'}
-    attributed = sum(v for v in baselines.values() if v is not None)
-    load1 = os.getloadavg()[0]
-    excess = load1 - attributed
-    if excess > args.max_preleg_load1:
-        fail(f'quiet-box: FOREIGN load {excess:.2f} (load1={load1:.2f} minus container '
-             f'idle {attributed:.2f} {baselines}) > {args.max_preleg_load1} — find the hog '
-             '(the 18-Aug lesson); values recorded either way')
+    # One reader, both callers (2026-08-22): foreign = load1 minus our
+    # containers minus OUR OWN process tree — the smoke's own corpus check and
+    # run_plan's step-0 sha256 are ours, not a hog — and a failing first
+    # reading is re-read on a bounded settle loop, because a snapshot cannot
+    # tell a decaying tail from a sustained hog.
+    qb = drv.quiet_box([args.rr_container, args.li_container], args.max_preleg_load1)
+    baselines = qb['container_idle_cores']
+    load1, excess = qb['load1'], qb['foreign_excess']
+    if not qb['PASS']:
+        fail(f'quiet-box: FOREIGN load {excess:.2f} > {args.max_preleg_load1} after '
+             f'{qb["n_readings"]} reading(s) over {qb["settle_wall_s"]:.0f}s, trend '
+             f'{qb["trend"]} — {json.dumps(qb["readings"])}. Ours is already subtracted '
+             '(containers + this process tree), so find the hog: ps aux --sort=-%cpu | head')
     else:
-        say(f'  PASS  quiet box (load1={load1:.2f}, container idle {attributed:.2f}, '
-            f'foreign excess {excess:.2f})')
+        say(f'  PASS  quiet box (load1={load1:.2f} − containers '
+            f'{qb["container_attributed"]:.2f} − ours {qb["own_process_cores"]:.2f} = '
+            f'foreign {excess:.2f}; {qb["n_readings"]} reading(s), trend {qb["trend"]})')
     # Interpreter read-back — the bare-python3 trap made structural: the smoke
     # records WHICH python ran it and whether it is a venv, so an interpreter
     # drift shows in the artifact, not in a stack trace mid-leg.
@@ -337,8 +341,9 @@ def check_readbacks(args) -> dict:
     except RuntimeError as exc:
         sdk = {'error': str(exc)}
         fail(str(exc))
-    return {'container_problems': problems or None, 'preleg_load1': round(load1, 2),
-            'container_idle_cores': baselines, 'foreign_excess': round(excess, 2),
+    return {'container_problems': problems or None, 'preleg_load1': load1,
+            'container_idle_cores': baselines, 'foreign_excess': excess,
+            'quiet_box': qb,
             'interpreter': interp, 'sdk': sdk, 'network_mode': network_mode}
 
 
