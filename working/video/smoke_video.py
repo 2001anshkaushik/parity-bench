@@ -196,9 +196,20 @@ def check_image_identity(rr_container: str, pdf_corpus: Path) -> dict:
         fail(f'duplication_patch_applied label is {label!r}, not "1" — wrong image; '
              'the fixture below would measure the wrong thing')
         return {'label': label, 'skipped': 'fixture not run against a mislabelled image'}
-    from smoke_phase2 import FIXTURE_SHA          # content pins + expected PATCHED counts
-    index = _fixture_index(pdf_corpus, FIXTURE_SHA)
-    missing = [s for s in FIXTURE_SHA if s not in index]
+    # FIXTURE_SHA's values are STOCK counts, and this smoke read them as patched
+    # ones (found 2026-08-22 when all five came back at EXACTLY half). Evidence,
+    # five ways: the constant's own docstring ("measured as duplicating on stock
+    # 3.3.1 ... for context only; the assertion is on repeat_factor",
+    # scripts/smoke_phase2.py:63-64); PHASE1_CARRYOVER.md:224 ("duplicated on the
+    # stock engine"); Phase 1 gated on repeat_factor and stored the count as
+    # "chunks_when_measured", never asserting it; 164 is the rocketride_pdf arm's
+    # count in results/smoke50_parser_in__20260815T050721Z__7df4f23c86b7.json,
+    # a run two days BEFORE the patch commit (61295e0, 2026-08-17); and the
+    # measured relation is exactly 2x, five for five. The bug emits the whole
+    # list twice, so a PATCHED engine must give exactly stock/2.
+    from smoke_phase2 import FIXTURE_SHA as FIXTURE_STOCK_CHUNKS   # STOCK counts
+    index = _fixture_index(pdf_corpus, FIXTURE_STOCK_CHUNKS)
+    missing = [s for s in FIXTURE_STOCK_CHUNKS if s not in index]
     if missing:
         fail(f'fixture documents absent by sha256: {missing} — corpus changed, '
              'never evidence the patch works')
@@ -207,23 +218,31 @@ def check_image_identity(rr_container: str, pdf_corpus: Path) -> dict:
     arm = RocketPdfArm('vidsmoke')
     rows = {}
     try:
-        for s, expect_chunks in FIXTURE_SHA.items():
+        for s, stock_chunks in FIXTURE_STOCK_CHUNKS.items():
             chunks, _ = arm.process(index[s].read_bytes())
             hashes = [hashlib.sha256(c.encode()).hexdigest() for c in chunks]
             doubled = gs.whole_list_doubled(hashes)
-            rows[s] = {'n_chunks': len(chunks), 'expected_patched': expect_chunks,
+            rows[s] = {'n_chunks': len(chunks),
+                       'stock_chunks_when_measured': stock_chunks,
+                       'expected_patched': stock_chunks // 2,
                        'whole_list_doubled': doubled}
             if doubled is True:
                 fail(f'fixture {s}: WHOLE-LIST DOUBLING on the patched image — '
                      'the label lies or the patch regressed')
-            elif len(chunks) != expect_chunks:
-                fail(f'fixture {s}: {len(chunks)} chunks vs expected {expect_chunks} '
-                     '(patched-behaviour counts, measured on the Phase 1 box)')
+            elif 2 * len(chunks) != stock_chunks:
+                # Doubling is absent, so the patch IS working; an off-half count
+                # means the DOCUMENT or the chunker moved. Two different findings,
+                # so they get two different messages.
+                fail(f'fixture {s}: {len(chunks)} chunks, expected exactly half the '
+                     f'stock count {stock_chunks} (= {stock_chunks // 2}). Doubling is '
+                     'ABSENT, so this is NOT a patch regression — the document or the '
+                     'chunker changed since the stock counts were measured.')
     finally:
         arm.close()
     if not _fails:
-        say(f'  PASS  label=1 and all {len(FIXTURE_SHA)} fixture documents at '
-            'patched counts, no doubling')
+        say(f'  PASS  label=1 and all {len(FIXTURE_STOCK_CHUNKS)} fixture documents at '
+            'exactly half their stock counts, no doubling — the patch MEASURED, '
+            'not asserted by a label')
     return {'label': label, 'fixture': rows}
 
 

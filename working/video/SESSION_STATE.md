@@ -1494,3 +1494,50 @@ HARDENED before first write (2026-08-22): the golden now records
 `written_under` = image_id, image_tag, declared_thread_env — so a future
 mismatch reports whether the CONDITIONS moved (re-write) or did not (a genuine
 REGRESSION), instead of leaving that ambiguous.
+
+## ▶ THE FIXTURE INVERSION (2026-08-22) — OURS, Phase 2 only, and it failed CLOSED
+
+All five fixture documents came back at EXACTLY half the constant, five for five
+(82/138/936/66/172 vs 164/276/1872/132/344). **The constants are STOCK counts and
+this smoke read them as patched ones.** Evidence, five independent ways:
+1. The constant's own docstring (`scripts/smoke_phase2.py:63-64`): "The five
+   documents measured as duplicating on stock 3.3.1 ... the chunk count
+   observed, **for context only; the assertion is on repeat_factor**."
+2. `PHASE1_CARRYOVER.md:224`: "five hard-coded PDF sha256 prefixes that
+   **duplicated on the stock engine**."
+3. Phase 1's gate (`smoke_phase2.py:147`) is `want = 1 if EXPECT_PATCH else 2`
+   on **repeat_factor**; the count is stored as `chunks_when_measured` and
+   never asserted.
+4. MEASURED: 164 is the **rocketride_pdf** arm's count in
+   `results/smoke50_parser_in__20260815T050721Z__7df4f23c86b7.json`
+   (`data/arms/rocketride_pdf/records[32]`), a run dated 2026-08-15 — two days
+   BEFORE the patch commit `61295e0` (2026-08-17). The llamaindex arm gave 75.
+5. The bug emits the whole list twice, so patched == stock/2 exactly; observed
+   exactly, five for five, all five stock counts even.
+
+**PHASE 1 IS UNAFFECTED — its smoke was never inverted.** It gated on
+repeat_factor in both directions (EXPECT_PATCH=0 wants 2, =1 wants 1) and never
+compared counts, so no Phase 1 run ever passed because the engine was unpatched.
+The inversion existed only in `working/video/smoke_video.py`, from the day it was
+written, and **it has never passed** — it blocked the campaign rather than
+certifying a wrong image. Failed closed, which is the safe direction, and it is
+the reason the constants were NOT edited on the strength of the pattern alone.
+
+**FIXED (smoke_video.py):** imports as `FIXTURE_STOCK_CHUNKS`, asserts
+`2 * measured == stock`, and splits the two findings that used to share one
+message — WHOLE-LIST DOUBLING means the patch regressed; an off-half count with
+doubling ABSENT means the document or chunker moved, NOT a patch regression.
+Nothing else in the tree asserted these values (only smoke_phase2 itself, which
+is correct, and PHASE1_CARRYOVER's prose, which is correct).
+
+**STOCK CONTROL — available, NOT required tonight.** Phase 1's tool already does
+it: `EXPECT_PATCH=0 SMOKE_EXTERNAL=1 python3 working/scripts/smoke_phase2.py`
+against a stock container expects repeat_factor 2 and reports a non-duplicating
+result as a BROKEN FIXTURE, not as a needless patch. It needs a stock image:
+`docker build -f docker/Dockerfile.rocketride --build-arg RR_DUP_PATCH=0
+-t rr:stock .` — a FULL build (engine fetch + apt + pip + bootcheck constraints
+compile, 10-30 min per the Dockerfile's own note) ≈ 25-45 min and several GB; no
+vision bake needed, since the fixture uses the PDF pipe. Deferred to the PATH B
+re-baseline, because the exact 2x relation against pre-patch measured counts
+already discriminates "patch works" from "fixture broken": a broken fixture
+would give arbitrary counts, not exactly half of five recorded stock values.
