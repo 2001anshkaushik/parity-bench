@@ -211,9 +211,19 @@ def check_image_identity(rr_container: str, pdf_corpus: Path) -> dict:
     index = _fixture_index(pdf_corpus, FIXTURE_STOCK_CHUNKS)
     missing = [s for s in FIXTURE_STOCK_CHUNKS if s not in index]
     if missing:
-        fail(f'fixture documents absent by sha256: {missing} — corpus changed, '
-             'never evidence the patch works')
-        return {'label': label, 'missing_sha': missing}
+        # NAME WHAT WE LOOKED AT. "absent by sha256" was true but not diagnosable:
+        # the real cause was a corpus directory that does not exist in THIS
+        # checkout (corpus/ is gitignored and provisioned per checkout), and the
+        # message never said which directory it had scanned or what it found.
+        n_pdfs = len(list(pdf_corpus.glob('*.pdf'))) if pdf_corpus.is_dir() else None
+        where = (f'{pdf_corpus} (exists, {n_pdfs} PDFs scanned)' if n_pdfs is not None
+                 else f'{pdf_corpus} (NOT A DIRECTORY)')
+        fail(f'fixture documents absent by sha256: {missing} — searched {where}. '
+             'The fixture is CONTENT-pinned, so this means the corpus is absent or '
+             'changed, never that the patch works. Pass --pdf-corpus <dir> (run_plan: '
+             'PDF_CORPUS=...) or restore the five files named in SESSION_STATE.')
+        return {'label': label, 'missing_sha': missing, 'pdf_corpus': str(pdf_corpus),
+                'pdfs_scanned': n_pdfs}
     from weekend_worker import RocketPdfArm
     arm = RocketPdfArm('vidsmoke')
     rows = {}

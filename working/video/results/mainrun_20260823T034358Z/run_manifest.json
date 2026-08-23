@@ -1,0 +1,29 @@
+{
+ "run_dir": "working/video/results/mainrun_20260823T034358Z",
+ "started_utc": "2026-08-23T03:43:58Z",
+ "git_sha": "99efd2c5fa9a4895424cebd17532d91e5c5941bf",
+ "dry_pass": true,
+ "numbers": {
+  "M_TOKENS": 16,
+  "LI_WORKERS": 8,
+  "WARM_N": 16,
+  "RR_THREADS_ENV": 2,
+  "RR_THREADS_ENV_applies_to": "parity posture only — rr restarted between postures (ruling 2026-08-21)",
+  "RR_DEFAULT_THREADS_ENV": "unset (engine default: what a user gets; read back in-process per leg)",
+  "LI_THREADS_ENV": 4,
+  "LIVENESS_MIN": null,
+  "GATE3_RUN_ID": "probe_20260821_195214",
+  "BLAST_C": 1,
+  "DEFAULT_N": 1,
+  "SEQ_N": 1,
+  "PASSES": 2,
+  "MEASURED_N": 1
+ },
+ "images": {"rr": "rr:patched-video", "li": "li:video"},
+ "decisions": {
+  "ruled_values": "Crossroads 31/32 (2026-08-21): M_TOKENS=16, RR_THREADS_ENV=2 (parity; default posture unset), LI_WORKERS=8, LI_THREADS_ENV=1, WARM_N=16, BLAST_C=16, DEFAULT_N=44, PASSES=2 — if the numbers above differ, this run is NOT the ruled campaign",
+  "M_TOKENS_rationale": "working/video/RR_PARITY_CURVE.md — the full M x T curve including the faster M=32 we DECLINED (+3.3% throughput for 31% of the box idle and 32 model stacks); idle burden is reported beside every parity number, never subtracted",
+  "WARM_N_rationale": "Crossroad 32: warm rows may be re-sent across instances; warm-vs-measured disjointness is the invariant; the driver gates every instance observed serving"
+ },
+ "completed": false
+}

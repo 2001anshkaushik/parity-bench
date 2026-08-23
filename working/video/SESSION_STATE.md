@@ -9,6 +9,16 @@ using it.
 
 ## ▶ COMPACTION BRIEFING — state as of late 2026-08-21 (THIS BLOCK WINS on conflict with the chronological blocks below)
 
+**▶▶ TWO CHECKOUTS ON THE BOX — GET THIS RIGHT OR EVERY COMMAND MISSES:**
+  `~/parity-bench-video`  ← THE VIDEO WORKTREE. Every campaign/dry-pass/probe
+                             command runs here. Branch video-bench.
+  `~/parity-bench`        ← Phase 1's checkout. Holds the provisioned
+                             `corpus/govdocs1/pdfs` (10k PDFs, gitignored, never
+                             from git) that the duplication fixture needs.
+                             Symlinked into the video worktree 2026-08-22.
+Commands in this file that say `~/parity-bench` mean Phase 1's checkout ON
+PURPOSE; everything else is `~/parity-bench-video`.
+
 **▶▶ THE NINE NUMBERS (Crossroads 31/32/34, 2026-08-22):**
   M_TOKENS=16 · RR_THREADS_ENV=2 (PARITY posture; default posture UNSET) ·
   LI_WORKERS=8 · **LI_THREADS_ENV=4** · WARM_N=16 · BLAST_C=16 ·
@@ -76,7 +86,7 @@ message as the T=1 comparison row). Candidate files: the matched-load recheck
 `probe_li_workers_T1_ppw4.json`, and — UNKNOWN, filename never relayed — the
 W=16 extension run, which may ALSO carry a W=8 point. Resolve by listing every
 point in every file (box, probe dir):
-  cd ~/parity-bench/working/video/probe && for f in probe_li_workers*.json; do
+  cd ~/parity-bench-video/working/video/probe && for f in probe_li_workers*.json; do
     python3 - "$f" <<'PYEOF'
   import json, sys
   d = json.load(open(sys.argv[1]))
@@ -126,7 +136,7 @@ throughout; fresh containers (`docker rm -f rr li_video` first).**
   anything but OK. Then `docker rm -f li_video` before the dry pass.
 
 **(4) DRY PASS (the composition has never completed), box, repo root:**
-  cd ~/parity-bench && git pull --ff-only origin video-bench && git rev-parse HEAD
+  cd ~/parity-bench-video && git pull --ff-only origin video-bench && git rev-parse HEAD
   DRY_PASS=1 M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=4 \
     WARM_N=16 BLAST_C=16 GATE3_RUN_ID=probe_20260821_195214 DEFAULT_N=44 \
     bash working/video/run_plan.sh 2>&1 | tee working/video/dry_console_$(date -u +%Y%m%dT%H%M%SZ).log; \
@@ -180,7 +190,7 @@ of the same `cwd=root` pattern (not on the video path), and
 `bake_rr_video.sh` passes `filepath='working/video/…pipe'` relative to the SDK
 — resolved client-side, proven working by every bake, but the same class.
 **BOX CLEANUP (look before deleting):**
-  cd ~/parity-bench && find working/working -type f | head -20   # expect ONLY collector_* from the failed dry pass
+  cd ~/parity-bench-video && find working/working -type f | head -20   # expect ONLY collector_* from the failed dry pass
   rm -rf working/working                                          # only if that is all it holds
 **ALSO FIXED with it:** the LI arm's provenance no longer carries
 `threads_note: "unset -> engine CONST_DEFAULT_MAX_THREADS=64 (constants.py:48)"`
@@ -286,7 +296,7 @@ f/s, t32 = 2.31 f/s (probe_rr steady sends).
   latency leg only.
 **SHARPEN BOTH FROM THE DRY PASS before launching** — it ran every leg at n=1,
 so it measured exactly these configurations once:
-  cd ~/parity-bench && for f in working/video/results/mainrun_*/records_*.jsonl; do \
+  cd ~/parity-bench-video && for f in working/video/results/mainrun_*/records_*.jsonl; do \
     python3 -c "
   import json,sys
   for line in open(sys.argv[1]):
@@ -307,7 +317,7 @@ made.
 
 **REAL RUN (after a green dry pass), nohup so an SSH drop cannot kill a
 measured leg; NO keep-alive (Crossroad 21 forbids it during measured legs):**
-  cd ~/parity-bench && mkdir -p working/video/results && \
+  cd ~/parity-bench-video && mkdir -p working/video/results && \
   M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=4 WARM_N=16 BLAST_C=16 \
   GATE3_RUN_ID=probe_20260821_195214 DEFAULT_N=44 PASSES=2 LIVENESS_MIN=<ASK> \
   nohup bash working/video/run_plan.sh > working/video/results/console_$(date -u +%Y%m%dT%H%M%SZ).log 2>&1 &
@@ -874,7 +884,7 @@ Known still-unmeasured sameness claims: LI image python micro version
 (gate 4 measures the consequence); glibc/OpenMP across container bases (torch
 bundles its own OpenMP; the staged gate-3 comparison is the measurement).
 
-## Exact box state (as relayed; box paths relative to ~/parity-bench)
+## Exact box state (as relayed; PHASE 1 era, paths relative to ~/parity-bench — the VIDEO worktree is ~/parity-bench-video, see the briefing)
 
 - **Floor venv GREEN:** `venv_creator: base-interpreter (/usr/bin/python3.12
   (3.12.13))`; 11/11 pins exact; base ~/.venv torch 2.13.0+cpu UNMOVED;

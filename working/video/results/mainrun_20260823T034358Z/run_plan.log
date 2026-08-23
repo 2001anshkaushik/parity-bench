@@ -1,0 +1,7 @@
+gate 5 (detection_liveness): LIVENESS_MIN not supplied — NOT RUN on every leg (dry pass only)
+=== DRY PASS — wiring only; every knob clamped; nothing here is a measurement ===
+run manifest: working/video/results/mainrun_20260823T034358Z/run_manifest.json
+=== RUN PLAN: M=16 li_workers=8 warm=16 rr_threads(parity)=2 rr_threads(default)=unset li_threads=4 liveness>=NOT_RUN gate3=probe_20260821_195214 C=1 seq_n=1 passes=2 -> working/video/results/mainrun_20260823T034358Z ===
+--- 0. manifest re-cut check (re-cut is a REUSE: fetched must be 0) ---
++ /opt/homebrew/bin/python3 working/video/fetch_ami_video.py --verify
+NOT DONE — no manifest at /Users/ansh/RocketRide/Benchmarking/benchmark-A/working/video/ami_video_manifest.jsonl. Build one on the box with --build-manifest.

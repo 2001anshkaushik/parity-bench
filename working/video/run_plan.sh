@@ -150,6 +150,13 @@ fi
 # PDF fixture and warm-up, writes a THROWAWAY golden. Retires the wiring risk
 # in ~minutes; NO number from a dry pass is a measurement.
 DRY_PASS="${DRY_PASS:-0}"
+# The PDF duplication fixture (smoke section A) reads the Phase 1 GovDocs1
+# corpus. corpus/ is gitignored — provisioned PER CHECKOUT, never from git — and
+# this worktree (~/parity-bench-video) is not Phase 1's (~/parity-bench), so the
+# path is passed EXPLICITLY rather than left to the driver default and to
+# however each box happens to be laid out (2026-08-22: the campaign died at the
+# fixture for exactly this).
+PDF_CORPUS="${PDF_CORPUS:-$PWD/corpus/govdocs1/pdfs}"
 RR_IMAGE="${RR_IMAGE:-rr:patched-video}"   # Crossroad 18: baked image (bake_rr_video.sh)
 LI_IMAGE="${LI_IMAGE:-li:video}"
 OUT="working/video/results/mainrun_$(date -u +%Y%m%dT%H%M%SZ)"
@@ -238,6 +245,15 @@ MEASURED_N=$((60 - WARM_N))
   echo "NOT DONE — DEFAULT_N=$DEFAULT_N > MEASURED_N=$MEASURED_N (Crossroad 27: the default"
   echo "posture runs a subset of the measured set, never more than it)"; exit 1; }
 SMOKE_EXTRA=()
+# A real run needs the fixture; a dry pass passes --skip-fixture and does not.
+# Fail here (1 second) rather than after both containers are up (~2 min).
+if [ "$DRY_PASS" != "1" ] && [ ! -d "$PDF_CORPUS" ]; then
+  echo "NOT DONE — PDF_CORPUS=$PDF_CORPUS is not a directory. Smoke section A (the"
+  echo "duplication fixture) MEASURES that this image is patched; a label is not a"
+  echo "measurement. Point PDF_CORPUS at the GovDocs1 corpus (Phase 1 checkout or a"
+  echo "symlink), or restore the five fixture PDFs named in working/video/SESSION_STATE.md."
+  exit 1
+fi
 if [ "$DRY_PASS" = "1" ]; then
   echo "=== DRY PASS — wiring only; every knob clamped; nothing here is a measurement ===" | tee -a "$LOG"
   # PASSES=2 here on purpose (2026-08-21): a dry pass that clamps PASSES to 1
@@ -303,7 +319,7 @@ echo "--- 1. LlamaIndex arm (both containers up for smoke read-backs; RR idles a
 start_rr unset
 start_li
 run "$PY" working/video/smoke_video.py --rr-container rr --li-container li_video \
-    --rr-threads-env unset "${SMOKE_EXTRA[@]}"
+    --rr-threads-env unset --pdf-corpus "$PDF_CORPUS" "${SMOKE_EXTRA[@]}"
 run "${DRIVER[@]}" --arm llamaindex --leg sequential --n "$SEQ_N" \
     --image-lineage "$LI_IMAGE_LINEAGE"
 for pass in $(seq 1 "$PASSES"); do
