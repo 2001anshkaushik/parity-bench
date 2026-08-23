@@ -821,7 +821,12 @@ def detection_liveness(records: Sequence[Dict[str, Any]],
 
 
 def label_multiset_agreement(frames_a: Sequence[Sequence[str]],
-                             frames_b: Sequence[Sequence[str]]) -> Dict[str, Any]:
+                             frames_b: Sequence[Sequence[str]],
+                             scores_a: Optional[Sequence[Sequence[float]]] = None,
+                             scores_b: Optional[Sequence[Sequence[float]]] = None,
+                             threshold: float = 0.3,
+                             boundary_eps: float = 0.001,
+                             max_boundary_rate: float = 0.005) -> Dict[str, Any]:
     """Gate 3: STRICT, zero tolerance (ruling 2026-08-20). Per-frame label
     multisets must be identical across arms — frame count and content. Any
     divergence is first a REAL difference (model swap, resize path, version
@@ -836,9 +841,53 @@ def label_multiset_agreement(frames_a: Sequence[Sequence[str]],
                 "frame_count_b": len(frames_b), "reason": "frame count differs"}
     diverging = [i for i, (a, b) in enumerate(zip(frames_a, frames_b))
                  if sorted(a) != sorted(b)]
-    return {"PASS": not diverging, "n_frames": len(frames_a),
-            "diverging_frames": diverging[:50] or None,
-            "n_diverging": len(diverging)}
+
+    # CROSSROAD 39 (2026-08-23): BOUNDARY EXCLUSION, NOT TOLERANCE. A detection
+    # whose score sits within `boundary_eps` of the detect threshold can cross
+    # it on float summation-order alone — measured: the SAME arms and videos
+    # pass clean at torch=2 (parity) and diverge on three frames at torch=16
+    # (default), more BLAS reduction partitions meaning more summation-order
+    # variance. Those frames are excluded and COUNTED; the multiset comparison
+    # itself stays EXACT, so a model swap — which moves scores far from the
+    # threshold — still fails, and so does DRIFT: exclusions above
+    # `max_boundary_rate` of frames fail the gate rather than passing quietly.
+    #
+    # Implemented at FRAME level, not per detection, because the records carry
+    # labels SORTED and scores in original order — they are not index-paired,
+    # and pairing them would need a new field on both arms, i.e. an LI image
+    # rebuild whose serving stack is unpinned at build. A frame is excluded only
+    # when EVERY unmatched score on BOTH arms is within eps of the threshold, so
+    # a frame carrying a real difference alongside a flap still fails.
+    boundary, real = [], []
+    if scores_a is not None and scores_b is not None and len(scores_a) == len(frames_a):
+        for i in diverging:
+            sa = Counter(round(float(x), 6) for x in (scores_a[i] or []))
+            sb = Counter(round(float(x), 6) for x in (scores_b[i] or []))
+            odd = list((sa - sb).elements()) + list((sb - sa).elements())
+            if odd and all(abs(x - threshold) <= boundary_eps for x in odd):
+                boundary.append(i)
+            else:
+                real.append(i)
+    else:
+        real = list(diverging)
+
+    rate = (len(boundary) / len(frames_a)) if frames_a else 0.0
+    drifting = rate > max_boundary_rate
+    out = {"PASS": (not real) and not drifting,
+           "n_frames": len(frames_a),
+           "diverging_frames": real[:50] or None,
+           "n_diverging": len(real),
+           "boundary_excluded_frames": boundary[:50] or None,
+           "n_boundary_excluded": len(boundary),
+           "boundary_excluded_rate": round(rate, 6),
+           "boundary_eps": boundary_eps, "threshold": threshold,
+           "max_boundary_rate": max_boundary_rate,
+           "scores_available": scores_a is not None and scores_b is not None}
+    if drifting:
+        out["reason"] = (f"boundary exclusions {len(boundary)}/{len(frames_a)} "
+                         f"({rate:.4%}) exceed {max_boundary_rate:.3%} — that is DRIFT, "
+                         "not flapping; do not read it as a passing run")
+    return out
 
 
 def score_triage(scores_a: Sequence[Sequence[float]],

@@ -1717,3 +1717,64 @@ Then: **170-video default blast wall = 23,691 / (that f/s) seconds per pass**,
 x2 passes. The bracket was 2.31-4.83 f/s = 164-342 min for two passes; this
 replaces it with one number. NOTE the sum-of-wall form measures SERVICE rate at
 the leg's concurrency, which is what the next leg will reproduce.
+
+## ▶ CROSSROADS 38 + 39 CLOSED (2026-08-23), and the sharpening command was WRONG
+
+**HUMAN DOWNGRADE, RECORDED AS REQUIRED.** *The three diverging frames in
+`mainrun_20260823T034243Z` `cross_default_blast` are float reduction-order
+flapping at the 0.3 detection threshold — evidenced by one 'chair' each, lowest
+unmatched scores 0.3000 / 0.3001 / 0.3227, and PARITY passing clean at torch=2
+while DEFAULT fails at torch=16. Downgraded by Ansh, 23 Aug 2026.*
+The posture split is the proof: same arms, same videos, same model, same
+corpus — only the thread count differs. More BLAS reduction partitions, more
+summation-order variance, and a detection sitting at 0.3000 crosses the cut.
+Three frames in ~5,600 (0.054%), and only at high thread count.
+
+**CROSSROAD 39 — BOUNDARY EXCLUSION, NOT TOLERANCE. LANDED.**
+`gates_shared.label_multiset_agreement` now excludes frames whose ONLY
+divergence is attributable to detections within +/-0.001 of the threshold, and
+COUNTS them; the multiset comparison stays EXACT. A model swap moves scores far
+from 0.3 and still fails; DRIFT fails too — exclusions above 0.5% of frames FAIL
+the gate with "that is DRIFT, not flapping". The count is surfaced at the top of
+the cross file (`boundary_exclusions_total`) and in `at_a_glance`, so it can
+never be silent. **No general tolerance was added.** Five controls fired: 3
+flaps/1000 frames passes with 3 counted; the same 3 at 0.87 FAIL; 20 flaps/1000
+FAIL as drift; 0.3011 (just outside eps) FAILS; absent scores preserve the exact
+comparison.
+IMPLEMENTED AT FRAME LEVEL, deliberately: records carry labels SORTED and scores
+in ORIGINAL order, so they are not index-paired, and per-detection exclusion
+would need a new field on both arms — i.e. an `li:video` REBUILD, whose serving
+stack is UNPINNED at build. Changing the LI substrate hours before the
+full-corpus run costs more than the marginal precision. A frame is excluded only
+when EVERY unmatched score on BOTH arms is within eps, so a frame carrying a real
+difference alongside a flap still fails. Add `frame_dets` (paired label+score)
+at the next natural LI rebuild.
+
+**gate3_triage.py CORRECTED — its verdict line was wrong about its own data.**
+When counts differ, the multiset difference of the SCORE lists returns every
+unpaired score in the frame, most belonging to detections both arms agree on.
+Judging on all of them printed "NOT all near threshold" for a genuine flap. The
+verdict now uses the score CLOSEST to the threshold — the only candidate for the
+detection that crossed it — and reports BOUNDARY FLAP at <=0.001. Re-exercised
+on the campaign's shape (one 'chair', 0.3001): "BOUNDARY FLAP — within 0.001".
+
+**CROSSROAD 38 — BAND ACCEPTED: [0.97374, 0.98963]**, centred, calibrated on
+`mainrun_20260823T034243Z`, catching ~1.0 frame of content loss where anchoring
+at 1.0 would have needed 2.63% and caught only 3.3 frames. The export names the
+calibrating run beside the band. PDF band unchanged at 2%.
+
+**THE SHARPENING COMMAND I GAVE WAS WRONG — my error.** Summing per-video
+`wall_s` across a C=16 blast counts overlapping wall clock up to 16 times, which
+is why it read 0.16 f/s against the leg's own AT A GLANCE of 2.402 — a ~15x gap
+that is the concurrency, not a measurement. **Use the leg's SPAN rate**
+(`throughput.total_frames_per_s` in the export, i.e. frames / leg_wall_s):
+  cd ~/parity-bench-video && ~/.venv/bin/python -c "
+  import json, glob
+  for f in sorted(glob.glob('working/video/results/mainrun_*/export_rocketride_video_default_blast*.json')):
+      d = json.load(open(f)); t = d['throughput']
+      print(f\"{f.split('/')[-1]:56s} frames={t['total_frames']:6d} span={d['leg_wall_s']:8.1f}s -> {t['total_frames_per_s']:5.3f} f/s\")
+  "
+**Arithmetic confirmed at 2.402 f/s:** 23,691 / 2.402 = 9,863 s = **2.74 h per
+default pass, 5.48 h for two**. Campaign total: LI blast x2 71 min + RR parity
+blast x2 61 min + RR default x2 329 min + sequential/warm/setup ~50 min =
+**~8.5 h**. DEFAULT_N=168, no shortcuts, launched tonight, finishing overnight.

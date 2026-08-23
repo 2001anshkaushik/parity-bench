@@ -93,10 +93,26 @@ def main() -> int:
             print(f"    frame {i:4d}: rr={len(ra[i])} dets, li={len(ma[i])} dets")
             print(f"        only on RR: {dict(only_rr) or '-'}    only on LI: {dict(only_li) or '-'}")
             if odd:
+                # THE VERDICT IS ABOUT THE DIVERGING DETECTION, NOT THE FRAME
+                # (corrected 2026-08-23). When the counts differ, the multiset
+                # difference of the SCORE lists returns every unpaired score in
+                # the frame, most of which belong to detections both arms agree
+                # on. Judging on all of them called a genuine boundary flap
+                # "NOT all near threshold" — the tool was wrong about its own
+                # data. Records carry labels SORTED and scores in original
+                # order, so a label cannot be paired to its score here; the
+                # score CLOSEST to the threshold is the only candidate for the
+                # detection that crossed it, and that is what the verdict uses.
+                closest = min(odd, key=lambda x: abs(x - threshold))
                 print(f"        unmatched scores: {[round(s, 4) for s in odd]}")
-                print(f"        distance to threshold {threshold}: "
-                      f"{[round(abs(s - threshold), 4) for s in odd]}")
-                print(f"        -> {'NEAR-THRESHOLD (within 0.02)' if near and len(near) == len(odd) else 'NOT all near threshold'}")
+                print(f"        CLOSEST to threshold {threshold}: {closest:.4f} "
+                      f"(distance {abs(closest - threshold):.4f})")
+                verdict = ('BOUNDARY FLAP — within 0.001' if abs(closest - threshold) <= 0.001
+                           else 'near the threshold (within 0.02) but OUTSIDE the 0.001 exclusion'
+                           if abs(closest - threshold) <= 0.02
+                           else 'NOT a boundary flap — the closest unmatched score is far from '
+                                'the threshold; first hypothesis stays a REAL difference')
+                print(f"        -> {verdict}")
             else:
                 print('        scores identical on both arms — labels differ with equal scores, '
                       'which is NOT a threshold flap')

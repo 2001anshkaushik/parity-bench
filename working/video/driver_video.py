@@ -166,7 +166,9 @@ def at_a_glance_line(export: Dict[str, Any]) -> str:
             f" | thread env expected {t_exp} / in-process torch {t_meas}"
             f" | gates PASS {n_pass} · NOT RUN {n_notrun} · FAIL {n_fail}"
             f" | efficiency valid={eff.get('valid')}"
-            f" | COLLECTOR {str(export.get('collector_status', 'unknown')).split(':')[0]}")
+            f" | COLLECTOR {str(export.get('collector_status', 'unknown')).split(':')[0]}"
+            + (f" | BOUNDARY-EXCLUDED {export['boundary_exclusions_total']} frames"
+               if export.get('boundary_exclusions_total') else ""))
 
 
 # ---------------------------------------------------------------------------
@@ -1353,7 +1355,8 @@ def cross_gates(rr_path: Path, li_path: Path, tol: float,
             if not mate:
                 continue
             per_video[r['video']] = gs.label_multiset_agreement(
-                r.get('frame_label_multisets') or [], mate.get('frame_label_multisets') or [])
+                r.get('frame_label_multisets') or [], mate.get('frame_label_multisets') or [],
+                scores_a=r.get('frame_scores'), scores_b=mate.get('frame_scores'))
         agreement = {'PASS': bool(per_video) and all(v['PASS'] is True for v in per_video.values()),
                      'armed_by_probe_run': gate3_armed,
                      'n_videos': len(per_video),
@@ -1381,6 +1384,11 @@ def cross_gates(rr_path: Path, li_path: Path, tol: float,
         'char_conservation': (gs.char_conservation_parity(pairs, tol=tol) if pairs
                               else gs.not_run('char_conservation',
                                               reason='no overlapping videos')),
+        # Crossroad 39: the boundary-exclusion count is surfaced at the top of
+        # the cross file, not buried per video — it can never be silent.
+        'boundary_exclusions_total': (
+            sum(v.get('n_boundary_excluded') or 0 for v in (agreement.get('per_video') or {}).values())
+            if isinstance(agreement.get('per_video'), dict) else None),
         'chunk_count_ratio': gs.chunk_count_ratio(rr_ok, li_ok),
         'n_rr': len(rr_ok), 'n_li': len(li_ok), 'n_paired': len(pairs),
     }

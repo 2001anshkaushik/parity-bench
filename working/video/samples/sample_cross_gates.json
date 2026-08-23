@@ -9,61 +9,131 @@
     "PASS": true,
     "n_frames": 83,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    },
    "ES2002b.Corner.avi": {
     "PASS": true,
     "n_frames": 151,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    },
    "ES2002c.Corner.avi": {
     "PASS": true,
     "n_frames": 159,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    },
    "ES2005a.Corner.avi": {
     "PASS": true,
     "n_frames": 31,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    },
    "ES2014d.Corner.avi": {
     "PASS": true,
     "n_frames": 193,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    },
    "ES2006b.Corner.avi": {
     "PASS": true,
     "n_frames": 121,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    },
    "ES2007c.Corner.avi": {
     "PASS": true,
     "n_frames": 93,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    },
    "ES2008a.Corner.avi": {
     "PASS": true,
     "n_frames": 66,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    },
    "ES2009d.Corner.avi": {
     "PASS": true,
     "n_frames": 173,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    },
    "ES2010b.Corner.avi": {
     "PASS": true,
     "n_frames": 76,
     "diverging_frames": null,
-    "n_diverging": 0
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
    }
   }
  },
@@ -125,6 +195,7 @@
    }
   ]
  },
+ "boundary_exclusions_total": 0,
  "chunk_count_ratio": {
   "gated": false,
   "n_pairs": 10,
