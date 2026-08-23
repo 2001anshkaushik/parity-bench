@@ -251,3 +251,62 @@ thread read-back.
 
 Latency is a fourth, but it is a unit conversion (per-video vs per-video-minute)
 rather than a disagreement.
+
+---
+
+## 8. The full-corpus run: her split and her legs (from code, 2026-08-22)
+
+**Q1 — her ami_full split IS stated, in the run script rather than the set file.**
+`corpus/sets/ami_full.txt`'s header states the selection and the ORDER ("sorted
+by ID; this order defines wave slices") but no split. `run/native170.sh` states
+it twice: prose at `:10` — *"168 measured + 2 warm per arm, 32 cores UNPINNED,
+single rep — the full-corpus sizing run"* — and code at `:19-20`
+(`N="${N:-168}"`, `WARM="${WARM:-2}"`). Her driver takes
+`warm_set = all_videos[n:n+warm_docs]` (`bench_video.py:256`), so the split is
+positional over the set file's order: **first 168 measured, last 2 warm**.
+Nothing for us to choose — we take hers: `--n-measured 168 --n-warm 2`.
+
+**Q2 — what she actually runs on the full corpus.**
+
+| | HERS (`run/native170.sh`) | OURS (`run_plan.sh`) |
+|---|---|---|
+| leg invocations | **2** | **9** |
+| RocketRide legs | ONE: `RR_MODE=blast` — a single atomic `send_files` batch of 168 (`:20,61,71`; `bench_video.py:274-276`) | SIX: default-posture sequential + blast x2, parity-posture sequential + blast x2 |
+| RR tokens | 1 (`use_existing=True`, one token) | 1 (default posture) and 16 (parity posture) |
+| RR thread env | **UNPINNED** — stated at `:10` | default posture UNSET (torch 16); parity posture 2 |
+| competitor legs | ONE: `LG_MODE=c170` — whole backlog offered at t=0 (`:21,78,88`) | THREE: LI sequential + blast x2 at C=16 |
+| competitor framework | LangGraph | LlamaIndex |
+| passes / reps | **single rep**, stated `:10` | `PASSES=2` on every blast leg |
+| envelope | 32 cores, unpinned | 32 cores, unpinned (no cpuset this phase) |
+| report | `bench/report.py --arms rr lg` (`:96-97`) | driver exports per leg + `--cross` per posture/leg/pass |
+
+**Which rows line up, stated not judged:**
+* **Her RR blast is closest to our DEFAULT posture** — both are one token,
+  unpinned. The submission SHAPE still differs: hers is one atomic `send_files`
+  of 168; ours is 168 per-video `send()` calls at C=16 through one token.
+* **Our PARITY posture has no counterpart in her run** (she runs one token).
+* **Our sequential legs have no counterpart at full-corpus scale** — her driver
+  supports `seq`, `native170.sh` does not use it.
+* **Only the RocketRide arm is cross-team comparable at all**: her competitor is
+  LangGraph, ours is LlamaIndex.
+* **Passes differ 1 vs 2**, so her run cannot carry a determinism verdict; ours
+  can (and ours fails closed at single rep).
+
+**Consequence for Monday's four-way table:** the comparable subset is *one leg*
+— her RR blast against our RR default blast — and even there the submission
+shape differs. Everything else of ours is additional rather than contested.
+That should be stated in the table, not discovered while reading it.
+
+### The three metric differences to state up front (from §7)
+
+Same run, different published number, for reasons that are definitional:
+1. **Memory basis** — hers is cgroup `memory.current` max, which *includes page
+   cache* (`v_metrics.py:140-141`); ours is anon. Her own results show the gap:
+   23.7 GB raw vs ~4.1 GB cache-corrected for the same run.
+2. **Throughput basis** — hers is total span (`v_metrics.py:22-42`); ours reports
+   total span AND the steady window with `window_n` required, which separates
+   ramp-up and the drain tail she flags herself.
+3. **`frame_law`** — hers asserts `floor(duration/15)+1` with ±1
+   (`v0_gates.py:74-86`); ours deleted the formula (Crossroad 23) and measures
+   the per-row expectation exactly. Same video, same arm, different verdict on
+   an 83-vs-84 frame count.
