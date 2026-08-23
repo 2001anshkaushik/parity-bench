@@ -125,3 +125,68 @@ Reading her code sharpens three items:
 **Not resolved here, for Ansh:** whose manifest the three-way run uses. Shashi's
 Tier A requires "same manifest file"; his 50-set and her ami_full differ from
 each other, and ours differs from both.
+
+---
+
+## 6. `ami30h` — what it actually is (read 2026-08-22, before building anything on it)
+
+**Q1 — the selection rule, from code not prose.** `corpus/sets/ami30h.txt` is a
+CHECKED-IN LIST of 62 meeting IDs whose header states the rule verbatim:
+
+> *"the 62 usable meetings (Closeup1 + Mix-Headset both on the mirror) whose
+> duration is CLOSEST TO 30 MINUTES, ties broken by meeting ID; then sorted by
+> ID. Durations 23.4-36.8 min, 32.7 h total, ~8.2 GB muxed. First 60 (sorted)
+> are measured, last 2 are warm-up (driver convention). Derived from
+> ami_eda/ami_per_meeting.json (mirror HEAD sweep 2026-08-20)."*
+
+**There is NO divergence between her script and the staged corpus.**
+`fetch_ami.sh` has a LIST MODE (`MEETING_LIST=corpus/sets/ami30h.txt`, used by
+`run/run30h.sh:21` and `run/native60.sh:55`); the ES/IS/TS candidate list is the
+FALLBACK branch when no list is given. The staged filename is `<meeting>.avi`
+because that is the MUX OUTPUT name (`Closeup1.avi` + `Mix-Headset.wav` ->
+`<meeting>.avi`), so unsuffixed names ARE Closeup1. **EN and IB appear because
+the rule ranges over ALL usable meetings by duration, not over the scenario
+subset.** Verified against her own `corpus/sets/ami_full_durations.json`: all 62
+ids matched, 32.72 h total (header 32.7), spread 23.4-36.8 min (header exact).
+
+**CORRECTION to §3 above:** it recorded "her candidate list yields 140, not the
+170 her prose states (ASK)". That was wrong — I read the fallback branch and
+treated it as the selection rule. `corpus/sets/ami_full.txt` is a checked-in
+list of exactly **170**: *"all usable AMI meetings (Closeup1 + Mix-Headset on
+the mirror). 170 of 171: TS3003d excluded (no Closeup1)."* No gap; nothing to ask.
+NOT in the repo: `ami_eda/ami_per_meeting.json`, the sweep the sets were derived
+FROM — so the sets are reproducible as lists, not as a derivation.
+
+**Q2 — which corpus produced her published numbers. TWO DIFFERENT SETS:**
+* **Run B, "native saturation", 60 videos / 31.43 h = `ami30h`.**
+  `run/native60.sh:2,26` (N=60, WARM=2, `S3_CORPUS=.../corpus/ami30h`). Our
+  computed first-60 total is 31.70 h against her 31.43 h (0.9% apart).
+* **Run A, "c6 head-to-head", 28 videos / 14.51 h = `ami30test`, NOT ami30h.**
+  `run/headtohead.sh:15-19,24` (N=28, WARM=2, MODE=c6,
+  `S3_CORPUS=.../corpus/ami30test`). There is no set file for it in the repo.
+
+**Consequence:** adopting ami30h makes us comparable to **Run B only**. Run A is
+the one run her own RESULTS.md says carries the only legitimate cross-arm
+LATENCY comparison ("the c6 latency win is the only apples-to-apples latency").
+Latency comparability would need `ami30test` as well.
+
+**Q3 — muxed, and why resolution barely moves the cost model.**
+Muxed by construction (the staged file IS the mux output). Size arithmetic as a
+cross-check on the ffprobe: Mix-Headset is 16 kHz mono PCM = 32,000 B/s, so a
+30-min meeting carries ~57.6 MB of AUDIO alone; ES2003b at 114 MB implies ~56 MB
+of video (~250 kbps), consistent with muxed low-bitrate DivX. Expect ffprobe to
+show 1 video + 1 `pcm_s16le` 16 kHz mono audio stream.
+**Resolution affects DECODE only, not detect.** `detection.py:60` gives the
+rfdetr backend `infer_edge=560` and `:518` runs every frame through
+`resize_for_inference(image, self._infer_max_edge)` — `:55` calls the downscale
+lossless with boxes mapped back. Detect is 87-92% of stage time by her own
+split, so per-frame cost is essentially resolution-independent. What moves the
+ETA is FRAME COUNT: **60 measured ~= 7,642 frames** (estimate from her durations;
+the manifest build measures it), **1.37x our Corner 44-set** — not the 2.8x
+projected from the wrong corpus size.
+
+**Facts settled; DECISIONS PENDING Ansh** (nothing built on this yet): the set
+is 60 measured + 2 warm, not 124 + 16; WARM_N=2 is compatible with our coverage
+gate only because Crossroad 32 allows warm rows to be RE-SENT; DEFAULT_N at 60
+does not trigger Crossroad 27's subset rule; and her duration spread is 1.57x
+against our 6.2x, which makes videos/hour meaningful again on her set.
