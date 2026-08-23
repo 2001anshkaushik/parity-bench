@@ -66,6 +66,7 @@ from harness import rr_credentials                     # noqa: E402
 from harness.jsonl_stream import JsonlWriter, read_completed  # noqa: E402
 import sdk_identity                                    # noqa: E402
 from argtypes import bounded_float, positive_int, run_id  # noqa: E402 — entry 8
+from corpus_locator import resolve_corpus_dir                # noqa: E402 — 2026-08-23
 # One census, one minter — the probes' own functions (stdlib-only module):
 # the driver and probe_rr must count task processes and stamp project_ids the
 # same way, or 'declared==measured' means different things per tool.
@@ -1021,7 +1022,15 @@ def preflight_containers(rr_container: Optional[str], li_container: Optional[str
 async def preflight(args, arm, rr_arm_active: bool) -> dict:
     say('preflight: manifest')
     meta, rows = load_manifest(Path(args.manifest))
-    bad = verify_corpus(rows, Path(args.corpus_dir))
+    # WHERE the corpus is: never this file's default (2026-08-23 — three tools
+    # carried three copies of corpus/ami/video and the campaign died at step 0
+    # on ami_full). Explicit must agree with the manifest meta; absent derives
+    # from it; a manifest that records none REFUSES. One resolver for all three.
+    corpus_dir, corpus_src = resolve_corpus_dir(args.corpus_dir, meta, Path(args.manifest),
+                                                'driver_video')
+    args.corpus_dir = str(corpus_dir)
+    say(f'preflight: corpus_dir={corpus_dir} [{corpus_src}]')
+    bad = verify_corpus(rows, corpus_dir)
     if bad:
         raise SystemExit('NOT DONE — corpus does not match manifest:\n  ' + '\n  '.join(bad))
 
@@ -1145,6 +1154,7 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
             'identity': identity, 'thread_pin_parity': pins,
             'network_mode': network_mode,
             'pipe_sha256': sha256_bytes(PIPE_PATH.read_bytes()),
+            'corpus_dir': str(corpus_dir), 'corpus_dir_source': corpus_src,
             'manifest_sha256': sha256_bytes(Path(args.manifest).read_bytes())}
 
 
@@ -1435,7 +1445,9 @@ async def amain() -> int:
     ap.add_argument('--threads', type=positive_int('threads', 256),
                     help='parity posture per-token threads= (default: unset)')
     ap.add_argument('--manifest', default=str(MANIFEST_DEFAULT))
-    ap.add_argument('--corpus-dir', default=str(ROOT / 'corpus' / 'ami' / 'video'))
+    ap.add_argument('--corpus-dir', default=None,
+                    help='no default (2026-08-23): derived from the manifest meta, or explicit '
+                         'and checked against it — corpus_locator.py')
     ap.add_argument('--interval-s', type=positive_int('interval-s', 3600), default=15)
     ap.add_argument('--rr-port', type=positive_int('rr-port', 65535), default=5565)
     ap.add_argument('--li-port', type=positive_int('li-port', 65535), default=8802)

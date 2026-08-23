@@ -234,7 +234,35 @@ fi
 if [ -z "${LI_IMAGE_LINEAGE:-}" ]; then
   LI_IMAGE_LINEAGE="docker/Dockerfile.llamaindex-video, unmodified build, no derived layers; serving stack UNPINNED at build (per-run pip freeze snapshot in li_image_freeze.txt)."
 fi
-DRIVER=("$PY" working/video/driver_video.py --out-dir "$OUT")
+# WHERE THE CORPUS IS — resolved ONCE, here, through the same locator every tool
+# uses, and passed EXPLICITLY to step 0, the smoke and the driver (2026-08-23:
+# the campaign died at step 0 four minutes in — fetch_ami_video, smoke_video and
+# driver_video each carried a private default of corpus/ami/video, correct for
+# Corner and silently wrong for ami_full at corpus/ami/full, and this script
+# passed --corpus-dir to none of them; step 0 found every file "missing" and
+# tried to FETCH a staged corpus). The manifest records the directory it was
+# built or stamped against (_meta.corpus_dir); CORPUS_DIR in the env is allowed
+# but must AGREE with it; a manifest that records none REFUSES here, naming the
+# one-time stamp command. Same class as PDF_CORPUS above and the golden path —
+# a default that was right for one corpus — so this one has no default at all.
+VIDEO_MANIFEST="${VIDEO_MANIFEST:-working/video/ami_video_manifest.jsonl}"
+[ -f "$VIDEO_MANIFEST" ] || { echo "NOT DONE — VIDEO_MANIFEST=$VIDEO_MANIFEST is not a file"; exit 1; }
+LOC_ARGS=(--manifest "$VIDEO_MANIFEST" --tool run_plan)
+[ -n "${CORPUS_DIR:-}" ] && LOC_ARGS+=(--corpus-dir "$CORPUS_DIR")
+if ! LOC_OUT="$("$PY" working/video/corpus_locator.py "${LOC_ARGS[@]}")"; then
+  echo "$LOC_OUT" | tee -a "$LOG"
+  echo "NOT DONE — corpus_dir could not be resolved (above). If the manifest records none, stamp it ONCE" | tee -a "$LOG"
+  echo "(a full sha256 verify that then records the directory in the manifest meta), then relaunch:" | tee -a "$LOG"
+  echo "  $PY working/video/fetch_ami_video.py --stamp-corpus-dir --corpus-dir <dir> --manifest $VIDEO_MANIFEST" | tee -a "$LOG"
+  exit 1
+fi
+CORPUS_DIR="${LOC_OUT%%$'\n'*}"     # line 1: the path
+CORPUS_SRC="${LOC_OUT#*$'\n'}"      # line 2: where it came from (logged beside the value)
+[ -d "$CORPUS_DIR" ] || { echo "NOT DONE — resolved CORPUS_DIR=$CORPUS_DIR is not a directory" | tee -a "$LOG"; exit 1; }
+echo "corpus: manifest=$VIDEO_MANIFEST corpus_dir=$CORPUS_DIR [$CORPUS_SRC]" | tee -a "$LOG"
+
+DRIVER=("$PY" working/video/driver_video.py --out-dir "$OUT" \
+        --manifest "$VIDEO_MANIFEST" --corpus-dir "$CORPUS_DIR")
 if [ -n "$LIVENESS_MIN" ]; then
   DRIVER+=(--liveness-min-fraction "$LIVENESS_MIN")
 else
@@ -248,11 +276,11 @@ manifest_count() {   # $1 = role
   "$PY" -c "
 import json, sys
 try:
-    rows = [json.loads(l) for l in open('working/video/ami_video_manifest.jsonl') if l.strip()]
+    rows = [json.loads(l) for l in open(sys.argv[2]) if l.strip()]
 except Exception:
     print(0); sys.exit(0)
 print(sum(1 for r in rows if '_meta' not in r and r.get('role') == sys.argv[1]))
-" "$1" 2>/dev/null || echo 0
+" "$1" "$VIDEO_MANIFEST" 2>/dev/null || echo 0
 }
 MEASURED_N=$(manifest_count measured)
 MANIFEST_WARM=$(manifest_count warm)
@@ -313,6 +341,9 @@ cat > "$OUT/run_manifest.json" <<MANIFEST
   "MEASURED_N": $MEASURED_N
  },
  "images": {"rr": "$RR_IMAGE", "li": "$LI_IMAGE"},
+ "corpus": {"manifest": "$VIDEO_MANIFEST", "corpus_dir": "$CORPUS_DIR",
+            "rule": "corpus_dir derives from _meta.corpus_dir (stamped after a full sha256 verify); an env CORPUS_DIR must agree with it; no tool carries a default that names a corpus (2026-08-23)",
+            "pdf_corpus": "$PDF_CORPUS"},
  "decisions": {
   "ruled_values": "Crossroads 31/32 (2026-08-21): M_TOKENS=16, RR_THREADS_ENV=2 (parity; default posture unset), LI_WORKERS=8, LI_THREADS_ENV=1, WARM_N=16, BLAST_C=16, DEFAULT_N=44, PASSES=2 — if the numbers above differ, this run is NOT the ruled campaign",
   "M_TOKENS_rationale": "working/video/RR_PARITY_CURVE.md — the full M x T curve including the faster M=32 we DECLINED (+3.3% throughput for 31% of the box idle and 32 model stacks); idle burden is reported beside every parity number, never subtracted",
@@ -336,13 +367,15 @@ echo "--- 0. manifest re-cut check (re-cut is a REUSE: fetched must be 0) ---" |
 # verification's tail no longer inflates it and no leg systematically settles
 # because of it. If a quiet-box check DOES settle now, something is burning
 # CPU at that moment — read the trend: DECAYING is a transient, SUSTAINED is a hog.
-run "$PY" working/video/fetch_ami_video.py --verify
+# --verify is READ-ONLY (never fetches) as of 2026-08-23; the dir is the resolved one.
+run "$PY" working/video/fetch_ami_video.py --verify --manifest "$VIDEO_MANIFEST" --corpus-dir "$CORPUS_DIR"
 
 echo "--- 1. LlamaIndex arm (both containers up for smoke read-backs; RR idles at the DEFAULT config) ---" | tee -a "$LOG"
 start_rr unset
 start_li
 run "$PY" working/video/smoke_video.py --rr-container rr --li-container li_video \
-    --rr-threads-env unset --pdf-corpus "$PDF_CORPUS" "${SMOKE_EXTRA[@]}"
+    --rr-threads-env unset --pdf-corpus "$PDF_CORPUS" \
+    --manifest "$VIDEO_MANIFEST" --corpus-dir "$CORPUS_DIR" "${SMOKE_EXTRA[@]}"
 run "${DRIVER[@]}" --arm llamaindex --leg sequential --n "$SEQ_N" \
     --image-lineage "$LI_IMAGE_LINEAGE"
 for pass in $(seq 1 "$PASSES"); do

@@ -1,4 +1,4 @@
-# SESSION STATE — last written 2026-08-23, pre-compaction
+# SESSION STATE — last written 2026-08-23 (after the step-0 death; relaunch sequence at the top)
 # (the 2026-08-23 briefing immediately below supersedes every block after it)
 
 **Audience: the post-compaction session, holding only this repo.** This is a
@@ -10,9 +10,15 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
-**WHERE WE ARE:** Phase B for the **ami_full (170-meeting) campaign**, blocked at
-**B7** (gate-3 re-stage). B1-B6 are DONE. The Corner campaign is BANKED. The
-launch line is at the bottom of this block.
+**WHERE WE ARE (updated 2026-08-23, after the step-0 death):** Phase B for the
+**ami_full (170-meeting) campaign** is COMPLETE — B1-B8 all done, **gate 3 armed
+on `probe_20260823_122005`**, golden identical at 13 chunks, corpus 170/170
+sha-verified (all relayed from the box). The first launch **died at step 0, four
+minutes in, nothing measured** — `fetch_ami_video.py --verify` without
+`--corpus-dir` looked in the Corner-era default `corpus/ami/video`, found every
+file missing, and tried to FETCH a staged corpus. FIXED (register entry 15);
+the box needs a pull and ONE stamp command before relaunch — see THE LAUNCH
+SEQUENCE at the bottom of this block. The Corner campaign is BANKED.
 
 ### B1-B6, done, with their values
 | step | value |
@@ -63,22 +69,16 @@ Do NOT re-implement these; verify the box has the fix commit first.
   with an explicit missing-arm branch; `resultio.latest()` sorts a fixed-width UTC
   stamp, so lexicographic IS chronological there.
 
-### B7 RE-RUN (floor venv `~/.venv-floor`) — the last blocker
-    cd ~/parity-bench-video/working/video/probe &&       VIDEO=~/parity-bench-video/corpus/ami/video/ES2009a.avi PROBE_MATRIX=2 ./probe_run.sh
-FIVE lines must read back before the id is used (the banners CHANGED on
-2026-08-23 — an old-wording line means the box has not pulled):
-  1. `gate 4: floor selected by identity: probe_li_floor_t2.json` — the fix
-     engaging. If this line is absent, the box is running the old script.
-  2. `gate 4: PASS — 93 frames byte-identical across arms (video_sha16 ...)`
-  3. `GATE-3 STAGED CONFIRMATION: ... on ES2009a.avi (t=2)`
-  4. `gate-3 staging: both arms confirmed on ES2009a.avi (sha16 ..., t=2)`
-  5. `gate-3 staging: EXACT agreement on 93 frames`
-**Any line naming ES2002a or 83 frames = a stale artifact was reached again; do
-not arm.** A `CANNOT COMPARE` line is an EVIDENCE fault (missing/foreign
-artifact), NOT arm disagreement — fix the evidence and re-run that step; it is
-never a decode finding. The id is the log stem `probe_YYYYMMDD_HHMMSS`.
-**B8 after it:** golden re-write, Phase 1 venv `~/.venv`, `rr` started with NO
-thread env, `smoke_video.py --rr-threads-env unset --pdf-corpus $PWD/corpus/govdocs1/pdfs --write-golden`.
+### B7 and B8 — DONE (relayed 2026-08-23)
+* **B7:** gate 3 armed on **`GATE3_RUN_ID=probe_20260823_122005`** — ES2009a, 93
+  frames, both arms confirmed on the same sha, EXACT agreement. (The earlier
+  `probe_20260823_110344` stays VOID.) NOTE: the re-run line this file carried
+  said `corpus/ami/video/ES2009a.avi`; the box's identity line read
+  `.../corpus/ami/full/ES2009a.avi`. **The ami_full corpus is at
+  `corpus/ami/full`** (relayed) — `corpus/ami/video` is the Corner-era location
+  and is what killed step 0. ASK if the absolute prefix matters.
+* **B8:** golden re-written for ami_full; "golden compared identical at 13
+  chunks"; smoke PASS 0 failures.
 
 ### CORRECTIONS THAT MUST SURVIVE — about a teammate's work, nearly published wrong
 1. **Her detect threshold is TOP-LEVEL, not nested.**
@@ -115,17 +115,40 @@ thread env, `smoke_video.py --rr-threads-env unset --pdf-corpus $PWD/corpus/govd
 * Gate 3's three diverging frames were DOWNGRADED IN WRITING by Ansh as
   boundary flapping (Crossroad 39 now excludes and COUNTS them).
 
-### THE LAUNCH LINE — once B7 and B8 land
-    cd ~/parity-bench-video && mkdir -p working/video/results &&     M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=4     WARM_N=2 BLAST_C=16 DEFAULT_N=168 PASSES=2 LIVENESS_MIN=0.5     GATE3_RUN_ID=<from B7 on ES2009a>     nohup bash working/video/run_plan.sh > working/video/results/console_$(date -u +%Y%m%dT%H%M%SZ).log 2>&1 &
-**~8.5 h**, finishing overnight. First ten minutes: quiet-box `basis` must read
-`instantaneous`; pins line must read `rr expected 'unset': declared {}` with
-`{'rr': 16, 'li': 4}`; then the first `AT A GLANCE`.
+### THE LAUNCH SEQUENCE (three steps; the first two are new on 2026-08-23)
+**Step 1 — pull.** The step-0 fix lives in `fetch_ami_video.py`, `run_plan.sh`,
+`driver_video.py`, `smoke_video.py` and the new `corpus_locator.py`. Without the
+pull, the relaunch dies the same way.
+
+**Step 2 — stamp the manifest ONCE** (a full sha256 verify — tens of seconds,
+the same work as step 0 — that then records the directory in the manifest
+meta so run_plan and every tool derive it; meta line only, data rows asserted
+byte-identical, old/new manifest sha printed):
+    cd ~/parity-bench-video &&     ~/.venv/bin/python working/video/fetch_ami_video.py --stamp-corpus-dir --corpus-dir "$PWD/corpus/ami/full"
+Read back: `STAMPED corpus_dir=/.../corpus/ami/full into ami_video_manifest.jsonl
+(meta line only; 170 data rows byte-identical)` then `DONE verified=170/170`.
+If it prints `NOT DONE` the directory is not where this file says — ASK, do not
+guess a path.
+
+**Step 3 — launch** (unchanged numbers; `CORPUS_DIR` is NOT needed — it derives
+from the stamp — but may be passed and then MUST agree with it):
+    cd ~/parity-bench-video && mkdir -p working/video/results &&     M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=4     WARM_N=2 BLAST_C=16 DEFAULT_N=168 PASSES=2 LIVENESS_MIN=0.5     GATE3_RUN_ID=probe_20260823_122005     nohup bash working/video/run_plan.sh > working/video/results/console_$(date -u +%Y%m%dT%H%M%SZ).log 2>&1 &
+**~8.5 h**, finishing overnight. First lines to read back, in order:
+  1. `corpus: manifest=working/video/ami_video_manifest.jsonl corpus_dir=/.../corpus/ami/full [manifest meta]`
+     — if this line is absent the box has not pulled; if it says `NOT DONE`, step 2 was skipped.
+  2. step 0: `MANIFEST MODE — VERIFY (sha256; read-only, never fetches): 170 files ... corpus_dir=... [manifest meta]`
+     then `DONE verified=170/170`. **Any `fetch [` line = the old code is running. Stop it.**
+  3. smoke: `corpus_dir=... [manifest meta]` as its first line; quiet-box `basis` must
+     read `instantaneous`; pins line `rr expected 'unset': declared {}` with `{'rr': 16, 'li': 4}`.
+  4. the first `AT A GLANCE`.
 
 ### ASK — DO NOT INVENT (held by this session, not by the repo)
-* **B7 has NOT been re-run successfully.** No valid `GATE3_RUN_ID` exists for
-  ami_full. ASK for the new id; do not reuse `probe_20260823_110344` (VOID).
-* **B8 (golden) has not been done for ami_full.** The existing golden is Corner.
-* Whether the box has pulled `4c659541` — the B7 fixes are useless until it has.
+* **B7/B8 values are RELAYED:** `GATE3_RUN_ID=probe_20260823_122005`, golden 13
+  chunks, 170/170 sha. The repo holds none of the probe outputs.
+* **Whether the box has pulled the step-0 fix** (entry 15) and whether the stamp
+  (launch step 2) has been run — the relaunch is impossible without both.
+* **The absolute path of the ami_full corpus** on the box: `corpus/ami/full`
+  under the video worktree is relayed; confirm before quoting it anywhere else.
 * The exact B1 probe output filenames on the box (unrelayed); the values above
   are relayed.
 * Whether Leela was told anything about her threshold shape or the RT-DETR

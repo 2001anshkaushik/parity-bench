@@ -435,3 +435,56 @@ than rewritten from memory, which is entry 2's point in miniature.
 > it should have failed. It now extracts from the live file every run. Kin to
 > entry 9's ending, and the same argument: these rules only hold when they are
 > structural, never when they are remembered.
+
+## 15. A default that was right for one corpus, and a tool that fetches when it should refuse (added 2026-08-23)
+
+> The campaign died at step 0, four minutes in, nothing measured. `run_plan`
+> called `fetch_ami_video.py --verify` with no `--corpus-dir`; the tool's
+> default was `corpus/ami/video` — correct for the Corner corpus, and silently
+> wrong for ami_full at `corpus/ami/full`. It found every file "missing", and
+> its answer to "missing" was to reach for the network: `urlopen('')` on a
+> staged row, because the fetch loop ran before the verify loop whatever flag
+> was given. Ansh's by-hand verify had passed because he passed the flag.
+>
+> **Two faults in one line, and both are classes.** (1) *A default that names a
+> corpus is a measurement bound to the corpus it was written against* (entry 3's
+> shape, at the level of paths): it stays correct until the corpus moves, then
+> becomes wrong without a character changing — and this is the THIRD instance in
+> two days. The PDF fixture corpus (2026-08-22, `run_plan` now passes
+> `PDF_CORPUS` explicitly for exactly this), the golden path the same night, and
+> now the video corpus. (2) *A verify must never fetch.* "Check what is on disk
+> against the manifest and report" and "go and get what is missing" are two
+> operations; one was wearing the other's flag, so a wrong path turned a read-only
+> check into a download attempt. Kin to entry 4's companion: the tool's response
+> to a negative finding was to manufacture a positive one.
+>
+> **And the sweep found it was not one omission but three.** `fetch_ami_video`,
+> `smoke_video` and `driver_video` each carried a private copy of the same
+> default, and `run_plan` passed `--corpus-dir` to none of them — step 0 was
+> simply the first to die. The smoke's own corpus read-back even invoked the
+> fetch mode (no `--verify`), so with the wrong directory it too would have
+> downloaded. Entry 14's shape exactly: fix the site you saw fail and the twin
+> keeps running. Three steps would have died in sequence, each asking for one
+> more flag, each fix correct and each fix the whole response.
+>
+> Shipped as a rule with one copy, not three patches. **No tool carries a default
+> that names a corpus.** The manifest records the directory it was built or
+> stamped against (`_meta.corpus_dir`, earned by a full sha256 verify —
+> `--stamp-corpus-dir`, meta line only, data rows asserted byte-identical);
+> every consumer derives from it through `corpus_locator.py`; an explicit
+> `--corpus-dir` must AGREE with it or the run refuses, naming both paths; a
+> manifest that records none refuses and names the stamp command. `run_plan`
+> resolves once through the same locator and passes the value — and its
+> SOURCE, logged beside it — to step 0, the smoke and the driver. The four
+> manifest operations are now named and exclusive: verify-size (default, the
+> smoke's fast check), `--verify` (sha256), `--fetch-missing` (the only one that
+> touches the network, and it refuses a staged row by name), `--stamp-corpus-dir`.
+> `fetch_url('')` raises before the socket. Controls: 33, with a tripwire on the
+> network so a verify that reaches for a download fails the test rather than a
+> campaign.
+>
+> The general form, for the next corpus: **when a value is right because of
+> where it was written, it is not a default, it is a recorded condition** — and a
+> recorded condition lives in the artifact it describes, not in each tool that
+> happens to need it. The manifest already described the corpus; it just did not
+> say where the corpus was.

@@ -20,13 +20,28 @@ usable meetings -> measured, next N_WARM -> warm (driver-side warm-up,
 disjoint from the measured set). Meetings with no available view are recorded
 as skipped, with the reason, and later ids fill the quota. Run on the box.
 
-MANIFEST MODE (default, manifest present): downloads only what is missing,
-then verifies EVERYTHING against the manifest (size always, sha256 with
---verify) before printing DONE. Never uses a counter as evidence.
+MANIFEST MODE — four operations, each named, none wearing another's flag
+(2026-08-23: the campaign died at step 0 because --verify, pointed at the wrong
+directory, found every file "missing" and FETCHED — urlopen('') on a staged row):
+  (no flag)            verify, size only, NEVER fetches   (the smoke's fast check)
+  --verify             verify, sha256,    NEVER fetches   (run_plan step 0)
+  --fetch-missing      provisioning: download rows that are absent AND carry a
+                       url; a staged row (url '') is never fetched — it is named
+                       and the run refuses. Then size-checks everything.
+  --stamp-corpus-dir   full sha256 verify against --corpus-dir, and on N/N PASS
+                       record that directory in _meta.corpus_dir (meta line only;
+                       data rows byte-identical, asserted). Run ONCE per corpus.
+A verify is read-only: it checks what is on disk against the manifest and
+reports. A missing file is a finding, not a reason to go and get one.
 
-Layout: corpus/ami/video/<MEETING>.<View>.avi ; manifest at
-working/video/ami_video_manifest.jsonl (one JSON object per line; first line
-is a _meta header).
+WHERE THE CORPUS IS is never a default in this file (corpus_locator.py): the
+manifest records the directory it was built or stamped against, every consumer
+derives from it, and an explicit --corpus-dir must agree with it. Build mode
+REQUIRES --corpus-dir (no manifest exists yet to derive from) and records it.
+
+Layout: <corpus_dir>/<MEETING>.<View>.avi (or <MEETING>.avi when --staged);
+manifest at working/video/ami_video_manifest.jsonl (one JSON object per line;
+first line is a _meta header).
 """
 
 import argparse
@@ -41,10 +56,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from argtypes import bounded_float, positive_int  # noqa: E402 — register entry 8
+from corpus_locator import (CorpusDirError, META_KEY, STAMP_CMD,  # noqa: E402
+                            manifest_corpus_dir, resolve_corpus_dir)
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / 'working' / 'video' / 'ami_video_manifest.jsonl'
-CORPUS = ROOT / 'corpus' / 'ami' / 'video'
+CORPUS: Path | None = None   # NEVER defaulted (2026-08-23): resolved from --corpus-dir
+                             # or the manifest meta, see corpus_locator.py
 MIRROR = 'https://groups.inf.ed.ac.uk/ami/AMICorpusMirror/amicorpus'
 
 STAGED_NAMES = False   # --staged: files are '<meeting>.avi', pre-muxed, never fetched
@@ -183,6 +201,10 @@ def parse_avi_header(p: Path) -> dict:
 
 def fetch_url(url: str, dest: Path, timeout: int = 120) -> bool:
     """Download url -> dest. False on 404, raises on other errors."""
+    if not url:
+        # A staged row carries url '' by design. Reaching here means a caller
+        # decided to fetch without looking — refuse BEFORE the network, naming it.
+        raise ValueError(f'fetch_url: empty url for {dest.name} — a staged row is never fetched')
     tmp = dest.with_suffix('.part')
     try:
         with urllib.request.urlopen(url, timeout=timeout) as resp, tmp.open('wb') as out:
@@ -300,6 +322,7 @@ def build_mode(n_measured: int, n_warm: int,
              'scenario meetings (ES2002-16, IS1000-09, TS3003-12) x abcd, sorted by id; '
              f'views tried in order {VIEW_PREFERENCE}; first {n_measured} usable = measured, '
              f'next {n_warm} = warm (disjoint); unavailable meetings skipped and recorded')),
+        META_KEY: str(CORPUS.resolve()),   # the directory every consumer derives from
         'meeting_list': (str(MEETING_LIST_PATH) if MEETING_LIST_PATH else None),
         'meeting_list_sha256': (sha256_file(MEETING_LIST_PATH) if MEETING_LIST_PATH else None),
         'n_measured': n_measured, 'n_warm': n_warm,
@@ -334,39 +357,106 @@ def build_mode(n_measured: int, n_warm: int,
     return 0
 
 
-def manifest_mode(verify_sha: bool) -> int:
+def _check_rows(rows, corpus: Path, sha: bool):
+    bad = []
+    for r in rows:
+        pth = corpus / r['file']
+        if not pth.exists():
+            bad.append((r['file'], f'missing from {corpus}'))
+        elif pth.stat().st_size != r['bytes']:
+            bad.append((r['file'], f'size {pth.stat().st_size} != {r["bytes"]}'))
+        elif sha and sha256_file(pth) != r['sha256']:
+            bad.append((r['file'], 'sha256 mismatch'))
+    return bad
+
+
+def manifest_mode(op: str, corpus_arg: str | None) -> int:
+    """op: 'verify-size' | 'verify' | 'fetch-missing' | 'stamp'. See the docstring."""
     if not MANIFEST.exists():
         print(f'NOT DONE — no manifest at {MANIFEST}. Build one on the box with --build-manifest.')
         return 1
-    meta, rows = load_manifest()
-    CORPUS.mkdir(parents=True, exist_ok=True)
-    print(f'MANIFEST MODE: {len(rows)} files defined by {MANIFEST.name} '
-          f'(built {meta.get("_meta", {}).get("built_utc", "?")})', flush=True)
+    meta_doc, rows = load_manifest()
+    meta = meta_doc.get('_meta', {})
 
-    missing = [r for r in rows if not (CORPUS / r['file']).exists()]
-    for i, r in enumerate(missing, 1):
-        print(f'  fetch [{i}/{len(missing)}] {r["file"]}', flush=True)
-        if not fetch_url(r['url'], CORPUS / r['file']):
-            print(f'NOT DONE — {r["url"]} returned 404; the mirror no longer matches the manifest.')
+    # WHERE the corpus is — one resolver, never a default (corpus_locator.py).
+    # A stamp may name a directory that DISAGREES with the meta (the corpus
+    # moved); everything else must agree or refuse.
+    if op == 'stamp':
+        if not corpus_arg:
+            print(f'NOT DONE — --stamp-corpus-dir needs an explicit --corpus-dir: {STAMP_CMD}')
             return 1
+        corpus, source = Path(corpus_arg).expanduser(), 'explicit (stamping)'
+        if not corpus.is_dir():
+            print(f'NOT DONE — --corpus-dir {corpus} is not a directory'); return 1
+    else:
+        try:
+            corpus, source = resolve_corpus_dir(corpus_arg, meta, MANIFEST, 'fetch_ami_video')
+        except CorpusDirError as e:
+            print(str(e)); return 1
 
-    print('verifying against the manifest ...', flush=True)
-    bad = []
-    for r in rows:
-        p = CORPUS / r['file']
-        if not p.exists():
-            bad.append((r['file'], 'missing'))
-        elif p.stat().st_size != r['bytes']:
-            bad.append((r['file'], f'size {p.stat().st_size} != {r["bytes"]}'))
-        elif verify_sha and sha256_file(p) != r['sha256']:
-            bad.append((r['file'], 'sha256 mismatch'))
+    label = {'verify-size': 'VERIFY (size only; read-only, never fetches)',
+             'verify': 'VERIFY (sha256; read-only, never fetches)',
+             'fetch-missing': 'FETCH MISSING (network), then size-check',
+             'stamp': f'STAMP {META_KEY} after a full sha256 verify'}[op]
+    print(f'MANIFEST MODE — {label}: {len(rows)} files defined by {MANIFEST.name} '
+          f'(built {meta.get("built_utc", "?")}); corpus_dir={corpus} [{source}]', flush=True)
+
+    if op == 'fetch-missing':
+        corpus.mkdir(parents=True, exist_ok=True)
+        missing = [r for r in rows if not (corpus / r['file']).exists()]
+        staged = [r['file'] for r in missing if not r.get('url')]
+        if staged:
+            print(f'NOT DONE — {len(staged)} missing row(s) carry no url (staged corpus: files '
+                  f'are placed by whoever staged them and NEVER fetched). Missing from {corpus}: '
+                  f'{staged[:10]}{" ..." if len(staged) > 10 else ""}')
+            return 1
+        for i, r in enumerate(missing, 1):
+            print(f'  fetch [{i}/{len(missing)}] {r["file"]}', flush=True)
+            if not fetch_url(r['url'], corpus / r['file']):
+                print(f'NOT DONE — {r["url"]} returned 404; the mirror no longer matches the manifest.')
+                return 1
+
+    sha = op in ('verify', 'stamp')
+    print(f'verifying against the manifest ({"sha256" if sha else "size only"}) ...', flush=True)
+    bad = _check_rows(rows, corpus, sha)
     if bad:
-        print('NOT DONE — the corpus does not match the manifest:')
-        for f, why in bad:
+        print(f'NOT DONE — the corpus at {corpus} does not match the manifest '
+              f'({len(bad)} of {len(rows)} rows):')
+        for f, why in bad[:40]:
             print(f'  {f}: {why}')
+        if len(bad) > 40:
+            print(f'  ... and {len(bad) - 40} more')
+        if op != 'fetch-missing' and any(why.startswith('missing') for _, why in bad):
+            print('A verify never fetches. If these files are meant to be downloaded, that is '
+                  '--fetch-missing; if the corpus is elsewhere, that is --corpus-dir.')
         return 1
+
+    if op == 'stamp':
+        previous = manifest_corpus_dir(meta)
+        before = sha256_file(MANIFEST)
+        raw = MANIFEST.read_text().splitlines()
+        data_lines = [l for l in raw if l.strip() and '_meta' not in json.loads(l)]
+        new_meta = dict(meta)
+        new_meta[META_KEY] = str(corpus.resolve())
+        new_meta['corpus_dir_stamped'] = {
+            'utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+            'proof': f'sha256 verify {len(rows)}/{len(rows)} against this directory',
+            'previous': str(previous) if previous else None}
+        MANIFEST.write_text(json.dumps({'_meta': new_meta}) + '\n'
+                            + ''.join(l + '\n' for l in data_lines))
+        # Data rows byte-identical, PROVEN not assumed.
+        after_data = [l for l in MANIFEST.read_text().splitlines()
+                      if l.strip() and '_meta' not in json.loads(l)]
+        if after_data != data_lines:
+            print('NOT DONE — data rows changed while stamping; restore the manifest from backup')
+            return 1
+        print(f'STAMPED {META_KEY}={corpus.resolve()} into {MANIFEST.name} '
+              f'(meta line only; {len(data_lines)} data rows byte-identical). '
+              f'manifest sha256 {before[:16]} -> {sha256_file(MANIFEST)[:16]}'
+              + (f'; previous {META_KEY}={previous}' if previous else ''), flush=True)
+
     print(f'DONE verified={len(rows)}/{len(rows)} against {MANIFEST.name} '
-          f'({"sha256" if verify_sha else "size only — pass --verify for sha256"}); '
+          f'({"sha256" if sha else "size only — pass --verify for sha256"}) at {corpus}; '
           f'roles: {sum(1 for r in rows if r["role"] == "measured")} measured, '
           f'{sum(1 for r in rows if r["role"] == "warm")} warm', flush=True)
     return 0
@@ -378,11 +468,22 @@ def main() -> int:
     ap = argparse.ArgumentParser(allow_abbrev=False)
     ap.add_argument('--build-manifest', action='store_true',
                     help='discovery: construct the manifest (run ONCE, on the box)')
-    ap.add_argument('--verify', action='store_true', help='manifest mode: sha256 every file')
+    ap.add_argument('--verify', action='store_true',
+                    help='manifest mode: sha256 every file. READ-ONLY — never fetches')
+    ap.add_argument('--fetch-missing', action='store_true',
+                    help='manifest mode: download absent rows that carry a url (staged rows '
+                         'are never fetched), then size-check. The only operation that '
+                         'touches the network')
+    ap.add_argument('--stamp-corpus-dir', action='store_true',
+                    help=f'manifest mode: full sha256 verify against --corpus-dir, then record '
+                         f'it as _meta.{META_KEY} so run_plan and every tool derive it. Meta '
+                         'line only; data rows asserted byte-identical. Run once per corpus')
     ap.add_argument('--n-measured', type=positive_int('n-measured', 500), default=N_MEASURED)
     ap.add_argument('--n-warm', type=positive_int('n-warm', 500), default=N_WARM)
     ap.add_argument('--manifest', default=None, help='override manifest path (wiring tests)')
-    ap.add_argument('--corpus-dir', default=None, help='override corpus dir (wiring tests)')
+    ap.add_argument('--corpus-dir', default=None,
+                    help='REQUIRED for --build-manifest and --stamp-corpus-dir; otherwise '
+                         'optional and must agree with the manifest meta (corpus_locator.py)')
     ap.add_argument('--view', default=None,
                     help='comma-separated view preference, e.g. Closeup1 (default: '
                          'Corner,Overhead). Closeup1 is the only view present in ES, IS '
@@ -411,8 +512,7 @@ def main() -> int:
     global MANIFEST, CORPUS
     if args.manifest:
         MANIFEST = Path(args.manifest)
-    if args.corpus_dir:
-        CORPUS = Path(args.corpus_dir)
+    CORPUS = Path(args.corpus_dir).expanduser() if args.corpus_dir else None  # never carried over
     if args.view:
         globals()['VIEW_PREFERENCE'] = [v.strip() for v in args.view.split(',') if v.strip()]
         if not VIEW_PREFERENCE:
@@ -427,10 +527,18 @@ def main() -> int:
             print(f'NOT DONE — --meeting-list {mlp} yielded no ids'); return 1
     if args.staged:
         globals()['STAGED_NAMES'] = True
+    ops = [n for n, on in (('verify', args.verify), ('fetch-missing', args.fetch_missing),
+                           ('stamp', args.stamp_corpus_dir), ('build', args.build_manifest)) if on]
+    if len(ops) > 1:
+        print(f'NOT DONE — one operation at a time, got {ops}'); return 1
     if args.build_manifest:
+        if CORPUS is None:
+            print('NOT DONE — --build-manifest needs --corpus-dir (no manifest exists yet to '
+                  'derive it from, and this file carries no default that names a corpus)')
+            return 1
         return build_mode(args.n_measured, args.n_warm,
                           args.measured_dpf, args.measured_chars_per_det)
-    return manifest_mode(args.verify)
+    return manifest_mode(ops[0] if ops else 'verify-size', args.corpus_dir)
 
 
 if __name__ == '__main__':

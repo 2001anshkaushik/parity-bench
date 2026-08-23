@@ -50,6 +50,7 @@ from harness import gates_shared as gs                      # noqa: E402
 from harness import rr_credentials                          # noqa: E402
 from harness.static_names import check_files                # noqa: E402
 import driver_video as drv                                  # noqa: E402
+from corpus_locator import CorpusDirError, read_meta, resolve_corpus_dir  # noqa: E402
 import sdk_identity                                         # noqa: E402
 
 SHA_INDEX_CACHE = ROOT / 'working' / 'results' / '.pdf_fixture_index.json'
@@ -138,7 +139,7 @@ def check_static() -> dict:
     say('\n0. static gate — undefined names in any branch (#36 class)')
     targets = [ROOT / 'working' / 'video' / n
                for n in ('driver_video.py', 'smoke_video.py', 'fetch_ami_video.py',
-                         'query_phase1_chunks.py')]
+                         'query_phase1_chunks.py', 'corpus_locator.py', 'argtypes.py')]
     targets += sorted((ROOT / 'working' / 'video' / 'probe').glob('*.py'))
     targets += sorted((ROOT / 'working' / 'video' / 'li_video').glob('*.py'))
     targets += [ROOT / 'working' / 'harness' / 'gates_shared.py']
@@ -476,7 +477,9 @@ def main() -> int:
     ap.add_argument('--golden-video', default=None,
                     help='default: the SHORTEST measured corpus item (keeps the smoke ~5 min)')
     ap.add_argument('--manifest', default=str(drv.MANIFEST_DEFAULT))
-    ap.add_argument('--corpus-dir', default=str(ROOT / 'corpus' / 'ami' / 'video'))
+    ap.add_argument('--corpus-dir', default=None,
+                    help='no default (2026-08-23): derived from the manifest meta, or explicit '
+                         'and checked against it — corpus_locator.py')
     ap.add_argument('--pdf-corpus', default=str(ROOT / 'corpus' / 'govdocs1' / 'pdfs'))
     ap.add_argument('--rr-container', default='rr')
     ap.add_argument('--li-container', default='li_video')
@@ -493,8 +496,21 @@ def main() -> int:
                     help='wiring tests only — a measured run never skips image identity')
     args = ap.parse_args()
 
+    # WHERE the corpus is — resolved ONCE, before any section, from the same
+    # locator the driver and fetch_ami_video use (2026-08-23). The golden video
+    # path (section B) and the corpus-vs-manifest read-back (section C) both
+    # derive from this; neither may fall back to a path this file names.
+    try:
+        corpus_dir, corpus_src = resolve_corpus_dir(args.corpus_dir, read_meta(Path(args.manifest)),
+                                                    Path(args.manifest), 'smoke_video')
+    except CorpusDirError as e:
+        print(str(e)); return 1
+    args.corpus_dir = str(corpus_dir)
+    say(f'corpus_dir={corpus_dir} [{corpus_src}]')
+
     t0 = time.time()
     out: dict = {}
+    out['corpus_dir'] = {'path': str(corpus_dir), 'source': corpus_src}
     out['static'] = check_static()
     out['entrypoints'] = check_entrypoints()
 
