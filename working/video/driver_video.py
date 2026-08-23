@@ -800,9 +800,31 @@ def container_idle_cores(container: str, sample_s: float = 4.0) -> Optional[floa
     return round((b - a) / 1e6 / sample_s, 3)
 
 
+def total_detections(records: List[dict]) -> Optional[int]:
+    """Detections across a leg, TYPE-CHECKED per source because the two arms
+    record it differently: the LI arm carries n_detections / detections_per_frame
+    as a list, while the RR arm cannot recover a client-side count and carries
+    frame_label_multisets (the multiset length IS the count). Returns None when
+    no record carries either — absent, never 0."""
+    total, seen = 0, False
+    for r in records:
+        n = r.get('n_detections')
+        if isinstance(n, int):
+            total += n; seen = True; continue
+        dpf = r.get('detections_per_frame')
+        if isinstance(dpf, list) and all(isinstance(x, (int, float)) for x in dpf):
+            total += int(sum(dpf)); seen = True; continue
+        fls = r.get('frame_label_multisets')
+        if isinstance(fls, list) and all(isinstance(x, list) for x in fls):
+            total += sum(len(x) for x in fls); seen = True
+    return total if seen else None
+
+
 def efficiency_block(service_cpu_s: Optional[float], leg_wall_s: float,
                      ok_frames: int, ok_video_s: float, n_ok: int,
-                     idle_burden: Optional[dict], ncpu: int) -> dict:
+                     idle_burden: Optional[dict], ncpu: int,
+                     n_detections: Optional[int] = None, n_chunks: Optional[int] = None,
+                     usd_per_hour: float = 1.428) -> dict:
     """The CPU-efficiency family for one leg from the container cgroup bracket
     — with the Ticket-4 idle burden BESIDE it. Measured 2026-08-21 (RR
     concurrency sweep, T=8): the engine idles at ~1.0 core + ~0.26 cores per
@@ -833,6 +855,20 @@ def efficiency_block(service_cpu_s: Optional[float], leg_wall_s: float,
                             if have_cpu and ok_frames else None),
         'cpu_s_per_video': (round(service_cpu_s / n_ok, 1)
                             if have_cpu and n_ok else None),
+        # Adopted from Leela's V-suite so the four-way table assembles without
+        # gaps (2026-08-23). All three derive from data we already collect; being
+        # a superset of her metric set costs nothing.
+        'cpu_s_per_detection': (round(service_cpu_s / n_detections, 4)
+                                if have_cpu and n_detections else None),
+        'cpu_s_per_chunk': (round(service_cpu_s / n_chunks, 3)
+                            if have_cpu and n_chunks else None),
+        'n_detections': n_detections,
+        'n_chunks': n_chunks,
+        'usd_per_1k_footage_hours': (
+            round(usd_per_hour / (ok_video_s / leg_wall_s) * 1000, 2)
+            if leg_wall_s and ok_video_s else None),
+        'usd_per_hour_basis': (f'{usd_per_hour} (instance on-demand $/h; '
+                               'cost = $/h / x_realtime * 1000, her V5 definition)'),
         'idle_burden': dict(idle_burden) if idle_burden else None,
         'policy': ('idle_burden is reported beside every figure above and never '
                    'subtracted — additivity under load is unmeasured (Ticket 4)'),
@@ -1418,6 +1454,10 @@ async def amain() -> int:
                     metavar='PROBE_RUN_ID',
                     help='arm strict cross-arm detection agreement; the id names the probe '
                          'run whose ES2002a comparison confirmed — absent = gate NOT RUN')
+    ap.add_argument('--usd-per-hour', type=bounded_float('usd-per-hour', 0.0001, 1000.0),
+                    default=1.428,
+                    help='instance on-demand $/hour for the cost metric (default 1.428, '
+                         'c7i.8xlarge us-east-1 — the same basis Leela uses)')
     ap.add_argument('--image-lineage', default=None,
                     help='Crossroad 33: how the active arm\'s image was produced, recorded '
                          'VERBATIM in provenance beside the measured image id — e.g. the '
@@ -1776,8 +1816,12 @@ async def amain() -> int:
         },
         # Ticket 4 (2026-08-21): the efficiency family carries the measured
         # idle burden with instances live — beside, never subtracted.
-        'efficiency': efficiency_block(service_cpu_s, leg_wall, ok_frames, ok_video_s,
-                                       len(ok_records), pf.get('idle_burden'), ncpu),
+        'efficiency': efficiency_block(
+            service_cpu_s, leg_wall, ok_frames, ok_video_s, len(ok_records),
+            pf.get('idle_burden'), ncpu,
+            n_detections=total_detections(ok_records),
+            n_chunks=sum(r.get('n_chunks') or 0 for r in ok_records) or None,
+            usd_per_hour=args.usd_per_hour),
         # A leg with no per-role sampling is DEGRADED, not merely quiet: every
         # memory/CPU-by-role figure is ABSENT, and a null summary beside nine
         # passing gates is the silent degradation this campaign has spent two

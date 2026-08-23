@@ -33,6 +33,12 @@
   "cpu_s_per_footage_min": 47.075,
   "cpu_s_per_frame": 11.8,
   "cpu_s_per_video": 1352.3,
+  "cpu_s_per_detection": null,
+  "cpu_s_per_chunk": null,
+  "n_detections": null,
+  "n_chunks": null,
+  "usd_per_1k_footage_hours": 43.09,
+  "usd_per_hour_basis": "1.428 (instance on-demand $/h; cost = $/h / x_realtime * 1000, her V5 definition)",
   "idle_burden": {
    "instances": 4,
    "instance_kind": "rr_tokens",
@@ -267,9 +273,9 @@
   }
  },
  "provenance_leela": {
-  "run_id": "20260822T114252Z-95701",
-  "timestamp_utc": "2026-08-22T11:42:52Z",
-  "git_commit": "67cf399c3418e8bf3dba5b49ffad84e8d17cdd74-dirty",
+  "run_id": "20260823T074631Z-23899",
+  "timestamp_utc": "2026-08-23T07:46:31Z",
+  "git_commit": "107fbf274c09b35a289811514fbe5651aca76c42-dirty",
   "image_digest": null,
   "framework_version": null,
   "instance_type": null,

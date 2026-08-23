@@ -68,6 +68,13 @@ in the box-command block before the number is set.
   would have pegged utilisation near 1.0, not 0.219. The read-back still runs —
   it converts a strong inference into proof for 2 minutes of box time.
 
+**[SUPERSEDED 2026-08-23 — the LI variance floor is NOT 1.3%. The completed
+campaign measured pass-1 vs pass-2 on the LI arm at 5.4% on span and 21% on the
+steady window (8.491 vs 7.025 frames/s); RR passes agree to 0.3-2.3%. USE:
+a cross-arm difference under ~5% on the LI arm is not distinguishable from
+repetition noise on this evidence, and the steady window on that arm is far
+noisier than the span. The two probe reps below remain a real datum; they were
+never a variance FLOOR for a full leg.]**
 **RESOLVED 2026-08-22 — TWO REPS, NOT A SLIP.** The enumeration found the W=8
 T=1 ppw=4 point in TWO files: `probe_li_workers_T1_ppw4.json` **0.0871** and
 `probe_li_workers_..._w16.json` **0.0882**, both at cpu_util 0.219. These are
@@ -1595,3 +1602,55 @@ Ansh's call.
 And by register entry 12 the RR side gets the SAME treatment or we repeat the
 asymmetry we just audited: spot-check the RR budget line on Closeup1 too
 (~25 min) and re-run only if a point moves.
+
+## ▶ CAMPAIGN COMPLETE (2026-08-23) — the three findings that go to Monday
+
+**1. SPAN vs STEADY WINDOW REVERSES THE WINNER.** Same run, same records:
+  span:          LI 8.952  RR-parity 9.826   -> RR +10%
+  steady window: LI 8.491  RR-parity 7.995   -> LI +6%
+Span absorbs the drain tail; the window measures the saturated interval. Leela
+reports span only (`v_metrics.py:22-42`), so this is a BASIS DIFFERENCE to name
+up front, not a correction to anyone. Three people otherwise compare three
+different quantities and reconcile nothing.
+
+**2. LI REPETITION NOISE IS LARGE.** pass1 vs pass2 on the LI arm: **5.4% on
+span, 21% on the steady window** (8.491 vs 7.025 frames/s). RR passes agree to
+0.3-2.3%. **A cross-arm difference under ~5% on the LI arm is not
+distinguishable from repetition noise on this evidence** — and the steady window
+is the noisier statistic on that arm, which is exactly where a reader would
+reach for precision. This supersedes the 1.3% probe-rep figure recorded earlier.
+
+**3. char_conservation 0.0208 vs tol 0.02 — REAL, EXPLAINED, NOT AN ARTIFACT.**
+Diagnosed from code, ruling out every serialization candidate:
+* `_to_detection` is byte-identical on both arms — same conversions, same key
+  order, same centroid arithmetic (`engine/.../detection.py:69-77` vs
+  `li_video/pipeline.py:70-76`), both serialized by `json.dumps` with defaults.
+* Neither arm skips empty frames (RR `nodes/detect/IInstance.py:76-77`
+  unconditional; LI `pipeline.py:186-193` unconditional).
+* No resize on either side: `resize_for_inference` is a documented NO-OP below
+  the 560 edge and our frames are 352x288, so coordinates are never scaled or
+  mapped back.
+* **The source text is identical in length by construction.** The engine
+  accumulates `self.text += text + '\n'` per frame and splits ONCE in
+  `closing()` (`preprocessor_langchain/IInstance.py:82-88`) = sum + n_frames;
+  our LI arm does `'\n'.join(per_frame_json) + '\n'` = sum + n_frames.
+**What remains is the SPLITTER, and the difference is deliberate.** Both are
+nominally 4000/200 (`li_video/service.py:39-40`; RR falls to LangChain defaults
+per Ticket 3), but RR runs `RecursiveCharacterTextSplitter` and the LI arm runs
+LlamaIndex-native `SentenceSplitter` — approved decision 3, because forcing
+LangChain's splitter onto the LI arm would benchmark our port rather than the
+framework. Two native splitters on byte-identical input produce different chunk
+boundaries: **the 24% chunk excess and the 1.8% char difference are the same
+phenomenon, not two.** The gate is reporting a real, chosen difference.
+**DO NOT widen the tolerance.** State it in the report. Confirm the mechanism in
+one command (chunk-size distributions should be bimodal on RR, packed near 4000
+on LI):
+  cd ~/parity-bench-video && ~/.venv/bin/python -c "
+  import json,glob,statistics as st
+  for f in sorted(glob.glob('working/video/results/mainrun_*/records_*blast*.jsonl')):
+      cs=[c for l in open(f) for c in (json.loads(l).get('chunk_chars') or [])]
+      if cs: print(f\"{f.split('/')[-1]:52s} n={len(cs):5d} mean={st.mean(cs):7.1f} median={st.median(cs):7.1f} min={min(cs):5d} max={max(cs):5d}\")
+  "
+RESIDUAL, stated: gate 3 compares label multisets only, so score/box float reprs
+are not proven equal by it. If the splitter accounts for less than the full
+1.8%, the remainder is float repr and the same command's char totals bound it.
