@@ -1654,3 +1654,66 @@ on LI):
 RESIDUAL, stated: gate 3 compares label multisets only, so score/box float reprs
 are not proven equal by it. If the splitter accounts for less than the full
 1.8%, the remainder is float repr and the same command's char totals bound it.
+
+## ▶ CROSSROAD 38 + gate-3 triage + Phase B sharpening (2026-08-23)
+
+**CROSSROAD 38 — the video band is MEASURED and CENTRED, not widened.**
+`working/video/probe/char_band_from_records.py`. Anchoring at 1.0 was already
+wrong once the splitters differ: the ratio has a SYSTEMATIC offset (~0.982) that
+is a splitter property, not content loss, so a band around 1.0 spends its whole
+width measuring the offset. The band is therefore centred on the MEASURED median
+ratio with a half-width of `margin x worst per-video deviation FROM THAT CENTRE`
+— never a number chosen to make a known result pass. The tool refuses to propose
+a band when fewer than 5 videos pair, and **refuses outright if the resulting
+band could not notice several whole frames going missing** ("the band is wrong").
+It prints the sensitivity it buys in chars, detections and frames, and the
+export must name the calibrating run beside the band. PDF band stays 2%.
+Command (after the campaign's records):
+  cd ~/parity-bench-video && ~/.venv/bin/python working/video/probe/char_band_from_records.py \
+    working/video/results/mainrun_<ts>/records_rocketride_video_parity_blast.jsonl \
+    working/video/results/mainrun_<ts>/records_llamaindex_video_workers_blast.jsonl \
+    --dpf 25.95 --chars-per-det 230.4 --run-id mainrun_<ts>
+On a shape matching the campaign (median 0.982, per-video spread 0.0066) it
+yields a band of ~[0.9766, 0.9872] that still trips on **~0.7 frames** of lost
+content per video — strictly MORE sensitive than the old +/-2% around 1.0, which
+would have needed 2.34% and only caught ~2.9 frames.
+
+**GATE 3 — why the grep found nothing, and the exact extraction.**
+`diverging_frames` is nested at `.cross_detection_agreement.per_video.<video>`
+and `json.dumps(indent=1)` puts the list on the FOLLOWING lines, so a line-based
+grep cannot see it. Also: `.cross_detection_agreement.score_triage_first_failure`
+is ALREADY COMPUTED in the file, for the first failing video only.
+`working/video/probe/gate3_triage.py` answers the real question — score_triage
+compares only frames whose detection COUNTS match, so a flapped frame is excluded
+from its paired deltas and merely counted, which never says WHICH detection or at
+what score. The tool prints, per diverging frame, the label-multiset symmetric
+difference and the scores present on one arm only, with each score's distance to
+the 0.3 threshold. Exercised on a planted 0.301 flap: reported NEAR-THRESHOLD at
+distance 0.001. DIAGNOSTIC ONLY — gate 3 stays FAILED until a human downgrades
+it in writing, and the first hypothesis remains a real difference.
+  cd ~/parity-bench-video && ~/.venv/bin/python working/video/probe/gate3_triage.py \
+    working/video/results/mainrun_<ts>/cross_parity_blast.json \
+    working/video/results/mainrun_<ts>/records_rocketride_video_parity_blast.jsonl \
+    working/video/results/mainrun_<ts>/records_llamaindex_video_workers_blast.jsonl
+
+**DETERMINISM, stronger than the repeat gate produces:** RR default vs parity
+char totals 32,539,271 vs 32,539,839 — **568 chars apart over 10,417 chunks
+(0.0017%) at DIFFERENT thread counts**. That is a cross-configuration
+determinism result the repeat gate cannot produce, and it belongs in the report.
+
+**PHASE B SHARPENING — collapse the 170-video RR-default bracket from the
+campaign's own records:**
+  cd ~/parity-bench-video && ~/.venv/bin/python -c "
+  import json, glob
+  for f in sorted(glob.glob('working/video/results/mainrun_*/records_rocketride_video_default_blast*.jsonl')):
+      fr = w = 0
+      for l in open(f):
+          r = json.loads(l)
+          if 'error' in r: continue
+          fr += r.get('frames_observed') or 0; w += r.get('wall_s') or 0
+      if w: print(f\"{f.split('/')[-1]:56s} frames={fr:6d} sum_wall={w:8.1f}s -> {fr/w:5.2f} f/s\")
+  "
+Then: **170-video default blast wall = 23,691 / (that f/s) seconds per pass**,
+x2 passes. The bracket was 2.31-4.83 f/s = 164-342 min for two passes; this
+replaces it with one number. NOTE the sum-of-wall form measures SERVICE rate at
+the leg's concurrency, which is what the next leg will reproduce.
