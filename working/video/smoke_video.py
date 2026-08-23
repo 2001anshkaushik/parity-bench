@@ -255,14 +255,30 @@ async def _send_video(video: Path, port: int) -> dict:
     return drv.record_from_rr(result)
 
 
-def check_golden(golden_path: Path, video: Path, port: int, write: bool) -> dict:
+def check_golden(golden_path: Path, video: Path, port: int, write: bool,
+                 rr_container: str) -> dict:
     say(f'\nB. golden record — {video.name} through the measured pipe '
         f'({"WRITE mode" if write else "compare"})')
     rec = asyncio.run(_send_video(video, port))
+    # WRITTEN_UNDER (2026-08-22, added before the golden was first created).
+    # The golden pins the measured pipe's ENTIRE output for one video. Without
+    # recording the conditions it was taken under, a future mismatch cannot
+    # distinguish "different image" from "real regression" — the exact
+    # ambiguity this campaign has spent the week deleting. The comparison below
+    # still reads only video_sha16 + chunk_sha256, so this is additive.
+    written_under = {
+        'image_id': drv.docker_inspect(rr_container, '{{.Image}}'),
+        'image_tag': drv.docker_inspect(rr_container, '{{.Config.Image}}'),
+        'declared_thread_env': drv.container_declared_threads(rr_container),
+        'note': ('a golden is bound to the image AND the thread configuration: intra-op '
+                 'thread count changes BLAS reduction order, which can flip a borderline '
+                 'detection, which changes chunk text and therefore chunk hashes'),
+    }
     fresh = {'video': video.name,
              'video_sha16': hashlib.sha256(video.read_bytes()).hexdigest()[:16],
              'n_chunks': rec['n_chunks'], 'chunk_sha256': rec['chunk_sha256'],
-             'frames_observed': rec['frames_observed']}
+             'frames_observed': rec['frames_observed'],
+             'written_under': written_under}
     if write:
         golden_path.write_text(json.dumps(fresh, indent=1))
         say(f'  golden WRITTEN: {golden_path} ({fresh["n_chunks"]} chunks, '
@@ -276,7 +292,18 @@ def check_golden(golden_path: Path, video: Path, port: int, write: bool) -> dict
         fail('golden was recorded from a DIFFERENT video file (sha mismatch)')
     d = gs.determinism_repeat(gold.get('chunk_sha256') or [], fresh['chunk_sha256'])
     if d['PASS'] is not True:
-        fail(f'golden mismatch: {json.dumps({k: v for k, v in d.items() if k != "PASS"})}')
+        # Name the conditions that moved, so a mismatch is a diagnosis and not a
+        # question. An absent 'written_under' means a pre-2026-08-22 golden.
+        was = gold.get('written_under') or {}
+        drift = {k: {'golden': was.get(k), 'now': written_under.get(k)}
+                 for k in ('image_id', 'declared_thread_env')
+                 if was.get(k) != written_under.get(k)}
+        fail(f'golden mismatch: {json.dumps({k: v for k, v in d.items() if k != "PASS"})}'
+             + (f' — CONDITIONS DIFFER from when the golden was written: '
+                f'{json.dumps(drift)}; re-write the golden if this change was intended, '
+                f'investigate as a regression if it was not'
+                if drift else ' — image and declared thread env are UNCHANGED since the '
+                'golden was written, so this is a REGRESSION, not a configuration drift'))
     else:
         say(f'  PASS  {fresh["n_chunks"]} chunks identical to golden')
     return {'golden': str(golden_path), 'determinism': d}
@@ -457,7 +484,7 @@ def main() -> int:
         say(f'\n(golden video: shortest measured item {shortest["file"]} '
             f'{shortest.get("video_s")}s)')
     out['golden'] = check_golden(Path(args.golden), Path(golden_video),
-                                 args.rr_port, args.write_golden)
+                                 args.rr_port, args.write_golden, args.rr_container)
     out['readbacks'] = check_readbacks(args)
     out['thread_pins'] = asyncio.run(check_pins(args))
 

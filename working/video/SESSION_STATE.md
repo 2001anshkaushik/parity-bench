@@ -1442,3 +1442,55 @@ run_plan. Register entries 6, 7, 8, 9 in; Ticket 5 drafted beside 3 and 4.
     WRONG (83 ≠ 84 on ES2002a) and deliberately has no corrected
     replacement. A manifest lacking the column must be re-cut before any
     leg; the driver refuses it loudly.
+
+## ▶ SETUP STEPS THE DRY PASS SKIPPED (2026-08-22) — both one-time, both blocking
+
+The campaign stopped at the smoke in 40.8 s, two failures, no legs run. Both are
+setup artifacts that have never been created, and the dry pass structurally
+could not have caught either: it passes `--skip-fixture` and writes a THROWAWAY
+golden to `mainrun_<ts>/dry_golden.json`.
+
+**1. THE PDF FIXTURE — the documents are NOT gone.** All five content-pinned
+files are in the laptop corpus (`corpus/` is gitignored — provisioned per box,
+never from git, which is why the box lacks them):
+  d2a4eb9c41a0fabd  000_000159.pdf  expect 164 chunks   4,051,537 B
+  2d6b5053716f4037  000_000595.pdf  expect 276          4,090,732 B
+  bc44bd5e4103696b  000_000674.pdf  expect 1872         2,285,075 B
+  f51fc895ceac979f  000_000762.pdf  expect 132          2,393,778 B
+  f1c250fa02fa8e74  000_000887.pdf  expect 344          1,307,071 B
+  total 14,128,193 B (13.5 MB). Expected counts: scripts/smoke_phase2.py:65.
+FIRST check the box for the whole corpus (`ls ~/parity-bench/corpus/govdocs1/pdfs
+| wc -l`); if present elsewhere, pass `--pdf-corpus <dir>` and copy nothing.
+WITHOUT the fixture, section A proves ONLY that the label reads "1" — and
+labels INHERIT through a derived build, so today's `rr:patched-video` carries a
+label set two builds ago with nothing re-verifying the patch. The campaign's
+video legs do carry `self_duplication_any` + `duplication_trigger` (a real
+measured detector on the real workload), but they fire DURING a leg, have no
+expected-count anchor, and NOT RUN is not a pass. `--skip-fixture` on a real
+run is refused (operator, 2026-08-22).
+
+**2. THE GOLDEN — sequencing matters more than the command.** It pins the
+measured pipe's ENTIRE output for one video: `video_sha16`, `n_chunks`,
+`frames_observed`, and the ORDERED `chunk_sha256` list, compared by exact
+equality. Video: auto-selected as the SHORTEST measured manifest row
+(smoke_video.py:451-456), so the smoke stays fast.
+INVALIDATED BY: a different video file (sha16-checked, named explicitly);
+anything altering the measured pipe's output — engine bytes on the
+frames/detect/chunk path, model weights, the pipe file, ffmpeg/torch/rfdetr
+versions; and PLAUSIBLY the thread configuration, since intra-op thread count
+changes BLAS reduction order, which can flip a borderline detection, which
+changes chunk text and therefore hashes.
+NOT invalidated by today's derived layer: it replaced only
+`working/nodes/env_probe/`, which is absent from the measured pipe, and every
+layer beneath is byte-identical (RootFS-prefix proven). **A golden written now
+is valid for this campaign.** PATH B (the full rebuild) WOULD invalidate it —
+re-write it after any re-baseline.
+SEQUENCING RULE: write it under the SAME container state the smoke will later
+compare it under. run_plan's step 1 does `start_rr unset`, so the golden must be
+written against an rr container started with NO thread env (torch 16, the
+default posture). A golden written against a T=2 parity container is a latent
+mismatch.
+HARDENED before first write (2026-08-22): the golden now records
+`written_under` = image_id, image_tag, declared_thread_env — so a future
+mismatch reports whether the CONDITIONS moved (re-write) or did not (a genuine
+REGRESSION), instead of leaving that ambiguous.
