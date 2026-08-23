@@ -125,6 +125,47 @@ G4_RC=${PIPESTATUS[0]}
 # re-stage silently compared stale Corner artifacts (2026-08-23). Both files are
 # now named from the matrix point AND asserted to carry this run's video sha.
 LAST_T="$(echo $MATRIX | awk '{print $NF}')"
+
+# GATE 4, POST-MATRIX COMPARE — the step the early run's "deferred" branch
+# promised and that did not exist (2026-08-23). The early identity step runs
+# BEFORE any floor for this video exists, so it can only save the engine's
+# hashes; gate 4 is finished HERE, from that file plus today's matching floor,
+# with no resend. Both sides must carry this run's video sha or it refuses.
+echo "== GATE-4 POST-MATRIX COMPARE: engine vs LI floor, both on $(basename "$VIDEO") ==" | tee -a "$LOG"
+"$PY" - "$VIDEO" "$LAST_T" <<'EOF4' | tee -a "$LOG"
+import hashlib, json, sys
+from pathlib import Path
+video, last_t = Path(sys.argv[1]), sys.argv[2]
+want = hashlib.sha256(video.read_bytes()).hexdigest()[:16]
+early_p, floor_p = 'probe_frame_identity_early.json', f'probe_li_floor_t{last_t}.json'
+for pth in (early_p, floor_p):
+    if not Path(pth).exists():
+        print(f'gate-4 compare: {pth} missing — gate 4 stays NOT RUN'); sys.exit(1)
+early, floor = json.load(open(early_p)), json.load(open(floor_p))
+for name, doc in (('engine/early', early), ('li_floor', floor)):
+    got = doc.get('video_sha16')
+    if got != want:
+        print(f'gate-4 compare: {name} carries video_sha16 {got!r}, this run is {want} '
+              f'({video.name}) — STALE COMPARATOR, refusing to decide gate 4'); sys.exit(1)
+a = early.get('engine_frame_png_sha16') or []
+b = floor.get('frame_png_sha16') or []
+if not a or not b:
+    print('gate-4 compare: absent hashes on one side — absence fails first'); sys.exit(1)
+if len(a) != len(b):
+    print(f'gate-4 compare: FRAME COUNT DIFFERS engine={len(a)} li={len(b)} — real-difference '
+          'hypothesis first (decode path / ffmpeg build), never tolerance'); sys.exit(1)
+bad = [i for i, (x, y) in enumerate(zip(a, b)) if x != y]
+out = {'gate4_decode_identity': {'PASS': not bad, 'n_engine': len(a), 'n_li': len(b),
+       'mismatched_frames': bad[:20] or None, 'video': video.name, 'video_sha16': want,
+       'floor_json': floor_p, 'compared_without_resend': True}}
+json.dump(out, open('probe_frame_identity_final.json', 'w'), indent=1)
+print(f'gate-4 compare: {"PASS" if not bad else "FAIL"} — {len(a)} frames byte-identical'
+      if not bad else f'gate-4 compare: FAIL on {len(bad)} of {len(a)} frames {bad[:10]}')
+sys.exit(0 if not bad else 1)
+EOF4
+GATE4_RC=${PIPESTATUS[0]}
+[ "$GATE4_RC" = "0" ] || echo "gate 4 NOT CONFIRMED (rc=$GATE4_RC) — read probe_frame_identity_final.json before arming anything" | tee -a "$LOG"
+
 echo "== GATE-3 STAGED CONFIRMATION: cross-arm label multisets on $(basename "$VIDEO") (t=$LAST_T) ==" | tee -a "$LOG"
 "$PY" - "$VIDEO" "$LAST_T" <<'EOF3' | tee -a "$LOG"
 import hashlib, json, sys

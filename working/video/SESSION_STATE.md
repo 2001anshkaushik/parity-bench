@@ -1860,3 +1860,55 @@ Read back BOTH lines before using the id:
   `gate-3 staging: both arms confirmed on ES2009a.avi (sha16 …, t=2)`
   then `EXACT agreement on N frames` with **N ≈ 93** (not 83 — 83 is Corner).
 The run id is the log stem `probe_YYYYMMDD_HHMMSS` printed at the top.
+
+## ▶ GATE 4 FAILED ON A STALE COMPARATOR (2026-08-23) — three defects, all fixed
+
+Your root cause is exactly right, and there was a third defect underneath it.
+
+1. **`probe_frame_identity.py:71` used the SAME lexicographic glob** —
+   `sorted(glob('probe_li_floor_t*.json'))[-1]` returns **t8**, so it loaded a
+   two-day-old Corner floor (83 frames of ES2002a) and compared it against 93
+   fresh ES2009a engine hashes. It reported a gate-4 FAILURE for a decode that
+   was correct.
+2. **It never checked WHICH VIDEO produced the floor it loaded.** Nothing could
+   have caught this: `probe_li_floor.py` recorded no `video` field at all until
+   today's fix, so the comparator had nothing to assert against.
+3. **The post-matrix compare step the deferred branch PROMISES did not exist.**
+   `probe_frame_identity` is invoked exactly once (`probe_run.sh:65`), before the
+   matrix; its `deferred` reason says "the post-matrix compare step finishes gate
+   4 from this file without a resend" — there was no such step, so a deferred
+   gate 4 could never complete.
+
+**FIXED:**
+* The identity step now selects a floor **by video identity, not by sort order**:
+  only a floor whose recorded `video_sha16` equals THIS video's is usable. Others
+  are NAMED and rejected (`floor_rejected` in the report, incl. `ABSENT
+  (pre-2026-08-23 floor)` for files with no video field). With `--no-floor-ok` it
+  DEFERS instead of comparing — which is what the flag always claimed to mean.
+  Without it, it refuses with the named mismatch.
+* **The post-matrix gate-4 compare now exists** (`probe_run.sh`, before the
+  gate-3 block): it finishes gate 4 from the early file's saved engine hashes
+  plus today's matching floor, **without a resend**, and refuses if either side
+  carries a different video sha. Writes `probe_frame_identity_final.json`.
+* Ordering concern answered by the defer, so the early step still runs first and
+  can still catch a decode problem before the matrix is spent.
+
+Behaviourally verified: stale Corner floor → REFUSED rc=1 with the two shas
+named; today's matching floor → PASS on 93 frames, no resend; selection picks
+the matching floor where the lexicographic last would have picked t8.
+
+**B7 RE-RUN (floor venv). This is the invocation that produces a usable id:**
+  cd ~/parity-bench-video/working/video/probe && \
+    VIDEO=~/parity-bench-video/corpus/ami/video/ES2009a.avi PROBE_MATRIX=2 ./probe_run.sh
+**Four lines to read back before the id is used:**
+  1. `GATE-4 POST-MATRIX COMPARE: engine vs LI floor, both on ES2009a.avi`
+  2. `gate-4 compare: PASS — 93 frames byte-identical`
+  3. `GATE-3 STAGED CONFIRMATION: ... on ES2009a.avi (t=2)`
+  4. `gate-3 staging: both arms confirmed on ES2009a.avi (sha16 …, t=2)`
+     then `EXACT agreement on N frames`, **N = 93**.
+Any line naming ES2002a or 83 frames means a stale artifact was reached again —
+do not arm. The id is the log stem `probe_YYYYMMDD_HHMMSS`.
+NOTE: the existing `probe_li_floor_t2.json` (today, 11:08, wrong video) and
+`t8` (Corner) both predate the `video_sha16` field, so both are now REJECTED by
+name rather than silently used; `preserve()` moves the t2 file aside before the
+re-run writes its own.

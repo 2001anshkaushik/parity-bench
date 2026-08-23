@@ -68,12 +68,39 @@ async def main() -> int:
     ap.add_argument('--out', default=str(Path(__file__).parent / 'probe_frame_identity_out.json'))
     args = ap.parse_args()
 
-    floor_path = args.floor_json or (sorted(glob.glob(str(Path(__file__).parent / 'probe_li_floor_t*.json'))) or [None])[-1]
+    # A COMPARATOR MUST PROVE ITS COMPARATOR (2026-08-23). This used to take
+    # `sorted(glob(...))[-1]` — lexicographic, so t8 beats t32/t2/t1 — and load
+    # it with no check of WHICH VIDEO produced it. On a fresh video the identity
+    # step runs BEFORE any matching floor exists, so it reached for a two-day-old
+    # Corner file and reported 93 engine frames against 83 floor frames as a gate
+    # FAILURE. That is a comparator that can fail (or pass) for the wrong reason.
+    # Now: only a floor whose recorded video_sha16 EQUALS this video's is usable;
+    # everything else is named and rejected, and gate 4 defers rather than
+    # comparing against whatever is lying around.
+    want_sha = hashlib.sha256(Path(args.video).read_bytes()).hexdigest()[:16]
+    candidates = ([args.floor_json] if args.floor_json
+                  else sorted(glob.glob(str(Path(__file__).parent / 'probe_li_floor_t*.json'))))
+    floor_path, floor, rejected = None, {}, []
+    for cand in candidates:
+        if not cand or not Path(cand).exists():
+            continue
+        try:
+            doc = json.load(open(cand))
+        except Exception:                       # noqa: BLE001 — unreadable is rejected, named
+            rejected.append({'file': Path(cand).name, 'video_sha16': 'UNREADABLE'})
+            continue
+        got = doc.get('video_sha16')
+        if got == want_sha:
+            floor_path, floor = cand, doc
+            break
+        rejected.append({'file': Path(cand).name,
+                         'video_sha16': got if got is not None else 'ABSENT (pre-2026-08-23 floor)'})
     if not floor_path and not args.no_floor_ok:
-        print('NOT DONE — no LI floor json (run the matrix first, or pass --no-floor-ok '
+        print(f'NOT DONE — no LI floor json produced from THIS video '
+              f'(sha16 {want_sha} = {Path(args.video).name}). Rejected: {rejected}. '
+              'Run the matrix on this video first, or pass --no-floor-ok '
               'for the early load-proof)')
         return 1
-    floor = json.load(open(floor_path)) if floor_path else {}
     li_hashes = floor.get('frame_png_sha16') or []
 
     # Measured surface (Phase 1 + installed-wheel paste, 2026-08-21).
@@ -131,8 +158,11 @@ async def main() -> int:
 
     if not li_hashes:
         gate4 = {'PASS': None, 'deferred': True,
-                 'reason': 'no floor hashes yet — engine hashes saved; the post-matrix '
-                           'compare step finishes gate 4 from this file without a resend'}
+                 'rejected_floors': rejected or None,
+                 'video_sha16': want_sha,
+                 'reason': ('no floor json from THIS video yet — engine hashes saved; the '
+                            'post-matrix compare step finishes gate 4 from this file '
+                            'without a resend. Floors from other videos are NEVER used')}
         match, mismatches = None, []
     else:
         match = engine_hashes == li_hashes
@@ -142,7 +172,8 @@ async def main() -> int:
                  'first_mismatches': mismatches[:5] or None}
     report = {
         'video': args.video, 'wall_s': round(wall, 1),
-        'floor_json': floor_path, 'null_flip': args.null_flip,
+        'floor_json': floor_path, 'floor_rejected': rejected or None,
+        'video_sha16': want_sha, 'null_flip': args.null_flip,
         'gate2c_index_completeness': {'PASS': bool(idx_ok), 'n': len(indices),
                                       'gaps': gaps or None, 'duplicates': dupes or None,
                                       'first': indices[0] if indices else None},
