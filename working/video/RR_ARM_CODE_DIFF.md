@@ -190,3 +190,64 @@ is 60 measured + 2 warm, not 124 + 16; WARM_N=2 is compatible with our coverage
 gate only because Crossroad 32 allows warm rows to be RE-SENT; DEFAULT_N at 60
 does not trigger Crossroad 27's subset rule; and her duration spread is 1.57x
 against our 6.2x, which makes videos/hour meaningful again on her set.
+
+---
+
+## 7. What each harness MEASURES and how it decides a run is valid (from code, 2026-08-22)
+
+Same source pin (`aa817d9a`). Configuration alignment is §1; this is the other
+half — two harnesses can run the identical arm and still publish different
+numbers. **No verdicts:** where a metric of ours has no counterpart in hers,
+that is a difference, not a deficiency.
+
+### 7a. Metrics
+
+| quantity | OURS | LEELA (file:line) | same run, same number? |
+|---|---|---|---|
+| throughput basis | frames/s primary over the leg wall, **plus a steady window** [first in-flight==C, last in-flight>=C] with `window_n` structurally required | `x_realtime = audio_s / span`, `videos_per_s`, `chunks_per_s`, `frames_per_s`, all over the TOTAL span (`v_metrics.py:22-42`) | **NO — different headline.** Hers includes ramp-up and drain tail; ours reports both total-span and saturated-window rates. On a 60-video blast with a long tail these diverge materially |
+| realtime factor source | `video_s_manifest` per row | `meta["measured_audio_s"]` or the sum of per-record durations (`:25`) | equal on muxed files; on video-only files hers falls back to the record sum |
+| latency basis | wall-s per **video-MINUTE**, raw `wall_s` kept beside it | raw `service_latency_s` seconds per video (`:46-59`) | **NO — different units.** Not comparable without dividing by duration |
+| percentiles | p50 / max / n only below n=50; **no p95** | nearest-rank p50 **and p95**, no interpolation (`_pct`, `:12-20`) | same rule above n=50; **differs at n=28** (her Run A reports p95 where we would not) |
+| blast-mode latency | no per-video service latency in blast (batch position includes queue wait) | same — batch span exact, `completion_curve_s` p50/p90/last instead (`:69-81`) | **SAME discipline** |
+| CPU source | container cgroup `cpu.stat usage_usec` bracketed around the leg / leg wall | container cgroup `cpu_usage_usec` delta over the sampler window / dt (`cpu_from_sampler`, `:87-101`); sampler every 15 s (`run/native60.sh:42`) | **SAME quantity, same source.** Ours brackets the leg; hers spans the sampler window |
+| utilisation denominator | `box_cpus` (32), flagged and never clamped if impossible | `DEFAULT_ALLOCATED_CORES = 32`, "against the ARM'S ALLOCATION, span-averaged" (`:9,132`) | **SAME while no cpuset is set** |
+| idle burden | `efficiency.idle_burden` beside every CPU figure (Ticket 4: ~1.0 core + ~0.26/token) | no counterpart | **difference** — her CPU figures include the idle spin without separating it |
+| memory basis | per-arm AND per-instance; anon recorded | `peak_mem_bytes` = cgroup `memory.current` max, **"includes page cache"** (`:140-141`); `peak_rss_bytes_anon` only when the sampler has a 5th column (`:107-109`) | **NO — biggest divergence.** Her published 23.7 GB vs a cache-corrected ~4.1 GB for the same run |
+| cost | not computed | `usd_per_1k_footage_hours` at $1.428/h (`:159-162`, `DEFAULT_USD_PER_HOUR`) | ours absent |
+| per-unit CPU | per footage-min, per frame, per video | also `cpu_s_per_detection`, `cpu_s_per_chunk` (`:126-127`) | hers is a superset here |
+
+**Ours with no counterpart in hers** (stated as differences): steady window +
+`window_n`; serving census as a fail-closed gate (declared==measured instances);
+quiet-box foreign excess; the Ticket-4 idle burden; a null control required on
+every detector; dual-posture RR reporting; per-worker / per-token in-process
+thread read-back.
+
+### 7b. Gates
+
+| gate | hers, what it asserts (`bench/metrics/v0_gates.py`) | ours |
+|---|---|---|
+| `census` | every manifest doc produced a record (`:27`) | same (fail-closed) |
+| `structure` | `vector_dim == 384`, norms within `NORM_TOL = 1e-3` (`:12-13,60-65`) | same tolerance |
+| **`frame_law`** | **`frames == floor(duration/15)+1`, tolerance ±1** (`:74-86`) | **DELETED (Crossroad 23)** — expectation MEASURED per row through the arms' own ffmpeg, exact, no ±1 |
+| `self_duplication` | whole-list doubling absent (`:105`) | same, plus tri-state indeterminate on uniform content |
+| `determinism` | rep-to-rep chunk-hash identity (`:117`) | same; ours fails closed at single-rep |
+| `cross_arm` | per-video cross-arm agreement (`:143`) | ours is strict zero-tolerance per-frame label multisets, armed by a staged run id |
+| `input_identity` | both arms ate identical bytes (`:195`) | same |
+| `corpus_pin` | records match the manifest pin (`:205`) | same |
+| `chunk_parity_tight` | \|Δchunks\| ≤ 1 per doc AND totals within 5% (`:222-232`) | ours: char conservation ±2%, chunk ratio reported not gated |
+| `detection_ratio` | WARN band 0.90–1.10 (`:18`) | ours: strict cross-arm agreement instead |
+| `chunk_ratio` | WARN band 0.8–1.25 (`:20`) | ours: reported, not gated |
+| **failure semantics** | any FAIL → "GATES FAILED — numbers below are diagnostic only, not quotable", `sys.exit(1)`; SKIP/WARN surfaced, not fatal (`report.py:71-73,142-149`) | **SAME philosophy.** Ours adds NOT RUN as a first-class verdict distinct from PASS/FAIL |
+
+### 7c. The three that would make the same run report different numbers
+
+1. **Memory** — `memory.current` (incl. page cache) vs anon. Same run: ~23.7 GB
+   vs ~4.1 GB. Any three-way memory table must state which basis it uses.
+2. **Throughput** — total span vs steady window. Hers absorbs ramp-up and the
+   drain tail she herself flags; ours separates them and requires `window_n`.
+3. **`frame_law`** — her ±1 formula passes a video where ffmpeg emits 83 against
+   a predicted 84; our measured column would record 83 as the expectation and
+   flag any deviation. Same video, same arm, different verdict.
+
+Latency is a fourth, but it is a unit conversion (per-video vs per-video-minute)
+rather than a disagreement.
