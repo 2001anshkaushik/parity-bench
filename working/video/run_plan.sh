@@ -240,7 +240,30 @@ if [ -n "$LIVENESS_MIN" ]; then
 else
   echo "gate 5 (detection_liveness): LIVENESS_MIN not supplied — NOT RUN on every leg (dry pass only)" | tee -a "$LOG"
 fi
-MEASURED_N=$((60 - WARM_N))
+# MEASURED_N COMES FROM THE MANIFEST, not from a corpus-size constant. It was
+# hardcoded 60 - WARM_N — the ES-only Corner corpus — and would be silently
+# wrong for any other set (Crossroad 34 moves us to Closeup1 across ES+IS+TS,
+# ~140 meetings). The manifest is the source of truth for what will be sent.
+manifest_count() {   # $1 = role
+  "$PY" -c "
+import json, sys
+try:
+    rows = [json.loads(l) for l in open('working/video/ami_video_manifest.jsonl') if l.strip()]
+except Exception:
+    print(0); sys.exit(0)
+print(sum(1 for r in rows if '_meta' not in r and r.get('role') == sys.argv[1]))
+" "$1" 2>/dev/null || echo 0
+}
+MEASURED_N=$(manifest_count measured)
+MANIFEST_WARM=$(manifest_count warm)
+require_pos_int MEASURED_N "$MEASURED_N"
+if [ "$WARM_N" != "$MANIFEST_WARM" ]; then
+  echo "NOT DONE — WARM_N=$WARM_N but the manifest carries $MANIFEST_WARM warm rows."
+  echo "The manifest decides what exists; WARM_N must match the cut or the warm-up"
+  echo "draws from a set that is not the one on disk."
+  exit 1
+fi
+echo "corpus from manifest: $MEASURED_N measured + $MANIFEST_WARM warm" | tee -a "$LOG"
 [ "$DEFAULT_N" -le "$MEASURED_N" ] || {
   echo "NOT DONE — DEFAULT_N=$DEFAULT_N > MEASURED_N=$MEASURED_N (Crossroad 27: the default"
   echo "posture runs a subset of the measured set, never more than it)"; exit 1; }

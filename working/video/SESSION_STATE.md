@@ -1551,3 +1551,47 @@ vision bake needed, since the fixture uses the PDF pipe. Deferred to the PATH B
 re-baseline, because the exact 2x relation against pre-patch measured counts
 already discriminates "patch works" from "fixture broken": a broken fixture
 would give arbitrary counts, not exactly half of five recorded stock values.
+
+## ▶ CROSSROAD 34 (2026-08-22): ADOPT LEELA'S CORPUS — Closeup1, full scenario set
+
+**Interference ruling for a fetch DURING a measured campaign — PARTLY confirmed,
+binding constraint is different.** CPU reasoning holds: the quiet-box gate reads
+`/proc/stat` busy = total − (idle **+ iowait**), so a network-blocked download is
+invisible to it, and curl/TLS is a fraction of a core. **But the driver evicts
+the corpus page cache before EVERY leg** (`drop_cache_fadvise`, fail-closed), so
+each leg re-reads ~13 GB from EBS — a concurrent multi-GB write competes for the
+same volume throughput, inflating read latency INSIDE the measured span, where
+no CPU-based gate can see it. And the fetch's CPU phases (sha256 ≈1 core, ffmpeg
+mux, and the 12 s/video frame decode ≈28 min of a core at 140 videos) WOULD
+register as foreign load and can trip the next leg's preflight.
+**SPLIT: Phase A (network only, rate-capped) is safe now; Phase B (verify, mux,
+decode, manifest, probes) waits for the campaign to finish.**
+
+**Prefer her STAGED files over re-fetching+re-muxing.** Her raw Closeup1 AVI is
+video-only; `fetch_ami.sh:4-11` stream-copy muxes `Mix-Headset.wav` in. If we
+re-mux ourselves the bytes may not match hers — different shas, different
+manifest, and the alignment we are buying is exactly identical bytes across all
+three arms. Pull her staged corpus; our manifest then sha-pins HER bytes.
+
+**Code landed for the swap:** `fetch_ami_video.py --view Closeup1` (the view rule
+is no longer hardcoded; Closeup1 is the only view in ES **and** IS **and** TS, so
+it is the one that reaches the full set) and `--staged` (files named
+`<meeting>.avi`, already muxed, **never downloaded** — an absent staged file is
+a skip, never a silently-substituted raw camera file). `run_plan.sh` no longer
+computes `MEASURED_N=$((60 - WARM_N))`: both counts now come from the manifest,
+and WARM_N must match the manifest's warm rows or the run refuses.
+
+**The nine numbers at ~140 (124 measured + 16 warm):** M_TOKENS=16 ·
+RR_THREADS_ENV=2 · LI_WORKERS=8 · LI_THREADS_ENV=4 · WARM_N=16 · BLAST_C=16 ·
+PASSES=2 · DEFAULT_N **and** LIVENESS_MIN + GATE3_RUN_ID re-derived. BLAST_C
+stays 16 (124/16 = 7.75 waves, ample window depth). **DEFAULT_N: the LETTER of
+Crossroad 27 says the full 124 (the subset rule triggers above ~1000 videos),
+but its REASON argues for 44** — the default posture is ~3.5x slower than parity,
+so 124 costs ~75 min/pass against parity's ~20, i.e. ~1.7 h extra for a finding
+that is a RATIO. Recommend DEFAULT_N=44 (directly comparable to tonight's).
+Ansh's call.
+
+**LI ARM IS OURS ALONE — its budget line re-runs on Closeup1, not carried.**
+And by register entry 12 the RR side gets the SAME treatment or we repeat the
+asymmetry we just audited: spot-check the RR budget line on Closeup1 too
+(~25 min) and re-run only if a point moves.

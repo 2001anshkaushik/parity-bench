@@ -47,7 +47,17 @@ MANIFEST = ROOT / 'working' / 'video' / 'ami_video_manifest.jsonl'
 CORPUS = ROOT / 'corpus' / 'ami' / 'video'
 MIRROR = 'https://groups.inf.ed.ac.uk/ami/AMICorpusMirror/amicorpus'
 
+STAGED_NAMES = False   # --staged: files are '<meeting>.avi', pre-muxed, never fetched
 VIEW_PREFERENCE = ['Corner', 'Overhead']  # selection rule; fallback recorded per row
+# Crossroad 34 (2026-08-22): the corpus moves to Closeup1. Corner exists only in
+# the ES rooms — IS names its room views C/L/R and TS names them Overview1/2 —
+# so a Corner rule caps at ~60 meetings, which is why Crossroad 15 stayed
+# ES-only. Closeup1 exists in ALL THREE instrumented room types, so it is the
+# view that reaches the full scenario set. --view overrides the rule; --staged
+# accepts files already muxed and named "<meeting>.avi" (the shape a staged
+# corpus arrives in) and NEVER downloads: an absent file is a hard failure,
+# because silently fetching a raw camera file in place of a staged one would
+# put different bytes on our arm than on theirs.
 N_MEASURED = 48
 N_WARM = 16
 
@@ -198,14 +208,19 @@ def build_mode(n_measured: int, n_warm: int,
         if len(rows) >= need:
             break
         picked = None
-        for view in VIEW_PREFERENCE:
-            fname = f'{mid}.{view}.avi'
-            url = f'{MIRROR}/{mid}/video/{fname}'
+        # STAGED (Crossroad 34): the file is "<meeting>.avi", already muxed by
+        # whoever staged it, and we NEVER fetch a substitute — identical bytes
+        # across all three arms is the whole point of adopting one corpus.
+        for view in (['staged'] if STAGED_NAMES else VIEW_PREFERENCE):
+            fname = f'{mid}.avi' if STAGED_NAMES else f'{mid}.{view}.avi'
+            url = '' if STAGED_NAMES else f'{MIRROR}/{mid}/video/{fname}'
             dest = CORPUS / fname
             if dest.exists():
                 reused += 1
                 picked = (view, fname, url, dest)
                 break
+            if STAGED_NAMES:
+                continue          # absent staged file -> recorded as a skip, never fetched
             if fetch_url(url, dest):
                 fetched += 1
                 picked = (view, fname, url, dest)
@@ -340,6 +355,14 @@ def main() -> int:
     ap.add_argument('--n-warm', type=positive_int('n-warm', 500), default=N_WARM)
     ap.add_argument('--manifest', default=None, help='override manifest path (wiring tests)')
     ap.add_argument('--corpus-dir', default=None, help='override corpus dir (wiring tests)')
+    ap.add_argument('--view', default=None,
+                    help='comma-separated view preference, e.g. Closeup1 (default: '
+                         'Corner,Overhead). Closeup1 is the only view present in ES, IS '
+                         'AND TS rooms, so it is the one that reaches the full set.')
+    ap.add_argument('--staged', action='store_true',
+                    help='corpus files are already staged/muxed and named <meeting>.avi; '
+                         'never download — an absent file fails loudly rather than '
+                         'silently substituting a raw camera file')
     ap.add_argument('--measured-dpf', type=bounded_float('measured-dpf', 0.1, 500.0),
                     default=None,
                     help='build: probe-measured detections/frame (summarize_probe_rr.py '
@@ -356,6 +379,12 @@ def main() -> int:
         MANIFEST = Path(args.manifest)
     if args.corpus_dir:
         CORPUS = Path(args.corpus_dir)
+    if args.view:
+        globals()['VIEW_PREFERENCE'] = [v.strip() for v in args.view.split(',') if v.strip()]
+        if not VIEW_PREFERENCE:
+            print('NOT DONE — --view given but empty'); return 1
+    if args.staged:
+        globals()['STAGED_NAMES'] = True
     if args.build_manifest:
         return build_mode(args.n_measured, args.n_warm,
                           args.measured_dpf, args.measured_chars_per_det)
