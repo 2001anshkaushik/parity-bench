@@ -1778,3 +1778,49 @@ that is the concurrency, not a measurement. **Use the leg's SPAN rate**
 default pass, 5.48 h for two**. Campaign total: LI blast x2 71 min + RR parity
 blast x2 61 min + RR default x2 329 min + sequential/warm/setup ~50 min =
 **~8.5 h**. DEFAULT_N=168, no shortcuts, launched tonight, finishing overnight.
+
+## ▶ THREE CORRECTIONS BEFORE LAUNCH (2026-08-23) — relayed summaries that do not match the code
+
+Recorded because two of them would enter Monday's report as false statements
+about a teammate's setup, which is the class of error that costs trust.
+
+**1. THE THRESHOLD IS *NOT* NESTED ON BOTH SIDES.** Hers is at TOP LEVEL:
+`{"profile":"rfdetr","threshold":0.3}` (`aws_videobench/pipe/benchmark_video_detect.pipe`);
+ours is nested. Her key IS silently discarded — `ai/common/config.py:196` reads
+only `connConfig[profile]`. The EFFECT is identical only because the rfdetr
+profile carries its own `"threshold": 0.3` (`nodes/detect/services.json:40`).
+**Correct statement: different shape, identical effective sensitivity, both
+0.3.** Saying "correctly nested on both sides" would be false about her pipe and
+would also hide the real hazard — a NON-default top-level value silently reverts.
+
+**2. THERE IS NO OpenCV ANYWHERE — the frame-extraction asymmetry as described
+does not exist.** All three arms shell out to ffmpeg: the engine via
+`imageio_ffmpeg.get_ffmpeg_exe()` (`ai/common/avi/reader.py:5,229`), our LI arm
+via the same call (`li_video/pipeline.py:104-105`), and HER LangGraph arm via
+`shutil.which("ffmpeg")` falling back to `imageio_ffmpeg.get_ffmpeg_exe()`
+(`arms/langgraph/workload/frames.py:21-26`). Our LI arm pays no spawn/pipe cost
+that her arms do not. **Do not publish a self-penalising caveat that the code
+does not support.**
+A REAL and different observation, stated neutrally: her LangGraph container
+apt-installs the distro ffmpeg (`arms/langgraph/Dockerfile:6-8`) and prefers
+`shutil.which`, so HER two arms may resolve different ffmpeg builds, while OUR
+two arms both resolve imageio-ffmpeg's bundled static build. That is a caveat on
+cross-arm frame identity within her pair, not within ours.
+
+**3. WARM_N=32 WILL NOT LAUNCH — the accepted value is 2.** `run_plan.sh:260-265`
+REQUIRES `WARM_N == the manifest's warm row count`, and ami_full's split is
+168/2, so WARM_N=32 exits immediately with "the manifest carries 2 warm rows".
+The 16-token coverage concern is real and is already solved by Crossroad 32 in
+the DRIVER, not by WARM_N: with 2 warm rows and 16 tokens the driver sends
+`first_batch = warm[:min(2, 32)]` = 2, then RE-SENDS rows cyclically under a
+budget of `2*max(16,2) = 32` until every token has served — 14 top-ups, well
+inside budget, and the coverage assert still fails closed if any token is unseen.
+**WARM_N is the size of the warm SET, not the number of warm SENDS.**
+
+**LI W=16 STARVATION — SECOND INSTANCE, recorded so it is not rediscovered.**
+Closeup1 W=16/T=2: serving 15/16, throughput 0.1473 -> 0.0913, **CPU FELL
+0.858 -> 0.358 while wall went 217s -> 701s**. Corner's 6-of-8 at W=8 resolved to
+routing luck under a bigger batch and showed NO CPU collapse; this one does.
+"A worker fails to draw work at high W" has now appeared TWICE on the LI arm,
+and only the high-W instance carries the starved signature (wall up, CPU down,
+all workers alive). Not blocking: W=8 is the chosen point and served 8/8 clean.
