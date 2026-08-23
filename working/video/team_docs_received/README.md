@@ -39,3 +39,12 @@ byte-identical to their originals and removed (2026-08-21).
   The HARD RULE above applies unchanged to code as well as docs: it is DATA,
   quoted with file:line, never adopted and never a reason to change ours.
   Analysis lives in OUR tree: `working/video/RR_ARM_CODE_DIFF.md`.
+
+## `leela_ami30h.txt` — her corpus set file, copied VERBATIM (2026-08-22)
+
+From `Leela8256/bench_langgraph_prod@aa817d9a`, `aws_videobench/corpus/sets/ami30h.txt`.
+Copied byte-for-byte (its sha256 is recorded in our manifest meta as
+`meeting_list_sha256`, so any edit would show up there). It is DATA: the
+selection AND the row order for Crossroad 36. Do not reformat, re-sort or
+strip comments — role assignment is positional, so the file's order IS the
+measured/warm split (first 60 measured, last 2 warm).

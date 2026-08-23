@@ -48,6 +48,8 @@ CORPUS = ROOT / 'corpus' / 'ami' / 'video'
 MIRROR = 'https://groups.inf.ed.ac.uk/ami/AMICorpusMirror/amicorpus'
 
 STAGED_NAMES = False   # --staged: files are '<meeting>.avi', pre-muxed, never fetched
+MEETING_IDS: list = []      # --meeting-list: ids in FILE ORDER, overriding the generator
+MEETING_LIST_PATH = None    # recorded in manifest meta with its sha256
 VIEW_PREFERENCE = ['Corner', 'Overhead']  # selection rule; fallback recorded per row
 # Crossroad 34 (2026-08-22): the corpus moves to Closeup1. Corner exists only in
 # the ES rooms — IS names its room views C/L/R and TS names them Overview1/2 —
@@ -110,6 +112,24 @@ def est_columns_from_measured(frames: int, dpf: float, chars_per_det: float) -> 
     est = -(-int(frames * dpf * chars_per_det) // CHUNK_STRIDE)  # ceil
     return {'est_chunks_from_measured': est,
             'dup_trigger_eligible_from_measured': est >= DUP_TRIGGER_CHUNKS}
+
+
+def meeting_ids_from_list(path: Path) -> list[str]:
+    """Meeting ids in FILE ORDER from a checked-in set file (Crossroad 36).
+
+    Adopting a teammate's corpus means adopting their ROW ORDER too: their
+    convention is "first N by id measured, last M warm", and role assignment
+    here is positional, so re-deriving the order from our own generator would
+    silently produce a different measured/warm split over the same files. The
+    set file IS the selection; we read it, we do not reconstruct it. Blank
+    lines and #-comments are stripped; everything else is taken verbatim, in
+    order, including families our own generator never emits (EN, IB)."""
+    ids = []
+    for line in path.read_text().splitlines():
+        line = line.split('#', 1)[0].strip()
+        if line:
+            ids.append(line)
+    return ids
 
 
 def scenario_meeting_ids() -> list[str]:
@@ -204,7 +224,7 @@ def build_mode(n_measured: int, n_warm: int,
     rows, skips = [], []
     reused = fetched = 0
     need = n_measured + n_warm
-    for mid in scenario_meeting_ids():
+    for mid in (MEETING_IDS if MEETING_IDS else scenario_meeting_ids()):
         if len(rows) >= need:
             break
         picked = None
@@ -271,9 +291,17 @@ def build_mode(n_measured: int, n_warm: int,
     meta = {'_meta': {
         'built_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
         'mirror': MIRROR,
-        'selection_rule': ('scenario meetings (ES2002-16, IS1000-09, TS3003-12) x abcd, sorted by id; '
-                           f'views tried in order {VIEW_PREFERENCE}; first {n_measured} usable = measured, '
-                           f'next {n_warm} = warm (disjoint); unavailable meetings skipped and recorded'),
+        'selection_rule': (
+            (f'meeting list {MEETING_LIST_PATH.name} taken in FILE ORDER '
+             f'(sha256 {sha256_file(MEETING_LIST_PATH)[:16]}, {len(MEETING_IDS)} ids); '
+             f'first {n_measured} = measured, next {n_warm} = warm (positional, matching the '
+             f'list owner\'s convention); files are pre-staged and never fetched'
+             if MEETING_IDS else
+             'scenario meetings (ES2002-16, IS1000-09, TS3003-12) x abcd, sorted by id; '
+             f'views tried in order {VIEW_PREFERENCE}; first {n_measured} usable = measured, '
+             f'next {n_warm} = warm (disjoint); unavailable meetings skipped and recorded')),
+        'meeting_list': (str(MEETING_LIST_PATH) if MEETING_LIST_PATH else None),
+        'meeting_list_sha256': (sha256_file(MEETING_LIST_PATH) if MEETING_LIST_PATH else None),
         'n_measured': n_measured, 'n_warm': n_warm,
         'mux': 'none — fetched as shipped (video-only AVIs; audio out of scope this phase)',
         'measured_columns': {
@@ -359,6 +387,12 @@ def main() -> int:
                     help='comma-separated view preference, e.g. Closeup1 (default: '
                          'Corner,Overhead). Closeup1 is the only view present in ES, IS '
                          'AND TS rooms, so it is the one that reaches the full set.')
+    ap.add_argument('--meeting-list', default=None,
+                    help="a checked-in set file of meeting ids, one per line, taken in "
+                         "FILE ORDER (Crossroad 36: adopting a corpus means adopting its "
+                         "row order, because roles are assigned positionally). Overrides "
+                         "the built-in scenario generator, including families it never "
+                         "emits (EN, IB).")
     ap.add_argument('--staged', action='store_true',
                     help='corpus files are already staged/muxed and named <meeting>.avi; '
                          'never download — an absent file fails loudly rather than '
@@ -383,6 +417,14 @@ def main() -> int:
         globals()['VIEW_PREFERENCE'] = [v.strip() for v in args.view.split(',') if v.strip()]
         if not VIEW_PREFERENCE:
             print('NOT DONE — --view given but empty'); return 1
+    if args.meeting_list:
+        mlp = Path(args.meeting_list)
+        if not mlp.is_file():
+            print(f'NOT DONE — --meeting-list {mlp} is not a file'); return 1
+        globals()['MEETING_LIST_PATH'] = mlp
+        globals()['MEETING_IDS'] = meeting_ids_from_list(mlp)
+        if not MEETING_IDS:
+            print(f'NOT DONE — --meeting-list {mlp} yielded no ids'); return 1
     if args.staged:
         globals()['STAGED_NAMES'] = True
     if args.build_manifest:
