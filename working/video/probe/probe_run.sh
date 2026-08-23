@@ -120,16 +120,35 @@ EOF4
 G4_RC=${PIPESTATUS[0]}
 [ "$G4_RC" = "0" ] || echo "gate 4 failed (rc=$G4_RC) — investigate before any measured run" | tee -a "$LOG"
 
-echo "== GATE-3 STAGED CONFIRMATION: cross-arm label multisets on ES2002a ==" | tee -a "$LOG"
-"$PY" - <<'EOF3' | tee -a "$LOG"
-import glob, json, sys
-# Latest RR probe steady-state send vs LI floor, same video, same threads point.
-rr_files = sorted(glob.glob('probe_rr_t*.json'))
-fl_files = sorted(glob.glob('probe_li_floor_t*.json'))
-if not rr_files or not fl_files:
-    print('gate-3 staging: missing probe outputs — cannot confirm'); sys.exit(1)
-rr = json.load(open(rr_files[-1]))
-fl = json.load(open(fl_files[-1]))
+# The matrix point THIS run produced — never a glob. `sorted(glob("probe_rr_t*"))[-1]`
+# is LEXICOGRAPHIC, so with t1/t2/t32/t8 on disk it returns t8, and a Closeup1
+# re-stage silently compared stale Corner artifacts (2026-08-23). Both files are
+# now named from the matrix point AND asserted to carry this run's video sha.
+LAST_T="$(echo $MATRIX | awk '{print $NF}')"
+echo "== GATE-3 STAGED CONFIRMATION: cross-arm label multisets on $(basename "$VIDEO") (t=$LAST_T) ==" | tee -a "$LOG"
+"$PY" - "$VIDEO" "$LAST_T" <<'EOF3' | tee -a "$LOG"
+import hashlib, json, sys
+from pathlib import Path
+video, last_t = Path(sys.argv[1]), sys.argv[2]
+want_sha = hashlib.sha256(video.read_bytes()).hexdigest()[:16]
+rr_path, fl_path = f'probe_rr_t{last_t}.json', f'probe_li_floor_t{last_t}.json'
+for pth in (rr_path, fl_path):
+    if not Path(pth).exists():
+        print(f'gate-3 staging: {pth} missing — cannot confirm'); sys.exit(1)
+rr = json.load(open(rr_path))
+fl = json.load(open(fl_path))
+# ABSENCE FAILS FIRST, and so does a stale artifact: both sides must record the
+# SAME video, and it must be the one this run was pointed at.
+for name, doc in (('rr', rr), ('li_floor', fl)):
+    got = doc.get('video_sha16')
+    if got is None:
+        print(f'gate-3 staging: {name} recorded no video_sha16 — cannot prove which video '
+              'it read; re-run with the current probes'); sys.exit(1)
+    if got != want_sha:
+        print(f'gate-3 staging: {name} was produced from a DIFFERENT video '
+              f'(recorded {got}, this run {want_sha} = {video.name}). STALE ARTIFACT — '
+              'an arming id from it would assert agreement on the wrong corpus.'); sys.exit(1)
+print(f'gate-3 staging: both arms confirmed on {video.name} (sha16 {want_sha}, t={last_t})')
 sends = [s for s in rr.get('sends', []) if 'documents' in s]
 if not sends:
     print('gate-3 staging: no RR send analysis'); sys.exit(1)

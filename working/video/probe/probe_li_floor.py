@@ -96,7 +96,12 @@ def main() -> int:
     args = ap.parse_args()
     video = Path(args.video)
 
+    # Record WHICH FILE this probe read (2026-08-23). Without it the gate-3
+    # staging comparison could not prove both arms saw the same video, and it
+    # silently compared a stale Corner artifact against a fresh Closeup1 one.
     report = {'threads_readback': readback(), 'versions': versions(),
+              'video': str(video),
+              'video_sha16': hashlib.sha256(video.read_bytes()).hexdigest()[:16],
               'interval_s': args.interval, 'stage_s': {}}
     print(json.dumps({'threads_readback': report['threads_readback']}))
 

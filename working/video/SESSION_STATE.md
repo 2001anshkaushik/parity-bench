@@ -1824,3 +1824,39 @@ routing luck under a bigger batch and showed NO CPU collapse; this one does.
 "A worker fails to draw work at high W" has now appeared TWICE on the LI arm,
 and only the high-W instance carries the starved signature (wall up, CPU down,
 all workers alive). Not blocking: W=8 is the chosen point and served 8/8 clean.
+
+## ▶ B7 STAGED ON THE WRONG VIDEO (2026-08-23) — cause, fix, and DO NOT USE probe_20260823_110344
+
+**The `VIDEO=` override DID work** (`probe_run.sh:16`, `VIDEO="${VIDEO:-…}"` —
+verified by reading the file back). The probe steps ran on the Closeup1 video.
+**The GATE-3 COMPARISON did not.** It selected its inputs with
+`sorted(glob.glob('probe_rr_t*.json'))[-1]` — a LEXICOGRAPHIC sort, so with
+`t1/t2/t32/t8` on disk from the Corner probe it returns **`t8`**. The fresh
+`t2` Closeup1 artifacts were written and then ignored; the block compared two
+stale Corner files and reported 83 frames on ES2002a. The banner also HARDCODED
+"on ES2002a", so it agreed with itself.
+
+**`GATE3_RUN_ID=probe_20260823_110344` IS VOID.** It would assert the arms
+agreed on ami_full when they agreed on Corner. Do not use it.
+
+**FIXED, three ways:**
+1. Inputs are named from the matrix point this run produced
+   (`LAST_T` = last value of `$MATRIX`), never a glob.
+2. **Both arms must record the SAME video, and it must be the one this run was
+   pointed at** — the comparison recomputes the sha16 of `$VIDEO` and refuses on
+   mismatch: *"STALE ARTIFACT — an arming id from it would assert agreement on
+   the wrong corpus."* `probe_li_floor.py` now records `video` + `video_sha16`
+   (it recorded neither, which is why nothing could catch this).
+3. The banner prints the ACTUAL video basename and the thread point.
+Behaviourally verified: correct pairing passes; a t8 pair from another video is
+REFUSED with rc=1; a missing matrix point is refused rather than silently
+globbed.
+
+**B7, RE-RUN (floor venv):**
+  cd ~/parity-bench-video/working/video/probe && \
+    VIDEO=~/parity-bench-video/corpus/ami/video/ES2009a.avi PROBE_MATRIX=2 ./probe_run.sh
+Read back BOTH lines before using the id:
+  `GATE-3 STAGED CONFIRMATION: cross-arm label multisets on ES2009a.avi (t=2)`
+  `gate-3 staging: both arms confirmed on ES2009a.avi (sha16 …, t=2)`
+  then `EXACT agreement on N frames` with **N ≈ 93** (not 83 — 83 is Corner).
+The run id is the log stem `probe_YYYYMMDD_HHMMSS` printed at the top.
