@@ -17,24 +17,77 @@ same files were simultaneously PASSING gate-3 staging. The real schema:
     report.sends[i].cgroup.memory_peak_bytes / anon_bytes_after
 
 Run from the probe dir (box):  ~/.venv-floor/bin/python summarize_probe_rr.py
+
+2026-08-23 — IT POOLED ACROSS VIDEOS SILENTLY. It globbed probe_rr_t*.json and
+summed steady-state frames/detections/chars over whatever was on disk, with no
+check of which video produced each file. That is not only a wrong curve: the two
+lines it prints, --measured-dpf and --measured-chars-per-det, are the inputs to
+the Crossroad-23 manifest re-cut, so a stale file from another corpus silently
+re-cuts the manifest. Pooling several videos is legitimate (B1 pooled 3 Closeup1
+videos deliberately) — pooling them WITHOUT SAYING SO is not. Files are now
+grouped by recorded video identity, the grouping is always printed, and more
+than one video refuses unless --all-videos makes the pooling explicit.
 """
 from __future__ import annotations
 
-import glob
+import argparse
 import json
 import sys
+from collections import defaultdict
 from pathlib import Path
+
+from artifact_identity import ABSENT, RC_CANNOT_COMPARE, cannot_compare
 
 
 def main() -> int:
-    files = sorted(glob.glob(str(Path(sys.argv[1] if len(sys.argv) > 1 else '.')
-                                 / 'probe_rr_t*.json')))
-    if not files:
-        print('NOT DONE — no probe_rr_t*.json here (pass the directory as arg 1)')
+    ap = argparse.ArgumentParser(allow_abbrev=False, description=__doc__)
+    ap.add_argument('dir', nargs='?', default='.', help='directory of probe_rr_t*.json')
+    ap.add_argument('--all-videos', action='store_true',
+                    help='pool every video present — an EXPLICIT choice, printed in the output')
+    args = ap.parse_args()
+
+    where = Path(args.dir)
+    groups: dict = defaultdict(list)
+    for f in sorted(where.glob('probe_rr_t*.json')):
+        try:
+            doc = json.loads(f.read_text())
+        except Exception:                     # noqa: BLE001 — unreadable is named, not skipped
+            groups['UNREADABLE'].append((f, {}))
+            continue
+        groups[doc.get('video_sha16') or ABSENT].append((f, doc))
+    if not groups:
+        print(f'NOT DONE — no probe_rr_t*.json in {where} (pass the directory as arg 1)')
         return 1
+
+    print('== artifacts by recorded video identity ==')
+    for sha, items in sorted(groups.items()):
+        name = next((d.get('video') for _, d in items if d.get('video')), '?')
+        print(f'  {sha}  {Path(str(name)).name}  <- {[f.name for f, _ in items]}')
+    usable = {k: v for k, v in groups.items() if k not in (ABSENT, 'UNREADABLE')}
+    for bad in (ABSENT, 'UNREADABLE'):
+        if bad in groups:
+            print(f'  EXCLUDED ({bad}): {[f.name for f, _ in groups[bad]]} — cannot prove '
+                  'which video produced these; re-run with the current probes')
+    if not usable:
+        print(cannot_compare('thread curve', 'no artifact can prove which video produced it'))
+        return RC_CANNOT_COMPARE
+    if len(usable) > 1 and not args.all_videos:
+        print(cannot_compare(
+            'thread curve', f'{len(usable)} DIFFERENT videos are present and pooling them would '
+            'blend corpora into one curve — and into --measured-dpf / --measured-chars-per-det, '
+            'which re-cut the manifest. Move the stale files aside, or pass --all-videos to pool '
+            'them deliberately'))
+        return RC_CANNOT_COMPARE
+    pooled = sorted({next((str(d.get('video')) for _, d in v if d.get('video')), '?')
+                     for v in usable.values()})
+    print(f'\n== curve over {len(pooled)} video(s), pooling DECLARED: '
+          f'{[Path(x).name for x in pooled]} ==')
+
+    files = [f for v in usable.values() for f, _ in v]
+    docs = {f: d for v in usable.values() for f, d in v}
     tot_frames = tot_dets = tot_chars = 0
-    for f in files:
-        r = json.load(open(f))
+    for f in sorted(files):
+        r = docs[f]
         print(f'\n== {Path(f).name}  (tokens={r.get("tokens")}, rc={r.get("rc")})')
         for s in r.get('sends', []):
             d = s.get('documents') or {}
@@ -55,6 +108,7 @@ def main() -> int:
                 tot_chars += d.get('total_chars') or 0
     if tot_frames and tot_dets:
         print('\n== Crossroad-23 re-cut inputs (steady-state sends, probe-measured) ==')
+        print(f'  pooled over: {[Path(x).name for x in pooled]}')
         print(f'  --measured-dpf {tot_dets / tot_frames:.2f}   '
               f'(detections/frame over {tot_frames} frames)')
         print(f'  --measured-chars-per-det {tot_chars / tot_dets:.1f}   '

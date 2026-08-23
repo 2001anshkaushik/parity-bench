@@ -25,38 +25,58 @@ launch line is at the bottom of this block.
 | B6 RR spot-check | M=16/T=2 **0.1152**, idle **5.323** cores (Corner read 5.24 — consistent) -> **M_TOKENS=16, RR_THREADS_ENV=2** |
 | WARM_N | **2** — the size of the warm SET, not the number of warm SENDS. `run_plan.sh:260-265` REFUSES anything that does not equal the manifest's warm row count. The driver covers 16 tokens by RE-SENDING those 2 rows (Crossroad 32): 2 first-batch + 14 top-ups, budget 32, coverage assert still fails closed. |
 
-### THE B7 BUG — BOTH FIXES ARE COMMITTED (`4c659541`). The BOX needs a pull.
-Do NOT re-implement these; verify the box is at `4c659541` or later first.
-* **What broke:** `probe_frame_identity.py` selected its floor with
-  `sorted(glob('probe_li_floor_t*.json'))[-1]` — LEXICOGRAPHIC, so **t8 beats
-  t32/t2/t1** — and loaded it with **no check of which video produced it**. The
-  floor jsons carried **no `video` field at all** (confirmed on the box: t1, t2,
-  t8, t32 all lack it), so nothing could catch it. And the identity step runs
-  BEFORE the floor step in `probe_run.sh`, so on a fresh video **no matching
-  floor can exist yet** — it reached for a two-day-old Corner file and compared
-  93 fresh ES2009a hashes against 83 stale ES2002a ones, reporting a gate-4
-  FAILURE for a decode that was correct.
-* **Fix 1 (landed):** `probe_li_floor.py` records `video` and `video_sha16`.
-* **Fix 2 (landed):** the identity step selects a floor **by video identity, not
-  sort order**, names and rejects every other candidate (incl. `ABSENT
-  (pre-2026-08-23 floor)`), and `--no-floor-ok` DEFERS instead of comparing.
-* **Fix 3 (landed, and it was missing entirely):** the **post-matrix gate-4
-  compare** that the deferred branch always promised did not exist. It now does,
-  finishing gate 4 from the early file's engine hashes plus today's matching
-  floor **without a resend**, refusing if either side carries a different sha.
-* The same lexicographic-glob defect was fixed in the **gate-3** block earlier
-  the same day (`78d630f0`); `GATE3_RUN_ID=probe_20260823_110344` is **VOID** —
-  it asserts agreement on ami_full that was measured on Corner.
+### THE B7 BUG — FIVE SITES, ALL FIXED. The BOX needs a pull.
+Do NOT re-implement these; verify the box has the fix commit first.
+* **The defect, one sentence:** `sorted(glob('probe_li_floor_t*.json'))[-1]` is
+  LEXICOGRAPHIC, so **t8 beats t32/t2/t1**, and the loaded file was never checked
+  for WHICH VIDEO produced it. Floor jsons carried no `video` field at all before
+  2026-08-23, so nothing could catch it: 93 fresh ES2009a hashes were compared
+  against 83 stale Corner ones and a correct decode was reported as a gate-4
+  FAILURE.
+* **It was at FIVE sites, patched three times at whichever site had just been
+  seen failing.** `probe_frame_identity.py` (early identity, `4c659541`);
+  `probe_run.sh` gate-3 staging (`78d630f0`); then still live until 2026-08-23:
+  `probe_run.sh` gate 4, `probe_run.sh` frame-count agreement (whose rc is the
+  probe's exit code), and `summarize_probe_rr.py` (which emits the
+  `--measured-dpf` / `--measured-chars-per-det` that RE-CUT THE MANIFEST).
+* **CORRECTION to `4c659541`'s message, which this file previously repeated:** it
+  claims the post-matrix gate-4 compare "did not exist". It DID — since
+  `01b82de`, broken — and `4c659541` added a SECOND one beside it. The twin is
+  what printed the failure the operator saw. The duplicate is now deleted; there
+  is ONE gate-4 comparator.
+* **The fix is one copy:** `working/video/probe/artifact_identity.py` holds the
+  only selector (`select_by_video` / `select_all_by_video` /
+  `require_same_video`); every site calls it. Register entry 14.
+* **New verdict vocabulary, and it changes how a failure reads:** 0 PASS,
+  1 REAL DIFFERENCE, 2 CANNOT COMPARE. A comparator that cannot prove both sides
+  read the same input reports CANNOT COMPARE — an EVIDENCE fault, never "decode
+  paths differ". `real_difference()` raises unless handed the `video_sha16`
+  proven on both sides.
+* **Verification (laptop, no box needed):**
+      python3 working/video/probe/test_artifact_identity_sites.py   # 21 call-site controls
+      python3 working/video/probe/artifact_identity.py --self-test  # 21 selector controls
+  Both must print PASS. They reproduce the exact stale-Corner layout and
+  null-control every verdict.
+* `GATE3_RUN_ID=probe_20260823_110344` is **VOID** — it asserts agreement on
+  ami_full that was measured on Corner.
+* Examined and SOUND, do not "fix": `gate3_triage.py` pairs records by video NAME
+  with an explicit missing-arm branch; `resultio.latest()` sorts a fixed-width UTC
+  stamp, so lexicographic IS chronological there.
 
 ### B7 RE-RUN (floor venv `~/.venv-floor`) — the last blocker
     cd ~/parity-bench-video/working/video/probe &&       VIDEO=~/parity-bench-video/corpus/ami/video/ES2009a.avi PROBE_MATRIX=2 ./probe_run.sh
-FOUR lines must read back before the id is used:
-  1. `GATE-4 POST-MATRIX COMPARE: engine vs LI floor, both on ES2009a.avi`
-  2. `gate-4 compare: PASS — 93 frames byte-identical`
+FIVE lines must read back before the id is used (the banners CHANGED on
+2026-08-23 — an old-wording line means the box has not pulled):
+  1. `gate 4: floor selected by identity: probe_li_floor_t2.json` — the fix
+     engaging. If this line is absent, the box is running the old script.
+  2. `gate 4: PASS — 93 frames byte-identical across arms (video_sha16 ...)`
   3. `GATE-3 STAGED CONFIRMATION: ... on ES2009a.avi (t=2)`
-  4. `gate-3 staging: both arms confirmed on ES2009a.avi` + `EXACT agreement on 93 frames`
+  4. `gate-3 staging: both arms confirmed on ES2009a.avi (sha16 ..., t=2)`
+  5. `gate-3 staging: EXACT agreement on 93 frames`
 **Any line naming ES2002a or 83 frames = a stale artifact was reached again; do
-not arm.** The id is the log stem `probe_YYYYMMDD_HHMMSS`.
+not arm.** A `CANNOT COMPARE` line is an EVIDENCE fault (missing/foreign
+artifact), NOT arm disagreement — fix the evidence and re-run that step; it is
+never a decode finding. The id is the log stem `probe_YYYYMMDD_HHMMSS`.
 **B8 after it:** golden re-write, Phase 1 venv `~/.venv`, `rr` started with NO
 thread env, `smoke_video.py --rr-threads-env unset --pdf-corpus $PWD/corpus/govdocs1/pdfs --write-golden`.
 

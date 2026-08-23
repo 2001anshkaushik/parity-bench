@@ -375,3 +375,63 @@ than rewritten from memory, which is entry 2's point in miniature.
 > containers, so every process of OURS on the host — driver, smoke, `docker`
 > calls, the console tee, and run_plan's own full-corpus sha256 — was charged
 > to a hog.
+
+## 14. The assert went in where the bug was seen, and the twin ten lines up kept running (added 2026-08-23)
+
+> `sorted(glob('probe_li_floor_t*.json'))[-1]` is lexicographic: with
+> t1/t2/t8/t32 on disk it returns **t8**. Five sites selected a cross-arm
+> artifact that way, and each was patched *at the site where the failure had
+> been observed* — so the identical defect resurfaced one site later, on the
+> next corpus, three times running: the early identity step (patched
+> `4c659541`), gate-3 staging (patched `78d630f0`), then gate 4, the
+> frame-count agreement check, and the thread-curve summarizer, all still
+> live. Every patch was correct. Every patch was also the whole response.
+>
+> **The sharpest part is what the third patch actually did.** Its diagnosis
+> read "the post-matrix compare the deferred branch promises does not exist",
+> and it *added one* — beside the existing post-matrix compare, which had been
+> there since `01b82de`, which was broken, and which is the one that then
+> reported `n_engine=93 n_li=83 — decode paths differ` from a two-day-old
+> Corner floor. Two comparators for one gate; the asserted one passed and the
+> unasserted one printed the verdict. **A broken implementation was mistaken
+> for a missing one, and the replacement was built instead of the original
+> being found.** The mechanism is banal and worth naming: the search was for
+> the *identity check* — the shape of the fix — and code that has never had
+> the check does not contain it. **Grep for the OPERATION, never for the
+> defect's signature and never for your own fix**; enumerate every site that
+> compares, then fix them together or, better, make them one.
+>
+> Shipped as one copy, per entry 6's addendum: `probe/artifact_identity.py`
+> holds the only selector (`select_by_video`, `select_all_by_video`,
+> `require_same_video`) and every site calls it — the duplicate gate-4
+> comparator is deleted rather than fixed. Note also the fix that was NOT
+> made: "take the newest instead" is an **ordering** fix for an **identity**
+> bug — right today, wrong the first time a probe re-runs out of order or a
+> floor is copied in. Identity is not a sort key.
+>
+> **Second half, the reviewer's, and it generalises past globs: a comparator
+> that cannot prove same-input has not found a difference.** The standing
+> policy — on a cross-arm mismatch the REAL-DIFFERENCE hypothesis comes first,
+> never tolerance — is correct, and it silently assumes both sides read the
+> same input. When that is unproven the honest verdict is not "real
+> difference" but **CANNOT COMPARE**: a fault in the EVIDENCE, not a finding
+> about the ARMS. Until now both printed the same sentence, so a true positive
+> and a stale-file bug were indistinguishable in the log — and the log is what
+> gets relayed. Now three verdicts with three exit codes (0 PASS / 1 REAL
+> DIFFERENCE / 2 CANNOT COMPARE), and `real_difference()` **raises** unless
+> handed the `video_sha16` proven on both sides. The entitlement is
+> structural: the only way to print the sentence is to hold the proof that
+> earns it.
+>
+> Two smaller things the day donated. The summarizer was not merely a
+> reporting tool — it emits `--measured-dpf` and `--measured-chars-per-det`,
+> the Crossroad-23 manifest re-cut inputs, so pooling across corpora would
+> have re-cut the manifest from blended numbers; it now groups by recorded
+> identity and refuses more than one video unless `--all-videos` makes the
+> pooling explicit (entry 12's addendum: a value that sets a run parameter
+> needs a read-back before it is quotable). And the harness written to catch
+> stale copies was itself testing a stale copy — it extracted the shell blocks
+> once and kept comparing against that snapshot across edits, passing a check
+> it should have failed. It now extracts from the live file every run. Kin to
+> entry 9's ending, and the same argument: these rules only hold when they are
+> structural, never when they are remembered.

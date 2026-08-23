@@ -25,13 +25,14 @@ Usage (box, after probe_run.sh produced probe_li_floor_t*.json):
 import argparse
 import asyncio
 import base64
-import glob
 import hashlib
 import json
 import os
 import sys
 import time
 from pathlib import Path
+from artifact_identity import (video_sha16, select_by_video, cannot_compare,
+                               RC_CANNOT_COMPARE)
 
 PIPE_SRC = Path(__file__).resolve().parent.parent / 'benchmark_video_detect.pipe'
 
@@ -77,30 +78,16 @@ async def main() -> int:
     # Now: only a floor whose recorded video_sha16 EQUALS this video's is usable;
     # everything else is named and rejected, and gate 4 defers rather than
     # comparing against whatever is lying around.
-    want_sha = hashlib.sha256(Path(args.video).read_bytes()).hexdigest()[:16]
-    candidates = ([args.floor_json] if args.floor_json
-                  else sorted(glob.glob(str(Path(__file__).parent / 'probe_li_floor_t*.json'))))
-    floor_path, floor, rejected = None, {}, []
-    for cand in candidates:
-        if not cand or not Path(cand).exists():
-            continue
-        try:
-            doc = json.load(open(cand))
-        except Exception:                       # noqa: BLE001 — unreadable is rejected, named
-            rejected.append({'file': Path(cand).name, 'video_sha16': 'UNREADABLE'})
-            continue
-        got = doc.get('video_sha16')
-        if got == want_sha:
-            floor_path, floor = cand, doc
-            break
-        rejected.append({'file': Path(cand).name,
-                         'video_sha16': got if got is not None else 'ABSENT (pre-2026-08-23 floor)'})
-    if not floor_path and not args.no_floor_ok:
-        print(f'NOT DONE — no LI floor json produced from THIS video '
-              f'(sha16 {want_sha} = {Path(args.video).name}). Rejected: {rejected}. '
-              'Run the matrix on this video first, or pass --no-floor-ok '
-              'for the early load-proof)')
-        return 1
+    want_sha = video_sha16(args.video)
+    sel = select_by_video(want_sha, ['probe_li_floor_t*.json'],
+                          where=Path(__file__).parent, explicit=args.floor_json)
+    floor_path, floor = sel.path, sel.doc
+    rejected = sel.rejected_json() or []
+    if not sel.ok and not args.no_floor_ok:
+        print(cannot_compare('gate 4', sel.why_not(Path(args.video).name) +
+                             '. Run the matrix on this video first, or pass --no-floor-ok '
+                             'for the early load-proof'))
+        return RC_CANNOT_COMPARE
     li_hashes = floor.get('frame_png_sha16') or []
 
     # Measured surface (Phase 1 + installed-wheel paste, 2026-08-21).
@@ -178,6 +165,7 @@ async def main() -> int:
                                       'gaps': gaps or None, 'duplicates': dupes or None,
                                       'first': indices[0] if indices else None},
         'gate4_decode_identity': gate4,
+        'same_input_proven': bool(floor_path),
         'engine_frame_png_sha16': engine_hashes,
         'timestamps_first_last': [indexed[0][1], indexed[-1][1]] if indexed else None,
     }
