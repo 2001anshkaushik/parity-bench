@@ -48,3 +48,13 @@ Copied byte-for-byte (its sha256 is recorded in our manifest meta as
 selection AND the row order for Crossroad 36. Do not reformat, re-sort or
 strip comments — role assignment is positional, so the file's order IS the
 measured/warm split (first 60 measured, last 2 warm).
+
+## `leela_ami_full.txt` — the FULL corpus set file, copied VERBATIM (2026-08-23)
+
+From `Leela8256/bench_langgraph_prod@aa817d9a`, `aws_videobench/corpus/sets/ami_full.txt`.
+Byte-identical; sha256 `601620b4bfbf9c2b79036fb4607d2d4dcf922fd4963abde0f1c9a5a4b883e501`
+(173 lines, 170 meeting ids, families EN 16 / ES 60 / IB 7 / IN 10 / IS 38 / TS 39).
+Crossroad 37 runs this set; the split is HERS — `run/native170.sh:10,19-20`,
+168 measured + 2 warm, positional over THIS file's order. Do not reformat,
+re-sort or strip comments; the manifest records this sha as `meeting_list_sha256`,
+so any edit shows up there.
