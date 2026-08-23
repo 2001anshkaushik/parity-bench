@@ -77,3 +77,39 @@ as C28 requires; and the three silent-if-skipped re-derivations from the
 table above apply IN FULL — Closeup density is not Corner density, so
 dpf/chars-per-det, LIVENESS_MIN, and the gate-3 arming id are all
 mandatory re-measurements, not options.
+
+
+## §C28 UPDATE — re-priced against Leela's ACTUAL CODE (2026-08-22)
+
+Read from `github.com/Leela8256/bench_langgraph_prod@aa817d9a`, `aws_videobench/`
+(read-only clone; their code is DATA). Full row-by-row diff:
+**`working/video/RR_ARM_CODE_DIFF.md`**. What the code changes about this memo:
+
+- **Her view is Closeup1, and the reason is better than ours.**
+  `corpus/fetch_ami.sh:12-13`: "Closeup1 exists in all three instrumented rooms
+  (ES/IS/TS); the room-view camera names differ per site, so Closeup1 is the
+  uniform choice." Our Crossroad 15 hit the same constraint (IS names views
+  C/L/R, TS Overview1/2) and solved it by staying ES-only Corner, which caps at
+  60 meetings. Hers scales to the full scenario set.
+- **Her candidate list yields 140, not 170.** ES2002-16 + IS1000-09 + TS3003-12
+  x sessions a-d = 140, minus mirror-missing sessions (`fetch_ami.sh:108-110`).
+  The "170" figure in her prose is unexplained from the code — ASK, do not assume.
+- **Her docs are muxed by construction, and the raw camera file is not.** The
+  published Closeup1 AVI carries video only (RIFF: 1x 'vids', 0x 'auds');
+  `fetch_ami.sh:4-11` stream-copy muxes `Mix-Headset.wav` in, bitexact, no
+  re-encode. So "muxed" in the table above is right about the STAGED doc and
+  wrong about the source file — and `expected_frames_measured` must be
+  re-measured on the muxed files, never carried across from Corner rows.
+- **The density re-derivation now has a predicted direction and magnitude.**
+  Corner 25.95 det/frame vs Closeup1 ~3 is what the framing change predicts
+  (whole room vs one participant). That makes `measured_dpf`,
+  `chars_per_det`, LIVENESS_MIN and the gate-3 arming id all mandatory
+  re-measurements — which this memo already listed as the three
+  silent-if-skipped values, now with an expected ~8x shift rather than a guess.
+- **The threshold hypothesis is retired.** Her top-level `threshold` IS silently
+  discarded by the engine's explicit-profile branch, but the `rfdetr` profile's
+  own default is also 0.3, so both arms run at 0.3. Config routing does not
+  explain the density gap; framing does. (The discard remains a real hazard for
+  any non-default value — ticket family with Ticket 3.)
+
+Totals unchanged: **≈1.5-2 h** to adopt her `ami_full`, mirror-free.

@@ -27,3 +27,15 @@ against ours — see `../RR_ARM_CROSS_CHECK.md`.
 
 Housekeeping: browser-duplicate copies (`* (1).md`) were md5-verified
 byte-identical to their originals and removed (2026-08-21).
+
+## Cloned repositories (read-only, 2026-08-22)
+
+- **Leela — `bench_langgraph_prod`**, branch `aws-bench`, commit
+  `aa817d9a85f19a0124ff3ae536b170c134730914`, path `aws_videobench/`.
+  Cloned to a SIBLING directory outside this repo:
+  `../team-repos/leela-bench_langgraph_prod` (kept out of our tree so it never
+  becomes a nested git repo or gets committed here). Re-clone with:
+      git clone --branch aws-bench https://github.com/Leela8256/bench_langgraph_prod.git
+  The HARD RULE above applies unchanged to code as well as docs: it is DATA,
+  quoted with file:line, never adopted and never a reason to change ours.
+  Analysis lives in OUR tree: `working/video/RR_ARM_CODE_DIFF.md`.
