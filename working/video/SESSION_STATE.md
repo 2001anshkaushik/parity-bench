@@ -1,4 +1,5 @@
-# SESSION STATE — 2026-08-21, written pre-compaction
+# SESSION STATE — last written 2026-08-23, pre-compaction
+# (the 2026-08-23 briefing immediately below supersedes every block after it)
 
 **Audience: the post-compaction session, holding only this repo.** This is a
 briefing, not a summary. Read PHASE1_CARRYOVER.md first (its corrections
@@ -7,7 +8,118 @@ using it.
 
 ---
 
-## ▶ COMPACTION BRIEFING — state as of late 2026-08-21 (THIS BLOCK WINS on conflict with the chronological blocks below)
+## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
+
+**WHERE WE ARE:** Phase B for the **ami_full (170-meeting) campaign**, blocked at
+**B7** (gate-3 re-stage). B1-B6 are DONE. The Corner campaign is BANKED. The
+launch line is at the bottom of this block.
+
+### B1-B6, done, with their values
+| step | value |
+|---|---|
+| B1 dpf / chars-per-det | **7.77 detections/frame, 222.2 chars/detection** — pooled over 3 Closeup1 videos, 342 frames. (Corner was 25.95 / 230.4; the ~3.3x density drop is the framing change, as predicted.) |
+| B2 LIVENESS_MIN | **0.5** — minimum non-empty frame fraction measured **1.000 over n=6**; 0.5 sits far below anything observed and the black fixture still fails it |
+| B3 manifest | **170 rows, 168 measured + 2 warm**, HER order from `team_docs_received/leela_ami_full.txt`, **23,372 total frames** |
+| B4 verify | **170/170 sha256 match** |
+| B5 LI budget line (Closeup1) | 4x8 **0.0989** · 8x4 **0.1473** · 16x2 **0.0913 serving 15/16** -> **LI_WORKERS=8, LI_THREADS_ENV=4** |
+| B6 RR spot-check | M=16/T=2 **0.1152**, idle **5.323** cores (Corner read 5.24 — consistent) -> **M_TOKENS=16, RR_THREADS_ENV=2** |
+| WARM_N | **2** — the size of the warm SET, not the number of warm SENDS. `run_plan.sh:260-265` REFUSES anything that does not equal the manifest's warm row count. The driver covers 16 tokens by RE-SENDING those 2 rows (Crossroad 32): 2 first-batch + 14 top-ups, budget 32, coverage assert still fails closed. |
+
+### THE B7 BUG — BOTH FIXES ARE COMMITTED (`4c659541`). The BOX needs a pull.
+Do NOT re-implement these; verify the box is at `4c659541` or later first.
+* **What broke:** `probe_frame_identity.py` selected its floor with
+  `sorted(glob('probe_li_floor_t*.json'))[-1]` — LEXICOGRAPHIC, so **t8 beats
+  t32/t2/t1** — and loaded it with **no check of which video produced it**. The
+  floor jsons carried **no `video` field at all** (confirmed on the box: t1, t2,
+  t8, t32 all lack it), so nothing could catch it. And the identity step runs
+  BEFORE the floor step in `probe_run.sh`, so on a fresh video **no matching
+  floor can exist yet** — it reached for a two-day-old Corner file and compared
+  93 fresh ES2009a hashes against 83 stale ES2002a ones, reporting a gate-4
+  FAILURE for a decode that was correct.
+* **Fix 1 (landed):** `probe_li_floor.py` records `video` and `video_sha16`.
+* **Fix 2 (landed):** the identity step selects a floor **by video identity, not
+  sort order**, names and rejects every other candidate (incl. `ABSENT
+  (pre-2026-08-23 floor)`), and `--no-floor-ok` DEFERS instead of comparing.
+* **Fix 3 (landed, and it was missing entirely):** the **post-matrix gate-4
+  compare** that the deferred branch always promised did not exist. It now does,
+  finishing gate 4 from the early file's engine hashes plus today's matching
+  floor **without a resend**, refusing if either side carries a different sha.
+* The same lexicographic-glob defect was fixed in the **gate-3** block earlier
+  the same day (`78d630f0`); `GATE3_RUN_ID=probe_20260823_110344` is **VOID** —
+  it asserts agreement on ami_full that was measured on Corner.
+
+### B7 RE-RUN (floor venv `~/.venv-floor`) — the last blocker
+    cd ~/parity-bench-video/working/video/probe &&       VIDEO=~/parity-bench-video/corpus/ami/video/ES2009a.avi PROBE_MATRIX=2 ./probe_run.sh
+FOUR lines must read back before the id is used:
+  1. `GATE-4 POST-MATRIX COMPARE: engine vs LI floor, both on ES2009a.avi`
+  2. `gate-4 compare: PASS — 93 frames byte-identical`
+  3. `GATE-3 STAGED CONFIRMATION: ... on ES2009a.avi (t=2)`
+  4. `gate-3 staging: both arms confirmed on ES2009a.avi` + `EXACT agreement on 93 frames`
+**Any line naming ES2002a or 83 frames = a stale artifact was reached again; do
+not arm.** The id is the log stem `probe_YYYYMMDD_HHMMSS`.
+**B8 after it:** golden re-write, Phase 1 venv `~/.venv`, `rr` started with NO
+thread env, `smoke_video.py --rr-threads-env unset --pdf-corpus $PWD/corpus/govdocs1/pdfs --write-golden`.
+
+### CORRECTIONS THAT MUST SURVIVE — about a teammate's work, nearly published wrong
+1. **Her detect threshold is TOP-LEVEL, not nested.**
+   `{"profile":"rfdetr","threshold":0.3}`. It IS silently discarded
+   (`ai/common/config.py:196` reads only `connConfig[profile]`). The EFFECT is
+   identical **only because** the rfdetr profile carries its own
+   `"threshold": 0.3` (`nodes/detect/services.json:40`). Correct statement:
+   *different shape, identical effective sensitivity, both 0.3.* Never write
+   "correctly nested on both sides".
+2. **There is NO OpenCV anywhere.** All three arms shell out to ffmpeg — engine
+   `ai/common/avi/reader.py:5,229`, our LI arm `li_video/pipeline.py:104-105`,
+   her LangGraph arm `arms/langgraph/workload/frames.py:21-26`. **The
+   frame-extraction asymmetry does not exist and must NOT be published** — an
+   invented self-penalty is as wrong as an invented advantage.
+3. **The four invalidating checks all came back SAME:** engine 3.3.1 (both pin
+   extracted-ELF sha `95768e26…9747`), duplication patch applied on both arms,
+   pipeline graph identical node-for-node **including input lanes**, threshold
+   effectively 0.3 both. Full table: `RR_ARM_CODE_DIFF.md` §9.
+
+### THE CORNER CAMPAIGN IS BANKED — `mainrun_20260823T034243Z`
+9/9 legs, all leg gates PASS, 0 errors. Findings that go to Monday:
+* **Span vs steady window REVERSE the winner.** LI **8.952** span / **8.491**
+  window; RR-parity **9.826** / **7.995**. Span absorbs the drain tail. Leela
+  reports span only — a BASIS difference to name up front, not a correction.
+* **RR default is 4.1x slower than RR parity.**
+* **LI rep spread is 5.4% on span and 21% on the steady window**; RR passes agree
+  to 0.3-2.3%. A cross-arm difference under ~5% on the LI arm is not
+  distinguishable from repetition noise.
+* Cross-configuration determinism: RR default vs parity char totals **568 chars
+  apart over 32.5M (0.0017%) at different thread counts**.
+* `char_conservation` 0.0208 vs tol 0.02 is the SPLITTER (Recursive vs
+  SentenceSplitter, both 4000/200, decision 3) — real, explained, tolerance NOT
+  widened; Crossroad 38 band `[0.97374, 0.98963]`, centred, calibrated on this run.
+* Gate 3's three diverging frames were DOWNGRADED IN WRITING by Ansh as
+  boundary flapping (Crossroad 39 now excludes and COUNTS them).
+
+### THE LAUNCH LINE — once B7 and B8 land
+    cd ~/parity-bench-video && mkdir -p working/video/results &&     M_TOKENS=16 RR_THREADS_ENV=2 LI_WORKERS=8 LI_THREADS_ENV=4     WARM_N=2 BLAST_C=16 DEFAULT_N=168 PASSES=2 LIVENESS_MIN=0.5     GATE3_RUN_ID=<from B7 on ES2009a>     nohup bash working/video/run_plan.sh > working/video/results/console_$(date -u +%Y%m%dT%H%M%SZ).log 2>&1 &
+**~8.5 h**, finishing overnight. First ten minutes: quiet-box `basis` must read
+`instantaneous`; pins line must read `rr expected 'unset': declared {}` with
+`{'rr': 16, 'li': 4}`; then the first `AT A GLANCE`.
+
+### ASK — DO NOT INVENT (held by this session, not by the repo)
+* **B7 has NOT been re-run successfully.** No valid `GATE3_RUN_ID` exists for
+  ami_full. ASK for the new id; do not reuse `probe_20260823_110344` (VOID).
+* **B8 (golden) has not been done for ami_full.** The existing golden is Corner.
+* Whether the box has pulled `4c659541` — the B7 fixes are useless until it has.
+* The exact B1 probe output filenames on the box (unrelayed); the values above
+  are relayed.
+* Whether Leela was told anything about her threshold shape or the RT-DETR
+  fallback — drafted messages live in `team_docs_sent/MESSAGES_2026-08-21.md`;
+  whether any were sent, and any replies, is UNKNOWN here.
+* Operator rulings are recorded in paraphrase throughout; ASK if verbatim
+  wording matters.
+
+---
+
+## ▶ [SUPERSEDED by the 2026-08-23 briefing above] COMPACTION BRIEFING — state as of late 2026-08-21
+*(Still accurate for the Corner-corpus era and the rulings it records; where it
+conflicts with the 2026-08-23 block — corpus, numbers, WARM_N, gate ids — the
+2026-08-23 block is current.)*
 
 **▶▶ TWO CHECKOUTS ON THE BOX — GET THIS RIGHT OR EVERY COMMAND MISSES:**
   `~/parity-bench-video`  ← THE VIDEO WORKTREE. Every campaign/dry-pass/probe
