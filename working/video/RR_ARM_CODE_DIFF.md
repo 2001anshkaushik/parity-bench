@@ -310,3 +310,66 @@ Same run, different published number, for reasons that are definitional:
    (`v0_gates.py:74-86`); ours deleted the formula (Crossroad 23) and measures
    the per-row expectation exactly. Same video, same arm, different verdict on
    an 83-vs-84 frame count.
+
+---
+
+## 9. Pre-launch verification, all eight rows with file:line on both sides (2026-08-23)
+
+Her side pinned at `aa817d9a`. **None of rows 1-4 blocks the launch.**
+
+### The four that would invalidate the comparison
+
+| # | row | OURS | HERS | verdict | consequence |
+|---|---|---|---|---|---|
+| 1 | engine bytes | release 3.3.1; tarball sha `d8dad45b…` AND extracted-ELF sha **`95768e26…9747`** (`docker/Dockerfile.rocketride:63-65,79`) | release 3.3.1; extracted-ELF sha **`95768e26…9747`**, verified after extraction (`arms/rocketride/Dockerfile:36-38,49`) | **SAME** | the same engine executable runs on both rigs |
+| 1b | base image / tag | `ubuntu:22.04` (`:38`); `rr:patched-video` + one documented derived layer | `python:3.12-slim-bookworm` (`:21`); `videobench-rocketride:3.3.1` (`docker-compose.yml:16`) | DIFFERENT | same ELF over a different libc/libc++; ours documents the base from measured DT_NEEDED |
+| 2 | duplication patch | `RR_DUP_PATCH=1` default, awk `preventDefault` after the flush, grep guards 1→2 (`docker/Dockerfile.rocketride:134-153`) | identical mechanism and guards, `ARG RR_DUP_PATCH=1` (`arms/rocketride/Dockerfile:74-91`); compose passes no build args (`docker-compose.yml:13-16`) and `native170.sh:55` builds plain | **SAME — both patched** | chunk counts are on the same basis; no 2x divergence |
+| 2b | patch VERIFICATION | MEASURED every run: the Phase 1 PDF fixture at exactly half the stock counts, no doubling (smoke section A) | asserted by `LABEL` (`arms/rocketride/Dockerfile:95-96`) | DIFFERENT | both run patched; only ours re-proves it per run |
+| 3 | pipeline graph | 6 nodes | 6 nodes | **IDENTICAL** — ids, providers, order AND input lanes all equal, 6/6 | no extra or missing work |
+| 4 | threshold path | NESTED: `{"profile":"rfdetr","rfdetr":{"threshold":0.3}}` | TOP LEVEL: `{"profile":"rfdetr","threshold":0.3}` | **DIFFERENT SHAPE, IDENTICAL EFFECT** | hers IS discarded (`ai/common/config.py:196` reads only `connConfig[profile]`) — but the rfdetr profile's own default is `"threshold": 0.3` (`nodes/detect/services.json:40`, applied at `nodes/detect/IGlobal.py:56`), the same value. **Both detect at 0.3; the dpf comparison is valid.** The discard stays a hazard for any NON-default value |
+
+### The three that may differ, recorded
+
+| # | row | OURS | HERS |
+|---|---|---|---|
+| 5 | tokens / thread env | default posture: 1 token, env UNSET (torch measured 16); parity posture: 16 tokens, env 2 — both read back in-process every leg | 1 token, `use_existing=True`, `ttl=28800` (`bench/bench_video.py:236-242`); `use(threads=N)` only when `RR_THREADS` is set, and the full-corpus run sets none — "32 cores UNPINNED" (`run/native170.sh:10`) |
+| 6 | warm-up | WARM_N=2 (her split), rows RE-SENT until every instance has served, coverage gated | `WARM=2`, `all_videos[n:n+warm_docs]` (`bench_video.py:256`), one batched `send_files` (`:260-266`), disjoint by construction |
+| 7 | legs | 9 invocations, 2 postures, PASSES=2 | 2 invocations, single rep (§8) |
+
+**Row 5 consequence:** her full-corpus run is configuration-equivalent to our
+**DEFAULT** posture — one token, no thread env. Our parity posture is additional.
+
+### 8. The LlamaIndex arm, audited against the RR arm on the REQUEST PATH
+
+Nobody else runs it, so nothing external validates it. Every place the two arms
+could do different work on the same input:
+
+| aspect | RR | LI | verdict |
+|---|---|---|---|
+| ffmpeg binary | `imageio_ffmpeg.get_ffmpeg_exe()` (`ai/common/avi/reader.py:5,229`) | same call (`li_video/pipeline.py:104-105`) | **SAME resolver** |
+| fps filter | `fps=1/15`, built from interval→fps (`ai/common/avi/frame.py:48-53`) | `fps=1/{interval_s}` (`pipeline.py:148`) | **SAME string** |
+| extra filters | appends `showinfo` (`frame.py`, filter chain) | none | DIFFERENT — passthrough logging filter, no pixel effect |
+| output format | `-f image2pipe -fps_mode passthrough -vcodec png` (`frame.py:100-108`) | identical (`pipeline.py:148-149`) | **SAME** |
+| logging flags | `-hide_banner -loglevel info` | `-nostdin -loglevel error` | DIFFERENT — stderr only |
+| sampling interval | pipe config 15 | `INTERVAL_S=15` (`li_video/service.py:34`) | **SAME** |
+| detector + weights | rfdetr, `rf-detr-base.pth` md5 vs the 1.5.2 registry | same md5 chain, `detect_impl` read back | **SAME** |
+| threshold | 0.3 (nested, resolved) | `THRESHOLD=0.3` (`service.py:35`) | **SAME** |
+| splitter | `RecursiveCharacterTextSplitter` 4000/200 (LangChain defaults, Ticket 3) | `SentenceSplitter` 4000/200, char length fn (`service.py:39-41`) | DIFFERENT — **DESIGN** (decision 3) |
+| embedder | `miniLM` profile → `sentence-transformers/multi-qa-MiniLM-L6-cos-v1` (`nodes/embedding_transformer/services.json:81-83`) | `EMBED_MODEL` = same id (`service.py:33`) | **SAME model** |
+| text assembly | `self.text += text + '\n'`, split ONCE (`preprocessor_langchain/IInstance.py:82-88`) | `'\n'.join(...) + '\n'` (`pipeline.py:198`) | **SAME length by construction** |
+| concurrency unit | `use()` tokens = task processes | uvicorn worker processes | DIFFERENT — **DESIGN** |
+
+**DESIGN differences (deliberate, reported):** splitter algorithm, concurrency
+unit, request shape (SDK `send` vs HTTP POST).
+**Would be BUGS — all verified ABSENT:** different ffmpeg binary, different fps
+filter, different interval, different threshold, different weights, different
+embedder, different text assembly.
+**Neither (logging only):** `showinfo`, the loglevel/banner flags.
+
+**ONE HONEST GAP.** The frame-identity claim rests on both arms resolving the
+SAME `imageio-ffmpeg` version. That version is pinned per arm (RR: bake package
+read-back + env_probe `package_versions`; LI: image freeze) and RECORDED per run
+in `identity_readback`, but **no gate asserts the two arms' versions are equal to
+each other** — cross-arm identity here is recorded, not enforced. It was
+MEASURED once at probe scope: gate 4 confirmed byte-identical PNG frames on
+ES2002a. Stated as a limitation, not repaired tonight.
