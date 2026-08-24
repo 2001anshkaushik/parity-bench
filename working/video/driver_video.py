@@ -1849,9 +1849,22 @@ async def amain() -> int:
     # ---- the leg, under the collector -------------------------------------
     rec_path = out_dir / f'records_{stem}.jsonl'
     prior, done_keys, torn = read_completed(rec_path, key='video')
+    # AN ERRORED RECORD IS NOT A COMPLETED ONE (2026-08-23). read_completed keys
+    # on 'video', and the failure path writes {'video': …, 'error': …} — so a leg
+    # that died with 16 errored rows would, on resume, treat those 16 videos as
+    # DONE and measure 152 of 168 while reporting success. Silent under-measurement
+    # is worse than the crash that caused it. Errored keys are dropped here and
+    # re-run; the rows stay in the file as the record of what happened, and the
+    # post-loop reader takes the LAST record per video.
+    errored = {r['video'] for r in prior if 'video' in r and 'error' in r}
+    done_keys -= errored
     if prior:
         say(f'resume: {len(done_keys)} videos already recorded'
+            + (f'; {len(errored)} errored row(s) will be RE-RUN, not skipped' if errored else '')
             + (f' (torn last line tolerated: {torn})' if torn else ''))
+        if errored:
+            say(f'resume: re-running after error: {sorted(errored)[:10]}'
+                + (' ...' if len(errored) > 10 else ''))
 
     collector = None
     if not args.no_collector:
