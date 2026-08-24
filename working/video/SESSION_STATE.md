@@ -10,6 +10,20 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
+**ROOT CAUSE ACCEPTED AND FIXED (2026-08-24): reads moved INSIDE the semaphore
+and OFF the event loop (`asyncio.to_thread`) in run_leg's one(), the gate-8
+repeat, and warm_one — at most C blobs resident (gauge returned as
+`max_resident_blobs` + console line `blob residency: max N concurrent`);
+`admit_ns` stamps AFTER the read so wall_s/span/window measure exactly what
+they always did (throughput consumes admit/done only, verified at
+driver_video.py:1342-1360); `read_s` recorded beside wall_s; submission order
+unchanged (enqueue_ns monotonic in manifest order, tested). Sequential leg =
+same one(), fixed identically (pre-fix exposure was bounded: ≤1 blob, ≤1.5s
+stalls). LI arm shares the same one() — banked LI blasts ran pre-fix with up to
+~1.4s done-stamp latency jitter (inside the arm's own 5.4%/21% rep spread);
+re-run is Ansh's call, not required by measurement definition. 8+1 controls in
+test_read_residency.py incl. a null control (C=8 residency exceeds 4).**
+
 **SOURCE-ONLY DIAGNOSIS FILED (2026-08-24): `working/video/DIAG_M1_BLAST_SOURCES.md`
 — read it before touching the RR blast path. Headline: both error strings are
 ONE connection-death event (dap_client on_disconnected sweeps all pending

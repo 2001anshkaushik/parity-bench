@@ -1193,19 +1193,36 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
     sem = asyncio.Semaphore(1 if leg == 'sequential' else concurrency)
     consecutive_failures = 0
     stop = asyncio.Event()
+    resident = max_resident = 0   # blobs held right now / high-water (read-back below)
 
     async def one(row):
-        nonlocal consecutive_failures
+        nonlocal consecutive_failures, resident, max_resident
         if row['file'] in done or stop.is_set():
             return
-        blob = (corpus_dir / row['file']).read_bytes()
         enqueue_ns = time.monotonic_ns()          # stamped BEFORE admission (#29)
         async with sem:
             if stop.is_set():
                 return
+            # BYTES ARE READ HERE — after admission, off the loop (2026-08-24,
+            # DIAG_M1_BLAST root cause). The old shape read 248MB synchronously
+            # on the event loop BEFORE the semaphore, and gather launches every
+            # row task, so rows 17..168 blocked the loop ~197s (no pongs, no
+            # drain, no receive — the shared RR websocket died with all 16
+            # in-flight sends) while ~41GB of blobs accumulated. Now a row owns
+            # a semaphore slot before it owns bytes: at most C blobs resident,
+            # and the loop never runs a read. admit_ns stamps AFTER the read so
+            # wall_s (admit->done) measures exactly what it always measured —
+            # the arm — and read_s is recorded beside it, never inside it.
+            t_read = time.monotonic()
+            blob = await asyncio.to_thread((corpus_dir / row['file']).read_bytes)
+            submitted_sha = await asyncio.to_thread(sha256_bytes, blob)
+            read_s = round(time.monotonic() - t_read, 3)
+            resident += 1
+            max_resident = max(max_resident, resident)
             admit_ns = time.monotonic_ns()        # stamped at admission (#29)
             rec = {'video': row['file'], 'role': row['role'],
-                   'submitted_sha256': sha256_bytes(blob), 'bytes': len(blob),
+                   'submitted_sha256': submitted_sha, 'bytes': len(blob),
+                   'read_s': read_s,
                    'expected_frames': expected_frames(row, interval_s),
                    'video_s_manifest': row.get('video_s'),
                    'enqueue_ns': enqueue_ns, 'admit_ns': admit_ns}
@@ -1223,6 +1240,9 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
                 if consecutive_failures >= BREAKER_K:
                     say(f'breaker: {BREAKER_K} consecutive failures — aborting leg (#32)')
                     stop.set()
+            finally:
+                resident -= 1
+                del blob
             writer.write(rec)
 
     if leg == 'sequential':
@@ -1234,12 +1254,14 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
             rep = dict(rows[0])
             rep_key = f"{rep['file']}::repeat"
             if rep_key not in done:
-                blob = (corpus_dir / rep['file']).read_bytes()
                 enqueue_ns = time.monotonic_ns()
                 async with sem:
+                    # same discipline as one(): bytes only once admitted, off-loop
+                    blob = await asyncio.to_thread((corpus_dir / rep['file']).read_bytes)
+                    rep_sha = await asyncio.to_thread(sha256_bytes, blob)
                     admit_ns = time.monotonic_ns()
                     rec = {'video': rep_key, 'role': 'determinism_repeat',
-                           'submitted_sha256': sha256_bytes(blob), 'bytes': len(blob),
+                           'submitted_sha256': rep_sha, 'bytes': len(blob),
                            'expected_frames': expected_frames(rep, interval_s),
                            'enqueue_ns': enqueue_ns, 'admit_ns': admit_ns}
                     try:
@@ -1252,7 +1274,10 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
                     writer.write(rec)
     else:
         await asyncio.gather(*[one(row) for row in rows])
-    return {'aborted_by_breaker': stop.is_set()}
+    say(f'blob residency: max {max_resident} concurrent resident (cap = '
+        f'{1 if leg == "sequential" else concurrency}); reads+sha off-loop via to_thread '
+        '(DIAG_M1_BLAST fix read-back)')
+    return {'aborted_by_breaker': stop.is_set(), 'max_resident_blobs': max_resident}
 
 
 def leg_gates(records: List[dict], rows: List[dict], arm_name: str,
@@ -1453,7 +1478,7 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
         entry = {'i': len(ledger), 'row': row['file'], 'serving_pid': None,
                  'token_index': None, 'wall_s': None, 'error': None}
         ledger.append(entry)
-        blob = (Path(args.corpus_dir) / row['file']).read_bytes()
+        blob = await asyncio.to_thread((Path(args.corpus_dir) / row['file']).read_bytes)
         t0 = time.monotonic()
         try:
             rec = await arm.process(blob, row['file'])
