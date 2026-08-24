@@ -10,6 +10,29 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
+**POST-READFIX FAILURES (2026-08-24 night): RR blast died twice more at C=16 —
+all 16 sends fail in a ~10 ms window at t≈66-71 s; read_s 12-17 s (16
+concurrent 248 MB reads contending on gp3). Errors now include NoneType
+transport attributes: from source, ONE request's ConnectionError schedules
+transport teardown (dap_client.py:246, fire-and-forget), on_disconnected fails
+every pending future at once (:120-142), and later sends hit
+`self._transport=None` (:214) — one connection death, the rest is cascade. NO
+constant in the stack equals 66-71 s (client+server ping 15/300, socket 180,
+ws max 250 MB, pipe zombie 60.0 at data_conn.py:141, per-connection pipe cap =
+Semaphore(thread_count) at data_conn.py:138); the first error's identity needs
+the probe taps — NOT determinable from records because dap_client.py:229
+discards causes. LEELA'S VIDEO ARM (aws-bench branch, aws_videobench/) differs
+STRUCTURALLY: she uses send_files, which streams 1 MB chunks
+(rocketride/mixins/data.py:551,653) — never a 248 MB frame; her video blast =
+ONE send_files over the whole corpus ("let server handle queuing", measured
+~11 effective concurrent per connection in her PDF bench), her head-to-head
+mode is c6, ttl finite but sized past the batch (TIMEOUT+7200 — she hit the
+ttl-kills-mid-batch bug 2026-08-23 too, independently). Our send() writes each
+video as ONE ~248 MB DAP message (data.py:405 + no chunking). KNEE SWEEP
+READY: `POINTS="16 8 4" bash working/video/probe/c_knee.sh` (~45-55 min, flock
++ pgrep guard so two drivers can never share a container again). Dry-pass
+C=4 n=6 = one small clean sample, NOT established. No campaign C chosen.**
+
 **ROOT CAUSE ACCEPTED AND FIXED (2026-08-24): reads moved INSIDE the semaphore
 and OFF the event loop (`asyncio.to_thread`) in run_leg's one(), the gate-8
 repeat, and warm_one — at most C blobs resident (gauge returned as
