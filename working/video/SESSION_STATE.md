@@ -10,6 +10,23 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
+**LAUNCH 5 (RESUME) DIED IDENTICALLY AT THE FIRST BLAST SENDS with ttl=0
+landed and enforcement-skip confirmed — TTL WAS NOT THE CAUSE of the blast
+failures (the warm-up had served on that token seconds earlier in EVERY
+failure; register entry 20 records the mis-closure). STANDING FACTS: RR
+default blast (M=1, C=16) has failed 3x at the first concurrent sends with
+ConnectionError('Could not send request') — a string minted at
+dap_client.py:229 inside `except Exception:`, so the TRUE exception was never
+recorded. One websocket per CLIENT (parity's 16 tokens share it); no lock in
+the send path; send() = pipe/open/write/close interleaved; probe_concurrency
+never probed M=1 at C>1 (always one send per token). Corner's banked default
+blast PASSED at M=1 C=16 on ~30 MB videos — ami_full's are 100-140 MB, so the
+live variable is SIZE x CONCURRENCY, not concurrency alone. NEXT ACTION, ruled
+"test not accept": run `probe_m1_concurrency.py` (taps both SDK layers,
+captures the true exception, matrix C1/C2/C16-big + C16-small, fresh
+client+token per point, ttl=0, null control first). Do NOT lower BLAST_C or
+reframe the default posture until its verdict matrix is read.**
+
 **LAUNCH 4 DIED AT LEG 6/9 (2026-08-24, ~05:23): the engine's ttl is an IDLE
 TIMER (task_server.py:331,365, read on the box), it reaped the default-blast
 token as container age crossed 7200 s, and 16 concurrent sends hit a dead task

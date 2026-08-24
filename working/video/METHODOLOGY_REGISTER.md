@@ -682,3 +682,44 @@ than rewritten from memory, which is entry 2's point in miniature.
 > "ttl reaps" was true for two days and became a false reassurance with one
 > changed argument. The grep for consumers of a changed value (entry 6)
 > includes the SENTENCES about it.
+
+## 20. The tidy mechanism explained the log line, and the timeline in hand already contradicted it (added 2026-08-24)
+
+> The ttl closure was accepted at 07:00 — engine source read, idle timer
+> confirmed, container age 2h25m > 7200 s, case closed — and it was wrong, or
+> at least was not the cause of the blast failures: with ttl=0 landed and the
+> engine confirmed skipping enforcement, the same leg died the same way six
+> minutes after a fresh launch. The fact that falsified it had been in hand
+> the whole time, in both failures: **warm-up had served on that token seconds
+> before the first blast send**. A token that served seconds ago has an idle
+> time of seconds. The ttl story required 2h of idleness that the leg's own
+> log said never happened — entry 11's rule, run in reverse on ourselves: the
+> benign-looking closure was never checked against the points already
+> collected. The container-age arithmetic was a COINCIDENCE that fit, and a
+> mechanism that explains the log line is not thereby the mechanism that
+> killed the run. (ttl=0 stays: the idle reaper was a real latent cliff for
+> the 2.7 h serial legs regardless.)
+>
+> Why three failures produced zero causal information: **the SDK discards the
+> exception.** `dap_client.py:229` — `except Exception:
+> raise ConnectionError('Could not send request')` — no chaining, no repr, no
+> type. A websockets concurrency violation, a ping-starvation disconnect, a
+> server rejection and a broken pipe all print the SAME SENTENCE. An error
+> message that discards its cause manufactures the next wrong theory; ours
+> cost two campaign nights. The probe now taps `DAPClient._send` and
+> `TransportWebSocket.send` at class level and records the true exception
+> before the wrapper eats it (`probe_m1_concurrency.py`).
+>
+> What the code settles while the probe waits: ONE websocket per CLIENT
+> (tokens multiplex over it by seq — so parity's 16 tokens share one
+> connection too); no lock anywhere in the send path; `send()` is not one
+> request but pipe/open/write/close — a stateful sequence per send,
+> interleaved N-ways under concurrency; and `probe_concurrency` sent one
+> send PER token at every point, so M=1 at C>1 was NEVER probed. But the
+> strong hypothesis — "one token cannot take concurrent sends, period" — is
+> already FALSIFIED by banked data: Corner's default blast ran M=1 C=16 twice,
+> 0 errors, on ~30 MB videos. ami_full's are 100–140 MB. The live variable is
+> size x concurrency, not concurrency alone — which is why the probe's matrix
+> carries the C16-small cell. What it is NOT, also from banked data: not
+> resources, not ttl, not the container, not the corpus (the same files pass
+> sequentially and on the LI arm).
