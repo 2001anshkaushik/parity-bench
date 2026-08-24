@@ -644,3 +644,41 @@ than rewritten from memory, which is entry 2's point in miniature.
 > name you expect instead of by the property you need. It now walks the
 > document for any object carrying BOTH census fields, whatever it is called or
 > however it is nested, and says so plainly when a file carries neither.
+
+## 19. The reaper was an idle timer, and every finite ttl is a movable cliff (Crossroad 43, added 2026-08-24)
+
+> Leg 6 died in seconds: 16 concurrent sends, 16 errors, breaker, abort. Not
+> resources (2/61 GB, 871 GB free, no OOM), no traceback — the engine log's
+> only voice was CPython's child watcher substituting returncode 255 because
+> the exit status was "already read". The stdlib reading held: 255 was the
+> engine reaping its own child during a CLEAN termination — the thing being
+> cleaned up was the cause. `task_server.py:331,365` (read on the box):
+> **the ttl is an IDLE timer** — `if _idle_time >= _ttl: terminate` — and the
+> diagnostic's timestamps closed it: container 02:58, failure 05:23, age
+> 2h25m > ttl 7200. Zero 255-lines in the passing legs' logs.
+>
+> The driver passed `ttl=7200` believing it a generous lifetime; it was a
+> deadline for a token to be USED. And the fix is not a bigger number:
+> **any finite ttl is a cliff that moves** — the default-posture blast
+> serializes 168 videos behind one device lock for ~2.7 h, so 7200 would have
+> been crossed mid-leg even without idle gaps. Crossroad 43: `ttl=0` on
+> measured legs (engine-documented: run until explicitly stopped), paired with
+> the obligation that ruling creates — with ttl=0 there is NO reaper standing
+> behind a failed terminate, so stop() now retries with a longer deadline and
+> then says exactly what leaked and what it poisons (~1 idle core inside the
+> cgroup the next leg's collector reads), instead of the old shrug "(recorded;
+> ttl reaps)" — a sentence that had quietly become false the moment the ttl
+> changed. The instrument tokens (envprobe 600, smoke golden 3600) KEEP their
+> finite ttls deliberately: short-lived, terminated in finally, and a reaper
+> behind those is protection, not a cliff.
+>
+> Two rules. **A timeout's unit of meaning is the thing it counts** — lifetime
+> and idleness both arrive as "seconds" and nothing in the signature
+> distinguishes them; the driver's belief was checkable in one grep of the
+> pinned engine source, and it went unread until 00:00 with a campaign down.
+> Kin to entry 3 (a measurement bound to its conditions) with the condition
+> being a SEMANTIC, not an environment. And **when a safety net is removed,
+> every message that mentioned it is now wrong**: the terminate-failure path's
+> "ttl reaps" was true for two days and became a false reassurance with one
+> changed argument. The grep for consumers of a changed value (entry 6)
+> includes the SENTENCES about it.

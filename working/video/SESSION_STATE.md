@@ -10,6 +10,22 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
+**LAUNCH 4 DIED AT LEG 6/9 (2026-08-24, ~05:23): the engine's ttl is an IDLE
+TIMER (task_server.py:331,365, read on the box), it reaped the default-blast
+token as container age crossed 7200 s, and 16 concurrent sends hit a dead task
+— breaker in seconds. The 255 line was CPython's child watcher losing the exit
+status to the engine's own clean reap: symptom, not cause. CROSSROAD 43 LANDED:
+ttl=0 on measured legs (engine-documented "run until explicitly stopped");
+stop() now retries terminate then escalates LOUDLY (no reaper stands behind
+ttl=0); instrument tokens keep finite ttls deliberately. Resume-safety fix in:
+errored records are RE-RUN, never counted done. FIVE LEGS BANKED (LI seq, LI
+blast p1/p2, RR default seq, smoke); MISSING: RR default blast p1/p2 + RR
+parity blast p1/p2 + cross-gates. RESUME (Crossroad 42): `bash
+working/video/resume_rr_legs.sh <mainrun dir>` — reads RR_IMAGE_LINEAGE from
+the banked export's own provenance (it is NOT in run_manifest.json), derives
+corpus_dir from the stamped manifest, REFUSES a pre-43 driver and an unmoved
+errored-records file, runs exactly the four legs, prints the cross-gate step.**
+
 **CROSSROAD 41 RULED AND IMPLEMENTED (2026-08-23, attempt 4 pending): the LI
 warm-up gate asserts the SERVICE WARM MARKERS (`/health` warm_workers ==
 declared_workers), not response-pid coverage. Three attempts failed the old

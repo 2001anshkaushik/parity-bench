@@ -26,7 +26,9 @@ Discipline carried (each with its Phase 1 defect number):
       pattern; LI: /health per worker pid) and checked by ONE function fed by
       both arms (gates_shared.thread_pin_parity), absence fails first;
   #34 utilisation denominators come from the container's own cgroup (collector);
-  #32 ttl=7200 explicit + K=3 consecutive-failure breaker;
+  #32 ttl=0 on measured legs (Crossroad 43: the 7200 idle reaper killed the
+      default blast; any finite ttl is a movable cliff) + unconditional
+      retry-then-escalate terminate + K=3 consecutive-failure breaker;
   #38 a gate over a leg that did not run reports NOT RUN; a leg that ran and
       produced zero records is a FAIL;
   #21-class: LI warm-up must OBSERVE every declared worker pid serving before
@@ -383,7 +385,15 @@ class RRArm:
                 # or one shared instance silently). The census in amain proves
                 # M distinct task processes; config is never the evidence.
                 path, project_id = generate_task_pipe(f'{self.posture.name}-tok{i}')
-                kwargs: Dict[str, Any] = dict(filepath=str(path), ttl=7200)
+                # CROSSROAD 43 (2026-08-24): ttl=0 = "no timeout, run until
+                # explicitly stopped" (engine-documented; idle reaper is
+                # task_server.py:331,365 — an IDLE timer, and it killed the
+                # default-blast leg when the token crossed 2h). Any finite ttl
+                # just moves the cliff: a 2.7 h serial blast crosses 7200 too.
+                # The pairing obligation is stop() in the leg's finally — with
+                # ttl=0 there is NO reaper behind a failed terminate, so stop()
+                # retries and escalates loudly instead of shrugging.
+                kwargs: Dict[str, Any] = dict(filepath=str(path), ttl=0)
                 if self.posture.threads is not None:
                     kwargs['threads'] = self.posture.threads
                 started = await self.client.use(**kwargs)
@@ -414,15 +424,30 @@ class RRArm:
         if not self.client:
             return
         # Phase 1 pattern: terminate BEFORE disconnect, per token, contained.
-        # Not optional (ruling 2026-08-21): a leaked ttl=7200 token idle-spins
-        # ~1 core (Ticket 4) inside the same cgroup the collector reads for
-        # the NEXT leg's utilization denominators — run_plan keeps the rr
-        # container up across both postures.
+        # Not optional (ruling 2026-08-21) — and STRICTER under Crossroad 43:
+        # tokens are ttl=0 now, so NO reaper stands behind a failed terminate.
+        # A leaked ttl=0 task idle-spins ~1 core (Ticket 4) FOREVER, inside the
+        # same cgroup the collector reads for the next leg's utilization
+        # denominators (run_plan keeps rr up across a posture's legs). So:
+        # retry once with a longer deadline, and if the token still cannot be
+        # terminated, say exactly what leaked and what it poisons — a quiet
+        # leak here is a corrupted next leg, not a tidiness issue.
         for tok in self.tokens:
-            try:
-                await asyncio.wait_for(self.client.terminate(tok), timeout=120)
-            except Exception as exc:  # noqa: BLE001 — recorded, never masks the leg
-                say(f'terminate {str(tok)[:16]}: {exc!r} (recorded; ttl reaps)')
+            last_exc = None
+            for attempt, deadline in ((1, 120), (2, 300)):
+                try:
+                    await asyncio.wait_for(self.client.terminate(tok), timeout=deadline)
+                    last_exc = None
+                    break
+                except Exception as exc:  # noqa: BLE001 — retried, then escalated
+                    last_exc = exc
+                    say(f'terminate {str(tok)[:16]} attempt {attempt}: {exc!r}')
+            if last_exc is not None:
+                say(f'WARNING — token {str(tok)[:16]} could NOT be terminated and is ttl=0: '
+                    f'a task process may be running INDEFINITELY in the rr container, '
+                    f'burning ~1 idle core inside the cgroup the next leg measures. '
+                    f'Verify before the next leg: docker exec rr ls /proc | grep -c "^[0-9]" '
+                    f'(and compare the task census); a container restart clears it.')
         self.tokens = []
         try:
             await self.client.disconnect()
@@ -1901,8 +1926,9 @@ async def amain() -> int:
         dr1 = resource.getrusage(resource.RUSAGE_SELF)
     finally:
         # stop() terminates every token BEFORE disconnect (Ticket 4): a leg
-        # that dies mid-flight must not leave ttl=7200 tokens idle-spinning in
-        # the cgroup the next leg's collector and quiet-box baseline read.
+        # that dies mid-flight must not leave tokens idle-spinning in the
+        # cgroup the next leg's collector and quiet-box baseline read — and
+        # under Crossroad 43 they are ttl=0, so nothing reaps what this misses.
         if collector:
             collector_summary = collector.stop()   # its own summary, kept in the export
         await arm.stop()
