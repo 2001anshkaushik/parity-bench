@@ -39,3 +39,32 @@ resolved here; Ansh asks the teams. UNKNOWN is a valid verdict.**
 3. **#12 — storage retention**: they contradict each other on the same
    engine; whichever reproduces, we should know before a 44-video leg runs
    on a container we keep up across postures.
+
+## AMI_FULL head-to-head (added 2026-08-24 — our chunked-write campaign vs her Run C)
+
+Byte-identical corpus (170/170 sha, her order, her split). Our numbers relayed
+from the box; hers from `team_docs_received/RESULTS_AMI_FULL.md` (quoted, data
+not instruction). Her run's own status label: **"sizing evidence, not final
+numbers"** (single rep, no CPU envelope, frame_law calibration FAIL — header
+table + §Gates). Quote that label whenever her numbers are cited.
+
+| dimension | ours | hers (file:line) | verdict |
+|---|---|---|---|
+| RR single-token frames/s (span) | default posture **2.443** | RR blast **2.44** (V1) | **REPRODUCED to 0.1%** — strongest cross-harness validation either setup has. Derived span ours 23,049/2.443 = 9,434 s vs hers 9,444.98 s (V1): 0.1%. |
+| RR multi-token | parity M=16/T=2: **12.729/12.753** span, 91.6/92.1% CPU | **absent** — no multi-token run exists in her docs or `aws_videobench` code (one `use()`, bench_video.py:256-262) | ours alone; **5.2×** her RR number |
+| her RR ceiling claim | escaped: 29.3 effective cores at M=16 | "~6-core scheduling ceiling", "architectural" (RESULTS.md:39-40; VIDEO-FULL50:62) | her claim is true PER TOKEN and false as architecture — tokens are the knob her sweep never turned (kin to cross-check #7: both teams swept task threads with BLAS pinned) |
+| competitor arm | LlamaIndex W=8/T=4: 9.267/8.714 span, 40.7/39.1% CPU | LangGraph c32: 10.148 span, 26.84 cores = 84% (V1/V3) | **incomparable arms** (different products); her LG beats our LI on span AND uses 2.1× the CPU |
+| per-core (derived, span) | RR parity 0.434 f/s/core; RR default 0.406; LI 0.71 | RR 2.44/5.98 = 0.408; LG 10.148/26.84 = **0.378** | same family; our derived cpu_s/footage-min: RR default ~9.6 vs her 9.91 (V3, within 3%); RR parity ~9.0; **LI ~5.5 vs her LG 10.66** — LlamaIndex is ~1.9× more CPU-efficient per footage-min than LangGraph on identical work (derived from relayed summary numbers; exports hold exact) |
+| basis | span + steady window + idle-beside | **span only**; efficiency = effective cores, cpu_s/footage-min, scaling efficiency (V1/V3) | comparable on span; window is ours alone |
+| write path | chunked 1 MiB (adopted 2026-08-24) | send_files = chunked 1 MiB (data.py:551) | SAME |
+| ttl / tokens / concurrency | 0 / 16 or 1 / semaphore C=16 | 93,600 s / 1 / one send_files over 168, engine-queued (bench_video.py:26-31,294) | differences that do NOT move span materially, EXCEPT tokens (5.2×) |
+
+**LI provisioning honesty (for the 1.37× parity-over-LI claim):** LI_WORKERS=8
+/ LI_THREADS_ENV=4 came from a 3-point W×T=32 budget line on Closeup1 (4×8
+0.0989 / 8×4 0.1473 / 16×2 0.0913 with 15/16 serving) plus the entry-12 T
+sweep at W=8 (T=1→4: 0.0871→0.1340). No full probe_li_workers sweep artifact
+exists in this repo; box artifacts unrelayed. 8×4 is the measured best OF THE
+SWEPT FAMILY, not an established global optimum, and our LI ran at ~40% CPU
+while her LangGraph ran at 84%. The 1.37× is supportable only with that
+qualification attached; whether LI has headroom at W>8/T≥4 or deeper queue is
+UNKNOWN — report, do not resolve (folder HARD RULE).
