@@ -1415,6 +1415,138 @@ def cross_gates(rr_path: Path, li_path: Path, tol: float,
 # main
 # ---------------------------------------------------------------------------
 
+async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
+    """Driver-side warm-up: disjoint warm rows, coverage proven per instance,
+    per-send ledger written before any verdict. Module-level so the Crossroad-40
+    distribution logic is testable without a box (test_warmup_distribution.py);
+    amain() calls it and nothing else does."""
+    say(f'warm-up: {len(warm)} disjoint items')
+    seen_pids, seen_tokens = set(), set()
+    ledger: List[dict] = []
+
+    async def warm_one(row):
+        entry = {'i': len(ledger), 'row': row['file'], 'serving_pid': None,
+                 'token_index': None, 'wall_s': None, 'error': None}
+        ledger.append(entry)
+        blob = (Path(args.corpus_dir) / row['file']).read_bytes()
+        t0 = time.monotonic()
+        try:
+            rec = await arm.process(blob, row['file'])
+            entry['serving_pid'] = rec.get('serving_pid')
+            entry['token_index'] = rec.get('token_index')
+            if rec.get('serving_pid'):
+                seen_pids.add(rec['serving_pid'])
+            if rec.get('token_index') is not None:
+                seen_tokens.add(rec['token_index'])
+        except Exception as exc:  # noqa: BLE001
+            entry['error'] = repr(exc)
+            say(f'warm-up failure on {row["file"]}: {exc!r} (recorded, continuing)')
+        finally:
+            entry['wall_s'] = round(time.monotonic() - t0, 3)
+
+    if args.arm == 'rocketride':
+        # Tokens are DRIVER-ADDRESSED round-robin (_next_token): a
+        # sequential top-up reaches a NEW token every send, so coverage is
+        # by construction and kernel accept plays no part. This arithmetic
+        # is the Corner-banked one (2 first batch + top-ups) — Crossroad 40
+        # is about the LI arm and changes nothing here.
+        conc_i = max(1, posture.tokens)
+        sem = asyncio.Semaphore(conc_i)
+
+        async def sem_warm(row):
+            async with sem:
+                await warm_one(row)
+
+        first_batch = warm[:min(len(warm), 2 * conc_i)]
+        await asyncio.gather(*[sem_warm(r) for r in first_batch])
+        budget = 2 * max(conc_i, len(warm))
+        extra, pos = 0, len(first_batch)
+        while warm and len(seen_tokens) < posture.tokens and extra < budget:
+            await warm_one(warm[pos % len(warm)])
+            pos += 1
+            extra += 1
+        used = len(first_batch) + extra
+        policy = (f'{len(first_batch)} first batch + {extra} top-up; rows re-sent when '
+                  'exhausted — Crossroad 32; tokens round-robin (addressed, not accepted)')
+        say(f'warm-up consumed {used} send(s) over {len(warm)} warm rows ({policy})')
+    else:
+        # CROSSROAD 40 (2026-08-23): LI warm-up goes CONCURRENT, in waves of
+        # max(2 x declared workers, the leg's own concurrency). uvicorn
+        # workers are KERNEL-SELECTED at accept, and low-concurrency traffic
+        # does not distribute — measured: 8 concurrent posts into W=8
+        # reached 6/8 (iid predicts ~5.25); 8 into W=4 reached 4/4; 32 into
+        # W=8 reached 8/8 reliably (the Corner discriminator). The old
+        # top-up sent ONE post at a time — the worst point of that curve —
+        # and 18 sends reaching 6/8 killed the campaign at leg 2. Two waves
+        # max = cumulative 4 x workers, the discriminator's proven load.
+        # The coverage rule is UNCHANGED (an unwarmed worker serving its
+        # first inference inside the measured window inflates the LI arm —
+        # our own comparison arm); what changed is the distribution.
+        workers = arm.declared_workers or 1
+        leg_c = (args.blast_concurrency or 1) if args.leg == 'blast' else 1
+        wave_n = max(2 * workers, leg_c)
+        max_waves = 2
+        sem = asyncio.Semaphore(wave_n)
+
+        async def sem_warm(row):
+            async with sem:
+                await warm_one(row)
+
+        waves = 0
+        while warm and waves < max_waves and len(seen_pids) < workers:
+            wave = [warm[(waves * wave_n + k) % len(warm)] for k in range(wave_n)]
+            await asyncio.gather(*[sem_warm(r) for r in wave])
+            waves += 1
+            say(f'warm-up wave {waves}/{max_waves}: {wave_n} concurrent sends over '
+                f'{len(warm)} warm rows -> {len(seen_pids)}/{workers} worker pids observed')
+        used = len(ledger)
+        policy = (f'{waves} wave(s) x {wave_n} concurrent (max(2 x {workers} workers, '
+                  f'leg concurrency {leg_c})) — Crossroad 40; warm SET re-sent per '
+                  'Crossroad 32; coverage rule unchanged')
+        say(f'warm-up consumed {used} send(s) over {len(warm)} warm rows ({policy})')
+
+    # THE LEDGER IS WRITTEN BEFORE ANY VERDICT (2026-08-23). The leg-2
+    # failure printed only a count — 6/8 — and discarded which pids served
+    # and how many sends each drew, so "distribution or dead workers?" was
+    # unanswerable from the record. The failing run now carries its own
+    # diagnosis (register entry 10's rule).
+    declared_pids = (sorted(int(k.rsplit('_', 1)[-1]) for k in pf['readbacks']
+                            if k.startswith('li_worker_'))
+                     if args.arm == 'llamaindex' else [])
+    per_pid: Dict[str, int] = {}
+    for e in ledger:
+        if e['serving_pid'] is not None:
+            per_pid[str(e['serving_pid'])] = per_pid.get(str(e['serving_pid']), 0) + 1
+    unserved = [p for p in declared_pids if p not in seen_pids]
+    warm_path = out_dir / f'warmup_{stem}.json'
+    warm_path.write_text(json.dumps({
+        'arm': arm.name, 'leg': args.leg, 'posture': posture.name, 'policy': policy,
+        'sends': ledger, 'per_pid_send_counts': per_pid or None,
+        'declared_worker_pids': declared_pids or None,
+        'unserved_pids': unserved or None,
+        'tokens_seen': sorted(seen_tokens) or None,
+        'note': ('pid identity is only comparable within ONE container lifetime '
+                 '(defect #23: pid reuse across restarts)')}, indent=1))
+    say(f'warm-up ledger: {warm_path.name}')
+
+    if args.arm == 'rocketride' and len(seen_tokens) < posture.tokens:
+        raise SystemExit(f'NOT DONE — warm-up touched {len(seen_tokens)}/{posture.tokens} '
+                         f'tokens; every instance must be warm before timing. '
+                         f'Ledger: {warm_path.name}')
+    if args.arm == 'llamaindex' and len(seen_pids) < (arm.declared_workers or 1):
+        raise SystemExit(
+            f'NOT DONE — warm-up observed {len(seen_pids)}/{arm.declared_workers} worker '
+            f'pids serving (#21-class) after {used} sends ({policy}). '
+            f'Unserved pids: {unserved or "UNKNOWN — declared set absent from readbacks"}; '
+            f'per-pid send counts: {per_pid}. Ledger: {warm_path.name}. Unwarmed workers '
+            'would serve measured traffic cold. If the SAME pids stay unserved across '
+            'waves at 4x-worker concurrency, that is not distribution — it is workers '
+            'that never draw work: a different bug; do not raise the budget, read the '
+            'ledger and the container log.')
+    say(f'warm-up complete: tokens={sorted(seen_tokens) or "n/a"} '
+        f'worker_pids={len(seen_pids) or "n/a"}')
+
+
 async def amain() -> int:
     # allow_abbrev=False + value-validated types (register entry 8): a guard
     # that checks presence rather than plausibility cannot fail for the case
@@ -1653,65 +1785,7 @@ async def amain() -> int:
 
     # ---- warm-up: driver-side, disjoint (role=warm), coverage proven ------
     if not args.skip_warmup:
-        say(f'warm-up: {len(warm)} disjoint items')
-        seen_pids, seen_tokens = set(), set()
-        conc = posture.tokens if args.arm == 'rocketride' else (arm.declared_workers or 1)
-        sem = asyncio.Semaphore(max(1, conc))
-
-        async def warm_one(row):
-            async with sem:
-                blob = (Path(args.corpus_dir) / row['file']).read_bytes()
-                try:
-                    rec = await arm.process(blob, row['file'])
-                    if rec.get('serving_pid'):
-                        seen_pids.add(rec['serving_pid'])
-                    if rec.get('token_index') is not None:
-                        seen_tokens.add(rec['token_index'])
-                except Exception as exc:  # noqa: BLE001
-                    say(f'warm-up failure on {row["file"]}: {exc!r} (recorded, continuing)')
-
-        # Warm-consumption ruling (2026-08-21): min(WARM_N, 2 x instances) per
-        # leg. Crossroad 26 governs the VALUE of WARM_N; consuming all 16
-        # rows through ONE serial token warms nothing the second item didn't
-        # (~14 min/run of redundant service at 44-scale). Coverage keeps
-        # C26's teeth: RR round-robins tokens so 2x covers by construction;
-        # LI accept routing is not round-robin (#21), so if the first batch
-        # leaves a declared worker unseen, remaining warm rows are spent one
-        # at a time until every instance served or rows run out — then the
-        # absence asserts below fail exactly as before.
-        conc_i = max(1, conc)
-        first_batch = warm[:min(len(warm), 2 * conc_i)]
-        await asyncio.gather(*[warm_one(r) for r in first_batch])
-        used = len(first_batch)
-
-        def _covered() -> bool:
-            if args.arm == 'rocketride':
-                return len(seen_tokens) >= posture.tokens
-            return len(seen_pids) >= (arm.declared_workers or 1)
-
-        # Crossroad 32: top up until every instance has served, RE-SENDING
-        # warm rows when they run out (measured rows are never touched here).
-        # Bounded, so an instance that never rotates in fails the coverage
-        # assert below instead of spinning forever.
-        budget = 2 * max(conc_i, len(warm))
-        extra, pos = 0, len(first_batch)
-        while warm and not _covered() and extra < budget:
-            await warm_one(warm[pos % len(warm)])
-            pos += 1
-            extra += 1
-        used = len(first_batch) + extra
-        say(f'warm-up consumed {used} send(s) over {len(warm)} warm rows '
-            f'({len(first_batch)} first batch + {extra} top-up; rows re-sent when '
-            f'exhausted — Crossroad 32; 2 x instances + coverage)')
-        if args.arm == 'rocketride' and len(seen_tokens) < posture.tokens:
-            raise SystemExit(f'NOT DONE — warm-up touched {len(seen_tokens)}/{posture.tokens} '
-                             'tokens; every instance must be warm before timing.')
-        if args.arm == 'llamaindex' and len(seen_pids) < (arm.declared_workers or 1):
-            raise SystemExit(f'NOT DONE — warm-up observed {len(seen_pids)}/{arm.declared_workers} '
-                             'worker pids serving (#21-class): unwarmed workers would serve '
-                             'measured traffic cold.')
-        say(f'warm-up complete: tokens={sorted(seen_tokens) or "n/a"} '
-            f'worker_pids={len(seen_pids) or "n/a"}')
+        await run_warmup(args, arm, posture, warm, pf, out_dir, stem)
 
     # ---- the leg, under the collector -------------------------------------
     rec_path = out_dir / f'records_{stem}.jsonl'
@@ -1807,8 +1881,10 @@ async def amain() -> int:
         offered_concurrency=(args.blast_concurrency if args.leg == 'blast' else 1),
         configured_concurrency=(posture.tokens if args.arm == 'rocketride'
                                 else (arm.declared_workers or None)),
-        warmup_policy=f'driver-side, {len(warm)} disjoint manifest warm rows, '
-                      f'coverage proven per instance',
+        warmup_policy=(f'driver-side, {len(warm)} disjoint manifest warm rows, coverage '
+                       'proven per instance; LI sends concurrent in waves of '
+                       'max(2 x workers, leg concurrency) (Crossroad 40), RR tokens '
+                       'round-robin; per-send ledger in warmup_<stem>.json'),
         timeout_s=7200,
         parser=f'ffmpeg fps=1/{args.interval_s} + rfdetr(RF-DETR base, thr 0.3)',
         chunk_size=measured_chunk_size or -1,   # FROM RECORDS; -1 = no records, unmissable

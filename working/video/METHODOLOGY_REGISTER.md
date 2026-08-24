@@ -488,3 +488,55 @@ than rewritten from memory, which is entry 2's point in miniature.
 > recorded condition lives in the artifact it describes, not in each tool that
 > happens to need it. The manifest already described the corpus; it just did not
 > say where the corpus was.
+
+## 16. Four anomalies, one behaviour: a kernel accept queue is not a scheduler (Crossroad 40, added 2026-08-23)
+
+> The campaign died at leg 2's warm-up: 18 sends could not reach two of eight
+> LlamaIndex workers. It was the FOURTH instance of one behaviour we had been
+> treating as four separate events: W=8 census 6/8 at 8 concurrent posts (iid
+> predicts ~5.25 — resolved as routing luck), W=16 sweep serving 15/16 with the
+> CPU collapse, a smoke /health read-back at 7/8, and now warm-up 6/8 at 18
+> sends. Named: **uvicorn workers are selected by the kernel at accept, and
+> low-concurrency traffic does not distribute** — a lone post goes to a
+> recently-active worker (LIFO wake-up), so sequential sends can hammer one
+> hot worker indefinitely, while concurrent posts wake the herd and spread.
+> The measured curve, all points already in hand: 1x-workers concurrency
+> reached 6/8; 2x reached 4/4 (the W=4 point); 4x reached 8/8 reliably (the
+> Corner discriminator).
+>
+> The warm-up had the defect in its structure: a concurrent FIRST BATCH of
+> `min(WARM_N, 2 x conc)` followed by a strictly SEQUENTIAL top-up loop. On
+> Corner (WARM_N=16) the first batch was 16 concurrent sends and always
+> covered — the sequential top-up never had to work, so its inability to
+> distribute stayed invisible. ami_full set WARM_N=2 (Crossroad 32, her
+> corpus's warm-set size), the first batch shrank to TWO sends, and coverage
+> fell to the coin-flip machine: leg 1's warm-up passed by luck, leg 2's
+> failed. **A parameter change two crossroads earlier turned a latent
+> structural defect into a campaign abort** — entry 3's mechanism (the
+> condition moved out from under a working thing) wearing entry 13's clothes
+> (nothing about the code changed).
+>
+> **Crossroad 40 — fix the distribution, not the threshold.** Warm-up sends go
+> CONCURRENT, in waves of `max(2 x declared workers, the leg's own
+> concurrency)`, two waves maximum (cumulative 4x workers — the discriminator's
+> proven load), re-sending the warm SET per Crossroad 32. The coverage rule is
+> UNCHANGED: an unwarmed worker serving its first inference inside the measured
+> window inflates the LlamaIndex arm's latency — our own comparison arm — so
+> relaxing it would be a shortcut that damages the comparison in our favour's
+> mirror. The RR arm is structurally immune and its Corner-banked arithmetic is
+> untouched: tokens are DRIVER-ADDRESSED round-robin — coverage by
+> construction; kernel accept plays no part. Confirmed from code, not assumed.
+>
+> **The instrument gap mattered as much as the bug.** The failing gate printed
+> a COUNT — 6/8 — and discarded which pids served and how many sends each drew,
+> so "distribution or dead workers?" could not be answered from the record
+> (entry 10's rule broken: the failing run must carry its own diagnosis).
+> Warm-up now writes a per-send ledger (row, pid, token, wall, error) plus the
+> declared pid set BEFORE any verdict, and the gate names the unserved pids and
+> the per-pid counts. The two hypotheses now separate in the artifact: pids
+> missing after two waves at 4x concurrency = workers that never draw work
+> (a different bug — the message says so and forbids raising the budget);
+> scattered shortfall at low concurrency = distribution. One caveat is recorded
+> in the ledger itself: pid identity is comparable only within one container
+> lifetime (defect #23), so cross-artifact pid matching must check lifetimes
+> first.

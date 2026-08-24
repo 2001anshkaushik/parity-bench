@@ -10,15 +10,21 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
-**WHERE WE ARE (updated 2026-08-23, after the step-0 death):** Phase B for the
-**ami_full (170-meeting) campaign** is COMPLETE — B1-B8 all done, **gate 3 armed
-on `probe_20260823_122005`**, golden identical at 13 chunks, corpus 170/170
-sha-verified (all relayed from the box). The first launch **died at step 0, four
-minutes in, nothing measured** — `fetch_ami_video.py --verify` without
-`--corpus-dir` looked in the Corner-era default `corpus/ami/video`, found every
-file missing, and tried to FETCH a staged corpus. FIXED (register entry 15);
-the box needs a pull and ONE stamp command before relaunch — see THE LAUNCH
-SEQUENCE at the bottom of this block. The Corner campaign is BANKED.
+**WHERE WE ARE (updated 2026-08-23, third launch pending):** Phase B COMPLETE
+— gate 3 armed on `probe_20260823_122005`, golden identical at 13 chunks,
+170/170 sha (all relayed). **Launch 1 died at step 0** (Corner-era corpus-dir
+default + a verify that fetched — register entry 15, FIXED, manifest stamped on
+the box). **Launch 2 died at leg 2 of 9, ~45 min in** — LI warm-up reached
+6/8 worker pids in 18 sends: the top-up loop sent ONE post at a time and kernel
+accept does not distribute low-concurrency traffic (register entry 16,
+**Crossroad 40**: warm-up now goes CONCURRENT in waves of max(2 x workers, leg
+concurrency), coverage rule UNCHANGED, per-send ledger written before any
+verdict, RR arithmetic untouched). **Leg 1 of launch 2 is BANKED**: llamaindex
+sequential, 6 records / 5 offered, 0 errors, 2.743 f/s (33.66x realtime), CPU
+9.1%, gates PASS 7 · NOT RUN 1 · FAIL 0, collector ok — but the campaign
+RESTARTS FROM SCRATCH, so it will be re-measured, not reused. Relaunch = pull +
+the same launch line (stamp already done); see THE LAUNCH SEQUENCE below. The
+Corner campaign is BANKED.
 
 ### B1-B6, done, with their values
 | step | value |
@@ -120,7 +126,8 @@ Do NOT re-implement these; verify the box has the fix commit first.
 `driver_video.py`, `smoke_video.py` and the new `corpus_locator.py`. Without the
 pull, the relaunch dies the same way.
 
-**Step 2 — stamp the manifest ONCE** (a full sha256 verify — tens of seconds,
+**Step 2 — stamp the manifest ONCE** — **DONE on the box** (launch 2 passed
+step 0 with `DONE verified=170/170`); re-running it is harmless and idempotent (a full sha256 verify — tens of seconds,
 the same work as step 0 — that then records the directory in the manifest
 meta so run_plan and every tool derive it; meta line only, data rows asserted
 byte-identical, old/new manifest sha printed):
