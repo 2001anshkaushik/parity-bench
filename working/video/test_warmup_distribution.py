@@ -36,10 +36,13 @@ def check(name, cond, detail=''):
 class FakeLIArm:
     """Kernel-ish accept: an arriving post goes to an idle worker if several
     posts are in flight together (the herd wakes everyone), else to the most
-    recently active worker (LIFO). Dead pids never serve."""
+    recently active worker (LIFO). `skew_to` reproduces the measured reality —
+    /process_video never blocks its event loop, so ONE worker can hoover up
+    connections however many are in flight. `warm_markers` is the SERVICE's own
+    count (Crossroad 41's instrument), independent of who answers requests."""
     name = 'llamaindex'
 
-    def __init__(self, workers=8, dead=()):
+    def __init__(self, workers=8, dead=(), skew_to=None, warm_markers=None):
         self.declared_workers = workers
         self.pids = [4000 + k for k in range(workers)]
         self.dead = set(dead)
@@ -47,16 +50,23 @@ class FakeLIArm:
         self.in_flight = 0
         self.hot = self.live[0]
         self.served: list[int] = []
+        self.skew_to = skew_to          # serve only these pids, at any concurrency
+        self.warm_markers = workers if warm_markers is None else warm_markers
+
+    async def health(self):
+        return {'warm_workers': self.warm_markers, 'declared_workers': self.declared_workers}
 
     async def process(self, blob, name):
         self.in_flight += 1
         try:
             await asyncio.sleep(0.001)
-            idle_share = min(self.in_flight, len(self.live))
+            pool = self.skew_to if self.skew_to else self.live
+            idle_share = min(self.in_flight, len(pool))
             # concurrent arrivals spread over that many distinct live workers;
             # a lone arrival sticks to the hot one
             k = len(self.served)
-            pid = self.live[k % idle_share] if idle_share > 1 else self.hot
+            pid = pool[k % idle_share] if idle_share > 1 else (
+                self.hot if not self.skew_to else pool[0])
             self.hot = pid
             self.served.append(pid)
             await asyncio.sleep(0.002)
@@ -67,6 +77,9 @@ class FakeLIArm:
 
 class FakeRRArm:
     name = 'rocketride'
+
+    async def health(self):
+        raise AssertionError('the RR arm must never be asked for LI warm markers')
 
     def __init__(self, tokens=16):
         self.declared_workers = None
@@ -116,9 +129,12 @@ def main() -> int:
         arm = FakeLIArm(workers=8)
         run(arm, drv.Posture('workers', 8, None), warm, args_for('llamaindex', corpus=corpus), d)
         doc = json.loads((d / 'warmup_teststem.json').read_text())
-        check('WARM_N=2, blast leg: coverage 8/8 reached (was 6/8 fatal)',
-              doc['unserved_pids'] is None and len(doc['per_pid_send_counts']) == 8,
-              json.dumps(doc['per_pid_send_counts']))
+        skew = doc['response_pid_distribution']
+        check('WARM_N=2, blast leg: 8/8 response pids reached (was 6/8 fatal)',
+              skew['unserved_declared_pids'] is None and len(skew['per_pid_send_counts']) == 8,
+              json.dumps(skew['per_pid_send_counts']))
+        check('...and the gate that PASSES it is the markers, not that count',
+              doc['gate']['warm_workers'] == 8, json.dumps(doc['gate']))
         check('wave size = max(2 x 8 workers, C=16) = 16, concurrent',
               '16 concurrent' in doc['policy'] and 'Crossroad 40' in doc['policy'], doc['policy'])
         check('one wave sufficed at 2x-worker concurrency (the W=4 evidence point)',
@@ -134,8 +150,8 @@ def main() -> int:
         run(arm, drv.Posture('workers', 8, None), warm,
             args_for('llamaindex', leg='sequential', blast_c=None, corpus=corpus), d)
         doc = json.loads((d / 'warmup_teststem.json').read_text())
-        check('sequential leg: wave still 16 (2 x workers floor), 8/8 covered',
-              doc['unserved_pids'] is None and '16 concurrent' in doc['policy'], doc['policy'])
+        check('sequential leg: wave still 16 (2 x workers floor), markers gate passes',
+              doc['gate']['warm_workers'] == 8 and '16 concurrent' in doc['policy'], doc['policy'])
 
     print('\nCONTROL — the OLD shape (1-at-a-time) really does starve on this same fake')
     with tempfile.TemporaryDirectory() as t:
@@ -155,24 +171,75 @@ def main() -> int:
         check('18 sends, 2 concurrent + 16 sequential -> coverage FAILS on the same fake '
               f'({len(seen)}/8) — the fix is the distribution, not the arm', len(seen) < 8)
 
-    print('\nDEAD WORKERS — the discriminator: same pids missing at FULL concurrency')
+    print('\nCROSSROAD 41 — the gate is the WARM MARKERS; scheduling skew is reported')
     with tempfile.TemporaryDirectory() as t:
         d = Path(t)
         corpus, warm = setup(d, warm_n=2)
-        arm = FakeLIArm(workers=8, dead=(4006, 4007))
+        # attempt 3 reproduced: 6/8 response pids, one worker taking 12 of 32
+        arm = FakeLIArm(workers=8, skew_to=[4000, 4001, 4002, 4003, 4004, 4005])
+        run(arm, drv.Posture('workers', 8, None), warm, args_for('llamaindex', corpus=corpus), d)
+        doc = json.loads((d / 'warmup_teststem.json').read_text())
+        skew = doc['response_pid_distribution']
+        check('severe skew (6/8 response pids) now PASSES — all 8 markers present',
+              doc['gate']['warm_workers'] == 8 and doc['gate']['declared_workers'] == 8
+              and skew['distinct_response_pids'] < 8, json.dumps(skew))
+        check('the gate names its rule as the markers, not the pids',
+              'warm markers' in doc['gate']['rule'] and 'Crossroad 41' in doc['gate']['rule'])
+        check('skew is EXPORTED: per-pid counts, busiest and quietest',
+              skew['busiest_worker_sends'] >= skew['quietest_serving_worker_sends']
+              and skew['per_pid_send_counts'], json.dumps(skew))
+        check('the export marks the distribution REPORTED, NOT GATED',
+              'NOT GATED' in skew['note'] and 'scheduling, not warmth' in skew['note'])
+        check('unserved pids still recorded for the record, not fatal',
+              'unserved_declared_pids' in skew)
+
+    print('\nNULL CONTROL — a missing warm marker MUST fail')
+    for missing in (7, 1, 0):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            corpus, warm = setup(d, warm_n=2)
+            arm = FakeLIArm(workers=8, warm_markers=missing)
+            rc, msg = 0, ''
+            try:
+                run(arm, drv.Posture('workers', 8, None), warm,
+                    args_for('llamaindex', corpus=corpus), d)
+            except SystemExit as e:
+                rc, msg = 1, str(e)
+            check(f'{missing}/8 warm markers -> NOT DONE, rc=1',
+                  rc == 1 and f'{missing}/8 workers have written a warm marker' in msg, msg)
+            check(f'{missing}/8: the message distinguishes a missing marker from skew',
+                  'not the scheduling skew' in msg and 'genuinely not ready' in msg, msg)
+            check(f'{missing}/8: ledger still written before the verdict',
+                  (d / 'warmup_teststem.json').exists())
+
+    with tempfile.TemporaryDirectory() as t:
+        d = Path(t)
+        corpus, warm = setup(d, warm_n=2)
+        arm = FakeLIArm(workers=8)
+        async def broken(): raise RuntimeError('connection refused')
+        arm.health = lambda: broken()
         rc, msg = 0, ''
         try:
             run(arm, drv.Posture('workers', 8, None), warm, args_for('llamaindex', corpus=corpus), d)
         except SystemExit as e:
             rc, msg = 1, str(e)
-        doc = json.loads((d / 'warmup_teststem.json').read_text())
-        check('gate FAILS and NAMES the two unserved pids', rc == 1 and '4006' in msg and '4007' in msg, msg)
-        check('ledger written BEFORE the verdict, unserved recorded',
-              doc['unserved_pids'] == [4006, 4007])
-        check('both waves ran (32 sends = 4x workers, the proven load) before failing',
-              '2 wave(s)' in doc['policy'] and len(doc['sends']) == 32, doc['policy'])
-        check('the message says what this pattern means and forbids the wrong fix',
-              'not distribution' in msg and 'do not raise the budget' in msg, msg)
+        check('/health unreadable -> ABSENCE FAILS, never falls back to response pids',
+              rc == 1 and 'Absence of the instrument is not evidence of warmth' in msg, msg)
+
+    with tempfile.TemporaryDirectory() as t:
+        d = Path(t)
+        corpus, warm = setup(d, warm_n=2)
+        arm = FakeLIArm(workers=8)
+        arm.health = lambda: _no_fields()
+        async def _no_fields(): return {}
+        arm.health = _no_fields
+        rc, msg = 0, ''
+        try:
+            run(arm, drv.Posture('workers', 8, None), warm, args_for('llamaindex', corpus=corpus), d)
+        except SystemExit as e:
+            rc, msg = 1, str(e)
+        check('/health without the fields -> refuses, does not default to a pass',
+              rc == 1 and 'cannot be proven' in msg, msg)
 
     print('\nRR ARM — Corner-banked arithmetic unchanged, addressed not accepted')
     with tempfile.TemporaryDirectory() as t:
@@ -182,8 +249,11 @@ def main() -> int:
         run(arm, drv.Posture('parity', 16, 2), warm, args_for('rocketride', corpus=corpus), d)
         doc = json.loads((d / 'warmup_teststem.json').read_text())
         check('M=16, WARM_N=2: 2 first batch + 14 top-up = 16 sends, 16/16 tokens',
-              len(doc['sends']) == 16 and doc['tokens_seen'] == list(range(16))
+              len(doc['sends']) == 16 and doc['gate']['tokens_seen'] == list(range(16))
               and '2 first batch + 14 top-up' in doc['policy'], doc['policy'])
+        check('RR never asked /health for LI warm markers (FakeRRArm raises if it is)',
+              doc['gate']['warm_workers'] is None and doc['gate']['declared_workers'] is None,
+              json.dumps(doc['gate']))
         check('RR policy names round-robin as ADDRESSED, kernel accept uninvolved',
               'round-robin' in doc['policy'] and 'addressed' in doc['policy'], doc['policy'])
 

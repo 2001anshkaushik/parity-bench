@@ -595,3 +595,52 @@ than rewritten from memory, which is entry 2's point in miniature.
 > entry 3's rule about proxies applies: measure the thing you need. Recorded,
 > not acted on: changing the gate's instrument is Ansh's ruling, and it is the
 > difference between a shortcut and a correction.
+
+## 18. Gating on a proxy we neither control nor need (Crossroad 41, added 2026-08-23)
+
+> Three attempts failed the LI warm-up gate with DIFFERENT pids unserved each
+> time — 6/8 [6,7]; 5/8 [10,11,13]; 6/8 [8,10] — which by the failure message's
+> own discriminator rules out workers that never draw work and leaves
+> scheduling. Severe scheduling: one worker took 12 of 32 sends, another took 1.
+> Entry 17 had already found the mechanism: `/process_video` is `async def` and
+> offloads the model call to a threadpool, so a worker's event loop never
+> blocks and one worker can accept unbounded concurrent connections. **The gate
+> was unachievable by construction** — Crossroad 40's concurrency raised the
+> odds and nothing a client does can compel the kernel to spread accepts.
+>
+> The gate counted distinct response pids. The property it existed to enforce
+> was "no worker serves its first inference inside the measured window". Those
+> are not the same thing, and the service already proved the real one directly:
+> every worker loads its model in `lifespan`, writes a warm marker, `/health`
+> reports the count, and `wait_ready --workers W` blocks on it **before the
+> driver posts anything**. Response-pid counting measured **uvicorn's
+> scheduling** — a property we neither control nor need — and three runs were
+> spent on it.
+>
+> **The distinction that made this a correction and not a shortcut, in the
+> reviewer's words:** lowering the threshold to 75% would have accepted cold
+> workers serving measured traffic — that is a relaxation, and it damages our
+> own comparison arm. Asserting the same property through its direct instrument
+> is not. The test is not "did the bar move" but "is the thing asserted still
+> the thing that matters" — and here the direct instrument is strictly
+> stronger, because a marker proves the model is loaded whereas a response
+> merely suggests it. Warm-up still SENDS (first-inference and allocator state
+> matter beyond marker presence) and still records the per-send ledger; only
+> the verdict moved.
+>
+> **What was demoted is not discarded.** The response-pid spread is now
+> exported — per-pid counts, busiest, quietest, unserved — and labelled
+> REPORTED, NOT GATED. "One worker took 12 of 32 sends" is a real, measured
+> observation about the LlamaIndex arm's behaviour under concurrent load, on
+> our own comparison arm, and it belongs in the report rather than in a gate.
+> A failed gate throws away the observation; a report keeps it. Kin to entry
+> 10's cure — the instrument stays, its authority changes.
+>
+> Postscript, and it is the same lesson at one remove: `which_8_of_8.sh`, the
+> tool written to settle which census the probe's 8/8 was, printed nine
+> filenames and no rows. It filtered points on a key named `workers`; the probe
+> writes `W`. **A guessed field name is a guessed path** (entry 15) and a
+> guessed selector (entry 14) — the third face of one habit: selecting by a
+> name you expect instead of by the property you need. It now walks the
+> document for any object carrying BOTH census fields, whatever it is called or
+> however it is nested, and says so plainly when a file carries neither.

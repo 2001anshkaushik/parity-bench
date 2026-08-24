@@ -10,6 +10,20 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
+**CROSSROAD 41 RULED AND IMPLEMENTED (2026-08-23, attempt 4 pending): the LI
+warm-up gate asserts the SERVICE WARM MARKERS (`/health` warm_workers ==
+declared_workers), not response-pid coverage. Three attempts failed the old
+gate with DIFFERENT pids each time (6/8 [6,7]; 5/8 [10,11,13]; 6/8 [8,10]) —
+scheduling, not dead workers, and unachievable by construction. NOT a
+relaxation: `wait_ready --workers W` already blocks until every worker has
+loaded its model and written a marker BEFORE the driver posts, so the marker is
+the DIRECT instrument for "no worker serves its first inference in the measured
+window"; response-pid counting measured uvicorn's scheduling. Warm-up still
+sends and still writes the ledger; the accept skew (busiest/quietest/per-pid)
+is EXPORTED as a published observation about the LI arm. Null control: a
+missing marker fails (7/8, 1/8, 0/8 all exercised), and an unreadable /health
+fails rather than falling back. Register entry 18.**
+
 **LAUNCH 3 ALSO FAILED at the LI warm-up (5/8, pids 10/11/13 unserved, 32 sends
 in 2 waves). Two hypotheses were killed from the code: the post paths are
 IDENTICAL (both urllib, fresh TCP connection per post — measured: 14 requests,

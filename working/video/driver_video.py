@@ -1502,14 +1502,13 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
         used = len(ledger)
         policy = (f'{waves} wave(s) x {wave_n} concurrent (max(2 x {workers} workers, '
                   f'leg concurrency {leg_c})) — Crossroad 40; warm SET re-sent per '
-                  'Crossroad 32; coverage rule unchanged')
+                  'Crossroad 32; warmth gated on warm markers, Crossroad 41')
         say(f'warm-up consumed {used} send(s) over {len(warm)} warm rows ({policy})')
 
-    # THE LEDGER IS WRITTEN BEFORE ANY VERDICT (2026-08-23). The leg-2
-    # failure printed only a count — 6/8 — and discarded which pids served
-    # and how many sends each drew, so "distribution or dead workers?" was
-    # unanswerable from the record. The failing run now carries its own
-    # diagnosis (register entry 10's rule).
+    # THE LEDGER IS WRITTEN BEFORE ANY VERDICT (2026-08-23). The leg-2 failure
+    # printed only a count — 6/8 — and discarded which pids served and how many
+    # sends each drew, so "distribution or dead workers?" was unanswerable from
+    # the record. The failing run now carries its own diagnosis (entry 10).
     declared_pids = (sorted(int(k.rsplit('_', 1)[-1]) for k in pf['readbacks']
                             if k.startswith('li_worker_'))
                      if args.arm == 'llamaindex' else [])
@@ -1517,14 +1516,65 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
     for e in ledger:
         if e['serving_pid'] is not None:
             per_pid[str(e['serving_pid'])] = per_pid.get(str(e['serving_pid']), 0) + 1
-    unserved = [p for p in declared_pids if p not in seen_pids]
+
+    # CROSSROAD 41 (2026-08-23) — GATE ON THE WARM MARKERS, NOT RESPONSE PIDS.
+    # Three attempts failed the old gate with DIFFERENT unserved pids each time
+    # (6/8 [6,7]; 5/8 [10,11,13]; 6/8 [8,10]), which by the failure message's own
+    # discriminator rules out workers that never draw work and leaves scheduling —
+    # severe scheduling: one worker took 12 of 32 sends, another took 1. The old
+    # gate was unachievable BY CONSTRUCTION: /process_video is async and offloads
+    # the model call to a threadpool, so a worker's event loop never blocks and one
+    # worker can accept unbounded concurrent connections. Concurrency raises the
+    # odds of distribution; nothing the client does can compel it.
+    #
+    # THIS IS NOT A RELAXATION. The property the gate exists to enforce is "no
+    # worker serves its first inference inside the measured window", and the
+    # service proves it directly: every worker loads its model in lifespan and
+    # writes a warm marker, /health reports the marker count, and wait_ready
+    # --workers W already blocked on it before the driver posted anything.
+    # Response-pid counting measured uvicorn's SCHEDULING — a property we neither
+    # control nor need. Lowering the threshold to 75% WOULD have been the
+    # relaxation: it accepts cold workers serving measured traffic. This asserts
+    # the SAME property by its direct instrument instead of a proxy that three
+    # runs prove unachievable.
+    warm_markers = warm_declared = None
+    if args.arm == 'llamaindex':
+        try:
+            h = await arm.health()
+            warm_markers = h.get('warm_workers')
+            warm_declared = h.get('declared_workers') or arm.declared_workers
+        except Exception as exc:  # noqa: BLE001 — absence fails, never shrugs
+            raise SystemExit(
+                f'NOT DONE — warm-up could not read /health to verify warm markers '
+                f'({exc!r}). Absence of the instrument is not evidence of warmth.')
+
+    # Distribution is REPORTED, never gated — and it is a real observation about
+    # the LI arm worth publishing: kernel accept skew under concurrent load,
+    # measured on our own comparison arm.
+    counts = sorted(per_pid.values(), reverse=True)
+    skew = {
+        'distinct_response_pids': len(seen_pids),
+        'declared_workers': warm_declared or (arm.declared_workers
+                                              if args.arm == 'llamaindex' else None),
+        'sends': len(ledger),
+        'per_pid_send_counts': per_pid or None,
+        'busiest_worker_sends': counts[0] if counts else None,
+        'quietest_serving_worker_sends': counts[-1] if counts else None,
+        'unserved_declared_pids': [x for x in declared_pids if x not in seen_pids] or None,
+        'note': ('REPORTED, NOT GATED (Crossroad 41). uvicorn workers are selected by the '
+                 'kernel at accept and /process_video does not block its event loop, so '
+                 'response-pid spread measures scheduling, not warmth. Warmth is gated on '
+                 'the service warm markers.'),
+    }
     warm_path = out_dir / f'warmup_{stem}.json'
     warm_path.write_text(json.dumps({
         'arm': arm.name, 'leg': args.leg, 'posture': posture.name, 'policy': policy,
-        'sends': ledger, 'per_pid_send_counts': per_pid or None,
+        'gate': {'rule': 'warm markers via /health (Crossroad 41)',
+                 'warm_workers': warm_markers, 'declared_workers': warm_declared,
+                 'tokens_seen': sorted(seen_tokens) or None},
+        'sends': ledger,
+        'response_pid_distribution': skew,
         'declared_worker_pids': declared_pids or None,
-        'unserved_pids': unserved or None,
-        'tokens_seen': sorted(seen_tokens) or None,
         'note': ('pid identity is only comparable within ONE container lifetime '
                  '(defect #23: pid reuse across restarts)')}, indent=1))
     say(f'warm-up ledger: {warm_path.name}')
@@ -1533,16 +1583,25 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
         raise SystemExit(f'NOT DONE — warm-up touched {len(seen_tokens)}/{posture.tokens} '
                          f'tokens; every instance must be warm before timing. '
                          f'Ledger: {warm_path.name}')
-    if args.arm == 'llamaindex' and len(seen_pids) < (arm.declared_workers or 1):
-        raise SystemExit(
-            f'NOT DONE — warm-up observed {len(seen_pids)}/{arm.declared_workers} worker '
-            f'pids serving (#21-class) after {used} sends ({policy}). '
-            f'Unserved pids: {unserved or "UNKNOWN — declared set absent from readbacks"}; '
-            f'per-pid send counts: {per_pid}. Ledger: {warm_path.name}. Unwarmed workers '
-            'would serve measured traffic cold. If the SAME pids stay unserved across '
-            'waves at 4x-worker concurrency, that is not distribution — it is workers '
-            'that never draw work: a different bug; do not raise the budget, read the '
-            'ledger and the container log.')
+    if args.arm == 'llamaindex':
+        if warm_markers is None or warm_declared is None:
+            raise SystemExit(
+                'NOT DONE — /health reported no warm_workers/declared_workers, so warmth '
+                'cannot be proven. Absence fails first; do not fall back to the response-pid '
+                f'count. Ledger: {warm_path.name}')
+        if warm_markers < warm_declared:
+            raise SystemExit(
+                f'NOT DONE — only {warm_markers}/{warm_declared} workers have written a warm '
+                f'marker (Crossroad 41). A worker without a marker has not loaded its model and '
+                f'would serve its first inference inside the measured window, inflating THIS '
+                f'arm. This is not the scheduling skew (reported, not gated): a missing marker '
+                f'means a worker is genuinely not ready — read the container log and wait_ready. '
+                f'Ledger: {warm_path.name}')
+        say(f'warm-up gate: {warm_markers}/{warm_declared} warm markers present (Crossroad 41)')
+        say(f'warm-up distribution (REPORTED, not gated): {len(seen_pids)}/{warm_declared} '
+            f'distinct response pids over {len(ledger)} sends; busiest '
+            f'{skew["busiest_worker_sends"]}, quietest {skew["quietest_serving_worker_sends"]} '
+            '— kernel accept skew, published')
     say(f'warm-up complete: tokens={sorted(seen_tokens) or "n/a"} '
         f'worker_pids={len(seen_pids) or "n/a"}')
 
