@@ -114,6 +114,68 @@ def main() -> int:
         check('NULL CONTROL: at C=8 residency exceeds 4 (the gauge can move)',
               out2['max_resident_blobs'] > 4, str(out2))
 
+    print('\nCHUNKED WRITE PATH (RRArm.process against a fake pipe)')
+
+    class FakePipe:
+        def __init__(self, fail_at=None):
+            self.writes, self.opened, self.closes, self.fail_at = [], False, 0, fail_at
+
+        @property
+        def is_opened(self):
+            return self.opened and not self.closes
+
+        async def open(self):
+            self.opened = True
+
+        async def write(self, buf):
+            if self.fail_at is not None and len(self.writes) == self.fail_at:
+                raise ConnectionError('injected mid-stream failure')
+            self.writes.append(len(buf))
+
+        async def close(self):
+            self.closes += 1
+            return {'documents': [{'page_content': 'x' * 10,
+                                   'metadata': {'chunkId': 0, 'time_stamp': 0}}]}
+
+    class FakeClient:
+        def __init__(self, pipe):
+            self._p = pipe
+            self.args = None
+
+        async def pipe(self, token, objinfo, mimetype):
+            self.args = (token, dict(objinfo), mimetype)
+            return self._p
+
+    def mk_arm(pipe):
+        arm = drv.RRArm.__new__(drv.RRArm)
+        arm.client = FakeClient(pipe)
+        arm.tokens, arm.project_ids, arm._rr = ['tokA'], ['p'], 0
+        return arm
+
+    MB = 1024 * 1024
+    fp = FakePipe()
+    rec = asyncio.run(mk_arm(fp).process(b'z' * (2 * MB + 5), 'v.avi'))
+    check('blob split at exactly 1 MiB with a partial tail, in order',
+          fp.writes == [MB, MB, 5], str(fp.writes))
+    check('record carries write_path and token_index; result via record_from_rr',
+          rec.get('write_path') == 'chunked-1MiB x 3' and rec.get('token_index') == 0
+          and rec.get('n_chunks') == 1, str({k: rec.get(k) for k in ('write_path', 'token_index', 'n_chunks')}))
+    check('close() called exactly once on success', fp.closes == 1)
+
+    fp2 = FakePipe(fail_at=1)
+    try:
+        asyncio.run(mk_arm(fp2).process(b'z' * (3 * MB), 'v.avi'))
+        check('mid-stream failure propagates', False, 'no raise')
+    except ConnectionError:
+        check('mid-stream failure propagates after cleanup close',
+              fp2.closes == 1 and fp2.writes == [MB], f'closes={fp2.closes} writes={fp2.writes}')
+
+    arm3 = mk_arm(FakePipe())
+    asyncio.run(arm3.process(b'q' * 100, 'small.avi'))
+    check('objinfo = {name, size}, mimetype video/x-msvideo (send()-identical surface)',
+          arm3.client.args == ('tokA', {'name': 'small.avi', 'size': 100}, 'video/x-msvideo'),
+          str(arm3.client.args))
+
     print(f'\nread-residency controls: {"PASS" if not FAILS else "FAIL"} ({len(FAILS)} failing)')
     return 1 if FAILS else 0
 

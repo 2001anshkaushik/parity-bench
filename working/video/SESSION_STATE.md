@@ -10,6 +10,25 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
+**CHUNKED WRITE PATH ADOPTED (Crossroad — operator-ruled, 2026-08-24): C=4
+n=12 ALSO failed (11 records / 4 errors), acquitting concurrency; RRArm.process
+now writes 1 MiB chunks (send_files' proven shape, data.py:551) through the
+SAME pipe/open/write/close primitives — same PIPELINE_RESULT, same objinfo,
+same sha/residency/breaker, C=16 and --tokens semantics UNCHANGED (chunking is
+inside our own send loop; send_files itself is NOT used, so no client-cap
+question). Records carry write_path='chunked-1MiB x N'; the arm announces 'RR
+write path: chunked 1 MiB...' at start; export provenance carries rr_write_path
+with the disclosure. Driver now holds a per-arm flock
+($TMPDIR/driver_video_<arm>.lock) — two drivers per arm are structurally
+impossible. MEASUREMENT CAVEAT (export + Monday): the banked RR default
+SEQUENTIAL leg ran whole-frame; all four RR blast legs run chunked (~237-238
+round-trips per 248 MB inside wall_s — definition unchanged, wire shape
+disclosed; matches Leela's published arm, improving cross-team comparability;
+direction of the overhead is against RR blast). Proof run then
+`working/video/overnight_rr.sh <mainrun dir>` (parity p1/p2 then default
+p1/p2, fresh container per leg, continues past failures, lineage from banked
+export, flock-guarded).**
+
 **POST-READFIX FAILURES (2026-08-24 night): RR blast died twice more at C=16 —
 all 16 sends fail in a ~10 ms window at t≈66-71 s; read_s 12-17 s (16
 concurrent 248 MB reads contending on gp3). Errors now include NoneType

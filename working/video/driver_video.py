@@ -406,18 +406,48 @@ class RRArm:
             raise
         say(f'RR: {len(self.tokens)} token(s) live, posture {self.posture.label()}, '
             f'{len(set(self.project_ids))} distinct project_id(s)')
+        say('RR write path: chunked 1 MiB per write request (send_files shape, '
+            'data.py:551; whole-frame single-message path retired 2026-08-24 — '
+            'DIAG_M1_BLAST)')
 
     def _next_token(self) -> tuple[int, str]:
         i = self._rr % len(self.tokens)
         self._rr += 1
         return i, self.tokens[i]
 
+    # 1 MiB — send_files' fixed chunk size (rocketride/mixins/data.py:551), the
+    # shape PROVEN on this exact corpus by Leela's aws_videobench arm. Adopted
+    # 2026-08-24 after DIAG_M1_BLAST: our send() wrote each video as ONE
+    # ~248 MB DAP message; 16 of those on the shared websocket killed the
+    # connection at every C tried (16, and 4). Chunks interleave fairly, so
+    # pongs, responses and other sends' chunks slot between them.
+    WRITE_CHUNK = 1024 * 1024
+
     async def process(self, blob: bytes, name: str) -> dict:
         idx, token = self._next_token()
-        result = await self.client.send(token, blob, objinfo={'name': name},
-                                        mimetype='video/x-msvideo')
+        # Same primitives send() uses (pipe/open/write/close — data.py:405,
+        # cleanup shape data.py:466-478), same PIPELINE_RESULT from close(),
+        # same objinfo shape (_objinfo_with_size: {'name', 'size'}); the ONLY
+        # change is write granularity: N x 1 MiB requests instead of one jumbo.
+        pipe = await self.client.pipe(token, {'name': name, 'size': len(blob)},
+                                      'video/x-msvideo')
+        await pipe.open()
+        n_chunks = 0
+        try:
+            for off in range(0, len(blob), self.WRITE_CHUNK):
+                await pipe.write(blob[off:off + self.WRITE_CHUNK])
+                n_chunks += 1
+            result = await pipe.close()
+        except Exception:
+            if pipe.is_opened:
+                try:
+                    await pipe.close()
+                except Exception:  # noqa: BLE001 — cleanup mirrors send()'s
+                    pass
+            raise
         rec = record_from_rr(result)
         rec['token_index'] = idx
+        rec['write_path'] = f'chunked-1MiB x {n_chunks}'
         return rec
 
     async def stop(self):
@@ -1760,6 +1790,26 @@ async def amain() -> int:
                                     time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())))
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # ONE DRIVER PER ARM, STRUCTURALLY (2026-08-24): two drivers against one
+    # container voided a probe tonight. Per-arm flock, held for the whole run;
+    # released by the OS on any exit. --cross mode returned above — it touches
+    # no container and takes no lock.
+    import fcntl
+    lock_path = Path(os.environ.get('TMPDIR', '/tmp')) / f'driver_video_{args.arm}.lock'
+    lock_fh = open(lock_path, 'a+')
+    try:
+        fcntl.flock(lock_fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        lock_fh.seek(0)
+        holder = lock_fh.read().strip() or 'unknown'
+        raise SystemExit(f'NOT DONE — another driver_video ({args.arm}) holds {lock_path} '
+                         f'(pid {holder}). Two drivers on one container corrupt both runs; '
+                         'refusing. A dead holder frees the lock on its own exit.')
+    lock_fh.truncate(0)
+    lock_fh.write(f'{os.getpid()}\n')
+    lock_fh.flush()
+    say(f'driver lock held: {lock_path} (pid {os.getpid()})')
+
     # ---- arm + posture ----------------------------------------------------
     li_probe = LIArm(args.li_port)
     if args.arm == 'llamaindex':
@@ -2112,6 +2162,10 @@ async def amain() -> int:
             'network_mode': pf.get('network_mode'),
             'image': image_provenance(svc_container, args.image_lineage),
             'interval_s': args.interval_s,
+            'rr_write_path': ('chunked-1MiB (2026-08-24, DIAG_M1_BLAST; the banked RR '
+                              'default SEQUENTIAL leg ran the whole-frame path — wall_s '
+                              'definition unchanged, wire shape differs and is disclosed)'
+                              if args.arm == 'rocketride' else None),
             'frames_observed_method': ('bracket-count' if args.arm == 'rocketride'
                                        else 'extractor-count'),
             'chunk_config_source': 'measured from records (config literal never exported)',
