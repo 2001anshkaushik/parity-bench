@@ -176,6 +176,38 @@ thread_env_args() {
        -e VECLIB_MAXIMUM_THREADS=$n -e NUMEXPR_NUM_THREADS=$n -e TORCH_NUM_THREADS=$n"
 }
 
+# CONTAINER STATE IS DECLARED, NOT ASSUMED (2026-08-23). run_plan has always
+# created fresh containers — start_rr/start_li each `docker rm -f` then
+# `docker run -d`, so a running container of the same name is destroyed, never
+# reused. That was true and it was never PROVEN in the log, so when leg 2's
+# warm-up failed against workers of unknown age the question "was this
+# container fresh?" could not be answered from the run's own record. It can now:
+# every lifetime prints its id, creation time and age, and REFUSES if the
+# container it is about to measure was not created by this call.
+container_provenance() {   # $1 = name, $2 = lifetime tag
+  local name="$1" tag="${2:-}" id created age
+  id="$(docker inspect -f '{{.Id}}' "$name" 2>/dev/null | cut -c1-12)"
+  created="$(docker inspect -f '{{.Created}}' "$name" 2>/dev/null)"
+  age="$("$PY" -c "
+import sys, time, datetime
+try:
+    t = datetime.datetime.fromisoformat(sys.argv[1].replace('Z','+00:00'))
+    print(int(time.time() - t.timestamp()))
+except Exception:
+    print(-1)
+" "$created" 2>/dev/null || echo -1)"
+  echo "container $name${tag:+ [$tag]}: id=$id created=$created age=${age}s (fresh lifetime, created by this call)" | tee -a "$LOG"
+  if [ "$age" -lt 0 ] 2>/dev/null; then
+    echo "NOT DONE — could not read $name creation time; container state is unknown and a" | tee -a "$LOG"
+    echo "campaign must start from a KNOWN container state." | tee -a "$LOG"; exit 1
+  fi
+  if [ "$age" -gt 600 ]; then
+    echo "NOT DONE — $name is ${age}s old but this call just created it. A pre-existing" | tee -a "$LOG"
+    echo "container is being measured: worker age, accumulated state and thread env are all" | tee -a "$LOG"
+    echo "unknown. Remove it by hand and relaunch." | tee -a "$LOG"; exit 1
+  fi
+}
+
 start_rr() {  # $1 = thread env for THIS lifetime: 'unset' (default posture) or N (parity)
   local t="$1"
   case "$t" in unset) ;; ''|*[!0-9]*) echo "NOT DONE — start_rr needs 'unset' or a positive int, got '$t'"; exit 1;; esac
@@ -195,6 +227,7 @@ start_rr() {  # $1 = thread env for THIS lifetime: 'unset' (default posture) or 
   # Readiness = a real SDK connect (one helper everywhere); asserts host mode
   # and records it in the log via run().
   run "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
+  container_provenance rr "$t"
 }
 
 start_li() {
@@ -213,6 +246,13 @@ start_li() {
   # Dockerfile pinning is a flagged follow-up ruling, not done here.
   docker exec li_video python -m pip freeze > "$OUT/li_image_freeze.txt" 2>>"$LOG" \
     || echo "li_image_freeze snapshot FAILED (recorded)" | tee -a "$LOG"
+  container_provenance li_video "W=$LI_WORKERS"
+  # ALL LI legs share this ONE lifetime by design (stop_arm li_video runs after
+  # the last LI leg) — so by leg 2 the workers have served leg 1's traffic and
+  # are no longer equally cold. probe_li_workers uses a FRESH container PER
+  # POINT, which is the one environmental difference between the probe's census
+  # and the driver's warm-up. Stated here so the difference is on the record
+  # rather than rediscovered.
 }
 
 stop_arm() {  # $2 = optional lifetime tag (rr now has two lifetimes — logs must not overwrite)

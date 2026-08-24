@@ -540,3 +540,58 @@ than rewritten from memory, which is entry 2's point in miniature.
 > in the ledger itself: pid identity is comparable only within one container
 > lifetime (defect #23), so cross-artifact pid matching must check lifetimes
 > first.
+
+## 17. The probe and the gate were not measuring the same thing (added 2026-08-23, pending Ansh's ruling)
+
+> Crossroad 40 made warm-up sends concurrent and the next run still failed:
+> 32 sends in two waves of 16, three pids unserved, one worker taking ten.
+> The reviewer's own failure text was the discriminator — same pids missing at
+> 4x-worker concurrency is not distribution — and the natural next question was
+> why `probe_li_workers` reaches 8/8 where the driver does not. Two hypotheses
+> were on the table: connection pooling (a reused keep-alive connection stays
+> pinned to one worker), and container age. Both were checkable without another
+> eight-minute run, and neither survived contact with the code.
+>
+> **The post paths are identical.** Both build a fresh
+> `urllib.request.Request` per post and call `urlopen`, both driven by
+> `asyncio.to_thread` inside `asyncio.gather`. Measured rather than read: a
+> keep-alive-capable local server, driven by the driver's exact shape, accepted
+> **14 distinct TCP connections for 14 requests** with `Connection: close` on
+> every one. No pooling exists to pin anything. (The first run of that
+> instrument reported 9 connections for 14 requests — `id(self.connection)` is
+> recycled by CPython after GC. The instrument was wrong, not the finding;
+> re-measured by client source port. Entry 9, again, inside the check built to
+> settle a hypothesis.)
+>
+> **What actually differs is what each one COUNTS.** `probe_li_workers` records
+> two censuses: `serving_by_cpu_delta` — processes that burned CPU during the
+> batch, which its docstring calls the serving proof — and
+> `distinct_response_pids`, reported alongside, with the explicit note that
+> **`distinct_pids < W` on one batch is scheduling, not a defect**. The
+> driver's warm-up gate counts only distinct response pids. So the probe's
+> headline 8/8 and the driver's fatal 5/8 may be two different measurements,
+> and the gate may be demanding a result the probe never demonstrated and
+> documented as not to be expected. `probe/which_8_of_8.sh` settles it from the
+> probe's own artifacts in one command.
+>
+> **And the mechanism says client concurrency cannot force the result the gate
+> wants.** `/process_video` is `async def` and offloads the model call with
+> `anyio.to_thread.run_sync`, so a worker's event loop is never blocked: one
+> worker can accept an unbounded number of concurrent connections and queue
+> them, returning to `accept()` immediately. Concurrency raises the ODDS of
+> distribution; it cannot compel it. Crossroad 40's premise — "concurrent posts
+> force uvicorn to distribute" — is therefore true only statistically, which is
+> the right fix for the wrong reason and explains why more load helped and did
+> not settle it.
+>
+> The rule, and it is entry 1's with the roles reversed: **when two instruments
+> disagree about the same system, check that they are measuring the same
+> quantity before believing either.** Four "instances" of a worker-coverage
+> anomaly were compared against a probe result that may never have been the
+> same number. Related: the service already proves the property the warm-up
+> exists to establish — every worker loads its model at startup and writes a
+> warm marker, and `wait_ready --workers W` blocks until all W are warm — so
+> "has this worker served a request" is a PROXY for "is this worker warm", and
+> entry 3's rule about proxies applies: measure the thing you need. Recorded,
+> not acted on: changing the gate's instrument is Ansh's ruling, and it is the
+> difference between a shortcut and a correction.

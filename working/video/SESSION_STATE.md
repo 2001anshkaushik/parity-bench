@@ -10,6 +10,20 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
+**LAUNCH 3 ALSO FAILED at the LI warm-up (5/8, pids 10/11/13 unserved, 32 sends
+in 2 waves). Two hypotheses were killed from the code: the post paths are
+IDENTICAL (both urllib, fresh TCP connection per post — measured: 14 requests,
+14 connections, `Connection: close`), and run_plan has ALWAYS created fresh
+containers (`docker rm -f` then `docker run -d`, both arms). What differs is
+WHAT IS COUNTED: `probe_li_workers` headlines `serving_by_cpu_delta` (CPU
+burners) and reports `distinct_response_pids` alongside, documenting that the
+latter is expected to be < W; the driver's gate counts ONLY response pids. Run
+`working/video/probe/which_8_of_8.sh` on the box to settle which number the
+probe's 8/8 was — this is the pivotal open question (register entry 17).
+Mechanism: `/process_video` is async + `anyio.to_thread.run_sync`, so ONE
+worker can accept unbounded concurrent connections; client concurrency raises
+the odds of distribution but cannot compel it.**
+
 **WHERE WE ARE (updated 2026-08-23, third launch pending):** Phase B COMPLETE
 — gate 3 armed on `probe_20260823_122005`, golden identical at 13 chunks,
 170/170 sha (all relayed). **Launch 1 died at step 0** (Corner-era corpus-dir
