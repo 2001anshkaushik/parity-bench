@@ -10,6 +10,20 @@ using it.
 
 ## ▶▶ COMPACTION BRIEFING — 2026-08-23, PHASE B FOR ami_full. THIS BLOCK WINS over everything below it, including the 2026-08-21 briefing.
 
+**SOURCE-ONLY DIAGNOSIS FILED (2026-08-24): `working/video/DIAG_M1_BLAST_SOURCES.md`
+— read it before touching the RR blast path. Headline: both error strings are
+ONE connection-death event (dap_client on_disconnected sweeps all pending
+futures; :229 mints 'Could not send request' for anything still sending); the
+driver's blast gathers ALL 168 row tasks and each does a synchronous 248MB
+read_bytes ON THE EVENT LOOP before parking on the semaphore — 16 reads = the
+measured 22.6s stagger, rows 17..168 = 152 more reads ≈ the remaining 197s, so
+the loop is blocked until ~t+219.6s, which is exactly when all 16 sends died
+together; no SDK/server constant equals 220s (180 / 15+300 / 250MB all miss);
+the probe survives because it reads once before sending. Probe's own 6/16
+failures match engine-side CONST_DATA_PIPE_TIMEOUT=60.0 (zombie-pipe reaper) —
+app-layer, a different failure. NO FIX PROPOSED YET per orders; parity blast p1
+was live and untouched.**
+
 **LAUNCH 5 (RESUME) DIED IDENTICALLY AT THE FIRST BLAST SENDS with ttl=0
 landed and enforcement-skip confirmed — TTL WAS NOT THE CAUSE of the blast
 failures (the warm-up had served on that token seconds earlier in EVERY
