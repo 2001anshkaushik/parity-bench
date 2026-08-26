@@ -49,6 +49,10 @@ os.environ.setdefault('TOKENIZERS_PARALLELISM', 'false')
 
 PNG_SIG = b'\x89PNG\r\n\x1a\n'
 
+# Which clock the stage stamps used — recorded on every response so legs from
+# the two eras are never silently compared (2026-08-25 ruling).
+STAGE_SEMANTICS = 'device_only'   # before 2026-08-25: 'includes_lock_wait'
+
 
 @dataclass
 class VideoPipelineResult:
@@ -183,15 +187,20 @@ class LlamaIndexVideoPipeline:
         r.frame_png_sha16 = [hashlib.sha256(f).hexdigest()[:16] for f in frames]
 
         per_frame_json: list[str] = []
-        t0 = time.monotonic()
+        # STAMP SEMANTICS (2026-08-25, ruling): stamps INSIDE the lock so
+        # stage_s measures the DEVICE, not the queue. Before this date the
+        # stamp started before acquisition and a queued request's clock ran
+        # while waiting (occupancies of 4.84 proved it). Every response now
+        # carries stage_s_semantics so the two eras are never silently compared.
         with self._lock:
+            t0 = time.monotonic()
             for png in frames:
                 dets = self._detect_frame(png)
                 r.detections_per_frame.append(len(dets))
                 r.frame_labels.append(sorted(d['label'] for d in dets))
                 r.frame_scores.append([d['score'] for d in dets])
                 per_frame_json.append(json.dumps(dets))
-        r.stage_s['detect'] = round(time.monotonic() - t0, 2)
+            r.stage_s['detect'] = round(time.monotonic() - t0, 2)
         r.n_detections = sum(r.detections_per_frame)
 
         # Engine semantics: accumulate with '\n', split ONCE per video.
@@ -204,11 +213,11 @@ class LlamaIndexVideoPipeline:
         r.chunk_chars = [len(c) for c in chunks]
         r.chunk_sha256 = [hashlib.sha256(c.encode()).hexdigest() for c in chunks]
 
-        t0 = time.monotonic()
         with self._lock:
+            t0 = time.monotonic()
             vectors = self._embedder.get_text_embedding_batch(chunks, show_progress=False) \
                 if chunks else []
-        r.stage_s['embed'] = round(time.monotonic() - t0, 2)
+            r.stage_s['embed'] = round(time.monotonic() - t0, 2)
         r.embed_dim = len(vectors[0]) if vectors else 0
         r.embedding_norms = [round(sum(x * x for x in v) ** 0.5, 6) for v in vectors]
         return r

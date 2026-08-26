@@ -13,6 +13,9 @@ from pydantic import BaseModel, Field
 
 
 class ProcessVideoResponse(BaseModel):
+    # which clock the stage stamps used ('device_only' from 2026-08-25;
+    # 'includes_lock_wait' before) — never compare stage_s across the two
+    stage_s_semantics: str = 'includes_lock_wait'
     # --- workload (gates read these) ------------------------------------
     n_frames: int
     n_detections: int

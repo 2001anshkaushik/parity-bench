@@ -347,6 +347,7 @@ def record_from_li(body: dict) -> dict:
         'embedding_norms': body.get('embedding_norms'),
         'stage_s': body.get('stage_s'),
         'serving_pid': body.get('pid'),
+        'stage_s_semantics': body.get('stage_s_semantics'),
     }
 
 
@@ -489,25 +490,64 @@ class RRArm:
 class LIArm:
     name = 'llamaindex_video'
 
-    def __init__(self, port: int):
-        self.port = port
+    # BALANCED MODE (ruling 2026-08-25, LI_SERVING_SKEW.md): several
+    # single-worker instances on distinct ports, and THE DRIVER round-robins
+    # ports per send — the structural twin of RR token round-robin, replacing
+    # kernel accept (which skewed one worker to 48 of 168 videos). One port =
+    # the historical default posture; both go through the same code.
+
+    def __init__(self, ports):
+        self.ports = [ports] if isinstance(ports, int) else list(ports)
+        self.port = self.ports[0]           # compat: single-port callers
+        self._rp = 0
         self.declared_workers: Optional[int] = None
+
+    def _next_port(self) -> int:
+        p = self.ports[self._rp % len(self.ports)]
+        self._rp += 1
+        return p
+
+    async def health_of(self, port: int) -> dict:
+        import urllib.request
+        return await asyncio.to_thread(
+            lambda: json.load(urllib.request.urlopen(
+                f'http://127.0.0.1:{port}/health', timeout=30)))
+
+    async def health(self) -> dict:
+        """Aggregate across instances: warm_workers/declared_workers SUM, so the
+        Crossroad-41 marker gate and the census work unchanged in both modes."""
+        docs = [await self.health_of(p) for p in self.ports]
+        agg = dict(docs[0])
+        agg['warm_workers'] = sum(int(d.get('warm_workers') or 0) for d in docs)
+        agg['declared_workers'] = sum(int(d.get('declared_workers') or 0) for d in docs)
+        agg['per_port'] = {p: {'warm_workers': d.get('warm_workers'),
+                               'declared_workers': d.get('declared_workers'),
+                               'pid': d.get('pid')} for p, d in zip(self.ports, docs)}
+        return agg
 
     async def start(self):
         health = await self.health()
         self.declared_workers = health.get('declared_workers')
+        if len(self.ports) > 1:
+            bad = {p: v for p, v in health['per_port'].items()
+                   if int(v.get('declared_workers') or 0) != 1}
+            if bad:
+                raise SystemExit(
+                    f'NOT DONE — balanced mode expects SINGLE-worker instances; '
+                    f'ports declaring != 1 worker: {bad}. 8 ports x W=8 would be 64 '
+                    'workers wearing an 8-worker label.')
         say(f'LI: warm_workers={health.get("warm_workers")} '
-            f'declared={self.declared_workers} detect_impl={health.get("detect_impl")}')
-
-    async def health(self) -> dict:
-        import urllib.request
-        return await asyncio.to_thread(
-            lambda: json.load(urllib.request.urlopen(
-                f'http://127.0.0.1:{self.port}/health', timeout=30)))
+            f'declared={self.declared_workers} over {len(self.ports)} instance(s) '
+            f'{self.ports if len(self.ports) > 1 else ""} '
+            f'detect_impl={health.get("detect_impl")}')
+        if len(self.ports) > 1:
+            say('LI balanced mode: driver round-robins ports per send '
+                '(kernel accept replaced — LI_SERVING_SKEW.md ruling)')
 
     async def process(self, blob: bytes, name: str) -> dict:
         import urllib.request
-        req = urllib.request.Request(f'http://127.0.0.1:{self.port}/process_video',
+        port = self._next_port()
+        req = urllib.request.Request(f'http://127.0.0.1:{port}/process_video',
                                      data=blob, method='POST',
                                      headers={'Content-Type': 'application/octet-stream'})
 
@@ -518,7 +558,9 @@ class LIArm:
         body = await asyncio.to_thread(_post)
         if 'error' in body:
             raise RuntimeError(f'LI service error: {body}')
-        return record_from_li(body)
+        rec = record_from_li(body)
+        rec['serving_port'] = port
+        return rec
 
     async def stop(self):
         pass
@@ -629,9 +671,13 @@ async def li_readbacks(arm: LIArm, timeout_s: float = 120) -> Dict[str, dict]:
     per_worker: Dict[str, dict] = {}
     declared = arm.declared_workers or 0
     deadline = time.monotonic() + timeout_s
+    # Multi-instance (balanced mode): pids are per-container namespaces and can
+    # collide (single-worker uvicorn serves in-process, often pid 1 everywhere),
+    # so worker identity is (port, pid), never pid alone.
     while len(per_worker) < declared and time.monotonic() < deadline:
-        h = await arm.health()
-        per_worker[f'li_worker_{h["pid"]}'] = {
+        for port in arm.ports:
+            h = await arm.health_of(port)
+            per_worker[f'li_worker_{port}_{h["pid"]}'] = {
             'env': h.get('thread_env') or {},
             'torch_num_threads': h.get('torch_num_threads'),
             'detect_impl': h.get('detect_impl'),
@@ -1506,16 +1552,19 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
 
     async def warm_one(row):
         entry = {'i': len(ledger), 'row': row['file'], 'serving_pid': None,
-                 'token_index': None, 'wall_s': None, 'error': None}
+                 'serving_port': None, 'token_index': None, 'wall_s': None, 'error': None}
         ledger.append(entry)
         blob = await asyncio.to_thread((Path(args.corpus_dir) / row['file']).read_bytes)
         t0 = time.monotonic()
         try:
             rec = await arm.process(blob, row['file'])
             entry['serving_pid'] = rec.get('serving_pid')
+            entry['serving_port'] = rec.get('serving_port')
             entry['token_index'] = rec.get('token_index')
             if rec.get('serving_pid'):
-                seen_pids.add(rec['serving_pid'])
+                # identity = (port, pid): balanced-mode containers have their own
+                # pid namespaces, so pid alone collides across instances
+                seen_pids.add((rec.get('serving_port'), rec['serving_pid']))
             if rec.get('token_index') is not None:
                 seen_tokens.add(rec['token_index'])
         except Exception as exc:  # noqa: BLE001
@@ -1589,13 +1638,20 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
     # printed only a count — 6/8 — and discarded which pids served and how many
     # sends each drew, so "distribution or dead workers?" was unanswerable from
     # the record. The failing run now carries its own diagnosis (entry 10).
-    declared_pids = (sorted(int(k.rsplit('_', 1)[-1]) for k in pf['readbacks']
+    def _worker_ident(key: str):
+        # 'li_worker_<pid>' (pre-2026-08-25) -> (None, pid);
+        # 'li_worker_<port>_<pid>' (balanced-era) -> (port, pid)
+        parts = key[len('li_worker_'):].split('_')
+        return (None, int(parts[0])) if len(parts) == 1 else (int(parts[0]), int(parts[1]))
+    declared_pids = (sorted(_worker_ident(k) for k in pf['readbacks']
                             if k.startswith('li_worker_'))
                      if args.arm == 'llamaindex' else [])
     per_pid: Dict[str, int] = {}
     for e in ledger:
         if e['serving_pid'] is not None:
-            per_pid[str(e['serving_pid'])] = per_pid.get(str(e['serving_pid']), 0) + 1
+            k = (f"{e.get('serving_port')}:{e['serving_pid']}" if e.get('serving_port')
+                 else str(e['serving_pid']))
+            per_pid[k] = per_pid.get(k, 0) + 1
 
     # CROSSROAD 41 (2026-08-23) — GATE ON THE WARM MARKERS, NOT RESPONSE PIDS.
     # Three attempts failed the old gate with DIFFERENT unserved pids each time
@@ -1640,7 +1696,11 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
         'per_pid_send_counts': per_pid or None,
         'busiest_worker_sends': counts[0] if counts else None,
         'quietest_serving_worker_sends': counts[-1] if counts else None,
-        'unserved_declared_pids': [x for x in declared_pids if x not in seen_pids] or None,
+        'unserved_declared_pids': [x for x in declared_pids
+                                   if x not in {(y if isinstance(y, tuple) else (None, y))
+                                                for y in seen_pids}
+                                   and (None, x[1]) not in {(y if isinstance(y, tuple) else (None, y))
+                                                            for y in seen_pids}] or None,
         'note': ('REPORTED, NOT GATED (Crossroad 41). uvicorn workers are selected by the '
                  'kernel at accept and /process_video does not block its event loop, so '
                  'response-pid spread measures scheduling, not warmth. Warmth is gated on '
@@ -1722,6 +1782,11 @@ async def amain() -> int:
     ap.add_argument('--interval-s', type=positive_int('interval-s', 3600), default=15)
     ap.add_argument('--rr-port', type=positive_int('rr-port', 65535), default=5565)
     ap.add_argument('--li-port', type=positive_int('li-port', 65535), default=8802)
+    ap.add_argument('--li-ports', default=None,
+                    help='balanced mode (ruling 2026-08-25): "8802-8809" or comma list — '
+                         'several SINGLE-worker instances, driver round-robins ports per '
+                         'send (structural twin of RR token round-robin). Omit = one '
+                         'endpoint on --li-port = the historical default posture')
     ap.add_argument('--rr-container', default='rr')
     ap.add_argument('--li-container', default='li_video')
     ap.add_argument('--out-dir', default=None)
@@ -1811,7 +1876,17 @@ async def amain() -> int:
     say(f'driver lock held: {lock_path} (pid {os.getpid()})')
 
     # ---- arm + posture ----------------------------------------------------
-    li_probe = LIArm(args.li_port)
+    li_ports = [args.li_port]
+    if args.li_ports:
+        spec = args.li_ports
+        if '-' in spec and ',' not in spec:
+            a, b = spec.split('-', 1)
+            li_ports = list(range(int(a), int(b) + 1))
+        else:
+            li_ports = [int(x) for x in spec.split(',') if x.strip()]
+        if len(li_ports) != len(set(li_ports)) or not li_ports:
+            raise SystemExit(f'NOT DONE — --li-ports {spec!r} has duplicates or is empty')
+    li_probe = LIArm(li_ports)
     if args.arm == 'llamaindex':
         arm = li_probe
         await arm.start()

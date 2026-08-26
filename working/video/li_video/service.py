@@ -27,7 +27,7 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from .pipeline import LlamaIndexVideoPipeline
+from .pipeline import STAGE_SEMANTICS, LlamaIndexVideoPipeline
 from .schema import ErrorResponse, HealthResponse, ProcessVideoResponse
 
 EMBED_MODEL = os.environ.get('WS1V_MODEL', 'sentence-transformers/multi-qa-MiniLM-L6-cos-v1')
@@ -155,7 +155,8 @@ async def process_video(request: Request):
         embed_dim=r.embed_dim, embedding_norms=r.embedding_norms,
         frame_labels=r.frame_labels, frame_scores=r.frame_scores,
         frame_png_sha16=r.frame_png_sha16,
-        stage_s=r.stage_s, wall_s=round(time.monotonic() - t0, 2),
+        stage_s=r.stage_s, stage_s_semantics=STAGE_SEMANTICS,
+        wall_s=round(time.monotonic() - t0, 2),
         pid=os.getpid(), detect_impl=ident['detect_impl'],
         model_names=ident['model_names'],
         torch_num_threads=_torch_threads(), versions=_versions(),

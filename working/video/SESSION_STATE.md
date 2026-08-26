@@ -80,6 +80,22 @@ failures match engine-side CONST_DATA_PIPE_TIMEOUT=60.0 (zombie-pipe reaper) —
 app-layer, a different failure. NO FIX PROPOSED YET per orders; parity blast p1
 was live and untouched.**
 
+**LI BALANCED POSTURE IMPLEMENTED (ruling 2026-08-25, after LI_SERVING_SKEW.md):
+banked LI legs are RE-LABELED "LI-default" (kernel-accept, skewed ~4.4/8
+effective workers), not discarded. New: (a) stage stamps moved INSIDE the lock
+(pipeline.py) — stage_s now measures the DEVICE; every response carries
+`stage_s_semantics` ('device_only' new / 'includes_lock_wait' banked) so the
+eras are never silently compared; requires an li:video IMAGE REBUILD (source is
+baked in — lineage + freeze disclose it). (b) Driver `--li-ports 8802-8809`:
+8 single-worker instances, DRIVER round-robins ports per send (structural twin
+of RR token round-robin); worker identity is (port,pid) everywhere (containers
+have own pid namespaces — pid alone collides); balanced mode REFUSES an
+instance declaring >1 worker; Crossroad-41 marker gate works unchanged via
+aggregated /health. 6 new controls (test_li_ports.py) + all suites green.
+Bring-up/proof/full-leg blocks in the 2026-08-25 operator reply; instances are
+started with an --entrypoint override (same image, port parameterized) —
+recorded in provenance via container inspect.**
+
 **LAUNCH 5 (RESUME) DIED IDENTICALLY AT THE FIRST BLAST SENDS with ttl=0
 landed and enforcement-skip confirmed — TTL WAS NOT THE CAUSE of the blast
 failures (the warm-up had served on that token seconds earlier in EVERY
