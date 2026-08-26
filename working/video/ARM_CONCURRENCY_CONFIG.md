@@ -87,9 +87,13 @@ Per request (in a threadpool thread): extract (ffmpeg subprocess, unlocked)
 stamped per stage — instrumentation the RR response structurally lacks
 (stated limitation).
 
-Concurrency math: 8 workers × 1 locked inference × 4 threads = 32 = cores.
-Measured anchor: `sum(stage_s.detect)/span = 8.00` — exactly one inference
-per worker, eight concurrent. Frames/s span 9.267/8.714 at ~40% CPU.
+Concurrency math: 8 workers × 1 locked inference × 4 threads = 32 = cores —
+the CEILING. Measured reality (2026-08-25, LI_SERVING_SKEW.md): kernel-accept
+skew holds effective concurrently-inferring workers at ~4.4 of 8, because
+stage_s clocks START BEFORE the lock (pipeline.py:186) — so
+sum(stage_s.detect)/span = 8.00 counts queued clocks, NOT concurrent
+inferences (per-worker occupancies of 4.84 are the proof). Frames/s span
+9.267/8.714 at ~40% CPU = ~13 cores ≈ 4.38 busy workers × 4 threads × 0.74.
 
 Config provenance: LI_WORKERS=8 / LI_THREADS_ENV=4 = best of the 3-point
 W×T=32 budget line (4×8 0.0989 / **8×4 0.1473** / 16×2 0.0913, 15/16
