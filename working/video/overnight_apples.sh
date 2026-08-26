@@ -24,6 +24,8 @@ grep -q "hashing_locus" working/video/driver_video.py || {
   echo "NOT DONE — driver predates the hashing-locus fix (00b86e1); pull first"; exit 1; }
 grep -q "resolve_service_containers" working/video/driver_video.py || {
   echo "NOT DONE — driver predates the multi-instance collector fix; pull first"; exit 1; }
+CORPUS_DIR="$("$PY" working/video/corpus_locator.py --manifest working/video/ami_video_manifest.jsonl --tool apples | head -1)" \
+  || { echo "NOT DONE — corpus_dir unresolved (stamp missing?)"; exit 1; }
 OUT="working/video/results/apples_$(date -u +%Y%m%dT%H%M%SZ)"; mkdir -p "$OUT"
 LOG="$OUT/session.log"
 LIN_RR="$( "$PY" - working/video/results <<'EOF'
@@ -151,6 +153,8 @@ except SystemExit as e:
     sys.exit(0 if 'NOT DONE' in str(e) else 1)
 " || { echo "  FAIL — driver service-set resolution not behaving" | tee -a "$LOG"; PLAN_FAIL=1; }
 [ "$PLAN_FAIL" = 0 ] || { echo "PLAN CHECK FAILED — refusing to start (fail at minute zero, not forty)" | tee -a "$LOG"; exit 1; }
+echo "rebuilding li:video BEFORE the dry preflights (they must exercise the image the legs run)" | tee -a "$LOG"
+docker build -q -t li:video -f docker/Dockerfile.llamaindex-video . | tee -a "$LOG"
 echo "shape checks passed — now the REAL preflights (2026-08-26: both failures passed the"
 echo "old plan check and died at minute 40 in a preflight it never exercised)" | tee -a "$LOG"
 dry_pf() { # $1=arm $2=N $3=T  — bring up via the SAME functions the legs use,
@@ -167,23 +171,53 @@ dry_pf() { # $1=arm $2=N $3=T  — bring up via the SAME functions the legs use,
     "$PY" working/video/driver_video.py --arm llamaindex --leg blast --n 168 \
         --blast-concurrency 16 --li-ports "$PORTS" --li-containers "$NAMES" --pass 1 \
         --image-lineage "dry preflight" --out-dir "$OUT/dry_pf" --preflight-only 2>&1 | tail -3 | tee -a "$LOG"
-    local rc=${PIPESTATUS[0]}; stop_li_set "$2"; return "$rc"
+    local rc=${PIPESTATUS[0]}
+    if [ "$rc" = 0 ]; then
+      # ONE REAL INFERENCE end-to-end (2026-08-26): third failure this session
+      # was a response-construction 500 that containers/weights/pins/health
+      # could never catch — only a real request through the real image can.
+      "$PY" - "$CORPUS_DIR" <<'EOSMOKE' 2>&1 | tee -a "$LOG"
+import json, sys, urllib.request
+from pathlib import Path
+smallest = min(Path(sys.argv[1]).glob('*.avi'), key=lambda p: p.stat().st_size)
+print(f'  e2e smoke send: {smallest.name} ({smallest.stat().st_size/1e6:.0f} MB) -> :8802')
+req = urllib.request.Request('http://127.0.0.1:8802/process_video',
+                             data=smallest.read_bytes(), method='POST',
+                             headers={'Content-Type': 'application/octet-stream'})
+body = json.load(urllib.request.urlopen(req, timeout=1800))
+assert body.get('n_frames', 0) > 0, body
+assert body.get('chunks') is not None, 'no chunks field — old image?'
+assert body.get('hashing_locus') == 'driver_post_response', body.get('hashing_locus')
+assert 'chunk_sha256' not in body or body['chunk_sha256'] is None, 'stale schema in image'
+print(f"  e2e smoke: 200 OK, n_frames={body['n_frames']}, chunks={len(body['chunks'])}, "
+      f"locus={body['hashing_locus']} — response constructs, fix live")
+EOSMOKE
+      rc=${PIPESTATUS[0]}
+    fi
+    stop_li_set "$2"; return "$rc"
   fi
+}
+shape_all_skipped() { # $1=arm $2=N $3=T — true when EVERY leg of this shape is in SKIP
+  local tags
+  case "$1_$2" in
+    rr_8) tags="rr_8x4_p1 rr_8x4_p2";; li_8) tags="li_8x4_p1 li_8x4_p2";;
+    rr_16) tags="rr_16x2_p1";; li_16) tags="li_16x2_p1";;
+  esac
+  local t; for t in $tags; do case " ${SKIP:-} " in *" $t "*) ;; *) return 1;; esac; done
+  return 0
 }
 for shape in "rr:8:4" "li:8:4" "rr:16:2" "li:16:2"; do
   IFS=: read -r D_ARM D_N D_T <<EOF3
 $shape
 EOF3
-  case " ${SKIP:-} " in
-    *" ${D_ARM}_${D_N}x${D_T}_p1 "*) [ "${D_ARM}" = rr ] && echo "  dry-preflight $shape: leg skipped; still exercising shape" | tee -a "$LOG";;
-  esac
+  if shape_all_skipped "$D_ARM" "$D_N"; then
+    echo "  dry-preflight $shape: all legs skipped — shape not exercised" | tee -a "$LOG"; continue
+  fi
   echo "  dry-preflight $shape ..." | tee -a "$LOG"
   dry_pf "$D_ARM" "$D_N" "$D_T" || { echo "PLAN CHECK FAILED at REAL preflight for $shape — refusing the session" | tee -a "$LOG"; exit 1; }
 done
 echo "PLAN CHECK PASSED — argv shapes AND real preflights, all legs validated" | tee -a "$LOG"
 
-echo "rebuilding li:video (hashing-locus change is baked into the image)" | tee -a "$LOG"
-docker build -q -t li:video -f docker/Dockerfile.llamaindex-video . | tee -a "$LOG"
 
 declare -a R=()
 rr_leg 8 4 1

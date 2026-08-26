@@ -25,8 +25,10 @@ class ProcessVideoResponse(BaseModel):
     chunk_chars: list[int]                # per-chunk lengths (RR side lacks these; we export them)
     chunks: list[str] | None = None       # chunk TEXTS — driver hashes them (locus ruling 2026-08-25)
     hashing_locus: str = 'in_service_in_wall'   # banked-era default; new service sends driver_post_response
-    chunk_sha256: list[str]               # per-chunk content hashes (per-arm gates only;
-    #                                       cross-arm hash equality stays DECLINED, Phase 1 rule)
+    # chunk_sha256 REMOVED 2026-08-26: hashes are computed DRIVER-side from
+    # `chunks` (hashing-locus ruling). 18/18 legs 500'd because this stayed
+    # REQUIRED while the service stopped sending it — response construction
+    # failed AFTER the pipeline had done all the work.
     embed_dim: int
     embedding_norms: list[float]          # gate 7: unit-norm within NORM_TOL, both arms
     frame_labels: list[list[str]]         # gate 3: per-frame label multisets (sorted)

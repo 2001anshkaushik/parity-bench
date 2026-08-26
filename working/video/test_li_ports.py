@@ -142,6 +142,34 @@ def main():
         check('mixed declared env REFUSED naming instances', 'DISAGREES' in str(e) and 'li_bal_9' in str(e))
     drv.container_declared_threads = orig_dt
 
+    print('\nSCHEMA <-> SERVICE AGREEMENT (the 18/18-500 class, 2026-08-26)')
+    import ast as _ast
+    import re as _re
+    svc_src = (HERE / 'li_video' / 'service.py').read_text()
+    call = svc_src[svc_src.index('ProcessVideoResponse('):]
+    depth = 0
+    for i, ch in enumerate(call):
+        depth += ch == '('
+        depth -= ch == ')'
+        if depth == 0:
+            call = call[:i + 1]
+            break
+    provided = set(_re.findall(r'(\w+)=', call))
+    sch_src = (HERE / 'li_video' / 'schema.py').read_text()
+    cls = sch_src[sch_src.index('class ProcessVideoResponse'):]
+    nxt = cls.find('\nclass ', 1)
+    cls = cls if nxt < 0 else cls[:nxt]
+    required = set()
+    for line in cls.splitlines():
+        m = _re.match(r'\s{4}(\w+):\s*[^=]+$', line.rstrip())
+        if m and '=' not in line:
+            required.add(m.group(1))
+    missing = required - provided
+    check('every REQUIRED response field is supplied by the service call',
+          not missing, f'missing from service kwargs: {sorted(missing)}')
+    check('chunk_sha256 is GONE from the schema (dropped, not optional)',
+          'chunk_sha256:' not in cls)
+
     print(f'\nli-ports controls: {"PASS" if not FAILS else "FAIL"} ({len(FAILS)} failing)')
     return 1 if FAILS else 0
 
