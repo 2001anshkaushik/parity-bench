@@ -146,14 +146,17 @@ def main():
     import ast as _ast
     import re as _re
     svc_src = (HERE / 'li_video' / 'service.py').read_text()
-    call = svc_src[svc_src.index('ProcessVideoResponse('):]
+    start = svc_src.index('ProcessVideoResponse(')
+    open_i = svc_src.index('(', start)
     depth = 0
-    for i, ch in enumerate(call):
-        depth += ch == '('
-        depth -= ch == ')'
+    for i in range(open_i, len(svc_src)):
+        depth += svc_src[i] == '('
+        depth -= svc_src[i] == ')'
         if depth == 0:
-            call = call[:i + 1]
+            call = svc_src[start:i + 1]
             break
+    else:
+        raise AssertionError('unbalanced ProcessVideoResponse call')
     provided = set(_re.findall(r'(\w+)=', call))
     sch_src = (HERE / 'li_video' / 'schema.py').read_text()
     cls = sch_src[sch_src.index('class ProcessVideoResponse'):]
