@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-# FINAL APPLES-TO-APPLES SESSION (2026-08-25, EIGHT legs per the flag-1 ruling),
-# n=168, C=16, fresh containers per leg. Headline cell 16x2 interleaved across
-# arms in one session; secondary 8x4 blocked per arm (permitted).
+# FINAL APPLES-TO-APPLES SESSION (2026-08-25, executive ruling — SIX legs),
+# n=168, C=16, fresh containers per leg. HEADLINE = 8x4 both arms (cross-team
+# consensus: 8 instances, with Leela and Shashi), n=2, interleaved across arms.
+# 16x2 legs are CEILING PROOFS, n=1, supporting data only, blocked at the end;
+# the queue-depth asymmetry at 8x4 (LI 2-deep at C=16, RR 1-deep) is a STATED
+# CAVEAT quantified by the ceiling cells. Collector fix (7c1cd81) and hashing
+# locus fix (00b86e1) required — this refuses a driver without them.
 #   1. RR  8x4  p1      4. LI-bal 8x4  p2
 #   2. LI-bal 8x4 p1    5. LI-bal 16x2 p1
 #   3. RR  8x4  p2      6. LI-bal 16x2 p2
@@ -16,6 +20,8 @@ cd "$(git rev-parse --show-toplevel 2>/dev/null || echo "$HOME/parity-bench-vide
 PY="${PYBIN:-$HOME/.venv/bin/python}"
 LOCK="${TMPDIR:-/tmp}/overnight_apples.lock"; exec 9>"$LOCK"
 flock -n 9 || { echo "NOT DONE — another apples session holds $LOCK"; exit 1; }
+grep -q "hashing_locus" working/video/driver_video.py || {
+  echo "NOT DONE — driver predates the hashing-locus fix (00b86e1); pull first"; exit 1; }
 grep -q "resolve_service_containers" working/video/driver_video.py || {
   echo "NOT DONE — driver predates the multi-instance collector fix; pull first"; exit 1; }
 OUT="working/video/results/apples_$(date -u +%Y%m%dT%H%M%SZ)"; mkdir -p "$OUT"
@@ -84,29 +90,25 @@ li_leg() { # $1=N instances $2=T $3=pass
 
 echo "=== LEG ORDER (verify the interleave BEFORE it runs) ===" | tee -a "$LOG"
 cat <<'ORDER' | tee -a "$LOG"
-  1. RR    16x2  p1   <- HEADLINE cell, interleaved across arms
-  2. LI-bal 16x2 p1
-  3. RR    16x2  p2
-  4. LI-bal 16x2 p2
-  5. RR     8x4  p1   <- secondary cell, blocked per arm (ruling: may block)
-  6. RR     8x4  p2
-  7. LI-bal  8x4 p1
-  8. LI-bal  8x4 p2
+  1. RR     8x4  p1   <- HEADLINE cell (executive ruling), interleaved across arms
+  2. LI-bal  8x4 p1
+  3. RR     8x4  p2
+  4. LI-bal  8x4 p2
+  5. RR    16x2  p1   <- CEILING PROOF, n=1, supporting data only (blocked)
+  6. LI-bal 16x2 p1
 ORDER
 echo "rebuilding li:video (hashing-locus change is baked into the image)" | tee -a "$LOG"
 docker build -q -t li:video -f docker/Dockerfile.llamaindex-video . | tee -a "$LOG"
 
 declare -a R=()
+rr_leg 8 4 1
+li_leg 8 4 1
+rr_leg 8 4 2
+li_leg 8 4 2
 rr_leg 16 2 1
 li_leg 16 2 1
-rr_leg 16 2 2
-li_leg 16 2 2
-rr_leg 8 4 1
-rr_leg 8 4 2
-li_leg 8 4 1
-li_leg 8 4 2
 
 echo "=== APPLES SESSION SUMMARY ===" | tee -a "$LOG"
 BAD=0; for r in "${R[@]}"; do echo "  $r" | tee -a "$LOG"; case "$r" in *rc=0) ;; *) BAD=1;; esac; done
-echo "results in $OUT — cross-gates next; RR 16x2 counterpart is BANKED (cross-session, flagged)" | tee -a "$LOG"
+echo "results in $OUT — headline 8x4 n=2 interleaved; 16x2 = ceiling proofs n=1. Cross-gates next." | tee -a "$LOG"
 exit "$BAD"
