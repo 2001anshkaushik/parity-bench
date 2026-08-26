@@ -1147,13 +1147,15 @@ def image_provenance(container: str, lineage: Optional[str]) -> dict:
     }
 
 
-def preflight_containers(rr_container: Optional[str], li_container: Optional[str]) -> List[str]:
+def preflight_containers(rr_container: Optional[str], li_container: Optional[str],
+                         li_containers: Optional[List[str]] = None) -> List[str]:
     """No cpuset on either arm this phase, no CFS quota ever (rule C1), and the
     RR container must BE the patched Phase 2 image — the box still carries the
     Phase 1 rr/li containers (2 days up, WITH cpuset), so name collisions fail
     here instead of contaminating a leg."""
     problems = []
-    for c in filter(None, [rr_container, li_container]):
+    li_set = li_containers if li_containers else [li_container]
+    for c in filter(None, [rr_container, *li_set]):
         running = docker_inspect(c, '{{.State.Running}}')
         if running != 'true':
             problems.append(f'{c}: not running (State.Running={running!r}) — refusing to '
@@ -1204,15 +1206,25 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
         raise SystemExit('NOT DONE — corpus does not match manifest:\n  ' + '\n  '.join(bad))
 
     say('preflight: container flags')
+    # THE SERVICE SET IS RESOLVED HERE, BEFORE ANY NAME IS CHECKED (2026-08-25:
+    # leg 2 died because preflight running-checked the default li_video while
+    # the real instances were li_bal_0..7 — the resolution existed but ran
+    # AFTER preflight). One resolution, stashed on args, reused by the CPU
+    # bracket/collector below — one copy, no drift.
+    args._svc_containers = resolve_service_containers(
+        args.arm, args.rr_container, args.li_container,
+        getattr(args, 'li_containers', None),
+        len(getattr(arm, 'ports', [0])) if args.arm == 'llamaindex' else 1)
     problems = preflight_containers(args.rr_container if rr_arm_active else None,
-                                    args.li_container if not rr_arm_active else None)
+                                    args.li_container if not rr_arm_active else None,
+                                    li_containers=(args._svc_containers
+                                                   if not rr_arm_active else None))
     if problems:
         raise SystemExit('NOT DONE — container flags:\n  ' + '\n  '.join(problems))
     # Crossroad 22: network mode is a RECORDED value in provenance, not an
     # implicit flag (the check itself is in preflight_containers, fail-closed).
-    active_container = args.rr_container if rr_arm_active else args.li_container
-    network_mode = {active_container:
-                    docker_inspect(active_container, '{{.HostConfig.NetworkMode}}')}
+    network_mode = {c: docker_inspect(c, '{{.HostConfig.NetworkMode}}')
+                    for c in args._svc_containers}
     say(f'preflight: network mode {network_mode} (Crossroad 22: host, both arms)')
 
     # Quiet-box gate — born from the 18-Aug finding: every sampler that day
@@ -1224,7 +1236,7 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
     # absolute: the engine idles at ~1 core by existing (Ticket 4), and a
     # parity posture with live tokens may legitimately idle higher. Foreign
     # load = load1 minus what our containers' cgroups account for.
-    qb = quiet_box(list(dict.fromkeys(filter(None, [args.rr_container, args.li_container]))),
+    qb = quiet_box(list(dict.fromkeys(filter(None, args._svc_containers))),
                    args.max_preleg_load1)
     if not qb['PASS'] and not args.allow_noisy_box:
         raise SystemExit(
@@ -2031,9 +2043,7 @@ async def amain() -> int:
     # live, before any work — through the same reader, both arms, and carry it
     # into the export's efficiency block. An absent read refuses the leg: an
     # efficiency figure that cannot name its idle burden is not quotable.
-    svc_containers = resolve_service_containers(
-        args.arm, args.rr_container, args.li_container,
-        getattr(args, 'li_containers', None), len(getattr(arm, 'ports', [0])) if args.arm == 'llamaindex' else 1)
+    svc_containers = args._svc_containers   # resolved ONCE, before preflight
     svc_container = svc_containers[0]   # image identity only — instances share one image
     instances = posture.tokens if args.arm == 'rocketride' else (arm.declared_workers or 1)
     idle_sample_s = 6.0
