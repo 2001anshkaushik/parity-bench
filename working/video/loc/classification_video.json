@@ -1,0 +1,1821 @@
+{
+ "working/video/li_video/service.py": [
+  {
+   "line": 20,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from __future__ import annotations"
+  },
+  {
+   "line": 22,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import os"
+  },
+  {
+   "line": 23,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import time"
+  },
+  {
+   "line": 24,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from contextlib import asynccontextmanager"
+  },
+  {
+   "line": 25,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from pathlib import Path"
+  },
+  {
+   "line": 27,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from fastapi import FastAPI, Request"
+  },
+  {
+   "line": 28,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from fastapi.responses import JSONResponse"
+  },
+  {
+   "line": 30,
+   "class": "instrumentation",
+   "why": "locus constant",
+   "text": "from .pipeline import STAGE_SEMANTICS, LlamaIndexVideoPipeline"
+  },
+  {
+   "line": 31,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from .schema import ErrorResponse, HealthResponse, ProcessVideoResponse"
+  },
+  {
+   "line": 33,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "EMBED_MODEL = os.environ.get('WS1V_MODEL', 'sentence-transformers/multi-qa-MiniLM-L6-cos-v1')"
+  },
+  {
+   "line": 34,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "INTERVAL_S = int(os.environ.get('WS1V_INTERVAL_S', '15'))"
+  },
+  {
+   "line": 35,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "THRESHOLD = float(os.environ.get('WS1V_THRESHOLD', '0.3'))"
+  },
+  {
+   "line": 39,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "CHUNK_SIZE = int(os.environ.get('WS1V_CHUNK_SIZE', '4000'))"
+  },
+  {
+   "line": 40,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "CHUNK_OVERLAP = int(os.environ.get('WS1V_CHUNK_OVERLAP', '200'))"
+  },
+  {
+   "line": 41,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "SPLIT_UNIT = os.environ.get('WS1V_SPLIT_UNIT', 'chars')  # 'chars' matches engine strlen; see pi"
+  },
+  {
+   "line": 42,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "DEVICE = os.environ.get('WS1V_DEVICE', 'cpu')"
+  },
+  {
+   "line": 43,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "WORKERS = int(os.environ.get('WS1V_WORKERS', '1'))"
+  },
+  {
+   "line": 44,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "WARM_ROOT = Path(os.environ.get('WS1V_WARM_DIR', '/tmp/ws1v_warm'))"
+  },
+  {
+   "line": 46,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "THREAD_ENV_KEYS = ['OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS',"
+  },
+  {
+   "line": 47,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS', 'TORCH_NUM_THREADS']"
+  },
+  {
+   "line": 49,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "_pipeline: LlamaIndexVideoPipeline | None = None"
+  },
+  {
+   "line": 52,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "def _supervisor_key() -> str:"
+  },
+  {
+   "line": 55,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "ppid = os.getppid()"
+  },
+  {
+   "line": 56,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "try:"
+  },
+  {
+   "line": 57,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "with open(f'/proc/{ppid}/stat') as fh:"
+  },
+  {
+   "line": 58,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "starttime = fh.read().rsplit(')', 1)[1].split()[19]"
+  },
+  {
+   "line": 59,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "except OSError:"
+  },
+  {
+   "line": 60,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "starttime = 'na'"
+  },
+  {
+   "line": 61,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return f'{ppid}_{starttime}'"
+  },
+  {
+   "line": 64,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "def _mark_warm() -> None:"
+  },
+  {
+   "line": 65,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "d = WARM_ROOT / _supervisor_key()"
+  },
+  {
+   "line": 66,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "d.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+   "line": 67,
+   "class": "instrumentation",
+   "why": "serving-instance read-back",
+   "text": "(d / f'{os.getpid()}').write_text(str(time.time()))"
+  },
+  {
+   "line": 70,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "def _warm_workers() -> int:"
+  },
+  {
+   "line": 71,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "d = WARM_ROOT / _supervisor_key()"
+  },
+  {
+   "line": 72,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return len(list(d.glob('*'))) if d.exists() else 0"
+  },
+  {
+   "line": 75,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "def _versions() -> dict:"
+  },
+  {
+   "line": 76,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from importlib.metadata import PackageNotFoundError, version"
+  },
+  {
+   "line": 77,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "out = {}"
+  },
+  {
+   "line": 78,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "for pkg in ['rfdetr', 'torch', 'torchvision', 'transformers', 'supervision',"
+  },
+  {
+   "line": 79,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "'llama-index-core', 'llama-index-embeddings-huggingface',"
+  },
+  {
+   "line": 80,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "'sentence-transformers', 'imageio-ffmpeg', 'fastapi', 'uvicorn']:"
+  },
+  {
+   "line": 81,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "try:"
+  },
+  {
+   "line": 82,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "out[pkg] = version(pkg)"
+  },
+  {
+   "line": 83,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "except PackageNotFoundError:"
+  },
+  {
+   "line": 84,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "out[pkg] = None"
+  },
+  {
+   "line": 85,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return out"
+  },
+  {
+   "line": 88,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "def _torch_threads() -> int:"
+  },
+  {
+   "line": 89,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import torch"
+  },
+  {
+   "line": 90,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return torch.get_num_threads()"
+  },
+  {
+   "line": 93,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "@asynccontextmanager"
+  },
+  {
+   "line": 94,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "async def lifespan(app: FastAPI):"
+  },
+  {
+   "line": 95,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "global _pipeline"
+  },
+  {
+   "line": 96,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "_pipeline = LlamaIndexVideoPipeline("
+  },
+  {
+   "line": 97,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "embed_model_name=EMBED_MODEL, interval_s=INTERVAL_S, threshold=THRESHOLD,"
+  },
+  {
+   "line": 98,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP,"
+  },
+  {
+   "line": 99,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "split_unit=SPLIT_UNIT, device=DEVICE)"
+  },
+  {
+   "line": 100,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "_pipeline.warm()          # refuses (ImportError) rather than falling back \u2014 identity over uptim"
+  },
+  {
+   "line": 101,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "_mark_warm()"
+  },
+  {
+   "line": 102,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "yield"
+  },
+  {
+   "line": 105,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "app = FastAPI(title='WS-1 video/detect LlamaIndex service', lifespan=lifespan)"
+  },
+  {
+   "line": 108,
+   "class": "ambiguous",
+   "why": "health endpoint: liveness needed; its fields are instrumentation",
+   "text": "@app.get('/health')"
+  },
+  {
+   "line": 109,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "async def health() -> HealthResponse:"
+  },
+  {
+   "line": 110,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "ident = _pipeline.identity() if _pipeline else {'detect_impl': 'NOT-LOADED', 'model_names': {}}"
+  },
+  {
+   "line": 111,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return HealthResponse("
+  },
+  {
+   "line": 112,
+   "class": "ambiguous",
+   "why": "readiness/identity used by both service and harness",
+   "text": "status='ok' if _pipeline and _pipeline.is_warm else 'cold',"
+  },
+  {
+   "line": 113,
+   "class": "instrumentation",
+   "why": "serving-instance read-back",
+   "text": "pid=os.getpid(),"
+  },
+  {
+   "line": 114,
+   "class": "ambiguous",
+   "why": "readiness/identity used by both service and harness",
+   "text": "warm=bool(_pipeline and _pipeline.is_warm),"
+  },
+  {
+   "line": 115,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "warm_workers=_warm_workers(),"
+  },
+  {
+   "line": 116,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "declared_workers=WORKERS,"
+  },
+  {
+   "line": 117,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "detect_impl=ident['detect_impl'],"
+  },
+  {
+   "line": 118,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "model_names=ident['model_names'],"
+  },
+  {
+   "line": 119,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "versions=_versions(),"
+  },
+  {
+   "line": 120,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "torch_num_threads=_torch_threads(),"
+  },
+  {
+   "line": 121,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "python_version=__import__('sys').version.split()[0],"
+  },
+  {
+   "line": 122,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "thread_env={k: os.environ.get(k) for k in THREAD_ENV_KEYS},"
+  },
+  {
+   "line": 123,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "split_unit=SPLIT_UNIT,"
+  },
+  {
+   "line": 124,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunk_size=CHUNK_SIZE,"
+  },
+  {
+   "line": 125,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunk_overlap=CHUNK_OVERLAP,"
+  },
+  {
+   "line": 126,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "interval_s=INTERVAL_S,"
+  },
+  {
+   "line": 127,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": ")"
+  },
+  {
+   "line": 130,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "@app.post('/process_video')"
+  },
+  {
+   "line": 131,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "async def process_video(request: Request):"
+  },
+  {
+   "line": 134,
+   "class": "ambiguous",
+   "why": "health: liveness is service, the rest is census",
+   "text": "if _pipeline is None or not _pipeline.is_warm:"
+  },
+  {
+   "line": 135,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return JSONResponse(status_code=503,"
+  },
+  {
+   "line": 136,
+   "class": "instrumentation",
+   "why": "serving-instance read-back",
+   "text": "content=ErrorResponse(error='cold', pid=os.getpid()).model_dump())"
+  },
+  {
+   "line": 137,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "blob = await request.body()"
+  },
+  {
+   "line": 138,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "if not blob:"
+  },
+  {
+   "line": 139,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return JSONResponse(status_code=400,"
+  },
+  {
+   "line": 140,
+   "class": "instrumentation",
+   "why": "serving-instance read-back",
+   "text": "content=ErrorResponse(error='empty body', pid=os.getpid()).model_dump())"
+  },
+  {
+   "line": 141,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "t0 = time.monotonic()"
+  },
+  {
+   "line": 142,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "try:"
+  },
+  {
+   "line": 143,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import anyio"
+  },
+  {
+   "line": 144,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "r = await anyio.to_thread.run_sync(_pipeline.process, blob)"
+  },
+  {
+   "line": 145,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "except Exception as exc:  # noqa: BLE001 \u2014 the wire carries the failure, never hides it"
+  },
+  {
+   "line": 146,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return JSONResponse(status_code=500,"
+  },
+  {
+   "line": 147,
+   "class": "instrumentation",
+   "why": "serving-instance read-back",
+   "text": "content=ErrorResponse(error='pipeline failure', pid=os.getpid(),"
+  },
+  {
+   "line": 148,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "detail=repr(exc)).model_dump())"
+  },
+  {
+   "line": 149,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "ident = _pipeline.identity()"
+  },
+  {
+   "line": 150,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return ProcessVideoResponse("
+  },
+  {
+   "line": 151,
+   "class": "instrumentation",
+   "why": "per-frame detection counts (gate input)",
+   "text": "n_frames=r.n_frames, n_detections=r.n_detections,"
+  },
+  {
+   "line": 152,
+   "class": "instrumentation",
+   "why": "per-frame detection counts (gate input)",
+   "text": "detections_per_frame=r.detections_per_frame,"
+  },
+  {
+   "line": 153,
+   "class": "ambiguous",
+   "why": "workload counts: a caller might want them; gates certainly do",
+   "text": "total_chars=r.total_chars, n_chunks=r.n_chunks,"
+  },
+  {
+   "line": 154,
+   "class": "instrumentation",
+   "why": "per-chunk lengths exported for the parity gate",
+   "text": "chunk_chars=r.chunk_chars, chunks=r.chunks,"
+  },
+  {
+   "line": 155,
+   "class": "instrumentation",
+   "why": "locus/semantics provenance field",
+   "text": "hashing_locus='driver_post_response',"
+  },
+  {
+   "line": 156,
+   "class": "instrumentation",
+   "why": "gate 7 norm export",
+   "text": "embed_dim=r.embed_dim, embedding_norms=r.embedding_norms,"
+  },
+  {
+   "line": 157,
+   "class": "instrumentation",
+   "why": "gate 3 per-frame label/score export",
+   "text": "frame_labels=r.frame_labels, frame_scores=r.frame_scores,"
+  },
+  {
+   "line": 158,
+   "class": "instrumentation",
+   "why": "locus/semantics provenance field",
+   "text": "stage_s=r.stage_s, stage_s_semantics=STAGE_SEMANTICS,"
+  },
+  {
+   "line": 159,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "wall_s=round(time.monotonic() - t0, 2),"
+  },
+  {
+   "line": 160,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "pid=os.getpid(), detect_impl=ident['detect_impl'],"
+  },
+  {
+   "line": 161,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "model_names=ident['model_names'],"
+  },
+  {
+   "line": 162,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "torch_num_threads=_torch_threads(), versions=_versions(),"
+  },
+  {
+   "line": 163,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": ")"
+  }
+ ],
+ "working/video/li_video/pipeline.py": [
+  {
+   "line": 36,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from __future__ import annotations"
+  },
+  {
+   "line": 38,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import io"
+  },
+  {
+   "line": 39,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import json"
+  },
+  {
+   "line": 40,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import os"
+  },
+  {
+   "line": 41,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import subprocess"
+  },
+  {
+   "line": 42,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import threading"
+  },
+  {
+   "line": 43,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import time"
+  },
+  {
+   "line": 44,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from dataclasses import dataclass, field"
+  },
+  {
+   "line": 47,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "os.environ.setdefault('TOKENIZERS_PARALLELISM', 'false')"
+  },
+  {
+   "line": 49,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "PNG_SIG = b'\\x89PNG\\r\\n\\x1a\\n'"
+  },
+  {
+   "line": 53,
+   "class": "instrumentation",
+   "why": "locus constant",
+   "text": "STAGE_SEMANTICS = 'device_only'   # before 2026-08-25: 'includes_lock_wait'"
+  },
+  {
+   "line": 56,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "@dataclass"
+  },
+  {
+   "line": 57,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "class VideoPipelineResult:"
+  },
+  {
+   "line": 58,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "n_frames: int = 0"
+  },
+  {
+   "line": 59,
+   "class": "instrumentation",
+   "why": "per-frame detection counts (gate input)",
+   "text": "n_detections: int = 0"
+  },
+  {
+   "line": 60,
+   "class": "instrumentation",
+   "why": "per-frame detection counts (gate input)",
+   "text": "detections_per_frame: list[int] = field(default_factory=list)"
+  },
+  {
+   "line": 61,
+   "class": "instrumentation",
+   "why": "gate 3 per-frame label/score export",
+   "text": "frame_labels: list[list[str]] = field(default_factory=list)"
+  },
+  {
+   "line": 62,
+   "class": "instrumentation",
+   "why": "gate 3 per-frame label/score export",
+   "text": "frame_scores: list[list[float]] = field(default_factory=list)"
+  },
+  {
+   "line": 63,
+   "class": "instrumentation",
+   "why": "gate 7 norm export",
+   "text": "embedding_norms: list[float] = field(default_factory=list)"
+  },
+  {
+   "line": 64,
+   "class": "ambiguous",
+   "why": "workload counts: a caller might want them; gates certainly do",
+   "text": "total_chars: int = 0"
+  },
+  {
+   "line": 65,
+   "class": "ambiguous",
+   "why": "workload counts: a caller might want them; gates certainly do",
+   "text": "n_chunks: int = 0"
+  },
+  {
+   "line": 66,
+   "class": "instrumentation",
+   "why": "per-chunk lengths exported for the parity gate",
+   "text": "chunk_chars: list[int] = field(default_factory=list)"
+  },
+  {
+   "line": 67,
+   "class": "instrumentation",
+   "why": "chunk TEXTS returned for driver-side hashing",
+   "text": "chunks: list[str] = field(default_factory=list)   # texts; hashed driver-side"
+  },
+  {
+   "line": 68,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "embed_dim: int = 0"
+  },
+  {
+   "line": 69,
+   "class": "instrumentation",
+   "why": "cross-arm hash export",
+   "text": "frame_png_sha16: list[str] = field(default_factory=list)"
+  },
+  {
+   "line": 70,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "stage_s: dict[str, float] = field(default_factory=dict)"
+  },
+  {
+   "line": 73,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "def _to_detection(label: str, score: float, x1, y1, x2, y2) -> dict:"
+  },
+  {
+   "line": 75,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "x1, y1, x2, y2 = float(x1), float(y1), float(x2), float(y2)"
+  },
+  {
+   "line": 76,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return {'label': str(label), 'score': float(score),"
+  },
+  {
+   "line": 77,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "'box': {'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2},"
+  },
+  {
+   "line": 78,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "'centroid': {'x': (x1 + x2) / 2.0, 'y': (y1 + y2) / 2.0}}"
+  },
+  {
+   "line": 81,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "class LlamaIndexVideoPipeline:"
+  },
+  {
+   "line": 82,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "def __init__(self,"
+  },
+  {
+   "line": 83,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "embed_model_name: str = 'sentence-transformers/multi-qa-MiniLM-L6-cos-v1',"
+  },
+  {
+   "line": 84,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "interval_s: int = 15,"
+  },
+  {
+   "line": 85,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "threshold: float = 0.3,"
+  },
+  {
+   "line": 86,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunk_size: int = 4000,"
+  },
+  {
+   "line": 87,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunk_overlap: int = 200,"
+  },
+  {
+   "line": 88,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "split_unit: str = 'chars',"
+  },
+  {
+   "line": 89,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "device: str = 'cpu'):"
+  },
+  {
+   "line": 90,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self.embed_model_name = embed_model_name"
+  },
+  {
+   "line": 91,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self.interval_s = interval_s"
+  },
+  {
+   "line": 92,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self.threshold = threshold"
+  },
+  {
+   "line": 93,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self.chunk_size = chunk_size"
+  },
+  {
+   "line": 94,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self.chunk_overlap = chunk_overlap"
+  },
+  {
+   "line": 95,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self.split_unit = split_unit"
+  },
+  {
+   "line": 96,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self.device = device"
+  },
+  {
+   "line": 97,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._detector = None"
+  },
+  {
+   "line": 98,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._embedder = None"
+  },
+  {
+   "line": 99,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._splitter = None"
+  },
+  {
+   "line": 100,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._ffmpeg = None"
+  },
+  {
+   "line": 101,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._class_names: dict = {}"
+  },
+  {
+   "line": 102,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._lock = threading.Lock()  # engine mirror: one model instance per process, serialized"
+  },
+  {
+   "line": 105,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "def warm(self) -> None:"
+  },
+  {
+   "line": 107,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import imageio_ffmpeg"
+  },
+  {
+   "line": 108,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()"
+  },
+  {
+   "line": 110,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import sys"
+  },
+  {
+   "line": 111,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "import types"
+  },
+  {
+   "line": 114,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "sys.modules.setdefault('matplotlib.pyplot', types.ModuleType('matplotlib.pyplot'))"
+  },
+  {
+   "line": 115,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from rfdetr import RFDETRBase  # ImportError = arm refuses to serve (no silent RT-DETR)"
+  },
+  {
+   "line": 116,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._detector = RFDETRBase()"
+  },
+  {
+   "line": 117,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._class_names = getattr(self._detector, 'class_names', None) or {}"
+  },
+  {
+   "line": 119,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from llama_index.core.node_parser import SentenceSplitter"
+  },
+  {
+   "line": 120,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "if self.split_unit == 'chars':"
+  },
+  {
+   "line": 122,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._splitter = SentenceSplitter(chunk_size=self.chunk_size,"
+  },
+  {
+   "line": 123,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunk_overlap=self.chunk_overlap,"
+  },
+  {
+   "line": 124,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "tokenizer=lambda text: text)"
+  },
+  {
+   "line": 125,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "else:"
+  },
+  {
+   "line": 126,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._splitter = SentenceSplitter(chunk_size=self.chunk_size,"
+  },
+  {
+   "line": 127,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunk_overlap=self.chunk_overlap)"
+  },
+  {
+   "line": 129,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from llama_index.embeddings.huggingface import HuggingFaceEmbedding"
+  },
+  {
+   "line": 130,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._embedder = HuggingFaceEmbedding(model_name=self.embed_model_name,"
+  },
+  {
+   "line": 131,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "device=self.device)"
+  },
+  {
+   "line": 133,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "self._embedder.get_text_embedding_batch(['warm'])"
+  },
+  {
+   "line": 135,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "@property"
+  },
+  {
+   "line": 136,
+   "class": "ambiguous",
+   "why": "readiness/identity used by both service and harness",
+   "text": "def is_warm(self) -> bool:"
+  },
+  {
+   "line": 137,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return self._embedder is not None and self._detector is not None"
+  },
+  {
+   "line": 139,
+   "class": "ambiguous",
+   "why": "readiness/identity used by both service and harness",
+   "text": "def identity(self) -> dict:"
+  },
+  {
+   "line": 140,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return {"
+  },
+  {
+   "line": 141,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "'detect_impl': 'rfdetr' if self._detector is not None else 'NOT-LOADED',"
+  },
+  {
+   "line": 142,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "'model_names': {"
+  },
+  {
+   "line": 143,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "'detector': type(self._detector).__name__ if self._detector else 'NOT-LOADED',"
+  },
+  {
+   "line": 144,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "'embedder': self.embed_model_name,"
+  },
+  {
+   "line": 145,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "},"
+  },
+  {
+   "line": 146,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "}"
+  },
+  {
+   "line": 149,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "def _extract_frames(self, video: bytes) -> list[bytes]:"
+  },
+  {
+   "line": 150,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "cmd = [self._ffmpeg, '-nostdin', '-loglevel', 'error', '-i', 'pipe:0',"
+  },
+  {
+   "line": 151,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "'-vf', f'fps=1/{self.interval_s}', '-f', 'image2pipe',"
+  },
+  {
+   "line": 152,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "'-fps_mode', 'passthrough', '-vcodec', 'png', '-']"
+  },
+  {
+   "line": 153,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "raw = subprocess.run(cmd, input=video, check=True, capture_output=True).stdout"
+  },
+  {
+   "line": 154,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "frames, i = [], 0"
+  },
+  {
+   "line": 155,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "while True:"
+  },
+  {
+   "line": 156,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "j = raw.find(PNG_SIG, i + 1)"
+  },
+  {
+   "line": 157,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "if j == -1:"
+  },
+  {
+   "line": 158,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "if i < len(raw):"
+  },
+  {
+   "line": 159,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "frames.append(raw[i:])"
+  },
+  {
+   "line": 160,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "break"
+  },
+  {
+   "line": 161,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "frames.append(raw[i:j])"
+  },
+  {
+   "line": 162,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "i = j"
+  },
+  {
+   "line": 163,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return [f for f in frames if f.startswith(PNG_SIG)]"
+  },
+  {
+   "line": 165,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "def _detect_frame(self, png: bytes) -> list[dict]:"
+  },
+  {
+   "line": 166,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from PIL import Image"
+  },
+  {
+   "line": 167,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "img = Image.open(io.BytesIO(png)).convert('RGB')"
+  },
+  {
+   "line": 168,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "preds = self._detector.predict(img, threshold=self.threshold)"
+  },
+  {
+   "line": 169,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "dets = []"
+  },
+  {
+   "line": 170,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "for k in range(len(preds)):"
+  },
+  {
+   "line": 171,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "cid = int(preds.class_id[k])"
+  },
+  {
+   "line": 172,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "dets.append(_to_detection(self._class_names.get(cid, str(cid)),"
+  },
+  {
+   "line": 173,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "float(preds.confidence[k]), *preds.xyxy[k]))"
+  },
+  {
+   "line": 174,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return dets"
+  },
+  {
+   "line": 177,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "def process(self, video: bytes) -> VideoPipelineResult:"
+  },
+  {
+   "line": 178,
+   "class": "ambiguous",
+   "why": "health: liveness is service, the rest is census",
+   "text": "if not self.is_warm:"
+  },
+  {
+   "line": 179,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "raise RuntimeError('pipeline not warm \u2014 lifespan did not run')"
+  },
+  {
+   "line": 180,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "r = VideoPipelineResult()"
+  },
+  {
+   "line": 182,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "t0 = time.monotonic()"
+  },
+  {
+   "line": 183,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "frames = self._extract_frames(video)"
+  },
+  {
+   "line": 184,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "r.stage_s['extract'] = round(time.monotonic() - t0, 2)"
+  },
+  {
+   "line": 185,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "r.n_frames = len(frames)"
+  },
+  {
+   "line": 193,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "per_frame_json: list[str] = []"
+  },
+  {
+   "line": 199,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "with self._lock:"
+  },
+  {
+   "line": 200,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "t0 = time.monotonic()"
+  },
+  {
+   "line": 201,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "for png in frames:"
+  },
+  {
+   "line": 202,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "dets = self._detect_frame(png)"
+  },
+  {
+   "line": 203,
+   "class": "instrumentation",
+   "why": "per-frame detection counts (gate input)",
+   "text": "r.detections_per_frame.append(len(dets))"
+  },
+  {
+   "line": 204,
+   "class": "instrumentation",
+   "why": "gate 3 per-frame label/score export",
+   "text": "r.frame_labels.append(sorted(d['label'] for d in dets))"
+  },
+  {
+   "line": 205,
+   "class": "instrumentation",
+   "why": "gate 3 per-frame label/score export",
+   "text": "r.frame_scores.append([d['score'] for d in dets])"
+  },
+  {
+   "line": 206,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "per_frame_json.append(json.dumps(dets))"
+  },
+  {
+   "line": 207,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "r.stage_s['detect'] = round(time.monotonic() - t0, 2)"
+  },
+  {
+   "line": 208,
+   "class": "instrumentation",
+   "why": "per-frame detection counts (gate input)",
+   "text": "r.n_detections = sum(r.detections_per_frame)"
+  },
+  {
+   "line": 211,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "blob = '\\n'.join(per_frame_json) + '\\n'"
+  },
+  {
+   "line": 212,
+   "class": "ambiguous",
+   "why": "workload counts: a caller might want them; gates certainly do",
+   "text": "r.total_chars = len(blob)"
+  },
+  {
+   "line": 213,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "t0 = time.monotonic()"
+  },
+  {
+   "line": 214,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunks = self._splitter.split_text(blob)"
+  },
+  {
+   "line": 215,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "r.stage_s['split'] = round(time.monotonic() - t0, 2)"
+  },
+  {
+   "line": 216,
+   "class": "ambiguous",
+   "why": "workload counts: a caller might want them; gates certainly do",
+   "text": "r.n_chunks = len(chunks)"
+  },
+  {
+   "line": 217,
+   "class": "instrumentation",
+   "why": "per-chunk lengths exported for the parity gate",
+   "text": "r.chunk_chars = [len(c) for c in chunks]"
+  },
+  {
+   "line": 218,
+   "class": "instrumentation",
+   "why": "chunk TEXTS returned for driver-side hashing",
+   "text": "r.chunks = chunks          # texts ride the response; the driver hashes them"
+  },
+  {
+   "line": 220,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "with self._lock:"
+  },
+  {
+   "line": 221,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "t0 = time.monotonic()"
+  },
+  {
+   "line": 222,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "vectors = self._embedder.get_text_embedding_batch(chunks, show_progress=False) \\"
+  },
+  {
+   "line": 223,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "if chunks else []"
+  },
+  {
+   "line": 224,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "r.stage_s['embed'] = round(time.monotonic() - t0, 2)"
+  },
+  {
+   "line": 225,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "r.embed_dim = len(vectors[0]) if vectors else 0"
+  },
+  {
+   "line": 226,
+   "class": "instrumentation",
+   "why": "gate 7 norm export",
+   "text": "r.embedding_norms = [round(sum(x * x for x in v) ** 0.5, 6) for v in vectors]"
+  },
+  {
+   "line": 227,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "return r"
+  }
+ ],
+ "working/video/li_video/schema.py": [
+  {
+   "line": 10,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from __future__ import annotations"
+  },
+  {
+   "line": 12,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "from pydantic import BaseModel, Field"
+  },
+  {
+   "line": 15,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "class ProcessVideoResponse(BaseModel):"
+  },
+  {
+   "line": 18,
+   "class": "instrumentation",
+   "why": "locus/semantics provenance field",
+   "text": "stage_s_semantics: str = 'includes_lock_wait'"
+  },
+  {
+   "line": 20,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "n_frames: int"
+  },
+  {
+   "line": 21,
+   "class": "instrumentation",
+   "why": "per-frame detection counts (gate input)",
+   "text": "n_detections: int"
+  },
+  {
+   "line": 22,
+   "class": "instrumentation",
+   "why": "per-frame detection counts (gate input)",
+   "text": "detections_per_frame: list[int]"
+  },
+  {
+   "line": 23,
+   "class": "ambiguous",
+   "why": "workload counts: a caller might want them; gates certainly do",
+   "text": "total_chars: int                      # chars entering the splitter (parity gate input)"
+  },
+  {
+   "line": 24,
+   "class": "ambiguous",
+   "why": "workload counts: a caller might want them; gates certainly do",
+   "text": "n_chunks: int"
+  },
+  {
+   "line": 25,
+   "class": "instrumentation",
+   "why": "per-chunk lengths exported for the parity gate",
+   "text": "chunk_chars: list[int]                # per-chunk lengths (RR side lacks these; we export them)"
+  },
+  {
+   "line": 26,
+   "class": "instrumentation",
+   "why": "chunk TEXTS returned for driver-side hashing",
+   "text": "chunks: list[str] | None = None       # chunk TEXTS \u2014 driver hashes them (locus ruling 2026-08-2"
+  },
+  {
+   "line": 27,
+   "class": "instrumentation",
+   "why": "locus/semantics provenance field",
+   "text": "hashing_locus: str = 'in_service_in_wall'   # banked-era default; new service sends driver_post_"
+  },
+  {
+   "line": 32,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "embed_dim: int"
+  },
+  {
+   "line": 33,
+   "class": "instrumentation",
+   "why": "gate 7 norm export",
+   "text": "embedding_norms: list[float]          # gate 7: unit-norm within NORM_TOL, both arms"
+  },
+  {
+   "line": 34,
+   "class": "instrumentation",
+   "why": "gate 3 per-frame label/score export",
+   "text": "frame_labels: list[list[str]]         # gate 3: per-frame label multisets (sorted)"
+  },
+  {
+   "line": 35,
+   "class": "instrumentation",
+   "why": "gate 3 per-frame label/score export",
+   "text": "frame_scores: list[list[float]]       # gate 3 triage input (diagnostic only)"
+  },
+  {
+   "line": 36,
+   "class": "instrumentation",
+   "why": "cross-arm hash export",
+   "text": "frame_png_sha16: list[str] | None = None   # REMOVED from serving path 2026-08-25 (no leg-gate c"
+  },
+  {
+   "line": 39,
+   "class": "instrumentation",
+   "why": "per-stage timing instrumentation",
+   "text": "stage_s: dict[str, float]             # extract / detect / split / embed"
+  },
+  {
+   "line": 40,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "wall_s: float"
+  },
+  {
+   "line": 43,
+   "class": "instrumentation",
+   "why": "serving-instance read-back",
+   "text": "pid: int                              # serving worker process"
+  },
+  {
+   "line": 44,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "detect_impl: str                      # 'rfdetr' \u2014 asserted at load, echoed here"
+  },
+  {
+   "line": 45,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "model_names: dict[str, str]           # detector + embedder, from the loaded objects"
+  },
+  {
+   "line": 46,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "torch_num_threads: int                # read INSIDE this process at request time"
+  },
+  {
+   "line": 47,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "versions: dict[str, str | None]       # rfdetr/torch/transformers/... importlib.metadata"
+  },
+  {
+   "line": 50,
+   "class": "ambiguous",
+   "why": "health: liveness is service, the rest is census",
+   "text": "class HealthResponse(BaseModel):"
+  },
+  {
+   "line": 51,
+   "class": "ambiguous",
+   "why": "health: liveness is service, the rest is census",
+   "text": "status: str"
+  },
+  {
+   "line": 52,
+   "class": "instrumentation",
+   "why": "serving-instance read-back",
+   "text": "pid: int"
+  },
+  {
+   "line": 53,
+   "class": "ambiguous",
+   "why": "health: liveness is service, the rest is census",
+   "text": "warm: bool"
+  },
+  {
+   "line": 54,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "warm_workers: int                     # aggregate marker count (defect #21/#23 pattern)"
+  },
+  {
+   "line": 55,
+   "class": "instrumentation",
+   "why": "warm-marker / worker-census apparatus (harness polls it)",
+   "text": "declared_workers: int"
+  },
+  {
+   "line": 56,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "detect_impl: str"
+  },
+  {
+   "line": 57,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "model_names: dict[str, str]"
+  },
+  {
+   "line": 58,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "versions: dict[str, str | None]"
+  },
+  {
+   "line": 59,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "torch_num_threads: int"
+  },
+  {
+   "line": 60,
+   "class": "instrumentation",
+   "why": "declared-vs-measured read-back / identity manifest",
+   "text": "python_version: str                   # interpreter identity \u2014 declared cross-arm, never discove"
+  },
+  {
+   "line": 61,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "thread_env: dict[str, str | None]     # the six variables, as this process sees them"
+  },
+  {
+   "line": 62,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "split_unit: str                       # 'chars' | 'tokens' \u2014 the splitter length semantics"
+  },
+  {
+   "line": 63,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunk_size: int"
+  },
+  {
+   "line": 64,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "chunk_overlap: int"
+  },
+  {
+   "line": 65,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "interval_s: int"
+  },
+  {
+   "line": 68,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "class ErrorResponse(BaseModel):"
+  },
+  {
+   "line": 69,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "error: str"
+  },
+  {
+   "line": 70,
+   "class": "instrumentation",
+   "why": "serving-instance read-back",
+   "text": "pid: int"
+  },
+  {
+   "line": 71,
+   "class": "service",
+   "why": "pipeline needs it to accept a video and return chunks/embeddings",
+   "text": "detail: str = Field(default='')"
+  }
+ ],
+ "working/video/li_video/__init__.py": []
+}

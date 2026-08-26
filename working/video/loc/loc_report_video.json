@@ -1,0 +1,79 @@
+{
+ "method": {
+  "source": "working/minimal/COUNTING_RULE.md (Phase 1, unmodified)",
+  "counter": "imported from /Users/ansh/RocketRide/Benchmarking/reference-now/leela/aws_bench/metrics/m6_loc.py",
+  "layers": [
+   "pipeline_definition",
+   "compute_transforms",
+   "serving_integration",
+   "client_harness"
+  ],
+  "scope_ruling": "developer-written service only; harness/driver/gates/collector/probes excluded (operator 2026-08-26)",
+  "cosmic": "NEW in Phase 2 \u2014 Phase 1 contains no COSMIC/CFP work"
+ },
+ "llamaindex": {
+  "per_file": {
+   "working/video/li_video/service.py": {
+    "service": 73,
+    "instrumentation": 35,
+    "ambiguous": 5
+   },
+   "working/video/li_video/pipeline.py": {
+    "service": 111,
+    "instrumentation": 27,
+    "ambiguous": 7
+   },
+   "working/video/li_video/schema.py": {
+    "service": 14,
+    "instrumentation": 25,
+    "ambiguous": 5
+   },
+   "working/video/li_video/__init__.py": {
+    "service": 0,
+    "instrumentation": 0,
+    "ambiguous": 0
+   }
+  },
+  "service_only": 198,
+  "instrumentation": 87,
+  "ambiguous": 17,
+  "as_built_python": 302,
+  "dockerfile_loc": 85,
+  "layers": {
+   "pipeline_definition": 0,
+   "compute_transforms": 111,
+   "serving_integration": 172,
+   "client_harness": 0
+  },
+  "totals": {
+   "as_built_incl_docker": 387,
+   "service_plus_ambiguous_incl_docker": 300,
+   "service_only_incl_docker": 283
+  }
+ },
+ "rocketride": {
+  "pipeline_definition_formatting_spread": {
+   "as_stored": 158,
+   "indent_2": 158,
+   "compact": 1,
+   "one_node_per_line": 8
+  },
+  "compute_transforms": 0,
+  "compute_transforms_note": "engine-internal: product code, not user code (Leela, COUNTING_RULE.md \u00a72 \u2014 the load-bearing entry)",
+  "serving_integration": 0,
+  "serving_integration_note": "the engine image serves; no developer-written service, no Dockerfile authored for this pipeline",
+  "client_harness": 0
+ },
+ "semantic_units": {
+  "llamaindex": {
+   "authored_python_units": 21,
+   "declared_nodes": 0,
+   "total": 21
+  },
+  "rocketride": {
+   "authored_python_units": 0,
+   "declared_nodes": 6,
+   "total": 6
+  }
+ }
+}
