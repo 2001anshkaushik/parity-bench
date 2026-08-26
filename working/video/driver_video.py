@@ -333,12 +333,23 @@ def record_from_li(body: dict) -> dict:
     return {
         'n_chunks': body.get('n_chunks'),
         'chunk_chars': body.get('chunk_chars'),
-        'chunk_sha256': body.get('chunk_sha256'),
+        # Locus ruling 2026-08-25: hash the returned TEXTS here, driver-side,
+        # post-response — the same place and the same formula
+        # (sha256_bytes(text.encode())) as record_from_rr. Values are identical
+        # to the banked in-service hashes by construction (same strings), so
+        # gate 3/8 and whole_list_doubled consume unchanged values. Old-image
+        # responses (no 'chunks') fall back to their in-wall hashes and say so.
+        'chunk_sha256': ([sha256_bytes(c.encode()) for c in body['chunks']]
+                         if body.get('chunks') is not None else body.get('chunk_sha256')),
+        'hashing_locus': (body.get('hashing_locus') or
+                          ('in_service_in_wall' if body.get('chunk_sha256') else None)),
         'sum_chunk_chars': sum(body.get('chunk_chars') or []),
         'frames_observed': body.get('n_frames'),
         'frames_observed_method': 'extractor-count',
         'chunkid_monotone': True,   # LI chunks arrive ordered by construction
-        'whole_list_doubled': gs.whole_list_doubled(body.get('chunk_sha256') or []),
+        'whole_list_doubled': gs.whole_list_doubled(
+            [sha256_bytes(c.encode()) for c in body['chunks']]
+            if body.get('chunks') is not None else (body.get('chunk_sha256') or [])),
         'n_detections': body.get('n_detections'),
         'detections_per_frame': body.get('detections_per_frame'),
         'frame_label_multisets': body.get('frame_labels'),
@@ -2132,6 +2143,8 @@ async def amain() -> int:
     # tokens whose burn the bracket is measuring.
     cg_leg1: Optional[int] = None
     collector_summary: Optional[dict] = None
+    say(f'service CPU bracket: summing {len(svc_containers)} container cgroup(s): '
+        f'{svc_containers if len(svc_containers) > 1 else svc_containers[0]}')
     cg_leg0 = containers_cpu_usage_usec(svc_containers)
     t_leg0 = time.monotonic()
     dr0 = resource.getrusage(resource.RUSAGE_SELF)

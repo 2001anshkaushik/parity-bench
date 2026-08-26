@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# FINAL APPLES-TO-APPLES SESSION (Task 5, 2026-08-25 — runs only after Ansh
-# approves). Six legs, n=168, C=16, fresh containers per leg:
+# FINAL APPLES-TO-APPLES SESSION (2026-08-25, EIGHT legs per the flag-1 ruling),
+# n=168, C=16, fresh containers per leg. Headline cell 16x2 interleaved across
+# arms in one session; secondary 8x4 blocked per arm (permitted).
 #   1. RR  8x4  p1      4. LI-bal 8x4  p2
 #   2. LI-bal 8x4 p1    5. LI-bal 16x2 p1
 #   3. RR  8x4  p2      6. LI-bal 16x2 p2
@@ -81,13 +82,29 @@ li_leg() { # $1=N instances $2=T $3=pass
   done
 }
 
+echo "=== LEG ORDER (verify the interleave BEFORE it runs) ===" | tee -a "$LOG"
+cat <<'ORDER' | tee -a "$LOG"
+  1. RR    16x2  p1   <- HEADLINE cell, interleaved across arms
+  2. LI-bal 16x2 p1
+  3. RR    16x2  p2
+  4. LI-bal 16x2 p2
+  5. RR     8x4  p1   <- secondary cell, blocked per arm (ruling: may block)
+  6. RR     8x4  p2
+  7. LI-bal  8x4 p1
+  8. LI-bal  8x4 p2
+ORDER
+echo "rebuilding li:video (hashing-locus change is baked into the image)" | tee -a "$LOG"
+docker build -q -t li:video -f docker/Dockerfile.llamaindex-video . | tee -a "$LOG"
+
 declare -a R=()
-rr_leg 8 4 1
-li_leg 8 4 1
-rr_leg 8 4 2
-li_leg 8 4 2
+rr_leg 16 2 1
 li_leg 16 2 1
+rr_leg 16 2 2
 li_leg 16 2 2
+rr_leg 8 4 1
+rr_leg 8 4 2
+li_leg 8 4 1
+li_leg 8 4 2
 
 echo "=== APPLES SESSION SUMMARY ===" | tee -a "$LOG"
 BAD=0; for r in "${R[@]}"; do echo "  $r" | tee -a "$LOG"; case "$r" in *rc=0) ;; *) BAD=1;; esac; done

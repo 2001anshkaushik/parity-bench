@@ -35,7 +35,6 @@ per-process device_lock, and it makes 'requests per worker' a clean unit.
 
 from __future__ import annotations
 
-import hashlib
 import io
 import json
 import os
@@ -65,7 +64,7 @@ class VideoPipelineResult:
     total_chars: int = 0
     n_chunks: int = 0
     chunk_chars: list[int] = field(default_factory=list)
-    chunk_sha256: list[str] = field(default_factory=list)
+    chunks: list[str] = field(default_factory=list)   # texts; hashed driver-side
     embed_dim: int = 0
     frame_png_sha16: list[str] = field(default_factory=list)
     stage_s: dict[str, float] = field(default_factory=dict)
@@ -184,7 +183,12 @@ class LlamaIndexVideoPipeline:
         frames = self._extract_frames(video)
         r.stage_s['extract'] = round(time.monotonic() - t0, 2)
         r.n_frames = len(frames)
-        r.frame_png_sha16 = [hashlib.sha256(f).hexdigest()[:16] for f in frames]
+        # HASHING LOCUS (ruling 2026-08-25): NO hashing inside wall_s. Frame
+        # hashes had no leg-gate consumer and are gone from the serving path
+        # (the probe's floor hashing is separate code); chunk hashes are
+        # computed DRIVER-side from the returned texts — the same place and
+        # formula as the RocketRide arm's. Responses carry hashing_locus so
+        # tonight's legs are never silently compared with the banked ones.
 
         per_frame_json: list[str] = []
         # STAMP SEMANTICS (2026-08-25, ruling): stamps INSIDE the lock so
@@ -211,7 +215,7 @@ class LlamaIndexVideoPipeline:
         r.stage_s['split'] = round(time.monotonic() - t0, 2)
         r.n_chunks = len(chunks)
         r.chunk_chars = [len(c) for c in chunks]
-        r.chunk_sha256 = [hashlib.sha256(c.encode()).hexdigest() for c in chunks]
+        r.chunks = chunks          # texts ride the response; the driver hashes them
 
         with self._lock:
             t0 = time.monotonic()

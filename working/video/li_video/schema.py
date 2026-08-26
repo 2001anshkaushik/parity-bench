@@ -23,13 +23,15 @@ class ProcessVideoResponse(BaseModel):
     total_chars: int                      # chars entering the splitter (parity gate input)
     n_chunks: int
     chunk_chars: list[int]                # per-chunk lengths (RR side lacks these; we export them)
+    chunks: list[str] | None = None       # chunk TEXTS — driver hashes them (locus ruling 2026-08-25)
+    hashing_locus: str = 'in_service_in_wall'   # banked-era default; new service sends driver_post_response
     chunk_sha256: list[str]               # per-chunk content hashes (per-arm gates only;
     #                                       cross-arm hash equality stays DECLINED, Phase 1 rule)
     embed_dim: int
     embedding_norms: list[float]          # gate 7: unit-norm within NORM_TOL, both arms
     frame_labels: list[list[str]]         # gate 3: per-frame label multisets (sorted)
     frame_scores: list[list[float]]       # gate 3 triage input (diagnostic only)
-    frame_png_sha16: list[str]            # cross-arm frame identity (byte-equal ffmpeg output)
+    frame_png_sha16: list[str] | None = None   # REMOVED from serving path 2026-08-25 (no leg-gate consumer; probe floor hashing is separate)
 
     # --- timings (probe + driver read these) -----------------------------
     stage_s: dict[str, float]             # extract / detect / split / embed

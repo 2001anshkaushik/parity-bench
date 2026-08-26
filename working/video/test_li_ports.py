@@ -30,10 +30,10 @@ def fake_urlopen(req, timeout=None):
     else:
         body = {'pid': 1, 'n_frames': 2, 'stage_s': {'detect': 1.0},
                 'stage_s_semantics': 'device_only', 'frame_labels': [[], []],
-                'frame_scores': [[], []], 'chunk_chars': [10], 'chunk_sha256': ['x'],
+                'frame_scores': [[], []], 'chunk_chars': [10],
+                'chunks': ['abcdefghij'], 'hashing_locus': 'driver_post_response',
                 'n_chunks': 1, 'total_chars': 10, 'detections_per_frame': [0, 0],
-                'n_detections': 0, 'embedding_norms': [], 'embed_dim': 0,
-                'frame_png_sha16': ['a', 'b']}
+                'n_detections': 0, 'embedding_norms': [], 'embed_dim': 0}
     return io.BytesIO(json.dumps(body).encode())
 
 def main():
@@ -50,6 +50,16 @@ def main():
     check('records carry serving_port and (port,pid) identity is distinct x8',
           len({(r['serving_port'], r['serving_pid']) for r in recs}) == 8
           and all(r['serving_pid'] == 1 for r in recs))
+    import hashlib
+    want_sha = hashlib.sha256(b'abcdefghij').hexdigest()
+    check('HASHING LOCUS: chunk_sha256 computed DRIVER-side from returned texts, RR formula',
+          all(r['chunk_sha256'] == [want_sha] and r['hashing_locus'] == 'driver_post_response'
+              for r in recs))
+    old_body_rec = drv.record_from_li({'chunk_sha256': ['legacyhash'], 'chunk_chars': [5],
+                                       'n_chunks': 1, 'pid': 9})
+    check('old-image response (no chunks) falls back to its in-wall hashes AND says so',
+          old_body_rec['chunk_sha256'] == ['legacyhash']
+          and old_body_rec['hashing_locus'] == 'in_service_in_wall')
     check('records carry stage_s_semantics from the service',
           all(r.get('stage_s_semantics') == 'device_only' for r in recs))
 
