@@ -73,6 +73,29 @@ def main():
     except SystemExit as e:
         check('balanced mode REFUSES multi-worker instances (8 ports x W=8 trap)',
               'SINGLE-worker' in str(e))
+    print('\nCOLLECTOR MULTI-INSTANCE (Task-1 blocker, 2026-08-25)')
+    names8 = ','.join(f'li_bal_{i}' for i in range(8))
+    got = drv.resolve_service_containers('llamaindex', 'rr', 'li_video', names8, 8)
+    check('8 ports + 8 containers -> full sample set', got == [f'li_bal_{i}' for i in range(8)])
+    for spec, n, why in ((None, 8, 'no --li-containers'), (names8 + ',extra', 8, 'count mismatch'),
+                         ('a,a', 2, 'duplicates')):
+        try:
+            drv.resolve_service_containers('llamaindex', 'rr', 'li_video', spec, n)
+            check(f'FAIL-CLOSED: {why} refused', False, 'no raise')
+        except SystemExit as e:
+            check(f'FAIL-CLOSED: {why} refused', 'NOT DONE' in str(e))
+    check('single-port keeps --li-container',
+          drv.resolve_service_containers('llamaindex', 'rr', 'li_video', None, 1) == ['li_video'])
+    check('rocketride unaffected',
+          drv.resolve_service_containers('rocketride', 'rr', 'li_video', None, 8) == ['rr'])
+
+    orig = drv.container_cpu_usage_usec
+    drv.container_cpu_usage_usec = lambda c, timeout_s=15: {'a': 100, 'b': 250}.get(c)
+    check('cgroup SUM across containers', drv.containers_cpu_usage_usec(['a', 'b']) == 350)
+    check('one unreadable member -> None, never a partial sum',
+          drv.containers_cpu_usage_usec(['a', 'dead']) is None)
+    drv.container_cpu_usage_usec = orig
+
     print(f'\nli-ports controls: {"PASS" if not FAILS else "FAIL"} ({len(FAILS)} failing)')
     return 1 if FAILS else 0
 

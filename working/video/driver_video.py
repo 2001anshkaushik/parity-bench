@@ -1049,6 +1049,58 @@ def docker_inspect(container: str, fmt: str) -> Optional[str]:
         return None
 
 
+def resolve_service_containers(arm: str, rr_container: Optional[str],
+                               li_container: Optional[str],
+                               li_containers_spec: Optional[str],
+                               n_li_ports: int) -> List[str]:
+    """The container set the efficiency family samples — ALL of the service or
+    none of it (2026-08-25 ruling). A multi-instance posture sampled from one
+    container reported one-Nth of the service as the service; that number was
+    quotable and wrong, which is the worst kind. FAIL CLOSED here."""
+    if arm == 'rocketride':
+        return [rr_container]
+    if li_containers_spec:
+        names = [x.strip() for x in li_containers_spec.split(',') if x.strip()]
+        if len(names) != len(set(names)) or not names:
+            raise SystemExit(f'NOT DONE — --li-containers {li_containers_spec!r} empty/duplicates')
+        if len(names) != n_li_ports:
+            raise SystemExit(f'NOT DONE — {n_li_ports} LI port(s) but {len(names)} '
+                             'container(s); every instance must be sampled or efficiency '
+                             'is unquotable (one container per port, same order)')
+        return names
+    if n_li_ports > 1:
+        raise SystemExit(f'NOT DONE — balanced mode ({n_li_ports} ports) requires '
+                         '--li-containers naming ALL instances: a single-container sample '
+                         f'reports one-{n_li_ports}th of the service as the service. '
+                         'Refusing to compute efficiency from it (fail closed).')
+    return [li_container]
+
+
+def containers_cpu_usage_usec(containers: List[str]) -> Optional[int]:
+    """Sum of the service's cgroups. None if ANY member is unreadable — a
+    partial sum dressed as a total is worse than absence (#34)."""
+    total = 0
+    for c in containers:
+        v = container_cpu_usage_usec(c)
+        if v is None:
+            return None
+        total += v
+    return total
+
+
+def containers_idle_cores(containers: List[str], sample_s: float = 4.0) -> Optional[float]:
+    """Idle burn summed across the service's containers, ONE shared wall window
+    (not N serial windows). None if any cgroup is unreadable."""
+    t0 = time.monotonic()
+    a = {c: container_cpu_usage_usec(c) for c in containers}
+    time.sleep(sample_s)
+    wall = time.monotonic() - t0
+    b = {c: container_cpu_usage_usec(c) for c in containers}
+    if any(a[c] is None or b[c] is None for c in containers):
+        return None
+    return round(sum(b[c] - a[c] for c in containers) / 1e6 / wall, 3)
+
+
 def image_provenance(container: str, lineage: Optional[str]) -> dict:
     """WHICH IMAGE this leg ran, as measured facts plus a declared lineage
     (Crossroad 33, 2026-08-22). The tag is not the identity: `rr:patched-video`
@@ -1091,6 +1143,11 @@ def preflight_containers(rr_container: Optional[str], li_container: Optional[str
     here instead of contaminating a leg."""
     problems = []
     for c in filter(None, [rr_container, li_container]):
+        running = docker_inspect(c, '{{.State.Running}}')
+        if running != 'true':
+            problems.append(f'{c}: not running (State.Running={running!r}) — refusing to '
+                            'proceed against a dead or defaulted container name')
+            continue
         cpuset = docker_inspect(c, '{{.HostConfig.CpusetCpus}}')
         nano = docker_inspect(c, '{{.HostConfig.NanoCpus}}')
         if cpuset is None:
@@ -1782,6 +1839,10 @@ async def amain() -> int:
     ap.add_argument('--interval-s', type=positive_int('interval-s', 3600), default=15)
     ap.add_argument('--rr-port', type=positive_int('rr-port', 65535), default=5565)
     ap.add_argument('--li-port', type=positive_int('li-port', 65535), default=8802)
+    ap.add_argument('--li-containers', default=None,
+                    help='balanced mode: comma list of the N single-worker containers, one '
+                         'per --li-ports entry in the same order. REQUIRED when li-ports > 1 '
+                         '(the collector and CPU bracket must sample ALL of the service).')
     ap.add_argument('--li-ports', default=None,
                     help='balanced mode (ruling 2026-08-25): "8802-8809" or comma list — '
                          'several SINGLE-worker instances, driver round-robins ports per '
@@ -1959,17 +2020,22 @@ async def amain() -> int:
     # live, before any work — through the same reader, both arms, and carry it
     # into the export's efficiency block. An absent read refuses the leg: an
     # efficiency figure that cannot name its idle burden is not quotable.
-    svc_container = args.rr_container if args.arm == 'rocketride' else args.li_container
+    svc_containers = resolve_service_containers(
+        args.arm, args.rr_container, args.li_container,
+        getattr(args, 'li_containers', None), len(getattr(arm, 'ports', [0])) if args.arm == 'llamaindex' else 1)
+    svc_container = svc_containers[0]   # image identity only — instances share one image
     instances = posture.tokens if args.arm == 'rocketride' else (arm.declared_workers or 1)
     idle_sample_s = 6.0
-    idle_live = container_idle_cores(svc_container, sample_s=idle_sample_s)
+    idle_live = containers_idle_cores(svc_containers, sample_s=idle_sample_s)
     if idle_live is None:
         await arm.stop()
-        raise SystemExit(f'NOT DONE — cannot read {svc_container!r} cgroup cpu.stat for the '
+        raise SystemExit(f'NOT DONE — cannot read cgroup cpu.stat across {svc_containers!r} for the '
                          'idle-with-instances-live sample (Ticket 4 burden); the leg\'s '
                          'efficiency figures would have no idle burden to carry.')
     ncpu = os.cpu_count() or 32
-    idle_before = (pf.get('preleg_container_idle_cores') or {}).get(svc_container)
+    _pre = pf.get('preleg_container_idle_cores') or {}
+    _vals = [_pre.get(c) for c in svc_containers]
+    idle_before = (round(sum(_vals), 3) if all(v is not None for v in _vals) else None)
     pf['idle_burden'] = {
         'instances': instances,
         'instance_kind': 'rr_tokens' if args.arm == 'rocketride' else 'li_workers',
@@ -2044,14 +2110,18 @@ async def amain() -> int:
     collector = None
     if not args.no_collector:
         from harness.collector_proc import ProcessCollector
-        container = args.rr_container if args.arm == 'rocketride' else args.li_container
-        root_pid = docker_inspect(container, '{{.State.Pid}}')
-        roles = {'driver': {'pids': [os.getpid()]}}
-        if root_pid and root_pid.isdigit():
-            roles['service'] = {'pids': [int(root_pid)]}
-        else:
-            raise SystemExit(f'NOT DONE — cannot resolve container root pid for {container!r}; '
-                             'the collector must sample the service or nothing is quotable.')
+        # ALL of the service's containers (2026-08-25): a multi-instance
+        # posture sampled from one container is one-Nth of the service.
+        root_pids = []
+        for container in svc_containers:
+            root_pid = docker_inspect(container, '{{.State.Pid}}')
+            if not (root_pid and root_pid.isdigit() and int(root_pid) > 0):
+                raise SystemExit(f'NOT DONE — cannot resolve container root pid for '
+                                 f'{container!r}; the collector must sample the WHOLE '
+                                 'service or nothing is quotable.')
+            root_pids.append(int(root_pid))
+        roles = {'driver': {'pids': [os.getpid()]},
+                 'service': {'pids': root_pids}}
         collector = ProcessCollector(out_dir / f'collector_{stem}.jsonl',
                                      roles, interval_s=0.5)
         collector.start()
@@ -2062,7 +2132,7 @@ async def amain() -> int:
     # tokens whose burn the bracket is measuring.
     cg_leg1: Optional[int] = None
     collector_summary: Optional[dict] = None
-    cg_leg0 = container_cpu_usage_usec(svc_container)
+    cg_leg0 = containers_cpu_usage_usec(svc_containers)
     t_leg0 = time.monotonic()
     dr0 = resource.getrusage(resource.RUSAGE_SELF)
     try:
@@ -2072,7 +2142,7 @@ async def amain() -> int:
                                      Path(args.corpus_dir), writer, done_keys,
                                      args.interval_s)
         leg_wall = time.monotonic() - t_leg0
-        cg_leg1 = container_cpu_usage_usec(svc_container)
+        cg_leg1 = containers_cpu_usage_usec(svc_containers)
         dr1 = resource.getrusage(resource.RUSAGE_SELF)
     finally:
         # stop() terminates every token BEFORE disconnect (Ticket 4): a leg
@@ -2138,7 +2208,7 @@ async def amain() -> int:
         chunk_size=measured_chunk_size or -1,   # FROM RECORDS; -1 = no records, unmissable
         chunk_overlap=0,
         embedding_model=EMBED_MODEL,
-        container=(args.rr_container if args.arm == 'rocketride' else args.li_container),
+        container=','.join(svc_containers),
         splitter=('RecursiveCharacterTextSplitter' if args.arm == 'rocketride'
                   else 'SentenceSplitter(native, char length function supplied)'),
     )
