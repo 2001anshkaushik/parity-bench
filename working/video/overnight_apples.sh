@@ -54,48 +54,59 @@ li_set() { # $1=N -> sets PORTS and NAMES (the ONE source; bring-up, driver argv
 envargs() { local n="$1"; echo "-e OMP_NUM_THREADS=$n -e MKL_NUM_THREADS=$n \
 -e OPENBLAS_NUM_THREADS=$n -e VECLIB_MAXIMUM_THREADS=$n -e NUMEXPR_NUM_THREADS=$n -e TORCH_NUM_THREADS=$n"; }
 
+start_rr_set() { # $1=T — ONE bring-up used by legs AND the dry preflight
+  docker rm -f rr >/dev/null 2>&1 || true
+  # shellcheck disable=SC2046
+  docker run -d --name rr --memory 58g $(envargs "$1") --log-opt max-size=200m \
+      --network host rr:patched-video >/dev/null
+  "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
+}
+stop_rr_set() { docker rm -f rr >/dev/null 2>&1 || true; }
+
+start_li_set() { # $1=N $2=T — ONE bring-up used by legs AND the dry preflight
+  li_set "$1"
+  local MEM; MEM=$([ "$1" -ge 16 ] && echo 3g || echo 7g)
+  local i
+  for i in $(seq 0 $(( $1 - 1 ))); do
+    docker rm -f "li_bal_$i" >/dev/null 2>&1 || true
+    # shellcheck disable=SC2046
+    docker run -d --name "li_bal_$i" --memory "$MEM" $(envargs "$2") -e WS1V_WORKERS=1 \
+        --log-opt max-size=200m --network host --entrypoint sh li:video -c \
+        "rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port $((8802+i)) --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30" >/dev/null
+  done
+  for i in $(seq 0 $(( $1 - 1 ))); do
+    "$PY" working/video/probe/wait_ready.py --arm li --port $((8802+i)) --workers 1 \
+        --container "li_bal_$i" --deadline 1200 || return 1
+  done
+}
+stop_li_set() { local i; for i in $(seq 0 $(( $1 - 1 ))); do docker rm -f "li_bal_$i" >/dev/null 2>&1 || true; done; }
+
 rr_leg() { # $1=M $2=T $3=pass
   local M="$1" T="$2" P="$3" tag="rr_${1}x${2}_p$3"
   case " ${SKIP:-} " in *" $tag "*) echo "=== $tag SKIPPED (banked) ===" | tee -a "$LOG"; R+=("$tag: SKIPPED (banked)"); return;; esac
   echo "=== $tag: fresh rr, M=$M six-vars=$T ===" | tee -a "$LOG"
-  docker rm -f rr >/dev/null 2>&1 || true
-  # shellcheck disable=SC2046
-  docker run -d --name rr --memory 58g $(envargs "$T") --log-opt max-size=200m \
-      --network host rr:patched-video >/dev/null
-  "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr 2>&1 | tee -a "$LOG" || { R+=("$tag: NOT READY"); docker rm -f rr >/dev/null 2>&1; return; }
+  start_rr_set "$T" 2>&1 | tee -a "$LOG" || { R+=("$tag: NOT READY"); stop_rr_set; return; }
   "$PY" working/video/driver_video.py --arm rocketride --posture parity --leg blast \
       --n 168 --blast-concurrency 16 --tokens "$M" --rr-threads-env "$T" --pass "$P" \
       --image-lineage "$LIN_RR" --out-dir "$OUT" 2>&1 | tee -a "$LOG"
   R+=("$tag: rc=${PIPESTATUS[0]}"); docker logs rr > "$OUT/dockerlog_$tag.txt" 2>&1 || true
-  docker rm -f rr >/dev/null 2>&1 || true
+  stop_rr_set
 }
 
 li_leg() { # $1=N instances $2=T $3=pass
   local N="$1" T="$2" P="$3" tag="li_${1}x${2}_p$3" MEM
   case " ${SKIP:-} " in *" $tag "*) echo "=== $tag SKIPPED (banked) ===" | tee -a "$LOG"; R+=("$tag: SKIPPED (banked)"); return;; esac
+  echo "=== $tag: $N fresh single-worker instances, torch=$T ===" | tee -a "$LOG"
+  start_li_set "$N" "$T" 2>&1 | tee -a "$LOG" || { R+=("$tag: instance NOT READY"); stop_li_set "$N"; return; }
   li_set "$N"
-  MEM=$([ "$N" -ge 16 ] && echo 3g || echo 7g)
-  echo "=== $tag: $N fresh single-worker instances, torch=$T, ${MEM}/instance ===" | tee -a "$LOG"
-  for i in $(seq 0 $((N-1))); do
-    docker rm -f "li_bal_$i" >/dev/null 2>&1 || true
-    # shellcheck disable=SC2046
-    docker run -d --name "li_bal_$i" --memory "$MEM" $(envargs "$T") -e WS1V_WORKERS=1 \
-        --log-opt max-size=200m --network host --entrypoint sh li:video -c \
-        "rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port $((8802+i)) --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30" >/dev/null
-  done
-  for i in $(seq 0 $((N-1))); do
-    "$PY" working/video/probe/wait_ready.py --arm li --port $((8802+i)) --workers 1 \
-        --container "li_bal_$i" --deadline 1200 2>&1 | tee -a "$LOG" \
-      || { R+=("$tag: instance $i NOT READY"); return; }
-  done
   "$PY" working/video/driver_video.py --arm llamaindex --leg blast --n 168 \
       --blast-concurrency 16 --li-ports "$PORTS" --li-containers "$NAMES" --pass "$P" \
       --image-lineage "$LIN_LI" --out-dir "$OUT" 2>&1 | tee -a "$LOG"
   R+=("$tag: rc=${PIPESTATUS[0]}")
-  for i in $(seq 0 $((N-1))); do
+  local i; for i in $(seq 0 $((N-1))); do
     docker logs "li_bal_$i" > "$OUT/dockerlog_${tag}_i$i.txt" 2>&1 || true
-    docker rm -f "li_bal_$i" >/dev/null 2>&1 || true
   done
+  stop_li_set "$N"
 }
 
 echo "=== LEG ORDER (verify the interleave BEFORE it runs) ===" | tee -a "$LOG"
@@ -140,7 +151,36 @@ except SystemExit as e:
     sys.exit(0 if 'NOT DONE' in str(e) else 1)
 " || { echo "  FAIL — driver service-set resolution not behaving" | tee -a "$LOG"; PLAN_FAIL=1; }
 [ "$PLAN_FAIL" = 0 ] || { echo "PLAN CHECK FAILED — refusing to start (fail at minute zero, not forty)" | tee -a "$LOG"; exit 1; }
-echo "PLAN CHECK PASSED — all legs validated" | tee -a "$LOG"
+echo "shape checks passed — now the REAL preflights (2026-08-26: both failures passed the"
+echo "old plan check and died at minute 40 in a preflight it never exercised)" | tee -a "$LOG"
+dry_pf() { # $1=arm $2=N $3=T  — bring up via the SAME functions the legs use,
+  # run the driver's ACTUAL preflight (--preflight-only), tear down.
+  if [ "$1" = rr ]; then
+    start_rr_set "$3" >>"$LOG" 2>&1 || { echo "  dry-preflight rr: BRING-UP FAILED" | tee -a "$LOG"; return 1; }
+    "$PY" working/video/driver_video.py --arm rocketride --posture parity --leg blast \
+        --n 168 --blast-concurrency 16 --tokens "$2" --rr-threads-env "$3" --pass 1 \
+        --image-lineage "dry preflight" --out-dir "$OUT/dry_pf" --preflight-only 2>&1 | tail -3 | tee -a "$LOG"
+    local rc=${PIPESTATUS[0]}; stop_rr_set; return "$rc"
+  else
+    start_li_set "$2" "$3" >>"$LOG" 2>&1 || { echo "  dry-preflight li($2): BRING-UP FAILED" | tee -a "$LOG"; stop_li_set "$2"; return 1; }
+    li_set "$2"
+    "$PY" working/video/driver_video.py --arm llamaindex --leg blast --n 168 \
+        --blast-concurrency 16 --li-ports "$PORTS" --li-containers "$NAMES" --pass 1 \
+        --image-lineage "dry preflight" --out-dir "$OUT/dry_pf" --preflight-only 2>&1 | tail -3 | tee -a "$LOG"
+    local rc=${PIPESTATUS[0]}; stop_li_set "$2"; return "$rc"
+  fi
+}
+for shape in "rr:8:4" "li:8:4" "rr:16:2" "li:16:2"; do
+  IFS=: read -r D_ARM D_N D_T <<EOF3
+$shape
+EOF3
+  case " ${SKIP:-} " in
+    *" ${D_ARM}_${D_N}x${D_T}_p1 "*) [ "${D_ARM}" = rr ] && echo "  dry-preflight $shape: leg skipped; still exercising shape" | tee -a "$LOG";;
+  esac
+  echo "  dry-preflight $shape ..." | tee -a "$LOG"
+  dry_pf "$D_ARM" "$D_N" "$D_T" || { echo "PLAN CHECK FAILED at REAL preflight for $shape — refusing the session" | tee -a "$LOG"; exit 1; }
+done
+echo "PLAN CHECK PASSED — argv shapes AND real preflights, all legs validated" | tee -a "$LOG"
 
 echo "rebuilding li:video (hashing-locus change is baked into the image)" | tee -a "$LOG"
 docker build -q -t li:video -f docker/Dockerfile.llamaindex-video . | tee -a "$LOG"

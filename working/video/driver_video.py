@@ -1060,6 +1060,42 @@ def docker_inspect(container: str, fmt: str) -> Optional[str]:
         return None
 
 
+class _ConsumedContainerArg:
+    """After service-set resolution, the raw args.{rr,li}_container attributes
+    are REPLACED with this: any use (str, format, ==, bool, hash) RAISES.
+    Structural, not a comment — the li_video-default bug shipped twice
+    (preflight flags 2026-08-25, LI weights md5 2026-08-26) because raw reads
+    after resolution compiled fine. Now they cannot run."""
+    _MSG = ('raw args container attribute read AFTER service-set resolution — '
+            'use args._svc_containers (class fix 2026-08-26; the raw default '
+            'was the dead-li_video bug, twice)')
+
+    def _boom(self, *a, **k):
+        raise RuntimeError(self._MSG)
+    __str__ = __format__ = __eq__ = __bool__ = __hash__ = _boom
+
+    def __repr__(self):
+        return '<consumed container arg>'
+
+
+def containers_rfdetr_md5(containers: List[str], path: str) -> Dict[str, Optional[str]]:
+    """Weights identity for EVERY instance. A mixed set is exactly the failure
+    this check exists to catch (one stale container serving old weights inside
+    a balanced set) — the caller refuses on ANY mismatch, naming per-instance."""
+    return {c: rfdetr_checkpoint_md5(c, path) for c in containers}
+
+
+def containers_declared_threads(containers: List[str]) -> Dict[str, Any]:
+    """Declared -e thread env per instance; instances are started by ONE loop,
+    so disagreement means a mixed set — refuse, naming each."""
+    per = {c: container_declared_threads(c) for c in containers}
+    vals = {json.dumps(v, sort_keys=True) for v in per.values()}
+    if len(vals) > 1:
+        raise SystemExit('NOT DONE — declared thread env DISAGREES across the service set '
+                         f'(mixed containers): { {c: v for c, v in per.items()} }')
+    return next(iter(per.values()))
+
+
 def resolve_service_containers(arm: str, rr_container: Optional[str],
                                li_container: Optional[str],
                                li_containers_spec: Optional[str],
@@ -1215,8 +1251,13 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
         args.arm, args.rr_container, args.li_container,
         getattr(args, 'li_containers', None),
         len(getattr(arm, 'ports', [0])) if args.arm == 'llamaindex' else 1)
-    problems = preflight_containers(args.rr_container if rr_arm_active else None,
-                                    args.li_container if not rr_arm_active else None,
+    # STRUCTURAL GUARD (2026-08-26): from here on, the raw attributes cannot be
+    # used — any str/==/format/bool on them raises. Twice a site below read the
+    # dead default; the third time is now a loud crash at the read site.
+    _rr_name = args.rr_container
+    args.rr_container = args.li_container = _ConsumedContainerArg()
+    problems = preflight_containers(_rr_name if rr_arm_active else None,
+                                    None,
                                     li_containers=(args._svc_containers
                                                    if not rr_arm_active else None))
     if problems:
@@ -1282,7 +1323,7 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
                              f'({info.get("rfdetr_import_error")!r}): a REAL import '
                              'failure (the field is present) — the engine would '
                              'silently serve RT-DETR, a different model. Refusing to run.')
-        md5 = rfdetr_checkpoint_md5(args.rr_container, RFDETR_PATHS['rr'])
+        md5 = rfdetr_checkpoint_md5(args._svc_containers[0], RFDETR_PATHS['rr'])
         identity['rr']['rfdetr_checkpoint_md5'] = md5
         identity['rr']['rfdetr_checkpoint_md5_ok'] = md5 == RFDETR_BASE_MD5
         if md5 != RFDETR_BASE_MD5:
@@ -1302,12 +1343,19 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
                           'versions': next(iter(per_worker.values()))['versions']}
         if impls != {'rfdetr'}:
             raise SystemExit(f'NOT DONE — LI detect_impl read back as {impls}, not rfdetr.')
-        md5 = rfdetr_checkpoint_md5(args.li_container, RFDETR_PATHS['li'])
-        identity['li']['rfdetr_checkpoint_md5'] = md5
-        identity['li']['rfdetr_checkpoint_md5_ok'] = md5 == RFDETR_BASE_MD5
-        if md5 != RFDETR_BASE_MD5:
-            raise SystemExit(f'NOT DONE — LI rf-detr-base.pth md5 {md5!r} != registry '
-                             f'{RFDETR_BASE_MD5}: wrong or absent weights.')
+        # EVERY instance's weights, not one container's (2026-08-26: this site
+        # read the dead li_video default and failed a healthy 8-instance set;
+        # and a MIXED set — one instance on other weights — is exactly what
+        # this check exists to catch).
+        md5s = containers_rfdetr_md5(args._svc_containers, RFDETR_PATHS['li'])
+        identity['li']['rfdetr_checkpoint_md5_by_container'] = md5s
+        identity['li']['rfdetr_checkpoint_md5_ok'] = all(
+            v == RFDETR_BASE_MD5 for v in md5s.values())
+        bad = {c: v for c, v in md5s.items() if v != RFDETR_BASE_MD5}
+        if bad:
+            raise SystemExit(f'NOT DONE — LI rf-detr-base.pth md5 mismatch vs registry '
+                             f'{RFDETR_BASE_MD5} on {len(bad)}/{len(md5s)} instance(s): {bad} '
+                             '(a mixed set is the exact failure this check exists for)')
 
     # Crossroad 17: per-arm declared-vs-measured; asymmetry across arms is a
     # recorded value, never a failure. Undeclared drift (#37) still fails.
@@ -1318,10 +1366,9 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
     # controls for both modes fire first, every preflight.
     gs.thread_pins_self_test()
     arm_label = 'rr' if rr_arm_active else 'li'
-    container = args.rr_container if rr_arm_active else args.li_container
     expected = {'rr': args.rr_threads_env} if rr_arm_active else None
     pins = gs.thread_pins_by_arm({arm_label: readbacks},
-                                 {arm_label: container_declared_threads(container)},
+                                 {arm_label: containers_declared_threads(args._svc_containers)},
                                  expected_by_arm=expected)
     if pins['PASS'] is not True:
         raise SystemExit(f'NOT DONE — thread pins (declared vs measured vs expected '
@@ -1876,6 +1923,11 @@ async def amain() -> int:
     ap.add_argument('--out-dir', default=None)
     ap.add_argument('--skip-cache-drop', action='store_true',
                     help='wiring tests only — measured runs must evict and prove it')
+    ap.add_argument('--preflight-only', action='store_true',
+                    help='run the FULL real preflight (containers, weights, pins, quiet box, '
+                         'readbacks) against live containers, then stop cleanly — the '
+                         'minute-zero plan check runs this so a leg cannot die at minute 40 '
+                         'on a preflight the plan check never exercised (2026-08-26)')
     ap.add_argument('--skip-warmup', action='store_true',
                     help='resume aid ONLY — a fresh container without warm-up is not measurable')
     ap.add_argument('--no-collector', action='store_true')
@@ -1996,6 +2048,12 @@ async def amain() -> int:
 
     pf = await preflight(args, arm if args.arm == 'llamaindex' else li_probe,
                          rr_arm_active=(args.arm == 'rocketride'))
+
+    if args.preflight_only:
+        say('PREFLIGHT-ONLY PASS — containers, weights (every instance), pins, quiet box '
+            f'and readbacks all green for {args.arm}; stopping cleanly (no warm-up, no leg).')
+        await arm.stop()
+        return 0
     rows_all = pf['rows']
     measured = [r for r in rows_all if r['role'] == 'measured'][:args.n]
     warm = [r for r in rows_all if r['role'] == 'warm']
@@ -2014,16 +2072,16 @@ async def amain() -> int:
         # use_existing reads). M tokens declared -> M NEW task processes
         # measured, or the leg refuses: a parity posture whose tokens share a
         # task is a queue wearing a parity label. Config is never the evidence.
-        census_before = settled_census(args.rr_container)
+        census_before = settled_census(args._svc_containers[0])
         await arm.start()
-        census_after = task_process_census(args.rr_container)
+        census_after = task_process_census(args._svc_containers[0])
         before_pids = {p['pid'] for p in census_before}
         new_procs = [p for p in census_after if p['pid'] not in before_pids]
         if len(new_procs) != posture.tokens:
             await arm.stop()
             raise SystemExit(
                 f'NOT DONE — declared {posture.tokens} token(s) but measured '
-                f'{len(new_procs)} NEW task process(es) in {args.rr_container} '
+                f'{len(new_procs)} NEW task process(es) in {args._svc_containers[0]} '
                 f'(census {len(census_before)} -> {len(census_after)}, new pids '
                 f'{[p["pid"] for p in new_procs]}). Tokens sharing a task process '
                 f'would make every parity number a queue measurement (D3).')
@@ -2200,9 +2258,9 @@ async def amain() -> int:
     # detect node's drop warning — with a channel-liveness marker so a dead
     # log can never read as 'no drops'. Detector = gate 1; this ATTRIBUTES.
     if args.arm == 'rocketride':
-        log_file = out_dir / f'dockerlog_{args.rr_container}_{posture.name}_{args.leg}{sfx}.txt'
+        log_file = out_dir / f'dockerlog_{args._svc_containers[0]}_{posture.name}_{args.leg}{sfx}.txt'
         try:
-            log_text = subprocess.run(['docker', 'logs', args.rr_container],
+            log_text = subprocess.run(['docker', 'logs', args._svc_containers[0]],
                                       capture_output=True, text=True, timeout=60
                                       ).stdout or ''
         except Exception:

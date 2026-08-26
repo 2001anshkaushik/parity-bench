@@ -106,6 +106,42 @@ def main():
           drv.containers_cpu_usage_usec(['a', 'dead']) is None)
     drv.container_cpu_usage_usec = orig
 
+    print('\nCONSUMED-ARG SENTINEL + SITE LINT (class fix 2026-08-26)')
+    sent = drv._ConsumedContainerArg()
+    for op, fn in (('str', lambda: str(sent)), ('format', lambda: f'{sent}'),
+                   ('eq', lambda: sent == 'li_video'), ('bool', lambda: bool(sent)),
+                   ('hash', lambda: hash(sent))):
+        try:
+            fn(); check(f'sentinel: {op} raises', False, 'no raise')
+        except RuntimeError as e:
+            check(f'sentinel: {op} raises with the pointer to _svc_containers',
+                  '_svc_containers' in str(e))
+    src = Path(drv.__file__).read_text()
+    cut = src.index('args.rr_container = args.li_container = _ConsumedContainerArg()')
+    below = src[cut + 60:]
+    raw = [l.strip() for l in below.splitlines()
+           if ('args.li_container' in l or 'args.rr_container' in l)
+           and 'li_containers' not in l and '#' != l.strip()[:1]]
+    check('LINT: zero raw args container reads below the sentinel line', not raw, str(raw[:4]))
+
+    orig_md5 = drv.rfdetr_checkpoint_md5
+    drv.rfdetr_checkpoint_md5 = lambda c, p: {'li_bal_0': 'GOOD', 'li_bal_1': 'BAD'}.get(c)
+    got = drv.containers_rfdetr_md5(['li_bal_0', 'li_bal_1'], '/x')
+    check('md5 checked per instance, mixed set visible by name',
+          got == {'li_bal_0': 'GOOD', 'li_bal_1': 'BAD'})
+    drv.rfdetr_checkpoint_md5 = orig_md5
+
+    orig_dt = drv.container_declared_threads
+    drv.container_declared_threads = lambda c: {'OMP': '4'} if c != 'li_bal_9' else {'OMP': '2'}
+    check('declared threads agree -> single value',
+          drv.containers_declared_threads(['a', 'b']) == {'OMP': '4'})
+    try:
+        drv.containers_declared_threads(['a', 'li_bal_9'])
+        check('mixed declared env REFUSED naming instances', False, 'no raise')
+    except SystemExit as e:
+        check('mixed declared env REFUSED naming instances', 'DISAGREES' in str(e) and 'li_bal_9' in str(e))
+    drv.container_declared_threads = orig_dt
+
     print(f'\nli-ports controls: {"PASS" if not FAILS else "FAIL"} ({len(FAILS)} failing)')
     return 1 if FAILS else 0
 
