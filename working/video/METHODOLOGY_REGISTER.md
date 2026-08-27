@@ -723,3 +723,54 @@ than rewritten from memory, which is entry 2's point in miniature.
 > carries the C16-small cell. What it is NOT, also from banked data: not
 > resources, not ttl, not the container, not the corpus (the same files pass
 > sequentially and on the LI arm).
+
+## 21. The dead default survived its own fix — entry 14 at the level of values (added 2026-08-26)
+
+> Two legs died one night on the same defect wearing two lines. The driver
+> grew multi-instance resolution (`--li-containers` → `args._svc_containers`),
+> and the fix landed where the failure had been observed — the CPU bracket and
+> collector — while `preflight_containers` 800 lines EARLIER kept
+> running-checking `args.li_container`: the default name `li_video`, dead 21
+> hours (H13). Fixed that site; the SAME night the weights check at another
+> site read the same raw default and failed a healthy 8-instance set with
+> `md5 None` (H12). Entry 14's mechanism exactly, one level down: there the
+> stale thing was a duplicate COMPARATOR, here a stale VALUE — and both times
+> the grep had been for the fix's shape, not for the operation ("who reads
+> this name"). The cure is structural, not another patch: resolution moved
+> BEFORE any name is used, and the raw attributes are then REPLACED with a
+> sentinel (`_ConsumedContainerArg`) whose str/format/==/bool/hash all RAISE
+> with a pointer to the resolved set — a third dead-default read is now a
+> loud crash at the read site, plus a lint test asserting zero raw reads
+> below the sentinel line. **When a value gains a resolved successor, the raw
+> form must become unreadable, not merely unfashionable.** Multi-instance
+> semantics were stated per site while routing: weights md5 = EVERY instance,
+> refused on any mismatch by name (a mixed set is the failure the check
+> exists for); declared thread env = must agree across the set; census and
+> logs = instance 0 by stated convention.
+
+## 22. The abort-before-write batch patch — one stale anchor silently discards the whole batch (added 2026-08-26)
+
+> Three times in one session, a multi-patch edit script (N anchored
+> replacements, each guarded by `assert old in s`, one `write_text` at the
+> end) hit ONE stale anchor — an indent changed by an earlier refactor, a
+> line Crossroad 41 had already rewritten — and the assert aborted the script
+> AFTER several replacements had succeeded in memory and BEFORE anything was
+> written. Net effect: the file unchanged, no error beyond a traceback that
+> scrolled past, and the test suites GREEN — green because they were testing
+> the untouched code. A checker cannot catch an edit that never happened.
+> The failure mode is the mirror of entry 4's companion: not a failure
+> wearing success's clothes, but a NO-OP wearing them. The cure used from
+> then on: per-patch apply-and-report (an ok/MISS line per anchor, write the
+> file regardless, then act on the MISSes), followed by a READ-BACK of the
+> modified file's changed lines before the commit — never the memory of
+> having edited.
+>
+> Beside it, the same session's process failure, recorded with its evidence:
+> `990f827` was PUSHED while its own newly added test was red (the
+> schema-service agreement test, failing on a paren-scan bug of its own);
+> caught and fixed one commit later at `e158479`. The discipline is
+> run-the-suite, READ the suite's output, then push — the run alone proves
+> nothing if the output is not read, which is entry 9 (the reading is not the
+> artifact) applied to one's own test results. Both rules are one rule:
+> **an edit or a push is not done when the command returns; it is done when
+> its effect has been read back.**

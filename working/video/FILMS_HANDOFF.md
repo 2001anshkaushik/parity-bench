@@ -1,8 +1,10 @@
 # FILMS_HANDOFF — briefing for the Archive Films campaign advisor
 
 **Read this instead of pasted context.** The AMI campaign (23–26 Aug 2026) is
-CLOSED; its definitive report is `WS1_Phase2_Video_Benchmark_DEFINITIVE.md`
-(operator-held; artifacts at `s3://rocketride-benchmark-data/ansh/video-ami-20260826/`).
+CLOSED; its definitive report is COMMITTED at
+`working/video/WS1_Phase2_Video_Benchmark_DEFINITIVE.md` (sha256-verified
+against the received original; artifacts at
+`s3://rocketride-benchmark-data/ansh/video-ami-20260826/`).
 This file carries what the next campaign needs: the banked numbers, what is
 settled, what is open, the Films-specific blockers, and the standing rules.
 Deeper history: `SESSION_STATE.md` (AMI-era, historical now),

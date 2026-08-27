@@ -58,3 +58,16 @@ Crossroad 37 runs this set; the split is HERS — `run/native170.sh:10,19-20`,
 168 measured + 2 warm, positional over THIS file's order. Do not reformat,
 re-sort or strip comments; the manifest records this sha as `meeting_list_sha256`,
 so any edit shows up there.
+
+## Pinning correction — the 24-Aug re-clone (recorded 2026-08-26)
+
+The 2026-08-24 fresh re-clone (scratch-side, for the send-path diff and the
+video-bench reads) checked out **FETCH_HEAD of `aws-bench`** without recording
+the sha at the time. Read back from the still-live clone on 2026-08-26:
+**`313430f349d5c10c98abe781624e961364607bed`**. Note the branch MOVED between
+the pinned 08-22 clone (`aa817d9a`) and that read — so file:line citations
+made from the 24-Aug clone (bench_video.py send path, run scripts, the
+send_files chunking shape) are pinned at `313430f3`, NOT at `aa817d9a`, and
+whether those lines drifted between the two shas was never checked.
+FILMS_HANDOFF §2.4's "adopt Leela's 4000/0 on the comparison arm" rests on
+the `313430f3` read. Rule stays the rule: record the sha AT clone time.
