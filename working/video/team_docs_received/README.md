@@ -71,3 +71,33 @@ send_files chunking shape) are pinned at `313430f3`, NOT at `aa817d9a`, and
 whether those lines drifted between the two shas was never checked.
 FILMS_HANDOFF §2.4's "adopt Leela's 4000/0 on the comparison arm" rests on
 the `313430f3` read. Rule stays the rule: record the sha AT clone time.
+
+## Re-pin, 2026-08-26 (fetch-only in the 08-22 clone; ordered this round)
+
+- The 08-22 clone pin stands: `aa817d9a85f19a0124ff3ae536b170c134730914`
+  (local branch `aws-bench` remains checked out there; never moved).
+- `git fetch origin` (fetch only — no merge, no checkout) run 2026-08-26 in
+  `../team-repos/leela-bench_langgraph_prod`. The 24-Aug read sha
+  `313430f349d5c10c98abe781624e961364607bed` is now **REACHABLE** in this
+  clone (it was absent before the fetch; the scratch clone it was originally
+  read from is gone from disk).
+- Fetched head, 2026-08-26: `origin/aws-bench` =
+  `3967d9f47b76f0f135c08d11f27dc7d0f503ad88`.
+- 4000/0 verified AT `313430f3` via git-object reads:
+  `aws_videobench/arms/langgraph/workload/chunk.py:12-13` (`CHUNK_SIZE =
+  4000`, `CHUNK_OVERLAP = 0`); `chunk.py` is UNCHANGED between `313430f3`
+  and `3967d9f` (absent from `git diff --stat` over the cited files), so the
+  §2.4 citation holds at both shas. Her docstring (`chunk.py:1-7`) records
+  her own derivation: 4000/0 reproduces the engine's ES2016d capture (20
+  chunks) byte-exactly; 4096 and 3600 do not.
+- `Benchmarking/reference/leela-bench_langgraph_prod` @
+  `e1cd6117ebb3e4a1c45054b14c2c358dca7c25da` is a **KNOWN-STALE copy, never
+  to be read** (standing rule: `reference*` paths are never read). Recorded
+  so it is never mistaken for the pinned clone. The pinned clone is
+  `../team-repos/leela-bench_langgraph_prod` and nothing else.
+- Working-tree caveat (2026-08-26): the 08-22 clone's tree carries local
+  modifications to 12 tracked `.pipe` files (one-line JSON pretty-printed;
+  +204/−21 lines; origin unknown, laptop-side). Git OBJECT reads (`git show
+  <sha>:<path>`, `git grep <pat> <sha>`) are unaffected and are how every
+  pin above was verified; do not trust those files' working-tree bytes
+  against any pin.
