@@ -97,7 +97,10 @@ the `313430f3` read. Rule stays the rule: record the sha AT clone time.
   `../team-repos/leela-bench_langgraph_prod` and nothing else.
 - Working-tree caveat (2026-08-26): the 08-22 clone's tree carries local
   modifications to 12 tracked `.pipe` files (one-line JSON pretty-printed;
-  +204/−21 lines; origin unknown, laptop-side). Git OBJECT reads (`git show
-  <sha>:<path>`, `git grep <pat> <sha>`) are unaffected and are how every
-  pin above was verified; do not trust those files' working-tree bytes
-  against any pin.
+  +204/−21 lines). Origin IDENTIFIED same day: the Phase 1 format-on-save
+  daemon that rewrites `.pipe` files in working trees on this Mac —
+  PHASE1_CARRYOVER.md:465-468 (item 10) and now METHODOLOGY_REGISTER.md
+  entry 23. Git OBJECT reads (`git show <sha>:<path>`, `git grep <pat>
+  <sha>`) are unaffected and are how every pin above was verified; on this
+  machine a working-tree read of any tracked `.pipe` is unciteable, here
+  and in our own repo alike.
