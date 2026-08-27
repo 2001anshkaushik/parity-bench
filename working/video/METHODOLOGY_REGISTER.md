@@ -723,6 +723,23 @@ than rewritten from memory, which is entry 2's point in miniature.
 > carries the C16-small cell. What it is NOT, also from banked data: not
 > resources, not ttl, not the container, not the corpus (the same files pass
 > sequentially and on the LI arm).
+>
+> **Addendum, 2026-08-27 — second occurrence, new path, and this time the
+> cause survived.** probe_frame_identity's `client.send()` of a 429.7 MB
+> film hit the server's 250 MiB refusal (entry 24). The caller saw the same
+> sentence as always — `ConnectionError('Could not send request')`,
+> dap_client.py:229 — while the true cause (websockets'
+> ConnectionClosedError quoting the server's 1009 close reason, WITH the
+> exact byte arithmetic) survived only in the chained traceback: the
+> wrapper raises without `from`, and the chain rode along as `__context__`.
+> Two facts for the upstream ticket: the diagnostic the wrapper discards is
+> SERVER-AUTHORED and names the number needed for the fix; and the
+> information demonstrably exists at the raise site — `raise
+> ConnectionError(...) from exc` is the whole repair. Second independent
+> occurrence of the opacity (the first, above, cost two campaign nights and
+> its true cause was never recovered); our probes now record the full
+> exception chain themselves (probe_detect_text.exc_chain) rather than
+> waiting on the SDK.
 
 ## 21. The dead default survived its own fix — entry 14 at the level of values (added 2026-08-26)
 
@@ -813,3 +830,39 @@ than rewritten from memory, which is entry 2's point in miniature.
 > any working-tree-dependent check on this machine (a dirty-tree gate, a
 > hash comparison against a checkout) must either name and stop the daemon
 > first, or be rewritten as an object read.
+
+## 24. A 250 MiB ceiling, measured by refusal — and what it re-prices in DIAG_M1_BLAST (added 2026-08-27)
+
+> The films frame-count check died in one message: the engine's websocket
+> closed 1009 ('message too big') naming its own arithmetic — a
+> 429,700,563-byte frame against a 262,144,000-byte limit. The frame was
+> the 429,700,405-byte film plus 158 bytes of DAP envelope on this message:
+> the transport sends raw binary (no base64), and the server refused it
+> outright. The limit is pinned on BOTH sides: CONST_WEB_WS_MAX_SIZE =
+> 250*1024*1024 (ai/constants.py:74), applied to the serving uvicorn at
+> ai/web/server.py:458, and the same 250 MiB literal on the client for what
+> IT receives (transport_websocket.py:384). Neither is env- or
+> config-settable: changing either is an engine/SDK patch — a
+> comparability deviation, not a knob.
+>
+> What it does NOT rewrite: DIAG_M1_BLAST had already named the constant
+> and proved ~248 MB messages fit sequentially
+> (DIAG_M1_BLAST_SOURCES.md:63-65); its loop-starvation reading of the
+> C=16 deaths stands, and its "which side closed / true first exception"
+> remains undetermined (dap_client ate it). What it DOES change: (1) the
+> margin — ami_full's largest whole-video messages ran ~5% under a
+> deterministic server refusal, so corpus sizing, not design, is what kept
+> the whole-blob era alive; (2) on films the whole-blob send is dead at
+> C=1 for any item larger than 262,143,842 bytes — at ~0.4 GB/h that is
+> essentially the entire corpus — so the chunked write path is promoted
+> from "measured 2.31% faster" to the ONLY admissible upload; (3) the
+> class now has a measured discriminator: on any large-send 'Could not
+> send request', the first check is payload+envelope vs 262,144,000. The
+> engine's own remote node has chunked at 0.98 MiB for exactly this reason
+> all along (nodes/remote/base/IInstance.py:301-303) — the limit was a
+> recorded condition inside the engine and an unrecorded one in every
+> client of send(). Kin: entry 3 (the condition was always there; the
+> corpus moved out from under the code that was safe on it), entry 19 (a
+> limit's unit of meaning — this one counts the MESSAGE, so no per-file
+> reasoning saves you), entry 15 (a value right because of where it was
+> written: send() was safe for the corpus it grew up on).
