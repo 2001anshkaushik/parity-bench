@@ -774,3 +774,42 @@ than rewritten from memory, which is entry 2's point in miniature.
 > artifact) applied to one's own test results. Both rules are one rule:
 > **an edit or a push is not done when the command returns; it is done when
 > its effect has been read back.**
+
+## 23. The working tree that edits itself — the rule existed, and a round was spent because it was filed where no reader would meet it (added 2026-08-26)
+
+> Twelve tracked `.pipe` files in the team-repos clone read as locally
+> modified — one-line JSON pretty-printed, +204/−21 lines — and the
+> 2026-08-26 re-pin round recorded their origin as UNKNOWN, routed around
+> them correctly (git-object reads for every pin), and filed a caveat. The
+> origin was not unknown. It is a Phase 1 finding, on file the whole time:
+> **a format-on-save daemon on this Mac rewrites `.pipe` files in the
+> working tree**, and it once produced a false accusation that a teammate's
+> committed pipe had drifted — his bytes were always correct; the tell was
+> checking his git blob hash directly (PHASE1_CARRYOVER.md:465-468, item
+> 10: "when a file disagrees with git, suspect your editor before
+> suspecting the author"). The same machine behaviour at field level:
+> SESSION_STATE.md:1742 — a pipe's `project_id` churns on save because an
+> app rewrites it. Leela's team records the same churn on her side
+> (team_docs_received/VIDEO-BENCHMARK-SETUP-2026-08-21.md:345 — DATA). The
+> daemon itself remains unnamed; naming it is NOT a precondition for the
+> rule, because the cure never touches the tree.
+>
+> **The rule, now filed where design reading starts: on this machine a
+> working-tree read of any tracked `.pipe` — hash or content — is
+> unciteable.** The citation surface is git objects only: `git show
+> <sha>:<path>`, `git grep <pat> <sha>`, `git cat-file`. A checkout is not
+> a read of a commit; it is an invitation for the environment to edit the
+> commit's bytes before the read arrives. Entry 3's mechanism (a condition
+> — an environment that mutates files — moved under the reading without a
+> character of ours changing) wearing entry 9's clothes (the working tree
+> is a rendering, not the artifact). The 2026-08-26 round applied the
+> object-read rule from first principles, so nothing measured was wrong;
+> what the round paid for was the DIAGNOSIS, re-derived from scratch,
+> because the finding lived in a Phase 1 carryover appendix and not in this
+> register — entry 7's mechanism one level up: the correction and the
+> situation it corrects were kept in different places, aligned by nobody.
+> A rule that is true but shelved where the surprised reader never stands
+> is, operationally, a rule that does not exist. Consequence for tooling:
+> any working-tree-dependent check on this machine (a dirty-tree gate, a
+> hash comparison against a checkout) must either name and stop the daemon
+> first, or be rewritten as an object read.
