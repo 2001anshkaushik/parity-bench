@@ -866,3 +866,34 @@ than rewritten from memory, which is entry 2's point in miniature.
 > limit's unit of meaning — this one counts the MESSAGE, so no per-file
 > reasoning saves you), entry 15 (a value right because of where it was
 > written: send() was safe for the corpus it grew up on).
+
+## 25. A flag lost in transit, caught by its read-back — and the pinned rebuild that moved 0.34% where unpinned moved 6% (added 2026-08-28)
+
+> The anchor cell's first attempt lost `--network host` to SSM
+> line-wrapping inside a long pasted block: all eight instances came up
+> with NetworkMode='' and the driver's Crossroad-22 preflight REFUSED,
+> naming the network mode it read back. Nothing was measured wrong,
+> because the read-back existed — this is entry 3's shipped rule
+> (`--network host` is a RECORDED, checked condition, never implied by the
+> flag that requested it) collecting its first live save: the flag that
+> requested the condition disappeared in transit, and the check that
+> measures the condition did not care how it got lost. The transport
+> failure itself is entry 9's shape one layer down — a pasted block is a
+> RENDERING of a command, and a terminal that wraps or swallows a line
+> does so without marking where. **Cure, standing: any long box block is a
+> COMMITTED SCRIPT FILE plus its sha256, printed by the script itself at
+> start and verified by the operator against the repo** — the first such
+> file is probe/run_proof_layer2.sh. Paste stays acceptable only for
+> short, single-purpose commands whose output is read.
+>
+> Paired, because the same anchor run produced it — **open item 3, strong
+> evidence, not proof:** the LI image rebuilt with UNCHANGED code but the
+> full 149-pin freeze install (the formerly UNPINNED service stack was the
+> suspect surface) landed at 12.782 span f/s against the banked pair
+> 12.745/12.733 — **0.34% from the banked mean, where the unpinned 25→26
+> Aug rebuild had moved 6.0%** and within-build repro sits at 0.09%. One
+> leg against an n=2 pair: consistent with "the unpinned install was the
+> delta's surface, and the freeze closed it", and not yet proof of it —
+> the counter-hypothesis (an unlucky 6% draw then, a lucky 0.34% draw now)
+> is unlikely at 0.09% within-build repro but is not excluded by n=1.
+> Ansh's phrasing adopted verbatim: strong evidence, not proof.
