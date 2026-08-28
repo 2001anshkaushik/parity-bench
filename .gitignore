@@ -52,6 +52,10 @@ working/results/selftest/
 *.safetensors
 *.bin
 *.onnx
+# *.pth added 2026-08-27: rf-detr-base.pth (372 MB) appeared at the repo root and at
+# working/video/probe/ during the reader-equivalence proof; a checkpoint must never
+# enter the repo — identity is the md5 read-back (RFDETR_BASE_MD5), not the bytes.
+*.pth
 .cache/
 huggingface/
 
