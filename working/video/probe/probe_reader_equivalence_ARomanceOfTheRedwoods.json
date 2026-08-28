@@ -1,0 +1,38 @@
+{
+ "probe": "reader_equivalence",
+ "created_utc": "20260828T010239Z",
+ "git_head": "5c893ffb35f18ba988d7bbaaca41baae23f35790",
+ "video": {
+  "path": "/home/ssm-user/films_probe/ARomanceOfTheRedwoods.mp4",
+  "name": "ARomanceOfTheRedwoods.mp4",
+  "bytes": 350080841,
+  "sha256": "79be5cab02a921ebe45c9289ad74645ac9b9269c8d34ffd7c8a13e1dc85e20a4"
+ },
+ "interval_s": 15,
+ "ffmpeg": {
+  "path": "/home/ssm-user/.venv-floor/lib/python3.12/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2",
+  "sha256": "e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99",
+  "version": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+ },
+ "legacy_source_pin": "pipeline.py:149-163 @ 7204a284269f7dc2769db3e0a106b6e5adbcb0a6 (frozen verbatim here)",
+ "new_source_sha256": "c84f7736054428fb126494e48afe48809dcfddf6c0df3fdf7e2e491260cd355f",
+ "legacy": {
+  "n_frames": 364,
+  "wall_s": 50.04
+ },
+ "new": {
+  "n_frames": 364,
+  "wall_s": 50.12,
+  "frames_dir_bytes": 26408558
+ },
+ "frames_equal": {
+  "equal": true,
+  "n_a": 364,
+  "n_b": 364,
+  "first_mismatch_index": null
+ },
+ "null_controls": {
+  "flip_fired": true,
+  "drop_last_fired": true
+ }
+}

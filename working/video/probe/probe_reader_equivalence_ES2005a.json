@@ -1,0 +1,45 @@
+{
+ "probe": "reader_equivalence",
+ "created_utc": "20260828T013158Z",
+ "git_head": "5c893ffb35f18ba988d7bbaaca41baae23f35790",
+ "video": {
+  "path": "/home/ssm-user/parity-bench-video/corpus/ami/full/ES2005a.avi",
+  "name": "ES2005a.avi",
+  "bytes": 27837728,
+  "sha256": "86ce4e3c784ef887f0d703c7e0800c8ea273ad96da40fc0cddc37c2dfd651ae9"
+ },
+ "interval_s": 15,
+ "ffmpeg": {
+  "path": "/home/ssm-user/.venv-floor/lib/python3.12/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2",
+  "sha256": "e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99",
+  "version": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers"
+ },
+ "legacy_source_pin": "pipeline.py:149-163 @ 7204a284269f7dc2769db3e0a106b6e5adbcb0a6 (frozen verbatim here)",
+ "new_source_sha256": "c84f7736054428fb126494e48afe48809dcfddf6c0df3fdf7e2e491260cd355f",
+ "legacy": {
+  "n_frames": 31,
+  "wall_s": 3.79
+ },
+ "new": {
+  "n_frames": 31,
+  "wall_s": 3.8,
+  "frames_dir_bytes": 4519292
+ },
+ "frames_equal": {
+  "equal": true,
+  "n_a": 31,
+  "n_b": 31,
+  "first_mismatch_index": null
+ },
+ "null_controls": {
+  "flip_fired": true,
+  "drop_last_fired": true
+ },
+ "detect_equivalence": {
+  "n_frames_detected": 31,
+  "torch_num_threads": 2,
+  "labels_equal": true,
+  "scores_equal": true,
+  "first_label_divergence": null
+ }
+}
