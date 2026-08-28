@@ -230,6 +230,11 @@ Do NOT re-implement these; verify the box has the fix commit first.
   `.../corpus/ami/full/ES2009a.avi`. **The ami_full corpus is at
   `corpus/ami/full`** (relayed) — `corpus/ami/video` is the Corner-era location
   and is what killed step 0. ASK if the absolute prefix matters.
+  **Addendum 2026-08-28 (box-measured):** `full/` files are Closeup1 video
+  stream-copy-muxed with Mix-Headset PCM audio (Leela's `fetch_ami.sh`;
+  170/170 carry an `auds` stream). `corpus/ami/closeup1` is a DUPLICATE
+  SUBSET of `full/` — 62/62 byte-identical to their `full/` counterparts,
+  all with audio — not a separate raw-view directory.
 * **B8:** golden re-written for ami_full; "golden compared identical at 13
   chunks"; smoke PASS 0 failures.
 

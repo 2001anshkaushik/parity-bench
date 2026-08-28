@@ -42,6 +42,12 @@ REQUIRES --corpus-dir (no manifest exists yet to derive from) and records it.
 Layout: <corpus_dir>/<MEETING>.<View>.avi (or <MEETING>.avi when --staged);
 manifest at working/video/ami_video_manifest.jsonl (one JSON object per line;
 first line is a _meta header).
+Box corpus layout note (measured 2026-08-28): corpus/ami/full = the staged
+ami_full corpus (Closeup1 video + Mix-Headset PCM muxed per file; 170/170
+carry an auds stream); corpus/ami/closeup1 is a DUPLICATE SUBSET of full/
+(62/62 byte-identical to their full/ counterparts, all with audio), NOT a
+separate raw-view directory; corpus/ami/video is the Corner-era location
+(raw camera files, no audio).
 """
 
 import argparse
@@ -326,7 +332,18 @@ def build_mode(n_measured: int, n_warm: int,
         'meeting_list': (str(MEETING_LIST_PATH) if MEETING_LIST_PATH else None),
         'meeting_list_sha256': (sha256_file(MEETING_LIST_PATH) if MEETING_LIST_PATH else None),
         'n_measured': n_measured, 'n_warm': n_warm,
-        'mux': 'none — fetched as shipped (video-only AVIs; audio out of scope this phase)',
+        # Conditional since 2026-08-28: the old unconditional 'video-only,
+        # mux none' sentence was FALSE on every staged ami_full row (the
+        # corpus changed under the sentence — register entry 19's class).
+        # The banked 170-row manifest artifact stays byte-frozen (its sha is
+        # run provenance); the correction lives here and in the DEFINITIVE.
+        'mux': (("pre-staged corpus accepted as-is (--staged): muxing was done by the "
+                 "staging owner, not this tool. For ami_full: each file is the meeting's "
+                 "Closeup1 camera video stream-copy-muxed with its Mix-Headset audio "
+                 "(16 kHz mono PCM-in-AVI) by Leela's corpus/fetch_ami.sh; box-measured "
+                 "2026-08-28: 170/170 files carry an auds stream, zero without")
+                if STAGED_NAMES else
+                'none — fetched as shipped (video-only AVIs; audio out of scope this phase)'),
         'measured_columns': {
             'interval_s': INTERVAL_S,
             'expected_frames_method': ('MEASURED at build (Crossroad 23): fps=1/15 through '

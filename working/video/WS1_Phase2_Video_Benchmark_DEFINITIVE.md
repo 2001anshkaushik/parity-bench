@@ -2,6 +2,16 @@
 ### Definitive report · 23–26 Aug 2026
 
 **Corpus:** ami_full — 168 measured AMI meeting videos (+2 warm), 23,049 frames, ~96.1 h footage
+*(Corpus identity amended 2026-08-28, by ruling — the original line understated what the files are:
+each corpus file is the meeting's **Closeup1** camera video stream-copy-muxed with its
+**Mix-Headset audio** (16 kHz mono PCM-in-AVI) by **Leela's staging pipeline**
+(`bench_langgraph_prod aws_videobench/corpus/fetch_ami.sh`, the shared three-team corpus),
+families EN 16 / ES 60 / IB 7 / IN 10 / IS 38 / TS 39 incl. non-scenario EN/IB/IN.
+Box-measured 2026-08-28: all 170 files in `corpus/ami/full` carry an `auds` stream, zero without;
+`corpus/ami/closeup1` is a duplicate subset of `full/` (62/62 byte-identical), not a separate view.
+The manifest meta's original "video-only AVIs, mux: none" sentence was false for this corpus;
+the manifest artifact stays byte-frozen — its sha is run provenance — and the writer is fixed.
+Frame extraction is `-vf`-only on both arms, so the audio track affects upload bytes, not frames.)*
 **Box:** AWS `i-0775f33f3dc16f6af`, c7i.8xlarge — Xeon Platinum 8488C, 32 vCPU, 61 GiB RAM
 **Engine:** RocketRide 3.3.1 (patched) · SDK `rocketride` 1.3.0 · Python 3.12.13
 **Artifacts:** `s3://rocketride-benchmark-data/ansh/video-ami-20260826/`
