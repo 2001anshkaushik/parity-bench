@@ -42,6 +42,22 @@ from argtypes import positive_int          # noqa: E402 — register entry 8
 _YEAR = re.compile(r'(18|19|20)\d\d')
 _NONALNUM = re.compile(r'[^a-z0-9]+')
 
+# RULING E (2026-08-28), recorded IN the rule so the output stays
+# deterministic and reproducible — never a hand edit: these prefix merges
+# were RATIFIED AS SPLITS (different films): killer_dill (1948 Stuart Erwin
+# comedy) vs killer_diller (1948 all-Black-cast musical); DanielBoone1936 vs
+# Daniel_Boone_-_Trail_Blazer (1956). The 10% duration window is KEPT (it
+# produced 17 correct clusters; the ratification step caught the two
+# over-merges, working as designed).
+RATIFIED_SPLITS = frozenset({
+    frozenset({'killerdill', 'killerdiller'}),
+    frozenset({'danielboone', 'danielboonetrailblazer'}),
+})
+# Flagged by Ansh, NOT acted on (cost is one film if wrong): [waterfront]
+# (waterfront_lady_1935 4100s vs waterfront 3829s) may be a third false
+# merge. It stays merged until ruled; the report prints the flag.
+UNRATIFIED_FLAGS = frozenset({'waterfront'})
+
 
 def title_key(doc: str) -> str:
     """Mechanical normalization: casefold, drop extension, drop 4-digit
@@ -111,6 +127,8 @@ def dedup_titles(rows, dup_duration_pct: float = 10.0):
         for k2 in keys[i + 1:]:
             if not k2.startswith(k1):
                 break          # keys sorted: prefixes are adjacent
+            if frozenset({k1, k2}) in RATIFIED_SPLITS:
+                continue       # RULING E: ratified different-film pair
             if close_enough(by_key[k1], by_key[k2]):
                 parent[find(k2)] = find(k1)
 
@@ -149,6 +167,30 @@ def probe_film(kept):
     return sorted(kept, key=lambda r: (-r['bytes'], r['doc']))[0]
 
 
+def select_subset(kept, k: int):
+    """RULING F selection, one copy (report prints it, the manifest builder
+    consumes it): k per stratum in (bytes desc, doc asc) order, capped by
+    cell size; the envelope film forced in if not already selected.
+    Returns (selected_rows_sorted_by_doc, strata_meta)."""
+    strata, (dlo, dhi), (blo, bhi) = stratify(kept)
+    chosen, by_cell = {}, {}
+    for cell in sorted(strata):
+        take = strata[cell][:k]
+        by_cell[f'D{cell[0]}xB{cell[1]}'] = [r['doc'] for r in take]
+        for r in take:
+            chosen[r['doc']] = r
+    env = probe_film(kept)
+    envelope_forced = env['doc'] not in chosen
+    if envelope_forced:
+        chosen[env['doc']] = env
+        by_cell.setdefault('envelope_forced', []).append(env['doc'])
+    meta = {'k': k, 'duration_tercile_cuts_s': [dlo, dhi],
+            'bytes_tercile_cuts': [blo, bhi], 'per_cell': by_cell,
+            'envelope_film': env['doc'], 'envelope_forced': envelope_forced,
+            'n_selected': len(chosen)}
+    return sorted(chosen.values(), key=lambda r: r['doc']), meta
+
+
 def report(manifest_path: Path, k: int) -> int:
     data = manifest_path.read_bytes()
     print(f'manifest: {manifest_path}')
@@ -167,10 +209,15 @@ def report(manifest_path: Path, k: int) -> int:
           f'{sum(len(v) for v in clusters.values())} member files, '
           f'{len(rows)} docs -> {len(kept)} distinct titles')
     for key, members in sorted(clusters.items()):
-        print(f'  [{key}]')
+        flag = ('  <-- UNRATIFIED FLAG (Ruling E): possible false merge, '
+                'left merged until ruled; cost one film'
+                if key in UNRATIFIED_FLAGS else '')
+        print(f'  [{key}]{flag}')
         for i, m in enumerate(members):
             keep = ' KEEP (largest bytes)' if i == 0 else ' drop'
             print(f'    {m["doc"]}: {m["bytes"]} B, {m["duration_s"]:.0f}s{keep}')
+    print(f'  ratified splits applied (Ruling E, in-rule, deterministic): '
+          f'{sorted(tuple(sorted(s)) for s in RATIFIED_SPLITS)}')
 
     strata, (dlo, dhi), (blo, bhi) = stratify(kept)
     print(f'\nstrata over deduped titles: duration terciles at '
@@ -180,10 +227,12 @@ def report(manifest_path: Path, k: int) -> int:
         first = ', '.join(m['doc'] for m in members[:min(3, k + 1)])
         print(f'  D{cell[0]}xB{cell[1]}: {len(members)} titles; '
               f'selection order head: {first}')
-    n_total = sum(min(k, len(v)) for v in strata.values())
-    print(f'\nwith k={k} per stratum the subset would be N={n_total} '
-          f'(+1 if the envelope film is not already selected) — N stays '
-          'OPEN; the sizing probe prices it and Ansh rules.')
+    selected, smeta = select_subset(kept, k)
+    print(f'\nSELECTION at k={k} (Ruling F rule: k per stratum by (bytes '
+          f'desc, doc asc), capped by cell size, envelope forced if absent): '
+          f'N={smeta["n_selected"]}, envelope_forced={smeta["envelope_forced"]}')
+    for cell, docs in sorted(smeta['per_cell'].items()):
+        print(f'  {cell}: {", ".join(docs)}')
 
     pf = probe_film(kept)
     print(f'\nPROBE FILM (rule: globally largest bytes after dedup): '
@@ -253,6 +302,35 @@ def self_test() -> int:
     _, cl3 = dedup_titles(load_rows(m3))
     check('v2 guard: prefix match beyond the duration window stays unmerged',
           len(cl3) == 0)
+
+    # RULING E: the ratified splits stay split even inside the window.
+    rul = {'killer_dill.mp4': (4322, 450_591_179),
+           'killer_diller.mp4': (4373, 893_689_958)}
+    m4 = {'duration_s': {d: v[0] for d, v in rul.items()},
+          'video_duration_s': {d: v[0] for d, v in rul.items()},
+          'sha256': {d: {'sha256': 'aa' * 32, 'bytes': v[1]}
+                     for d, v in rul.items()}}
+    kept4, cl4 = dedup_titles(load_rows(m4))
+    check('Ruling E: ratified split pair never merges (both titles kept)',
+          len(cl4) == 0 and len(kept4) == 2)
+
+    # RULING F selection: deterministic, capped, envelope forced.
+    many = {f'f{i:02d}.mp4': (3000 + i * 400, 100_000 + i * 10_000)
+            for i in range(9)}
+    m5 = {'duration_s': {d: v[0] for d, v in many.items()},
+          'video_duration_s': {d: v[0] for d, v in many.items()},
+          'sha256': {d: {'sha256': 'bb' * 32, 'bytes': v[1]}
+                     for d, v in many.items()}}
+    kept5, _ = dedup_titles(load_rows(m5))
+    sel_a, meta_a = select_subset(kept5, 2)
+    sel_b, meta_b = select_subset(kept5, 2)
+    check('Ruling F selection is deterministic (two runs identical)',
+          [r['doc'] for r in sel_a] == [r['doc'] for r in sel_b]
+          and meta_a == meta_b)
+    check('Ruling F: k caps at cell size and N = sum of takes',
+          meta_a['n_selected'] == len(sel_a) <= 2 * 9)
+    check('Ruling F: envelope film is in the selection',
+          any(r['doc'] == meta_a['envelope_film'] for r in sel_a))
     strata, _, _ = stratify(kept)
     check('every kept title lands in exactly one stratum',
           sum(len(v) for v in strata.values()) == len(kept))
