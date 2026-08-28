@@ -4,9 +4,23 @@ Parity by construction with engine 3.3.1 (each choice cites the engine
 source it mirrors):
 
   frames:  the IDENTICAL ffmpeg binary (imageio-ffmpeg, same pinned version
-           as the engine resolves -> byte-identical executable) with the
-           identical filter string 'fps=1/{interval}' -> PNG image2pipe
-           (ai/common/avi/frame.py builds exactly this).
+           as the engine resolves -> byte-identical executable, proven by
+           probe_frame_parity 2026-08-27: sha-equal binaries, byte-equal
+           frames A==B==C on three films) with the engine-mirror flags
+           ('fps=1/{interval}', '-fps_mode passthrough', '-vcodec png' —
+           Ruling B 2026-08-27), reading the SPOOLED FILE like the engine
+           reads its cache file (reader.py:418-437, :425) and writing
+           frames TO DISK, loaded one at a time for detection.
+           STREAMING REFACTOR (2026-08-27, adopting Leela's post-mortem fix
+           2d7533b — her LG arm OOM-died at 42.7 GB buffering every frame
+           of 32 films in flight): the old shape decoded the whole PNG
+           stream into memory (subprocess stdout + a second sliced copy +
+           the full frame list resident through detection). Frames now live
+           on disk until detection reads them one at a time; bounded
+           resident frames k=1. Muxer change image2pipe -> image2 files is
+           certified byte-identical by probe_reader_equivalence before any
+           measured leg (Ruling B: a byte difference there is a STOP and a
+           finding, never a loosened comparison).
   detect:  rfdetr RFDETRBase().predict(image, threshold=0.3), canonical
            detection dicts {label, score, box, centroid} serialized with
            json.dumps — byte-shaped like nodes/detect/IInstance.py:79.
@@ -23,7 +37,9 @@ source it mirrors):
            behaviour (re-ruled 2026-08-20: the engine's chunk config is inert
            and LangChain library defaults run — we match what the engine
            DOES, and the writeup carries one line saying we supplied the
-           length function).
+           length function). UNCHANGED by the streaming refactor (Ruling C:
+           the §2.4 4000/0 change lands separately, after — one variable at
+           a time).
   embed:   HuggingFaceEmbedding multi-qa-MiniLM-L6-cos-v1 (the exact string
            the engine's miniLM profile pins), device from WS1V_DEVICE.
 
@@ -35,22 +51,28 @@ per-process device_lock, and it makes 'requests per worker' a clean unit.
 
 from __future__ import annotations
 
-import io
 import json
 import os
+import shutil
 import subprocess
+import tempfile
 import threading
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 
 # Set before torch/tokenizers import (ws1 lesson): fork-safety warning + hangs.
 os.environ.setdefault('TOKENIZERS_PARALLELISM', 'false')
 
-PNG_SIG = b'\x89PNG\r\n\x1a\n'
-
 # Which clock the stage stamps used — recorded on every response so legs from
 # the two eras are never silently compared (2026-08-25 ruling).
 STAGE_SEMANTICS = 'device_only'   # before 2026-08-25: 'includes_lock_wait'
+
+# Which reader shape produced the frames — same discipline as STAGE_SEMANTICS
+# and hashing_locus: eras are never silently compared (ruling 2026-08-27).
+# Before this date the implicit value was 'buffered_pipe_in_memory'
+# (subprocess.run(input=video), full stdout, all frames resident).
+READER_SEMANTICS = 'spooled_file_frames_on_disk'
 
 
 @dataclass
@@ -68,6 +90,7 @@ class VideoPipelineResult:
     embed_dim: int = 0
     frame_png_sha16: list[str] = field(default_factory=list)
     stage_s: dict[str, float] = field(default_factory=dict)
+    frames_dir_bytes: int = 0     # disk high-water of the per-request frame dir
 
 
 def _to_detection(label: str, score: float, x1, y1, x2, y2) -> dict:
@@ -146,25 +169,47 @@ class LlamaIndexVideoPipeline:
         }
 
     # --------------------------------------------------------------- stages
-    def _extract_frames(self, video: bytes) -> list[bytes]:
-        cmd = [self._ffmpeg, '-nostdin', '-loglevel', 'error', '-i', 'pipe:0',
-               '-vf', f'fps=1/{self.interval_s}', '-f', 'image2pipe',
-               '-fps_mode', 'passthrough', '-vcodec', 'png', '-']
-        raw = subprocess.run(cmd, input=video, check=True, capture_output=True).stdout
-        frames, i = [], 0
-        while True:
-            j = raw.find(PNG_SIG, i + 1)
-            if j == -1:
-                if i < len(raw):
-                    frames.append(raw[i:])
-                break
-            frames.append(raw[i:j])
-            i = j
-        return [f for f in frames if f.startswith(PNG_SIG)]
+    def _extract_frames(self, video_path: str) -> tuple[str, list[str]]:
+        """Decode the SPOOLED FILE to per-frame PNGs ON DISK; return
+        (frames_dir, sorted paths). The caller owns the dir and removes it.
 
-    def _detect_frame(self, png: bytes) -> list[dict]:
+        Engine-mirror argv (Ruling B 2026-08-27): same filter, '-fps_mode
+        passthrough', explicit '-vcodec png' — only the muxer changes,
+        image2pipe -> image2 files (Leela's disk form, 2d7533b; her literal
+        argv drops passthrough/vcodec and is proven count-equal only, so we
+        keep the engine-anchored flags the parity probe certified byte-exact).
+        File input matches the engine's cache-file topology (reader.py:425)
+        and removes the moov-at-end pipe failure class outright.
+        check=True stays: a decode failure REFUSES the request (the engine
+        fails open here, reader.py:344 — we deliberately do not mirror that).
+        """
+        td = tempfile.mkdtemp(prefix='ws1v_frames_',
+                              dir=os.environ.get('WS1V_SPOOL_DIR') or None)
+        out = Path(td)
+        cmd = [self._ffmpeg, '-nostdin', '-loglevel', 'error',
+               '-i', str(video_path),
+               '-vf', f'fps=1/{self.interval_s}',
+               '-f', 'image2', '-fps_mode', 'passthrough',
+               '-vcodec', 'png', str(out / 'f_%06d.png')]
+        try:
+            subprocess.run(cmd, check=True, capture_output=True)
+        except subprocess.CalledProcessError as e:
+            shutil.rmtree(td, ignore_errors=True)
+            tail = (e.stderr or b'')[-500:].decode('utf-8', 'replace')
+            # Keep the true cause on the wire — the dap_client.py:229 lesson.
+            raise RuntimeError(f'ffmpeg rc={e.returncode}: {tail}') from e
+        return td, [str(p) for p in sorted(out.glob('f_*.png'))]
+
+    @staticmethod
+    def _load_frame(path: str):
+        """One extracted PNG -> RGB, from disk (Leela's load_frame shape:
+        same pixels the detector saw when frames were in memory — certified
+        by probe_reader_equivalence's detect layer, not assumed)."""
         from PIL import Image
-        img = Image.open(io.BytesIO(png)).convert('RGB')
+        with Image.open(path) as im:
+            return im.convert('RGB').copy()
+
+    def _detect_frame(self, img) -> list[dict]:
         preds = self._detector.predict(img, threshold=self.threshold)
         dets = []
         for k in range(len(preds)):
@@ -174,15 +219,19 @@ class LlamaIndexVideoPipeline:
         return dets
 
     # --------------------------------------------------------------- process
-    def process(self, video: bytes) -> VideoPipelineResult:
+    def process(self, video_path: str) -> VideoPipelineResult:
+        """The full lane over a SPOOLED video file (the service streams the
+        request body to disk and hands the path here — no whole-video bytes
+        object exists anywhere in this process)."""
         if not self.is_warm:
             raise RuntimeError('pipeline not warm — lifespan did not run')
         r = VideoPipelineResult()
 
         t0 = time.monotonic()
-        frames = self._extract_frames(video)
+        frames_dir, frame_paths = self._extract_frames(video_path)
         r.stage_s['extract'] = round(time.monotonic() - t0, 2)
-        r.n_frames = len(frames)
+        r.n_frames = len(frame_paths)
+        r.frames_dir_bytes = sum(os.stat(p).st_size for p in frame_paths)
         # HASHING LOCUS (ruling 2026-08-25): NO hashing inside wall_s. Frame
         # hashes had no leg-gate consumer and are gone from the serving path
         # (the probe's floor hashing is separate code); chunk hashes are
@@ -191,20 +240,24 @@ class LlamaIndexVideoPipeline:
         # tonight's legs are never silently compared with the banked ones.
 
         per_frame_json: list[str] = []
-        # STAMP SEMANTICS (2026-08-25, ruling): stamps INSIDE the lock so
-        # stage_s measures the DEVICE, not the queue. Before this date the
-        # stamp started before acquisition and a queued request's clock ran
-        # while waiting (occupancies of 4.84 proved it). Every response now
-        # carries stage_s_semantics so the two eras are never silently compared.
-        with self._lock:
-            t0 = time.monotonic()
-            for png in frames:
-                dets = self._detect_frame(png)
-                r.detections_per_frame.append(len(dets))
-                r.frame_labels.append(sorted(d['label'] for d in dets))
-                r.frame_scores.append([d['score'] for d in dets])
-                per_frame_json.append(json.dumps(dets))
-            r.stage_s['detect'] = round(time.monotonic() - t0, 2)
+        try:
+            # STAMP SEMANTICS (2026-08-25, ruling): stamps INSIDE the lock so
+            # stage_s measures the DEVICE, not the queue. Every response
+            # carries stage_s_semantics so eras are never silently compared.
+            # BOUNDED RESIDENCY (2026-08-27, Leela's form): one frame is
+            # loaded from disk, detected, and freed per iteration — k=1.
+            with self._lock:
+                t0 = time.monotonic()
+                for p in frame_paths:
+                    img = self._load_frame(p)
+                    dets = self._detect_frame(img)
+                    r.detections_per_frame.append(len(dets))
+                    r.frame_labels.append(sorted(d['label'] for d in dets))
+                    r.frame_scores.append([d['score'] for d in dets])
+                    per_frame_json.append(json.dumps(dets))
+                r.stage_s['detect'] = round(time.monotonic() - t0, 2)
+        finally:
+            shutil.rmtree(frames_dir, ignore_errors=True)   # her cleanup-in-finally
         r.n_detections = sum(r.detections_per_frame)
 
         # Engine semantics: accumulate with '\n', split ONCE per video.

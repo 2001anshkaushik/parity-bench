@@ -20,6 +20,7 @@ Run:
 from __future__ import annotations
 
 import os
+import tempfile
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -27,8 +28,19 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from .pipeline import STAGE_SEMANTICS, LlamaIndexVideoPipeline
+from .pipeline import READER_SEMANTICS, STAGE_SEMANTICS, LlamaIndexVideoPipeline
 from .schema import ErrorResponse, HealthResponse, ProcessVideoResponse
+
+# Ruling A (2026-08-27), recorded where the export will carry it: we adopt
+# Leela's memory discipline from her films500 OOM post-mortem (her commit
+# 2d7533b — stream, never buffer; frames on disk; detect one at a time) but
+# KEEP our raw octet-stream wire contract, streamed via request.stream(),
+# instead of her MultipartEncoder: multipart would change the wire contract,
+# add a dependency to a frozen image, and add a server-side parser — three
+# failure surfaces for a memory property request.stream() already gives.
+WIRE_DEVIATION = ('adopted 2d7533b memory discipline; kept raw octet-stream '
+                  'body via request.stream() (no MultipartEncoder — Ruling A '
+                  '2026-08-27)')
 
 EMBED_MODEL = os.environ.get('WS1V_MODEL', 'sentence-transformers/multi-qa-MiniLM-L6-cos-v1')
 INTERVAL_S = int(os.environ.get('WS1V_INTERVAL_S', '15'))
@@ -42,6 +54,8 @@ SPLIT_UNIT = os.environ.get('WS1V_SPLIT_UNIT', 'chars')  # 'chars' matches engin
 DEVICE = os.environ.get('WS1V_DEVICE', 'cpu')
 WORKERS = int(os.environ.get('WS1V_WORKERS', '1'))
 WARM_ROOT = Path(os.environ.get('WS1V_WARM_DIR', '/tmp/ws1v_warm'))
+# Spool + frames dir root (streaming refactor 2026-08-27). None = system tmp.
+SPOOL_DIR = os.environ.get('WS1V_SPOOL_DIR') or None
 
 THREAD_ENV_KEYS = ['OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS',
                    'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS', 'TORCH_NUM_THREADS']
@@ -124,28 +138,52 @@ async def health() -> HealthResponse:
         chunk_size=CHUNK_SIZE,
         chunk_overlap=CHUNK_OVERLAP,
         interval_s=INTERVAL_S,
+        reader_semantics=READER_SEMANTICS,
+        wire_deviation=WIRE_DEVIATION,
+        spool_dir=SPOOL_DIR or tempfile.gettempdir(),
     )
 
 
 @app.post('/process_video')
 async def process_video(request: Request):
-    """Body = raw video bytes. Sync model work runs in the threadpool; the
-    pipeline's internal lock keeps one model call at a time per worker."""
+    """Body = raw video bytes, STREAMED to a spool file (never held whole —
+    streaming refactor 2026-08-27, adopting 2d7533b's memory discipline with
+    the Ruling-A wire deviation recorded in WIRE_DEVIATION). Sync model work
+    runs in the threadpool; the pipeline's internal lock keeps one model call
+    at a time per worker."""
     if _pipeline is None or not _pipeline.is_warm:
         return JSONResponse(status_code=503,
                             content=ErrorResponse(error='cold', pid=os.getpid()).model_dump())
-    blob = await request.body()
-    if not blob:
-        return JSONResponse(status_code=400,
-                            content=ErrorResponse(error='empty body', pid=os.getpid()).model_dump())
     t0 = time.monotonic()
+    spool = tempfile.NamedTemporaryFile(delete=False, dir=SPOOL_DIR,
+                                        prefix='ws1v_spool_', suffix='.vid')
+    bytes_spooled = 0
     try:
-        import anyio
-        r = await anyio.to_thread.run_sync(_pipeline.process, blob)
-    except Exception as exc:  # noqa: BLE001 — the wire carries the failure, never hides it
-        return JSONResponse(status_code=500,
-                            content=ErrorResponse(error='pipeline failure', pid=os.getpid(),
-                                                  detail=repr(exc)).model_dump())
+        try:
+            with spool as fh:
+                async for chunk in request.stream():
+                    fh.write(chunk)
+                    bytes_spooled += len(chunk)
+        except Exception as exc:  # noqa: BLE001 — a broken upload is the client's failure, said plainly
+            return JSONResponse(status_code=400,
+                                content=ErrorResponse(error='body stream failed',
+                                                      pid=os.getpid(),
+                                                      detail=repr(exc)).model_dump())
+        if bytes_spooled == 0:
+            return JSONResponse(status_code=400,
+                                content=ErrorResponse(error='empty body', pid=os.getpid()).model_dump())
+        try:
+            import anyio
+            r = await anyio.to_thread.run_sync(_pipeline.process, spool.name)
+        except Exception as exc:  # noqa: BLE001 — the wire carries the failure, never hides it
+            return JSONResponse(status_code=500,
+                                content=ErrorResponse(error='pipeline failure', pid=os.getpid(),
+                                                      detail=repr(exc)).model_dump())
+    finally:
+        try:
+            os.unlink(spool.name)
+        except OSError:
+            pass
     ident = _pipeline.identity()
     return ProcessVideoResponse(
         n_frames=r.n_frames, n_detections=r.n_detections,
@@ -156,6 +194,8 @@ async def process_video(request: Request):
         embed_dim=r.embed_dim, embedding_norms=r.embedding_norms,
         frame_labels=r.frame_labels, frame_scores=r.frame_scores,
         stage_s=r.stage_s, stage_s_semantics=STAGE_SEMANTICS,
+        reader_semantics=READER_SEMANTICS,
+        bytes_spooled=bytes_spooled, frames_dir_bytes=r.frames_dir_bytes,
         wall_s=round(time.monotonic() - t0, 2),
         pid=os.getpid(), detect_impl=ident['detect_impl'],
         model_names=ident['model_names'],

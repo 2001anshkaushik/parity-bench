@@ -16,6 +16,13 @@ class ProcessVideoResponse(BaseModel):
     # which clock the stage stamps used ('device_only' from 2026-08-25;
     # 'includes_lock_wait' before) — never compare stage_s across the two
     stage_s_semantics: str = 'includes_lock_wait'
+    # which reader shape produced the frames ('spooled_file_frames_on_disk'
+    # from 2026-08-27; 'buffered_pipe_in_memory' before — the default names
+    # the old era so old-image responses self-identify). Same discipline as
+    # stage_s_semantics/hashing_locus: eras are never silently compared.
+    reader_semantics: str = 'buffered_pipe_in_memory'
+    bytes_spooled: int | None = None      # request bytes streamed to the spool file
+    frames_dir_bytes: int | None = None   # disk high-water of the per-request frame dir
     # --- workload (gates read these) ------------------------------------
     n_frames: int
     n_detections: int
@@ -63,6 +70,9 @@ class HealthResponse(BaseModel):
     chunk_size: int
     chunk_overlap: int
     interval_s: int
+    reader_semantics: str | None = None   # streaming refactor 2026-08-27
+    wire_deviation: str | None = None     # Ruling A record — rides into exports via readbacks
+    spool_dir: str | None = None
 
 
 class ErrorResponse(BaseModel):
