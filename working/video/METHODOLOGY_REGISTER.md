@@ -897,3 +897,31 @@ than rewritten from memory, which is entry 2's point in miniature.
 > the counter-hypothesis (an unlucky 6% draw then, a lucky 0.34% draw now)
 > is unlikely at 0.09% within-build repro but is not excluded by n=1.
 > Ansh's phrasing adopted verbatim: strong evidence, not proof.
+
+## 26. A box commit is landed only when the laptop has read it back from origin — and a cut bundle CLAIMS the base (ruled in 2026-08-28)
+
+> The box committed d1b5ac3 (the proof-layer-1 artifacts) and bundled it to
+> S3; the advisor's report said "box will bundle them" as if that were a
+> landing, and the next round pushed four laptop commits onto the same base
+> — 871e92e — before the bundle was fetched. The histories diverged and the
+> box's `git pull --ff-only` refused, exactly as it should. Cause, honestly:
+> **the advisor wrote "bundle when convenient" instead of marking it a
+> stop-and-land step**, and the next prompt pushed onto the claimed base.
+> Nothing was lost — the repair was a merge that landed the box side as-is
+> after a mechanical path-overlap check (none) — but the repair existed
+> only because both sides' history stayed unrewritten.
+>
+> The rule, ruled in verbatim: **a box commit is landed only when the
+> bundle has been fetched into the laptop repo AND `git ls-remote origin`
+> confirms the commit is reachable from the branch head, shas printed and
+> compared.** Cut, uploaded, downloaded, even verified are not landed. And
+> the corollary: **between a bundle being cut and its landing, the branch
+> base is CLAIMED — no laptop work pushes onto that base until the box side
+> is in.** The only permitted repair when the claim is violated is a merge
+> that lands the box side as-is, after a mechanical path-overlap check
+> (stop and report on any overlap rather than resolving unilaterally) —
+> never a rebase, never a rewrite of the box's history. Kin: entry 22 (a
+> push is done when its effect has been read back — this is that rule on
+> the bundle path) and entry 25 (transport of commands; this is transport
+> of COMMITS — a bundle in S3 is a rendering of history that nobody has
+> read back yet).
