@@ -72,17 +72,55 @@ def load_rows(manifest: dict):
     return rows
 
 
-def dedup_titles(rows):
+def dedup_titles(rows, dup_duration_pct: float = 10.0):
     """Ansh's rule: one transcode per title — keep largest bytes, tie by
-    doc asc. Returns (kept_rows, clusters) with clusters = every title key
-    that had >1 member, fully listed."""
+    doc asc. Two mechanical detectors, both deterministic:
+      v1  exact normalized-key equality;
+      v2  PREFIX merge: key A (len >= 8) is a prefix of key B AND the two
+          groups' closest durations are within dup_duration_pct — catches
+          junk-suffixed transcodes (…VideoQualityUpgrade, …720p_652,
+          …1939_201509) that v1 provably missed on this corpus
+          (CarnivalOfSouls x3 and GulliversTravels x3 were the measured
+          counterexamples, 2026-08-28). v2 was added against named
+          counterexamples, so the FULL cluster list is printed for human
+          ratification — a merged false positive would be visible there,
+          and the 10% window is a chosen value flagged for Ansh's ruling.
+    Returns (kept_rows, clusters); clusters fully listed."""
     by_key = {}
     for r in rows:
         by_key.setdefault(title_key(r['doc']), []).append(r)
+
+    keys = sorted(by_key)
+    parent = {k: k for k in keys}
+
+    def find(k):
+        while parent[k] != k:
+            parent[k] = parent[parent[k]]
+            k = parent[k]
+        return k
+
+    def close_enough(g1, g2):
+        return any(abs(a['duration_s'] - b['duration_s'])
+                   <= dup_duration_pct / 100.0 * min(a['duration_s'],
+                                                     b['duration_s'])
+                   for a in g1 for b in g2)
+
+    for i, k1 in enumerate(keys):
+        if len(k1) < 8:
+            continue
+        for k2 in keys[i + 1:]:
+            if not k2.startswith(k1):
+                break          # keys sorted: prefixes are adjacent
+            if close_enough(by_key[k1], by_key[k2]):
+                parent[find(k2)] = find(k1)
+
+    groups = {}
+    for k in keys:
+        groups.setdefault(find(k), []).extend(by_key[k])
     clusters = {k: sorted(v, key=lambda r: (-r['bytes'], r['doc']))
-                for k, v in by_key.items() if len(v) > 1}
+                for k, v in groups.items() if len(v) > 1}
     kept = [sorted(v, key=lambda r: (-r['bytes'], r['doc']))[0]
-            for v in by_key.values()]
+            for v in groups.values()]
     return sorted(kept, key=lambda r: r['doc']), clusters
 
 
@@ -189,6 +227,32 @@ def self_test() -> int:
           any(r['doc'] == 'HisGirlFriday-1940.mp4' for r in kept)
           and not any(r['doc'] == 'his_girl_friday.mp4' for r in kept))
     check('5 distinct titles remain from 6 docs', len(kept) == 5)
+
+    # v2 prefix merge: the measured counterexamples' shape (junk suffixes).
+    tri = {'gullivers_travels1939.mp4': (4360, 454_000_000),
+           'GulliversTravels720p_652.mp4': (4583, 475_808_316),
+           'GulliversTravels1939_201509.mp4': (4586, 476_779_476),
+           'unrelated.mp4': (4500, 400_000_000)}
+    m2 = {'duration_s': {d: v[0] for d, v in tri.items()},
+          'video_duration_s': {d: v[0] for d, v in tri.items()},
+          'sha256': {d: {'sha256': 'cd' * 32, 'bytes': v[1]}
+                     for d, v in tri.items()}}
+    kept2, cl2 = dedup_titles(load_rows(m2))
+    check('v2 prefix merge clusters the junk-suffixed trio into ONE title',
+          len(cl2) == 1 and len(next(iter(cl2.values()))) == 3
+          and len(kept2) == 2)
+    check('v2 keeps the largest-bytes member of the merged trio',
+          any(r['doc'] == 'GulliversTravels1939_201509.mp4' for r in kept2))
+
+    # v2 guard: a prefix pair FAR apart in duration is NOT merged.
+    far = {'thegolem.mp4': (3600, 1), 'TheGolemHowHeCame.mp4': (6200, 2)}
+    m3 = {'duration_s': {d: v[0] for d, v in far.items()},
+          'video_duration_s': {d: v[0] for d, v in far.items()},
+          'sha256': {d: {'sha256': 'ef' * 32, 'bytes': v[1]}
+                     for d, v in far.items()}}
+    _, cl3 = dedup_titles(load_rows(m3))
+    check('v2 guard: prefix match beyond the duration window stays unmerged',
+          len(cl3) == 0)
     strata, _, _ = stratify(kept)
     check('every kept title lands in exactly one stratum',
           sum(len(v) for v in strata.values()) == len(kept))
