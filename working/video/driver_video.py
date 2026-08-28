@@ -87,6 +87,22 @@ def say(msg: str) -> None:
     print(f'[driver] {msg}', flush=True)
 
 
+def sha256_file(path: Path, chunk: int = 1 << 20) -> str:
+    """Streaming file hash — the submitted-sha source since the streaming
+    refactor (2026-08-27): the driver never holds a whole blob (blocker 2),
+    so the sha comes from a chunked pass over the file. Run off the event
+    loop; the pass also warms the page cache, so the streamed send that
+    follows reads mostly from cache and wall_s keeps its admit->done meaning."""
+    h = hashlib.sha256()
+    with open(path, 'rb') as fh:
+        while True:
+            b = fh.read(chunk)
+            if not b:
+                break
+            h.update(b)
+    return h.hexdigest()
+
+
 def sha256_bytes(b: bytes) -> str:
     return hashlib.sha256(b).hexdigest()
 
@@ -435,20 +451,29 @@ class RRArm:
     # pongs, responses and other sends' chunks slot between them.
     WRITE_CHUNK = 1024 * 1024
 
-    async def process(self, blob: bytes, name: str) -> dict:
+    async def process(self, path: Path, name: str) -> dict:
         idx, token = self._next_token()
         # Same primitives send() uses (pipe/open/write/close — data.py:405,
         # cleanup shape data.py:466-478), same PIPELINE_RESULT from close(),
-        # same objinfo shape (_objinfo_with_size: {'name', 'size'}); the ONLY
-        # change is write granularity: N x 1 MiB requests instead of one jumbo.
-        pipe = await self.client.pipe(token, {'name': name, 'size': len(blob)},
+        # same objinfo shape (_objinfo_with_size: {'name', 'size'}); write
+        # granularity is N x 1 MiB requests, and since the streaming refactor
+        # (Ruling 4, 2026-08-27) each chunk is READ FROM DISK per write — the
+        # SDK needs bytes per chunk only (data.py:231-244) and the driver
+        # never holds a whole blob. Above the 250 MiB message ceiling
+        # (register entry 24) this is the only admissible upload.
+        size = Path(path).stat().st_size
+        pipe = await self.client.pipe(token, {'name': name, 'size': size},
                                       'video/x-msvideo')
         await pipe.open()
         n_chunks = 0
         try:
-            for off in range(0, len(blob), self.WRITE_CHUNK):
-                await pipe.write(blob[off:off + self.WRITE_CHUNK])
-                n_chunks += 1
+            with open(path, 'rb') as fh:
+                while True:
+                    chunk = fh.read(self.WRITE_CHUNK)
+                    if not chunk:
+                        break
+                    await pipe.write(chunk)
+                    n_chunks += 1
             result = await pipe.close()
         except Exception:
             if pipe.is_opened:
@@ -460,6 +485,7 @@ class RRArm:
         rec = record_from_rr(result)
         rec['token_index'] = idx
         rec['write_path'] = f'chunked-1MiB x {n_chunks}'
+        rec['upload_source'] = 'file-streamed'
         return rec
 
     async def stop(self):
@@ -555,16 +581,24 @@ class LIArm:
             say('LI balanced mode: driver round-robins ports per send '
                 '(kernel accept replaced — LI_SERVING_SKEW.md ruling)')
 
-    async def process(self, blob: bytes, name: str) -> dict:
+    async def process(self, path: Path, name: str) -> dict:
         import urllib.request
         port = self._next_port()
-        req = urllib.request.Request(f'http://127.0.0.1:{port}/process_video',
-                                     data=blob, method='POST',
-                                     headers={'Content-Type': 'application/octet-stream'})
+        # Streamed upload (Ruling 4, 2026-08-27): the body is an open FILE
+        # with an explicit Content-Length — http.client reads file-likes in
+        # blocks, so no whole blob exists driver-side; the service streams
+        # the body to its spool (request.stream(), Ruling A).
+        size = Path(path).stat().st_size
 
         def _post():
-            with urllib.request.urlopen(req, timeout=7200) as resp:
-                return json.load(resp)
+            with open(path, 'rb') as fh:
+                req = urllib.request.Request(
+                    f'http://127.0.0.1:{port}/process_video',
+                    data=fh, method='POST',
+                    headers={'Content-Type': 'application/octet-stream',
+                             'Content-Length': str(size)})
+                with urllib.request.urlopen(req, timeout=7200) as resp:
+                    return json.load(resp)
 
         body = await asyncio.to_thread(_post)
         if 'error' in body:
@@ -1396,7 +1430,10 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
     sem = asyncio.Semaphore(1 if leg == 'sequential' else concurrency)
     consecutive_failures = 0
     stop = asyncio.Event()
-    resident = max_resident = 0   # blobs held right now / high-water (read-back below)
+    # Since the streaming refactor (Ruling 4, 2026-08-27) no whole blob is
+    # ever resident — this counts in-flight STREAMS holding a slot after the
+    # sha pass; the read-back below proves the cap held.
+    resident = max_resident = 0
 
     async def one(row):
         nonlocal consecutive_failures, resident, max_resident
@@ -1406,31 +1443,30 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
         async with sem:
             if stop.is_set():
                 return
-            # BYTES ARE READ HERE — after admission, off the loop (2026-08-24,
-            # DIAG_M1_BLAST root cause). The old shape read 248MB synchronously
-            # on the event loop BEFORE the semaphore, and gather launches every
-            # row task, so rows 17..168 blocked the loop ~197s (no pongs, no
-            # drain, no receive — the shared RR websocket died with all 16
-            # in-flight sends) while ~41GB of blobs accumulated. Now a row owns
-            # a semaphore slot before it owns bytes: at most C blobs resident,
-            # and the loop never runs a read. admit_ns stamps AFTER the read so
-            # wall_s (admit->done) measures exactly what it always measured —
-            # the arm — and read_s is recorded beside it, never inside it.
+            # STREAMING REFACTOR (Ruling 4, 2026-08-27): the driver never
+            # holds a whole blob. The sha pass below (off the loop, after
+            # admission — the DIAG_M1_BLAST discipline unchanged) streams the
+            # file in 1 MiB chunks and warms the page cache; the send then
+            # streams from disk (RRArm: per-write reads; LIArm: file body).
+            # admit_ns stamps AFTER the sha pass so wall_s (admit->done)
+            # keeps measuring the arm; read_s is the sha pass, recorded
+            # BESIDE it — its basis changed from read+sha to sha-over-file
+            # (same bytes touched once either way).
+            path = corpus_dir / row['file']
             t_read = time.monotonic()
-            blob = await asyncio.to_thread((corpus_dir / row['file']).read_bytes)
-            submitted_sha = await asyncio.to_thread(sha256_bytes, blob)
+            submitted_sha = await asyncio.to_thread(sha256_file, path)
             read_s = round(time.monotonic() - t_read, 3)
             resident += 1
             max_resident = max(max_resident, resident)
             admit_ns = time.monotonic_ns()        # stamped at admission (#29)
             rec = {'video': row['file'], 'role': row['role'],
-                   'submitted_sha256': submitted_sha, 'bytes': len(blob),
-                   'read_s': read_s,
+                   'submitted_sha256': submitted_sha, 'bytes': path.stat().st_size,
+                   'read_s': read_s, 'read_s_basis': 'sha256 streaming pass (refactor 2026-08-27)',
                    'expected_frames': expected_frames(row, interval_s),
                    'video_s_manifest': row.get('video_s'),
                    'enqueue_ns': enqueue_ns, 'admit_ns': admit_ns}
             try:
-                body = await arm.process(blob, row['file'])
+                body = await arm.process(path, row['file'])
                 rec.update(body)
                 rec['done_ns'] = time.monotonic_ns()
                 rec['wall_s'] = round((rec['done_ns'] - admit_ns) / 1e9, 2)
@@ -1445,7 +1481,6 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
                     stop.set()
             finally:
                 resident -= 1
-                del blob
             writer.write(rec)
 
     if leg == 'sequential':
@@ -1459,16 +1494,17 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
             if rep_key not in done:
                 enqueue_ns = time.monotonic_ns()
                 async with sem:
-                    # same discipline as one(): bytes only once admitted, off-loop
-                    blob = await asyncio.to_thread((corpus_dir / rep['file']).read_bytes)
-                    rep_sha = await asyncio.to_thread(sha256_bytes, blob)
+                    # same discipline as one(): sha pass once admitted, off-loop;
+                    # no whole blob (streaming refactor 2026-08-27)
+                    rep_path = corpus_dir / rep['file']
+                    rep_sha = await asyncio.to_thread(sha256_file, rep_path)
                     admit_ns = time.monotonic_ns()
                     rec = {'video': rep_key, 'role': 'determinism_repeat',
-                           'submitted_sha256': rep_sha, 'bytes': len(blob),
+                           'submitted_sha256': rep_sha, 'bytes': rep_path.stat().st_size,
                            'expected_frames': expected_frames(rep, interval_s),
                            'enqueue_ns': enqueue_ns, 'admit_ns': admit_ns}
                     try:
-                        rec.update(await arm.process(blob, rep['file']))
+                        rec.update(await arm.process(rep_path, rep['file']))
                         rec['done_ns'] = time.monotonic_ns()
                         rec['wall_s'] = round((rec['done_ns'] - admit_ns) / 1e9, 2)
                     except Exception as exc:  # noqa: BLE001
@@ -1477,10 +1513,10 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
                     writer.write(rec)
     else:
         await asyncio.gather(*[one(row) for row in rows])
-    say(f'blob residency: max {max_resident} concurrent resident (cap = '
-        f'{1 if leg == "sequential" else concurrency}); reads+sha off-loop via to_thread '
-        '(DIAG_M1_BLAST fix read-back)')
-    return {'aborted_by_breaker': stop.is_set(), 'max_resident_blobs': max_resident}
+    say(f'stream residency: max {max_resident} concurrent in-flight (cap = '
+        f'{1 if leg == "sequential" else concurrency}); sha pass off-loop via to_thread; '
+        'no whole blob held (streaming refactor 2026-08-27, DIAG_M1_BLAST discipline kept)')
+    return {'aborted_by_breaker': stop.is_set(), 'max_inflight_streams': max_resident}
 
 
 def leg_gates(records: List[dict], rows: List[dict], arm_name: str,
@@ -1681,10 +1717,10 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
         entry = {'i': len(ledger), 'row': row['file'], 'serving_pid': None,
                  'serving_port': None, 'token_index': None, 'wall_s': None, 'error': None}
         ledger.append(entry)
-        blob = await asyncio.to_thread((Path(args.corpus_dir) / row['file']).read_bytes)
+        warm_path = Path(args.corpus_dir) / row['file']
         t0 = time.monotonic()
         try:
-            rec = await arm.process(blob, row['file'])
+            rec = await arm.process(warm_path, row['file'])
             entry['serving_pid'] = rec.get('serving_pid')
             entry['serving_port'] = rec.get('serving_port')
             entry['token_index'] = rec.get('token_index')
@@ -2317,6 +2353,14 @@ async def amain() -> int:
             n_detections=total_detections(ok_records),
             n_chunks=sum(r.get('n_chunks') or 0 for r in ok_records) or None,
             usd_per_hour=args.usd_per_hour),
+        # Blocker-1/2 instrumentation (2026-08-27): the driver's OWN peak,
+        # measured not assumed — proves the streaming refactor emptied the
+        # driver of blobs. Basis stated; container-side memory is mem_watch's
+        # job (cgroup anon vs page cache, per instance).
+        'driver_memory': {
+            'ru_maxrss_kb': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+            'basis': 'getrusage(RUSAGE_SELF).ru_maxrss at export time — the '
+                     'driver process peak over the whole leg (KiB on Linux)'},
         # A leg with no per-role sampling is DEGRADED, not merely quiet: every
         # memory/CPU-by-role figure is ABSENT, and a null summary beside nine
         # passing gates is the silent degradation this campaign has spent two

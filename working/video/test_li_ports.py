@@ -43,7 +43,16 @@ def main():
     check('aggregate: declared_workers = 8 over 8 single-worker instances',
           arm.declared_workers == 8)
     CALLS.clear()
-    recs = [asyncio.run(arm.process(b'x', f'v{i}')) for i in range(16)]
+    # Streaming refactor (2026-08-27): process takes a PATH and streams the
+    # file body — the round-robin contract is unchanged.
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix='.avi', delete=False) as tf:
+        tf.write(b'x')
+        tiny = Path(tf.name)
+    try:
+        recs = [asyncio.run(arm.process(tiny, f'v{i}')) for i in range(16)]
+    finally:
+        tiny.unlink(missing_ok=True)
     ports = [p for _, p in CALLS]
     check('round-robin: 16 sends cycle ports 8802-8809 twice, in order',
           ports == list(range(8802, 8810)) * 2, str(ports))

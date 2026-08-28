@@ -162,10 +162,10 @@ def main() -> int:
             seen = set()
             for k in range(18):     # 2 "concurrent" + 16 sequential, as died on the box
                 if k < 2:
-                    recs = await asyncio.gather(arm.process(b'', 'w'), arm.process(b'', 'w'))
+                    recs = await asyncio.gather(arm.process('w.avi', 'w'), arm.process('w.avi', 'w'))
                     seen |= {r['serving_pid'] for r in recs}
                 else:
-                    seen.add((await arm.process(b'', 'w'))['serving_pid'])
+                    seen.add((await arm.process('w.avi', 'w'))['serving_pid'])
             return seen
         seen = asyncio.run(old_shape())
         check('18 sends, 2 concurrent + 16 sequential -> coverage FAILS on the same fake '
