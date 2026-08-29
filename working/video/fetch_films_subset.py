@@ -142,7 +142,10 @@ def selection_rule_string(k: int, smeta: dict) -> str:
         f'{smeta["bytes_tercile_cuts"]}; k={k} per stratum in (bytes desc, '
         'doc asc) order capped by cell size; envelope film '
         f'{smeta["envelope_film"]} forced if absent (forced='
-        f'{smeta["envelope_forced"]}). RULING F 2026-08-28.')
+        f'{smeta["envelope_forced"]}). RULING F 2026-08-28; RULING H '
+        f'2026-08-28: N={smeta["n_selected"]} ACCEPTED (the ruling\'s '
+        'earlier stated 32 was arithmetic sloppiness, recorded verbatim; '
+        'the rule was not bent to match it).')
 
 
 def build_manifest(her_manifest: dict, her_sha: str, corpus_dir: Path,
@@ -268,6 +271,8 @@ def self_test() -> int:
               meta.get(META_KEY) == str(corpus.resolve())
               and meta['source_manifest_sha256'] == 'ff' * 32
               and 'RULING F' in meta['selection_rule']
+              and 'RULING H' in meta['selection_rule']
+              and f'N={meta["n_measured"]}' in meta['selection_rule']
               and meta['ratified_splits']
               and 'UNRULED' in meta['warm_note'])
         check('rows carry the driver schema fields + the labelled her-count',
