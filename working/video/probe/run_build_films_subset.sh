@@ -13,9 +13,12 @@
 # Disk: selection ~16-20 GB at the ~500 MB median (grapes 2.2 GB included);
 # films already under ~/films_probe are NOT reused — the corpus dir is the
 # single stamped home (entry 15), so expect refetches of the probe films.
-# NOTE printed by the report and carried here: the ruled rule at k=4 yields
-# N=35 (8 cells x 4 + the 3-title cell), not the ruling's stated 32 — read
-# the printed N and STOP if Ansh wants the discrepancy reconciled first.
+# RULING H (2026-08-28): N=35 measured ACCEPTED. RULING J: +2 dedicated warm
+# films (next unselected candidate from D0xB0 and D2xB2, role=warm,
+# WARM_N=2, disjoint — warmed-never-measured preserved), so expect 37 rows.
+# RESUMABLE: a film already on disk is verified from disk, never refetched —
+# a re-run after Ruling J fetches only the ~1 GB warm pair and recuts the
+# manifest; the ~16-20 GB measured set is not re-downloaded.
 # =============================================================================
 set -euo pipefail
 

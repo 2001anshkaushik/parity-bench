@@ -58,7 +58,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / 'probe'))  # probe/
 from argtypes import positive_int          # noqa: E402 — register entry 8
 from corpus_locator import META_KEY        # noqa: E402 — one key, one locator
 from films_strata_report import (          # noqa: E402 — ONE COPY of the rule
-    RATIFIED_SPLITS, UNRATIFIED_FLAGS, dedup_titles, load_rows, select_subset)
+    RATIFIED_SPLITS, UNRATIFIED_FLAGS, WARM_CELLS, dedup_titles, load_rows,
+    select_subset, select_warm_pair)
 from probe_frame_parity import IendWalk, SigScan  # noqa: E402 — both splitters
 
 HER_MANIFEST_SHA_RULED = \
@@ -145,7 +146,12 @@ def selection_rule_string(k: int, smeta: dict) -> str:
         f'{smeta["envelope_forced"]}). RULING F 2026-08-28; RULING H '
         f'2026-08-28: N={smeta["n_selected"]} ACCEPTED (the ruling\'s '
         'earlier stated 32 was arithmetic sloppiness, recorded verbatim; '
-        'the rule was not bent to match it).')
+        'the rule was not bent to match it). RULING J 2026-08-28: warm '
+        'pair = the NEXT unselected candidate in the same (bytes desc, doc '
+        'asc) order from '
+        + ' and '.join(f'D{c[0]}xB{c[1]}' for c in WARM_CELLS)
+        + ' (short + long regime), role=warm, WARM_N=2, disjoint from the '
+        'measured selection — as reproducible as the measured set.')
 
 
 def build_manifest(her_manifest: dict, her_sha: str, corpus_dir: Path,
@@ -154,15 +160,18 @@ def build_manifest(her_manifest: dict, her_sha: str, corpus_dir: Path,
     rows_all = load_rows(her_manifest)
     kept, clusters = dedup_titles(rows_all)
     selected, smeta = select_subset(kept, k)
-    print(f'selection: N={smeta["n_selected"]} (k={k}; '
-          f'{len(rows_all)} docs -> {len(kept)} titles -> {len(selected)} selected)')
+    warm = select_warm_pair(kept, {r['doc'] for r in selected})
+    print(f'selection: N={smeta["n_selected"]} measured (k={k}; '
+          f'{len(rows_all)} docs -> {len(kept)} titles) + {len(warm)} warm '
+          f'(Ruling J: {", ".join(w["doc"] for w in warm)})')
 
+    work = [(r, 'measured') for r in selected] + [(w, 'warm') for w in warm]
     out_rows = []
-    for i, r in enumerate(selected, 1):
+    for i, (r, role) in enumerate(work, 1):
         doc = r['doc']
         dest = corpus_dir / doc
         if not dest.is_file():
-            print(f'  [{i}/{len(selected)}] fetching {doc} '
+            print(f'  [{i}/{len(work)}] fetching {doc} '
                   f'({r["bytes"] / 1e9:.2f} GB) ...')
             fetch_fn(s3_prefix, doc, dest)
         sha, nbytes = sha256_file(dest)
@@ -184,9 +193,9 @@ def build_manifest(her_manifest: dict, her_sha: str, corpus_dir: Path,
             'her_frames_counted_note': 'HER native-rate null-mux count — '
                                        'NEVER the gate-1 expectation',
             'expected_frames_measured': n_frames,
-            'role': 'measured',
+            'role': role,
         })
-        print(f'  [{i}/{len(selected)}] {doc}: verified sha, '
+        print(f'  [{i}/{len(work)}] {doc} [{role}]: verified sha, '
               f'expected_frames_measured={n_frames}')
 
     meta = {'_meta': {
@@ -197,11 +206,20 @@ def build_manifest(her_manifest: dict, her_sha: str, corpus_dir: Path,
         'strata': smeta,
         'ratified_splits': sorted(tuple(sorted(s)) for s in RATIFIED_SPLITS),
         'unratified_flags': sorted(UNRATIFIED_FLAGS),
-        'n_measured': len(out_rows),
-        'n_warm': 0,
-        'warm_note': 'warm split for films legs is UNRULED — every row is '
-                     'measured; a warm-gated leg must not run off this '
-                     'manifest until the split is ruled',
+        'n_measured': sum(1 for r in out_rows if r['role'] == 'measured'),
+        'n_warm': sum(1 for r in out_rows if r['role'] == 'warm'),
+        'warm_note': ('RULING J 2026-08-28: WARM_N=2, dedicated warm films '
+                      'disjoint from the measured set, one short-regime '
+                      '(D0xB0) + one long-regime (D2xB2), warmed-never-'
+                      'measured preserved (a correctness property, not a '
+                      'tuning knob; AMI-item warming rejected — it exercises '
+                      'neither the 1080p decode path nor films-sized spools). '
+                      'Crossroad 32/40/41 mechanics carry unchanged: the warm '
+                      'SET is re-sent to cover lanes in waves of '
+                      'max(2 x workers, leg C) capped at 2; LI warmth gated '
+                      'on lifespan markers, pid spread reported-not-gated; '
+                      'RR structurally covered by driver-addressed token '
+                      'round-robin.'),
         META_KEY: str(corpus_dir.resolve()),
         'corpus_dir_stamped': {'utc': UTC,
                                'proof': f'sha256 verify {len(out_rows)}/'
@@ -266,23 +284,31 @@ def self_test() -> int:
         lines = out.read_text().splitlines()
         meta = json.loads(lines[0])['_meta']
         rows = [json.loads(l) for l in lines[1:]]
-        check('meta carries the locator key, source sha, selection rule, '
-              'ratified splits, warm note',
+        check('meta carries the locator key, source sha, selection rule '
+              '(F+H+J), ratified splits, ruled warm note',
               meta.get(META_KEY) == str(corpus.resolve())
               and meta['source_manifest_sha256'] == 'ff' * 32
               and 'RULING F' in meta['selection_rule']
               and 'RULING H' in meta['selection_rule']
+              and 'RULING J' in meta['selection_rule']
               and f'N={meta["n_measured"]}' in meta['selection_rule']
               and meta['ratified_splits']
-              and 'UNRULED' in meta['warm_note'])
+              and 'RULING J' in meta['warm_note']
+              and 'Crossroad 32/40/41' in meta['warm_note'])
         check('rows carry the driver schema fields + the labelled her-count',
               all({'file', 'bytes', 'sha256', 'video_s', 'role',
                    'expected_frames_measured', 'her_frames_counted'}
                   <= set(r) for r in rows)
-              and all(r['role'] == 'measured' for r in rows)
               and all(r['expected_frames_measured'] == 123 for r in rows))
-        check('N equals the selection (k=2 over the synthetic strata)',
-              res['n'] == len(rows) == meta['n_measured'])
+        warm_rows = [r for r in rows if r['role'] == 'warm']
+        meas_rows = [r for r in rows if r['role'] == 'measured']
+        check('Ruling J: exactly 2 warm rows, disjoint from the measured set',
+              len(warm_rows) == meta['n_warm'] == 2
+              and not {r['file'] for r in warm_rows}
+              & {r['file'] for r in meas_rows})
+        check('N splits correctly (measured + warm = all rows)',
+              res['n'] == len(rows) == meta['n_measured'] + meta['n_warm']
+              and len(meas_rows) == meta['n_measured'])
 
         # Fail-closed: corrupt one selected file -> the build aborts.
         victim = rows[0]['file']

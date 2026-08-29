@@ -167,6 +167,38 @@ def probe_film(kept):
     return sorted(kept, key=lambda r: (-r['bytes'], r['doc']))[0]
 
 
+# RULING J (2026-08-28): the warm pair — two dedicated warm films, disjoint
+# from the measured selection, by deterministic rule: the NEXT candidate in
+# (bytes desc, doc asc) order from D0xB0 (short regime) and D2xB2 (long
+# regime), role='warm', WARM_N=2. Warm coverage spans the decode range the
+# leg will see. Reasoning recorded with the ruling: (c) warming with
+# measured films breaks warmed-never-measured, a correctness property not a
+# tuning knob; (d) AMI items exercise neither the 1080p decode path nor
+# films-sized spools, so the first measured film would still pay the cold
+# cost warm-up exists to absorb; (a) positional inheritance is inapplicable
+# (our subset is our rule over her corpus — no her-order to be positional
+# in). Crossroad 32/40/41 mechanics carry unchanged.
+WARM_CELLS = ((0, 0), (2, 2))
+
+
+def select_warm_pair(kept, selected_docs):
+    """The RULING J warm films: first unselected candidate per WARM_CELLS,
+    in the same (bytes desc, doc asc) selection order. One copy — the
+    report prints it and the manifest builder consumes it."""
+    strata, _, _ = stratify(kept)
+    warm = []
+    for cell in WARM_CELLS:
+        pick = next((r for r in strata.get(cell, [])
+                     if r['doc'] not in selected_docs
+                     and r['doc'] not in {w['doc'] for w in warm}), None)
+        if pick is None:
+            raise SystemExit(f'NOT DONE — no unselected warm candidate in '
+                             f'stratum D{cell[0]}xB{cell[1]} (Ruling J needs '
+                             'one; the cell is exhausted)')
+        warm.append(pick)
+    return warm
+
+
 def select_subset(kept, k: int):
     """RULING F selection, one copy (report prints it, the manifest builder
     consumes it): k per stratum in (bytes desc, doc asc) order, capped by
@@ -233,6 +265,12 @@ def report(manifest_path: Path, k: int) -> int:
           f'N={smeta["n_selected"]}, envelope_forced={smeta["envelope_forced"]}')
     for cell, docs in sorted(smeta['per_cell'].items()):
         print(f'  {cell}: {", ".join(docs)}')
+
+    warm = select_warm_pair(kept, {r['doc'] for r in selected})
+    print(f'\nWARM PAIR (Ruling J: next unselected candidate from D0xB0 and '
+          f'D2xB2, disjoint from the {smeta["n_selected"]} measured): '
+          + ', '.join(f'{w["doc"]} ({w["bytes"]} B, {w["duration_s"]:.0f}s)'
+                      for w in warm))
 
     pf = probe_film(kept)
     print(f'\nPROBE FILM (rule: globally largest bytes after dedup): '
@@ -331,6 +369,19 @@ def self_test() -> int:
           meta_a['n_selected'] == len(sel_a) <= 2 * 9)
     check('Ruling F: envelope film is in the selection',
           any(r['doc'] == meta_a['envelope_film'] for r in sel_a))
+
+    # RULING J: warm pair — disjoint, deterministic, from the two corner cells.
+    wp1 = select_warm_pair(kept5, {r['doc'] for r in sel_a})
+    wp2 = select_warm_pair(kept5, {r['doc'] for r in sel_a})
+    sel_docs = {r['doc'] for r in sel_a}
+    check('Ruling J: warm pair is 2 films, disjoint from the selection',
+          len(wp1) == 2 and not sel_docs & {w['doc'] for w in wp1})
+    check('Ruling J: warm pair deterministic (two runs identical)',
+          [w['doc'] for w in wp1] == [w['doc'] for w in wp2])
+    strata5, _, _ = stratify(kept5)
+    check('Ruling J: warm films come from D0xB0 and D2xB2',
+          wp1[0]['doc'] in [r['doc'] for r in strata5[(0, 0)]]
+          and wp1[1]['doc'] in [r['doc'] for r in strata5[(2, 2)]])
     strata, _, _ = stratify(kept)
     check('every kept title lands in exactly one stratum',
           sum(len(v) for v in strata.values()) == len(kept))
