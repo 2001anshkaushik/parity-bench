@@ -88,6 +88,14 @@ def load_batch(manifest_path: Path, corpus_dir_arg):
         r = rows.get(doc)
         if r is None:
             raise SystemExit(f'NOT DONE — batch doc {doc} not in manifest rows')
+        # STRUCTURAL, not incidental (Ruling J round): the sweep batch is
+        # measured rows ONLY — a warm row reaching the batch means the
+        # selection meta and the roles disagree, and the probe refuses
+        # rather than quietly measuring warm content.
+        if r.get('role') != 'measured':
+            raise SystemExit(f'NOT DONE — batch doc {doc} has role='
+                             f'{r.get("role")!r}; warm rows are never in the '
+                             'sweep batch (warmed-never-measured)')
         p = corpus_dir / doc
         if not p.is_file() or p.stat().st_size != r['bytes']:
             raise SystemExit(f'NOT DONE — {doc}: missing or size mismatch in '
@@ -351,6 +359,31 @@ def self_test() -> int:
           and CELLS['li-8x4']['instances'] == 8)
     check('knee threshold is probe_concurrency\'s 0.7, verbatim',
           KNEE_THRESHOLD == 0.7)
+
+    # STRUCTURAL warm exclusion: a per_cell head with role='warm' is REFUSED.
+    import tempfile
+    with tempfile.TemporaryDirectory() as t:
+        d = Path(t)
+        corpus = d / 'corpus'
+        corpus.mkdir()
+        (corpus / 'w.mp4').write_bytes(b'x' * 10)
+        man = d / 'm.jsonl'
+        meta = {'_meta': {'corpus_dir': str(corpus.resolve()),
+                          'strata': {'per_cell': {'D0xB0': ['w.mp4']}}}}
+        row = {'file': 'w.mp4', 'bytes': 10, 'video_s': 1.0,
+               'expected_frames_measured': 1, 'role': 'warm'}
+        man.write_text(json.dumps(meta) + '\n' + json.dumps(row) + '\n')
+        try:
+            load_batch(man, None)
+            check('warm row in the batch is REFUSED (structural)', False)
+        except SystemExit as e:
+            check('warm row in the batch is REFUSED (structural)',
+                  'warmed-never-measured' in str(e))
+        row['role'] = 'measured'
+        man.write_text(json.dumps(meta) + '\n' + json.dumps(row) + '\n')
+        batch, _, _, _ = load_batch(man, None)
+        check('measured row passes the same gate', len(batch) == 1)
+
     print('self-test:', 'PASS' if ok else 'FAIL')
     return 0 if ok else 4
 
