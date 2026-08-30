@@ -82,3 +82,25 @@ def check_files(paths) -> Dict[str, List[Dict]]:
         if f:
             out[str(p)] = f
     return out
+
+
+def probe_selftest_findings(probe_file) -> Dict[str, List[Dict]]:
+    """The standard probe self-test scan (register entry 27, 2026-08-30): every
+    .py in the probe file's own directory, its parent (working/video), and the
+    parent's li_video/ and samples/ subdirs. Returns {} when clean.
+
+    Wired into EVERY probe's --self-test after the posture-sweep kill: 11
+    points died in oom_state() on a missing `import re` that py_compile and a
+    20/20 self-test both passed, because the function is reachable only on a
+    live box — exactly the class this module was built for (defect #36) and
+    exactly the code a self-test cannot execute. This checker crosses entry
+    2's independence boundary WITHOUT execution, so it covers the functions
+    the self-test structurally cannot. One copy here; probes call it, never
+    re-derive the scan scope."""
+    probe_dir = Path(probe_file).resolve().parent
+    video = probe_dir.parent
+    files: List[Path] = []
+    for d in (probe_dir, video, video / 'li_video', video / 'samples'):
+        if d.is_dir():
+            files += sorted(d.glob('*.py'))
+    return check_files(files)

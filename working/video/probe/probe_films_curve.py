@@ -46,6 +46,7 @@ import argparse
 import asyncio
 import hashlib
 import json
+import re
 import resource
 import subprocess
 import sys
@@ -545,26 +546,57 @@ def self_test() -> int:
         check('chunk read-back: an ABSENT field is refused, never agreement',
               'None' in str(e))
 
+    # ENTRY 27 (2026-08-30): oom_state() killed all 11 sweep points on a
+    # missing `import re` — reachable only on a live box, invisible to this
+    # suite. The canned runner EXECUTES the body (regex included) on the
+    # exact shapes `docker inspect` and `grep oom_kill memory.events` emit.
+    def _canned(argv, timeout=30):
+        if 'inspect' in argv:
+            return 0, 'false', ''
+        return 0, 'oom_kill 3\noom_group_kill 0', ''
+    check('oom_state: canned docker/memory.events outputs parse (the re '
+          'path EXECUTES under self-test)',
+          oom_state(['c1'], runner=_canned)
+          == {'c1': {'oomkilled': 'false', 'oom_kill_events': 3}})
+    check('oom_state: uninspectable container recorded, never raised',
+          oom_state(['gone'], runner=lambda a, timeout=30: (1, '', 'no such'))
+          ['gone'] == {'oomkilled': 'uninspectable', 'oom_kill_events': None})
+
+    # ENTRY 27, the broad half: a green self-test must include "every name
+    # in this tree resolves" — the functions only a live box reaches are
+    # exactly the ones a self-test never executes. Lazy import: the live
+    # point path is untouched.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # working/
+    from harness.static_names import probe_selftest_findings
+    sn = probe_selftest_findings(__file__)
+    check('static names: every video-tree name resolves (entry 27)', sn == {})
+    if sn:
+        print('  UNRESOLVED:', sn)
+
     print('self-test:', 'PASS' if ok else 'FAIL')
     return 0 if ok else 4
 
 
 # ----------------------------------------------------------------------- main
 
-def oom_state(containers):
+def oom_state(containers, runner=None):
     """Per container: docker's OOMKilled flag (container init killed) AND the
     cgroup's memory.events oom_kill counter (child processes killed inside
     the cgroup — the likelier films failure: the kernel kills a task/worker
     process while the container survives). The run_proof_layer2.sh pattern,
     promoted into every point so an OOM is distinguishable in the artifact
-    from a timeout or an application error."""
+    from a timeout or an application error. `runner` is injectable (entry 27:
+    this function killed the whole 2026-08-30 sweep with a missing `import
+    re` that no self-test could reach — the canned-output self-test now
+    EXECUTES this body, docker or no docker)."""
+    run = runner or run_text
     out = {}
     for c in containers:
-        rc1, killed, _ = run_text(['docker', 'inspect', '--format',
-                                   '{{.State.OOMKilled}}', c])
-        rc2, ev, _ = run_text(['docker', 'exec', c, 'sh', '-c',
-                               'grep oom_kill /sys/fs/cgroup/memory.events '
-                               '2>/dev/null'])
+        rc1, killed, _ = run(['docker', 'inspect', '--format',
+                              '{{.State.OOMKilled}}', c])
+        rc2, ev, _ = run(['docker', 'exec', c, 'sh', '-c',
+                          'grep oom_kill /sys/fs/cgroup/memory.events '
+                          '2>/dev/null'])
         kills = None
         if rc2 == 0:
             m = re.search(r'^oom_kill (\d+)', ev, re.M)

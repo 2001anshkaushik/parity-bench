@@ -545,6 +545,16 @@ def self_test() -> int:
     check('IEND walk needs types+lengths only (crc not verified, as engine)',
           len(drive(IendWalk(), bad, 5)) == 1)
 
+    # ENTRY 27 (2026-08-30 sweep kill — a missing `import re` passed
+    # py_compile AND a green self-test): every probe self-test scans the
+    # video tree for unresolvable names. Lazy import: live paths untouched.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # working/
+    from harness.static_names import probe_selftest_findings
+    sn = probe_selftest_findings(__file__)
+    check('static names: every video-tree name resolves (entry 27)', sn == {})
+    if sn:
+        print('  UNRESOLVED:', sn)
+
     print('self-test:', 'PASS' if ok else 'FAIL')
     return 0 if ok else 4
 

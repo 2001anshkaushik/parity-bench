@@ -937,3 +937,56 @@ than rewritten from memory, which is entry 2's point in miniature.
 > `repo HEAD` line is read at the STOP before anything measures** — a
 > sweep run at a stale HEAD is a different instrument wearing the same
 > command line.
+
+## 27. A green self-test is a claim about the paths it ran — and the checker for the paths it cannot run existed, outside the loop (added 2026-08-30)
+
+> The posture sweep died at all 11 points in ~15 minutes with zero
+> artifacts: `NameError: name 're' is not defined` in
+> probe_films_curve.py oom_state() — `re.search` in a module that never
+> imported re. py_compile had passed (a parse proves nothing about
+> names), and the same-day self-test had passed 20/20, because
+> oom_state() is reachable ONLY from the live point path — it reads
+> docker inspect and the container's memory.events — so no laptop
+> self-test ever called it, and Python resolves a name when the line
+> runs, not when the module loads. The suite's own OOM check exercised
+> oom_delta (the arithmetic), never oom_state (the reader); the
+> neighbouring module (probe_films_sizing.py:52) imports re beside an
+> identical call shape — the pattern the eye fills in. The wrapper's
+> record-and-continue held exactly as designed: 11 points, 11 honest
+> failures, a summarize that said so. The box paid ~15 minutes for a
+> name the laptop could have refused in milliseconds.
+>
+> **Third occurrence of the class.** Defect #36 — LI_CONTAINER undefined
+> inside an if-EXTERNAL branch (smoke50_parser_in.py:978), survived every
+> local run, detonated after 9,975 records; static_names.py was BUILT
+> from it (its docstring, static_names.py:1-6; relayed this round as
+> "#37", but #37 is the thread-pin defect per driver_video.py:24 — the
+> file's own number stands here). Then the bare-python3 audit (as
+> relayed). Now oom_state. Each time the name sat in code no local run
+> executes — and that population is not random: **the functions whose
+> first execution is on the box are exactly the functions whose names a
+> self-test never resolves.** Entry 2 named the two independence
+> crossings — execution, or an artifact the writing did not produce —
+> and static_names.py IS the non-execution crossing for this class
+> (symtable computes real scoping with nothing run). It existed the
+> whole time as a separate step nobody ran: entry 7's mechanism (the
+> correction and the thing it corrects kept in different places, aligned
+> by nobody), at the level of checkers instead of commands.
+>
+> Cure, structural per entry 9's closing argument: **every probe's
+> --self-test now runs the tree scan itself** —
+> static_names.probe_selftest_findings(), one copy, called from all
+> seven probes' suites — so "self-test PASS" can no longer be printed
+> over an unresolvable name anywhere under working/video. The live
+> defect served as the wiring's null control: the scan run BEFORE the
+> fix, over 41 files, found exactly the sweep-killer and nothing else.
+> Beside the broad fix, the narrow one: oom_state takes an injectable
+> runner and the suite now EXECUTES its body on canned docker and
+> memory.events shapes — the OOM instrument, ordered in so an OOM at
+> 32x1 would be a FINDING, was itself the only unmeasured instrument in
+> the file (entry 12: the read-back is half of the measurement). Kin to
+> entry 22, which is the whole lesson in one line: an edit or a push is
+> done when its EFFECT has been read back — a green suite is the
+> command's success, not the effect, and the effect includes the paths
+> the suite structurally cannot take, which is precisely where a
+> second, non-execution instrument must stand.
