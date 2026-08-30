@@ -72,17 +72,26 @@ def preserve(path: Path):
         print(f'note: existing {path.name} moved aside as {aside.name}')
 
 
-def load_batch(manifest_path: Path, corpus_dir_arg):
-    """The sweep batch: head doc of every strata cell, from OUR manifest's
-    own meta (deterministic). Films are size-verified against their rows —
-    the full sha verification is the build's job, already stamped."""
+def load_batch(manifest_path: Path, corpus_dir_arg, batch_mode: str = 'heads'):
+    """The sweep batch, deterministic from OUR manifest:
+      'heads'    — head doc of every strata cell (the RULING-I C-sweep
+                   batch: 9 films, ~12.6 h footage);
+      'measured' — every role='measured' row in manifest row order (the
+                   RULING-K posture-sweep batch: the full 35, ~49.3 h — a
+                   9-film batch cannot saturate M>=16 lanes).
+    Warm rows are excluded STRUCTURALLY in both modes (role guard).
+    Films are size-verified against their rows — the full sha verification
+    is the build's job, already stamped."""
     lines = [json.loads(l) for l in manifest_path.read_text().splitlines()]
     meta = lines[0]['_meta']
     rows = {r['file']: r for r in lines[1:]}
     corpus_dir, src = resolve_corpus_dir(corpus_dir_arg, meta, manifest_path)
-    per_cell = meta['strata']['per_cell']
-    batch_docs = [docs[0] for cell, docs in sorted(per_cell.items())
-                  if cell != 'envelope_forced' and docs]
+    if batch_mode == 'measured':
+        batch_docs = [r['file'] for r in lines[1:] if r.get('role') == 'measured']
+    else:
+        per_cell = meta['strata']['per_cell']
+        batch_docs = [docs[0] for cell, docs in sorted(per_cell.items())
+                      if cell != 'envelope_forced' and docs]
     batch = []
     for doc in batch_docs:
         r = rows.get(doc)
@@ -261,52 +270,59 @@ def curve_rows(points):
     return rows, knee_at
 
 
+def _point_row(d: dict, out_dir: Path) -> dict:
+    label = d.get('label') or d['cell']
+    mw_path = out_dir / f'memwatch_{label}_C{d["concurrency"]}.json'
+    anon_sum = peak_max = spool_max = per_instance_anon = None
+    if mw_path.exists():
+        mw = json.loads(mw_path.read_text())['containers']
+        anons = [v.get('max_anon_bytes') for v in mw.values()
+                 if v.get('max_anon_bytes') is not None]
+        peaks = [v.get('max_memory_peak_bytes') for v in mw.values()
+                 if v.get('max_memory_peak_bytes') is not None]
+        spools = [v.get('max_spool_used_bytes') for v in mw.values()
+                  if v.get('max_spool_used_bytes') is not None]
+        anon_sum = sum(anons) if anons else None
+        per_instance_anon = max(anons) if anons else None
+        peak_max = max(peaks) if peaks else None
+        spool_max = max(spools) if spools else None
+    m = d['metrics']
+    return {
+        'label': label, 'C': d['concurrency'],
+        'lanes': d.get('lanes'), 'spend_threads': d.get('spend_threads'),
+        'batch_mode': d.get('batch_mode'),
+        'span_s': m['span_s'], 'frames_per_s': m['frames_per_s'],
+        'realtime_factor': m['realtime_factor'],
+        'cores': m['service_cpu']['cores'],
+        'util_pct': m['service_cpu']['util_pct'],
+        'anon_sum': anon_sum, 'anon_max_instance': per_instance_anon,
+        'memory_peak_max': peak_max, 'spool_max': spool_max,
+        'errors': m['n_errors'],
+        'saturated': d['inflight_max'] >= min(d['concurrency'], d['n_films']),
+        'probe_ru_maxrss_kb': d.get('probe_ru_maxrss_kb'),
+    }
+
+
 def summarize(out_dir: Path) -> int:
-    print(f'CURVE SUMMARY over {out_dir} '
-          f'(knee rule: marginal efficiency < {KNEE_THRESHOLD}, '
-          'probe_concurrency.py:15-17 verbatim; C is NOT picked here — '
-          'Ansh rules from this table, RULING I)')
-    any_points = False
-    for cell in sorted(CELLS):
-        points = []
-        for art in sorted(out_dir.glob(f'curve_{cell}_C*.json')):
-            d = json.loads(art.read_text())
-            mw_path = out_dir / f'memwatch_{cell}_C{d["concurrency"]}.json'
-            anon_sum = peak_max = spool_max = None
-            per_instance_anon = None
-            if mw_path.exists():
-                mw = json.loads(mw_path.read_text())['containers']
-                anons = [v.get('max_anon_bytes') for v in mw.values()
-                         if v.get('max_anon_bytes') is not None]
-                peaks = [v.get('max_memory_peak_bytes') for v in mw.values()
-                         if v.get('max_memory_peak_bytes') is not None]
-                spools = [v.get('max_spool_used_bytes') for v in mw.values()
-                          if v.get('max_spool_used_bytes') is not None]
-                anon_sum = sum(anons) if anons else None
-                per_instance_anon = max(anons) if anons else None
-                peak_max = max(peaks) if peaks else None
-                spool_max = max(spools) if spools else None
-            m = d['metrics']
-            points.append({
-                'C': d['concurrency'], 'span_s': m['span_s'],
-                'frames_per_s': m['frames_per_s'],
-                'realtime_factor': m['realtime_factor'],
-                'cores': m['service_cpu']['cores'],
-                'util_pct': m['service_cpu']['util_pct'],
-                'anon_sum': anon_sum,
-                'anon_max_instance': per_instance_anon,
-                'memory_peak_max': peak_max, 'spool_max': spool_max,
-                'errors': m['n_errors'],
-                'saturated': d['inflight_max'] >= min(d['concurrency'],
-                                                      d['n_films']),
-                'probe_ru_maxrss_kb': d.get('probe_ru_maxrss_kb'),
-            })
-        if not points:
-            continue
-        any_points = True
-        points.sort(key=lambda p: p['C'])
+    print(f'CURVE SUMMARY over {out_dir} — nothing is picked here: Ansh '
+          'rules posture from the cross-posture table (RULING K) and C from '
+          f'the per-posture marginal chain (RULING I; knee = first marginal '
+          f'efficiency < {KNEE_THRESHOLD}, probe_concurrency.py:15-17 verbatim)')
+    by_label = {}
+    for art in sorted(out_dir.glob('curve_*.json')):
+        d = json.loads(art.read_text())
+        row = _point_row(d, out_dir)
+        by_label.setdefault(row['label'], []).append(row)
+    if not by_label:
+        print('no point artifacts found')
+        return 1
+
+    all_rows = []
+    for label in sorted(by_label):
+        points = sorted(by_label[label], key=lambda p: p['C'])
         rows, knee_at = curve_rows(points)
-        print(f'\n== {cell} ==')
+        all_rows.extend(rows)
+        print(f'\n== {label} ==')
         for r in rows:
             flags = ('' if r['errors'] == 0 else f' ERRORS={r["errors"]}') + \
                     ('' if r['saturated'] else ' NEVER-SATURATED')
@@ -319,11 +335,23 @@ def summarize(out_dir: Path) -> int:
                      if 'marginal_efficiency' in r else '')
                   + (f" | marg GB/lane {r['marginal_gb_per_lane']}"
                      if 'marginal_gb_per_lane' in r else '') + flags)
-        print(f"  knee (first marg-eff < {KNEE_THRESHOLD}): "
-              f"{'C=' + str(knee_at) if knee_at else 'none within swept range'}")
-    if not any_points:
-        print('no point artifacts found')
-        return 1
+        if len(points) > 1:
+            print(f"  knee (first marg-eff < {KNEE_THRESHOLD}): "
+                  f"{'C=' + str(knee_at) if knee_at else 'none within swept range'}")
+
+    # Cross-posture table (RULING K / Crossroad 17): the full matrix for BOTH
+    # arms, published beside whatever gets chosen — sorted by throughput,
+    # spend printed so under/full/over-subscription reads at a glance.
+    print('\n== POSTURE MATRIX (all arms, all points; sorted by frames/s; '
+          'no winner picked) ==')
+    for r in sorted(all_rows, key=lambda x: -(x['frames_per_s'] or 0)):
+        print(f"  {r['label']} C={r['C']} [{r.get('batch_mode')}]: "
+              f"{r['frames_per_s']} f/s | rt x{r['realtime_factor']} | "
+              f"lanes {r['lanes']} x env = spend {r['spend_threads']} threads "
+              f"| {r['cores']} cores ({r['util_pct']}%) | anon sum "
+              f"{r['anon_sum']} B | mem.peak {r['memory_peak_max']}"
+              + ('' if r['errors'] == 0 else f' | ERRORS={r["errors"]}')
+              + ('' if r['saturated'] else ' | NEVER-SATURATED'))
     return 0
 
 
@@ -360,6 +388,25 @@ def self_test() -> int:
     check('knee threshold is probe_concurrency\'s 0.7, verbatim',
           KNEE_THRESHOLD == 0.7)
 
+    # RULING K: dynamic posture resolution + labels.
+    from types import SimpleNamespace as NS
+    p1, l1 = resolve_posture(NS(cell=None, arm='rr', tokens=16,
+                                instances=None, threads_env='2'))
+    check("dynamic RR posture: rr_M16xT2, env '2'",
+          l1 == 'rr_M16xT2' and p1 == {'arm': 'rr', 'tokens': 16, 'env': '2'})
+    p2, l2 = resolve_posture(NS(cell=None, arm='li', tokens=None,
+                                instances=16, threads_env='2'))
+    check('dynamic LI posture: li_N16xT2',
+          l2 == 'li_N16xT2' and p2['instances'] == 16 and p2['env'] == '2')
+    p3, l3 = resolve_posture(NS(cell='rr-8x4', arm=None, tokens=None,
+                                instances=None, threads_env=None))
+    check('legacy named cell still resolves (rr-8x4, 8 tokens)',
+          l3 == 'rr-8x4' and p3['tokens'] == 8)
+    p4, l4 = resolve_posture(NS(cell=None, arm='rr', tokens=32,
+                                instances=None, threads_env='unset'))
+    check("threads-env 'unset' -> env None, label T-unset",
+          l4 == 'rr_M32xTunset' and p4['env'] is None)
+
     # STRUCTURAL warm exclusion: a per_cell head with role='warm' is REFUSED.
     import tempfile
     with tempfile.TemporaryDirectory() as t:
@@ -384,15 +431,67 @@ def self_test() -> int:
         batch, _, _, _ = load_batch(man, None)
         check('measured row passes the same gate', len(batch) == 1)
 
+        # RULING K batch mode: 'measured' takes every measured row in
+        # manifest order and never a warm row.
+        (corpus / 'a.mp4').write_bytes(b'y' * 5)
+        (corpus / 'z.mp4').write_bytes(b'z' * 7)
+        rows2 = [
+            {'file': 'a.mp4', 'bytes': 5, 'video_s': 1.0,
+             'expected_frames_measured': 1, 'role': 'measured'},
+            {'file': 'w.mp4', 'bytes': 10, 'video_s': 1.0,
+             'expected_frames_measured': 1, 'role': 'warm'},
+            {'file': 'z.mp4', 'bytes': 7, 'video_s': 1.0,
+             'expected_frames_measured': 1, 'role': 'measured'},
+        ]
+        man.write_text(json.dumps(meta) + '\n'
+                       + '\n'.join(json.dumps(r) for r in rows2) + '\n')
+        batch2, _, _, _ = load_batch(man, None, 'measured')
+        check("batch 'measured': all measured rows in order, warm excluded",
+              [b['file'] for b in batch2] == ['a.mp4', 'z.mp4'])
+
     print('self-test:', 'PASS' if ok else 'FAIL')
     return 0 if ok else 4
 
 
 # ----------------------------------------------------------------------- main
 
+def resolve_posture(args):
+    """Posture from --cell (the three measured named cells) OR the dynamic
+    RULING-K grid args (--arm + --tokens/--instances + --threads-env).
+    Returns (posture_dict, label). env is a string ('4') or None (unset);
+    check_posture_env fail-closes either way."""
+    if args.cell:
+        return dict(CELLS[args.cell]), args.cell
+    if not args.arm:
+        raise SystemExit('NOT DONE — give --cell or --arm (with '
+                         '--tokens/--instances and --threads-env)')
+    env = None if args.threads_env in (None, 'unset') else str(args.threads_env)
+    if args.arm == 'rr':
+        if not args.tokens:
+            raise SystemExit('NOT DONE — --arm rr needs --tokens')
+        t = env or 'unset'
+        return ({'arm': 'rr', 'tokens': args.tokens, 'env': env},
+                f'rr_M{args.tokens}xT{t}')
+    if not args.instances:
+        raise SystemExit('NOT DONE — --arm li needs --instances')
+    t = env or 'unset'
+    return ({'arm': 'li', 'instances': args.instances, 'env': env},
+            f'li_N{args.instances}xT{t}')
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(allow_abbrev=False)
-    ap.add_argument('--cell', choices=sorted(CELLS))
+    ap.add_argument('--cell', choices=sorted(CELLS),
+                    help='one of the three measured named cells; OR use the '
+                         'dynamic grid args below (Ruling K)')
+    ap.add_argument('--arm', choices=['rr', 'li'])
+    ap.add_argument('--tokens', type=positive_int('tokens', 64), default=None)
+    ap.add_argument('--instances', type=positive_int('instances', 32),
+                    default=None)
+    ap.add_argument('--threads-env', default=None,
+                    help="int or 'unset' — the six BLAS/OMP vars expected on "
+                         'the containers (read back fail-closed)')
+    ap.add_argument('--batch', choices=['heads', 'measured'], default='heads')
     ap.add_argument('--concurrency', type=positive_int('concurrency', 64))
     ap.add_argument('--manifest',
                     default=str(Path(__file__).resolve().parents[1]
@@ -412,16 +511,25 @@ def main() -> int:
         return self_test()
     if args.summarize:
         return summarize(Path(args.summarize).expanduser())
-    for req in ('cell', 'concurrency', 'containers'):
+    for req in ('concurrency', 'containers'):
         if not getattr(args, req):
             ap.error(f'--{req} is required for a point '
                      '(unless --self-test/--summarize)')
+    if (args.threads_env is not None and args.threads_env != 'unset'
+            and not args.threads_env.isdigit()):
+        ap.error("--threads-env must be an integer or 'unset'")
 
-    cell = CELLS[args.cell]
+    cell, label = resolve_posture(args)
     manifest_path = Path(args.manifest).expanduser()
     if not manifest_path.is_file():
         raise SystemExit(f'NOT DONE — subset manifest not found: {manifest_path}')
-    batch, meta, corpus_dir, src = load_batch(manifest_path, args.corpus_dir)
+    batch, meta, corpus_dir, src = load_batch(manifest_path, args.corpus_dir,
+                                              args.batch)
+    lanes = cell.get('tokens') or cell.get('instances') or 1
+    if args.concurrency < lanes:
+        print(f'WARNING — C={args.concurrency} < lanes={lanes}: this point '
+              'cannot saturate the posture (Ruling K requires C >= M for '
+              'posture points); recorded, not refused')
     containers = [c.strip() for c in args.containers.split(',') if c.strip()]
     check_posture_env(containers, cell['env'])   # fail-closed, entry 12
     port = args.port or (5565 if cell['arm'] == 'rr' else 8802)
@@ -432,8 +540,8 @@ def main() -> int:
     repo = Path(__file__).resolve().parents[3]
     head = subprocess.run(['git', '-C', str(repo), 'rev-parse', 'HEAD'],
                           capture_output=True, text=True).stdout.strip()
-    print(f'point {args.cell} C={args.concurrency}: batch of {len(batch)} '
-          f'films (strata heads), corpus {corpus_dir} [{src}]')
+    print(f'point {label} C={args.concurrency}: batch of {len(batch)} films '
+          f'({args.batch}), corpus {corpus_dir} [{src}]')
 
     cpu_before = {c: cpu_usage_usec(c) for c in containers}
     t0 = time.monotonic()
@@ -447,11 +555,14 @@ def main() -> int:
     bracket_wall = round(time.monotonic() - t0, 2)
     cpu_after = {c: cpu_usage_usec(c) for c in containers}
 
+    env_n = int(cell['env']) if cell.get('env') else None
     metrics = point_metrics(results, batch, bracket_wall,
                             cpu_before, cpu_after, containers)
     artifact = {
         'probe': 'films_curve', 'created_utc': UTC, 'git_head': head,
-        'cell': args.cell, 'concurrency': args.concurrency,
+        'cell': label, 'label': label, 'concurrency': args.concurrency,
+        'batch_mode': args.batch, 'lanes': lanes,
+        'spend_threads': (lanes * env_n) if env_n else None,
         'posture': cell, 'containers': containers,
         'manifest_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
         'batch': [{'file': b['file'], 'bytes': b['bytes'],
@@ -464,12 +575,12 @@ def main() -> int:
         'memory_note': "anon/memory.peak/spool are mem_watch's, recorded "
                        'beside this artifact by the wrapper',
     }
-    out = out_dir / f'curve_{args.cell}_C{args.concurrency}.json'
+    out = out_dir / f'curve_{label}_C{args.concurrency}.json'
     preserve(out)
     out.write_text(json.dumps(artifact, indent=1))
     rb = json.loads(out.read_text())          # entry 22: read back
     m = rb['metrics']
-    print(f"POINT {args.cell} C={args.concurrency}: span {m['span_s']}s | "
+    print(f"POINT {label} C={args.concurrency}: span {m['span_s']}s | "
           f"{m['frames_per_s']} f/s | rt x{m['realtime_factor']} | "
           f"{m['service_cpu']['cores']} cores | errors {m['n_errors']} | "
           f"inflight max {rb['inflight_max']}"
