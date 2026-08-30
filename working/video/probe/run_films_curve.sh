@@ -1,25 +1,24 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Films concurrency sweep (RULING I, 2026-08-28). Committed script +
-# self-printed sha256 per register entry 25.
+# Films C sweep (RULING I, re-ordered by RULING K: this runs AFTER the
+# posture sweep and Ansh's posture ruling — M x threads sets the posture, C
+# then saturates it; sweeping C first risks finding the knee for a posture
+# we abandon). Committed script + self-printed sha256 per register entry 25.
 #
-# Points: rr-8x4 and li-8x4 at C in {1,2,4,8} (the headline cells get the
-# full sweep); rr-default at C in {1,2} only (M=1 by definition — C above 1
-# measures queueing at the single reader lock, worth a control, not four
-# points). Every point runs the SAME 9-film batch (strata-cell heads from
-# OUR subset manifest's meta — fixed workload, variable C) with the FIXED
-# mem_watch beside it; posture env read-backs fail closed inside the probe.
+# Set the RULED winners before running (defaults are the AMI shapes and are
+# NOT a ruling): RR_TOKENS, RR_TENV, LI_INSTANCES, LI_TENV.
 #
-# Ends with probe_films_curve.py --summarize: the curve table, marginal
-# efficiency per step ([T(C)/T(prev)]/[C/prev], knee < 0.7 — the
-# probe_concurrency rule verbatim), and marginal GB per active lane.
-# C IS NOT PICKED HERE — Ansh rules from the printed curve.
+# Points: the winning RR and LI postures at C in {1,2,4,8}; rr-default at
+# C in {1,2} only (M=1 by definition — C above 1 measures queueing at the
+# single per-instance reader lock; one control point verifies queued-item
+# survival at films timescale, not four). Every point runs the SAME 9-film
+# strata-heads batch (fixed workload, variable C — content-controlled
+# curve) with the fixed mem_watch beside it; posture env read-backs fail
+# closed; warm rows structurally excluded.
 #
-# Estimated cost (stated before the run; single-lane realtime factors
-# measured 44.6/31.8/34.7 on grapes): batch footage ~12.5 h -> rr-8x4
-# ~50-65 min over 4 points, li-8x4 ~45-60 min, rr-default ~35 min over 2,
-# bring-ups ~15 min => ~2.5-3.5 h wall. Disk: no new fetches (subset on
-# disk); transient rr /tmp spool up to ~5-7 GB at C=8.
+# --summarize prints the curve, marginal efficiency per step
+# ([T(C)/T(prev)]/[C/prev], knee < 0.7 — probe_concurrency.py:15-17
+# verbatim) and marginal GB per active lane. C IS NOT PICKED HERE.
 # =============================================================================
 set -euo pipefail
 
@@ -32,32 +31,36 @@ echo "repo HEAD: $(git rev-parse HEAD)"
 PY="${PY:-$HOME/.venv-floor/bin/python3}"
 MANIFEST="${MANIFEST:-working/video/films_video_manifest.jsonl}"
 OUT_DIR="${OUT_DIR:-$HOME/films_probe/curve_out}"
+RR_TOKENS="${RR_TOKENS:-8}"
+RR_TENV="${RR_TENV:-4}"
+LI_INSTANCES="${LI_INSTANCES:-8}"
+LI_TENV="${LI_TENV:-4}"
 mkdir -p "$OUT_DIR"
 [ -f "$MANIFEST" ] || { echo "NOT DONE — subset manifest missing: $MANIFEST (run the build first)"; exit 1; }
+echo "winners in use (from the posture ruling): RR M=${RR_TOKENS} T=${RR_TENV}; LI N=${LI_INSTANCES} T=${LI_TENV}"
 
-ENVARGS4="-e OMP_NUM_THREADS=4 -e MKL_NUM_THREADS=4 -e OPENBLAS_NUM_THREADS=4 \
--e VECLIB_MAXIMUM_THREADS=4 -e NUMEXPR_NUM_THREADS=4 -e TORCH_NUM_THREADS=4"
+envargs() { local n="$1"; echo "-e OMP_NUM_THREADS=$n -e MKL_NUM_THREADS=$n \
+-e OPENBLAS_NUM_THREADS=$n -e VECLIB_MAXIMUM_THREADS=$n -e NUMEXPR_NUM_THREADS=$n -e TORCH_NUM_THREADS=$n"; }
 
 teardown() {
   docker rm -f rr >/dev/null 2>&1 || true
-  local i; for i in 0 1 2 3 4 5 6 7; do docker rm -f "li_bal_$i" >/dev/null 2>&1 || true; done
+  local i; for i in $(seq 0 15); do docker rm -f "li_bal_$i" >/dev/null 2>&1 || true; done
   touch "$OUT_DIR/memwatch.stop" 2>/dev/null || true
 }
 trap teardown EXIT
 
-point() { # $1=cell $2=C $3=containers-csv
-  local cell="$1" c="$2" containers="$3"
-  echo "---- point $cell C=$c ----"
+point() { # $1=probe-args $2=C $3=containers $4=label
+  echo "---- point $4 C=$2 ----"
   rm -f "$OUT_DIR/memwatch.stop"
-  "$PY" working/video/probe/mem_watch.py --containers "$containers" \
+  "$PY" working/video/probe/mem_watch.py --containers "$3" \
       --spool-path /tmp --duration-s 14400 \
       --stop-file "$OUT_DIR/memwatch.stop" \
-      --out "$OUT_DIR/memwatch_${cell}_C${c}" &
+      --out "$OUT_DIR/memwatch_$4_C$2" &
   local mw=$!
   local rc=0
-  "$PY" working/video/probe/probe_films_curve.py --cell "$cell" \
-      --concurrency "$c" --manifest "$MANIFEST" \
-      --containers "$containers" --out-dir "$OUT_DIR" || rc=$?
+  # shellcheck disable=SC2086
+  "$PY" working/video/probe/probe_films_curve.py $1 --concurrency "$2" \
+      --manifest "$MANIFEST" --containers "$3" --out-dir "$OUT_DIR" || rc=$?
   touch "$OUT_DIR/memwatch.stop"
   wait "$mw" || true
   return "$rc"
@@ -68,34 +71,41 @@ docker rm -f rr >/dev/null 2>&1 || true
 docker run -d --name rr --memory 58g --log-opt max-size=200m --network host \
     rr:patched-video >/dev/null
 "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
-for c in 1 2; do point rr-default "$c" rr; done
+for c in 1 2; do point "--cell rr-default" "$c" rr rr-default; done
 docker rm -f rr >/dev/null 2>&1 || true
 
-echo "== posture rr-8x4 (full sweep) =="
+echo "== ruled RR posture (M=${RR_TOKENS} x T=${RR_TENV}), full C sweep =="
 # shellcheck disable=SC2086
-docker run -d --name rr --memory 58g $ENVARGS4 --log-opt max-size=200m \
+docker run -d --name rr --memory 58g $(envargs "$RR_TENV") --log-opt max-size=200m \
     --network host rr:patched-video >/dev/null
 "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
-for c in 1 2 4 8; do point rr-8x4 "$c" rr; done
+for c in 1 2 4 8; do
+  point "--arm rr --tokens $RR_TOKENS --threads-env $RR_TENV --batch heads" \
+      "$c" rr "rr_M${RR_TOKENS}xT${RR_TENV}"
+done
 docker rm -f rr >/dev/null 2>&1 || true
 
-echo "== posture li-8x4 (full sweep) =="
+echo "== ruled LI posture (N=${LI_INSTANCES} x T=${LI_TENV}), full C sweep =="
 NAMES=""
-for i in 0 1 2 3 4 5 6 7; do
+MEM=$([ "$LI_INSTANCES" -ge 16 ] && echo 3g || echo 7g)
+for i in $(seq 0 $((LI_INSTANCES - 1))); do
   docker rm -f "li_bal_$i" >/dev/null 2>&1 || true
   # shellcheck disable=SC2086
-  docker run -d --name "li_bal_$i" --memory 7g $ENVARGS4 -e WS1V_WORKERS=1 \
-      --log-opt max-size=200m --network host --entrypoint sh li:video -c \
+  docker run -d --name "li_bal_$i" --memory "$MEM" $(envargs "$LI_TENV") \
+      -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c \
       "rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port $((8802+i)) --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30" >/dev/null
   NAMES="$NAMES,li_bal_$i"
 done
 NAMES="${NAMES#,}"
-for i in 0 1 2 3 4 5 6 7; do
+for i in $(seq 0 $((LI_INSTANCES - 1))); do
   "$PY" working/video/probe/wait_ready.py --arm li --port $((8802+i)) \
       --workers 1 --container "li_bal_$i" --deadline 1200
 done
-for c in 1 2 4 8; do point li-8x4 "$c" "$NAMES"; done
-for i in 0 1 2 3 4 5 6 7; do docker rm -f "li_bal_$i" >/dev/null 2>&1 || true; done
+for c in 1 2 4 8; do
+  point "--arm li --instances $LI_INSTANCES --threads-env $LI_TENV --batch heads" \
+      "$c" "$NAMES" "li_N${LI_INSTANCES}xT${LI_TENV}"
+done
+for i in $(seq 0 $((LI_INSTANCES - 1))); do docker rm -f "li_bal_$i" >/dev/null 2>&1 || true; done
 
 echo "== curve =="
 "$PY" working/video/probe/probe_films_curve.py --summarize "$OUT_DIR"
