@@ -309,13 +309,23 @@ def summarize(out_dir: Path) -> int:
           f'the per-posture marginal chain (RULING I; knee = first marginal '
           f'efficiency < {KNEE_THRESHOLD}, probe_concurrency.py:15-17 verbatim)')
     by_label = {}
+    failed_points = []
     for art in sorted(out_dir.glob('curve_*.json')):
         d = json.loads(art.read_text())
+        if 'FAILED' in d:
+            failed_points.append(d)
+            continue
         row = _point_row(d, out_dir)
         by_label.setdefault(row['label'], []).append(row)
-    if not by_label:
+    for d in failed_points:
+        print(f"  FAILED POINT (a finding, not a gap): {d.get('label')} "
+              f"C={d.get('concurrency')} — oom={json.dumps(d.get('oom'))}; "
+              f"chain={d['FAILED'].get('exception_chain')}")
+    if not by_label and not failed_points:
         print('no point artifacts found')
         return 1
+    if not by_label:
+        return 0   # only failed points — reported above, evidence preserved
 
     all_rows = []
     for label in sorted(by_label):
@@ -449,11 +459,72 @@ def self_test() -> int:
         check("batch 'measured': all measured rows in order, warm excluded",
               [b['file'] for b in batch2] == ['a.mp4', 'z.mp4'])
 
+        # OOM instrumentation: delta math + FAILED artifacts surfaced, not
+        # crashed on (the 32x1 stress-point requirement).
+        check('oom_delta: per-container delta and the after-flag',
+              oom_delta({'c': {'oomkilled': 'false', 'oom_kill_events': 2}},
+                        {'c': {'oomkilled': 'true', 'oom_kill_events': 5}})
+              == {'c': {'oomkilled': 'true', 'oom_kill_delta': 3}})
+        sweep = d / 'sweep'
+        sweep.mkdir()
+        (sweep / 'curve_rr_M32xT1_C35.json').write_text(json.dumps(
+            {'FAILED': {'stage': 'point-execution', 'exception_chain': ['X']},
+             'label': 'rr_M32xT1', 'concurrency': 35,
+             'oom': {'rr': {'oomkilled': 'true', 'oom_kill_delta': 1}}}))
+        (sweep / 'curve_rr-8x4_C8.json').write_text(json.dumps(
+            {'label': 'rr-8x4', 'cell': 'rr-8x4', 'concurrency': 8,
+             'lanes': 8, 'spend_threads': 32, 'batch_mode': 'measured',
+             'n_films': 35, 'inflight_max': 8,
+             'metrics': {'span_s': 100.0, 'frames_per_s': 50.0,
+                         'realtime_factor': 100.0, 'n_errors': 0,
+                         'service_cpu': {'cores': 20.0, 'util_pct': 62.5}}}))
+        check('summarize survives a FAILED point beside a good one (rc 0)',
+              summarize(sweep) == 0)
+
     print('self-test:', 'PASS' if ok else 'FAIL')
     return 0 if ok else 4
 
 
 # ----------------------------------------------------------------------- main
+
+def oom_state(containers):
+    """Per container: docker's OOMKilled flag (container init killed) AND the
+    cgroup's memory.events oom_kill counter (child processes killed inside
+    the cgroup — the likelier films failure: the kernel kills a task/worker
+    process while the container survives). The run_proof_layer2.sh pattern,
+    promoted into every point so an OOM is distinguishable in the artifact
+    from a timeout or an application error."""
+    out = {}
+    for c in containers:
+        rc1, killed, _ = run_text(['docker', 'inspect', '--format',
+                                   '{{.State.OOMKilled}}', c])
+        rc2, ev, _ = run_text(['docker', 'exec', c, 'sh', '-c',
+                               'grep oom_kill /sys/fs/cgroup/memory.events '
+                               '2>/dev/null'])
+        kills = None
+        if rc2 == 0:
+            m = re.search(r'^oom_kill (\d+)', ev, re.M)
+            kills = int(m.group(1)) if m else None
+        out[c] = {'oomkilled': killed if rc1 == 0 else 'uninspectable',
+                  'oom_kill_events': kills}
+    return out
+
+
+def oom_delta(before: dict, after: dict) -> dict:
+    """Per container: OOMKilled flag after + oom_kill event count delta."""
+    out = {}
+    for c, a in after.items():
+        b = (before.get(c) or {}).get('oom_kill_events')
+        d = (a['oom_kill_events'] - b
+             if a['oom_kill_events'] is not None and b is not None else None)
+        out[c] = {'oomkilled': a['oomkilled'], 'oom_kill_delta': d}
+    return out
+
+
+def run_text(argv, timeout=30):
+    p = subprocess.run(argv, capture_output=True, text=True, timeout=timeout)
+    return p.returncode, p.stdout.strip(), p.stderr.strip()
+
 
 def resolve_posture(args):
     """Posture from --cell (the three measured named cells) OR the dynamic
@@ -544,16 +615,41 @@ def main() -> int:
           f'({args.batch}), corpus {corpus_dir} [{src}]')
 
     cpu_before = {c: cpu_usage_usec(c) for c in containers}
+    oom_before = oom_state(containers)
     t0 = time.monotonic()
-    if cell['arm'] == 'rr':
-        results, inflight_max = asyncio.run(
-            run_point_rr(cell, batch, args.concurrency, port, args.ttl))
-    else:
-        ports = [8802 + i for i in range(cell['instances'])]
-        results, inflight_max = asyncio.run(
-            run_point_li(batch, args.concurrency, ports))
+    out_dir_p = out_dir   # single assignment above; alias kept for the writes
+    try:
+        if cell['arm'] == 'rr':
+            results, inflight_max = asyncio.run(
+                run_point_rr(cell, batch, args.concurrency, port, args.ttl))
+        else:
+            ports = [8802 + i for i in range(cell['instances'])]
+            results, inflight_max = asyncio.run(
+                run_point_li(batch, args.concurrency, ports))
+    except Exception as exc:   # noqa: BLE001 — a dead point still leaves evidence
+        failed = {
+            'probe': 'films_curve', 'created_utc': UTC, 'git_head': head,
+            'FAILED': {'stage': 'point-execution',
+                       'exception_chain': exc_chain(exc)},
+            'cell': label, 'label': label, 'concurrency': args.concurrency,
+            'batch_mode': args.batch, 'lanes': lanes, 'posture': cell,
+            'containers': containers,
+            'oom': oom_delta(oom_before, oom_state(containers)),
+            'note': 'point-level failure (connect/use/gather machinery) — '
+                    'per-film errors would have been recorded instead; the '
+                    'oom block above says whether the kernel killed anything; '
+                    "mem_watch's last ticks carry the anon at failure",
+        }
+        fpath = out_dir_p / f'curve_{label}_C{args.concurrency}.json'
+        preserve(fpath)
+        fpath.write_text(json.dumps(failed, indent=1))
+        print(f'NOT DONE — point {label} C={args.concurrency} FAILED; '
+              f'artifact written to {fpath}; oom={failed["oom"]}; '
+              f'chain={failed["FAILED"]["exception_chain"]}')
+        return 1
     bracket_wall = round(time.monotonic() - t0, 2)
     cpu_after = {c: cpu_usage_usec(c) for c in containers}
+    oom = oom_delta(oom_before, oom_state(containers))
 
     env_n = int(cell['env']) if cell.get('env') else None
     metrics = point_metrics(results, batch, bracket_wall,
@@ -564,6 +660,7 @@ def main() -> int:
         'batch_mode': args.batch, 'lanes': lanes,
         'spend_threads': (lanes * env_n) if env_n else None,
         'posture': cell, 'containers': containers,
+        'oom': oom,
         'manifest_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
         'batch': [{'file': b['file'], 'bytes': b['bytes'],
                    'video_s': b['video_s'],
@@ -575,15 +672,19 @@ def main() -> int:
         'memory_note': "anon/memory.peak/spool are mem_watch's, recorded "
                        'beside this artifact by the wrapper',
     }
-    out = out_dir / f'curve_{label}_C{args.concurrency}.json'
+    out = out_dir_p / f'curve_{label}_C{args.concurrency}.json'
     preserve(out)
     out.write_text(json.dumps(artifact, indent=1))
     rb = json.loads(out.read_text())          # entry 22: read back
     m = rb['metrics']
+    oom_fired = any(v.get('oomkilled') == 'true' or (v.get('oom_kill_delta') or 0) > 0
+                    for v in rb['oom'].values())
     print(f"POINT {label} C={args.concurrency}: span {m['span_s']}s | "
           f"{m['frames_per_s']} f/s | rt x{m['realtime_factor']} | "
           f"{m['service_cpu']['cores']} cores | errors {m['n_errors']} | "
           f"inflight max {rb['inflight_max']}"
+          + (f" | OOM FIRED: {json.dumps(rb['oom'])} — A FINDING, read "
+             "mem_watch's anon at this point" if oom_fired else '')
           + (' | EXPECTATION MISMATCHES: '
              + json.dumps(m['frame_expectation_mismatches'])
              if m['frame_expectation_mismatches'] else ''))

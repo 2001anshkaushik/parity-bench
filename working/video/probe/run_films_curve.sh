@@ -71,7 +71,10 @@ docker rm -f rr >/dev/null 2>&1 || true
 docker run -d --name rr --memory 58g --log-opt max-size=200m --network host \
     rr:patched-video >/dev/null
 "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
-for c in 1 2; do point "--cell rr-default" "$c" rr rr-default; done
+for c in 1 2; do
+  point "--cell rr-default" "$c" rr rr-default \
+    || echo "POINT rr-default C=$c FAILED (rc=$?) — recorded; sweep continues"
+done
 docker rm -f rr >/dev/null 2>&1 || true
 
 echo "== ruled RR posture (M=${RR_TOKENS} x T=${RR_TENV}), full C sweep =="
@@ -81,7 +84,8 @@ docker run -d --name rr --memory 58g $(envargs "$RR_TENV") --log-opt max-size=20
 "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
 for c in 1 2 4 8; do
   point "--arm rr --tokens $RR_TOKENS --threads-env $RR_TENV --batch heads" \
-      "$c" rr "rr_M${RR_TOKENS}xT${RR_TENV}"
+      "$c" rr "rr_M${RR_TOKENS}xT${RR_TENV}" \
+    || echo "POINT rr C=$c FAILED (rc=$?) — recorded; sweep continues"
 done
 docker rm -f rr >/dev/null 2>&1 || true
 
@@ -103,7 +107,8 @@ for i in $(seq 0 $((LI_INSTANCES - 1))); do
 done
 for c in 1 2 4 8; do
   point "--arm li --instances $LI_INSTANCES --threads-env $LI_TENV --batch heads" \
-      "$c" "$NAMES" "li_N${LI_INSTANCES}xT${LI_TENV}"
+      "$c" "$NAMES" "li_N${LI_INSTANCES}xT${LI_TENV}" \
+    || echo "POINT li C=$c FAILED (rc=$?) — recorded; sweep continues"
 done
 for i in $(seq 0 $((LI_INSTANCES - 1))); do docker rm -f "li_bal_$i" >/dev/null 2>&1 || true; done
 

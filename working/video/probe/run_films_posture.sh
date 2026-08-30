@@ -113,20 +113,29 @@ li_point() { # $1=N $2=T $3=C
   for i in $(seq 0 $((n - 1))); do docker rm -f "li_bal_$i" >/dev/null 2>&1 || true; done
 }
 
+# A failed point is RECORDED AND THE SWEEP CONTINUES (2026-08-30 fix): the
+# probe writes a FAILED artifact with the exception chain and the OOM state
+# (docker OOMKilled + cgroup memory.events oom_kill delta), mem_watch's last
+# ticks carry the anon at failure, and earlier points are already on disk —
+# an OOM at the 32x1 stress point is a FINDING, never a crashed sweep.
 echo "== RocketRide posture grid (M x T, C = min(2M, 35)) =="
-rr_point 8 4 16
-rr_point 16 2 32
-rr_point 32 1 35
-rr_point 4 8 8
-rr_point 8 2 16
-if [ "${SKIP_OVERSUB:-0}" != "1" ]; then rr_point 16 4 32; else echo "SKIP rr 16x4 (SKIP_OVERSUB=1)"; fi
+rr_point 8 4 16   || echo "POINT rr_M8xT4 FAILED (rc=$?) — recorded; sweep continues"
+rr_point 16 2 32  || echo "POINT rr_M16xT2 FAILED (rc=$?) — recorded; sweep continues"
+rr_point 32 1 35  || echo "POINT rr_M32xT1 FAILED (rc=$?) — recorded; sweep continues"
+rr_point 4 8 8    || echo "POINT rr_M4xT8 FAILED (rc=$?) — recorded; sweep continues"
+rr_point 8 2 16   || echo "POINT rr_M8xT2 FAILED (rc=$?) — recorded; sweep continues"
+if [ "${SKIP_OVERSUB:-0}" != "1" ]; then
+  rr_point 16 4 32 || echo "POINT rr_M16xT4 FAILED (rc=$?) — recorded; sweep continues"
+else echo "SKIP rr 16x4 (SKIP_OVERSUB=1)"; fi
 
 echo "== LlamaIndex posture grid (N x T, W=1, C = min(2N, 35)) =="
-li_point 8 4 16
-li_point 16 2 32
-li_point 4 8 8
-li_point 8 2 16
-if [ "${SKIP_OVERSUB:-0}" != "1" ]; then li_point 8 8 16; else echo "SKIP li 8x8 (SKIP_OVERSUB=1)"; fi
+li_point 8 4 16   || echo "POINT li_N8xT4 FAILED (rc=$?) — recorded; sweep continues"
+li_point 16 2 32  || echo "POINT li_N16xT2 FAILED (rc=$?) — recorded; sweep continues"
+li_point 4 8 8    || echo "POINT li_N4xT8 FAILED (rc=$?) — recorded; sweep continues"
+li_point 8 2 16   || echo "POINT li_N8xT2 FAILED (rc=$?) — recorded; sweep continues"
+if [ "${SKIP_OVERSUB:-0}" != "1" ]; then
+  li_point 8 8 16 || echo "POINT li_N8xT8 FAILED (rc=$?) — recorded; sweep continues"
+else echo "SKIP li 8x8 (SKIP_OVERSUB=1)"; fi
 
 echo "== posture matrix =="
 "$PY" working/video/probe/probe_films_curve.py --summarize "$OUT_DIR"
