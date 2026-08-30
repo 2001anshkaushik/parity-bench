@@ -925,3 +925,15 @@ than rewritten from memory, which is entry 2's point in miniature.
 > the bundle path) and entry 25 (transport of commands; this is transport
 > of COMMITS — a bundle in S3 is a rendering of history that nobody has
 > read back yet).
+>
+> **Addendum, 2026-08-30 — second occurrence, other direction.** The box
+> committed the films subset manifest (6b348c7) on 5a79dcd without pulling
+> first, while origin was already at 8dc356d — the mirror image of the
+> first incident (there the laptop pushed onto a claimed base; here the box
+> worked on a stale one). The repair was identical and clean: mechanical
+> overlap check (box touched only the manifest; NONE), merge as-is, push,
+> ls-remote read back. The rule gains its operational other half: **the
+> box pulls --ff-only BEFORE it works, and the wrapper's self-printed
+> `repo HEAD` line is read at the STOP before anything measures** — a
+> sweep run at a stale HEAD is a different instrument wearing the same
+> command line.
