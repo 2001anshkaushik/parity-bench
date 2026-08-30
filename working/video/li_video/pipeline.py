@@ -33,13 +33,15 @@ source it mirrors):
   split:   LlamaIndex-NATIVE SentenceSplitter (approved decision 3;
            cross-arm chunk-hash equality stays declined). Size semantics:
            WS1V_SPLIT_UNIT='chars' (default) passes a character-length
-           tokenizer; size/overlap default 4000/200 to match MEASURED engine
-           behaviour (re-ruled 2026-08-20: the engine's chunk config is inert
-           and LangChain library defaults run — we match what the engine
-           DOES, and the writeup carries one line saying we supplied the
-           length function). UNCHANGED by the streaming refactor (Ruling C:
-           the §2.4 4000/0 change lands separately, after — one variable at
-           a time).
+           tokenizer; size/overlap default 4000/0 — RULING L (2026-08-30,
+           the separate round Ruling C promised). The engine's chunk config
+           is inert and LangChain library defaults 4000/200 run, but
+           LangChain realizes overlap in whole split units (~0 realized on
+           the engine), while SentenceSplitter at 200 realized a true
+           ~200/boundary — the AMI char_conservation 4.86% failure
+           (DEFINITIVE §2.4: adopt 4000/0 on the comparison arm). We match
+           what the engine DOES, and the writeup carries one line saying we
+           supplied the length function.
   embed:   HuggingFaceEmbedding multi-qa-MiniLM-L6-cos-v1 (the exact string
            the engine's miniLM profile pins), device from WS1V_DEVICE.
 
@@ -107,7 +109,7 @@ class LlamaIndexVideoPipeline:
                  interval_s: int = 15,
                  threshold: float = 0.3,
                  chunk_size: int = 4000,
-                 chunk_overlap: int = 200,
+                 chunk_overlap: int = 0,
                  split_unit: str = 'chars',
                  device: str = 'cpu'):
         self.embed_model_name = embed_model_name

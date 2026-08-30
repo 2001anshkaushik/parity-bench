@@ -3,11 +3,14 @@
 
 Phase 1's +/-2% was calibrated on PDF text where both arms ran the same
 splitter. On the video workload they do not: RR runs LangChain's
-RecursiveCharacterTextSplitter and the LI arm runs LlamaIndex-native
-SentenceSplitter (approved decision 3), both nominally 4000/200. Two native
+RecursiveCharacterTextSplitter (library defaults 4000/200, config inert) and
+the LI arm runs LlamaIndex-native SentenceSplitter (approved decision 3) —
+4000/200 in the AMI era, 4000/0 from RULING L (2026-08-30) on. Two native
 splitters on byte-identical input produce different chunk boundaries, so the
 cross-arm char ratio has a SYSTEMATIC offset that has nothing to do with
-content loss. A band anchored at 1.0 measures that offset; a band anchored at
+content loss — and the offset is CONFIG-BOUND: a band cut from records at one
+overlap config does not carry to the other (the films band is cut from films
+records at 4000/0; RULING_L_SPLITTER_EQUIVALENCE.md). A band anchored at 1.0 measures that offset; a band anchored at
 the offset measures what the gate is actually for.
 
 So the band is centred on the MEASURED ratio and its width comes from the

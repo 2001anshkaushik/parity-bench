@@ -20,7 +20,9 @@ in-flight high-water so "never saturated" is visible, not silent.
 One POINT per invocation (the wrapper owns bring-ups and runs mem_watch
 beside every point); posture env read-back is fail-closed before anything
 runs (imported one-copy from probe_films_sizing — a cell that cannot prove
-its posture is not quoted). Per point: batch span, total frames (per-film
+its posture is not quoted), and so is the LI chunk-config read-back
+(RULING L: 4000/0/chars from /health on EVERY instance — a stale li:video
+image is refused, never silently measured at the wrong workload). Per point: batch span, total frames (per-film
 observed vs expected_frames_measured, mismatches flagged per film),
 frames/s, realtime factor, service CPU cores/util (cgroup delta, idle
 lanes included — the envelope), probe ru_maxrss, per-film rows with errors
@@ -63,6 +65,45 @@ from driver_video import frames_from_chunks  # noqa: E402
 PIPE_SRC = Path(__file__).resolve().parents[1] / 'benchmark_video_detect.pipe'
 UTC = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
 KNEE_THRESHOLD = 0.7   # probe_concurrency.py:15-17, adopted verbatim
+
+# RULING L (2026-08-30, Ruling C's second half — DEFINITIVE §2.4 adoption):
+# the LI comparison arm runs 4000/0/chars. This is the sweep-side DECLARED
+# expectation for the /health read-back; the operative copy of the value is
+# the image env (docker/Dockerfile.llamaindex-video ENV, parsed by
+# li_video/service.py). This constant exists so a stale li:video image
+# cannot silently measure a posture at the 4000/200 workload.
+EXPECTED_LI_CHUNK = {'chunk_size': 4000, 'chunk_overlap': 0,
+                     'split_unit': 'chars'}
+
+
+def check_li_chunk_config(ports, fetch=None):
+    """Fail-closed chunk-config read-back on EVERY LI instance (entry 12:
+    a value that sets a run parameter has a read-back before it is
+    quotable, and the read-back is half of the measurement). Reads /health
+    — the values the serving process LOADED, not the image's declaration.
+    `fetch` is injectable for the null-controlled self-test. An absent
+    field is an ABSENCE failure, never treated as agreement."""
+    if fetch is None:
+        import urllib.request
+
+        def fetch(p):
+            with urllib.request.urlopen(
+                    f'http://127.0.0.1:{p}/health', timeout=30) as r:
+                return json.load(r)
+    got, bad = {}, {}
+    for p in ports:
+        h = fetch(p)                       # one GET per instance
+        vals = {k: h.get(k) for k in EXPECTED_LI_CHUNK}
+        got[p] = vals
+        if vals != EXPECTED_LI_CHUNK:
+            bad[p] = vals
+    if bad:
+        raise SystemExit(
+            f'NOT DONE — LI chunk-config read-back does not match RULING L '
+            f'(expected {EXPECTED_LI_CHUNK}): {bad}. A 4000/200 read-back '
+            f'means a stale li:video image — rebuild and verify per '
+            f'probe/run_ruling_l_box.sh before any posture point.')
+    return {'expected': EXPECTED_LI_CHUNK, 'per_port': got}
 
 
 def preserve(path: Path):
@@ -481,6 +522,29 @@ def self_test() -> int:
         check('summarize survives a FAILED point beside a good one (rc 0)',
               summarize(sweep) == 0)
 
+    # RULING L chunk-config read-back: null-controlled (entry 12 — the
+    # refusal paths must demonstrably fire, or the check checks nothing).
+    rb = check_li_chunk_config([8802, 8803],
+                               fetch=lambda p: dict(EXPECTED_LI_CHUNK))
+    check('chunk read-back: matching /health passes, per-port recorded',
+          rb['per_port'][8803] == EXPECTED_LI_CHUNK
+          and rb['expected'] == EXPECTED_LI_CHUNK)
+    try:
+        check_li_chunk_config([8802], fetch=lambda p: {
+            'chunk_size': 4000, 'chunk_overlap': 200, 'split_unit': 'chars'})
+        check('chunk read-back: a 200 image is REFUSED naming both values',
+              False)
+    except SystemExit as e:
+        check('chunk read-back: a 200 image is REFUSED naming both values',
+              "'chunk_overlap': 200" in str(e) and "'chunk_overlap': 0" in str(e))
+    try:
+        check_li_chunk_config([8802], fetch=lambda p: {'chunk_size': 4000})
+        check('chunk read-back: an ABSENT field is refused, never agreement',
+              False)
+    except SystemExit as e:
+        check('chunk read-back: an ABSENT field is refused, never agreement',
+              'None' in str(e))
+
     print('self-test:', 'PASS' if ok else 'FAIL')
     return 0 if ok else 4
 
@@ -604,6 +668,17 @@ def main() -> int:
     containers = [c.strip() for c in args.containers.split(',') if c.strip()]
     check_posture_env(containers, cell['env'])   # fail-closed, entry 12
     port = args.port or (5565 if cell['arm'] == 'rr' else 8802)
+    li_ports = ([8802 + i for i in range(cell['instances'])]
+                if cell['arm'] == 'li' else None)
+    # RULING L read-back, fail-closed per instance (entry 12): chunk config
+    # sets the LI arm's embed workload. RR has no read-back surface for its
+    # splitter (inert config, no /health twin) — the honest asymmetry; its
+    # evidence is the detect-text/frame-parity probes and
+    # CHAR_CONSERVATION_MECHANISM.md.
+    chunk_rb = (check_li_chunk_config(li_ports) if cell['arm'] == 'li'
+                else {'arm': 'rr', 'note': 'engine splitter inert-config '
+                      '(LangChain library defaults); no per-point read-back '
+                      'surface exists'})
     out_dir = Path(args.out_dir).expanduser() if args.out_dir \
         else Path.home() / 'films_probe' / 'curve_out'
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -623,9 +698,8 @@ def main() -> int:
             results, inflight_max = asyncio.run(
                 run_point_rr(cell, batch, args.concurrency, port, args.ttl))
         else:
-            ports = [8802 + i for i in range(cell['instances'])]
             results, inflight_max = asyncio.run(
-                run_point_li(batch, args.concurrency, ports))
+                run_point_li(batch, args.concurrency, li_ports))
     except Exception as exc:   # noqa: BLE001 — a dead point still leaves evidence
         failed = {
             'probe': 'films_curve', 'created_utc': UTC, 'git_head': head,
@@ -634,6 +708,7 @@ def main() -> int:
             'cell': label, 'label': label, 'concurrency': args.concurrency,
             'batch_mode': args.batch, 'lanes': lanes, 'posture': cell,
             'containers': containers,
+            'chunk_config_readback': chunk_rb,
             'oom': oom_delta(oom_before, oom_state(containers)),
             'note': 'point-level failure (connect/use/gather machinery) — '
                     'per-film errors would have been recorded instead; the '
@@ -660,6 +735,7 @@ def main() -> int:
         'batch_mode': args.batch, 'lanes': lanes,
         'spend_threads': (lanes * env_n) if env_n else None,
         'posture': cell, 'containers': containers,
+        'chunk_config_readback': chunk_rb,
         'oom': oom,
         'manifest_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
         'batch': [{'file': b['file'], 'bytes': b['bytes'],

@@ -108,8 +108,14 @@ print('OFFLINE CACHE OK: both models load as ws1v, hermetic HOME')" \
 
 # MALLOC_ARENA_MAX=2: Leela's post-mortem value (2d7533b) — glibc arena
 # growth was part of her monotonic-anon OOM; adopted with the streaming form.
+# WS1V_CHUNK_OVERLAP=0: RULING L (2026-08-30; Ruling C's second half, DEFINITIVE
+# §2.4 "adopt 4000/0 on the comparison arm"). LangChain realizes overlap in
+# whole split units (~0 realized by the engine); SentenceSplitter at 200
+# realized a true ~200/boundary — the AMI char_conservation 4.86% failure.
+# The films sweep probe refuses any point whose /health does not read back
+# 4000/0/chars, so a stale image cannot silently measure at 200.
 ENV WS1V_WORKERS=1 WS1V_INTERVAL_S=15 WS1V_THRESHOLD=0.3 \
-    WS1V_CHUNK_SIZE=4000 WS1V_CHUNK_OVERLAP=200 WS1V_SPLIT_UNIT=chars \
+    WS1V_CHUNK_SIZE=4000 WS1V_CHUNK_OVERLAP=0 WS1V_SPLIT_UNIT=chars \
     WS1V_DEVICE=cpu HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
     MALLOC_ARENA_MAX=2
 EXPOSE 8802

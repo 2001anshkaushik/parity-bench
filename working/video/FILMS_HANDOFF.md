@@ -19,10 +19,15 @@ patched (`rr:patched-video`), SDK 1.3.0, Python 3.12.13. LI image
 `li:video-anchor` = pre-refactor code + pinned deps (kept for reruns;
 worktree `~/anchor_7204` may still exist).
 **BOX STATE: at `6b348c7`, pre-Ruling-K. It MUST `git pull --ff-only` to
-`21c6ff2` before the posture sweep runs** — at `6b348c7` the sweep wrapper
-does not exist and the point probe is the old, abortable, OOM-blind one.
-The wrappers print `repo HEAD` and their own sha at start; the STOP reads
-both. (The box has now committed on a stale base twice — pull FIRST.)
+the Ruling-L commit (the commit carrying this handoff revision, later than
+`21c6ff2`) and then run `probe/run_ruling_l_box.sh` (li:video rebuild +
+read-backs) before the posture sweep runs** — at `6b348c7` the sweep
+wrapper does not exist and the point probe is the old, abortable,
+OOM-blind one; at `21c6ff2` the Dockerfile still bakes 4000/200 and the
+probe has no chunk read-back, so a sweep from there would silently measure
+the wrong workload. The wrappers print `repo HEAD` and their own sha at
+start; the STOP reads both. (The box has now committed on a stale base
+twice — pull FIRST.)
 
 ---
 
@@ -103,8 +108,7 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
   `-vcodec png`); only the muxer changed (image2pipe→image2 files); byte
   divergence would have been a STOP finding — the proof passed instead.
 - **C** — splitter stayed 4000/200 through the refactor (one variable at a
-  time); **the ruled 4000/0 films change has NOT yet been applied — open,
-  §4**.
+  time); the ruled 4000/0 films change landed as **Ruling L** (below).
 - **D** — anchor step 1 only (freeze-pinned rebuild, unchanged code) ran:
   **12.782 vs banked 12.745/12.733 = 0.34%** → BUILD UNCHANGED, proceed;
   step 2 dropped for budget — the code delta is priced on Films, not AMI.
@@ -128,6 +132,19 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
   engine's dimension (worth 5.21× on AMI); C at fixed posture measures the
   driver's queue at the reader lock; sweeping C first risks finding the
   knee for a posture we abandon.
+- **L** (2026-08-30) — **the 4000/0 change APPLIED in-repo** (Ruling C's
+  second half; DEFINITIVE §2.4 adoption): overlap 200→0 in the image ENV,
+  service env default and pipeline constructor default together (no stale
+  twin); engine untouched (inert-config LangChain defaults);
+  `li:video-anchor` untouched (banked-comparable). Equivalence note:
+  `RULING_L_SPLITTER_EQUIVALENCE.md` — chunk texts/counts/char sums are
+  CROSS-ERA vs 4000/200 runs, frames/detect are not. The sweep probe now
+  REFUSES any LI point whose /health does not read back 4000/0/chars on
+  every instance (entry 12) and records the read-back in each artifact;
+  the box rebuild+verify is `probe/run_ruling_l_box.sh` (image-env
+  read-back + in-container parse/realization check, null-controlled) and
+  MUST run before the posture sweep — the change lands before the sweep,
+  never between passes.
 
 ## 4. OPEN — carry forward, do not silently drop
 
@@ -150,12 +167,13 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    LI_TENV set to the winners (defaults are AMI shapes and say so). Ansh
    rules C from the marginal chain.
 4. **No warm-gated films leg until both sweeps land and are ruled.**
-5. **Ruling C second half unapplied**: the ruled films splitter change to
-   4000/0 (both arms' comparison basis; engine stays at its inert-config
-   LangChain defaults) needs its own round: LI env change
-   (WS1V_CHUNK_OVERLAP=0), image rebuild, and an equivalence note — chunk
-   texts will legitimately change, so it must land BEFORE gate-8/chunk
-   baselines are cut for films, never between passes.
+5. **Ruling C second half — APPLIED in-repo as Ruling L (2026-08-30)**:
+   the repo carries 4000/0 (image ENV + service + pipeline defaults), the
+   equivalence note, and the sweep probe's fail-closed /health chunk
+   read-back. STILL OPEN on the box: `git pull --ff-only`, then
+   `probe/run_ruling_l_box.sh` (li:video rebuild + image-env and
+   in-container read-backs, null-controlled) — must complete BEFORE the
+   posture sweep; the probe refuses every LI point at a stale image.
 6. **[waterfront] unratified cluster flag** (waterfront_lady_1935 4100s vs
    waterfront 3829s) — left merged; possible third false merge; cost one
    film; Ansh rules.
@@ -245,7 +263,8 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
 |---|---|
 | subset manifest (sha 54186c24…) | `working/video/films_video_manifest.jsonl` @ `6b348c7`; corpus at box `~/films_corpus/subset` |
 | selection rule (one copy, Rulings E/F/H/J in-rule) | `probe/films_strata_report.py`; builder `fetch_films_subset.py` |
-| posture sweep (RUN NEXT, after box pulls `21c6ff2`) | `probe/run_films_posture.sh` + `probe/probe_films_curve.py` |
+| posture sweep (RUN NEXT, after the box pulls the Ruling-L commit AND run_ruling_l_box.sh passes) | `probe/run_films_posture.sh` + `probe/probe_films_curve.py` |
+| Ruling L (LI 4000/0): equivalence note; box rebuild+verify | `RULING_L_SPLITTER_EQUIVALENCE.md`; `probe/run_ruling_l_box.sh` + `probe/verify_li_chunk_config.py` |
 | C sweep (after posture ruling) | `probe/run_films_curve.sh` (winners via env) |
 | memory instrument | `probe/mem_watch.py` (fixed VmHWM, oom-aware sweeps) |
 | sizing/equivalence/parity/detect-text probes + artifacts | `probe/probe_films_sizing.py`, `probe_reader_equivalence*`, `probe_frame_parity*`, `probe_detect_text*` (artifacts committed where noted; sizing/proof-2/anchor artifacts box-side, landing awaits ruling) |

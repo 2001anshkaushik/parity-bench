@@ -45,11 +45,17 @@ WIRE_DEVIATION = ('adopted 2d7533b memory discipline; kept raw octet-stream '
 EMBED_MODEL = os.environ.get('WS1V_MODEL', 'sentence-transformers/multi-qa-MiniLM-L6-cos-v1')
 INTERVAL_S = int(os.environ.get('WS1V_INTERVAL_S', '15'))
 THRESHOLD = float(os.environ.get('WS1V_THRESHOLD', '0.3'))
-# 4000/200 matches MEASURED engine behaviour (re-ruled 2026-08-20): the
-# engine's own chunk-size config is inert (kwargs-filter bug) and its splitter
-# runs at LangChain library defaults. We benchmark what the engine DOES.
+# 4000/0 — RULING L (2026-08-30, Ruling C's second half). The engine's own
+# chunk config is inert (kwargs-filter bug) and its splitter runs at LangChain
+# library defaults 4000/200 — but LangChain REALIZES overlap in whole split
+# units (nothing retained on long-line regimes; only short lines on films),
+# while SentenceSplitter at 200 realized a true ~200 chars/boundary: the AMI
+# char_conservation 4.86% failure (CHAR_CONSERVATION_MECHANISM.md; DEFINITIVE
+# §2.4 — "adopt 4000/0 on the comparison arm"). We benchmark what the engine
+# DOES, so the comparison arm carries overlap 0. /health reports the values
+# this process loaded; the films sweep probe refuses any other read-back.
 CHUNK_SIZE = int(os.environ.get('WS1V_CHUNK_SIZE', '4000'))
-CHUNK_OVERLAP = int(os.environ.get('WS1V_CHUNK_OVERLAP', '200'))
+CHUNK_OVERLAP = int(os.environ.get('WS1V_CHUNK_OVERLAP', '0'))
 SPLIT_UNIT = os.environ.get('WS1V_SPLIT_UNIT', 'chars')  # 'chars' matches engine strlen; see pipeline.py
 DEVICE = os.environ.get('WS1V_DEVICE', 'cpu')
 WORKERS = int(os.environ.get('WS1V_WORKERS', '1'))
