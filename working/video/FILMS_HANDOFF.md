@@ -18,15 +18,16 @@ patched (`rr:patched-video`), SDK 1.3.0, Python 3.12.13. LI image
 `li:video` — REBUILT 2026-08-28 freeze-pinned + streaming reader;
 `li:video-anchor` = pre-refactor code + pinned deps (kept for reruns;
 worktree `~/anchor_7204` may still exist).
-**BOX STATE: at `6b348c7`, pre-Ruling-K. It MUST `git pull --ff-only` to
-the Ruling-L commit (the commit carrying this handoff revision, later than
-`21c6ff2`) and then run `probe/run_ruling_l_box.sh` (li:video rebuild +
-read-backs) before the posture sweep runs** — at `6b348c7` the sweep
-wrapper does not exist and the point probe is the old, abortable,
-OOM-blind one; at `21c6ff2` the Dockerfile still bakes 4000/200 and the
-probe has no chunk read-back, so a sweep from there would silently measure
-the wrong workload. The wrappers print `repo HEAD` and their own sha at
-start; the STOP reads both. (The box has now committed on a stale base
+**BOX STATE: ran the posture sweep at `3f0a7b5` (Ruling-L rebuild verified
+live — every LI point passed the /health 4000/0 read-back). It MUST `git
+pull --ff-only` to the Ruling-M commit (the commit carrying this handoff
+revision) before (a) the re-summarize — the `3f0a7b5` summarizer dies on
+KeyError `n_films` against real artifacts — and (b) the C sweep
+(`probe/run_films_curve_ruling_m.sh`).** The 11 posture artifacts +
+memwatch summaries sit box-side at `~/films_probe/posture_out/`; no box
+commit or bundle is outstanding, so no base is claimed (entry 26) and
+laptop pushes are free. The wrappers print `repo HEAD` and their own sha
+at start; the STOP reads both. (The box has committed on a stale base
 twice — pull FIRST.)
 
 ---
@@ -145,6 +146,26 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
   read-back + in-container parse/realization check, null-controlled) and
   MUST run before the posture sweep — the change lands before the sweep,
   never between passes.
+- **M** (2026-08-30) — postures RULED from the completed matrix (11/11
+  points, 0 errors, no OOM): **RR = M16xT2** (8.65 f/s, leads its grid);
+  **LI = N16xT2** — N8xT4 (10.105) and N16xT2 (10.071) sit 0.34% apart at
+  n=1 and the only reproducibility evidence is 0.09% from a DIFFERENT
+  corpus, so they are not separable at this evidence level; among tied
+  options N16xT2 uses 12% less CPU (23.55 vs 26.76 cores) and matches
+  RR's winning shape — a matched 16x2-vs-16x2 headline instead of two
+  shapes needing explanation. Revisitable if the C sweep separates them;
+  the full matrix publishes both with the tie stated. Report-bound
+  findings: **LI leads at EVERY matched posture** (+21.5% at 8x4, +16.4%
+  at 16x2, +17.6% at 4x8, +21.4% at 8x2; best-vs-best +16.8%);
+  **oversubscription costs RR 38% and collapses LI 4.6x** (rr_M16xT4
+  5.295 f/s; li_N8xT8 2.201 f/s) while burning the most CPU (27.24 /
+  30.81 cores); **half the thread spend (8x2) buys ~94% (RR) / ~97.7%
+  (LI) of peak at 66-75% of the cores**. The C sweep runs at the winners
+  via `probe/run_films_curve_ruling_m.sh` (values pinned in git, entry
+  25); the Ruling-I C grid tops out at C=8 < 16 lanes — every curve
+  point under-saturates the ruled posture, so extending the grid to
+  include 16/32 is FLAGGED for Ansh (`C_GRID` lever exists), not
+  silently applied.
 
 ## 4. OPEN — carry forward, do not silently drop
 
@@ -156,16 +177,26 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    posture point (~30 GB projected baseline, C=35) is the deliberate
    stress point**; mem_watch rides every point; an OOM there is a FINDING
    (oom block in every artifact: OOMKilled + memory.events deltas).
-2. **The posture sweep is UNRUN** (`probe/run_films_posture.sh`, sha
-   `7c0499ce…`): RR grid 8×4 / 16×2 / 32×1 / 4×8 / 8×2(under) /
-   16×4(over); LI grid 8×4 / 16×2 / 4×8 / 8×2 / 8×8(over), W=1 held
-   (kernel-accept skew measured pathological at AMI); C=min(2×lanes,35) on
-   the full measured 35; SKIP_OVERSUB=1 is the budget lever. Ansh rules
-   both postures from the printed POSTURE MATRIX.
-3. **The C sweep is UNRUN** (`probe/run_films_curve.sh`, sha `1d0d846b…`):
-   runs AFTER the posture ruling with RR_TOKENS/RR_TENV/LI_INSTANCES/
-   LI_TENV set to the winners (defaults are AMI shapes and say so). Ansh
-   rules C from the marginal chain.
+   UPDATE 2026-08-30: the stress point RAN — errors 0, no OOM FIRED, at
+   --memory 58g. The measured peaks live in the memwatch summaries at box
+   `~/films_probe/posture_out/`; the FIXED `--summarize` prints them per
+   point (anon sum, per-instance max, memory.peak, spool, probe rss); the
+   linearity verdict on r=0.94/w=0.58 awaits that read-back.
+2. **The posture sweep RAN 2026-08-30** (11/11 points, 0 errors, no OOM;
+   wrapper sha `7c0499ce…` unchanged) and the postures are **RULED —
+   Ruling M** (16×2 both arms). Artifacts + memwatch summaries are
+   box-side at `~/films_probe/posture_out/` (no bundle/commit cut —
+   landing awaits ruling, like the sizing artifacts). Its first
+   `--summarize` crashed (KeyError `n_films` — reader/fixture defect,
+   fixed same day, entry 27 addendum); the matrix is re-derived from the
+   existing artifacts, no re-run.
+3. **The C sweep is UNRUN**: reissued at the RULED winners via
+   `probe/run_films_curve_ruling_m.sh` (RR 16×2 / LI 16×2 pinned in git;
+   it execs `run_films_curve.sh`, which gained a `C_GRID` env — default
+   is the RULING-I grid {1,2,4,8}, unchanged). OPEN QUESTION for Ansh:
+   at 16-lane winners C=8 under-saturates every point (knee cannot
+   appear below C=16); extend C_GRID to include 16/32, or keep as ruled?
+   Ansh rules C from the marginal chain either way.
 4. **No warm-gated films leg until both sweeps land and are ruled.**
 5. **Ruling C second half — APPLIED in-repo as Ruling L (2026-08-30)**:
    the repo carries 4000/0 (image ENV + service + pipeline defaults), the
@@ -263,9 +294,9 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
 |---|---|
 | subset manifest (sha 54186c24…) | `working/video/films_video_manifest.jsonl` @ `6b348c7`; corpus at box `~/films_corpus/subset` |
 | selection rule (one copy, Rulings E/F/H/J in-rule) | `probe/films_strata_report.py`; builder `fetch_films_subset.py` |
-| posture sweep (RUN NEXT, after the box pulls the Ruling-L commit AND run_ruling_l_box.sh passes) | `probe/run_films_posture.sh` + `probe/probe_films_curve.py` |
-| Ruling L (LI 4000/0): equivalence note; box rebuild+verify | `RULING_L_SPLITTER_EQUIVALENCE.md`; `probe/run_ruling_l_box.sh` + `probe/verify_li_chunk_config.py` |
-| C sweep (after posture ruling) | `probe/run_films_curve.sh` (winners via env) |
+| posture sweep — DONE 2026-08-30, RULED (M: 16×2 both arms); artifacts box-side | `probe/run_films_posture.sh` (sha `7c0499ce…`); artifacts `~/films_probe/posture_out/` |
+| Ruling L (LI 4000/0): equivalence note; box rebuild+verify (done, verified live) | `RULING_L_SPLITTER_EQUIVALENCE.md`; `probe/run_ruling_l_box.sh` + `probe/verify_li_chunk_config.py` |
+| C sweep (RUN NEXT at the Ruling-M winners; C_GRID extension awaits Ansh) | `probe/run_films_curve_ruling_m.sh` → `probe/run_films_curve.sh` |
 | memory instrument | `probe/mem_watch.py` (fixed VmHWM, oom-aware sweeps) |
 | sizing/equivalence/parity/detect-text probes + artifacts | `probe/probe_films_sizing.py`, `probe_reader_equivalence*`, `probe_frame_parity*`, `probe_detect_text*` (artifacts committed where noted; sizing/proof-2/anchor artifacts box-side, landing awaits ruling) |
 | AMI banked numbers | DEFINITIVE (amended corpus line); anchor export box `~/films_probe/anchor_out/` |

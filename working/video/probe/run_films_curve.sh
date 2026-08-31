@@ -8,9 +8,13 @@
 # Set the RULED winners before running (defaults are the AMI shapes and are
 # NOT a ruling): RR_TOKENS, RR_TENV, LI_INSTANCES, LI_TENV.
 #
-# Points: the winning RR and LI postures at C in {1,2,4,8}; rr-default at
-# C in {1,2} only (M=1 by definition — C above 1 measures queueing at the
-# single per-instance reader lock; one control point verifies queued-item
+# Points: the winning RR and LI postures at C_GRID (default "1 2 4 8" —
+# the RULING I grid, sized when the assumed winners had 8 lanes; at the
+# RULING M 16-lane winners C=8 under-saturates and the knee cannot appear
+# below C=16 — extending the grid is Ansh's ruling, and C_GRID is the
+# lever, e.g. C_GRID="1 2 4 8 16 32"); rr-default at C in {1,2} only
+# (M=1 by definition — C above 1 measures queueing at the single
+# per-instance reader lock; one control point verifies queued-item
 # survival at films timescale, not four). Every point runs the SAME 9-film
 # strata-heads batch (fixed workload, variable C — content-controlled
 # curve) with the fixed mem_watch beside it; posture env read-backs fail
@@ -35,9 +39,10 @@ RR_TOKENS="${RR_TOKENS:-8}"
 RR_TENV="${RR_TENV:-4}"
 LI_INSTANCES="${LI_INSTANCES:-8}"
 LI_TENV="${LI_TENV:-4}"
+C_GRID="${C_GRID:-1 2 4 8}"
 mkdir -p "$OUT_DIR"
 [ -f "$MANIFEST" ] || { echo "NOT DONE — subset manifest missing: $MANIFEST (run the build first)"; exit 1; }
-echo "winners in use (from the posture ruling): RR M=${RR_TOKENS} T=${RR_TENV}; LI N=${LI_INSTANCES} T=${LI_TENV}"
+echo "winners in use (from the posture ruling): RR M=${RR_TOKENS} T=${RR_TENV}; LI N=${LI_INSTANCES} T=${LI_TENV}; C grid: ${C_GRID}"
 
 envargs() { local n="$1"; echo "-e OMP_NUM_THREADS=$n -e MKL_NUM_THREADS=$n \
 -e OPENBLAS_NUM_THREADS=$n -e VECLIB_MAXIMUM_THREADS=$n -e NUMEXPR_NUM_THREADS=$n -e TORCH_NUM_THREADS=$n"; }
@@ -82,7 +87,8 @@ echo "== ruled RR posture (M=${RR_TOKENS} x T=${RR_TENV}), full C sweep =="
 docker run -d --name rr --memory 58g $(envargs "$RR_TENV") --log-opt max-size=200m \
     --network host rr:patched-video >/dev/null
 "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
-for c in 1 2 4 8; do
+# shellcheck disable=SC2086
+for c in $C_GRID; do
   point "--arm rr --tokens $RR_TOKENS --threads-env $RR_TENV --batch heads" \
       "$c" rr "rr_M${RR_TOKENS}xT${RR_TENV}" \
     || echo "POINT rr C=$c FAILED (rc=$?) — recorded; sweep continues"
@@ -105,7 +111,8 @@ for i in $(seq 0 $((LI_INSTANCES - 1))); do
   "$PY" working/video/probe/wait_ready.py --arm li --port $((8802+i)) \
       --workers 1 --container "li_bal_$i" --deadline 1200
 done
-for c in 1 2 4 8; do
+# shellcheck disable=SC2086
+for c in $C_GRID; do
   point "--arm li --instances $LI_INSTANCES --threads-env $LI_TENV --batch heads" \
       "$c" "$NAMES" "li_N${LI_INSTANCES}xT${LI_TENV}" \
     || echo "POINT li C=$c FAILED (rc=$?) — recorded; sweep continues"

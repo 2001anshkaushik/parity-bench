@@ -289,6 +289,60 @@ def point_metrics(results, batch, bracket_wall, cpu_before, cpu_after,
 
 # ---------------------------------------------------------------- summarize
 
+def build_point_artifact(*, head, label, concurrency, batch_mode, lanes,
+                         env_n, posture, containers, chunk_config_readback,
+                         oom, manifest_sha256, batch, inflight_max,
+                         per_film, metrics, probe_ru_maxrss_kb):
+    """The ONE success-artifact shape — main() writes through this and the
+    self-test builds its summarize fixtures through it (entry 27 addendum,
+    2026-08-30): --summarize died on its FIRST real artifacts because
+    _point_row read a top-level 'n_films' the producer NEVER wrote — the
+    reader was born disagreeing with the writer at d73f445, and the 21c6ff2
+    fixture was hand-shaped to the READER's expectation, so 23 green checks
+    certified the bug. A hand-written fixture is the author's memory of the
+    schema sampled against the author's code (entry 2, inside the test);
+    a producer-built fixture makes that class unwritable."""
+    return {
+        'probe': 'films_curve', 'created_utc': UTC, 'git_head': head,
+        'cell': label, 'label': label, 'concurrency': concurrency,
+        'batch_mode': batch_mode, 'lanes': lanes,
+        'spend_threads': (lanes * env_n) if env_n else None,
+        'posture': posture, 'containers': containers,
+        'chunk_config_readback': chunk_config_readback,
+        'oom': oom,
+        'manifest_sha256': manifest_sha256,
+        'batch': [{'file': b['file'], 'bytes': b['bytes'],
+                   'video_s': b['video_s'],
+                   'expected_frames': b['expected_frames']} for b in batch],
+        'inflight_max': inflight_max,
+        'per_film': sorted(per_film, key=lambda r: r['admit_ns']),
+        'metrics': metrics,
+        'probe_ru_maxrss_kb': probe_ru_maxrss_kb,
+        'memory_note': "anon/memory.peak/spool are mem_watch's, recorded "
+                       'beside this artifact by the wrapper',
+    }
+
+
+def build_failed_artifact(*, head, label, concurrency, batch_mode, lanes,
+                          posture, containers, chunk_config_readback, oom,
+                          exception_chain):
+    """The ONE failed-point shape (same rule as build_point_artifact)."""
+    return {
+        'probe': 'films_curve', 'created_utc': UTC, 'git_head': head,
+        'FAILED': {'stage': 'point-execution',
+                   'exception_chain': exception_chain},
+        'cell': label, 'label': label, 'concurrency': concurrency,
+        'batch_mode': batch_mode, 'lanes': lanes, 'posture': posture,
+        'containers': containers,
+        'chunk_config_readback': chunk_config_readback,
+        'oom': oom,
+        'note': 'point-level failure (connect/use/gather machinery) — '
+                'per-film errors would have been recorded instead; the '
+                'oom block above says whether the kernel killed anything; '
+                "mem_watch's last ticks carry the anon at failure",
+    }
+
+
 def curve_rows(points):
     """points: list of dicts with C, frames_per_s, anon_sum... sorted by C.
     Returns the marginal columns (probe_concurrency.py:15-17 rule verbatim;
@@ -329,6 +383,15 @@ def _point_row(d: dict, out_dir: Path) -> dict:
         peak_max = max(peaks) if peaks else None
         spool_max = max(spools) if spools else None
     m = d['metrics']
+    # n_films lives in metrics — the producer's ONLY copy since d73f445;
+    # the old top-level read here was born disagreeing with the writer and
+    # first executed against real artifacts on 2026-08-30 (KeyError, whole
+    # matrix). Absent value -> saturation is NOT KNOWN (None), never
+    # computed from a guess.
+    n_films = m.get('n_films')
+    saturated = (d['inflight_max'] >= min(d['concurrency'], n_films)
+                 if n_films is not None and d.get('inflight_max') is not None
+                 else None)
     return {
         'label': label, 'C': d['concurrency'],
         'lanes': d.get('lanes'), 'spend_threads': d.get('spend_threads'),
@@ -340,9 +403,17 @@ def _point_row(d: dict, out_dir: Path) -> dict:
         'anon_sum': anon_sum, 'anon_max_instance': per_instance_anon,
         'memory_peak_max': peak_max, 'spool_max': spool_max,
         'errors': m['n_errors'],
-        'saturated': d['inflight_max'] >= min(d['concurrency'], d['n_films']),
+        'saturated': saturated,
         'probe_ru_maxrss_kb': d.get('probe_ru_maxrss_kb'),
     }
+
+
+def _sat_flag(saturated) -> str:
+    """Three states, printed distinctly: a point that cannot report
+    saturation says NOT KNOWN — it is never allowed to read as saturated
+    OR as never-saturated."""
+    return {True: '', False: ' NEVER-SATURATED'}.get(
+        saturated, ' SATURATION-NOT-KNOWN')
 
 
 def summarize(out_dir: Path) -> int:
@@ -377,12 +448,13 @@ def summarize(out_dir: Path) -> int:
         print(f'\n== {label} ==')
         for r in rows:
             flags = ('' if r['errors'] == 0 else f' ERRORS={r["errors"]}') + \
-                    ('' if r['saturated'] else ' NEVER-SATURATED')
+                    _sat_flag(r['saturated'])
             print(f"  C={r['C']}: span {r['span_s']}s | {r['frames_per_s']} f/s "
                   f"| rt x{r['realtime_factor']} | {r['cores']} cores "
                   f"({r['util_pct']}%) | anon sum {r['anon_sum']} B "
                   f"(max/inst {r['anon_max_instance']}) | mem.peak "
-                  f"{r['memory_peak_max']} | spool {r['spool_max']}"
+                  f"{r['memory_peak_max']} | spool {r['spool_max']} "
+                  f"| probe rss {r['probe_ru_maxrss_kb']} KB"
                   + (f" | marg-eff {r['marginal_efficiency']}"
                      if 'marginal_efficiency' in r else '')
                   + (f" | marg GB/lane {r['marginal_gb_per_lane']}"
@@ -403,7 +475,7 @@ def summarize(out_dir: Path) -> int:
               f"| {r['cores']} cores ({r['util_pct']}%) | anon sum "
               f"{r['anon_sum']} B | mem.peak {r['memory_peak_max']}"
               + ('' if r['errors'] == 0 else f' | ERRORS={r["errors"]}')
-              + ('' if r['saturated'] else ' | NEVER-SATURATED'))
+              + _sat_flag(r['saturated']))
     return 0
 
 
@@ -509,19 +581,75 @@ def self_test() -> int:
               == {'c': {'oomkilled': 'true', 'oom_kill_delta': 3}})
         sweep = d / 'sweep'
         sweep.mkdir()
-        (sweep / 'curve_rr_M32xT1_C35.json').write_text(json.dumps(
-            {'FAILED': {'stage': 'point-execution', 'exception_chain': ['X']},
-             'label': 'rr_M32xT1', 'concurrency': 35,
-             'oom': {'rr': {'oomkilled': 'true', 'oom_kill_delta': 1}}}))
-        (sweep / 'curve_rr-8x4_C8.json').write_text(json.dumps(
-            {'label': 'rr-8x4', 'cell': 'rr-8x4', 'concurrency': 8,
-             'lanes': 8, 'spend_threads': 32, 'batch_mode': 'measured',
-             'n_films': 35, 'inflight_max': 8,
-             'metrics': {'span_s': 100.0, 'frames_per_s': 50.0,
-                         'realtime_factor': 100.0, 'n_errors': 0,
-                         'service_cpu': {'cores': 20.0, 'util_pct': 62.5}}}))
-        check('summarize survives a FAILED point beside a good one (rc 0)',
+        # ENTRY 27 addendum (2026-08-30): fixtures come from the PRODUCER
+        # chain (point_metrics -> build_point_artifact), never hand-shaped —
+        # the --summarize KeyError('n_films') survived 23 green checks
+        # because the old fixture was written to the READER's expectation.
+        # This block therefore also EXECUTES point_metrics for the first
+        # time (it was on the entry-27 never-executed list).
+        canned_batch = [
+            {'file': 'a.mp4', 'bytes': 5, 'video_s': 600.0,
+             'expected_frames': 40},
+            {'file': 'z.mp4', 'bytes': 7, 'video_s': 900.0,
+             'expected_frames': 60},
+        ]
+        canned_results = [
+            {'file': 'a.mp4', 'token_index': 0, 'admit_ns': 1_000,
+             'done_ns': 50_000_000_000, 'wall_s': 50.0, 'n_frames': 40},
+            {'file': 'z.mp4', 'token_index': 1, 'admit_ns': 2_000,
+             'done_ns': 100_000_000_000, 'wall_s': 100.0, 'n_frames': 60},
+        ]
+        mets = point_metrics(canned_results, canned_batch, 100.0,
+                             {'rr': 0}, {'rr': 2_000_000_000}, ['rr'])
+        check('point_metrics on canned rows: n_films/frames/cores clean',
+              mets['n_films'] == 2 and mets['total_frames'] == 100
+              and mets['frame_expectation_mismatches'] is None
+              and mets['service_cpu']['cores'] == 20.0)
+        good = build_point_artifact(
+            head='selftest', label='rr_M8xT4', concurrency=16,
+            batch_mode='measured', lanes=8, env_n=4, posture={'arm': 'rr'},
+            containers=['rr'], chunk_config_readback={'arm': 'rr'},
+            oom={'rr': {'oomkilled': 'false', 'oom_kill_delta': 0}},
+            manifest_sha256='0' * 64, batch=canned_batch, inflight_max=16,
+            per_film=canned_results, metrics=mets, probe_ru_maxrss_kb=1234)
+        (sweep / 'curve_rr_M8xT4_C16.json').write_text(json.dumps(good))
+        failed = build_failed_artifact(
+            head='selftest', label='rr_M32xT1', concurrency=35,
+            batch_mode='measured', lanes=32, posture={'arm': 'rr'},
+            containers=['rr'], chunk_config_readback={'arm': 'rr'},
+            oom={'rr': {'oomkilled': 'true', 'oom_kill_delta': 1}},
+            exception_chain=['X'])
+        (sweep / 'curve_rr_M32xT1_C35.json').write_text(json.dumps(failed))
+        check('summarize survives a FAILED point beside a good one (rc 0), '
+              'both artifacts producer-built',
               summarize(sweep) == 0)
+        row = _point_row(json.loads(
+            (sweep / 'curve_rr_M8xT4_C16.json').read_text()), sweep)
+        check("saturation from the producer's own metrics.n_films "
+              '(inflight 16 >= min(C=16, n_films=2))',
+              row['saturated'] is True and row['span_s'] == 100.0
+              and row['probe_ru_maxrss_kb'] == 1234)
+        nk = dict(good)
+        nk['metrics'] = {k: v for k, v in mets.items() if k != 'n_films'}
+        check('absent n_films -> saturation NOT KNOWN (None), never guessed',
+              _point_row(nk, sweep)['saturated'] is None
+              and _sat_flag(None) == ' SATURATION-NOT-KNOWN'
+              and _sat_flag(False) == ' NEVER-SATURATED'
+              and _sat_flag(True) == '')
+        # memwatch sidecar: the REAL mem_watch summary schema (containers ->
+        # max_*_bytes, mem_watch.py:141-160) so the anon/peak/spool columns
+        # are exercised with the shape the box actually writes.
+        (sweep / 'memwatch_rr_M8xT4_C16.json').write_text(json.dumps(
+            {'basis': {}, 'containers': {
+                'rr': {'max_anon_bytes': 9_000_000_000,
+                       'max_memory_peak_bytes': 11_000_000_000,
+                       'max_spool_used_bytes': 2_000_000_000}}}))
+        row2 = _point_row(good, sweep)
+        check('memwatch sidecar read: anon/peak/spool populate from the '
+              'real schema', row2['anon_sum'] == 9_000_000_000
+              and row2['anon_max_instance'] == 9_000_000_000
+              and row2['memory_peak_max'] == 11_000_000_000
+              and row2['spool_max'] == 2_000_000_000)
 
     # RULING L chunk-config read-back: null-controlled (entry 12 — the
     # refusal paths must demonstrably fire, or the check checks nothing).
@@ -733,20 +861,12 @@ def main() -> int:
             results, inflight_max = asyncio.run(
                 run_point_li(batch, args.concurrency, li_ports))
     except Exception as exc:   # noqa: BLE001 — a dead point still leaves evidence
-        failed = {
-            'probe': 'films_curve', 'created_utc': UTC, 'git_head': head,
-            'FAILED': {'stage': 'point-execution',
-                       'exception_chain': exc_chain(exc)},
-            'cell': label, 'label': label, 'concurrency': args.concurrency,
-            'batch_mode': args.batch, 'lanes': lanes, 'posture': cell,
-            'containers': containers,
-            'chunk_config_readback': chunk_rb,
-            'oom': oom_delta(oom_before, oom_state(containers)),
-            'note': 'point-level failure (connect/use/gather machinery) — '
-                    'per-film errors would have been recorded instead; the '
-                    'oom block above says whether the kernel killed anything; '
-                    "mem_watch's last ticks carry the anon at failure",
-        }
+        failed = build_failed_artifact(
+            head=head, label=label, concurrency=args.concurrency,
+            batch_mode=args.batch, lanes=lanes, posture=cell,
+            containers=containers, chunk_config_readback=chunk_rb,
+            oom=oom_delta(oom_before, oom_state(containers)),
+            exception_chain=exc_chain(exc))
         fpath = out_dir_p / f'curve_{label}_C{args.concurrency}.json'
         preserve(fpath)
         fpath.write_text(json.dumps(failed, indent=1))
@@ -761,25 +881,14 @@ def main() -> int:
     env_n = int(cell['env']) if cell.get('env') else None
     metrics = point_metrics(results, batch, bracket_wall,
                             cpu_before, cpu_after, containers)
-    artifact = {
-        'probe': 'films_curve', 'created_utc': UTC, 'git_head': head,
-        'cell': label, 'label': label, 'concurrency': args.concurrency,
-        'batch_mode': args.batch, 'lanes': lanes,
-        'spend_threads': (lanes * env_n) if env_n else None,
-        'posture': cell, 'containers': containers,
-        'chunk_config_readback': chunk_rb,
-        'oom': oom,
-        'manifest_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
-        'batch': [{'file': b['file'], 'bytes': b['bytes'],
-                   'video_s': b['video_s'],
-                   'expected_frames': b['expected_frames']} for b in batch],
-        'inflight_max': inflight_max,
-        'per_film': sorted(results, key=lambda r: r['admit_ns']),
-        'metrics': metrics,
-        'probe_ru_maxrss_kb': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
-        'memory_note': "anon/memory.peak/spool are mem_watch's, recorded "
-                       'beside this artifact by the wrapper',
-    }
+    artifact = build_point_artifact(
+        head=head, label=label, concurrency=args.concurrency,
+        batch_mode=args.batch, lanes=lanes, env_n=env_n, posture=cell,
+        containers=containers, chunk_config_readback=chunk_rb, oom=oom,
+        manifest_sha256=hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        batch=batch, inflight_max=inflight_max, per_film=results,
+        metrics=metrics,
+        probe_ru_maxrss_kb=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     out = out_dir_p / f'curve_{label}_C{args.concurrency}.json'
     preserve(out)
     out.write_text(json.dumps(artifact, indent=1))

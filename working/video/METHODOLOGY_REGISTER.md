@@ -990,3 +990,26 @@ than rewritten from memory, which is entry 2's point in miniature.
 > command's success, not the effect, and the effect includes the paths
 > the suite structurally cannot take, which is precisely where a
 > second, non-execution instrument must stand.
+>
+> **Addendum, same day — the second bug in the same file was the same
+> lesson one layer deeper.** `--summarize`, run for the first time over
+> REAL artifacts (the completed 11/11 posture matrix), died on
+> KeyError('n_films'): `_point_row` read a top-level key the producer
+> has NEVER written — `n_films` has lived inside point_metrics' return
+> since the file's first commit (d73f445), so the reader was born
+> disagreeing with the writer, and the fixture added at 21c6ff2 was
+> hand-shaped to match the READER, so 23 green checks certified the
+> defect. The morning's name scan was clean — every name resolved; the
+> SHAPE was wrong, and no name checker sees shapes. A hand-written
+> fixture is entry 2's self-copy INSIDE the test: the author's memory
+> of the schema sampled against the author's code, and no such sample
+> can catch the fabrication. Cure, one copy per entry 6's addendum: the
+> artifact shape now has ONE producer (build_point_artifact /
+> build_failed_artifact), main() writes through it, and the self-test
+> builds its fixtures through the same functions with point_metrics
+> feeding them — producer and formatter tested as one chain, so a
+> schema change breaks a test instead of a matrix. Honest boundary kept
+> per the operator's instruction: an artifact that cannot report
+> n_films prints SATURATION-NOT-KNOWN — never computed from a guess,
+> and never conflated with NEVER-SATURATED (the old two-state print
+> would have mislabelled None as never-saturated).
