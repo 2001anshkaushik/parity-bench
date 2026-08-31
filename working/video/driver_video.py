@@ -462,8 +462,15 @@ class RRArm:
         # never holds a whole blob. Above the 250 MiB message ceiling
         # (register entry 24) this is the only admissible upload.
         size = Path(path).stat().st_size
+        # Ruling T item 7 (2026-08-31): mime from the file, not a hardcoded
+        # x-msvideo — the .mp4 films corpus was mislabeled on the wire and in
+        # provenance. Engine routing keys on the 'video/' prefix, so the
+        # fallback stays the historical label: behavior is byte-identical for
+        # every non-.mp4 input, and .mp4 now carries its true type.
+        mime = {'.mp4': 'video/mp4'}.get(Path(name).suffix.lower(),
+                                         'video/x-msvideo')
         pipe = await self.client.pipe(token, {'name': name, 'size': size},
-                                      'video/x-msvideo')
+                                      mime)
         await pipe.open()
         n_chunks = 0
         try:
@@ -710,6 +717,24 @@ async def rr_readback(port: int) -> dict:
     return info
 
 
+# RULING L (2026-08-30) — the films comparison basis: LI runs 4000/0/chars.
+# ONE copy of the expectation (entry 6): the sweep probe imports it from here
+# (probe_films_curve.check_li_chunk_config) and the leg preflight checks it
+# below (Ruling T item 3, 2026-08-31). The operative value is the image env
+# (docker/Dockerfile.llamaindex-video) parsed by li_video/service.py; this
+# constant exists so a stale li:video image can never measure a leg.
+EXPECTED_LI_CHUNK = {'chunk_size': 4000, 'chunk_overlap': 0,
+                     'split_unit': 'chars'}
+
+
+def li_chunk_mismatches(per_worker: Dict[str, dict]) -> Dict[str, dict]:
+    """Workers whose /health chunk config does not read back as RULING L.
+    An absent field is ABSENCE, never agreement (register discipline)."""
+    return {k: {f: v.get(f) for f in EXPECTED_LI_CHUNK}
+            for k, v in per_worker.items()
+            if {f: v.get(f) for f in EXPECTED_LI_CHUNK} != EXPECTED_LI_CHUNK}
+
+
 async def li_readbacks(arm: LIArm, timeout_s: float = 120) -> Dict[str, dict]:
     """Sample /health until every declared worker pid has answered (or timeout —
     which is an ABSENCE failure downstream, never a shrug)."""
@@ -728,6 +753,10 @@ async def li_readbacks(arm: LIArm, timeout_s: float = 120) -> Dict[str, dict]:
             'detect_impl': h.get('detect_impl'),
             'python_version': h.get('python_version'),
             'versions': h.get('versions') or {},
+            # RULING L read-back inputs (the values the serving process LOADED)
+            'chunk_size': h.get('chunk_size'),
+            'chunk_overlap': h.get('chunk_overlap'),
+            'split_unit': h.get('split_unit'),
         }
     return per_worker
 
@@ -1377,6 +1406,26 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
                           'versions': next(iter(per_worker.values()))['versions']}
         if impls != {'rfdetr'}:
             raise SystemExit(f'NOT DONE — LI detect_impl read back as {impls}, not rfdetr.')
+        # RULING L leg read-back (Ruling T item 3, 2026-08-31): the sweeps'
+        # probe refused a stale-config point; the LEGS were uncovered until
+        # here. Null controls fire first, every preflight (register pattern) —
+        # a check that cannot catch a 200 image checks nothing.
+        if li_chunk_mismatches({'w': dict(EXPECTED_LI_CHUNK)}) != {}:
+            raise SystemExit('NOT DONE — li_chunk_mismatches null control (pass) broken')
+        if 'w' not in li_chunk_mismatches(
+                {'w': {**EXPECTED_LI_CHUNK, 'chunk_overlap': 200}}):
+            raise SystemExit('NOT DONE — li_chunk_mismatches null control (refuse) broken')
+        bad_chunk = li_chunk_mismatches(per_worker)
+        if bad_chunk:
+            raise SystemExit(
+                f'NOT DONE — LI chunk-config read-back does not match RULING L '
+                f'(expected {EXPECTED_LI_CHUNK}) on {len(bad_chunk)}/{len(per_worker)} '
+                f'worker(s): {bad_chunk} — stale li:video image? Rebuild + verify '
+                'per probe/run_ruling_l_box.sh.')
+        identity['li']['chunk_config_readback'] = {
+            'expected': EXPECTED_LI_CHUNK,
+            'per_worker': {k: {f: v.get(f) for f in EXPECTED_LI_CHUNK}
+                           for k, v in per_worker.items()}}
         # EVERY instance's weights, not one container's (2026-08-26: this site
         # read the dead li_video default and failed a healthy 8-instance set;
         # and a MIXED set — one instance on other weights — is exactly what

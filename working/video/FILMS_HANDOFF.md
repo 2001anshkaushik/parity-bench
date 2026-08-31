@@ -18,18 +18,17 @@ patched (`rr:patched-video`), SDK 1.3.0, Python 3.12.13. LI image
 `li:video` — REBUILT 2026-08-28 freeze-pinned + streaming reader;
 `li:video-anchor` = pre-refactor code + pinned deps (kept for reruns;
 worktree `~/anchor_7204` may still exist).
-**BOX STATE: ran the posture sweep at `3f0a7b5` and the C sweep at
-`9e035b8` (C_GRID extended to {1..32} per Ansh). It MUST `git pull
---ff-only` to the 2026-08-31 refusal-round commit before (a) the
-curve_out re-summarize — older summarizers print fictional marginals
-above C=8 on the heads artifacts — and (b)
-`probe/run_films_curve_highc.sh` (Ruling N: six measured-batch points,
-C∈{8,16,32} both arms).**
-Artifacts box-side: `~/films_probe/posture_out/` and
-`~/films_probe/curve_out/` (the latter archived at
-`s3://rocketride-benchmark-data/ansh/c-sweep-20260831/`); no box commit
-or bundle of repo history is outstanding — no base claimed (entry 26),
-laptop pushes free. The wrappers print `repo HEAD` and their own sha at
+**BOX STATE: ran the posture sweep, the C sweep, and the Ruling-N
+points; all sweeps CLOSED and ruled (M/N/O). It MUST `git pull
+--ff-only` to the Rulings-P–T build commit, then run
+`probe/run_films_staging.sh` (STOP: read arming.json), then
+`run_plan_films.sh` — the main campaign (~7–8 h).**
+Artifacts box-side: `~/films_probe/posture_out/`, `~/films_probe/
+curve_out/` (S3 `ansh/c-sweep-20260831/`), `~/films_probe/curve_hi_out/`;
+no box commit or bundle of repo history is outstanding — no base claimed
+(entry 26), laptop pushes free. AFTER the campaign the results are
+IN-REPO: the box commits + bundles them — that claims the base
+(STOP-AND-LAND). The scripts print `repo HEAD` and their own sha at
 start; the STOP reads both. (The box has committed on a stale base twice
 — pull FIRST.)
 
@@ -203,6 +202,31 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
   depth, clean to state. (Ruling relayed "10% / 6.8%"; exact ratios
   from the verbatim rates shown.) RR anon sum 22.3/23.9/24.6 GB,
   mem.peak 30.0/38.0/38.0 GB across C=8/16/32 — comfortably inside 58g.
+- **P–T** (2026-08-31, the main-run rulings; built the same day) —
+  **P**: cells = RR default + RR M16xT2 + LI N16xT2, sequential leg kept
+  on all three (gate 8 lives nowhere else; latency + speedup divisor),
+  2 blast passes each, C=16 throughout, DEFAULT_N=35; default cell stays
+  RR-internal per Crossroad 27 (LI's out-of-box is measured-pathological
+  — one report line, not a cell); report framing: both frameworks were
+  configuration-limited out of the box. **Q**: gate 3 ARMED via a staged
+  films cross-arm comparison — film = 20000LeaguesUndertheSea (first
+  measured row, and the film with committed A==B==C byte-level frame
+  parity: the same-frames precondition is strongest there). **R**:
+  LIVENESS_MIN cut FROM the staged run (0.5 × measured min non-empty
+  fraction, derivation in arming.json and the run manifest; single-film
+  basis disclosed; never Corner numbers on films). **S**: warm waves
+  KEPT at 2×workers — warmth gates on markers and the extra wave is the
+  margin; revisit post-campaign from the ledger. **T**: build items done
+  — driver LI preflight now REFUSES a leg whose /health ≠ 4000/0/chars
+  (EXPECTED_LI_CHUNK one copy in driver_video, probe imports it;
+  null-controlled at every preflight); mime derived from the file
+  (.mp4 → video/mp4, fallback unchanged); films smoke golden write-once
+  via staging; balanced 16×1@3g bring-up; corrected LI_IMAGE_LINEAGE
+  (the UNPINNED text was false since b295dea); films manifest
+  hard-pinned; step-0 verify confirmed manifest-generic in staging.
+  Carried with disclosure IN EVERY CROSS FILE (via the cross label):
+  char_conservation's first films verdict is band-cutting DATA; H16's
+  0.5% drift cap is live and unsized for films.
 
 ## 4. OPEN — carry forward, do not silently drop
 
@@ -241,13 +265,15 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    `~/films_probe/curve_hi_out/` box-side. The heads C=1..8 chain stands
    as its own chain (knee C=8 on its own workload; heads is ~34% slower
    per §5's batch-composition finding).
-4. **The MAIN FILMS RUN is now unblocked** (was: "no warm-gated leg
-   until both sweeps land and are ruled" — both landed, M/O ruled).
-   Settled config: 35 measured + 2 warm (manifest `54186c24…`), RR
-   M16xT2 C=16, LI N16xT2 C=16, splitter 4000/0 both arms, WARM_N=2,
-   PASSES=2. Cell list, run-plan build items and AMI-shaped hazards are
-   with Ansh for ruling (a) — the advisor's (a)–(e) analysis is in the
-   2026-08-31 round report; DO NOT build before that ruling.
+4. **The MAIN FILMS RUN is BUILT to Rulings P–T (2026-08-31)** and is
+   the next box work. Sequence: `probe/run_films_staging.sh` (step-0
+   verify + films golden write-once + staged gate-3 + LIVENESS_MIN →
+   `~/films_probe/gate3_films/arming.json`; STOP: Ansh reads the arming
+   verdict) → `run_plan_films.sh` (ruled numbers BAKED, reads
+   arming.json, refuses without it; ~7–8 h; optional PREFLIGHT_ONLY=1
+   wiring pass ~15 min). Results land IN-REPO under
+   `working/video/results/films_mainrun_*` → post-campaign box commit +
+   bundle = entry-26 STOP-AND-LAND, no laptop pushes until landed.
 5. **Ruling C second half — APPLIED in-repo as Ruling L (2026-08-30)**:
    the repo carries 4000/0 (image ENV + service + pipeline defaults), the
    equivalence note, and the sweep probe's fail-closed /health chunk
@@ -373,7 +399,7 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
 | Ruling L (LI 4000/0): equivalence note; box rebuild+verify (done, verified live) | `RULING_L_SPLITTER_EQUIVALENCE.md`; `probe/run_ruling_l_box.sh` + `probe/verify_li_chunk_config.py` |
 | C sweep — heads chain DONE 2026-08-31 (C≤8 sound; C=16/32 unsaturated → refused by the summarizer) | `probe/run_films_curve_ruling_m.sh` → `probe/run_films_curve.sh`; artifacts `~/films_probe/curve_out/` + S3 `ansh/c-sweep-20260831/` |
 | high-C reissue — DONE 2026-08-31 (6/6, inflight confirmed; C RULED 16 both arms, Ruling O) | `probe/run_films_curve_highc.sh`; artifacts `~/films_probe/curve_hi_out/` |
-| MAIN FILMS RUN (NEXT: awaiting Ansh's ruling (a) on cells — do not build before it) | plan skeleton `run_plan.sh` (AMI-shaped; hazards listed 2026-08-31); driver `driver_video.py` |
+| MAIN FILMS RUN (RUN NEXT, built to P–T): staging then campaign | `probe/run_films_staging.sh` (+`probe/derive_gate3_arming.py`) → `run_plan_films.sh`; AMI skeleton `run_plan.sh` untouched |
 | memory instrument | `probe/mem_watch.py` (fixed VmHWM, oom-aware sweeps) |
 | sizing/equivalence/parity/detect-text probes + artifacts | `probe/probe_films_sizing.py`, `probe_reader_equivalence*`, `probe_frame_parity*`, `probe_detect_text*` (artifacts committed where noted; sizing/proof-2/anchor artifacts box-side, landing awaits ruling) |
 | AMI banked numbers | DEFINITIVE (amended corpus line); anchor export box `~/films_probe/anchor_out/` |

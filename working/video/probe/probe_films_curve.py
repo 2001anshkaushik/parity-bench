@@ -66,20 +66,16 @@ from corpus_locator import resolve_corpus_dir  # noqa: E402 — one locator
 from probe_detect_text import exc_chain, upload_chunked  # noqa: E402
 from probe_films_sizing import CELLS, check_posture_env, cpu_usage_usec  # noqa: E402
 from probe_rr import fresh_project_pipe    # noqa: E402
-from driver_video import frames_from_chunks  # noqa: E402
+from driver_video import EXPECTED_LI_CHUNK, frames_from_chunks  # noqa: E402
 
 PIPE_SRC = Path(__file__).resolve().parents[1] / 'benchmark_video_detect.pipe'
 UTC = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
 KNEE_THRESHOLD = 0.7   # probe_concurrency.py:15-17, adopted verbatim
 
-# RULING L (2026-08-30, Ruling C's second half — DEFINITIVE §2.4 adoption):
-# the LI comparison arm runs 4000/0/chars. This is the sweep-side DECLARED
-# expectation for the /health read-back; the operative copy of the value is
-# the image env (docker/Dockerfile.llamaindex-video ENV, parsed by
-# li_video/service.py). This constant exists so a stale li:video image
-# cannot silently measure a posture at the 4000/200 workload.
-EXPECTED_LI_CHUNK = {'chunk_size': 4000, 'chunk_overlap': 0,
-                     'split_unit': 'chars'}
+# RULING L (2026-08-30) expectation — ONE copy, imported from driver_video
+# (Ruling T item 3, 2026-08-31, moved there so the LEG preflight and this
+# sweep probe consult the same object; the import edge already ran
+# probe -> driver, so the constant lives at the importee).
 
 
 def check_li_chunk_config(ports, fetch=None):
