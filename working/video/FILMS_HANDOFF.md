@@ -18,17 +18,19 @@ patched (`rr:patched-video`), SDK 1.3.0, Python 3.12.13. LI image
 `li:video` — REBUILT 2026-08-28 freeze-pinned + streaming reader;
 `li:video-anchor` = pre-refactor code + pinned deps (kept for reruns;
 worktree `~/anchor_7204` may still exist).
-**BOX STATE: ran the posture sweep at `3f0a7b5` (Ruling-L rebuild verified
-live — every LI point passed the /health 4000/0 read-back). It MUST `git
-pull --ff-only` to the Ruling-M commit (the commit carrying this handoff
-revision) before (a) the re-summarize — the `3f0a7b5` summarizer dies on
-KeyError `n_films` against real artifacts — and (b) the C sweep
-(`probe/run_films_curve_ruling_m.sh`).** The 11 posture artifacts +
-memwatch summaries sit box-side at `~/films_probe/posture_out/`; no box
-commit or bundle is outstanding, so no base is claimed (entry 26) and
-laptop pushes are free. The wrappers print `repo HEAD` and their own sha
-at start; the STOP reads both. (The box has committed on a stale base
-twice — pull FIRST.)
+**BOX STATE: ran the posture sweep at `3f0a7b5` and the C sweep at
+`9e035b8` (C_GRID extended to {1..32} per Ansh). It MUST `git pull
+--ff-only` to the 2026-08-31 refusal-round commit before (a) the
+curve_out re-summarize — older summarizers print fictional marginals
+above C=8 on the heads artifacts — and (b)
+`probe/run_films_curve_highc.sh` (the four measured-batch points).**
+Artifacts box-side: `~/films_probe/posture_out/` and
+`~/films_probe/curve_out/` (the latter archived at
+`s3://rocketride-benchmark-data/ansh/c-sweep-20260831/`); no box commit
+or bundle of repo history is outstanding — no base claimed (entry 26),
+laptop pushes free. The wrappers print `repo HEAD` and their own sha at
+start; the STOP reads both. (The box has committed on a stale base twice
+— pull FIRST.)
 
 ---
 
@@ -169,19 +171,15 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
 
 ## 4. OPEN — carry forward, do not silently drop
 
-1. **Memory slope under concurrency** (Ruling G, top risk): 8.10 GB anon at
-   ONE active lane is unextrapolated. Single-lane differencing gives
-   ~0.94 GB/token resident + ~0.58 GB/active-lane (two equations, two
-   points — assumes linearity through 8× BLAS scratch, allocator
-   contention, coincident embeds, C×2.2 GB spool page cache). The **32×1
-   posture point (~30 GB projected baseline, C=35) is the deliberate
-   stress point**; mem_watch rides every point; an OOM there is a FINDING
-   (oom block in every artifact: OOMKilled + memory.events deltas).
-   UPDATE 2026-08-30: the stress point RAN — errors 0, no OOM FIRED, at
-   --memory 58g. The measured peaks live in the memwatch summaries at box
-   `~/films_probe/posture_out/`; the FIXED `--summarize` prints them per
-   point (anon sum, per-instance max, memory.peak, spool, probe rss); the
-   linearity verdict on r=0.94/w=0.58 awaits that read-back.
+1. **CLOSED 2026-08-31 — memory slope under concurrency (Ruling G, was
+   the top risk)**: the posture-sweep read-back fit the token term LINEAR
+   at ~0.92 GB/token (vs the 0.94 single-lane prediction), and the C
+   sweep shows NEITHER arm's memory scales with C — RR anon 17.26 GB at
+   C=1 → 18.19 GB at C=16 (per-item term ~0.06 GB, baseline-dominated),
+   LI flat 14.7–15.1 GB across the whole range. No OOM anywhere, the
+   32×1 stress point included. Artifacts: box
+   `~/films_probe/posture_out/` + `~/films_probe/curve_out/`, the latter
+   archived at `s3://rocketride-benchmark-data/ansh/c-sweep-20260831/`.
 2. **The posture sweep RAN 2026-08-30** (11/11 points, 0 errors, no OOM;
    wrapper sha `7c0499ce…` unchanged) and the postures are **RULED —
    Ruling M** (16×2 both arms). Artifacts + memwatch summaries are
@@ -190,13 +188,26 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    `--summarize` crashed (KeyError `n_films` — reader/fixture defect,
    fixed same day, entry 27 addendum); the matrix is re-derived from the
    existing artifacts, no re-run.
-3. **The C sweep is UNRUN**: reissued at the RULED winners via
-   `probe/run_films_curve_ruling_m.sh` (RR 16×2 / LI 16×2 pinned in git;
-   it execs `run_films_curve.sh`, which gained a `C_GRID` env — default
-   is the RULING-I grid {1,2,4,8}, unchanged). OPEN QUESTION for Ansh:
-   at 16-lane winners C=8 under-saturates every point (knee cannot
-   appear below C=16); extend C_GRID to include 16/32, or keep as ruled?
-   Ansh rules C from the marginal chain either way.
+3. **The C sweep RAN 2026-08-31** (14/14 points, 0 errors, C_GRID
+   extended to {1,2,4,8,16,32}) — **but the knee is NOT measured**: the
+   9-film heads batch caps in-flight at 9, so C=16 and C=32 were the same
+   experiment twice (inflight max 9; rr 6.636 vs 6.42, li 7.357 vs 7.321
+   f/s, sub-1% apart) and the marginal rows above C=8 were arithmetic on
+   concurrency that never happened (cause: the batch was sized under
+   Ruling I for 8-lane winners; C_GRID was extended without extending
+   it). The summarizer now REFUSES the class: a step whose endpoint did
+   not realize its requested C prints MARG NOT MEASURED with the reason
+   (inflight vs requested C vs n_films), the knee prints NOT DETERMINED
+   when an unrealized step precedes it, and chains are grouped per
+   (label, batch) — heads and measured are different workloads, one
+   chain never spans both. NEXT: `probe/run_films_curve_highc.sh`
+   re-runs ONLY the four unsaturated points on the measured batch
+   (~1.5–2 h); the heads C=1..8 chain stands as its own chain. If Ansh
+   wants ONE publishable knee chain instead of two clean ones: the full
+   measured-batch chain C∈{1..32} costs ~10–14 h both arms (C=1 pushes
+   the 49.33 h corpus through one lane, ~2.5–3.5 h/arm); a pruned
+   {4,8,16,32} variant ~3–4 h. Ansh rules C from whichever chain(s)
+   land.
 4. **No warm-gated films leg until both sweeps land and are ruled.**
 5. **Ruling C second half — APPLIED in-repo as Ruling L (2026-08-30)**:
    the repo carries 4000/0 (image ENV + service + pipeline defaults), the
@@ -252,6 +263,13 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
 - Era-discipline fields added this session: `reader_semantics`,
   `WIRE_DEVIATION`, `read_s_basis`, `driver_memory` — never compare across
   eras silently.
+- **C-sweep findings (2026-08-31, heads batch, ruled 16×2 postures)**:
+  LI leads at every SATURATED C (+18.9% at C=2, +11.4% at C=4, +16.8% at
+  C=8); rr-default is flat C=1→C=2 (2.285→2.408 f/s, marg-eff 0.527) —
+  single-token queueing at the reader lock confirmed at films timescale;
+  memory does not scale with C on either arm (blocker-1 closure numbers
+  in §4.1). The C=16/32 heads points are NOT findings about concurrency
+  (unsaturated — §4.3).
 
 ## 6. Standing rules — unchanged ones survive every campaign
 
@@ -296,7 +314,8 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
 | selection rule (one copy, Rulings E/F/H/J in-rule) | `probe/films_strata_report.py`; builder `fetch_films_subset.py` |
 | posture sweep — DONE 2026-08-30, RULED (M: 16×2 both arms); artifacts box-side | `probe/run_films_posture.sh` (sha `7c0499ce…`); artifacts `~/films_probe/posture_out/` |
 | Ruling L (LI 4000/0): equivalence note; box rebuild+verify (done, verified live) | `RULING_L_SPLITTER_EQUIVALENCE.md`; `probe/run_ruling_l_box.sh` + `probe/verify_li_chunk_config.py` |
-| C sweep (RUN NEXT at the Ruling-M winners; C_GRID extension awaits Ansh) | `probe/run_films_curve_ruling_m.sh` → `probe/run_films_curve.sh` |
+| C sweep — heads chain DONE 2026-08-31 (C≤8 sound; C=16/32 unsaturated → refused by the summarizer) | `probe/run_films_curve_ruling_m.sh` → `probe/run_films_curve.sh`; artifacts `~/films_probe/curve_out/` + S3 `ansh/c-sweep-20260831/` |
+| high-C reissue (RUN NEXT): measured batch, 4 points, ~1.5–2 h | `probe/run_films_curve_highc.sh` |
 | memory instrument | `probe/mem_watch.py` (fixed VmHWM, oom-aware sweeps) |
 | sizing/equivalence/parity/detect-text probes + artifacts | `probe/probe_films_sizing.py`, `probe_reader_equivalence*`, `probe_frame_parity*`, `probe_detect_text*` (artifacts committed where noted; sizing/proof-2/anchor artifacts box-side, landing awaits ruling) |
 | AMI banked numbers | DEFINITIVE (amended corpus line); anchor export box `~/films_probe/anchor_out/` |

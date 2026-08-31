@@ -29,11 +29,16 @@ lanes included — the envelope), probe ru_maxrss, per-film rows with errors
 recorded never masked.
 
 --summarize DIR computes and prints, from the measured points only:
-  * the per-posture curve table (span, f/s, realtime, CPU, max anon,
-    memory.peak, spool high-water, errors);
+  * the per-posture curve table (span, f/s, realtime, inflight, CPU, max
+    anon, memory.peak, spool high-water, probe rss, errors), chains grouped
+    by (label, BATCH) — a chain never spans batches (different workloads);
   * marginal efficiency per C step, probe_concurrency's rule verbatim
     ([throughput(C)/throughput(prev)] / [C/prev], probe_concurrency.py:15-17)
-    with the first step below 0.7 flagged as the knee;
+    with the first step below 0.7 flagged as the knee — computed ONLY
+    between points that realized their requested C (inflight_max >= C);
+    an unrealized step reports MARG NOT MEASURED and blocks the knee to
+    NOT DETERMINED (2026-08-31: C=16/32 on the 9-film heads batch were
+    the same experiment twice at inflight 9);
   * marginal GB per active lane between successive points (arm-summed
     anon; per-instance beside it).
 It does NOT pick C — Ansh rules from the printed curve (RULING I).
@@ -343,26 +348,60 @@ def build_failed_artifact(*, head, label, concurrency, batch_mode, lanes,
     }
 
 
+def _c_realized(p) -> bool:
+    """Did this point actually RUN at its requested C? False when the batch
+    (or anything else) capped in-flight below C — the 2026-08-31 C sweep ran
+    C=16/32 on the 9-film heads batch: inflight_max 9 at both, so the two
+    points were the same experiment twice and every marginal computed with
+    those C values was arithmetic on concurrency that never happened. An
+    absent inflight_max is ABSENCE, never realization. (Distinct from the
+    'saturated' flag, whose min(C, n_films) asks 'did we reach the batch's
+    achievable bound' — TRUE at C=16 on 9 films, which is exactly why it
+    could not refuse this.)"""
+    return (p.get('inflight_max') is not None
+            and p['inflight_max'] >= p['C'])
+
+
 def curve_rows(points):
-    """points: list of dicts with C, frames_per_s, anon_sum... sorted by C.
-    Returns the marginal columns (probe_concurrency.py:15-17 rule verbatim;
-    knee = first step with marginal efficiency < KNEE_THRESHOLD)."""
+    """points: _point_row dicts sorted by C — ONE label, ONE batch (summarize
+    groups by both; a chain must never span batches: heads and measured are
+    different workloads, so a cross-batch step confounds delta-C with
+    delta-content). Marginal columns per probe_concurrency.py:15-17 verbatim,
+    computed ONLY between two points that BOTH realized their requested C
+    (inflight_max >= C); otherwise the step is NOT MEASURED with the reason —
+    the CANNOT-COMPARE discipline (entry 14): a computation that cannot mean
+    what it says must not print a number. knee: first MEASURED step below
+    KNEE_THRESHOLD; 'NOT DETERMINED' the moment the walk meets an unrealized
+    step before any measured knee — the knee cannot be located across
+    fictional concurrency."""
     rows, knee_at = [], None
+    knee_blocked = False
     for i, p in enumerate(points):
         row = dict(p)
         if i > 0 and points[i - 1].get('frames_per_s') and p.get('frames_per_s'):
             prev = points[i - 1]
-            marg = ((p['frames_per_s'] / prev['frames_per_s'])
-                    / (p['C'] / prev['C']))
-            row['marginal_efficiency'] = round(marg, 3)
-            if knee_at is None and marg < KNEE_THRESHOLD:
-                knee_at = p['C']
-            if (p.get('anon_sum') is not None
-                    and prev.get('anon_sum') is not None):
-                row['marginal_gb_per_lane'] = round(
-                    (p['anon_sum'] - prev['anon_sum'])
-                    / (p['C'] - prev['C']) / 1e9, 3)
+            if _c_realized(prev) and _c_realized(p):
+                marg = ((p['frames_per_s'] / prev['frames_per_s'])
+                        / (p['C'] / prev['C']))
+                row['marginal_efficiency'] = round(marg, 3)
+                if knee_at is None and not knee_blocked and marg < KNEE_THRESHOLD:
+                    knee_at = p['C']
+                if (p.get('anon_sum') is not None
+                        and prev.get('anon_sum') is not None):
+                    row['marginal_gb_per_lane'] = round(
+                        (p['anon_sum'] - prev['anon_sum'])
+                        / (p['C'] - prev['C']) / 1e9, 3)
+            else:
+                bad = p if not _c_realized(p) else prev
+                row['marginal_not_measured'] = (
+                    f"inflight_max {bad.get('inflight_max')} < requested "
+                    f"C={bad['C']} (batch n_films {bad.get('n_films')}) — "
+                    'this concurrency never happened')
+                if knee_at is None:
+                    knee_blocked = True
         rows.append(row)
+    if knee_at is None and knee_blocked:
+        return rows, 'NOT DETERMINED'
     return rows, knee_at
 
 
@@ -396,6 +435,7 @@ def _point_row(d: dict, out_dir: Path) -> dict:
         'label': label, 'C': d['concurrency'],
         'lanes': d.get('lanes'), 'spend_threads': d.get('spend_threads'),
         'batch_mode': d.get('batch_mode'),
+        'n_films': n_films, 'inflight_max': d.get('inflight_max'),
         'span_s': m['span_s'], 'frames_per_s': m['frames_per_s'],
         'realtime_factor': m['realtime_factor'],
         'cores': m['service_cpu']['cores'],
@@ -429,7 +469,12 @@ def summarize(out_dir: Path) -> int:
             failed_points.append(d)
             continue
         row = _point_row(d, out_dir)
-        by_label.setdefault(row['label'], []).append(row)
+        # Chains are per (label, batch): heads and measured are DIFFERENT
+        # workloads (9 films/12.59 h vs 35/49.33 h), so a marginal step
+        # across them would confound delta-C with delta-content
+        # (2026-08-31 ruling round; the probe's fixed-workload contract).
+        by_label.setdefault((row['label'], row['batch_mode'] or '?'),
+                            []).append(row)
     for d in failed_points:
         print(f"  FAILED POINT (a finding, not a gap): {d.get('label')} "
               f"C={d.get('concurrency')} — oom={json.dumps(d.get('oom'))}; "
@@ -441,16 +486,17 @@ def summarize(out_dir: Path) -> int:
         return 0   # only failed points — reported above, evidence preserved
 
     all_rows = []
-    for label in sorted(by_label):
-        points = sorted(by_label[label], key=lambda p: p['C'])
+    for label, batch_mode in sorted(by_label):
+        points = sorted(by_label[(label, batch_mode)], key=lambda p: p['C'])
         rows, knee_at = curve_rows(points)
         all_rows.extend(rows)
-        print(f'\n== {label} ==')
+        print(f'\n== {label} [batch {batch_mode}] ==')
         for r in rows:
             flags = ('' if r['errors'] == 0 else f' ERRORS={r["errors"]}') + \
                     _sat_flag(r['saturated'])
             print(f"  C={r['C']}: span {r['span_s']}s | {r['frames_per_s']} f/s "
-                  f"| rt x{r['realtime_factor']} | {r['cores']} cores "
+                  f"| rt x{r['realtime_factor']} | inflight {r['inflight_max']} "
+                  f"| {r['cores']} cores "
                   f"({r['util_pct']}%) | anon sum {r['anon_sum']} B "
                   f"(max/inst {r['anon_max_instance']}) | mem.peak "
                   f"{r['memory_peak_max']} | spool {r['spool_max']} "
@@ -458,10 +504,18 @@ def summarize(out_dir: Path) -> int:
                   + (f" | marg-eff {r['marginal_efficiency']}"
                      if 'marginal_efficiency' in r else '')
                   + (f" | marg GB/lane {r['marginal_gb_per_lane']}"
-                     if 'marginal_gb_per_lane' in r else '') + flags)
+                     if 'marginal_gb_per_lane' in r else '')
+                  + (f" | MARG NOT MEASURED: {r['marginal_not_measured']}"
+                     if r.get('marginal_not_measured') else '') + flags)
         if len(points) > 1:
-            print(f"  knee (first marg-eff < {KNEE_THRESHOLD}): "
-                  f"{'C=' + str(knee_at) if knee_at else 'none within swept range'}")
+            if knee_at == 'NOT DETERMINED':
+                print(f'  knee (first marg-eff < {KNEE_THRESHOLD}): NOT '
+                      'DETERMINED — the chain contains a point that never '
+                      'ran at its requested C at/before the first '
+                      'sub-threshold step (see MARG NOT MEASURED rows)')
+            else:
+                print(f"  knee (first marg-eff < {KNEE_THRESHOLD}): "
+                      f"{'C=' + str(knee_at) if knee_at else 'none within swept range'}")
 
     # Cross-posture table (RULING K / Crossroad 17): the full matrix for BOTH
     # arms, published beside whatever gets chosen — sorted by throughput,
@@ -489,10 +543,14 @@ def self_test() -> int:
         print(f'  {"PASS" if cond else "FAIL"}  {name}')
         ok = ok and cond
 
-    pts = [{'C': 1, 'frames_per_s': 10.0, 'anon_sum': 9_000_000_000},
-           {'C': 2, 'frames_per_s': 19.0, 'anon_sum': 9_700_000_000},
-           {'C': 4, 'frames_per_s': 30.0, 'anon_sum': 11_100_000_000},
-           {'C': 8, 'frames_per_s': 33.0, 'anon_sum': 13_900_000_000}]
+    pts = [{'C': 1, 'frames_per_s': 10.0, 'anon_sum': 9_000_000_000,
+            'inflight_max': 1, 'n_films': 35},
+           {'C': 2, 'frames_per_s': 19.0, 'anon_sum': 9_700_000_000,
+            'inflight_max': 2, 'n_films': 35},
+           {'C': 4, 'frames_per_s': 30.0, 'anon_sum': 11_100_000_000,
+            'inflight_max': 4, 'n_films': 35},
+           {'C': 8, 'frames_per_s': 33.0, 'anon_sum': 13_900_000_000,
+            'inflight_max': 8, 'n_films': 35}]
     rows, knee = curve_rows(pts)
     check('marginal efficiency: C=2 step = (19/10)/2 = 0.95',
           rows[1]['marginal_efficiency'] == 0.95)
@@ -506,6 +564,37 @@ def self_test() -> int:
           rows[3]['marginal_gb_per_lane'] == 0.7)
     rows2, knee2 = curve_rows(pts[:2])
     check('no knee within range -> none', knee2 is None)
+
+    # 2026-08-31: the C-realization gate. The heads batch capped inflight at
+    # 9 while C=16/32 were requested; the old chain divided by concurrency
+    # that never happened and printed a fictional knee. NOT MEASURED / NOT
+    # DETERMINED, never a number (entry 14's CANNOT-COMPARE discipline).
+    pts_u = [{'C': 4, 'frames_per_s': 4.0, 'inflight_max': 4, 'n_films': 9},
+             {'C': 8, 'frames_per_s': 6.9, 'inflight_max': 8, 'n_films': 9},
+             {'C': 16, 'frames_per_s': 6.64, 'inflight_max': 9, 'n_films': 9},
+             {'C': 32, 'frames_per_s': 6.42, 'inflight_max': 9, 'n_films': 9}]
+    rows_u, knee_u = curve_rows(pts_u)
+    check('unrealized C: marg-eff NOT MEASURED with the full reason, '
+          'never a number',
+          'marginal_efficiency' not in rows_u[2]
+          and 'inflight_max 9 < requested C=16'
+              in rows_u[2]['marginal_not_measured']
+          and 'n_films 9' in rows_u[2]['marginal_not_measured']
+          and 'marginal_efficiency' not in rows_u[3])
+    check('knee NOT DETERMINED when an unrealized step precedes any '
+          'sub-threshold reading', knee_u == 'NOT DETERMINED')
+    pts_k = [{'C': 1, 'frames_per_s': 10.0, 'inflight_max': 1, 'n_films': 9},
+             {'C': 2, 'frames_per_s': 11.0, 'inflight_max': 2, 'n_films': 9},
+             {'C': 16, 'frames_per_s': 12.0, 'inflight_max': 9, 'n_films': 9}]
+    rows_k, knee_k = curve_rows(pts_k)
+    check('a knee found on MEASURED steps before the unrealized tail stands',
+          knee_k == 2 and rows_k[1]['marginal_efficiency'] == 0.55
+          and 'marginal_not_measured' in rows_k[2])
+    rows_a, knee_a = curve_rows(
+        [{'C': 1, 'frames_per_s': 10.0, 'inflight_max': 1, 'n_films': 9},
+         {'C': 2, 'frames_per_s': 19.0, 'n_films': 9}])
+    check('ABSENT inflight_max is absence, never realization',
+          'marginal_not_measured' in rows_a[1] and knee_a == 'NOT DETERMINED')
     check('cells table still the measured postures (sweep reuses them)',
           CELLS['rr-8x4']['tokens'] == 8 and CELLS['rr-default']['tokens'] == 1
           and CELLS['li-8x4']['instances'] == 8)
@@ -650,6 +739,29 @@ def self_test() -> int:
               and row2['anon_max_instance'] == 9_000_000_000
               and row2['memory_peak_max'] == 11_000_000_000
               and row2['spool_max'] == 2_000_000_000)
+
+        # 2026-08-31: chains never span batches — the same label at a
+        # different batch_mode summarizes as its OWN chain (heads C<=8 and
+        # measured high-C are different workloads; a cross-batch marginal
+        # step would confound delta-C with delta-content).
+        import contextlib
+        import io
+        good_h = build_point_artifact(
+            head='selftest', label='rr_M8xT4', concurrency=32,
+            batch_mode='heads', lanes=8, env_n=4, posture={'arm': 'rr'},
+            containers=['rr'], chunk_config_readback={'arm': 'rr'},
+            oom={'rr': {'oomkilled': 'false', 'oom_kill_delta': 0}},
+            manifest_sha256='0' * 64, batch=canned_batch, inflight_max=2,
+            per_film=canned_results, metrics=mets, probe_ru_maxrss_kb=1)
+        (sweep / 'curve_rr_M8xT4_C32.json').write_text(json.dumps(good_h))
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc_split = summarize(sweep)
+        out_txt = buf.getvalue()
+        check('chains split by (label, batch): heads and measured groups '
+              'both print, rc 0',
+              rc_split == 0 and '[batch measured]' in out_txt
+              and '[batch heads]' in out_txt)
 
     # RULING L chunk-config read-back: null-controlled (entry 12 — the
     # refusal paths must demonstrably fire, or the check checks nothing).
