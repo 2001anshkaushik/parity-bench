@@ -23,7 +23,8 @@ worktree `~/anchor_7204` may still exist).
 --ff-only` to the 2026-08-31 refusal-round commit before (a) the
 curve_out re-summarize — older summarizers print fictional marginals
 above C=8 on the heads artifacts — and (b)
-`probe/run_films_curve_highc.sh` (the four measured-batch points).**
+`probe/run_films_curve_highc.sh` (Ruling N: six measured-batch points,
+C∈{8,16,32} both arms).**
 Artifacts box-side: `~/films_probe/posture_out/` and
 `~/films_probe/curve_out/` (the latter archived at
 `s3://rocketride-benchmark-data/ansh/c-sweep-20260831/`); no box commit
@@ -167,7 +168,26 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
   25); the Ruling-I C grid tops out at C=8 < 16 lanes — every curve
   point under-saturates the ruled posture, so extending the grid to
   include 16/32 is FLAGGED for Ansh (`C_GRID` lever exists), not
-  silently applied.
+  silently applied. (Extension ruled and run; see N for the outcome.)
+- **N** (2026-08-31) — high-C reissue RULED: **option 1 plus C=8**, not
+  the full measured chain. Reasoning recorded: option 2's 10–14 h is
+  dominated by C=1 re-measuring single-lane throughput already held;
+  option 1 costs hours not a night and adds the first same-corpus
+  repeatability pairs at the ruled postures (its C=32 reruns vs the
+  posture sweep's measured-batch C=32: 8.65 RR / 10.071 LI — the exact
+  evidence Ruling M's tie note lacked). The knee region is bracketed
+  from BELOW by honest saturated steps (heads marg-eff RR
+  0.805/0.725/0.598, LI 0.846/0.736/0.627 at C=2/4/8 — both cross 0.7
+  between C=4 and C=8); the reissue brackets from above. The C=8
+  ADDITION (three points per arm, {8,16,32}) makes measured-C=8 vs
+  heads-C=8 at the same posture (heads: RR 6.636, LI 6.349) a direct
+  price on the batch change — "we did not mix" becomes a measurement,
+  not just a discipline. Flagged in advance: the 9 heads are the
+  largest-bytes film per stratum and may be systematically slower per
+  frame; measured-C=8 landing well above heads-C=8 is a
+  batch-composition finding, not noise. Entry 28 records the
+  saturated-flag lesson (two correct predicates, one of them the wrong
+  question).
 
 ## 4. OPEN — carry forward, do not silently drop
 
@@ -200,14 +220,12 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    (inflight vs requested C vs n_films), the knee prints NOT DETERMINED
    when an unrealized step precedes it, and chains are grouped per
    (label, batch) — heads and measured are different workloads, one
-   chain never spans both. NEXT: `probe/run_films_curve_highc.sh`
-   re-runs ONLY the four unsaturated points on the measured batch
-   (~1.5–2 h); the heads C=1..8 chain stands as its own chain. If Ansh
-   wants ONE publishable knee chain instead of two clean ones: the full
-   measured-batch chain C∈{1..32} costs ~10–14 h both arms (C=1 pushes
-   the 49.33 h corpus through one lane, ~2.5–3.5 h/arm); a pruned
-   {4,8,16,32} variant ~3–4 h. Ansh rules C from whichever chain(s)
-   land.
+   chain never spans both. **RULED — Ruling N (option 1 + C=8)**:
+   `probe/run_films_curve_highc.sh` runs THREE measured-batch points per
+   arm, C∈{8,16,32} (~2.5–3 h); the heads C=1..8 chain stands as its own
+   chain with an honest knee at C=8 (marg-eff RR 0.598 / LI 0.627 —
+   found on realized steps before the unrealized tail, so it stands).
+   Ansh rules C from the two chains + the batch-pricing point.
 4. **No warm-gated films leg until both sweeps land and are ruled.**
 5. **Ruling C second half — APPLIED in-repo as Ruling L (2026-08-30)**:
    the repo carries 4000/0 (image ENV + service + pipeline defaults), the
@@ -315,7 +333,7 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
 | posture sweep — DONE 2026-08-30, RULED (M: 16×2 both arms); artifacts box-side | `probe/run_films_posture.sh` (sha `7c0499ce…`); artifacts `~/films_probe/posture_out/` |
 | Ruling L (LI 4000/0): equivalence note; box rebuild+verify (done, verified live) | `RULING_L_SPLITTER_EQUIVALENCE.md`; `probe/run_ruling_l_box.sh` + `probe/verify_li_chunk_config.py` |
 | C sweep — heads chain DONE 2026-08-31 (C≤8 sound; C=16/32 unsaturated → refused by the summarizer) | `probe/run_films_curve_ruling_m.sh` → `probe/run_films_curve.sh`; artifacts `~/films_probe/curve_out/` + S3 `ansh/c-sweep-20260831/` |
-| high-C reissue (RUN NEXT): measured batch, 4 points, ~1.5–2 h | `probe/run_films_curve_highc.sh` |
+| high-C reissue (RUN NEXT, Ruling N): measured batch, 6 points C∈{8,16,32}×2 arms, ~2.5–3 h | `probe/run_films_curve_highc.sh` |
 | memory instrument | `probe/mem_watch.py` (fixed VmHWM, oom-aware sweeps) |
 | sizing/equivalence/parity/detect-text probes + artifacts | `probe/probe_films_sizing.py`, `probe_reader_equivalence*`, `probe_frame_parity*`, `probe_detect_text*` (artifacts committed where noted; sizing/proof-2/anchor artifacts box-side, landing awaits ruling) |
 | AMI banked numbers | DEFINITIVE (amended corpus line); anchor export box `~/films_probe/anchor_out/` |

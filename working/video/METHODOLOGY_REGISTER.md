@@ -1013,3 +1013,35 @@ than rewritten from memory, which is entry 2's point in miniature.
 > n_films prints SATURATION-NOT-KNOWN — never computed from a guess,
 > and never conflated with NEVER-SATURATED (the old two-state print
 > would have mislabelled None as never-saturated).
+
+## 28. Two correct predicates, one of them the wrong question (added 2026-08-31; diagnosis accepted and ordered recorded by Ansh)
+
+> When the C sweep ran C=16/32 on a 9-film batch, the summarizer's
+> `saturated` flag read TRUE — and it was RIGHT. Its predicate,
+> `inflight_max >= min(C, n_films)`, answers "did the point reach the
+> batch's achievable bound", and the points did: nine films, nine
+> in-flight. The marginal chain then divided by REQUESTED C and printed
+> efficiency rows for concurrency that never happened, and the flag that
+> existed to catch saturation problems could not object — because nobody
+> had asked it the question the arithmetic depended on: "did the point
+> run at its requested C" (`inflight_max >= C`). Both predicates are
+> correct; they answer different questions; the computation consulted
+> the wrong one.
+>
+> This is a DISTINCT failure shape from a wrong predicate (entry 10's
+> census, entry 8's presence-guard) and from a proxy for the right
+> quantity (entries 3 and 18): nothing here was broken or proxied — the
+> system carried a TRUE answer to a question nobody was asking, and the
+> true answer read as clearance for arithmetic it did not license.
+> Nearest kin is entry 17 (two instruments, two quantities, one name),
+> moved inside a single artifact: 'saturated' was one word wearing two
+> meanings — batch-bound-reached vs requested-C-realized — and each
+> reader took whichever meaning their sentence needed. The cure, as
+> shipped with the 2026-08-31 realization gate: give each question its
+> own NAMED predicate (`_c_realized` beside `saturated`), make every
+> computation consult the one it depends on, and print both questions'
+> raw inputs beside the verdict (`inflight_max` and `n_films` now ride
+> every row) so a reader can see which question any flag answers. The
+> rule: **before trusting a guard, state in words the question it
+> answers and compare that with the question the computation needs
+> answered — a TRUE flag licenses nothing but its own question.**
