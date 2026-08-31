@@ -16,8 +16,11 @@
 # steps (heads marg-eff RR 0.805/0.725/0.598, LI 0.846/0.736/0.627 at
 # C=2/4/8 — both cross 0.7 between C=4 and C=8); this run brackets it
 # from above. THE C=8 ADDITION prices the batch change directly:
-# measured-C=8 vs heads-C=8 at the same posture (heads: RR 6.636, LI
-# 6.349 f/s) — without it the measured chain would share no C with the
+# measured-C=8 vs heads-C=8 at the same posture (heads: RR 5.435, LI
+# 6.349 f/s — CORRECTED 2026-08-31 post-run: the ruling relay had 6.636
+# here, which is the heads-C=16 figure; the box artifacts adjudicated;
+# the measured result was RR 8.21 / LI 9.569 = the ~34% batch finding)
+# — without it the measured chain would share no C with the
 # heads chain and the batch difference would stay unmeasured. FLAGGED IN
 # ADVANCE (Ansh): the 9 heads are the largest-bytes film per stratum and
 # may be systematically slower per frame than the full 35 — measured-C=8

@@ -180,7 +180,9 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
   0.805/0.725/0.598, LI 0.846/0.736/0.627 at C=2/4/8 — both cross 0.7
   between C=4 and C=8); the reissue brackets from above. The C=8
   ADDITION (three points per arm, {8,16,32}) makes measured-C=8 vs
-  heads-C=8 at the same posture (heads: RR 6.636, LI 6.349) a direct
+  heads-C=8 at the same posture (heads: RR 5.435, LI 6.349 — the ruling
+  relay's 6.636 here was the heads-C=16 figure; corrected 2026-08-31
+  post-run from the box artifacts) a direct
   price on the batch change — "we did not mix" becomes a measurement,
   not just a discipline. Flagged in advance: the 9 heads are the
   largest-bytes film per stratum and may be systematically slower per
@@ -188,6 +190,19 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
   batch-composition finding, not noise. Entry 28 records the
   saturated-flag lesson (two correct predicates, one of them the wrong
   question).
+- **O** (2026-08-31) — **C RULED: 16, BOTH ARMS**, from the Ruling-N
+  measured-batch chains (6/6 points, 0 errors, inflight 8/16/32
+  confirmed at every point — the realization read-back working).
+  Recorded reasoning: C=16 is the knee by the pre-registered 0.7
+  criterion (marg-eff at the 8→16 step: RR 0.552, LI 0.534); it is LI's
+  throughput PEAK (C=32 is 4.2% worse, 9.788 vs 10.221 f/s);
+  statistically tied with C=32 for RR (+0.75%, 9.127 vs 9.059 — inside
+  the 2.8–5.5% run-to-run variance in §5); C=8 gives up ~9.4% RR /
+  ~6.4% LI (8.21 vs 9.059; 9.569 vs 10.221) for nothing, since memory
+  does not scale with C; and 16 in flight matches 16 lanes — no queue
+  depth, clean to state. (Ruling relayed "10% / 6.8%"; exact ratios
+  from the verbatim rates shown.) RR anon sum 22.3/23.9/24.6 GB,
+  mem.peak 30.0/38.0/38.0 GB across C=8/16/32 — comfortably inside 58g.
 
 ## 4. OPEN — carry forward, do not silently drop
 
@@ -220,13 +235,19 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    (inflight vs requested C vs n_films), the knee prints NOT DETERMINED
    when an unrealized step precedes it, and chains are grouped per
    (label, batch) — heads and measured are different workloads, one
-   chain never spans both. **RULED — Ruling N (option 1 + C=8)**:
-   `probe/run_films_curve_highc.sh` runs THREE measured-batch points per
-   arm, C∈{8,16,32} (~2.5–3 h); the heads C=1..8 chain stands as its own
-   chain with an honest knee at C=8 (marg-eff RR 0.598 / LI 0.627 —
-   found on realized steps before the unrealized tail, so it stands).
-   Ansh rules C from the two chains + the batch-pricing point.
-4. **No warm-gated films leg until both sweeps land and are ruled.**
+   chain never spans both. **CLOSED — Ruling N ran 2026-08-31 (6/6, 0
+   errors, inflight 8/16/32 confirmed) and Ruling O ruled C=16 BOTH
+   ARMS** from the measured chains (see §3-O). Artifacts:
+   `~/films_probe/curve_hi_out/` box-side. The heads C=1..8 chain stands
+   as its own chain (knee C=8 on its own workload; heads is ~34% slower
+   per §5's batch-composition finding).
+4. **The MAIN FILMS RUN is now unblocked** (was: "no warm-gated leg
+   until both sweeps land and are ruled" — both landed, M/O ruled).
+   Settled config: 35 measured + 2 warm (manifest `54186c24…`), RR
+   M16xT2 C=16, LI N16xT2 C=16, splitter 4000/0 both arms, WARM_N=2,
+   PASSES=2. Cell list, run-plan build items and AMI-shaped hazards are
+   with Ansh for ruling (a) — the advisor's (a)–(e) analysis is in the
+   2026-08-31 round report; DO NOT build before that ruling.
 5. **Ruling C second half — APPLIED in-repo as Ruling L (2026-08-30)**:
    the repo carries 4000/0 (image ENV + service + pipeline defaults), the
    equivalence note, and the sweep probe's fail-closed /health chunk
@@ -288,6 +309,24 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
   memory does not scale with C on either arm (blocker-1 closure numbers
   in §4.1). The C=16/32 heads points are NOT findings about concurrency
   (unsaturated — §4.3).
+- **Batch composition, MEASURED (2026-08-31)**: at C=8, same 16×2
+  posture, the heads batch is ~34% slower than the measured batch on
+  BOTH arms (RR 5.435 vs 8.21 f/s; LI 6.349 vs 9.569). Identical on both
+  arms ⇒ workload, not framework — the 9 heads are the largest-bytes
+  film per stratum, more bytes per frame than the full 35. This is the
+  measured number behind the structural refusal to chain across batches:
+  heads numbers stand alone, never beside measured ones.
+- **Same-corpus repeatability at the ruled postures** (the evidence
+  Ruling M's tie note lacked): C=32 measured, Ruling-N run vs posture
+  sweep — RR 9.127 vs 8.65 (5.5% apart), LI 9.788 vs 10.071 (2.8%).
+  Different runs on different days — looser than AMI's 0.09%
+  within-build pair by design of the comparison. It CONFIRMS Ruling M's
+  refusal to separate LI's 0.34% posture gap: run-to-run variance is an
+  order of magnitude larger than that gap.
+- **LI −4.2% at C=32** (9.788 vs 10.221): quantifies the queue-depth
+  asymmetry AMI noted qualitatively and never measured — 32 in flight
+  across 16 single-worker instances is two-deep per instance. One line
+  in the report, not more.
 
 ## 6. Standing rules — unchanged ones survive every campaign
 
@@ -333,7 +372,8 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
 | posture sweep — DONE 2026-08-30, RULED (M: 16×2 both arms); artifacts box-side | `probe/run_films_posture.sh` (sha `7c0499ce…`); artifacts `~/films_probe/posture_out/` |
 | Ruling L (LI 4000/0): equivalence note; box rebuild+verify (done, verified live) | `RULING_L_SPLITTER_EQUIVALENCE.md`; `probe/run_ruling_l_box.sh` + `probe/verify_li_chunk_config.py` |
 | C sweep — heads chain DONE 2026-08-31 (C≤8 sound; C=16/32 unsaturated → refused by the summarizer) | `probe/run_films_curve_ruling_m.sh` → `probe/run_films_curve.sh`; artifacts `~/films_probe/curve_out/` + S3 `ansh/c-sweep-20260831/` |
-| high-C reissue (RUN NEXT, Ruling N): measured batch, 6 points C∈{8,16,32}×2 arms, ~2.5–3 h | `probe/run_films_curve_highc.sh` |
+| high-C reissue — DONE 2026-08-31 (6/6, inflight confirmed; C RULED 16 both arms, Ruling O) | `probe/run_films_curve_highc.sh`; artifacts `~/films_probe/curve_hi_out/` |
+| MAIN FILMS RUN (NEXT: awaiting Ansh's ruling (a) on cells — do not build before it) | plan skeleton `run_plan.sh` (AMI-shaped; hazards listed 2026-08-31); driver `driver_video.py` |
 | memory instrument | `probe/mem_watch.py` (fixed VmHWM, oom-aware sweeps) |
 | sizing/equivalence/parity/detect-text probes + artifacts | `probe/probe_films_sizing.py`, `probe_reader_equivalence*`, `probe_frame_parity*`, `probe_detect_text*` (artifacts committed where noted; sizing/proof-2/anchor artifacts box-side, landing awaits ruling) |
 | AMI banked numbers | DEFINITIVE (amended corpus line); anchor export box `~/films_probe/anchor_out/` |
