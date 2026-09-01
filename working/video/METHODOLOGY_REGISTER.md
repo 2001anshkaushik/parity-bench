@@ -1013,6 +1013,25 @@ than rewritten from memory, which is entry 2's point in miniature.
 > n_films prints SATURATION-NOT-KNOWN — never computed from a guess,
 > and never conflated with NEVER-SATURATED (the old two-state print
 > would have mislabelled None as never-saturated).
+>
+> **Second addendum (2026-08-31) — the cure does not transfer by having
+> written it.** The very next new reader of driver records
+> (derive_gate3_arming.py, written days AFTER this addendum by its own
+> author) hand-built its fixtures again — under the WIRE schema's field
+> name (`frame_labels`, schema.py) instead of the RECORD's
+> (`frame_label_multisets`, record_from_rr/record_from_li) — and its
+> green 7/7 suite certified a reader that refused every real staged
+> record ("carries no frame_labels", 2026-08-31; third occurrence:
+> n_films, saturated's two questions, now this). The rule gains its
+> operational half: **producer-built fixtures are a rule about WRITING
+> new readers, not about fixing old ones** — every reader of a produced
+> shape starts life with its fixtures built through the producer
+> (record_from_li on a canned wire body, here) and with a null control
+> in the exact shape of the last miss (a record wearing the wire name
+> must be REFUSED naming sought + actual keys). Both now in the
+> deriver's suite. The campaign's own cross path was verified correct
+> (driver_video.py:1705-1707 reads the record names) — the driver reads
+> its own records; only the fresh outside reader guessed.
 
 ## 28. Two correct predicates, one of them the wrong question (added 2026-08-31; diagnosis accepted and ordered recorded by Ansh)
 

@@ -51,11 +51,45 @@ def first_measured(records_path: Path) -> dict:
     return ok[0]
 
 
-def nonempty_fraction(frame_labels) -> float:
-    if not frame_labels:
-        raise SystemExit('NOT DONE — record carries no frame_labels; '
-                         'liveness cannot be derived from nothing')
-    return sum(1 for f in frame_labels if f) / len(frame_labels)
+def gate3_inputs(record: dict) -> tuple:
+    """(label multisets, scores) read by the PRODUCER's record field names —
+    frame_label_multisets / frame_scores (record_from_rr driver_video.py:333,
+    record_from_li :371; the campaign cross path reads the same keys,
+    :1705-1707). The first version of this file read 'frame_labels' — the
+    WIRE schema's name, not the record's — and refused real staged records
+    with 'carries no frame_labels' (2026-08-31): the third
+    reader-written-from-remembered-schema defect this campaign (entry 27
+    addendum). Absence refuses NAMING what was sought and what the record
+    actually carries (entry 15: name what you looked at)."""
+    labels = record.get('frame_label_multisets')
+    scores = record.get('frame_scores')
+    if not labels:
+        raise SystemExit(
+            "NOT DONE — record carries no 'frame_label_multisets' "
+            f"(sought: frame_label_multisets, frame_scores; record keys: "
+            f'{sorted(record.keys())[:24]}); liveness and gate 3 cannot be '
+            'derived from nothing')
+    return labels, scores
+
+
+def nonempty_fraction(frame_label_multisets) -> float:
+    if not frame_label_multisets:
+        raise SystemExit('NOT DONE — empty frame_label_multisets; liveness '
+                         'cannot be derived from nothing')
+    return (sum(1 for f in frame_label_multisets if f)
+            / len(frame_label_multisets))
+
+
+def near_threshold_census(scores, threshold=0.3, eps=0.001) -> dict:
+    """H16 exposure on this film: detections whose score sits inside the
+    boundary window [threshold-eps, threshold+eps] — the population that can
+    flap across arms on summation order. Reported so Ansh sees the film's
+    boundary exposure in the arming artifact itself."""
+    frames = [i for i, fr in enumerate(scores or [])
+              if any(abs(float(s) - threshold) <= eps for s in (fr or []))]
+    n = sum(1 for fr in (scores or []) for s in (fr or [])
+            if abs(float(s) - threshold) <= eps)
+    return {'n_detections_in_window': n, 'frames': frames[:50] or None}
 
 
 def derive(rr: dict, li: dict, git_head: str) -> dict:
@@ -63,12 +97,13 @@ def derive(rr: dict, li: dict, git_head: str) -> dict:
         raise SystemExit(f"NOT DONE — different films: rr={rr.get('video')!r} "
                          f"li={li.get('video')!r}; arming needs ONE staged film "
                          'on both arms (entry 14: same-input or CANNOT COMPARE)')
+    rr_labels, rr_scores = gate3_inputs(rr)
+    li_labels, li_scores = gate3_inputs(li)
     agreement = gs.label_multiset_agreement(
-        rr.get('frame_labels') or [], li.get('frame_labels') or [],
-        rr.get('frame_scores'), li.get('frame_scores'),
+        rr_labels, li_labels, rr_scores, li_scores,
         threshold=0.3, boundary_eps=0.001)
-    fr_rr = nonempty_fraction(rr.get('frame_labels'))
-    fr_li = nonempty_fraction(li.get('frame_labels'))
+    fr_rr = nonempty_fraction(rr_labels)
+    fr_li = nonempty_fraction(li_labels)
     liveness_min = round(0.5 * min(fr_rr, fr_li), 3)
     return {
         'probe': 'derive_gate3_arming', 'created_utc': UTC,
@@ -82,6 +117,19 @@ def derive(rr: dict, li: dict, git_head: str) -> dict:
             'probe_frame_parity artifact — so the same-frames precondition '
             'is strongest exactly here'),
         'agreement': agreement,
+        'score_treatment': (
+            'gate 3 compares SORTED LABEL MULTISETS only '
+            '(gates_shared.py:842-843); scores are consulted solely on '
+            'frames whose labels already diverge, as 6-decimal-rounded '
+            'multisets for the boundary exclusion — sub-1e-6 cross-arm '
+            'score differences are invisible to the verdict by design'),
+        'near_threshold_census': {
+            'window': 'abs(score - 0.3) <= 0.001 (the H16 boundary window)',
+            'rr': near_threshold_census(rr_scores),
+            'li': near_threshold_census(li_scores),
+            'note': 'H16 drift cap (0.5%/video) is LIVE and UNSIZED for '
+                    'films — this census is the film\'s measured exposure',
+        },
         'liveness': {
             'nonempty_frame_fraction_rr': round(fr_rr, 4),
             'nonempty_frame_fraction_li': round(fr_li, 4),
@@ -104,35 +152,69 @@ def self_test() -> int:
         print(f'  {"PASS" if cond else "FAIL"}  {name}')
         ok = ok and cond
 
-    agree_rr = {'video': 'f.mp4', 'frame_labels': [['a'], [], ['b', 'b']],
-                'frame_scores': [[0.9], [], [0.8, 0.7]]}
-    agree_li = json.loads(json.dumps(agree_rr))
+    # ENTRY 27 addendum, applied to THIS file after it recommitted the very
+    # defect (2026-08-31): fixtures come from the PRODUCER
+    # (driver_video.record_from_li on a canned wire body), never hand-shaped.
+    # The first version hand-built records under the WIRE name
+    # 'frame_labels' and its green suite certified a reader that then
+    # refused every real staged record — the third
+    # reader-written-from-remembered-schema defect of the campaign.
+    from driver_video import record_from_li
+
+    def canned_record(labels, scores, video='f.mp4'):
+        body = {'chunks': ['x'], 'chunk_chars': [1], 'n_chunks': 1,
+                'n_frames': len(labels),
+                'n_detections': sum(len(f) for f in labels),
+                'detections_per_frame': [len(f) for f in labels],
+                'frame_labels': labels, 'frame_scores': scores,
+                'embed_dim': 384, 'embedding_norms': [1.0],
+                'stage_s': {}, 'pid': 1}
+        rec = record_from_li(body)     # the real producer maps wire->record
+        rec['video'] = video           # the driver adds identity around it
+        return rec
+
+    agree_rr = canned_record([['a'], [], ['b', 'b']], [[0.9], [], [0.8, 0.7]])
+    agree_li = canned_record([['a'], [], ['b', 'b']], [[0.9], [], [0.8, 0.7]])
     art = derive(agree_rr, agree_li, 'deadbeefcafe')
-    check('agreeing film arms (strict gate PASS, armed true)',
+    check('agreeing arms through PRODUCER-built records (strict PASS, armed)',
           art['armed'] is True and art['agreement']['PASS'] is True)
     check('liveness = 0.5 x min fraction (2/3 frames non-empty -> 0.333)',
           art['liveness']['liveness_min'] == 0.333
           and art['liveness']['nonempty_frame_fraction_rr'] == 0.6667)
     check('run id carries utc + head', 'deadbeef' in art['gate3_run_id'])
-    dis_li = json.loads(json.dumps(agree_rr))
-    dis_li['frame_labels'][2] = ['b']          # real divergence, far from eps
-    dis_li['frame_scores'][2] = [0.8]
+    near = derive(canned_record([['a']], [[0.2995]]),
+                  canned_record([['a']], [[0.2995]]), 'deadbeefcafe')
+    check('H16 census: 0.2995 lands in the boundary window; 0.9 does not',
+          near['near_threshold_census']['rr']['n_detections_in_window'] == 1
+          and near['near_threshold_census']['rr']['frames'] == [0]
+          and art['near_threshold_census']['rr']['n_detections_in_window'] == 0)
+    dis_li = canned_record([['a'], [], ['b']], [[0.9], [], [0.8]])
     art2 = derive(agree_rr, dis_li, 'deadbeefcafe')
     check('diverging arms -> armed false, gate FAIL (null control fires)',
           art2['armed'] is False and art2['agreement']['PASS'] is False
           and art2['agreement']['n_diverging'] == 1)
     try:
-        derive(agree_rr, {'video': 'other.mp4', 'frame_labels': [['a']]},
-               'deadbeefcafe')
+        wire_named = dict(agree_rr)
+        wire_named['frame_labels'] = wire_named.pop('frame_label_multisets')
+        derive(wire_named, agree_li, 'deadbeefcafe')
+        check("the 2026-08-31 defect shape (a record wearing the WIRE name "
+              "'frame_labels') is REFUSED naming sought + actual keys", False)
+    except SystemExit as e:
+        check("the 2026-08-31 defect shape (a record wearing the WIRE name "
+              "'frame_labels') is REFUSED naming sought + actual keys",
+              'frame_label_multisets' in str(e) and 'record keys' in str(e))
+    other = canned_record([['a']], [[0.9]], video='other.mp4')
+    try:
+        derive(agree_rr, other, 'deadbeefcafe')
         check('different films REFUSED (same-input or CANNOT COMPARE)', False)
     except SystemExit as e:
         check('different films REFUSED (same-input or CANNOT COMPARE)',
               'CANNOT COMPARE' in str(e))
     try:
-        nonempty_fraction([])
-        check('empty frame_labels refused, never a derived zero', False)
+        derive(canned_record([], []), agree_li, 'deadbeefcafe')
+        check('empty multisets refused, never a derived zero', False)
     except SystemExit as e:
-        check('empty frame_labels refused, never a derived zero',
+        check('empty multisets refused, never a derived zero',
               'nothing' in str(e))
 
     # ENTRY 27: every probe self-test scans the video tree for unresolvable
