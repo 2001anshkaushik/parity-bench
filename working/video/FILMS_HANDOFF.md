@@ -278,6 +278,16 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    exception chain and skips corpse-terminates, `pipe` added to the
    verified surface WITH evidence, transport_cost refuses over-ceiling
    blobs, frame_identity quarantine-noted; scan clean over 68 files.
+   SECOND staging attempt (2026-08-31): everything passed EXCEPT the
+   deriver, which read the WIRE field name (`frame_labels`) against
+   records carrying the RECORD name (`frame_label_multisets`) — fixed
+   with producer-built fixtures + a regression null control (entry 27
+   second addendum); the campaign cross path verified to read the
+   record names correctly (driver:1705-1707). **RESUME FROM STEP 4
+   ALONE**: golden (write-once), smoke, and both staged legs are DONE
+   on disk at `~/films_probe/gate3_films/` — after the pull, paste only
+   the derive command; a full staging re-run would refuse at the
+   existing golden by design.
    Sequence (reissued): `probe/run_films_staging.sh` (step-0 verify +
    films golden write-once + staged gate-3 + LIVENESS_MIN →
    `~/films_probe/gate3_films/arming.json`; STOP: Ansh reads the arming
