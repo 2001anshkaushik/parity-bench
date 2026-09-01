@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """Gates 2c + 4 at probe depth: engine-side frame indices and PNG bytes.
 
+QUARANTINE NOTE (2026-08-31, entry 29): this probe still uses client.send()
+whole-blob and is the instrument that DISCOVERED the 250 MiB ceiling by dying
+on it (entry 24). It is superseded on films by probe_detect_text (chunked)
+and probe_frame_parity; kept as the discovery artifact. DO NOT run it on any
+item over ~250 MiB — it will measure the refusal, not the frames.
+
 Generates a variant of the measured pipe (a3_env_torch pattern — the measured
 pipe file is untouched) that ADDS a response on frame_grabber's `documents`
 lane, whose Docs carry the frame PNG (base64), `chunkId` = frame_number and

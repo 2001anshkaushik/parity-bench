@@ -1045,3 +1045,59 @@ than rewritten from memory, which is entry 2's point in miniature.
 > rule: **before trusting a guard, state in words the question it
 > answers and compare that with the question the computation needs
 > answered — a TRUE flag licenses nothing but its own question.**
+
+## 29. The ceiling was measured, the rule was written, and the unconverted path waited for the next reader (added 2026-08-31)
+
+> Films staging died at the golden write: smoke_video._send_video still
+> carried client.send(token, video.read_bytes()) — ONE whole-blob DAP
+> message — and the shortest measured film is 527.3 MiB against the
+> 262,144,000-byte ceiling entry 24 measured BY REFUSAL days earlier.
+> Entry 24 wrote the rule ("chunked writes are the ONLY admissible
+> upload") and re-priced the class; what it did not order was the AUDIT:
+> enumerate every send() call site and convert, guard, or quarantine
+> each. The driver was converted (58f2bb3); the smoke — a path only a
+> live box reaches, exercised only when a campaign runs — was not, and
+> no campaign ran between the conversion and today. Third instance of
+> the class "a path only a live box reaches was never converted / never
+> checked": oom_state's import re (entry 27), the bare-python3 audit (as
+> relayed), now the golden send.
+>
+> Same incident, one layer down, same shape: the SDK static scan blocked
+> staging with three "client.pipe() not in the verified surface" fails —
+> and the scanner was RIGHT to block. pipe() is real (dev-checkout
+> signature engine/rocketride/mixins/data.py:368-370; executed on the
+> installed wheel by the detect-text probe on a 429.7 MB film and by 31
+> sweep points), but the surface list froze at d5a32f5, pipe() entered
+> at 58f2bb3 three days later, and scan_tree's only caller is the smoke
+> — which never ran between the two. A checker wired to a path that
+> stopped running is a checker outside the loop (entries 7 and 27's
+> mechanism); it fired the moment the path ran again — the system
+> working, LATE. The surface was extended WITH its evidence, never to
+> silence the gate.
+>
+> The failure also exercised an untested failure path: terminate ran
+> against a dead connection and raised AttributeError, so the log's
+> loudest line was corpse-handling, not the cause (which rode
+> __context__ per entry 20 and went unprinted). The golden path now
+> reports the full exception chain AT the send failure, skips terminate
+> on a dead connection and says so, and states the leak bound: a golden
+> task's ttl 3600 is an IDLE timer (entry 19), so an unterminated task
+> reaps inside the >=2.5 h LI block or dies with the container teardown
+> — no collision with measured legs in any built sequence, and a failed
+> golden kills the plan before legs exist (fail-closed run()).
+>
+> The audit entry 24 should have ordered, performed today — every
+> client.send() site, classified by max plausible payload: smoke golden
+> (CONVERTED — the one import of the one proven loop, entry 6); driver
+> envprobe (a ~13-byte string; safe); probe_transport_cost (AMI
+> whole-vs-chunked comparator — now REFUSES blobs over the ceiling
+> rather than measuring a refusal as a timing); probe_frame_identity
+> (the ceiling's discovery instrument, superseded, quarantine-noted);
+> probe_m1_concurrency and probe_rr floor sends (AMI-era diagnostics,
+> AMI-sized payloads, on no films path); the Phase-1 scripts tree
+> (text/PDF, KB-MB, out of scope). The rule the class keeps teaching:
+> **a measured limit is not absorbed when the rule is written; it is
+> absorbed when every path that can hit it has been enumerated and each
+> one converted, guarded, or quarantined — the audit is part of the
+> finding, not a follow-up** (entry 6's consumer-grep rule, at the
+> level of transport).

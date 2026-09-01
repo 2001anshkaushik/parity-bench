@@ -262,26 +262,58 @@ async def _send_video(video: Path, port: int) -> dict:
     # Measured surface (Phase 1 + installed-wheel paste, 2026-08-21); fresh
     # project_id via the driver's own minter (D3 — the measured pipe's fixed
     # id shares a derived task token with any concurrently live leg task).
+    # CHUNKED since 2026-08-31 — register entry 24's SECOND bite: the films
+    # golden (HouseOnBareMountain, 527.3 MiB) died against the 250 MiB DAP
+    # message ceiling because this path still wrote client.send()'s ONE
+    # whole-blob message. Entry 24 already said chunked writes are the only
+    # admissible upload; the ONE proven loop is imported (probe_detect_text.
+    # upload_chunked — green on a 429.7 MB film and on every sweep RR point),
+    # never re-written (entry 6).
     from rocketride import RocketRideClient
+    sys.path.insert(0, str(ROOT / 'working' / 'video' / 'probe'))
+    from probe_detect_text import exc_chain, upload_chunked
     os.environ['ROCKETRIDE_URI'] = f'http://127.0.0.1:{port}'
     rr_credentials.resolve(strict=True)
     pipe, _project_id = drv.generate_task_pipe('smoke-golden')
     client = RocketRideClient()
     await client.connect(timeout=60000)
     token = None
+    send_exc = None
     try:
         started = await client.use(filepath=str(pipe), ttl=3600)
         token = started['token']
-        result = await client.send(token, video.read_bytes(),
-                                   objinfo={'name': video.name}, mimetype='video/x-msvideo')
+        up = await upload_chunked(client, token, video,
+                                  video.stat().st_size)
+        result = up['result']
+        say(f'  golden upload: chunked-1MiB x {up["n_writes"]} '
+            f'({up["upload_wall_s"]}s up, {up["close_wall_s"]}s close)')
+    except Exception as exc:  # noqa: BLE001 — report the CHAIN, then raise
+        send_exc = exc
+        # dap_client.py:229 discards the cause; the truth rides __context__
+        # (entry 20 addendum). Report it AT the failure — the 2026-08-31
+        # incident reported only a corpse-terminate AttributeError instead.
+        say(f'  golden send FAILED — true chain: {exc_chain(exc)}')
+        raise
     finally:
-        if token:
-            try:  # terminate BEFORE disconnect: a leaked golden task (ttl 3600)
-                  # would collide with step-2 legs if the LI legs finish first
+        if token and send_exc is None:
+            try:  # terminate BEFORE disconnect: a leaked golden task (ttl
+                  # 3600, an IDLE timer) would sit in the rr container the
+                  # default legs then measure
                 await asyncio.wait_for(client.terminate(token), timeout=60)
             except Exception as exc:  # noqa: BLE001
-                say(f'  golden terminate: {exc!r} (recorded; ttl reaps)')
-        await client.disconnect()
+                say(f'  golden terminate FAILED: {exc_chain(exc)} (recorded; '
+                    'the task idle-reaps at ttl 3600 — inside the LI block in '
+                    'every built sequence — or dies with the container)')
+        elif token:
+            say('  golden terminate SKIPPED: the send failed and the '
+                'connection is presumed dead (terminating a corpse raised '
+                'AttributeError on 2026-08-31 and masked the cause, reported '
+                'above); the task idle-reaps at ttl 3600 or dies with the '
+                'container teardown')
+        try:
+            await client.disconnect()
+        except Exception as exc:  # noqa: BLE001
+            say(f'  golden disconnect: {exc_chain(exc)} (recorded)')
     return drv.record_from_rr(result)
 
 

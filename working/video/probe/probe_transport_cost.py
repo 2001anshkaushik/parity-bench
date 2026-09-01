@@ -33,6 +33,15 @@ CHUNK = 1024 * 1024
 
 
 async def send_whole(client, token, blob, name):
+    # Entry 24 (2026-08-31 audit): a whole-blob DAP message dies
+    # deterministically at 262,144,000 bytes — this AMI-era instrument's
+    # whole-vs-chunked comparison is UNDEFINED for films-sized items, so it
+    # refuses rather than measuring a refusal as a timing.
+    if len(blob) + 512 > 262_144_000:
+        raise SystemExit(
+            f'NOT DONE — whole-blob leg of {len(blob)} bytes would exceed the '
+            '250 MiB DAP message ceiling (CONST_WEB_WS_MAX_SIZE, entry 24). '
+            'This probe is AMI-era; on films use the chunked path only.')
     return await client.send(token, blob, objinfo={'name': name},
                              mimetype='video/x-msvideo')
 

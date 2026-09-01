@@ -60,6 +60,22 @@ REQUIRED_METHOD_PARAMS: dict[str, set] = {
     'connect': {'timeout'},
     'use': {'filepath', 'ttl', 'threads'},
     'send': {'token', 'data', 'objinfo', 'mimetype'},
+    # pipe — the chunked write path, the ONLY admissible upload above the
+    # 250 MiB DAP message ceiling (register entry 24). Evidence (added
+    # 2026-08-31, register entry 29): dev-checkout signature `async def
+    # pipe(self, token, objinfo=None, mime_type=None, provider=None,
+    # on_sse=None) -> DataPipe` (engine/rocketride/mixins/data.py:368-370);
+    # EXECUTED against the installed 1.3.0 wheel by probe_detect_text's
+    # upload_chunked on a 429.7 MB film (committed artifact
+    # probe_detect_text_20000LeaguesUndertheSea.json, n_writes recorded),
+    # by every RR point of the posture/C sweeps (31 points, 0 errors), and
+    # by the driver's leg path since 58f2bb3. The returned DataPipe's
+    # open/write/close ride the same executed evidence (write requires
+    # bytes per chunk, data.py:231-232); the scanner tracks client.*
+    # calls only. This list froze at d5a32f5 BEFORE 58f2bb3 introduced
+    # pipe(), and scan_tree's only caller (the smoke) never ran between
+    # the two — the 2026-08-31 staging was the first scan over the calls.
+    'pipe': {'token', 'objinfo', 'mime_type'},
     'terminate': {'token'},
     'disconnect': set(),
 }

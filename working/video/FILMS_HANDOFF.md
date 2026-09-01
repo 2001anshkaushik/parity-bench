@@ -266,8 +266,20 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    as its own chain (knee C=8 on its own workload; heads is ~34% slower
    per §5's batch-composition finding).
 4. **The MAIN FILMS RUN is BUILT to Rulings P–T (2026-08-31)** and is
-   the next box work. Sequence: `probe/run_films_staging.sh` (step-0
-   verify + films golden write-once + staged gate-3 + LIVENESS_MIN →
+   the next box work. FIRST ATTEMPT of staging FAILED at the golden
+   write — **entry 24's second bite** (smoke's `_send_video` still
+   whole-blob `client.send()`; golden film 527.3 MiB vs the 250 MiB
+   ceiling; the swallowed 1009 plus a corpse-terminate AttributeError) —
+   and three SDK-scan blocks (`client.pipe()` absent from a surface list
+   frozen at d5a32f5, before 58f2bb3 introduced pipe; the scan's only
+   caller is the smoke, which never ran between the two). ALL FIXED
+   (entry 29): golden path imports the one chunked loop
+   (probe_detect_text.upload_chunked), failure path reports the true
+   exception chain and skips corpse-terminates, `pipe` added to the
+   verified surface WITH evidence, transport_cost refuses over-ceiling
+   blobs, frame_identity quarantine-noted; scan clean over 68 files.
+   Sequence (reissued): `probe/run_films_staging.sh` (step-0 verify +
+   films golden write-once + staged gate-3 + LIVENESS_MIN →
    `~/films_probe/gate3_films/arming.json`; STOP: Ansh reads the arming
    verdict) → `run_plan_films.sh` (ruled numbers BAKED, reads
    arming.json, refuses without it; ~7–8 h; optional PREFLIGHT_ONLY=1
