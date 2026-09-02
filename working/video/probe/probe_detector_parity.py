@@ -242,8 +242,21 @@ def side(which: str, png_paths) -> int:
             'array_sha256': hashlib.sha256(arr.tobytes()).hexdigest(),
             'array_shape': list(arr.shape), 'array_dtype': str(arr.dtype),
             'predict': _predict_dump(det, names, img, [0.001, 0.3])})
-    print(json.dumps({'side': which, 'libs': _lib_identity(),
-                      'frames': frames}, indent=1))
+    doc = {'side': which, 'libs': _lib_identity(), 'frames': frames}
+    return doc
+
+
+def write_side(which: str, png_paths, out_path: Path) -> int:
+    """2026-09-02 Layer-3 lesson (the campaign's FOURTH shape defect): the
+    side doc used to travel over STDOUT — a channel the engine's embedded
+    interpreter also prints to, so the captured 'JSON' arrived with a
+    banner prefix and compare crashed on it. The artifact now goes to an
+    EXPLICIT FILE; stdout stays a human channel (entry 9: a shared stream
+    is a rendering, not an artifact)."""
+    doc = side(which, png_paths)
+    out_path.write_text(json.dumps(doc, indent=1))
+    rb = json.loads(out_path.read_text())          # entry 22: read back
+    print(f"side {which}: {len(rb['frames'])} frame(s) -> {out_path}")
     return 0
 
 
@@ -413,6 +426,28 @@ def self_test() -> int:
         check('glued flags refused naming the glue (entry 8 class)',
               'glued flags' in str(e) and '--census--cross' in str(e))
 
+    # 2026-09-02 Layer-3 regression controls: side docs travel as FILES;
+    # a polluted stdout capture is refused NAMING the file and its prefix.
+    import tempfile
+    with tempfile.TemporaryDirectory() as t:
+        polluted = Path(t) / 'bad.json'
+        polluted.write_text('ENGINE BANNER LINE\n{"side": "engine"}')
+        import json as _json
+        try:
+            _json.loads(polluted.read_text())
+            parse_fails = False
+        except _json.JSONDecodeError:
+            parse_fails = True
+        check('a banner-polluted capture is indeed non-JSON (the v2 crash '
+              'shape reproduced)', parse_fails)
+        outp = Path(t) / 'side.json'
+        # write_side's file contract without a model: exercise the write+
+        # read-back path via a canned doc through the same json round-trip.
+        outp.write_text(json.dumps(sdoc('engine', [frame()])))
+        rb = json.loads(outp.read_text())
+        check('side doc as FILE round-trips clean (the --side-out contract)',
+              rb['side'] == 'engine' and rb['frames'][0]['png'] == 'p1.png')
+
     from harness.static_names import probe_selftest_findings
     sn = probe_selftest_findings(__file__)
     check('static names: every video-tree name resolves (entry 27)', sn == {})
@@ -437,6 +472,10 @@ def main() -> int:
     ap.add_argument('--side', choices=['engine', 'li'])
     ap.add_argument('--png', nargs='+',
                     help='one or more PNGs — one model load serves all')
+    ap.add_argument('--side-out', default=None,
+                    help='REQUIRED with --side: file the side doc is written '
+                         'to (stdout is a shared, pollutable stream — the '
+                         '2026-09-02 Layer-3 crash)')
     ap.add_argument('--compare', nargs=2, metavar=('ENGINE_JSON', 'LI_JSON'))
     ap.add_argument('--self-test', action='store_true')
     reject_glued_flags(sys.argv[1:])
@@ -453,11 +492,24 @@ def main() -> int:
     if args.side:
         if not args.png:
             ap.error('--side needs --png')
-        return side(args.side, args.png)
+        if not args.side_out:
+            ap.error('--side needs --side-out <file> (stdout is a shared, '
+                     'pollutable stream — the 2026-09-02 Layer-3 crash)')
+        return write_side(args.side, args.png, Path(args.side_out))
     if args.compare:
-        e = json.loads(Path(args.compare[0]).expanduser().read_text())
-        li = json.loads(Path(args.compare[1]).expanduser().read_text())
-        print(json.dumps(compare(e, li), indent=1))
+        docs = []
+        for p in args.compare:
+            path = Path(p).expanduser()
+            text = path.read_text()
+            try:
+                docs.append(json.loads(text))
+            except json.JSONDecodeError as exc:
+                raise SystemExit(
+                    f'NOT DONE — {path} is not JSON ({exc}); first 120 '
+                    f'chars: {text[:120]!r}. A side doc travels as a FILE '
+                    'via --side-out, never a stdout capture (a shared '
+                    'stream is a rendering, not an artifact).')
+        print(json.dumps(compare(docs[0], docs[1]), indent=1))
         return 0
     ap.error('one of --census / --side / --compare / --self-test')
     return 2

@@ -161,14 +161,18 @@ echo "== LAYER 3: side runs (one model load each) =="
 docker cp "$PROBE" rr:/tmp/probe_detector_parity.py
 docker cp "$OUT/small.png" rr:/tmp/small.png
 docker cp "$OUT/large.png" rr:/tmp/large.png
+# --side-out (2026-09-02, the Layer-3 lesson): the side doc travels as a
+# FILE — the engine's embedded interpreter prints its own banner to stdout,
+# which corrupted the v2 stdout capture into non-JSON.
 docker exec -w "$EPREFIX/cache" -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 rr "$EPY" \
     /tmp/probe_detector_parity.py --side engine --png /tmp/small.png /tmp/large.png \
-    > "$OUT/side_engine.json" 2>"$OUT/side_engine.err"
+    --side-out /tmp/side_engine.json 2>"$OUT/side_engine.err"
+docker cp rr:/tmp/side_engine.json "$OUT/side_engine.json"
 docker run --rm -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 \
     -v "$ROOT/$PROBE:/tmp/probe_detector_parity.py:ro" \
     -v "$OUT:/data" --entrypoint python "$LI_IMAGE" \
     /tmp/probe_detector_parity.py --side li --png /data/small.png /data/large.png \
-    > "$OUT/side_li.json" 2>"$OUT/side_li.err"
+    --side-out /data/side_li.json 2>"$OUT/side_li.err"
 
 echo "== VERDICTS (predictions above; libs identity rides them) =="
 "$PYF" "$PROBE" --compare "$OUT/side_engine.json" "$OUT/side_li.json"

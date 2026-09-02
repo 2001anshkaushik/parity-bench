@@ -401,6 +401,35 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    string ≠ same bytes), the torch BUILD reads (Task 3) and the
    installed predict source diffed across containers — one rr bring-up
    serves all (~8–12 min; rr was down post-campaign).
+   **RULING U (2026-09-02) — GATE 3'S STRICT VERDICT IS CORRECT AND
+   STANDS.** Layer 1 excluded the last environmental candidate: both
+   containers run torch 2.10.0+cu128 (git 449b1768, cuda 12.8, wheel
+   cp312-cp312-manylinux_2_28_x86_64, IDENTICAL torch/lib — no
+   MKL/OpenBLAS, built-in kernels both), numpy 2.5.2, pillow 10.4.0,
+   torchvision 0.25.0+cu128, rfdetr 1.5.2 with BYTE-IDENTICAL detr.py
+   (sha d0cf8916… both). Recorded reasoning: same frames (A==C byte
+   parity ×3 failing films), same pillow, same torch build, same
+   detector source bytes, same md5-verified weights — two arms running
+   identical code on identical inputs produce different detections
+   above 560px: a REAL cross-arm difference, not an instrument
+   artifact. 27 films FAIL, 8 PASS; the report states the partition
+   with the excluded mechanisms. OPEN, bounded, next campaign: thread
+   counts at inference time, batch shape, memory layout, allocator
+   state — how each arm runs the same code; settled by completing the
+   side test (raw scores + per-side torch.get_num_threads on one
+   identical frame per size class) then a controlled thread sweep. The
+   side test's Layer 3 crashed on a stdout-capture argument defect —
+   FIXED for the record (--side-out file contract; entry 27 third
+   addendum: the fourth shape defect, moved from the field to the
+   CHANNEL), NOT re-run per the scope ruling.
+   **RESULTS DOCUMENT DRAFTED**:
+   `WS1_Phase2_Films_Benchmark_DEFINITIVE.md` (DRAFT — publishes only
+   when Ansh reports it done): throughput + idle burden + memory, the
+   full posture matrix and C chain beside the chosen config, the §6
+   divergence with all four exclusions and Ruling U, the
+   not-publishable list (char band confound, H16 cap, cross-team CPU),
+   instrument defects with bias directions, the Leela join contract
+   with the 416-counter caution, limitations incl. the arming lesson.
    SIDE TEST v1 DIED ON THE INTERPRETER (2026-09-02): the engine's
    embedded python is NOT the container's /usr/bin/python3 — its
    console-script shebangs point at `/opt/rocketride/engine/engine`

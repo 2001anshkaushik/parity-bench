@@ -1014,6 +1014,23 @@ than rewritten from memory, which is entry 2's point in miniature.
 > and never conflated with NEVER-SATURATED (the old two-state print
 > would have mislabelled None as never-saturated).
 >
+> **Third addendum (2026-09-02) — the fourth shape defect moved from the
+> FIELD to the CHANNEL.** The detector-parity side docs travelled over
+> STDOUT, and the engine's embedded interpreter (the engine executable
+> itself) prints its own banner to stdout — so the captured "JSON"
+> arrived with a prefix and --compare crashed on the fourth
+> producer/consumer contract break of the campaign (n_films' nesting,
+> saturated's two questions, frame_labels' wire-vs-record name, and now
+> a data artifact routed through a stream another writer shares). The
+> fix belongs in the ARGUMENT CONTRACT, not the parser: a probe's data
+> artifact travels as a FILE at an explicit path (--side-out, refused
+> absent), because a shared stream is a rendering, not an artifact
+> (entry 9); and the consumer's parse failure names the file and its
+> first bytes (entry 15: name what you looked at). Kin to the whole
+> entry: stdout pollution from the embedded interpreter is exactly a
+> property only a live box exhibits — no laptop test prints that
+> banner.
+>
 > **Second addendum (2026-08-31) — the cure does not transfer by having
 > written it.** The very next new reader of driver records
 > (derive_gate3_arming.py, written days AFTER this addendum by its own
