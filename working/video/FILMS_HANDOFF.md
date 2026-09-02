@@ -542,7 +542,16 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    reported with sources; **Ansh asks them; nothing becomes a message —
    everything travels inside the results package he hands over** (§9 of
    the films DEFINITIVE now carries the 560px caution as document
-   text).
+   text). The comparison table itself: `AMI_CROSS_TEAM_TABLE.md` —
+   their four columns verbatim + our three cells, every derived column
+   verified at full precision (four draft corrections: 8×4 x_realtime
+   175.45/173.61; 16×2 pass-2 191.3; default spans 9434.7/9423.1;
+   default $/1k 38.94); $1.428/basis confirmed by reproducing all four
+   of their $/1k to the cent; Shashi's span column flagged (not
+   frames÷f/s, +1.5% — his x_rt/$1k cohere with f/s); memory row
+   unfillable until the S3 exports are read (SSO expired this round —
+   `aws sso login --profile rocketride`), which also converts derived
+   spans to measured (bound: ±½ ulp of banked f/s).
 
 ## 5. Findings this session that belong in the (next) report
 
