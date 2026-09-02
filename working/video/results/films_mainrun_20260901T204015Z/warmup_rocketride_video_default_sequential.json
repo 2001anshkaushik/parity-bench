@@ -1,0 +1,46 @@
+{
+ "arm": "rocketride_video",
+ "leg": "sequential",
+ "posture": "default",
+ "policy": "2 first batch + 0 top-up; rows re-sent when exhausted \u2014 Crossroad 32; tokens round-robin (addressed, not accepted)",
+ "gate": {
+  "rule": "warm markers via /health (Crossroad 41)",
+  "warm_workers": null,
+  "declared_workers": null,
+  "tokens_seen": [
+   0
+  ]
+ },
+ "sends": [
+  {
+   "i": 0,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 0,
+   "wall_s": 57.767,
+   "error": null
+  },
+  {
+   "i": 1,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 0,
+   "wall_s": 285.879,
+   "error": null
+  }
+ ],
+ "response_pid_distribution": {
+  "distinct_response_pids": 0,
+  "declared_workers": null,
+  "sends": 2,
+  "per_pid_send_counts": null,
+  "busiest_worker_sends": null,
+  "quietest_serving_worker_sends": null,
+  "unserved_declared_pids": null,
+  "note": "REPORTED, NOT GATED (Crossroad 41). uvicorn workers are selected by the kernel at accept and /process_video does not block its event loop, so response-pid spread measures scheduling, not warmth. Warmth is gated on the service warm markers."
+ },
+ "declared_worker_pids": null,
+ "note": "pid identity is only comparable within ONE container lifetime (defect #23: pid reuse across restarts)"
+}

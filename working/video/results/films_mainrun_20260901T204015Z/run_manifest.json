@@ -1,0 +1,78 @@
+{
+ "run_dir": "working/video/results/films_mainrun_20260901T204015Z",
+ "campaign": "films_mainrun",
+ "started_utc": "2026-09-01T20:40:15Z",
+ "git_sha": "1560b286fcc6726657d0af73cfd1da9f78e88de4",
+ "preflight_only": false,
+ "ruled_numbers": {
+  "rulings": "P (cells/passes/seq), O (C=16 both arms), M (16x2 postures), L (4000/0), J (warm split), S (warm waves kept 2x)",
+  "M_TOKENS": 16,
+  "RR_THREADS_ENV": 2,
+  "RR_DEFAULT_THREADS_ENV": "unset (engine default \u2014 what a user gets)",
+  "LI_INSTANCES": 16,
+  "LI_THREADS_ENV": 2,
+  "BLAST_C": 16,
+  "DEFAULT_N": 35,
+  "SEQ_N": 5,
+  "PASSES": 2,
+  "WARM_N": 2
+ },
+ "arming": {
+  "probe": "derive_gate3_arming",
+  "created_utc": "20260901T203906Z",
+  "git_head": "1560b286fcc6726657d0af73cfd1da9f78e88de4",
+  "gate3_run_id": "films-staging-20260901T203906Z-1560b286",
+  "film": "20000LeaguesUndertheSea.mp4",
+  "film_choice_reason": "first measured manifest row (deterministic; what --n 1 sends) AND the film whose frames are proven byte-identical A==B==C across the engine argv / LI pipe / LI file paths \u2014 committed probe_frame_parity artifact \u2014 so the same-frames precondition is strongest exactly here",
+  "agreement": {
+   "PASS": true,
+   "n_frames": 395,
+   "diverging_frames": null,
+   "n_diverging": 0,
+   "boundary_excluded_frames": null,
+   "n_boundary_excluded": 0,
+   "boundary_excluded_rate": 0.0,
+   "boundary_eps": 0.001,
+   "threshold": 0.3,
+   "max_boundary_rate": 0.005,
+   "scores_available": true
+  },
+  "score_treatment": "gate 3 compares SORTED LABEL MULTISETS only (gates_shared.py:842-843); scores are consulted solely on frames whose labels already diverge, as 6-decimal-rounded multisets for the boundary exclusion \u2014 sub-1e-6 cross-arm score differences are invisible to the verdict by design",
+  "near_threshold_census": {
+   "window": "abs(score - 0.3) <= 0.001 (the H16 boundary window)",
+   "rr": {
+    "n_detections_in_window": 3,
+    "frames": [
+     250,
+     362,
+     365
+    ]
+   },
+   "li": {
+    "n_detections_in_window": 3,
+    "frames": [
+     250,
+     362,
+     365
+    ]
+   },
+   "note": "H16 drift cap (0.5%/video) is LIVE and UNSIZED for films \u2014 this census is the film's measured exposure"
+  },
+  "liveness": {
+   "nonempty_frame_fraction_rr": 0.7696,
+   "nonempty_frame_fraction_li": 0.7696,
+   "liveness_min": 0.385,
+   "derivation": "RULING R: 0.5 x min(per-arm non-empty-frame fraction) measured on the staged film by the leg driver's own records \u2014 the measured minimum with a stated 2x margin. Single-film basis DISCLOSED; never a Corner-derived number on films content."
+  },
+  "armed": true
+ },
+ "corpus": {
+  "manifest": "working/video/films_video_manifest.jsonl",
+  "corpus_dir": "/home/ssm-user/films_corpus/subset",
+  "manifest_sha256_expected": "54186c24a25df594ffd14c9a270281863208ef23dfec2b00814372ed125d4b54"
+ },
+ "disclosures": "DISCLOSURES: char_conservation verdict at the Phase-1 +/-2 pct default is band-cutting DATA for the films band (Ruling L equivalence note), not a calibrated headline; the gate-3 boundary-exclusion drift cap (0.5 pct/video) is LIVE and UNSIZED for films content (H16 open \u2014 do not read its verdict as calibrated).",
+ "completed": true,
+ "cross_gates_failed": true,
+ "completed_utc": "2026-09-02T06:15:53Z"
+}

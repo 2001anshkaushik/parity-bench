@@ -1,0 +1,38 @@
+[entrypoint] RocketRide engine on 0.0.0.0:5565
+
+        _____            _        _   _____  _     _
+       |  __ \          | |      | | |  __ \(_)   | |
+       | |__) |___   ___| | _____| |_| |__) |_  __| | ___
+       |  _  // _ \ / __| |/ / _ \ __|  _  /| |/ _` |/ _ \
+       | | \ \ (_) | (__|   <  __/ |_| | \ \| | (_| |  __/
+       |_|  \_\___/ \___|_|\_\___|\__|_|  \_\_|\__,_|\___|
+
+
+            Copyright (c) 2026 Aparavi Software AG
+                    All rights reserved
+    
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5565 (Press CTRL+C to quit)
+INFO:     127.0.0.1:47140 - "WebSocket /task/service" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:37768 - "WebSocket /task/service" [accepted]
+INFO:     connection open
+child process pid 97 exit status already read:  will report returncode 255
+INFO:     127.0.0.1:58474 - "WebSocket /task/service" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:56938 - "WebSocket /task/service" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:53396 - "WebSocket /task/service" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:56646 - "WebSocket /task/service" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:37030 - "WebSocket /task/service" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:58436 - "WebSocket /task/service" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:41190 - "WebSocket /task/service" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:40262 - "WebSocket /task/service" [accepted]
+INFO:     connection open

@@ -1,0 +1,396 @@
+{
+ "arm": "llamaindex_video",
+ "leg": "sequential",
+ "posture": "workers",
+ "policy": "1 wave(s) x 32 concurrent (max(2 x 16 workers, leg concurrency 1)) \u2014 Crossroad 40; warm SET re-sent per Crossroad 32; warmth gated on warm markers, Crossroad 41",
+ "gate": {
+  "rule": "warm markers via /health (Crossroad 41)",
+  "warm_workers": 16,
+  "declared_workers": 16,
+  "tokens_seen": null
+ },
+ "sends": [
+  {
+   "i": 0,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 695.122,
+   "error": null
+  },
+  {
+   "i": 1,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8803,
+   "token_index": null,
+   "wall_s": 1268.299,
+   "error": null
+  },
+  {
+   "i": 2,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8804,
+   "token_index": null,
+   "wall_s": 702.077,
+   "error": null
+  },
+  {
+   "i": 3,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8805,
+   "token_index": null,
+   "wall_s": 1313.193,
+   "error": null
+  },
+  {
+   "i": 4,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8806,
+   "token_index": null,
+   "wall_s": 706.264,
+   "error": null
+  },
+  {
+   "i": 5,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8807,
+   "token_index": null,
+   "wall_s": 1296.767,
+   "error": null
+  },
+  {
+   "i": 6,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8808,
+   "token_index": null,
+   "wall_s": 700.653,
+   "error": null
+  },
+  {
+   "i": 7,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8809,
+   "token_index": null,
+   "wall_s": 1309.678,
+   "error": null
+  },
+  {
+   "i": 8,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8810,
+   "token_index": null,
+   "wall_s": 691.735,
+   "error": null
+  },
+  {
+   "i": 9,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8811,
+   "token_index": null,
+   "wall_s": 1284.592,
+   "error": null
+  },
+  {
+   "i": 10,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8812,
+   "token_index": null,
+   "wall_s": 703.683,
+   "error": null
+  },
+  {
+   "i": 11,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8813,
+   "token_index": null,
+   "wall_s": 1310.627,
+   "error": null
+  },
+  {
+   "i": 12,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8814,
+   "token_index": null,
+   "wall_s": 707.623,
+   "error": null
+  },
+  {
+   "i": 13,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8815,
+   "token_index": null,
+   "wall_s": 1269.057,
+   "error": null
+  },
+  {
+   "i": 14,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8816,
+   "token_index": null,
+   "wall_s": 704.0,
+   "error": null
+  },
+  {
+   "i": 15,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8817,
+   "token_index": null,
+   "wall_s": 1299.371,
+   "error": null
+  },
+  {
+   "i": 16,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 700.744,
+   "error": null
+  },
+  {
+   "i": 17,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8803,
+   "token_index": null,
+   "wall_s": 1277.436,
+   "error": null
+  },
+  {
+   "i": 18,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8804,
+   "token_index": null,
+   "wall_s": 707.8,
+   "error": null
+  },
+  {
+   "i": 19,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8805,
+   "token_index": null,
+   "wall_s": 1306.186,
+   "error": null
+  },
+  {
+   "i": 20,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8806,
+   "token_index": null,
+   "wall_s": 710.617,
+   "error": null
+  },
+  {
+   "i": 21,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8807,
+   "token_index": null,
+   "wall_s": 1288.745,
+   "error": null
+  },
+  {
+   "i": 22,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8808,
+   "token_index": null,
+   "wall_s": 706.237,
+   "error": null
+  },
+  {
+   "i": 23,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8809,
+   "token_index": null,
+   "wall_s": 1302.298,
+   "error": null
+  },
+  {
+   "i": 24,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8810,
+   "token_index": null,
+   "wall_s": 697.58,
+   "error": null
+  },
+  {
+   "i": 25,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8811,
+   "token_index": null,
+   "wall_s": 1275.088,
+   "error": null
+  },
+  {
+   "i": 26,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8812,
+   "token_index": null,
+   "wall_s": 709.066,
+   "error": null
+  },
+  {
+   "i": 27,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8813,
+   "token_index": null,
+   "wall_s": 1303.26,
+   "error": null
+  },
+  {
+   "i": 28,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8814,
+   "token_index": null,
+   "wall_s": 712.199,
+   "error": null
+  },
+  {
+   "i": 29,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8815,
+   "token_index": null,
+   "wall_s": 1278.329,
+   "error": null
+  },
+  {
+   "i": 30,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": 1,
+   "serving_port": 8816,
+   "token_index": null,
+   "wall_s": 708.629,
+   "error": null
+  },
+  {
+   "i": 31,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": 1,
+   "serving_port": 8817,
+   "token_index": null,
+   "wall_s": 1307.204,
+   "error": null
+  }
+ ],
+ "response_pid_distribution": {
+  "distinct_response_pids": 16,
+  "declared_workers": 16,
+  "sends": 32,
+  "per_pid_send_counts": {
+   "8802:1": 2,
+   "8803:1": 2,
+   "8804:1": 2,
+   "8805:1": 2,
+   "8806:1": 2,
+   "8807:1": 2,
+   "8808:1": 2,
+   "8809:1": 2,
+   "8810:1": 2,
+   "8811:1": 2,
+   "8812:1": 2,
+   "8813:1": 2,
+   "8814:1": 2,
+   "8815:1": 2,
+   "8816:1": 2,
+   "8817:1": 2
+  },
+  "busiest_worker_sends": 2,
+  "quietest_serving_worker_sends": 2,
+  "unserved_declared_pids": null,
+  "note": "REPORTED, NOT GATED (Crossroad 41). uvicorn workers are selected by the kernel at accept and /process_video does not block its event loop, so response-pid spread measures scheduling, not warmth. Warmth is gated on the service warm markers."
+ },
+ "declared_worker_pids": [
+  [
+   8802,
+   1
+  ],
+  [
+   8803,
+   1
+  ],
+  [
+   8804,
+   1
+  ],
+  [
+   8805,
+   1
+  ],
+  [
+   8806,
+   1
+  ],
+  [
+   8807,
+   1
+  ],
+  [
+   8808,
+   1
+  ],
+  [
+   8809,
+   1
+  ],
+  [
+   8810,
+   1
+  ],
+  [
+   8811,
+   1
+  ],
+  [
+   8812,
+   1
+  ],
+  [
+   8813,
+   1
+  ],
+  [
+   8814,
+   1
+  ],
+  [
+   8815,
+   1
+  ],
+  [
+   8816,
+   1
+  ],
+  [
+   8817,
+   1
+  ]
+ ],
+ "note": "pid identity is only comparable within ONE container lifetime (defect #23: pid reuse across restarts)"
+}

@@ -1,0 +1,187 @@
+{
+ "arm": "rocketride_video",
+ "leg": "blast",
+ "posture": "parity",
+ "policy": "2 first batch + 14 top-up; rows re-sent when exhausted \u2014 Crossroad 32; tokens round-robin (addressed, not accepted)",
+ "gate": {
+  "rule": "warm markers via /health (Crossroad 41)",
+  "warm_workers": null,
+  "declared_workers": null,
+  "tokens_seen": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15
+  ]
+ },
+ "sends": [
+  {
+   "i": 0,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 0,
+   "wall_s": 146.767,
+   "error": null
+  },
+  {
+   "i": 1,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 1,
+   "wall_s": 315.903,
+   "error": null
+  },
+  {
+   "i": 2,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 2,
+   "wall_s": 141.365,
+   "error": null
+  },
+  {
+   "i": 3,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 3,
+   "wall_s": 320.236,
+   "error": null
+  },
+  {
+   "i": 4,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 4,
+   "wall_s": 138.777,
+   "error": null
+  },
+  {
+   "i": 5,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 5,
+   "wall_s": 315.991,
+   "error": null
+  },
+  {
+   "i": 6,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 6,
+   "wall_s": 150.437,
+   "error": null
+  },
+  {
+   "i": 7,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 7,
+   "wall_s": 306.192,
+   "error": null
+  },
+  {
+   "i": 8,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 8,
+   "wall_s": 138.001,
+   "error": null
+  },
+  {
+   "i": 9,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 9,
+   "wall_s": 299.105,
+   "error": null
+  },
+  {
+   "i": 10,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 10,
+   "wall_s": 142.864,
+   "error": null
+  },
+  {
+   "i": 11,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 11,
+   "wall_s": 312.17,
+   "error": null
+  },
+  {
+   "i": 12,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 12,
+   "wall_s": 137.977,
+   "error": null
+  },
+  {
+   "i": 13,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 13,
+   "wall_s": 312.216,
+   "error": null
+  },
+  {
+   "i": 14,
+   "row": "Killers_from_space.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 14,
+   "wall_s": 148.661,
+   "error": null
+  },
+  {
+   "i": 15,
+   "row": "DoubleFeatureHell6grindhouse2.mp4",
+   "serving_pid": null,
+   "serving_port": null,
+   "token_index": 15,
+   "wall_s": 304.268,
+   "error": null
+  }
+ ],
+ "response_pid_distribution": {
+  "distinct_response_pids": 0,
+  "declared_workers": null,
+  "sends": 16,
+  "per_pid_send_counts": null,
+  "busiest_worker_sends": null,
+  "quietest_serving_worker_sends": null,
+  "unserved_declared_pids": null,
+  "note": "REPORTED, NOT GATED (Crossroad 41). uvicorn workers are selected by the kernel at accept and /process_video does not block its event loop, so response-pid spread measures scheduling, not warmth. Warmth is gated on the service warm markers."
+ },
+ "declared_worker_pids": null,
+ "note": "pid identity is only comparable within ONE container lifetime (defect #23: pid reuse across restarts)"
+}

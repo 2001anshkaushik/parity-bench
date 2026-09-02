@@ -1,0 +1,5 @@
+/usr/local/lib/python3.12/site-packages/albumentations/__init__.py:24: UserWarning: A new version of Albumentations is available: 2.0.8 (you have 1.4.24). Upgrade using: pip install -U albumentations. To disable automatic update checks, set the environment variable NO_ALBUMENTATIONS_UPDATE to 1.
+  check_for_updates()
+[2026-09-01 20:44:26] [INFO] rf-detr - File rf-detr-base.pth already exists with correct MD5 hash.
+[2026-09-01 20:44:26] [INFO] rf-detr - Loading pretrain weights
+[2026-09-01 20:51:24] [WARNING] rf-detr - Model is not optimized for inference. Latency may be higher than expected. You can optimize the model for inference by calling model.optimize_for_inference().
