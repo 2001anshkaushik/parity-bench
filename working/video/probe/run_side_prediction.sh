@@ -1,36 +1,44 @@
 #!/usr/bin/env bash
 # =============================================================================
-# SIDE TEST AS A PREDICTION TEST (2026-09-02, ruled). The size partition is
-# perfect (35/35: every film with long edge <= 560px is bit-identical across
-# arms; every film above it diverges — 560 is RF-DETR's input edge), and the
-# near-threshold split falsified threshold amplification (clean vs diverging
-# near01 rates 0.05119 vs 0.04514; adjacent fraction 0.524). This block
-# tests the PREDICTION, not a confirmation:
+# SIDE TEST AS A PREDICTION TEST — v2 (2026-09-02). v1 died on interpreter
+# resolution: the engine does NOT use the container's system python — its
+# console-script shebangs point at /opt/rocketride/engine/engine (the engine
+# executable EMBEDS CPython and is the venv's registered interpreter;
+# engine/bin/pip3 shebang, laptop extract). v1's fallback reached for
+# /usr/bin/python3 — the ~/.venv-vs-~/.venv-floor trap one layer in. v2:
+#   * interpreter resolved by CAPABILITY, never by name: every candidate
+#     must `import torch, rfdetr` inside 90 s or is rejected; NO system
+#     fallback exists; none-found = fail closed with the tried list.
+#   * RESUMABLE: frames already on disk are REUSED (small.png 25,519 B /
+#     large.png 400,575 B extracted by v1 — never re-extracted); the rr
+#     bring-up is skipped when rr runs.
+#   * EVIDENCE IN LAYERS, python-free first: the torch build reads, the
+#     package-version scrape and the rfdetr detr.py byte-diff need only
+#     sh/find/cat in each container — they CANNOT die on an interpreter and
+#     they likely name the differing library on their own. The predict run
+#     (scores) is the LAST layer; if the embedded interpreter cannot run it
+#     standalone, the script REPORTS AND STOPS (exit 3) with everything the
+#     earlier layers yielded — per Ansh's scope ruling: the mechanism is
+#     already pinned by the 35/35 size partition; this is one clean
+#     confirmation run naming WHICH library differs (upstream-ticket
+#     evidence), never a blocker for ruling gate 3.
 #
-#   PRE-REGISTERED PREDICTIONS (printed again before anything runs):
-#   P1  small frame (20000LeaguesUndertheSea, 320x240 — the clean class):
-#       pre-predict arrays EQUAL and raw scores within <=1e-5 (the measured
-#       Leagues float-noise background, ~1e-7).
-#   P2  large frame (HouseOnBareMountain, >560px — the diverging class):
-#       pre-predict arrays EQUAL (the load paths are equivalent on RGB —
-#       census-established) BUT raw scores diverge at %-scale (>=1e-3) or
-#       detection counts change: the divergence arises INSIDE predict,
-#       where the downscale runs.
+# PRE-REGISTERED PREDICTIONS (unchanged from v1):
+#   P1 small (20000Leagues, 320x240): arrays EQUAL, scores <= 1e-5 (the
+#      measured Leagues noise floor).
+#   P2 large (HouseOnBareMountain, >560px): arrays EQUAL, scores %-scale
+#      (>= 1e-3) or counts change — the divergence lives INSIDE predict,
+#      where the downscale runs.
 #   FALSIFIER: a large-frame delta at 1e-7 scale kills the resize mechanism
-#   too and forces a deeper bisect. libs_identity (pillow/torch/torchvision
-#   versions + rfdetr detr.py sha per container) rides the verdict: a
-#   pillow or wheel-bytes mismatch = the resize class; all-equal libs =
-#   deeper bisect.
+#   too and forces a deeper bisect.
 #
-# Also in this ONE bring-up (rr is currently down): the torch BUILD reads
-# both containers (version.py incl. git/cuda, wheel tag, torch/lib listing —
-# the BLAS bundle question), and the installed rfdetr predict SOURCE dumped
-# from both containers and diffed (same version string does not guarantee
-# same bytes).
-#
-# Cost ~8-12 min: rr bring-up ~2-3, two frame extracts ~1, build reads
-# ~1, one model load per side ~2-3 each, compares seconds. No leg re-run,
-# no gate changed. Committed script + self-printed sha256 (entry 25).
+# Weights note (Task-2 risk, stated): the engine-side predict runs with
+# -w /opt/rocketride/engine/cache — the WORKDIR mechanism the LI image's
+# own bake-proof uses for offline checkpoint resolution; HF_HUB_OFFLINE/
+# TRANSFORMERS_OFFLINE are set and any fetch attempt surfaces as a failure,
+# never a silent download.
+# Committed script + self-printed sha256 (entry 25). Cost ~6-10 min from
+# the resumed state (no extraction, bring-up only if rr is down).
 # =============================================================================
 set -euo pipefail
 
@@ -48,6 +56,7 @@ LI_IMAGE="${LI_IMAGE:-li:video}"
 SMALL_FILM="20000LeaguesUndertheSea.mp4"
 LARGE_FILM="HouseOnBareMountain.mp4"
 PROBE="working/video/probe/probe_detector_parity.py"
+EPREFIX="/opt/rocketride/engine"
 mkdir -p "$OUT"
 
 echo "== PRE-REGISTERED PREDICTIONS =="
@@ -70,12 +79,11 @@ cleanup() {
 }
 trap cleanup EXIT
 
-EPY="$(docker exec rr sh -c 'for p in /opt/rocketride/engine/bin/python3 /usr/bin/python3 /usr/local/bin/python3; do [ -x "$p" ] && { echo "$p"; break; }; done')"
-[ -n "$EPY" ] || { echo "NOT DONE — no python found in rr container"; exit 1; }
-echo "engine python: $EPY"
-
-echo "== frame extraction (mid-film, the arms' own ffmpeg) =="
-mid() { "$PYF" - "$MANIFEST" "$1" <<'PYMID'
+echo "== frames (RESUME: reuse if present — v1's extracts are good) =="
+if [ -s "$OUT/small.png" ] && [ -s "$OUT/large.png" ]; then
+  echo "reusing existing frames:"; ls -la "$OUT"/small.png "$OUT"/large.png
+else
+  mid() { "$PYF" - "$MANIFEST" "$1" <<'PYMID'
 import json, sys
 for line in open(sys.argv[1]):
     r = json.loads(line)
@@ -84,37 +92,76 @@ for line in open(sys.argv[1]):
 else:
     raise SystemExit(f'NOT DONE — {sys.argv[2]} not in manifest')
 PYMID
-}
-FF="$("$PYF" -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
-"$FF" -nostdin -loglevel error -y -ss "$(mid "$SMALL_FILM")" -i "$CORPUS/$SMALL_FILM" \
-    -frames:v 1 -vcodec png "$OUT/small.png"
-"$FF" -nostdin -loglevel error -y -ss "$(mid "$LARGE_FILM")" -i "$CORPUS/$LARGE_FILM" \
-    -frames:v 1 -vcodec png "$OUT/large.png"
-ls -la "$OUT"/small.png "$OUT"/large.png
-
-echo "== TASK 3: torch BUILD identity, both containers =="
-TREAD='import torch, os; d = os.path.dirname(torch.__file__); print(open(os.path.join(d, "version.py")).read()); import glob; print(sorted(os.path.basename(x) for x in glob.glob(os.path.join(d, "lib", "*")))[:24]); w = glob.glob(os.path.join(d, "..", "torch-*.dist-info", "WHEEL")); print(open(w[0]).read() if w else "no WHEEL file")'
-echo "-- engine (rr) --";  docker exec rr "$EPY" -c "$TREAD"
-echo "-- li ($LI_IMAGE) --"; docker run --rm --entrypoint python "$LI_IMAGE" -c "$TREAD"
-
-echo "== installed rfdetr predict SOURCE, both containers, diffed =="
-PREDSRC='import inspect; from rfdetr import RFDETRBase; print(inspect.getsource(inspect.unwrap(RFDETRBase.predict)))'
-docker exec rr "$EPY" -c "$PREDSRC" > "$OUT/predict_engine.py.txt" 2>"$OUT/predict_engine.err" || \
-  { echo "engine predict-source dump FAILED:"; cat "$OUT/predict_engine.err"; }
-docker run --rm --entrypoint python "$LI_IMAGE" -c "$PREDSRC" > "$OUT/predict_li.py.txt" 2>"$OUT/predict_li.err" || \
-  { echo "li predict-source dump FAILED:"; cat "$OUT/predict_li.err"; }
-if diff -q "$OUT/predict_engine.py.txt" "$OUT/predict_li.py.txt" >/dev/null 2>&1; then
-  echo "predict source: IDENTICAL across containers"
-else
-  echo "predict source: DIFFERS — diff follows"
-  diff "$OUT/predict_engine.py.txt" "$OUT/predict_li.py.txt" || true
+  }
+  FF="$("$PYF" -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')"
+  "$FF" -nostdin -loglevel error -y -ss "$(mid "$SMALL_FILM")" -i "$CORPUS/$SMALL_FILM" \
+      -frames:v 1 -vcodec png "$OUT/small.png"
+  "$FF" -nostdin -loglevel error -y -ss "$(mid "$LARGE_FILM")" -i "$CORPUS/$LARGE_FILM" \
+      -frames:v 1 -vcodec png "$OUT/large.png"
+  ls -la "$OUT"/small.png "$OUT"/large.png
 fi
 
-echo "== side runs (one model load each; stderr to .err files) =="
+echo "== LAYER 1 (python-free, cannot die on an interpreter) =="
+echo "-- engine (rr): torch build --"
+docker exec rr sh -c "SP=$EPREFIX/lib/python3.12/site-packages; \
+  cat \$SP/torch/version.py 2>/dev/null || echo 'torch/version.py NOT FOUND'; \
+  echo '--- torch/lib ---'; ls \$SP/torch/lib 2>/dev/null | head -24; \
+  echo '--- WHEEL ---'; cat \$SP/torch-*.dist-info/WHEEL 2>/dev/null"
+echo "-- li ($LI_IMAGE): torch build --"
+docker run --rm --entrypoint sh "$LI_IMAGE" -c "VP=\$(find /usr/local/lib /usr/lib -maxdepth 4 -type d -name site-packages 2>/dev/null | head -1); \
+  cat \$VP/torch/version.py 2>/dev/null; echo '--- torch/lib ---'; \
+  ls \$VP/torch/lib 2>/dev/null | head -24; echo '--- WHEEL ---'; \
+  cat \$VP/torch-*.dist-info/WHEEL 2>/dev/null"
+echo "-- package versions, both (dist-info scrape) --"
+docker exec rr sh -c "ls $EPREFIX/lib/python3.12/site-packages | grep -iE '^(pillow|torch|torchvision|rfdetr|numpy).*dist-info' | sort" | sed 's/^/  engine  /'
+docker run --rm --entrypoint sh "$LI_IMAGE" -c "VP=\$(find /usr/local/lib /usr/lib -maxdepth 4 -type d -name site-packages 2>/dev/null | head -1); \
+  ls \$VP | grep -iE '^(pillow|torch|torchvision|rfdetr|numpy).*dist-info' | sort" | sed 's/^/  li      /'
+echo "-- rfdetr detr.py byte identity (same version string != same bytes) --"
+docker exec rr sh -c "cat \$(find $EPREFIX -path '*rfdetr/detr.py' 2>/dev/null | head -1)" \
+    > "$OUT/detr_engine.py" 2>/dev/null || echo "engine detr.py NOT FOUND under $EPREFIX"
+docker run --rm --entrypoint sh "$LI_IMAGE" -c "cat \$(find /usr/local/lib /usr/lib -path '*rfdetr/detr.py' 2>/dev/null | head -1)" \
+    > "$OUT/detr_li.py" 2>/dev/null || echo "li detr.py NOT FOUND"
+if [ -s "$OUT/detr_engine.py" ] && [ -s "$OUT/detr_li.py" ]; then
+  sha256sum "$OUT/detr_engine.py" "$OUT/detr_li.py"
+  if diff -q "$OUT/detr_engine.py" "$OUT/detr_li.py" >/dev/null; then
+    echo "detr.py: BYTE-IDENTICAL across containers"
+  else
+    echo "detr.py: DIFFERS — first 40 diff lines:"; diff "$OUT/detr_engine.py" "$OUT/detr_li.py" | head -40
+  fi
+fi
+
+echo "== LAYER 2: engine interpreter by CAPABILITY (import torch, rfdetr in 90s) =="
+SHEBANG="$(docker exec rr sh -c "head -1 $EPREFIX/bin/pip3 2>/dev/null | sed 's/^#!//'" || true)"
+CANDIDATES="$SHEBANG $EPREFIX/engine $EPREFIX/bin/python3.12 $EPREFIX/bin/python3 \
+$(docker exec rr sh -c "find $EPREFIX -maxdepth 3 -type f -name 'python3*' 2>/dev/null" | tr '\n' ' ')"
+EPY=""
+for cand in $CANDIDATES; do
+  [ -n "$cand" ] || continue
+  echo "  trying: $cand"
+  if timeout 90 docker exec rr "$cand" -c 'import torch, rfdetr; print("CAP_OK")' 2>/dev/null | grep -q CAP_OK; then
+    EPY="$cand"; echo "  CAPABLE: $cand"; break
+  fi
+done
+if [ -z "$EPY" ]; then
+  echo "ENGINE-SIDE PREDICT NOT OBTAINABLE STANDALONE — no candidate imported"
+  echo "torch+rfdetr (tried: $CANDIDATES). Per Ansh's scope ruling: REPORT AND"
+  echo "STOP — Layer 1 above carries the build identity and the detr.py diff,"
+  echo "which likely name the differing library already; gate 3 rules on the"
+  echo "35/35 size partition. LI side follows for its half of the record."
+  docker run --rm -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 \
+      -v "$ROOT/$PROBE:/tmp/probe_detector_parity.py:ro" \
+      -v "$OUT:/data" --entrypoint python "$LI_IMAGE" \
+      /tmp/probe_detector_parity.py --side li --png /data/small.png /data/large.png \
+      > "$OUT/side_li.json" 2>"$OUT/side_li.err" || true
+  echo "LI side written to $OUT/side_li.json (engine side ABSENT)."
+  exit 3
+fi
+
+echo "== LAYER 3: side runs (one model load each) =="
 docker cp "$PROBE" rr:/tmp/probe_detector_parity.py
 docker cp "$OUT/small.png" rr:/tmp/small.png
 docker cp "$OUT/large.png" rr:/tmp/large.png
-docker exec -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 rr "$EPY" \
+docker exec -w "$EPREFIX/cache" -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 rr "$EPY" \
     /tmp/probe_detector_parity.py --side engine --png /tmp/small.png /tmp/large.png \
     > "$OUT/side_engine.json" 2>"$OUT/side_engine.err"
 docker run --rm -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 \
@@ -125,6 +172,6 @@ docker run --rm -e HF_HUB_OFFLINE=1 -e TRANSFORMERS_OFFLINE=1 \
 
 echo "== VERDICTS (predictions above; libs identity rides them) =="
 "$PYF" "$PROBE" --compare "$OUT/side_engine.json" "$OUT/side_li.json"
-echo "DONE — artifacts in $OUT (side_*.json, predict_*.py.txt, *.err)."
-echo "Bring back the verdict block, the libs_diff, the torch build reads,"
-echo "and the predict-source diff line verbatim."
+echo "DONE — artifacts in $OUT. Bring back: both frame verdicts with"
+echo "max_sorted_delta, libs_diff, the Layer-1 build reads and the detr.py"
+echo "identity line, verbatim."

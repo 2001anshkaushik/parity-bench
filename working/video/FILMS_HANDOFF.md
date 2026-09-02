@@ -401,6 +401,26 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    string ≠ same bytes), the torch BUILD reads (Task 3) and the
    installed predict source diffed across containers — one rr bring-up
    serves all (~8–12 min; rr was down post-campaign).
+   SIDE TEST v1 DIED ON THE INTERPRETER (2026-09-02): the engine's
+   embedded python is NOT the container's /usr/bin/python3 — its
+   console-script shebangs point at `/opt/rocketride/engine/engine`
+   (the engine executable embeds CPython and is the venv's registered
+   interpreter; engine/bin/pip3 shebang) — the venv-vs-floor trap one
+   layer in. v2 (`run_side_prediction.sh`, same name): interpreter
+   resolved by CAPABILITY (every candidate must `import torch, rfdetr`
+   in 90 s; shebang-derived + find-derived candidates; NO system
+   fallback), RESUMABLE (v1's extracted frames reused, bring-up skipped
+   when rr runs), and evidence YIELDS IN LAYERS — Layer 1 is
+   python-free (sh/find/cat: torch build reads, dist-info version
+   scrape, rfdetr detr.py byte-diff — cannot die on an interpreter and
+   likely names the differing library alone); the predict run is last,
+   with weights resolved by `-w /opt/rocketride/engine/cache` (the
+   WORKDIR mechanism the LI bake-proof uses) and offline env set. If no
+   candidate is capable: REPORT AND STOP (exit 3) with Layer 1 + the LI
+   half — per ANSH'S SCOPE RULING, recorded: the mechanism is pinned by
+   the 35/35 partition; the side test names WHICH library differs
+   (upstream-ticket evidence), and gate 3 is ruled on the partition
+   evidence regardless.
    ALSO RECORDED: (i) probe cell B (`-i pipe:0`, the legacy form) died
    rc=234/183 on 2 of 3 films with n=0 — the campaign is IMMUNE (both
    arms read FILES: pipeline.py:191-195, whose docstring predicted this
