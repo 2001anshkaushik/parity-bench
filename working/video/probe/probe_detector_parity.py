@@ -70,11 +70,32 @@ from pathlib import Path
 UTC = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
 
 
+def reject_glued_flags(argv) -> None:
+    """A token like '--census--cross' is argparse-refused loudly (verified
+    2026-09-02: exit 2, no artifact — it cannot silently swallow), but the
+    refusal is a usage dump; this names the glue and the fix (entry 8's
+    missing-space class, at the option token instead of the value)."""
+    for tok in argv:
+        if tok.startswith('--') and '--' in tok[2:]:
+            raise SystemExit(f'NOT DONE — glued flags {tok!r}: two options '
+                             'ran together (missing space in the paste?). '
+                             'Separate them and re-run.')
+
+
 # ------------------------------------------------------------------- census
 def census(manifest: Path, corpus: Path, cross_path: Path, out: Path) -> int:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    import imageio_ffmpeg
+    try:
+        import imageio_ffmpeg
+    except ImportError:
+        raise SystemExit(
+            'NOT DONE — this interpreter has no imageio_ffmpeg. The census '
+            'runs under the FLOOR venv (~/.venv-floor/bin/python3); the '
+            'driver venv (~/.venv) does not carry it — the probe/driver '
+            'interpreter split, the entry-15 carryover class (2026-09-02: '
+            'this exact trap cost a paste).')
     ff = imageio_ffmpeg.get_ffmpeg_exe()
+    import numpy as np
     from PIL import Image
     agr = {}
     if cross_path.is_file():
@@ -100,28 +121,47 @@ def census(manifest: Path, corpus: Path, cross_path: Path, out: Path) -> int:
                     'utf-8', 'replace'), 'n_diverging': agr.get(r['file'])})
                 continue
             with Image.open(png) as im:
+                arr = np.asarray(im)
                 rows.append({'film': r['file'], 'mode': im.mode,
                              'size': list(im.size),
+                             'array_dtype': str(arr.dtype),
+                             'array_shape': list(arr.shape),
+                             'aspect': round(im.size[0] / im.size[1], 4),
                              'n_diverging': agr.get(r['file'])})
-    by_mode = {}
-    for r in rows:
-        by_mode.setdefault(r.get('mode', 'ERROR'), []).append(
-            r.get('n_diverging'))
-    partition = {m: {'n_films': len(v),
-                     'zero_divergence': sum(1 for x in v if x == 0),
-                     'diverging': sum(1 for x in v if (x or 0) > 0)}
-                 for m, v in by_mode.items()}
+    partition = partition_census(rows)
     doc = {'probe': 'detector_parity_census', 'created_utc': UTC,
-           'per_film': rows, 'partition_by_mode': partition,
-           'verdict_note': ('mode PARTITIONS divergence if one mode holds '
-                            'all zero-divergence films and another all '
-                            'diverging ones — then the wrapper delta '
-                            '(engine keeps original mode, LI converts RGB) '
-                            'is the mechanism')}
+           'per_film': rows, **partition,
+           'channel_order_note': ('PIL arrays are RGB by construction on '
+                                  'both arms (no cv2/BGR anywhere in either '
+                                  'load path — pipeline.py:210-212, '
+                                  'image.py:36-38); the 560px resize happens '
+                                  'INSIDE rfdetr.predict, identical package '
+                                  'both arms — its geometry comes from the '
+                                  'wheel-source paste, not assumed here'),
+           'verdict_note': ('a property PARTITIONS divergence if one class '
+                            'holds all zero-divergence films and another '
+                            'all diverging ones')}
     out.write_text(json.dumps(doc, indent=1))
     print(json.dumps(partition, indent=1))
     print(f'census -> {out}')
     return 0
+
+
+def partition_census(rows) -> dict:
+    """Partition the clean/diverging split by every recorded property."""
+    def split(key):
+        by = {}
+        for r in rows:
+            by.setdefault(str(r.get(key, 'ERROR')), []).append(
+                r.get('n_diverging'))
+        return {k: {'n_films': len(v),
+                    'zero_divergence': sum(1 for x in v if x == 0),
+                    'diverging': sum(1 for x in v if (x or 0) > 0)}
+                for k, v in by.items()}
+    return {'partition_by_mode': split('mode'),
+            'partition_by_size': split('size'),
+            'partition_by_dtype': split('array_dtype'),
+            'partition_by_shape': split('array_shape')}
 
 
 # ------------------------------------------------------------------- sides
@@ -243,18 +283,29 @@ def self_test() -> int:
     check('non-self-deterministic side -> VOID (null control)',
           'VOID' in r5['verdict'])
 
-    # census partition logic on canned rows
-    rows = [{'film': 'a', 'mode': 'L', 'n_diverging': 100},
-            {'film': 'b', 'mode': 'L', 'n_diverging': 90},
-            {'film': 'c', 'mode': 'RGB', 'n_diverging': 0}]
-    by = {}
-    for x in rows:
-        by.setdefault(x['mode'], []).append(x['n_diverging'])
-    part = {m: {'zero_divergence': sum(1 for v in vs if v == 0),
-                'diverging': sum(1 for v in vs if (v or 0) > 0)}
-            for m, vs in by.items()}
-    check('partition arithmetic: L=2 diverging, RGB=1 zero-divergence',
-          part['L']['diverging'] == 2 and part['RGB']['zero_divergence'] == 1)
+    # census partition logic on canned rows — every recorded property.
+    rows = [{'film': 'a', 'mode': 'RGB', 'size': [640, 480],
+             'array_dtype': 'uint8', 'array_shape': [480, 640, 3],
+             'n_diverging': 100},
+            {'film': 'b', 'mode': 'RGB', 'size': [640, 480],
+             'array_dtype': 'uint8', 'array_shape': [480, 640, 3],
+             'n_diverging': 90},
+            {'film': 'c', 'mode': 'RGB', 'size': [320, 240],
+             'array_dtype': 'uint8', 'array_shape': [240, 320, 3],
+             'n_diverging': 0}]
+    part = partition_census(rows)
+    check('partition arithmetic: mode does NOT partition (one class, mixed) '
+          'while size DOES (640x480 diverging, 320x240 clean)',
+          part['partition_by_mode']['RGB']['diverging'] == 2
+          and part['partition_by_mode']['RGB']['zero_divergence'] == 1
+          and part['partition_by_size']['[640, 480]']['diverging'] == 2
+          and part['partition_by_size']['[320, 240]']['zero_divergence'] == 1)
+    try:
+        reject_glued_flags(['--census--cross', '/tmp/x'])
+        check('glued flags refused naming the glue (entry 8 class)', False)
+    except SystemExit as e:
+        check('glued flags refused naming the glue (entry 8 class)',
+              'glued flags' in str(e) and '--census--cross' in str(e))
 
     from harness.static_names import probe_selftest_findings
     sn = probe_selftest_findings(__file__)
@@ -281,6 +332,7 @@ def main() -> int:
     ap.add_argument('--png')
     ap.add_argument('--compare', nargs=2, metavar=('ENGINE_JSON', 'LI_JSON'))
     ap.add_argument('--self-test', action='store_true')
+    reject_glued_flags(sys.argv[1:])
     args = ap.parse_args()
     if args.self_test:
         sys.path.insert(0, str(Path(__file__).resolve().parents[2]))

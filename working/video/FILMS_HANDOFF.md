@@ -345,6 +345,33 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    preprocessing, gate 3 strict is CORRECT (arms not doing the same
    work); ARRAYS EQUAL + scores differ ⇒ float class, strict multisets
    are the wrong instrument for a threshold-crossing detector.
+   **CENSUS FALSIFIED THE MODE HYPOTHESIS (2026-09-02)**: all 35 films
+   decode to RGB PNGs — .convert('RGB') is a no-op on this corpus; the
+   wrapper delta is real in source and does nothing here (the stated
+   falsifier fired). CORRECTION on the record: the "engine dist-info"
+   torch citation was a macOS arm64 EXTRACT (wheel tag
+   cp312-none-macosx_11_0_arm64, .dylibs) — it attests the engine
+   distribution's VERSION PIN (2.10.0, git_version 449b1768…), NOT the
+   rr container's build; the container build identity needs the
+   one-paste reads below. The ~1e-7 float figure is an UPPER BOUND FROM
+   ONE FILM's agreement (Leagues), not a measured range — it does not
+   bound content with many near-threshold detections. REMAINING
+   CANDIDATES: sub-percent score shifts amplified at the 0.3 threshold
+   (free test: `diagnose_cross_films.py --near-threshold` — clean-8 vs
+   diverging-27 near-threshold rates + adjacency of diverging frames;
+   also prints per-film n_diverging/exclusions/PASS to resolve the
+   census-8 vs quoted-3 zero-divergence discrepancy) and the WHEEL
+   BUILD (LI +cu128 from the PyTorch index vs the engine's own linux
+   build — same version string, different binaries; container-side
+   read-pastes: `docker exec rr sh -c 'cat <engine-prefix>/lib/
+   python3.12/site-packages/torch/version.py; ls .../torch/lib | head'`
+   and the same via `docker run --rm --entrypoint sh li:video`). The
+   census gained size/dtype/shape/aspect partitions (same mode ≠ same
+   tensor), an interpreter guard (census = FLOOR venv; ~/.venv lacks
+   imageio_ffmpeg — the entry-15 carryover trap, cost a paste), and a
+   glued-flags refusal naming the glue (verified: argparse already
+   refuses loudly, exit 2 — the 8/27 output therefore came from a run
+   whose --cross join WORKED). Side test STILL HELD until Ansh rules.
    ALSO RECORDED: (i) probe cell B (`-i pipe:0`, the legacy form) died
    rc=234/183 on 2 of 3 films with n=0 — the campaign is IMMUNE (both
    arms read FILES: pipeline.py:191-195, whose docstring predicted this

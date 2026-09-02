@@ -179,6 +179,79 @@ def confound_join(cross: dict, rr_by: dict, li_by: dict) -> dict:
     }
 
 
+def near_threshold_split(rr_by: dict, li_by: dict, cross: dict,
+                         thr: float = 0.3) -> dict:
+    """FREE mechanism test (2026-09-02, after the mode hypothesis died by
+    census): if the divergence is sub-percent score shifts amplified at the
+    0.3 threshold, the clean films should carry FEWER near-threshold
+    detections, and most diverging frames should involve a detection within
+    0.01 of threshold on EITHER arm. Also prints, per film, n_diverging /
+    n_boundary_excluded / PASS — resolving the census-8 vs quoted-3
+    zero-divergence discrepancy from the same artifacts."""
+    agr = (cross.get('cross_detection_agreement') or {}).get('per_video') or {}
+
+    def med(vals):
+        s = sorted(v for v in vals if v is not None)
+        if not s:
+            return None
+        return (s[len(s) // 2] if len(s) % 2 else
+                round((s[len(s) // 2 - 1] + s[len(s) // 2]) / 2, 5))
+
+    films = []
+    for v in sorted(set(rr_by) & set(li_by)):
+        rl, rs = gate3_inputs(rr_by[v])
+        ll, ls_ = gate3_inputs(li_by[v])
+        g = agr.get(v) or {}
+
+        def cnt(scores, eps):
+            return sum(1 for fr in (scores or []) for s in (fr or [])
+                       if abs(float(s) - thr) <= eps)
+        tot_rr = sum(len(f or []) for f in (rs or []))
+        tot_li = sum(len(f or []) for f in (ls_ or []))
+        row = {'video': v, 'n_diverging': g.get('n_diverging'),
+               'n_boundary_excluded': g.get('n_boundary_excluded'),
+               'PASS': g.get('PASS'),
+               'tot_det_rr': tot_rr, 'tot_det_li': tot_li,
+               'near01_rr': cnt(rs, 0.01), 'near01_li': cnt(ls_, 0.01),
+               'near05_rr': cnt(rs, 0.05), 'near05_li': cnt(ls_, 0.05)}
+        row['near01_rate'] = round(
+            (row['near01_rr'] + row['near01_li']) / max(1, tot_rr + tot_li), 5)
+        row['near05_rate'] = round(
+            (row['near05_rr'] + row['near05_li']) / max(1, tot_rr + tot_li), 5)
+        div = ([i for i in range(len(rl))
+                if sorted(rl[i]) != sorted(ll[i])]
+               if len(rl) == len(ll) else [])
+        adj = sum(1 for i in div
+                  if any(abs(float(s) - thr) <= 0.01
+                         for s in list((rs or [[]] * len(rl))[i] or [])
+                         + list((ls_ or [[]] * len(ll))[i] or [])))
+        row['n_div_frames'] = len(div)
+        row['div_frames_adjacent01'] = adj
+        row['adjacent_fraction'] = round(adj / len(div), 3) if div else None
+        films.append(row)
+    clean = [f for f in films if f['n_diverging'] == 0]
+    diver = [f for f in films if (f['n_diverging'] or 0) > 0]
+    return {
+        'summary': {
+            'clean_n': len(clean), 'diverging_n': len(diver),
+            'unjoined_n': sum(1 for f in films if f['n_diverging'] is None),
+            'median_near01_rate': {'clean': med([f['near01_rate'] for f in clean]),
+                                   'diverging': med([f['near01_rate'] for f in diver])},
+            'median_near05_rate': {'clean': med([f['near05_rate'] for f in clean]),
+                                   'diverging': med([f['near05_rate'] for f in diver])},
+            'median_adjacent_fraction_diverging':
+                med([f['adjacent_fraction'] for f in diver]),
+            'clean_films': [f['video'] for f in clean],
+            'reading': ('clean rate << diverging rate AND adjacent fraction '
+                        'high  => sub-percent score shifts amplified at the '
+                        'threshold — mechanism confirmed; adjacent fraction '
+                        'LOW => much divergence is far from threshold — '
+                        'something larger is wrong and the side test decides'),
+        },
+        'per_film': films,
+    }
+
+
 def li_embed_share(li_by: dict) -> dict:
     """Embed-stage share of LI wall — bounds how much of the throughput
     comparison the char-volume asymmetry can touch. RR records carry no
@@ -286,6 +359,31 @@ def self_test() -> int:
               dirn['films_where_rr_detects_more'] == 1
               and dirn['films_where_li_detects_more'] == 0)
 
+        # 2026-09-02: near-threshold mechanism split (mode hypothesis died
+        # by census; this is the free follow-up). Film N: clean, scores far
+        # from 0.3. Film D: diverging at frames whose scores hug 0.3.
+        rr2 = [rec([['a'], ['a', 'b']], [[0.9], [0.9, 0.305]], [80], 'D.mp4'),
+               rec([['c'], ['c']], [[0.8], [0.7]], [50], 'N.mp4')]
+        li2 = [rec([['a'], ['a']], [[0.9], [0.9]], [80], 'D.mp4'),
+               rec([['c'], ['c']], [[0.8], [0.7]], [50], 'N.mp4')]
+        rr2p, li2p = d / 'rr2.jsonl', d / 'li2.jsonl'
+        rr2p.write_text('\n'.join(json.dumps(r) for r in rr2) + '\n')
+        li2p.write_text('\n'.join(json.dumps(r) for r in li2) + '\n')
+        cross2 = cross_gates(rr2p, li2p, 0.02, gate3_armed='selftest')
+        nt = near_threshold_split(load_records(rr2p), load_records(li2p),
+                                  cross2)
+        check('near-threshold split: clean film rate 0, diverging film '
+              'carries the 0.305 detection at eps 0.01',
+              nt['summary']['clean_films'] == ['N.mp4']
+              and nt['summary']['median_near01_rate']['clean'] == 0.0
+              and nt['summary']['median_near01_rate']['diverging'] > 0)
+        dfilm = [f for f in nt['per_film'] if f['video'] == 'D.mp4'][0]
+        check('diverging frame is threshold-adjacent (fraction 1.0), '
+              'PASS/exclusions carried per film',
+              dfilm['adjacent_fraction'] == 1.0
+              and dfilm['n_div_frames'] == 1
+              and dfilm['PASS'] is not None)
+
     # ENTRY 27: every probe self-test scans the video tree for unresolvable
     # names. Lazy import: live paths untouched.
     from harness.static_names import probe_selftest_findings
@@ -309,6 +407,9 @@ def main() -> int:
     ap.add_argument('--cell', default='parity_blast',
                     help='cell for records + cross join (pass-1 files)')
     ap.add_argument('--dump-n', type=int, default=6)
+    ap.add_argument('--near-threshold', action='store_true',
+                    help='print ONLY the near-threshold mechanism split '
+                         '(clean vs diverging films; free, records-only)')
     ap.add_argument('--self-test', action='store_true')
     args = ap.parse_args()
     if args.self_test:
@@ -323,6 +424,13 @@ def main() -> int:
     li_by = load_records(out_dir / f'records_llamaindex_video_workers_{leg}.jsonl')
     cross_path = out_dir / f'cross_{args.cell}.json'
     cross = json.loads(cross_path.read_text())
+
+    if args.near_threshold:
+        print(f'\n== NEAR-THRESHOLD SPLIT [{args.cell}] (free, records-only) ==')
+        nt = near_threshold_split(rr_by, li_by, cross)
+        print(json.dumps(nt['summary'], indent=1))
+        print(json.dumps(nt['per_film'], indent=1))
+        return 0
 
     print(f'\n== TASK 2: per-frame anatomy — {args.film} [{args.cell}] ==')
     if args.film not in rr_by or args.film not in li_by:
