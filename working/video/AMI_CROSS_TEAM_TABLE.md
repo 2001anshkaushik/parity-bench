@@ -11,6 +11,17 @@ pass1 / pass2), **measured values read from the landed run exports**
 (identification and hashes: `results/AMI_LANDING.md`); the single
 CPU-s/frame value is the mean of the two exported per-pass values.
 
+> **Before reading the landed run_manifest: its `completed: false` is a
+> tooling wart, not a verdict on the run.** The campaign launch died at
+> its first blast sends and was resumed; the resume tool
+> (`resume_rr_legs.sh`) re-ran the legs but never flipped the manifest
+> flag. The completion evidence is primary and landed: all six exports
+> carry exactly 168 completed records each with `frames_census` PASS
+> and no missing videos, the measured spans match 23,049 frames at the
+> banked rates, and `results/resume_console_20260824T074227Z.log` shows
+> the resumed run's preflight PASS and execution. Details:
+> `results/AMI_LANDING.md`.
+
 | | Leela 32 × OMP 1 | Shashi 32×1 | Leela 16 × OMP 2 | Shashi 16×2 | Ansh 16 × OMP 2 | Ansh 8 × OMP 4 | Ansh default (1 token, env unset) |
 |---|---|---|---|---|---|---|---|
 | frames/s | 16.213 | 16.17 | 15.314 | 15.39 | 12.729 / 12.753 | 11.694 / 11.571 | 2.443 / 2.446 |
@@ -44,15 +55,16 @@ already mixes bases (Leela cgroup-incl-cache vs Shashi RSS in one row);
 no memory figure in this table is comparable across bases, and each of
 Ansh's cells carries all three labels rather than one number.
 
-ᵉ **The pass-1 errors-gate artifact, classified**: the 16×2 and default
-pass-1 exports report `gates.errors PASS=false, n_errors=16`
-(n_records 184 = 168+16). The 16 rows are corpses of the campaign
-launch that died at its first 16 blast sends and was resumed
-(`resume_console_20260824T074227Z.log`, landed): enqueued hours before
-the leg's first completed row, instant connection errors, and all 16
-videos completed OK in the same leg. `frames_census` passes with
-exactly 168 records; spans and CPU brackets are computed on the
-completed set. Full classification with records-file hashes:
+ᵉ **The pass-1 exports' errors gate reads FAIL, and it affects no
+figure in this table**: the 16 counted "errors" (n_records 184 =
+168+16) are corpse rows of the campaign launch that died at its first
+16 blast sends — enqueued hours BEFORE the leg's first completed row,
+instant connection errors, every one of the 16 videos completed OK in
+the same leg after the resume (`resume_console_20260824T074227Z.log`,
+landed). `frames_census` passes with exactly 168 records and no
+missing videos; the spans and CPU brackets are computed on the
+completed set, which the measured span ↔ frames ↔ f/s agreement
+confirms. Full classification with records-file hashes:
 `results/AMI_LANDING.md`. Pass-2 legs read 168/0 clean.
 
 Row cautions:

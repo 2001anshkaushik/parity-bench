@@ -50,15 +50,18 @@ f969f485a89528b8fd9f2cb27e62fb640d92e0cf815ad0ca482c269002cb8395  apples_2026082
 S3 (key `ansh/video-ami-20260826/resume_console_20260824T074227Z.log`);
 it is landed here beside the run directories.
 
-## The pass-1 errors gate — classified, from the records
+## The pass-1 errors gate reads FAIL — and no measured figure is affected
 
-Both pass-1 exports in `mainrun_20260824T025550Z` report
-`gates.errors: PASS=false, n_errors=16` with `n_records=184`
-(= 168 + 16), while both pass-2 exports read 168/0. The 16 error rows
-were classified from the full records files (fetched, not landed —
-hashes below): all 16 are `role=measured` rows for 16 distinct videos,
-enqueued **~1.9 h (parity) / ~3.3 h (default) BEFORE the leg's first
-completed row**, each dying instantly at send
+**Verdict first**: both pass-1 exports in `mainrun_20260824T025550Z`
+report `gates.errors: PASS=false, n_errors=16`, and all 16 are corpse
+rows of an aborted launch, not failures of the measured run — every
+throughput, CPU and memory figure quoted from these exports is computed
+on the 168-record completed set and is unaffected. The basis for that
+verdict, classified from the full records files (fetched, not landed —
+hashes below): `n_records=184` (= 168 + 16), while both pass-2 exports
+read 168/0. All 16 error rows are `role=measured` rows for 16 distinct
+videos, enqueued **~1.9 h (parity) / ~3.3 h (default) BEFORE the leg's
+first completed row**, each dying instantly at send
 (`ConnectionError('Could not send request')` /
 `AttributeError("'NoneType' object has no attribute 'is_connected'")`),
 and **every one of the 16 videos also completed OK later in the same

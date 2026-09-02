@@ -573,6 +573,17 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    ten env numbers match SESSION_STATE:294's launch line exactly. No
    apples dir has a run_manifest (8×4 identity = export-embedded
    provenance: posture read-backs, census 8→8, shared image digest).
+   **PACKAGE ASSEMBLED (same day)**: `AMI_CROSS_TEAM_COVER.md` (one
+   page: table pointer, the gap plainly, candidates as HYPOTHESIS with
+   patched-vs-stock first, the specific ask — per-stage CPU split on
+   one identical file or an exchanged cgroup sampler stream);
+   completed:false and the pass-1 errors gate now explained
+   verdict-first at the top of the table doc and in AMI_LANDING.md.
+   Nothing blocks handover; two optional strengtheners on record
+   (box-minutes per-file byte-identity cross-check; her post-pin cells
+   stay HYPOTHESIS until she publishes pins). The films DEFINITIVE is a
+   separate deliverable — its DRAFT banner untouched, not part of this
+   package.
 
 ## 5. Findings this session that belong in the (next) report
 
