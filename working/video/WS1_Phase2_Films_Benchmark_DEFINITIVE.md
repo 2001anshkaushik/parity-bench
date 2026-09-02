@@ -311,12 +311,24 @@ then the 0.5% cap stays live and disclosed in every export.
 Her per-film records filter to our 35 by `doc`, with `input_sha256`
 equality as the identity check — **no equality proof, no comparison**
 (CANNOT COMPARE, register entry 14). Her repo pins: 08-22 `aa817d9a`,
-24-Aug `313430f3`, head `3967d9f4`. One standing caution for any joined
-frame-count figure: **her RR frame counts carry the counter artifact we
-measured** — her `bench_video.py:106`-shape bracket counter retains
-chunk-boundary duplicates (416 on 20000Leagues where the engine's own
-frame stream, detect text and our overlap-stripped counter all agree on
-395; first divergence at index 44; committed artifacts at `7204a28`).
+24-Aug `313430f3`, head `3967d9f4`. Two standing cautions for any join:
+
+1. **Frame counts**: her RR frame counts carry the counter artifact we
+   measured — her `bench_video.py:106`-shape bracket counter retains
+   chunk-boundary duplicates (416 on 20000Leagues where the engine's own
+   frame stream, detect text and our overlap-stripped counter all agree on
+   395; first divergence at index 44; committed artifacts at `7204a28`).
+2. **The 560px edge (§6)**: on content whose frame long edge exceeds
+   560px, the two arms produce genuinely different detections from
+   identical frames and identical library builds. Any joined
+   detection-level figure (labels, scores, agreement rates) on >560px
+   content must carry that finding; ≤560px content joins clean. The AMI
+   corpus (352×288, uniform) sits below the edge and is unaffected —
+   consistent with its byte-identical gate-3 scores.
+
+This section is document text inside the results package; nothing in it
+travels as a direct message to her team — the package is handed over by
+Ansh, and questions flow back the same way.
 
 ## 10. Limitations
 

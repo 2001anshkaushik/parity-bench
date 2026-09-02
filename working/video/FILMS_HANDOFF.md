@@ -469,6 +469,26 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    (1.0011 / 1.0023 / 1.0056 — n=3, all within 0.6% ABOVE 1.0, the
    direction the Ruling-L note predicted from engine short-line
    retention).
+   **RESULTS LANDED (entry 26, 2026-09-02): box commit `646eaea`**
+   fetched via bundle, verified exactly one commit ahead of `79e4676`
+   touching only the results dir (95 files) + golden record, ff-merged,
+   pushed. run_manifest: completed, cross_gates_failed=true, campaign
+   git_sha `1560b28`, all ruled numbers match. One observation: wall
+   ~9.6 h vs the ~7–8 h estimate (single-lane-rate arithmetic
+   under-priced 16-lane warm-up — now §10 limitation 7). REVIEW ROUND +
+   **RULINGS V/W/X applied (2026-09-02, commit `5766686`)**: headline
+   carries BOTH per-core figures (+26.7% per measured core / +3.9% per
+   effective core — the gap between them IS the token tax) with the
+   ordered restatement (near-equal per-core cost; 4.66 cores standing
+   still); §2.2 explains span +6.5% vs window +2.2% (half the
+   completions land in ramp/drain); V = 500-header probe NOT run
+   (recorded in §6); W = char band + H16 formally DEFERRED with
+   settlers; X = open-mechanism paragraph goes upstream as the ticket.
+   Provenance pass at `646eaea` clean except ONE gap, marked in §6: the
+   parity/census/Layer-1 diagnosis artifacts are BOX-SIDE
+   (`~/films_probe/parity_failing/`, `~/films_probe/detector_parity/`)
+   — relayed verbatim, not landed. DRAFT banner stays until Ansh
+   reports it done.
 5. **Ruling C second half — APPLIED in-repo as Ruling L (2026-08-30)**:
    the repo carries 4000/0 (image ENV + service + pipeline defaults), the
    equivalence note, and the sweep probe's fail-closed /health chunk
@@ -485,15 +505,44 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    the box cross-file score lists, the per-video drift denominator fails
    any <200-frame video, and `label_multiset_agreement` still has no
    committed test; the gate FIX awaits Ansh's ruling); **CPU-per-frame
-   discrepancy with Leela** (no cross-team CPU figure publishable until
-   settled); **model-server row untested** (`--modelserver=` nullcontext
-   device lock).
+   discrepancy with Leela — ESCALATED, see item 9** (no cross-team CPU
+   figure publishable until settled); **model-server row untested**
+   (`--modelserver=` nullcontext device lock).
 8. Small films-leg to-dos: driver's hardcoded mime `video/x-msvideo`
    (routes correctly by prefix; label wrong for .mp4); the LI client's
    7200 s urlopen ceiling (slow-posture films legs can exceed it — the
    probes use 14400 s); upstream `dap_client.py:229` ticket (`raise …
    from exc` — entry 20 + 24 carry the evidence, second occurrence
    measured).
+9. **STOP 2026-09-02 — the ~20% AMI RR-vs-RR question (OPEN, gates the
+   comparison package).** Leela's cross-team table (received as DATA)
+   shows her RR and Shashi's RR agreeing to 0.3–0.5% on full AMI at
+   15.31–16.21 f/s (16×OMP2 / 32×OMP1) — our banked AMI 16×2 is
+   12.729/12.753, **~20% below both**. Full reconciliation from held
+   artifacts + her repo at pins (git-object reads only, no fetch, no
+   contact): `AMI_CROSS_TEAM_RECONCILIATION.md`. The short of it: the
+   gap reduces to a **stable ~19–20% CPU-per-frame difference**
+   (ours 2.308/2.590 vs hers 1.934/2.156 CPU-s/frame at 16×2/8×4, same
+   cgroup basis, same pipe composition object-diffed, same 23,049
+   frames, both ~92% util at the new postures); her earlier 8×4 was
+   admission-limited at 74.6% util, which is why we looked +5.1% faster
+   THEN. Two independent harnesses agree and **ours is the outlier**.
+   Candidates (all HYPOTHESIS, none resolved): her patched engine vs
+   our STOCK (the one named build delta; our own provenance declares
+   patched-vs-stock not comparable, provenance_leela.py:137-141 —
+   weakened by our clean self-duplication gates), CPU-bracket edges,
+   client topology (1 socket ×16 tokens vs 16 sockets), image layers.
+   Her 32×1/16×2 cells post-date the held pins (HYPOTHESIS they follow
+   her matched pattern); our side has NO 32×1 AMI cell and the AMI
+   exports are NOT in-repo (only the 08-23 run_manifest + log) —
+   landing them entry-26-style is the first step if this goes
+   cross-team. The 560px mechanism does NOT touch AMI (352×288,
+   below-edge; SESSION_STATE.md:1945 + her setup doc :210 + the
+   byte-identical gate-3 scores). Per the received-docs hard rule:
+   reported with sources; **Ansh asks them; nothing becomes a message —
+   everything travels inside the results package he hands over** (§9 of
+   the films DEFINITIVE now carries the 560px caution as document
+   text).
 
 ## 5. Findings this session that belong in the (next) report
 
