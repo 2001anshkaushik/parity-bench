@@ -1,5 +1,63 @@
 # FILMS_HANDOFF — briefing for the Archive Films campaign (rewritten 2026-08-30)
 
+> # ★ CAMPAIGN CLOSED — 2026-09-02 ★
+>
+> **Outcome.** The main run completed 2026-09-01 (9 legs, 0 errors, every
+> per-leg gate PASS/NOT-RUN), landed at `646eaea`, results written up in
+> `WS1_Phase2_Films_Benchmark_DEFINITIVE.md` (DRAFT banner stays until the
+> last diagnosis artifacts land — one box paste outstanding, below).
+> Headline: at the ruled 16×2 posture, C=16, LlamaIndex +6.5% span /
+> +26.7% per measured core / **+3.9% per effective core** — near-equal
+> per-core cost with RocketRide's token model spending 4.66 cores idle;
+> default→parity 4.05×. The campaign's second finding is §6: a REAL
+> cross-arm detection divergence above RF-DETR's 560px input edge
+> (27 FAIL / 8 PASS, partition exact, four mechanisms excluded by
+> measurement) — filed upstream as Ticket 6 (Ruling X).
+>
+> **Rulings L–X, one line each (A–K are in §3 below):**
+> - **L**: LI splitter 4000/0 — overlap matched to what the engine
+>   realizes; fail-closed /health read-back every preflight.
+> - **M**: postures 16×2 both arms, from the 11-point matrix.
+> - **N**: C-sweep reissued on the measured batch only (heads C>8 was
+>   unrealized concurrency — refused, never ruled on).
+> - **O**: C=16 both arms (pre-registered 0.7 marginal rule; LI's peak).
+> - **P**: cells = RR default + RR 16×2 + LI 16×2, 2 passes,
+>   Crossroad-27 framing for the default cell.
+> - **Q**: gate-3 arming staged on 20000Leagues (byte-parity-proven film).
+> - **R**: LIVENESS_MIN 0.385 derived from the staged run, never Corner.
+> - **S**: warm waves kept 2× (the accepted wall cost — §10.7).
+> - **T**: build items 1–7 incl. the mime fix before the run.
+> - **U**: gate 3's strict verdict CORRECT and stands — 27 FAIL / 8 PASS
+>   is a real cross-arm difference, not an instrument artifact.
+> - **V**: the 500-header generality probe NOT run (recorded in §6).
+> - **W**: char band + H16 cap formally DEFERRED with named settlers.
+> - **X**: the open-mechanism paragraph goes upstream — FILED 2026-09-02
+>   as Ticket 6 in `working/upstream/RocketRide_Engine_Tickets.md`.
+>
+> **Open, carried forward:** (1) the ONE outstanding box paste —
+> `probe/archive_films_diagnosis.sh` archives
+> `~/films_probe/{parity_failing,detector_parity}` (their stated S3
+> prefixes were checked EMPTY; landing + banner decision follow);
+> (2) H16's boundary-drift cap, live and unsized for films (Ruling W;
+> settler = films-sized denominator ruled before data); (3) the films
+> char band — confounded by §6, settled only by an agreeing-detections
+> run (Ruling W); (4) the corpus-wide >560px fraction — NOT derivable
+> from held artifacts (her manifest records no resolution; Ruling V);
+> (5) the ~20% AMI CPU-per-frame gap with Leela/Shashi — package
+> assembled, item 9; (6) side-test completion next campaign (thread
+> settlers; instrument committed); (7) H7, model-server row, waterfront
+> flag — item 7; (8) box hygiene ruling pending (inventory delivered
+> 2026-09-02; nothing deleted).
+>
+> **Box state at close:** worktree `~/parity-bench-video` last committed
+> `646eaea` (the laptop is ahead — the box pulls before any reuse);
+> campaign containers down; on disk: `~/films_probe/*` (sizing, posture,
+> curve, curve_hi, gate3_films, anchor_out, parity_failing,
+> detector_parity), `~/films_corpus/subset` (~29 GB), the AMI corpus
+> dirs, images `rr:patched-video` / `li:video` / `li:video-anchor`, and
+> worktree `~/anchor_7204` (may persist). Nothing deleted pending the
+> hygiene ruling.
+
 **Read this instead of pasted context.** Supersedes the 2026-08-26 version
 (which described five open blockers — all now CLOSED — and predates the
 corpus adoption, the subset, and Rulings A–K). The AMI campaign (23–26 Aug
@@ -18,11 +76,10 @@ patched (`rr:patched-video`), SDK 1.3.0, Python 3.12.13. LI image
 `li:video` — REBUILT 2026-08-28 freeze-pinned + streaming reader;
 `li:video-anchor` = pre-refactor code + pinned deps (kept for reruns;
 worktree `~/anchor_7204` may still exist).
-**BOX STATE: ran the posture sweep, the C sweep, and the Ruling-N
-points; all sweeps CLOSED and ruled (M/N/O). It MUST `git pull
---ff-only` to the Rulings-P–T build commit, then run
-`probe/run_films_staging.sh` (STOP: read arming.json), then
-`run_plan_films.sh` — the main campaign (~7–8 h).**
+**BOX STATE: superseded — see the CAMPAIGN CLOSED block at the top.
+The main campaign RAN 2026-09-01 and is landed; the only outstanding
+box work is the `archive_films_diagnosis.sh` paste.** (The paragraph
+below is the pre-campaign state, kept as history.)
 Artifacts box-side: `~/films_probe/posture_out/`, `~/films_probe/
 curve_out/` (S3 `ansh/c-sweep-20260831/`), `~/films_probe/curve_hi_out/`;
 no box commit or bundle of repo history is outstanding — no base claimed

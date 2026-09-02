@@ -1,0 +1,356 @@
+{
+ "probe": "films_curve",
+ "created_utc": "20260831T092344Z",
+ "git_head": "9e035b8707e9f383da24985b99cbaa723319f3ef",
+ "cell": "li_N16xT2",
+ "label": "li_N16xT2",
+ "concurrency": 8,
+ "batch_mode": "heads",
+ "lanes": 16,
+ "spend_threads": 32,
+ "posture": {
+  "arm": "li",
+  "instances": 16,
+  "env": "2"
+ },
+ "containers": [
+  "li_bal_0",
+  "li_bal_1",
+  "li_bal_2",
+  "li_bal_3",
+  "li_bal_4",
+  "li_bal_5",
+  "li_bal_6",
+  "li_bal_7",
+  "li_bal_8",
+  "li_bal_9",
+  "li_bal_10",
+  "li_bal_11",
+  "li_bal_12",
+  "li_bal_13",
+  "li_bal_14",
+  "li_bal_15"
+ ],
+ "chunk_config_readback": {
+  "expected": {
+   "chunk_size": 4000,
+   "chunk_overlap": 0,
+   "split_unit": "chars"
+  },
+  "per_port": {
+   "8802": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8803": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8804": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8805": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8806": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8807": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8808": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8809": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8810": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8811": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8812": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8813": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8814": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8815": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8816": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8817": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   }
+  }
+ },
+ "oom": {
+  "li_bal_0": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_1": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_2": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_3": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_4": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_5": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_6": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_7": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_8": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_9": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_10": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_11": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_12": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_13": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_14": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_15": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  }
+ },
+ "manifest_sha256": "54186c24a25df594ffd14c9a270281863208ef23dfec2b00814372ed125d4b54",
+ "batch": [
+  {
+   "file": "parole_inc.mp4",
+   "bytes": 444557399,
+   "video_s": 4267.59,
+   "expected_frames": 285
+  },
+  {
+   "file": "HouseOnBareMountain.mp4",
+   "bytes": 552895530,
+   "video_s": 3718.99,
+   "expected_frames": 248
+  },
+  {
+   "file": "ABucketofBlood.mp4",
+   "bytes": 1711003992,
+   "video_s": 3928.17,
+   "expected_frames": 262
+  },
+  {
+   "file": "ThisisNotaTest.mp4",
+   "bytes": 446462026,
+   "video_s": 4331.76,
+   "expected_frames": 289
+  },
+  {
+   "file": "gammera.mp4",
+   "bytes": 555650657,
+   "video_s": 5121.88,
+   "expected_frames": 341
+  },
+  {
+   "file": "HorrorHotel1960.mp4",
+   "bytes": 1617111108,
+   "video_s": 4587.78,
+   "expected_frames": 306
+  },
+  {
+   "file": "Eisenstein-October.mp4",
+   "bytes": 442372200,
+   "video_s": 6139.8,
+   "expected_frames": 409
+  },
+  {
+   "file": "street_angel.mp4",
+   "bytes": 565167881,
+   "video_s": 5429.45,
+   "expected_frames": 362
+  },
+  {
+   "file": "the-grapes-of-wrath-1940.mp4",
+   "bytes": 2190569811,
+   "video_s": 7784.69,
+   "expected_frames": 519
+  }
+ ],
+ "inflight_max": 8,
+ "per_film": [
+  {
+   "file": "parole_inc.mp4",
+   "serving_port": 8802,
+   "admit_ns": 12615371995059,
+   "n_frames": 285,
+   "bytes_spooled": 444557399,
+   "frames_dir_bytes": 88424162,
+   "done_ns": 12803626961807,
+   "wall_s": 188.25
+  },
+  {
+   "file": "HouseOnBareMountain.mp4",
+   "serving_port": 8803,
+   "admit_ns": 12615373530826,
+   "n_frames": 248,
+   "bytes_spooled": 552895530,
+   "frames_dir_bytes": 115752591,
+   "done_ns": 12780770224417,
+   "wall_s": 165.4
+  },
+  {
+   "file": "ABucketofBlood.mp4",
+   "serving_port": 8804,
+   "admit_ns": 12615374134034,
+   "n_frames": 262,
+   "bytes_spooled": 1711003992,
+   "frames_dir_bytes": 85371851,
+   "done_ns": 12815844321590,
+   "wall_s": 200.47
+  },
+  {
+   "file": "ThisisNotaTest.mp4",
+   "serving_port": 8805,
+   "admit_ns": 12615374410888,
+   "n_frames": 289,
+   "bytes_spooled": 446462026,
+   "frames_dir_bytes": 50578421,
+   "done_ns": 12798378955138,
+   "wall_s": 183.0
+  },
+  {
+   "file": "gammera.mp4",
+   "serving_port": 8806,
+   "admit_ns": 12615374863146,
+   "n_frames": 341,
+   "bytes_spooled": 555650657,
+   "frames_dir_bytes": 54744347,
+   "done_ns": 12825477755169,
+   "wall_s": 210.1
+  },
+  {
+   "file": "HorrorHotel1960.mp4",
+   "serving_port": 8807,
+   "admit_ns": 12615375391348,
+   "n_frames": 306,
+   "bytes_spooled": 1617111108,
+   "frames_dir_bytes": 75327243,
+   "done_ns": 12836870636329,
+   "wall_s": 221.5
+  },
+  {
+   "file": "Eisenstein-October.mp4",
+   "serving_port": 8808,
+   "admit_ns": 12615375950742,
+   "n_frames": 409,
+   "bytes_spooled": 442372200,
+   "frames_dir_bytes": 23985316,
+   "done_ns": 12853988268244,
+   "wall_s": 238.61
+  },
+  {
+   "file": "street_angel.mp4",
+   "serving_port": 8809,
+   "admit_ns": 12615376410506,
+   "n_frames": 362,
+   "bytes_spooled": 565167881,
+   "frames_dir_bytes": 99335856,
+   "done_ns": 12847804892036,
+   "wall_s": 232.43
+  },
+  {
+   "file": "the-grapes-of-wrath-1940.mp4",
+   "serving_port": 8810,
+   "admit_ns": 12780770361174,
+   "n_frames": 519,
+   "bytes_spooled": 2190569811,
+   "frames_dir_bytes": 492240250,
+   "done_ns": 13091211051173,
+   "wall_s": 310.44
+  }
+ ],
+ "metrics": {
+  "span_s": 475.84,
+  "n_films": 9,
+  "n_ok": 9,
+  "n_errors": 0,
+  "total_frames": 3021,
+  "frames_per_s": 6.349,
+  "realtime_factor": 95.22,
+  "frame_expectation_mismatches": null,
+  "service_cpu": {
+   "cores": 10.85,
+   "util_pct": 33.9,
+   "basis": "cgroup cpu.stat usage_usec delta over the point wall (475.84s), summed over 16/16 containers; idle lanes included; util against 32 vCPU"
+  }
+ },
+ "probe_ru_maxrss_kb": 44928,
+ "memory_note": "anon/memory.peak/spool are mem_watch's, recorded beside this artifact by the wrapper"
+}

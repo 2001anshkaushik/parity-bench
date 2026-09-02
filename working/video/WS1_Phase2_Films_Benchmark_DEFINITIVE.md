@@ -184,6 +184,25 @@ batches.
 
 ## 6. The detection divergence — a real cross-arm difference (Ruling U)
 
+**In plain terms.** On small videos the two arms detect the same
+objects — to the last bit. RF-DETR, the detector both arms run from
+byte-identical code and weights, takes its input at up to 560 pixels on
+the long edge, so a film at or under that size reaches the detector
+exactly as decoded, and every such film agrees perfectly across arms. A
+bigger film has to be shrunk to fit first, and after that shrink the
+two sides part: the same objects come back with confidence scores
+shifted by fractions of a percent, which is enough to push a borderline
+object over the 0.3 cutoff on one side and not the other. The split on
+this corpus is clean — all 8 films at or under 560px agree exactly, all
+27 above it diverge, no exceptions. Everything upstream is proven equal
+(identical frames in, identical libraries, identical weights), so the
+difference is born inside the shrink step; which runtime detail makes
+identical code produce slightly different pixels there — thread count,
+memory layout, allocator state — is the one question left open below.
+Why it matters: a detection-level figure compared across these two
+stacks is trustworthy at or below 560px and carries this caveat above
+it. Frame counts and the throughput results are untouched (§2.1).
+
 **cross_detection_agreement failed on 27 of 35 films in every cell; the
 8 passing films are exactly the films that need no downscale.** The
 partition is exact, 35/35, on RF-DETR's own 560px input edge:
@@ -238,17 +257,24 @@ dimensions — unverified). Until then, the finding's scope is: every
 measured film above 560px diverged, every one at or below did not, on
 this subset.
 
-**Where the §6 evidence lives** (provenance pass at `646eaea`): the
-Leagues A==B==C parity and detect-text artifacts are COMMITTED
+**Where the §6 evidence lives** (provenance pass re-run 2026-09-02):
+the Leagues A==B==C parity and detect-text artifacts are COMMITTED
 (`probe/probe_frame_parity_20000LeaguesUndertheSea.json`,
 `probe/probe_detect_text_20000LeaguesUndertheSea.json`); the
-near-threshold split is REPRODUCIBLE in-repo from the landed records
-(`probe/diagnose_cross_films.py --near-threshold` over the results dir);
-the three failing-film parity artifacts, the mode/size census, and the
-Layer-1 build-read outputs are BOX-SIDE
-(`~/films_probe/parity_failing/`, `~/films_probe/detector_parity/`) —
-relayed verbatim into the record but not yet landed; a small bundle
-lands them if this document is to be fully self-contained at one commit.
+near-threshold split, anatomy and direction figures are REPRODUCIBLE
+in-repo from the landed records (`probe/diagnose_cross_films.py` over
+the results dir); the §4/§5 sweep point artifacts are now LANDED
+(`results/posture-sweep-20260830/`, `results/c-sweep-20260831/`,
+`results/c-sweep-highc-20260831/` — 31 files, every f/s cell verified
+verbatim at landing; hashes in `results/FILMS_LANDING.md`), with §4's
+absolute memory figures tracing to the S3-archived `memwatch_*.jsonl`
+streams those artifacts name (pointers in the landing note). The three
+failing-film parity artifacts, the mode/size census, and the Layer-1
+build-read outputs remain BOX-SIDE (`~/films_probe/parity_failing/`,
+`~/films_probe/detector_parity/`) — relayed verbatim, not yet landed;
+their stated S3 archive prefixes were checked EMPTY 2026-09-02, and
+`probe/archive_films_diagnosis.sh` (committed) creates them; landing
+follows that paste.
 
 **Ruled (V): the 500-header probe was considered and NOT run.** The
 reasoning, recorded so this reads as ruled rather than overlooked: the
@@ -267,7 +293,8 @@ controlled thread-count sweep on that harness. The instrument exists
 (`probe/probe_detector_parity.py` + `probe/run_side_prediction.sh`); its
 last run stopped on a fixed argument-contract defect. **Ruled (X): this
 paragraph goes upstream as the ticket, side-test harness attached; it
-is not a publication gate.**
+is not a publication gate. FILED 2026-09-02 as Ticket 6,
+`working/upstream/RocketRide_Engine_Tickets.md`.**
 
 ## 7. Not publishable from this run, and why
 

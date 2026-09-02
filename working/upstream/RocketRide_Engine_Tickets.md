@@ -1,10 +1,12 @@
-# RocketRide Engine — Five Tickets
+# RocketRide Engine — Six Tickets
 
-Drafted from the WS-1 cross-team benchmark campaign, 14–21 August 2026.
+Tickets 1–5 drafted from the WS-1 cross-team benchmark campaign, 14–21 August 2026.
 Three independent harnesses — each comparing RocketRide against a different framework
 (LangGraph, Haystack, LlamaIndex) — three separately built corpora, three separate
 c7i.8xlarge hosts. Harnesses are identified below by the framework they measured against;
 all three findings are reproducible from the artifacts listed in the appendix.
+Ticket 6 added 2026-09-02 from the WS-1 Phase 2 Archive Films campaign (Ruling X);
+its evidence trail is `working/video/WS1_Phase2_Films_Benchmark_DEFINITIVE.md` §6.
 
 > All bundle- and source-side facts below are verified against
 > `rocketride-org/rocketride-server` at HEAD `1138936` and every `server-v3.x` tag; the
@@ -642,3 +644,85 @@ Compare against the same commands with the six variables at 8: send 2 wall ≈17
    at pipeline load.
 3. At the guidance configuration, steady-state CPU-seconds per unit work within 15% of the
    measured knee point.
+
+
+---
+
+# TICKET 6 — Detection divergence above RF-DETR's 560px input edge: identical code, identical weights, identical frames — different detections across execution environments
+
+**Type:** Correctness / Reproducibility · **Severity:** Medium (silent sub-percent score
+shifts that flip threshold-crossing detections; bounded — frame counts and object identity
+unaffected) · **Component:** `nodes/detect` execution environment (NOT the detector library —
+excluded by measurement, below)
+
+**Affects:** engine 3.3.1 (`rr:patched-video` lineage) running `rfdetr 1.5.2` /
+`torch 2.10.0+cu128`, measured against a reference harness running the **byte-identical**
+library stack. Measured 2026-09-01/02 (Archive Films campaign, 35 films, 6 cells).
+
+**Found by:** a strict cross-arm detection-agreement gate (sorted label multisets per frame)
+failing 27 of 35 films in every cell — with the 8 passing films exactly the films whose
+frames need no downscale.
+
+## Summary
+
+Two processes running **the same detector code on the same bytes produce different
+detections whenever the input must be downscaled.** RF-DETR's input edge is 560px. On this
+corpus the partition is exact, 35/35, zero exceptions:
+
+| long edge | films | verdict |
+|---|---:|---|
+| ≤ 560px (320×240 ×4, 464×368 ×2, 540×360, 560×380) | 8 | detections bit-identical across environments |
+| > 560px (624×480 … 1424×1072) | 27 | diverging |
+
+Anatomy: the environments find the **same objects at 0.5–5% shifted confidence scores**;
+divergence appears where a score crosses the 0.3 threshold from opposite sides. The
+direction is systematic, not noise: the engine environment detects more on 22 films, the
+reference on 5, equal on 8.
+
+## What is excluded, each by measurement (not inference)
+
+1. **Different input frames** — byte-level per-frame PNG hash parity proven on three
+   diverging films plus the one clean measured film (manifest-sha same-input proof).
+2. **PIL image mode** (the one load-path code delta between harnesses) — all 35 films
+   decode to RGB; the delta is a no-op on this corpus.
+3. **Threshold amplification of ordinary float noise** — clean films have *slightly higher*
+   near-threshold detection rates than diverging ones (0.05119 vs 0.04514 median at ±0.01);
+   only 0.524 of diverging frames are threshold-adjacent; and a same-environment repeat is
+   deterministic. Noise would not respect a resolution boundary.
+4. **Library or build difference** — both environments run torch 2.10.0+cu128
+   (git `449b1768…`, wheel `cp312-cp312-manylinux_2_28_x86_64`, identical `torch/lib` —
+   built-in kernels, no MKL/OpenBLAS), numpy 2.5.2, pillow 10.4.0, torchvision 0.25.0+cu128,
+   rfdetr 1.5.2 with **byte-identical `detr.py`** (sha `d0cf8916…`) and md5-verified
+   identical weights.
+
+What remains is **how each environment executes the identical downscale + inference**:
+thread counts at inference time, batch shape, memory layout, allocator state. Not attributed
+here — deliberately left to measurement rather than answered wrongly.
+
+## Reproduction / decisive instrument (attached)
+
+`working/video/probe/probe_detector_parity.py` + `working/video/probe/run_side_prediction.sh`
+(the campaign repo): one identical PNG per size class through both environments' exact load
+paths, arrays hashed, raw scores at 9 dp with per-side `torch.get_num_threads()` captured
+in-process, self-determinism null controls, delta tiers (≤1e-5 = measured same-environment
+background; ≥1e-3 = the mechanism). Prediction it tests: small frame → arrays equal, scores
+within noise; large frame → divergence appears inside `predict` after the resize.
+
+## Impact
+
+- Any pair of deployments of this stack whose execution environments differ can silently
+  disagree on detections for >560px video — sub-percent score shifts flipping
+  threshold-crossing objects — while agreeing perfectly on smaller content. Nothing warns.
+- Cross-system comparisons, regression suites, or audit replays built on detection equality
+  are trustworthy at ≤560px and need a tolerance policy above it.
+- Neither environment is established "correct"; the divergence is between two executions of
+  the same code. (Which side sits closer to a canonical single-threaded reference is one
+  decisive-instrument run away.)
+
+## Acceptance criteria
+
+1. On one identical >560px frame, raw-score parity across execution environments at ≤1e-5 —
+   or the runtime variable that produces the delta is named and documented.
+2. The detect path's resize is documented as execution-environment-sensitive (with the
+   controlling variables), or pinned so identical inputs give identical detections.
+3. The attached instrument runs green (both size classes) on the fixed configuration.

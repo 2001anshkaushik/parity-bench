@@ -1,0 +1,196 @@
+{
+ "probe": "films_curve",
+ "created_utc": "20260831T074354Z",
+ "git_head": "9e035b8707e9f383da24985b99cbaa723319f3ef",
+ "cell": "rr_M16xT2",
+ "label": "rr_M16xT2",
+ "concurrency": 4,
+ "batch_mode": "heads",
+ "lanes": 16,
+ "spend_threads": 32,
+ "posture": {
+  "arm": "rr",
+  "tokens": 16,
+  "env": "2"
+ },
+ "containers": [
+  "rr"
+ ],
+ "chunk_config_readback": {
+  "arm": "rr",
+  "note": "engine splitter inert-config (LangChain library defaults); no per-point read-back surface exists"
+ },
+ "oom": {
+  "rr": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  }
+ },
+ "manifest_sha256": "54186c24a25df594ffd14c9a270281863208ef23dfec2b00814372ed125d4b54",
+ "batch": [
+  {
+   "file": "parole_inc.mp4",
+   "bytes": 444557399,
+   "video_s": 4267.59,
+   "expected_frames": 285
+  },
+  {
+   "file": "HouseOnBareMountain.mp4",
+   "bytes": 552895530,
+   "video_s": 3718.99,
+   "expected_frames": 248
+  },
+  {
+   "file": "ABucketofBlood.mp4",
+   "bytes": 1711003992,
+   "video_s": 3928.17,
+   "expected_frames": 262
+  },
+  {
+   "file": "ThisisNotaTest.mp4",
+   "bytes": 446462026,
+   "video_s": 4331.76,
+   "expected_frames": 289
+  },
+  {
+   "file": "gammera.mp4",
+   "bytes": 555650657,
+   "video_s": 5121.88,
+   "expected_frames": 341
+  },
+  {
+   "file": "HorrorHotel1960.mp4",
+   "bytes": 1617111108,
+   "video_s": 4587.78,
+   "expected_frames": 306
+  },
+  {
+   "file": "Eisenstein-October.mp4",
+   "bytes": 442372200,
+   "video_s": 6139.8,
+   "expected_frames": 409
+  },
+  {
+   "file": "street_angel.mp4",
+   "bytes": 565167881,
+   "video_s": 5429.45,
+   "expected_frames": 362
+  },
+  {
+   "file": "the-grapes-of-wrath-1940.mp4",
+   "bytes": 2190569811,
+   "video_s": 7784.69,
+   "expected_frames": 519
+  }
+ ],
+ "inflight_max": 4,
+ "per_film": [
+  {
+   "file": "parole_inc.mp4",
+   "token_index": 0,
+   "admit_ns": 6752046564787,
+   "n_frames": 285,
+   "upload_wall_s": 14.95,
+   "close_wall_s": 151.36,
+   "done_ns": 6918392662049,
+   "wall_s": 166.35
+  },
+  {
+   "file": "HouseOnBareMountain.mp4",
+   "token_index": 1,
+   "admit_ns": 6752046699537,
+   "n_frames": 248,
+   "upload_wall_s": 18.78,
+   "close_wall_s": 136.17,
+   "done_ns": 6908037986593,
+   "wall_s": 155.99
+  },
+  {
+   "file": "ABucketofBlood.mp4",
+   "token_index": 2,
+   "admit_ns": 6752046738368,
+   "n_frames": 262,
+   "upload_wall_s": 49.37,
+   "close_wall_s": 140.81,
+   "done_ns": 6945263225536,
+   "wall_s": 193.22
+  },
+  {
+   "file": "ThisisNotaTest.mp4",
+   "token_index": 3,
+   "admit_ns": 6752046866397,
+   "n_frames": 289,
+   "upload_wall_s": 15.99,
+   "close_wall_s": 150.33,
+   "done_ns": 6920406150882,
+   "wall_s": 168.36
+  },
+  {
+   "file": "gammera.mp4",
+   "token_index": 4,
+   "admit_ns": 6908038539202,
+   "n_frames": 341,
+   "upload_wall_s": 17.11,
+   "close_wall_s": 168.52,
+   "done_ns": 7093704150396,
+   "wall_s": 185.67
+  },
+  {
+   "file": "HorrorHotel1960.mp4",
+   "token_index": 5,
+   "admit_ns": 6918393213749,
+   "n_frames": 306,
+   "upload_wall_s": 47.86,
+   "close_wall_s": 153.43,
+   "done_ns": 7119724532198,
+   "wall_s": 201.33
+  },
+  {
+   "file": "Eisenstein-October.mp4",
+   "token_index": 6,
+   "admit_ns": 6920406477435,
+   "n_frames": 409,
+   "upload_wall_s": 13.81,
+   "close_wall_s": 190.47,
+   "done_ns": 7124742819878,
+   "wall_s": 204.34
+  },
+  {
+   "file": "street_angel.mp4",
+   "token_index": 7,
+   "admit_ns": 6945263762336,
+   "n_frames": 362,
+   "upload_wall_s": 16.5,
+   "close_wall_s": 176.74,
+   "done_ns": 7138551269048,
+   "wall_s": 193.29
+  },
+  {
+   "file": "the-grapes-of-wrath-1940.mp4",
+   "token_index": 8,
+   "admit_ns": 7093704759101,
+   "n_frames": 519,
+   "upload_wall_s": 58.25,
+   "close_wall_s": 264.84,
+   "done_ns": 7416826599887,
+   "wall_s": 323.12
+  }
+ ],
+ "metrics": {
+  "span_s": 664.78,
+  "n_films": 9,
+  "n_ok": 9,
+  "n_errors": 0,
+  "total_frames": 3021,
+  "frames_per_s": 4.544,
+  "realtime_factor": 68.16,
+  "frame_expectation_mismatches": null,
+  "service_cpu": {
+   "cores": 10.55,
+   "util_pct": 33.0,
+   "basis": "cgroup cpu.stat usage_usec delta over the point wall (875.39s), summed over 1/1 containers; idle lanes included; util against 32 vCPU"
+  }
+ },
+ "probe_ru_maxrss_kb": 55504,
+ "memory_note": "anon/memory.peak/spool are mem_watch's, recorded beside this artifact by the wrapper"
+}

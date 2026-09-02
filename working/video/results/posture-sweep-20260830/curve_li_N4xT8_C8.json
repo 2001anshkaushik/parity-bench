@@ -1,0 +1,652 @@
+{
+ "probe": "films_curve",
+ "created_utc": "20260830T100713Z",
+ "git_head": "3f0a7b5a9578707f99b6373b94a3cc41dc5c2980",
+ "cell": "li_N4xT8",
+ "label": "li_N4xT8",
+ "concurrency": 8,
+ "batch_mode": "measured",
+ "lanes": 4,
+ "spend_threads": 32,
+ "posture": {
+  "arm": "li",
+  "instances": 4,
+  "env": "8"
+ },
+ "containers": [
+  "li_bal_0",
+  "li_bal_1",
+  "li_bal_2",
+  "li_bal_3"
+ ],
+ "chunk_config_readback": {
+  "expected": {
+   "chunk_size": 4000,
+   "chunk_overlap": 0,
+   "split_unit": "chars"
+  },
+  "per_port": {
+   "8802": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8803": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8804": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   },
+   "8805": {
+    "chunk_size": 4000,
+    "chunk_overlap": 0,
+    "split_unit": "chars"
+   }
+  }
+ },
+ "oom": {
+  "li_bal_0": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_1": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_2": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  },
+  "li_bal_3": {
+   "oomkilled": "false",
+   "oom_kill_delta": 0
+  }
+ },
+ "manifest_sha256": "54186c24a25df594ffd14c9a270281863208ef23dfec2b00814372ed125d4b54",
+ "batch": [
+  {
+   "file": "20000LeaguesUndertheSea.mp4",
+   "bytes": 429700405,
+   "video_s": 5922.32,
+   "expected_frames": 395
+  },
+  {
+   "file": "ABucketofBlood.mp4",
+   "bytes": 1711003992,
+   "video_s": 3928.17,
+   "expected_frames": 262
+  },
+  {
+   "file": "A_Study_In_Scarlet.mp4",
+   "bytes": 445884801,
+   "video_s": 4278.6,
+   "expected_frames": 285
+  },
+  {
+   "file": "AtWarWithTheArmy.mp4",
+   "bytes": 564633680,
+   "video_s": 5431.48,
+   "expected_frames": 362
+  },
+  {
+   "file": "DiaryOfANudistwidescreen.mp4",
+   "bytes": 1438754414,
+   "video_s": 4309.7,
+   "expected_frames": 287
+  },
+  {
+   "file": "DoubleFeatureHell8grindhouse3.mp4",
+   "bytes": 1659460088,
+   "video_s": 9954.51,
+   "expected_frames": 664
+  },
+  {
+   "file": "Eisenstein-October.mp4",
+   "bytes": 442372200,
+   "video_s": 6139.8,
+   "expected_frames": 409
+  },
+  {
+   "file": "Gung_Ho.mp4",
+   "bytes": 538365709,
+   "video_s": 5159.89,
+   "expected_frames": 344
+  },
+  {
+   "file": "HorrorHotel1960.mp4",
+   "bytes": 1617111108,
+   "video_s": 4587.78,
+   "expected_frames": 306
+  },
+  {
+   "file": "HouseOnBareMountain.mp4",
+   "bytes": 552895530,
+   "video_s": 3718.99,
+   "expected_frames": 248
+  },
+  {
+   "file": "JailBait.mp4",
+   "bytes": 535686957,
+   "video_s": 4272.33,
+   "expected_frames": 285
+  },
+  {
+   "file": "Jamaica_Inn.mp4",
+   "bytes": 1597404950,
+   "video_s": 5929.0,
+   "expected_frames": 395
+  },
+  {
+   "file": "LadyofBurlesque.mp4",
+   "bytes": 564852567,
+   "video_s": 5414.33,
+   "expected_frames": 361
+  },
+  {
+   "file": "LouisianaHussy_319.mp4",
+   "bytes": 551490725,
+   "video_s": 5085.24,
+   "expected_frames": 339
+  },
+  {
+   "file": "Mastertouch.mp4",
+   "bytes": 564169020,
+   "video_s": 5537.19,
+   "expected_frames": 369
+  },
+  {
+   "file": "Mr._Wong_Detective.mp4",
+   "bytes": 900907451,
+   "video_s": 4106.74,
+   "expected_frames": 274
+  },
+  {
+   "file": "Sabotage_1936.mp4",
+   "bytes": 1229793765,
+   "video_s": 4555.28,
+   "expected_frames": 304
+  },
+  {
+   "file": "TheGolem_893.mp4",
+   "bytes": 441886671,
+   "video_s": 6083.31,
+   "expected_frames": 406
+  },
+  {
+   "file": "TheMarinesareComing.mp4",
+   "bytes": 443698355,
+   "video_s": 4253.18,
+   "expected_frames": 284
+  },
+  {
+   "file": "TheWhiteWarrior1961.mp4",
+   "bytes": 1248422040,
+   "video_s": 5124.85,
+   "expected_frames": 342
+  },
+  {
+   "file": "TheWomanInGreen1945.mp4",
+   "bytes": 548925974,
+   "video_s": 3868.12,
+   "expected_frames": 258
+  },
+  {
+   "file": "The_Hunchback_of_Notre_Dame.mp4",
+   "bytes": 439361029,
+   "video_s": 6043.17,
+   "expected_frames": 403
+  },
+  {
+   "file": "The_Mystery_of_Mr._Wong.mp4",
+   "bytes": 881144285,
+   "video_s": 4223.86,
+   "expected_frames": 282
+  },
+  {
+   "file": "TheyMadeMeAKiller.mp4",
+   "bytes": 474629907,
+   "video_s": 3859.25,
+   "expected_frames": 257
+  },
+  {
+   "file": "ThisisNotaTest.mp4",
+   "bytes": 446462026,
+   "video_s": 4331.76,
+   "expected_frames": 289
+  },
+  {
+   "file": "Two_Dollar_Bettor_movie.mp4",
+   "bytes": 445996305,
+   "video_s": 4287.91,
+   "expected_frames": 286
+  },
+  {
+   "file": "WorldGoneMad.mp4",
+   "bytes": 444455167,
+   "video_s": 4260.28,
+   "expected_frames": 284
+  },
+  {
+   "file": "gammera.mp4",
+   "bytes": 555650657,
+   "video_s": 5121.88,
+   "expected_frames": 341
+  },
+  {
+   "file": "indestructible_man.mp4",
+   "bytes": 443781059,
+   "video_s": 4262.32,
+   "expected_frames": 284
+  },
+  {
+   "file": "mclintok_widescreen.mp4",
+   "bytes": 1553674262,
+   "video_s": 7607.22,
+   "expected_frames": 507
+  },
+  {
+   "file": "parole_inc.mp4",
+   "bytes": 444557399,
+   "video_s": 4267.59,
+   "expected_frames": 285
+  },
+  {
+   "file": "rhythm_blues_review.mp4",
+   "bytes": 446062495,
+   "video_s": 4285.28,
+   "expected_frames": 286
+  },
+  {
+   "file": "slave_in_bondage.mp4",
+   "bytes": 849100783,
+   "video_s": 4152.28,
+   "expected_frames": 277
+  },
+  {
+   "file": "street_angel.mp4",
+   "bytes": 565167881,
+   "video_s": 5429.45,
+   "expected_frames": 362
+  },
+  {
+   "file": "the-grapes-of-wrath-1940.mp4",
+   "bytes": 2190569811,
+   "video_s": 7784.69,
+   "expected_frames": 519
+  }
+ ],
+ "inflight_max": 8,
+ "per_film": [
+  {
+   "file": "20000LeaguesUndertheSea.mp4",
+   "serving_port": 8802,
+   "admit_ns": 15379162981710,
+   "n_frames": 395,
+   "bytes_spooled": 429700405,
+   "frames_dir_bytes": 17776300,
+   "done_ns": 15669845805701,
+   "wall_s": 290.68
+  },
+  {
+   "file": "ABucketofBlood.mp4",
+   "serving_port": 8803,
+   "admit_ns": 15379164478511,
+   "n_frames": 262,
+   "bytes_spooled": 1711003992,
+   "frames_dir_bytes": 85371851,
+   "done_ns": 15615177136782,
+   "wall_s": 236.01
+  },
+  {
+   "file": "A_Study_In_Scarlet.mp4",
+   "serving_port": 8804,
+   "admit_ns": 15379164899178,
+   "n_frames": 285,
+   "bytes_spooled": 445884801,
+   "frames_dir_bytes": 69707931,
+   "done_ns": 15619332961635,
+   "wall_s": 240.17
+  },
+  {
+   "file": "AtWarWithTheArmy.mp4",
+   "serving_port": 8805,
+   "admit_ns": 15379165494013,
+   "n_frames": 362,
+   "bytes_spooled": 564633680,
+   "frames_dir_bytes": 104379545,
+   "done_ns": 15646485553452,
+   "wall_s": 267.32
+  },
+  {
+   "file": "DiaryOfANudistwidescreen.mp4",
+   "serving_port": 8802,
+   "admit_ns": 15379165674829,
+   "n_frames": 287,
+   "bytes_spooled": 1438754414,
+   "frames_dir_bytes": 321611554,
+   "done_ns": 15673328229070,
+   "wall_s": 294.16
+  },
+  {
+   "file": "DoubleFeatureHell8grindhouse3.mp4",
+   "serving_port": 8803,
+   "admit_ns": 15379166422514,
+   "n_frames": 664,
+   "bytes_spooled": 1659460088,
+   "frames_dir_bytes": 185299809,
+   "done_ns": 15993960674806,
+   "wall_s": 614.79
+  },
+  {
+   "file": "Eisenstein-October.mp4",
+   "serving_port": 8804,
+   "admit_ns": 15379167091684,
+   "n_frames": 409,
+   "bytes_spooled": 442372200,
+   "frames_dir_bytes": 23985316,
+   "done_ns": 15616086346791,
+   "wall_s": 236.92
+  },
+  {
+   "file": "Gung_Ho.mp4",
+   "serving_port": 8805,
+   "admit_ns": 15379167777216,
+   "n_frames": 344,
+   "bytes_spooled": 538365709,
+   "frames_dir_bytes": 103136514,
+   "done_ns": 15649673527329,
+   "wall_s": 270.51
+  },
+  {
+   "file": "HorrorHotel1960.mp4",
+   "serving_port": 8802,
+   "admit_ns": 15615177266052,
+   "n_frames": 306,
+   "bytes_spooled": 1617111108,
+   "frames_dir_bytes": 75327243,
+   "done_ns": 15911066035829,
+   "wall_s": 295.89
+  },
+  {
+   "file": "HouseOnBareMountain.mp4",
+   "serving_port": 8803,
+   "admit_ns": 15616086388267,
+   "n_frames": 248,
+   "bytes_spooled": 552895530,
+   "frames_dir_bytes": 115752591,
+   "done_ns": 15997768746663,
+   "wall_s": 381.68
+  },
+  {
+   "file": "JailBait.mp4",
+   "serving_port": 8804,
+   "admit_ns": 15619333067066,
+   "n_frames": 285,
+   "bytes_spooled": 535686957,
+   "frames_dir_bytes": 41992430,
+   "done_ns": 15771566799677,
+   "wall_s": 152.23
+  },
+  {
+   "file": "Jamaica_Inn.mp4",
+   "serving_port": 8805,
+   "admit_ns": 15646485719353,
+   "n_frames": 395,
+   "bytes_spooled": 1597404950,
+   "frames_dir_bytes": 85967605,
+   "done_ns": 15892493895922,
+   "wall_s": 246.01
+  },
+  {
+   "file": "LadyofBurlesque.mp4",
+   "serving_port": 8802,
+   "admit_ns": 15649673622876,
+   "n_frames": 361,
+   "bytes_spooled": 564852567,
+   "frames_dir_bytes": 55999832,
+   "done_ns": 15915366264661,
+   "wall_s": 265.69
+  },
+  {
+   "file": "LouisianaHussy_319.mp4",
+   "serving_port": 8803,
+   "admit_ns": 15669845895671,
+   "n_frames": 339,
+   "bytes_spooled": 551490725,
+   "frames_dir_bytes": 74034634,
+   "done_ns": 16154443733513,
+   "wall_s": 484.6
+  },
+  {
+   "file": "Mastertouch.mp4",
+   "serving_port": 8804,
+   "admit_ns": 15673328329036,
+   "n_frames": 369,
+   "bytes_spooled": 564169020,
+   "frames_dir_bytes": 144395901,
+   "done_ns": 15891692986809,
+   "wall_s": 218.36
+  },
+  {
+   "file": "Mr._Wong_Detective.mp4",
+   "serving_port": 8805,
+   "admit_ns": 15771566868830,
+   "n_frames": 274,
+   "bytes_spooled": 900907451,
+   "frames_dir_bytes": 51402446,
+   "done_ns": 15895929436730,
+   "wall_s": 124.36
+  },
+  {
+   "file": "Sabotage_1936.mp4",
+   "serving_port": 8802,
+   "admit_ns": 15891693097719,
+   "n_frames": 304,
+   "bytes_spooled": 1229793765,
+   "frames_dir_bytes": 61041067,
+   "done_ns": 16073930460625,
+   "wall_s": 182.24
+  },
+  {
+   "file": "TheGolem_893.mp4",
+   "serving_port": 8803,
+   "admit_ns": 15892494012910,
+   "n_frames": 406,
+   "bytes_spooled": 441886671,
+   "frames_dir_bytes": 27661915,
+   "done_ns": 16426855859595,
+   "wall_s": 534.36
+  },
+  {
+   "file": "TheMarinesareComing.mp4",
+   "serving_port": 8804,
+   "admit_ns": 15895929543221,
+   "n_frames": 284,
+   "bytes_spooled": 443698355,
+   "frames_dir_bytes": 43462563,
+   "done_ns": 16010586855761,
+   "wall_s": 114.66
+  },
+  {
+   "file": "TheWhiteWarrior1961.mp4",
+   "serving_port": 8805,
+   "admit_ns": 15911066211992,
+   "n_frames": 342,
+   "bytes_spooled": 1248422040,
+   "frames_dir_bytes": 185270763,
+   "done_ns": 16159497856381,
+   "wall_s": 248.43
+  },
+  {
+   "file": "TheWomanInGreen1945.mp4",
+   "serving_port": 8802,
+   "admit_ns": 15915366350973,
+   "n_frames": 258,
+   "bytes_spooled": 548925974,
+   "frames_dir_bytes": 69399018,
+   "done_ns": 16077052704617,
+   "wall_s": 161.69
+  },
+  {
+   "file": "The_Hunchback_of_Notre_Dame.mp4",
+   "serving_port": 8803,
+   "admit_ns": 15993960847787,
+   "n_frames": 403,
+   "bytes_spooled": 439361029,
+   "frames_dir_bytes": 23933222,
+   "done_ns": 16619579485517,
+   "wall_s": 625.62
+  },
+  {
+   "file": "The_Mystery_of_Mr._Wong.mp4",
+   "serving_port": 8804,
+   "admit_ns": 15997768782447,
+   "n_frames": 282,
+   "bytes_spooled": 881144285,
+   "frames_dir_bytes": 60782090,
+   "done_ns": 16102754195480,
+   "wall_s": 104.99
+  },
+  {
+   "file": "TheyMadeMeAKiller.mp4",
+   "serving_port": 8805,
+   "admit_ns": 16010586968620,
+   "n_frames": 257,
+   "bytes_spooled": 474629907,
+   "frames_dir_bytes": 43122333,
+   "done_ns": 16161665734573,
+   "wall_s": 151.08
+  },
+  {
+   "file": "ThisisNotaTest.mp4",
+   "serving_port": 8802,
+   "admit_ns": 16073930569316,
+   "n_frames": 289,
+   "bytes_spooled": 446462026,
+   "frames_dir_bytes": 50578421,
+   "done_ns": 16184377185998,
+   "wall_s": 110.45
+  },
+  {
+   "file": "Two_Dollar_Bettor_movie.mp4",
+   "serving_port": 8803,
+   "admit_ns": 16077052847343,
+   "n_frames": 286,
+   "bytes_spooled": 445996305,
+   "frames_dir_bytes": 56873440,
+   "done_ns": 16751655342966,
+   "wall_s": 674.6
+  },
+  {
+   "file": "WorldGoneMad.mp4",
+   "serving_port": 8804,
+   "admit_ns": 16102754347260,
+   "n_frames": 284,
+   "bytes_spooled": 444455167,
+   "frames_dir_bytes": 58615322,
+   "done_ns": 16206347901674,
+   "wall_s": 103.59
+  },
+  {
+   "file": "gammera.mp4",
+   "serving_port": 8805,
+   "admit_ns": 16154443802038,
+   "n_frames": 341,
+   "bytes_spooled": 555650657,
+   "frames_dir_bytes": 54744347,
+   "done_ns": 16345793575272,
+   "wall_s": 191.35
+  },
+  {
+   "file": "indestructible_man.mp4",
+   "serving_port": 8802,
+   "admit_ns": 16159498105126,
+   "n_frames": 284,
+   "bytes_spooled": 443781059,
+   "frames_dir_bytes": 84223635,
+   "done_ns": 16279506973858,
+   "wall_s": 120.01
+  },
+  {
+   "file": "mclintok_widescreen.mp4",
+   "serving_port": 8803,
+   "admit_ns": 16161665885567,
+   "n_frames": 507,
+   "bytes_spooled": 1553674262,
+   "frames_dir_bytes": 157892412,
+   "done_ns": 16758020990635,
+   "wall_s": 596.36
+  },
+  {
+   "file": "parole_inc.mp4",
+   "serving_port": 8804,
+   "admit_ns": 16184377310501,
+   "n_frames": 285,
+   "bytes_spooled": 444557399,
+   "frames_dir_bytes": 88424162,
+   "done_ns": 16310221209775,
+   "wall_s": 125.84
+  },
+  {
+   "file": "rhythm_blues_review.mp4",
+   "serving_port": 8805,
+   "admit_ns": 16206348058441,
+   "n_frames": 286,
+   "bytes_spooled": 446062495,
+   "frames_dir_bytes": 90595492,
+   "done_ns": 16349071805251,
+   "wall_s": 142.72
+  },
+  {
+   "file": "slave_in_bondage.mp4",
+   "serving_port": 8802,
+   "admit_ns": 16279507143545,
+   "n_frames": 277,
+   "bytes_spooled": 849100783,
+   "frames_dir_bytes": 70612214,
+   "done_ns": 16365226076692,
+   "wall_s": 85.72
+  },
+  {
+   "file": "street_angel.mp4",
+   "serving_port": 8803,
+   "admit_ns": 16310221334236,
+   "n_frames": 362,
+   "bytes_spooled": 565167881,
+   "frames_dir_bytes": 99335856,
+   "done_ns": 16759777897704,
+   "wall_s": 449.56
+  },
+  {
+   "file": "the-grapes-of-wrath-1940.mp4",
+   "serving_port": 8804,
+   "admit_ns": 16345793703123,
+   "n_frames": 519,
+   "bytes_spooled": 2190569811,
+   "frames_dir_bytes": 492240250,
+   "done_ns": 16539559763890,
+   "wall_s": 193.77
+  }
+ ],
+ "metrics": {
+  "span_s": 1380.61,
+  "n_films": 35,
+  "n_ok": 35,
+  "n_errors": 0,
+  "total_frames": 11841,
+  "frames_per_s": 8.577,
+  "realtime_factor": 128.62,
+  "frame_expectation_mismatches": null,
+  "service_cpu": {
+   "cores": 22.65,
+   "util_pct": 70.8,
+   "basis": "cgroup cpu.stat usage_usec delta over the point wall (1380.62s), summed over 4/4 containers; idle lanes included; util against 32 vCPU"
+  }
+ },
+ "probe_ru_maxrss_kb": 54576,
+ "memory_note": "anon/memory.peak/spool are mem_watch's, recorded beside this artifact by the wrapper"
+}
