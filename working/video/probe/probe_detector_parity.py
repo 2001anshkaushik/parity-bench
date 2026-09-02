@@ -165,10 +165,34 @@ def partition_census(rows) -> dict:
 
 
 # ------------------------------------------------------------------- sides
-def _predict_dump(img, thresholds):
-    from rfdetr import RFDETRBase
-    det = RFDETRBase()
-    names = getattr(det, 'class_names', None) or {}
+def _lib_identity() -> dict:
+    """The libraries doing the work, per side — versions AND file bytes,
+    because same version string does not guarantee same bytes (2026-09-02:
+    the size partition points INSIDE predict, where the resize lives)."""
+    import numpy
+    import PIL
+    import rfdetr
+    import torch
+    import torchvision
+    import rfdetr.detr as rd
+    detr_file = Path(rd.__file__)
+    return {
+        'pillow': PIL.__version__,
+        'torch': torch.__version__,
+        'torch_git': getattr(__import__('torch.version', fromlist=['x']),
+                             'git_version', None),
+        'torch_cuda': getattr(__import__('torch.version', fromlist=['x']),
+                              'cuda', None),
+        'torchvision': torchvision.__version__,
+        'numpy': numpy.__version__,
+        'rfdetr_version': getattr(rfdetr, '__version__', None),
+        'rfdetr_detr_file': str(detr_file),
+        'rfdetr_detr_sha256': hashlib.sha256(
+            detr_file.read_bytes()).hexdigest(),
+    }
+
+
+def _predict_dump(det, names, img, thresholds):
     out = {}
     for thr in thresholds:
         runs = []
@@ -183,67 +207,120 @@ def _predict_dump(img, thresholds):
     return out
 
 
-def side(which: str, png_path: Path) -> int:
+def side(which: str, png_paths) -> int:
+    """One model load, every frame through it — the block runs each side
+    ONCE for both the small-film and large-film frames."""
     import numpy as np
     from PIL import Image
     os.environ.setdefault('HF_HUB_OFFLINE', '1')
     os.environ.setdefault('TRANSFORMERS_OFFLINE', '1')
-    png = png_path.read_bytes()
-    if which == 'engine':
-        # QUOTED from the engine's load path (image.py:36-38): mode is
-        # PRESERVED, no convert. ai.common imports rocketlib (C++ binding),
-        # so the two lines are quoted by citation — stated deviation.
-        import io
-        img = Image.open(io.BytesIO(png))
-        img.load()
-    else:
+    if which == 'li':
         sys.path.insert(0, '/app')              # the li:video image layout
         from li_video.pipeline import LlamaIndexVideoPipeline
-        img = LlamaIndexVideoPipeline._load_frame(str(png_path))
-    arr = np.asarray(img)
-    doc = {'side': which, 'png_sha256': hashlib.sha256(png).hexdigest(),
-           'pil_mode': img.mode, 'pil_size': list(img.size),
-           'array_sha256': hashlib.sha256(arr.tobytes()).hexdigest(),
-           'array_shape': list(arr.shape), 'array_dtype': str(arr.dtype),
-           'predict': _predict_dump(img, [0.001, 0.3])}
-    print(json.dumps(doc, indent=1))
+    from rfdetr import RFDETRBase
+    det = RFDETRBase()
+    names = getattr(det, 'class_names', None) or {}
+    frames = []
+    for p in png_paths:
+        png_path = Path(p)
+        png = png_path.read_bytes()
+        if which == 'engine':
+            # QUOTED from the engine's load path (image.py:36-38): mode
+            # PRESERVED, no convert. ai.common imports rocketlib (C++
+            # binding), so the two lines are quoted by citation — stated
+            # deviation.
+            import io
+            img = Image.open(io.BytesIO(png))
+            img.load()
+        else:
+            img = LlamaIndexVideoPipeline._load_frame(str(png_path))
+        arr = np.asarray(img)
+        frames.append({
+            'png': png_path.name,
+            'png_sha256': hashlib.sha256(png).hexdigest(),
+            'pil_mode': img.mode, 'pil_size': list(img.size),
+            'array_sha256': hashlib.sha256(arr.tobytes()).hexdigest(),
+            'array_shape': list(arr.shape), 'array_dtype': str(arr.dtype),
+            'predict': _predict_dump(det, names, img, [0.001, 0.3])})
+    print(json.dumps({'side': which, 'libs': _lib_identity(),
+                      'frames': frames}, indent=1))
     return 0
 
 
 # ----------------------------------------------------------------- compare
-def compare(engine_doc: dict, li_doc: dict) -> dict:
-    if engine_doc['png_sha256'] != li_doc['png_sha256']:
+def _compare_frame(e: dict, li: dict) -> dict:
+    if e['png_sha256'] != li['png_sha256']:
         return {'verdict': 'CANNOT COMPARE — different input PNGs',
-                'engine': engine_doc['png_sha256'], 'li': li_doc['png_sha256']}
-    for d in (engine_doc, li_doc):
+                'engine': e['png_sha256'], 'li': li['png_sha256']}
+    for d, side_name in ((e, 'engine'), (li, 'li')):
         for thr, block in d['predict'].items():
             if not block['self_deterministic']:
-                return {'verdict': f"VOID — {d['side']} not self-deterministic "
-                                   f'at threshold {thr}; a side that cannot '
-                                   'bit-match itself voids the comparison'}
-    arrays_equal = (engine_doc['array_sha256'] == li_doc['array_sha256']
-                    and engine_doc['array_shape'] == li_doc['array_shape'])
-    raw_e = engine_doc['predict']['0.001']['detections']
-    raw_l = li_doc['predict']['0.001']['detections']
+                return {'verdict': f'VOID — {side_name} not '
+                                   f'self-deterministic at threshold {thr}; '
+                                   'a side that cannot bit-match itself '
+                                   'voids the comparison'}
+    arrays_equal = (e['array_sha256'] == li['array_sha256']
+                    and e['array_shape'] == li['array_shape'])
+    raw_e = e['predict']['0.001']['detections']
+    raw_l = li['predict']['0.001']['detections']
     scores_equal = raw_e == raw_l
+    # Score-delta TIERS (2026-09-02): the Leagues staging already measured a
+    # ~1e-7 cross-arm background on the clean class, so strict equality
+    # cannot discriminate. Sorted-confidence pairing when counts match;
+    # <=1e-5 = the known float-noise background (NOT the campaign
+    # mechanism); >=1e-3 = the %-scale class the diverging films show.
+    max_delta = None
+    if len(raw_e) == len(raw_l):
+        se = sorted(float(s) for _, s in raw_e)
+        sl = sorted(float(s) for _, s in raw_l)
+        max_delta = max((abs(a - b) for a, b in zip(se, sl)), default=0.0)
     if not arrays_equal:
-        verdict = ('ARRAYS DIFFER — the arms hand rfdetr DIFFERENT tensors '
-                   '(engine mode ' + engine_doc['pil_mode'] + ' vs li '
-                   + li_doc['pil_mode'] + '): preprocessing is the '
-                   'mechanism; gate 3 strict is CORRECT — the arms are not '
-                   'doing the same work')
-    elif not scores_equal:
-        verdict = ('ARRAYS EQUAL, RAW SCORES DIFFER — divergence arises '
-                   'inside predict on identical input: float-environment '
-                   'class; strict label-multiset equality is the wrong '
-                   'instrument for a threshold-crossing detector')
+        verdict = ('ARRAYS DIFFER — the arms hand rfdetr different tensors '
+                   f"(engine mode {e['pil_mode']} vs li {li['pil_mode']}): "
+                   'load-path preprocessing is the mechanism')
+    elif scores_equal:
+        verdict = ('ARRAYS EQUAL, RAW SCORES BIT-EQUAL (9 dp) — no '
+                   'divergence at this frame')
+    elif max_delta is not None and max_delta <= 1e-5:
+        verdict = (f'ARRAYS EQUAL, scores within {max_delta:.2e} — the '
+                   'known float-noise background (Leagues staging ~1e-7), '
+                   'NOT the campaign mechanism')
     else:
-        verdict = ('ARRAYS EQUAL, RAW SCORES EQUAL (9 dp) — neither '
-                   'mechanism visible at this frame; escalate with more '
-                   'frames before concluding')
-    return {'verdict': verdict, 'arrays_equal': arrays_equal,
-            'raw_scores_equal': scores_equal,
+        # The resize lives INSIDE predict, so equal pre-predict arrays with
+        # %-scale score deltas (or count changes) point FIRST at the resize
+        # implementation the two containers run (Pillow version/build or
+        # wheel bytes — libs_identity adjudicates), then at float env.
+        delta_txt = (f'max sorted-score delta {max_delta:.2e}'
+                     if max_delta is not None else
+                     f'detection COUNTS differ ({len(raw_e)} vs {len(raw_l)})')
+        verdict = (f'ARRAYS EQUAL, %-SCALE DIVERGENCE INSIDE predict '
+                   f'({delta_txt}) on identical input; prime suspect the '
+                   'resize implementation (libs_identity: pillow/wheel-bytes '
+                   'mismatch = resize class; all-equal libs = deeper bisect)')
+    return {'png': e.get('png'), 'pil_size': e.get('pil_size'),
+            'verdict': verdict, 'arrays_equal': arrays_equal,
+            'raw_scores_equal': scores_equal, 'max_sorted_delta': max_delta,
             'n_raw_detections': {'engine': len(raw_e), 'li': len(raw_l)}}
+
+
+def compare(engine_doc: dict, li_doc: dict) -> dict:
+    """Side docs: {'side', 'libs', 'frames': [...]} — frames paired by
+    png sha; the libs identity rides beside every frame verdict."""
+    libs_e, libs_l = engine_doc.get('libs') or {}, li_doc.get('libs') or {}
+    libs_diff = {k: {'engine': libs_e.get(k), 'li': libs_l.get(k)}
+                 for k in sorted(set(libs_e) | set(libs_l))
+                 if k != 'rfdetr_detr_file'          # paths differ trivially
+                 and libs_e.get(k) != libs_l.get(k)}
+    li_by_sha = {f['png_sha256']: f for f in li_doc.get('frames') or []}
+    frames = []
+    for ef in engine_doc.get('frames') or []:
+        lf = li_by_sha.get(ef['png_sha256'])
+        frames.append(_compare_frame(ef, lf) if lf else
+                      {'png': ef.get('png'),
+                       'verdict': 'CANNOT COMPARE — no li frame with this '
+                                  'png sha'})
+    return {'libs_identical': not libs_diff,
+            'libs_diff': libs_diff or None, 'frames': frames}
 
 
 def self_test() -> int:
@@ -254,10 +331,9 @@ def self_test() -> int:
         print(f'  {"PASS" if cond else "FAIL"}  {name}')
         ok = ok and cond
 
-    def doc(side_name, png='p1', arr='a1', mode='RGB', dets=None,
-            deterministic=True):
+    def frame(png='p1', arr='a1', mode='RGB', dets=None, deterministic=True):
         dets = dets if dets is not None else [['person', '0.500000000']]
-        return {'side': side_name, 'png_sha256': png, 'array_sha256': arr,
+        return {'png': f'{png}.png', 'png_sha256': png, 'array_sha256': arr,
                 'array_shape': [4, 4, 3], 'array_dtype': 'uint8',
                 'pil_mode': mode, 'pil_size': [4, 4],
                 'predict': {'0.001': {'detections': dets,
@@ -265,23 +341,53 @@ def self_test() -> int:
                             '0.3': {'detections': dets,
                                     'self_deterministic': deterministic}}}
 
-    r = compare(doc('engine'), doc('li'))
-    check('equal arrays + equal scores -> escalate verdict',
-          r['arrays_equal'] and r['raw_scores_equal']
-          and 'escalate' in r['verdict'])
-    r2 = compare(doc('engine', arr='aX', mode='L'), doc('li'))
-    check('different arrays -> preprocessing verdict naming both modes',
-          not r2['arrays_equal'] and 'ARRAYS DIFFER' in r2['verdict']
-          and 'mode L' in r2['verdict'])
-    r3 = compare(doc('engine', dets=[['person', '0.500000123']]), doc('li'))
-    check('equal arrays + 9dp score delta -> float-environment verdict',
-          r3['arrays_equal'] and not r3['raw_scores_equal']
-          and 'inside predict' in r3['verdict'])
-    r4 = compare(doc('engine', png='OTHER'), doc('li'))
-    check('different PNGs -> CANNOT COMPARE', 'CANNOT COMPARE' in r4['verdict'])
-    r5 = compare(doc('engine', deterministic=False), doc('li'))
+    def sdoc(side_name, frames, pillow='10.4.0'):
+        return {'side': side_name, 'frames': frames,
+                'libs': {'pillow': pillow, 'torch': '2.10.0',
+                         'rfdetr_detr_file': f'/{side_name}/detr.py',
+                         'rfdetr_detr_sha256': 'abc'}}
+
+    r = compare(sdoc('engine', [frame()]), sdoc('li', [frame()]))
+    check('equal arrays + equal scores + equal libs -> no-divergence frame',
+          r['libs_identical'] and r['frames'][0]['arrays_equal']
+          and r['frames'][0]['raw_scores_equal']
+          and 'no divergence' in r['frames'][0]['verdict'])
+    r2 = compare(sdoc('engine', [frame(arr='aX', mode='L')]),
+                 sdoc('li', [frame()]))
+    check('different arrays -> load-path verdict naming both modes',
+          not r2['frames'][0]['arrays_equal']
+          and 'ARRAYS DIFFER' in r2['frames'][0]['verdict']
+          and 'mode L' in r2['frames'][0]['verdict'])
+    r3 = compare(sdoc('engine', [frame(dets=[['person', '0.500000123']])],
+                      pillow='9.5.0'),
+                 sdoc('li', [frame()]))
+    check('1.2e-7 delta -> float-noise tier (NOT the mechanism), and the '
+          'pillow build mismatch is surfaced',
+          r3['frames'][0]['arrays_equal']
+          and 'float-noise background' in r3['frames'][0]['verdict']
+          and r3['libs_diff'] == {'pillow': {'engine': '9.5.0',
+                                             'li': '10.4.0'}})
+    r3b = compare(sdoc('engine', [frame(dets=[['person', '0.480000000']])]),
+                  sdoc('li', [frame()]))
+    check('2e-2 delta -> %-scale INSIDE-predict tier (resize prime suspect)',
+          r3b['frames'][0]['arrays_equal']
+          and '%-SCALE DIVERGENCE INSIDE predict'
+          in r3b['frames'][0]['verdict'])
+    r4 = compare(sdoc('engine', [frame(png='OTHER')]),
+                 sdoc('li', [frame()]))
+    check('unpaired PNG -> CANNOT COMPARE',
+          'CANNOT COMPARE' in r4['frames'][0]['verdict'])
+    r5 = compare(sdoc('engine', [frame(deterministic=False)]),
+                 sdoc('li', [frame()]))
     check('non-self-deterministic side -> VOID (null control)',
-          'VOID' in r5['verdict'])
+          'VOID' in r5['frames'][0]['verdict'])
+    r6 = compare(sdoc('engine', [frame(), frame(png='p2', dets=[
+        ['person', '0.400000000']])]),
+        sdoc('li', [frame(), frame(png='p2')]))
+    check('two frames pair by sha: small clean + large diverging in one '
+          'compare (the prediction-test shape)',
+          r6['frames'][0]['raw_scores_equal'] is True
+          and r6['frames'][1]['raw_scores_equal'] is False)
 
     # census partition logic on canned rows — every recorded property.
     rows = [{'film': 'a', 'mode': 'RGB', 'size': [640, 480],
@@ -329,7 +435,8 @@ def main() -> int:
                                          / 'detector_parity'
                                          / f'census_{UTC}.json'))
     ap.add_argument('--side', choices=['engine', 'li'])
-    ap.add_argument('--png')
+    ap.add_argument('--png', nargs='+',
+                    help='one or more PNGs — one model load serves all')
     ap.add_argument('--compare', nargs=2, metavar=('ENGINE_JSON', 'LI_JSON'))
     ap.add_argument('--self-test', action='store_true')
     reject_glued_flags(sys.argv[1:])
@@ -346,7 +453,7 @@ def main() -> int:
     if args.side:
         if not args.png:
             ap.error('--side needs --png')
-        return side(args.side, Path(args.png))
+        return side(args.side, args.png)
     if args.compare:
         e = json.loads(Path(args.compare[0]).expanduser().read_text())
         li = json.loads(Path(args.compare[1]).expanduser().read_text())

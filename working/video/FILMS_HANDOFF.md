@@ -360,7 +360,8 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    (free test: `diagnose_cross_films.py --near-threshold` — clean-8 vs
    diverging-27 near-threshold rates + adjacency of diverging frames;
    also prints per-film n_diverging/exclusions/PASS to resolve the
-   census-8 vs quoted-3 zero-divergence discrepancy) and the WHEEL
+   census-8 vs quoted-3 zero-divergence discrepancy — RESOLVED: 8 clean
+   films by the size table below) and the WHEEL
    BUILD (LI +cu128 from the PyTorch index vs the engine's own linux
    build — same version string, different binaries; container-side
    read-pastes: `docker exec rr sh -c 'cat <engine-prefix>/lib/
@@ -372,6 +373,34 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    glued-flags refusal naming the glue (verified: argparse already
    refuses loudly, exit 2 — the 8/27 output therefore came from a run
    whose --cross join WORKED). Side test STILL HELD until Ansh rules.
+   **THE SIZE PARTITION IS THE ANSWER — PERFECT, 35/35, ZERO EXCEPTIONS
+   (2026-09-02)**: every film with long edge ≤ 560px is bit-identical
+   across arms; every film above 560px diverges. 560 is RF-DETR's input
+   edge: at-or-under needs NO downscale; above gets RESIZED, and the
+   arms' resize produces different pixels. The table: 320×240 ×4 clean;
+   464×368 ×2 clean; 540×360 ×1 clean; 560×380 ×1 clean (=8 clean);
+   624×480, 640×276, 640×480, 704×480, 714×480, 720×432, 720×480,
+   720×544, 720×576, 936×720, 1424×1072 — 27 films, all diverging.
+   Mode constant RGB, dtype constant uint8 — neither partitions; float
+   noise would not respect a resolution boundary. BOTH prior hypotheses
+   FALSIFIED with data: mode (all-RGB census) and threshold
+   amplification (clean vs diverging median near01 rates 0.05119 vs
+   0.04514 — clean films slightly HIGHER; near05 0.21297 vs 0.18781;
+   adjacent fraction 0.524 = half the divergence far from threshold).
+   ON THE RECORD (Ansh's own, alongside the unrun sha audit): the
+   arming film is 320×240 — chosen for its byte-parity proof, which
+   selected exactly the one class of film that structurally CANNOT
+   exhibit this; the staging gate-3 pass was uninformative about the
+   corpus. NEXT (ruled): `probe/run_side_prediction.sh` — the side test
+   as a PREDICTION test (small frame: arrays equal + scores ≤1e-5
+   noise floor; large frame: arrays equal + %-scale divergence inside
+   predict; falsifier: a 1e-7-scale large-frame delta kills the resize
+   mechanism too), with score-delta TIERS (≤1e-5 = the measured Leagues
+   background, ≥1e-3 = the mechanism), libs identity per container
+   (pillow/torch/torchvision + rfdetr detr.py sha — same version
+   string ≠ same bytes), the torch BUILD reads (Task 3) and the
+   installed predict source diffed across containers — one rr bring-up
+   serves all (~8–12 min; rr was down post-campaign).
    ALSO RECORDED: (i) probe cell B (`-i pipe:0`, the legacy form) died
    rc=234/183 on 2 of 3 films with n=0 — the campaign is IMMUNE (both
    arms read FILES: pipeline.py:191-195, whose docstring predicted this
