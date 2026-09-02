@@ -288,14 +288,36 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    on disk at `~/films_probe/gate3_films/` — after the pull, paste only
    the derive command; a full staging re-run would refuse at the
    existing golden by design.
-   Sequence (reissued): `probe/run_films_staging.sh` (step-0 verify +
-   films golden write-once + staged gate-3 + LIVENESS_MIN →
-   `~/films_probe/gate3_films/arming.json`; STOP: Ansh reads the arming
-   verdict) → `run_plan_films.sh` (ruled numbers BAKED, reads
-   arming.json, refuses without it; ~7–8 h; optional PREFLIGHT_ONLY=1
-   wiring pass ~15 min). Results land IN-REPO under
-   `working/video/results/films_mainrun_*` → post-campaign box commit +
-   bundle = entry-26 STOP-AND-LAND, no laptop pushes until landed.
+   **CAMPAIGN RAN 2026-09-01: 9 legs, 0 errors, per-leg gates all
+   PASS/NOT-RUN.** Throughput banked (n=2 spreads 0.22–2.08%): LI 16×2
+   10.145/10.123 f/s @21.45 cores; RR 16×2 9.413/9.611 @25.52 cores
+   (idle burden 4.66); RR default 2.360/2.342 — default→parity 4.05×;
+   best-vs-best LI +6.5% span / +26.7% per core, steady-window gap
+   +2.2%. Archive: `s3://rocketride-benchmark-data/ansh/
+   films-mainrun-20260901/` (95 objects); in-repo results NOT yet
+   committed by the box — when it commits+bundles them, entry-26
+   STOP-AND-LAND applies; the box pulls the diagnosis commit FIRST.
+   **CROSS GATES FAILED all six cells: cross_detection_agreement 34/35
+   films; the ONE passing film (every cell, 395/395) is
+   20000LeaguesUndertheSea — the arming film and the only measured film
+   ever byte-parity-proven A==B==C.** Failures are not flaps (most
+   diverging frames differ in detection COUNT; max paired score delta
+   0.368; boundary exclusions 0–1/film — H16 not the story); gate 1
+   passed both arms, so frame COUNTS agree everywhere. On the record
+   (Ansh): the whole-corpus per-frame sha pass was priced two rounds
+   earlier and never ruled; every same-frames proof covers three films,
+   one is in the corpus, that one passes. HYPOTHESIS under test: the
+   arms decoded DIFFERENT frames on unverified films (VFR selection —
+   same count, different content) ⇒ those films' gate-3 verdict is
+   **CANNOT COMPARE (entry 14), not FAIL** — provisional until the
+   discriminator runs. DIAGNOSIS TOOLS (2026-09-01, read-only, no gate
+   changed, nothing re-run): `probe/diagnose_cross_films.py` (per-frame
+   anatomy + drift-by-index signature + corpus detection direction +
+   char-band data with the confound probe + LI embed share) and
+   `probe/run_frame_parity_failing.sh` (the existing byte-parity probe
+   on ABucketofBlood / HouseOnBareMountain / A_Study_In_Scarlet, with
+   manifest-sha same-input proof; ~6–12 min). Nothing publishes until
+   Ansh rules on the discriminator's verdict.
 5. **Ruling C second half — APPLIED in-repo as Ruling L (2026-08-30)**:
    the repo carries 4000/0 (image ENV + service + pipeline defaults), the
    equivalence note, and the sweep probe's fail-closed /health chunk
