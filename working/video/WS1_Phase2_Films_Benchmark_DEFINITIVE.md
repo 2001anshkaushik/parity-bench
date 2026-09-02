@@ -57,13 +57,22 @@ per film at manifest build through the arms' own sha-pinned ffmpeg
 | RR M16xT2 | 9.413 / 9.611 | 2.08% | 25.52 | 79.8% | 8.218 / 8.303 |
 | RR default | 2.360 / 2.342 | 0.77% | 6.40 | 20.0% | 1.540 / 1.526 |
 
-- **Best-vs-best, scoped: at the ruled 16×2-vs-16×2 posture, C=16, on
-  this 35-film archive corpus with RF-DETR base, LlamaIndex delivered
-  +6.5% span throughput** (pass means, 10.134 vs 9.512 f/s). This is a
-  measured result at one measured configuration — not a general claim
-  about the frameworks (§10).
-- **Per core, computed both ways and both published** (the difference
-  between them IS the token model's idle tax, §3):
+- **The headline, scoped — at the ruled 16×2-vs-16×2 posture, C=16, on
+  this 35-film archive corpus with RF-DETR base: LlamaIndex delivered
+  +6.5% span throughput (10.134 vs 9.512 f/s, pass means); +26.7% per
+  MEASURED core, because that is the cost a user actually pays, idle
+  included; and +3.9% per EFFECTIVE core, because that is the cost of
+  the work itself once each arm's idle spin leaves its own
+  denominator.** Read together, the finding is not "LlamaIndex is more
+  efficient at the work" — **the two engines do the work at nearly the
+  same per-core cost, and RocketRide's process model spends 4.66 cores
+  (14.6% of the box) standing still**: a specific product finding with
+  a mechanism (§3), not a framework verdict. Both per-core figures are
+  in this sentence because either alone misleads — measured-core alone
+  overstates the framework gap, effective-core alone hides the tax. A
+  measured result at one measured configuration (§10).
+- **The per-core computation, both ways** (the difference between them
+  IS the token model's idle tax, §3):
   - per *measured* service core (idle included in the denominator):
     LI 0.4724 vs RR 0.3727 f/s/core — **LI +26.7%** (per-pass ratios
     +28.2% / +25.3%);
@@ -221,13 +230,32 @@ sit above it — but that fraction is selection-weighted (duration×bytes
 strata over her corpus), not an estimate of the archive. **Her sealed
 500-film manifest records no resolution** (its per-film contract carries
 duration, bytes/sha, frames_counted, nominal_fps, license, audio —
-ARCHIVE_FILMS.md §3 — and our subset builder consumed no dimension
-field), so the corpus-wide fraction above 560px is **not derivable from
+`team_docs_received/ARCHIVE_FILMS.md` §3 — and our subset builder
+consumed no dimension field), so the corpus-wide fraction above 560px is **not derivable from
 any artifact we hold**. Establishing it would take one read-only header
 probe over her 500 S3 objects (or her census EDA, if it captured
 dimensions — unverified). Until then, the finding's scope is: every
 measured film above 560px diverged, every one at or below did not, on
 this subset.
+
+**Where the §6 evidence lives** (provenance pass at `646eaea`): the
+Leagues A==B==C parity and detect-text artifacts are COMMITTED
+(`probe/probe_frame_parity_20000LeaguesUndertheSea.json`,
+`probe/probe_detect_text_20000LeaguesUndertheSea.json`); the
+near-threshold split is REPRODUCIBLE in-repo from the landed records
+(`probe/diagnose_cross_films.py --near-threshold` over the results dir);
+the three failing-film parity artifacts, the mode/size census, and the
+Layer-1 build-read outputs are BOX-SIDE
+(`~/films_probe/parity_failing/`, `~/films_probe/detector_parity/`) —
+relayed verbatim into the record but not yet landed; a small bundle
+lands them if this document is to be fully self-contained at one commit.
+
+**Ruled (V): the 500-header probe was considered and NOT run.** The
+reasoning, recorded so this reads as ruled rather than overlooked: the
+scope statement above is the honest form of the claim; a header pass
+over her S3 prefix would generalize a finding on her data without her
+involvement; and the 77% figure is load-bearing for nothing this
+document asserts.
 
 **Open, bounded, not pursued this campaign**: the remaining candidates
 are properties of *how* each arm runs the same code — thread counts at
@@ -236,9 +264,10 @@ settle them: completing the single-frame side test (raw scores at
 threshold 0.001 on one identical frame per size class, with per-side
 `torch.get_num_threads()` captured in the same process), then a
 controlled thread-count sweep on that harness. The instrument exists
-(`probe/probe_detector_parity.py` + `run_side_prediction.sh`); its last
-run stopped on a fixed argument-contract defect, and per the scope ruling
-the library question is upstream-ticket material, not a gate blocker.
+(`probe/probe_detector_parity.py` + `probe/run_side_prediction.sh`); its
+last run stopped on a fixed argument-contract defect. **Ruled (X): this
+paragraph goes upstream as the ticket, side-test harness attached; it
+is not a publication gate.**
 
 ## 7. Not publishable from this run, and why
 
@@ -255,6 +284,13 @@ the library question is upstream-ticket material, not a gate blocker.
   verdict here leaned on it (exclusions ran 0–1 per film).
 - **Cross-team CPU-per-frame**: still blocked on the unresolved AMI-era
   accounting discrepancy with Leela's team.
+
+**Ruled (W): the char band and the H16 cap are formally DEFERRED to the
+next campaign.** The band is settled only by a run whose detection sets
+agree — this run's input is confounded, and its n=8 clean films are
+themselves a ≤560px-biased subsample of the corpus. H16 is settled by a
+films-sized denominator **ruled before the data, never after**; until
+then the 0.5% cap stays live and disclosed in every export.
 
 ## 8. Instrument defects, with direction of bias (campaign discipline)
 
@@ -302,3 +338,9 @@ frame stream, detect text and our overlap-stripped counter all agree on
    with a stated 2× margin (Ruling R; disclosed in the run manifest).
 6. RR records carry no stage timings; the embed-share bound in §2.1 is
    LI-side only (stated where used).
+7. **The wall estimate ran wrong in a knowable direction**: 9.6 h
+   against the 7–8 h estimate, the excess in the warm-up waves and the
+   default cell. The estimate was built from measured single-lane rates
+   and under-priced warm-up at 16 lanes — the cost Ruling S accepted
+   knowingly (2×-worker waves kept as the marker-gate margin). An
+   estimate wrong in a knowable direction belongs here, not buried.
