@@ -5,8 +5,16 @@ Companion to `WS1_Phase2_Video_Benchmark_DEFINITIVE.md` (the AMI campaign,
 closed 2026-08-28). Campaign: 2026-09-01, box `i-0775f33f3dc16f6af`
 (c7i.8xlarge, 32 vCPU / 61 GiB), 9 legs, **0 errors, every per-leg gate
 PASS or NOT-RUN, zero FAIL**. Run dir `working/video/results/
-films_mainrun_*` (box; archived `s3://rocketride-benchmark-data/ansh/
-films-mainrun-20260901/`, 95 objects). Every number below is from the
+films_mainrun_20260901T204015Z/` — **landed in-repo at commit `646eaea`**
+(entry-26 bundle, parent `79e4676`; also archived
+`s3://rocketride-benchmark-data/ansh/films-mainrun-20260901/`, 95
+objects). The campaign ran at repo `1560b28…`; its run_manifest reads
+`completed: true`, `cross_gates_failed: true`, every ruled number
+matching Rulings P/O/M/L/J/S, arming
+`films-staging-20260901T203906Z-1560b286` with LIVENESS_MIN 0.385
+(Ruling-R derivation embedded). Wall clock 20:40Z→06:16Z (~9.6 h against
+the ~7–8 h estimate; the excess sits in warm-up waves and the default
+cell). Every number below is from the
 banked records or the committed diagnosis artifacts; where a claim is a
 reading, it says so.
 
@@ -49,11 +57,23 @@ per film at manifest build through the arms' own sha-pinned ffmpeg
 | RR M16xT2 | 9.413 / 9.611 | 2.08% | 25.52 | 79.8% | 8.218 / 8.303 |
 | RR default | 2.360 / 2.342 | 0.77% | 6.40 | 20.0% | 1.540 / 1.526 |
 
-- **Best-vs-best (pass means): LlamaIndex +6.5% span throughput
-  (10.134 vs 9.512 f/s) and +26.7% per measured service core**
-  (0.4724 vs 0.3727 f/s/core). The steady-window gap is only **+2.2%**
-  (8.439 vs 8.261) — both published: the span includes drain tails, the
-  window is the saturated regime.
+- **Best-vs-best, scoped: at the ruled 16×2-vs-16×2 posture, C=16, on
+  this 35-film archive corpus with RF-DETR base, LlamaIndex delivered
+  +6.5% span throughput** (pass means, 10.134 vs 9.512 f/s). This is a
+  measured result at one measured configuration — not a general claim
+  about the frameworks (§10).
+- **Per core, computed both ways and both published** (the difference
+  between them IS the token model's idle tax, §3):
+  - per *measured* service core (idle included in the denominator):
+    LI 0.4724 vs RR 0.3727 f/s/core — **LI +26.7%** (per-pass ratios
+    +28.2% / +25.3%);
+  - per *effective* core (each arm's measured idle spin removed from
+    its own denominator — RR 25.52−4.66=20.86, LI 21.45−0.07=21.38):
+    LI 0.4740 vs RR 0.4560 — **LI +3.9%**.
+  Throughput itself is never idle-adjusted (discipline); these are two
+  denominators for the same banked numbers.
+- The steady-window gap is only **+2.2%** (8.439 vs 8.261) — both
+  published; §2.2 explains the difference from the records.
 - **Out-of-box → tuned: 4.05×** (RR default 2.351 → RR 16×2 9.512, an
   RR-internal ratio per Crossroad 27 — the default cell is never a
   cross-arm performance comparison, and its cross files say so). LI's
@@ -76,14 +96,35 @@ text volume, bounded by the measured stage shares: extract 22.5% / detect
 stage_s; stated). A char-volume asymmetry riding on 2.6% of wall cannot
 move a +6.5% headline.
 
+### 2.2 Why the span gap (+6.5%) exceeds the window gap (+2.2%)
+
+The steady window is defined as `[first in-flight==C, last in-flight>=C]`
+with completions inside (driver `steady_window`); the span additionally
+carries the ramp (lanes filling) and the drain tail (the last long films
+finishing on emptying lanes). Measured: the RR windows ran 734.4/726.9 s
+holding 19 of 35 completions (6,035 frames → 8.218/8.303 f/s); the LI
+windows 637.5/646.3 s holding 17 (5,504/5,328 frames → 8.634/8.244).
+So the **saturated rates are near-equal (+2.2%)** and roughly half the
+completions per leg land outside the window — in ramp and drain, where
+per-lane speed and tail scheduling dominate and where most of the +6.5%
+span advantage is earned. Both numbers are published because they answer
+different questions: the window is the sustained rate a long queue would
+see; the span is what a 35-film batch actually costs end to end.
+
 ## 3. The idle burden — the token model's cost (product finding)
 
 RR at 16 tokens burns **4.66 cores (14.6% of the box) before any work
-arrives**; LI's 16 idle instances burn 0.066 cores. Reported beside every
-RR number, **never subtracted** (campaign discipline): it is what a user
-pays to hold 16 engine tokens resident. It is also why RR's higher core
-count (25.52 vs 21.45) buys less throughput: effective compute is
-~20.9 cores against LI's ~21.4.
+arrives** (export `efficiency.idle_burden.idle_cores_with_instances_live`
+4.657/4.656 across passes; ~1.01 of it is the engine master alone, and
+even the single-token default posture idles 1.23 cores); LI's 16 idle
+instances burn 0.066–0.069 cores. Reported beside every RR number,
+**never subtracted from throughput** (campaign discipline): it is what a
+user pays to hold 16 engine tokens resident. Its size is exactly the gap
+between the two per-core figures in §2 — **+26.7% per measured core
+collapses to +3.9% per effective core once each arm's idle spin is
+removed from its own denominator** — so RR's parity cell reaches
+9.5 f/s while paying a ~4.66-core tax LI does not pay, and both readings
+are published rather than one netted number.
 
 ## 4. Memory (Ruling-G risk, retired)
 
@@ -174,6 +215,19 @@ systematic — **RR detects more on 22 films, LI on 5, equal on 8**.
 inputs produce different detections above 560px. That is a **real
 cross-arm difference, not an instrument artifact**. Gate 3's strict
 verdict is CORRECT and stands: 27 films FAIL, 8 films PASS.
+
+**How general is the 560px boundary?** Within our 35, 27 films (77%)
+sit above it — but that fraction is selection-weighted (duration×bytes
+strata over her corpus), not an estimate of the archive. **Her sealed
+500-film manifest records no resolution** (its per-film contract carries
+duration, bytes/sha, frames_counted, nominal_fps, license, audio —
+ARCHIVE_FILMS.md §3 — and our subset builder consumed no dimension
+field), so the corpus-wide fraction above 560px is **not derivable from
+any artifact we hold**. Establishing it would take one read-only header
+probe over her 500 S3 objects (or her census EDA, if it captured
+dimensions — unverified). Until then, the finding's scope is: every
+measured film above 560px diverged, every one at or below did not, on
+this subset.
 
 **Open, bounded, not pursued this campaign**: the remaining candidates
 are properties of *how* each arm runs the same code — thread counts at
