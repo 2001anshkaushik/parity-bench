@@ -8,7 +8,9 @@ is read from committed run exports; provenance and hashes are in
 `results/AMI_LANDING.md`.
 
 **The finding, plainly.** At matched utilization (~90–93%) on the same
-corpus and the same five-stage pipe, Ansh's harness spends **~19–20%
+corpus — byte-identical inputs, proven per-file: all 168 measured
+videos' sha256s match across the two sides' independently fetched
+corpora — and the same five-stage pipe, Ansh's harness spends **~19–20%
 more CPU per frame** than both of the other two — 2.308 vs 1.934/1.893
 CPU-s/frame at 16×2, and the same-sized gap at the other matched
 posture — which surfaces as ~20% lower throughput. Leela's and Shashi's
@@ -27,6 +29,17 @@ Ansh's side is the outlier and the burden of explanation sits there.
    constructed differently).
 3. Client topology (one client per task, N websockets, versus 16
    tokens multiplexed on one websocket).
+
+**What Ansh's columns add that neither of the others has: the
+out-of-the-box row.** The default cell — one token, no thread
+environment, what a developer gets without tuning — runs the full
+corpus at 2.443/2.446 f/s and 18.8% box utilization: roughly **5.2×
+below the same engine's tuned ceiling on the same corpus and box**
+(12.729/12.753 at 16×2). This is a product finding about the engine's
+defaults, not a point in the comparison — it is an RR-internal ratio,
+deliberately never a cross-arm number — and it is the number the
+product owner needs: it is what every untuned deployment actually
+runs at, and no published column shows it.
 
 **The ask.** One identical file run through both harnesses at the same
 posture with a per-stage CPU split — or, alternatively, an exchanged

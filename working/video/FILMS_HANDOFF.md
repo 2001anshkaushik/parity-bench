@@ -579,11 +579,20 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    one identical file or an exchanged cgroup sampler stream);
    completed:false and the pass-1 errors gate now explained
    verdict-first at the top of the table doc and in AMI_LANDING.md.
-   Nothing blocks handover; two optional strengtheners on record
-   (box-minutes per-file byte-identity cross-check; her post-pin cells
-   stay HYPOTHESIS until she publishes pins). The films DEFINITIVE is a
-   separate deliverable — its DRAFT banner untouched, not part of this
-   package.
+   Nothing blocks handover. **Byte-identity CLOSED (2026-09-02,
+   laptop-side)**: all 168 measured videos' submitted_sha256 (our
+   records, both pass-1 legs agreeing) match Leela's canonical
+   corpus_manifest per-file sha256 exactly — zero differ; her manifest
+   object predates every compared run and is landed
+   (results/leela_corpus_manifest_ami_full.json). The fetches were
+   INDEPENDENT (ours Corner/Overhead, hers AMI mirror) — the
+   reconciliation's shared-staging line was WRONG for AMI and is
+   corrected; independent fetches, identical bytes. Cover now carries
+   the proven-identical line AND the default-posture product finding
+   (5.2× off tuned ceiling, Crossroad-27 RR-internal framing). One
+   standing label: her post-pin cells stay HYPOTHESIS until she
+   publishes pins. The films DEFINITIVE is a separate deliverable — its
+   DRAFT banner untouched, not part of this package.
 
 ## 5. Findings this session that belong in the (next) report
 

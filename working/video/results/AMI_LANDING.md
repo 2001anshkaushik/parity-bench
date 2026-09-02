@@ -85,6 +85,35 @@ e4a8a08b3ccb0e3073152a6169e52470132c68f27cf702f6ffe7e1ca2efcb886  mainrun_202608
 2f38c528d9d0bb4b88d1387198fee5324c017303a4702238e6015a4e2897300d  mainrun_20260824T025550Z/records_rocketride_video_default_blast.jsonl
 ```
 
+## Corpus byte-identity check — PROVEN IDENTICAL, 168/168
+
+Run 2026-09-02, laptop-side, read-only. Inputs: (a) our two pass-1
+records files (every completed row carries `submitted_sha256` — the
+sha256 of the video bytes the driver read from disk and sent; hashes of
+the fetched files above), and (b) Leela's canonical corpus manifest
+`s3://rocketride-benchmark-data/leela/corpus/ami_full/corpus_manifest.json`
+(landed beside this file as `leela_corpus_manifest_ami_full.json`,
+sha256 `05cca878…`, S3 LastModified **2026-08-22T03:17:24Z** — before
+every compared run, unmodified since; her `fetch_ami.sh:192-207` embeds
+`sha256sum *.avi` into it and her fail-closed `corpus_pin` gate
+verifies her disk against it at run time).
+
+Verdict: **all 168 measured videos match her per-file sha256 exactly;
+zero differ; zero missing.** Internal controls: each video carries ONE
+distinct submitted sha within each leg, and the parity and default legs
+agree with each other on every video. Her map's 2 extra files
+(`TS3012c.avi`, `TS3012d.avi`) are the corpus's +2 warm meetings —
+uncompared, and never counted in any measured figure.
+
+Weight of the result: the two corpora were fetched **independently**
+(ours from the Corner/Overhead mirrors — `fetch_ami_video.py:16`; hers
+from the AMI mirror into her S3 staging), so this is two independent
+acquisition paths converging on identical bytes, not one copy verified
+twice. Scope caveat, stated: this proves OUR sent bytes equal HER
+canonical pins; that her runs consumed disk matching those pins is her
+own corpus_pin gate's claim (fail-closed, her mechanism), not
+re-proven here.
+
 ## Manifest warts, stated
 
 1. `mainrun_20260824T025550Z/run_manifest.json` reads

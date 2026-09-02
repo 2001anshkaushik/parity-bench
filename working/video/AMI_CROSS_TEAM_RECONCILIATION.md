@@ -95,12 +95,20 @@ leg's cgroup sampler streams. **Ansh asks them; we change nothing.**
   manifest meta as `meeting_list_sha256`; same positional 168+2 split.
 - Frames: **identical** (23,049 both; her 137.2/video).
 - Footage: hers 96.06 h probed; ours ~96.1 h. Same basis family.
-- Per-file BYTES: our per-file sha256s live in the box-side AMI manifest
-  (verified by `--verify` before every leg); her corpus_pin verifies hers.
-  Both corpora were staged by HER pipeline to the same S3 prefix and ours
-  was fetched from it. **Byte identity is very likely but NOT PROVEN from
-  laptop-held objects** — provable in minutes on the box (our manifest
-  shas vs her committed/manifested shas). HYPOTHESIS until then.
+- Per-file BYTES: **PROVEN IDENTICAL, 168/168 (2026-09-02)** — our
+  records' per-video `submitted_sha256` (the bytes the driver actually
+  sent; consistent within and across both pass-1 legs) match Leela's
+  canonical `corpus_manifest.json` per-file sha256 exactly for all 168
+  measured meetings; zero differ (`results/AMI_LANDING.md`, byte-identity
+  section; her manifest landed beside it, S3 object dated 2026-08-22,
+  before every compared run). CORRECTION to this document's earlier text:
+  the two corpora were NOT staged from one shared prefix — ours was
+  fetched from the Corner/Overhead mirrors (`fetch_ami_video.py:16`),
+  hers from the AMI mirror into her staging; that error previously
+  understated the result. Independent fetches, identical bytes. The 2
+  warm meetings are uncompared (never in any measured figure); her runs'
+  disk-vs-manifest agreement is her own fail-closed corpus_pin gate's
+  claim.
 - Boxes differ: hers `i-0bdc8b1e…`, ours `i-0775f33f…` — same instance
   type; our own 24-vs-26-Aug sessions differed 3.6% on one box, so
   cross-box variance is real but an order short of 20%.
