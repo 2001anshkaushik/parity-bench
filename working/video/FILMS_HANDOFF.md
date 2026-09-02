@@ -318,6 +318,52 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    on ABucketofBlood / HouseOnBareMountain / A_Study_In_Scarlet, with
    manifest-sha same-input proof; ~6–12 min). Nothing publishes until
    Ansh rules on the discriminator's verdict.
+   **DISCRIMINATOR ANSWERED 2026-09-02: frames IDENTICAL** (A==C EXACT
+   on all three failing films, manifest-sha proof) — the different-frames
+   hypothesis is DEAD; divergence is downstream of decode. Anatomy: same
+   objects, ~0.5–5% score shifts, divergence where scores cross 0.3 from
+   opposite sides; direction systematic (RR more on 22 films, LI 5,
+   equal 8); 20000Leagues identical both arms (916 detections).
+   MECHANISM EVIDENCE (source): both stacks run rfdetr 1.5.2 / torch
+   2.10.0 / torchvision 0.25.0 (engine dist-info; li_image_freeze
+   :109,132-133 — LI's are +cu128 wheel builds: the plausible ~1e-7
+   background, the Leagues staging 7th-decimal). The ONLY
+   arm-controlled delta before rfdetr.predict: LI forces .convert('RGB')
+   (pipeline.py:210-212); the engine load KEEPS THE PNG'S ORIGINAL MODE
+   — its docstring says so, a past optimization removed the normalizing
+   round-trip (image.py:19-24, 36-38) — and detection.py:172 passes the
+   image untouched. FAVORED: mode-conditional preprocessing (gray8 PNGs
+   from B&W streams → the arms hand rfdetr different tensors on exactly
+   those films; per-film all-or-nothing ✓). The bitrate/resolution
+   variant is DEAD: zero-divergence films at 0.58/0.58/1.00 Mbit/s with
+   diverging A_Study_In_Scarlet at 0.83 between them. DECISIVE TEST
+   built, **DO NOT RUN UNTIL ANSH RULES**:
+   `probe/probe_detector_parity.py` (~8–12 min) — per-film PNG-mode
+   census joined to divergence, the installed wheel's predict source,
+   and one PNG through both arms' exact load paths (array sha + raw
+   scores at 9 dp, self-determinism nulls): ARRAYS DIFFER ⇒
+   preprocessing, gate 3 strict is CORRECT (arms not doing the same
+   work); ARRAYS EQUAL + scores differ ⇒ float class, strict multisets
+   are the wrong instrument for a threshold-crossing detector.
+   ALSO RECORDED: (i) probe cell B (`-i pipe:0`, the legacy form) died
+   rc=234/183 on 2 of 3 films with n=0 — the campaign is IMMUNE (both
+   arms read FILES: pipeline.py:191-195, whose docstring predicted this
+   exact moov-at-end pipe class at :183-184; the engine caches MP4 to
+   disk, reader.py:159-172/:425); Scarlet's pipe SUCCESS ⇒ moov-front —
+   archive MP4s split on moov placement; the true ffmpeg error text is
+   in the parity artifacts' cell-B stderr_tail (probe captures it,
+   probe_frame_parity.py:321-332). (ii) **THE THROUGHPUT COMPARISON
+   STANDS**: gate 1 exact on both arms in every leg (equal frame counts
+   = the ruled blocker-4 basis); measured stage shares extract 22.5% /
+   detect 74.9% / split 0.02% / embed 2.6%, so the char asymmetry rides
+   on 2.6% of LI wall — LI +6.5% span, +26.7% per core, window gap
+   +2.2%, default→parity 4.05×. (iii) char_conservation is CONFOUNDED
+   by the divergence (median |ratio−1|: high-divergence half 0.0188 vs
+   low 0.0085) — the films band CANNOT be cut from this run; the only
+   uncontaminated band evidence is the three zero-divergence films
+   (1.0011 / 1.0023 / 1.0056 — n=3, all within 0.6% ABOVE 1.0, the
+   direction the Ruling-L note predicted from engine short-line
+   retention).
 5. **Ruling C second half — APPLIED in-repo as Ruling L (2026-08-30)**:
    the repo carries 4000/0 (image ENV + service + pipeline defaults), the
    equivalence note, and the sweep probe's fail-closed /health chunk
