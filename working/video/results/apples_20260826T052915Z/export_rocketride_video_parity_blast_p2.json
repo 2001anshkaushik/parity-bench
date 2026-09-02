@@ -1,0 +1,1553 @@
+{
+ "at_a_glance": "rocketride_video parity[tokens=8,threads=unset(engine-default-64)] blast pass 2 records 168 (errors 0) / offered 168 | THROUGHPUT 11.571 frames/s (173.6x realtime), steady window 11.438 frames/s (n=152) | SERVICE CPU 29.843 cores = 93.3% of 32 | IDLE BURDEN 2.839 cores with 8 rr_tokens live = 8.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 \u00b7 NOT RUN 2 \u00b7 FAIL 0 | efficiency valid=True | COLLECTOR ok",
+ "arm": "rocketride_video",
+ "posture": "parity[tokens=8,threads=unset(engine-default-64)]",
+ "leg": "blast",
+ "pass": 2,
+ "submission_order": "manifest-seq: deterministic by meeting id, identical both arms; NOT longest-first \u2014 sorting to shorten the drain tail would benchmark our scheduler, not the frameworks (ruling 2026-08-20)",
+ "throughput": {
+  "total_span_s": 1992.0,
+  "total_frames": 23049,
+  "total_frames_per_s": 11.571,
+  "total_realtime_factor": 173.6,
+  "steady_window": {
+   "defined": true,
+   "window_start_ns": 15562858761098,
+   "window_end_ns": 17404602829014,
+   "window_wall_s": 1841.7,
+   "window_n": 152,
+   "window_frames": 21066,
+   "window_frames_per_s": 11.438,
+   "window_realtime_factor": 171.61,
+   "note": "window = [first in-flight==C, last in-flight>=C]; completions inside"
+  }
+ },
+ "efficiency": {
+  "valid": true,
+  "source": "container cgroup cpu.stat usage_usec bracketed around the leg \u2014 the same reader as the probes (#34: denominators from the container, never the driver)",
+  "service_cpu_s": 59446.7,
+  "effective_cores": 29.843,
+  "cpu_util_of_box": 0.9326,
+  "box_cpus": 32,
+  "cpu_s_per_footage_min": 10.314,
+  "cpu_s_per_frame": 2.579,
+  "cpu_s_per_video": 353.8,
+  "cpu_s_per_detection": 0.3033,
+  "cpu_s_per_chunk": 4.141,
+  "n_detections": 196000,
+  "n_chunks": 14354,
+  "usd_per_1k_footage_hours": 8.23,
+  "usd_per_hour_basis": "1.428 (instance on-demand $/h; cost = $/h / x_realtime * 1000, her V5 definition)",
+  "idle_burden": {
+   "instances": 8,
+   "instance_kind": "rr_tokens",
+   "idle_cores_before_instances": 1.008,
+   "idle_cores_with_instances_live": 2.839,
+   "sample_s": 6.0,
+   "idle_share_of_box": 0.0887,
+   "box_cpus": 32,
+   "marginal_cores_per_instance": 0.229,
+   "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+   "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve",
+   "idle_cpu_s_over_leg_if_additive": 5655.2,
+   "idle_share_of_service_cpu_if_additive": 0.0951
+  },
+  "policy": "idle_burden is reported beside every figure above and never subtracted \u2014 additivity under load is unmeasured (Ticket 4)"
+ },
+ "collector_status": "ok",
+ "collector_summary": {
+  "roles": {
+   "driver": {
+    "peak_rss_bytes": 3369054208,
+    "peak_rss_mb": 3212.98,
+    "peak_vms_bytes": 4673568768,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 2,
+    "peak_thread_count": 19,
+    "peak_cgroup_anon_mb": 3229.55,
+    "peak_cgroup_current_mb": 25470.14,
+    "peak_cgroup_tasks": 81,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/snap.amazon-ssm-agent.amazon-ssm-agent.service",
+    "cgroup_samples": 3985,
+    "peak_fd_count": 33,
+    "distinct_pids_seen": 2,
+    "total_cpu_seconds": 156.2,
+    "ctx_switches_voluntary": 66495,
+    "ctx_switches_involuntary": 5485,
+    "samples": 3985,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": -1293814.1,
+    "rss_final_over_initial": 0.7045
+   },
+   "service": {
+    "peak_rss_bytes": 28878897152,
+    "peak_rss_mb": 27541.06,
+    "peak_vms_bytes": 251056263168,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 25,
+    "peak_thread_count": 3012,
+    "peak_cgroup_anon_mb": 23468.12,
+    "peak_cgroup_current_mb": 25768.73,
+    "peak_cgroup_tasks": 3012,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-856af0a8f731908eb585944d30931cc65ee93db240d43249200853398d98af59.scope",
+    "cgroup_samples": 3985,
+    "peak_fd_count": 0,
+    "distinct_pids_seen": 177,
+    "total_cpu_seconds": 62173.82,
+    "ctx_switches_voluntary": 13968760,
+    "ctx_switches_involuntary": 90852916,
+    "samples": 3985,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": 3836582.98,
+    "rss_final_over_initial": 2.0484
+   }
+  },
+  "system": {
+   "compressor_delta_bytes": 0,
+   "swapouts_delta": 0,
+   "compressions_delta": 0,
+   "peak_system_mem_percent": 44.5
+  }
+ },
+ "n_offered": 168,
+ "n_records": 168,
+ "n_errors": 0,
+ "leg_wall_s": 1992.0,
+ "aborted_by_breaker": false,
+ "wall_s_order_stats": [
+  19.8,
+  26.0,
+  30.3,
+  35.8,
+  40.3,
+  41.2,
+  41.4,
+  41.7,
+  42.1,
+  42.2,
+  42.7,
+  43.5,
+  45.6,
+  46.0,
+  51.2,
+  51.4,
+  51.5,
+  51.5,
+  54.2,
+  54.9,
+  56.0,
+  59.3,
+  60.9,
+  63.5,
+  67.0,
+  67.8,
+  68.1,
+  70.9,
+  72.8,
+  74.7,
+  76.8,
+  79.9,
+  82.2,
+  82.3,
+  84.0,
+  84.9,
+  85.0,
+  87.4,
+  88.5,
+  89.9,
+  90.1,
+  90.3,
+  90.4,
+  91.2,
+  92.1,
+  92.2,
+  93.5,
+  93.8,
+  95.4,
+  97.4,
+  97.9,
+  99.5,
+  99.8,
+  99.9,
+  100.2,
+  100.2,
+  100.5,
+  103.3,
+  103.6,
+  104.0,
+  104.1,
+  104.2,
+  104.8,
+  107.2,
+  107.4,
+  107.8,
+  109.0,
+  109.2,
+  109.4,
+  109.6,
+  112.5,
+  112.6,
+  112.6,
+  113.2,
+  115.7,
+  117.1,
+  117.4,
+  117.7,
+  119.1,
+  126.8,
+  128.3,
+  128.8,
+  129.4,
+  130.8,
+  132.4,
+  133.6,
+  134.1,
+  136.7,
+  137.0,
+  137.0,
+  138.0,
+  138.3,
+  138.8,
+  138.8,
+  139.2,
+  141.4,
+  142.1,
+  143.4,
+  148.5,
+  151.0,
+  155.9,
+  157.1,
+  157.4,
+  171.0,
+  176.0,
+  177.8,
+  179.4,
+  182.1,
+  192.1,
+  196.6,
+  207.2,
+  207.9,
+  207.9,
+  215.9,
+  217.1,
+  221.7,
+  234.4,
+  238.5,
+  238.8,
+  240.0,
+  242.6,
+  253.5,
+  255.2,
+  255.7,
+  264.1,
+  268.0,
+  268.3,
+  275.8,
+  277.6,
+  278.4,
+  278.7,
+  280.3,
+  297.6,
+  300.9,
+  305.4,
+  306.1,
+  306.6,
+  313.1,
+  317.7,
+  321.1,
+  329.2,
+  335.7,
+  337.3,
+  338.1,
+  339.7,
+  348.1,
+  364.1,
+  365.4,
+  365.9,
+  373.8,
+  374.0,
+  378.7,
+  384.8,
+  393.0,
+  401.7,
+  405.2,
+  405.3,
+  413.8,
+  415.8,
+  426.6,
+  428.7,
+  431.0,
+  440.2,
+  504.1,
+  545.8,
+  593.6,
+  601.4,
+  618.4
+ ],
+ "latency_normalized": {
+  "wall_s_per_video_minute": [
+   2.18,
+   2.2,
+   2.22,
+   2.23,
+   2.25,
+   2.26,
+   2.28,
+   2.28,
+   2.28,
+   2.3,
+   2.3,
+   2.3,
+   2.31,
+   2.34,
+   2.36,
+   2.36,
+   2.37,
+   2.38,
+   2.4,
+   2.4,
+   2.41,
+   2.44,
+   2.45,
+   2.45,
+   2.45,
+   2.48,
+   2.48,
+   2.48,
+   2.49,
+   2.5,
+   2.54,
+   2.54,
+   2.56,
+   2.59,
+   2.61,
+   2.61,
+   2.62,
+   2.64,
+   2.66,
+   2.67,
+   2.67,
+   2.68,
+   2.69,
+   2.74,
+   2.75,
+   2.78,
+   2.81,
+   2.81,
+   2.83,
+   2.84,
+   2.84,
+   2.86,
+   2.87,
+   2.89,
+   2.92,
+   2.92,
+   2.92,
+   2.98,
+   3.03,
+   3.05,
+   3.05,
+   3.05,
+   3.06,
+   3.07,
+   3.07,
+   3.08,
+   3.09,
+   3.1,
+   3.13,
+   3.14,
+   3.15,
+   3.16,
+   3.21,
+   3.25,
+   3.26,
+   3.33,
+   3.46,
+   3.48,
+   3.56,
+   3.62,
+   3.66,
+   3.67,
+   3.77,
+   3.78,
+   3.79,
+   3.83,
+   3.87,
+   3.9,
+   4.07,
+   4.07,
+   4.34,
+   4.44,
+   4.51,
+   4.52,
+   4.62,
+   4.66,
+   4.78,
+   4.89,
+   4.97,
+   5.0,
+   5.05,
+   5.15,
+   5.17,
+   5.18,
+   5.25,
+   5.27,
+   5.33,
+   5.34,
+   5.35,
+   5.45,
+   5.51,
+   5.54,
+   5.59,
+   5.63,
+   5.64,
+   5.71,
+   5.83,
+   5.86,
+   5.99,
+   6.2,
+   6.23,
+   6.25,
+   6.25,
+   6.31,
+   6.36,
+   6.42,
+   6.44,
+   6.51,
+   6.72,
+   6.74,
+   6.88,
+   6.94,
+   7.17,
+   7.19,
+   7.34,
+   7.36,
+   7.38,
+   7.99,
+   8.18,
+   8.21,
+   8.33,
+   8.73,
+   8.93,
+   9.24,
+   9.39,
+   9.47,
+   9.75,
+   9.78,
+   9.8,
+   9.98,
+   10.1,
+   10.4,
+   10.56,
+   10.65,
+   10.68,
+   10.81,
+   11.5,
+   11.85,
+   12.54,
+   13.43,
+   13.46,
+   14.01,
+   14.15,
+   16.99,
+   17.67,
+   17.7,
+   18.05,
+   18.98
+  ],
+  "note": "raw per-video wall_s and video_s_manifest are in every record; this normalization keeps the 6x duration confound visible",
+  "p50": 3.79,
+  "max": 18.98,
+  "n": 168,
+  "percentile_policy": "p50/max/n only below n=50 (no dressed percentiles)"
+ },
+ "preleg_load1": 17.35,
+ "preleg_container_idle_cores": {
+  "rr": 1.008
+ },
+ "preleg_foreign_excess": 0.01,
+ "quiet_box_override": null,
+ "driver_cpu": {
+  "cpu_s": 97.1,
+  "share_of_box": 0.0015,
+  "over_1pct": false
+ },
+ "gates": {
+  "frames_census": {
+   "PASS": true,
+   "arm": "rocketride_video",
+   "n_records": 168,
+   "missing_videos": null,
+   "rows": [
+    {
+     "video": "EN2002a.avi",
+     "PASS": true,
+     "frames": 143
+    },
+    {
+     "video": "EN2009b.avi",
+     "PASS": true,
+     "frames": 164
+    },
+    {
+     "video": "EN2002b.avi",
+     "PASS": true,
+     "frames": 119
+    },
+    {
+     "video": "EN2003a.avi",
+     "PASS": true,
+     "frames": 149
+    },
+    {
+     "video": "EN2002d.avi",
+     "PASS": true,
+     "frames": 147
+    },
+    {
+     "video": "ES2002a.avi",
+     "PASS": true,
+     "frames": 82
+    },
+    {
+     "video": "EN2009c.avi",
+     "PASS": true,
+     "frames": 206
+    },
+    {
+     "video": "EN2006a.avi",
+     "PASS": true,
+     "frames": 235
+    },
+    {
+     "video": "ES2003a.avi",
+     "PASS": true,
+     "frames": 75
+    },
+    {
+     "video": "EN2001d.avi",
+     "PASS": true,
+     "frames": 226
+    },
+    {
+     "video": "EN2006b.avi",
+     "PASS": true,
+     "frames": 203
+    },
+    {
+     "video": "EN2002c.avi",
+     "PASS": true,
+     "frames": 194
+    },
+    {
+     "video": "EN2004a.avi",
+     "PASS": true,
+     "frames": 230
+    },
+    {
+     "video": "ES2003b.avi",
+     "PASS": true,
+     "frames": 140
+    },
+    {
+     "video": "ES2004a.avi",
+     "PASS": true,
+     "frames": 77
+    },
+    {
+     "video": "ES2005a.avi",
+     "PASS": true,
+     "frames": 31
+    },
+    {
+     "video": "ES2002b.avi",
+     "PASS": true,
+     "frames": 151
+    },
+    {
+     "video": "EN2001b.avi",
+     "PASS": true,
+     "frames": 230
+    },
+    {
+     "video": "EN2001a.avi",
+     "PASS": true,
+     "frames": 239
+    },
+    {
+     "video": "ES2002d.avi",
+     "PASS": true,
+     "frames": 179
+    },
+    {
+     "video": "ES2005d.avi",
+     "PASS": true,
+     "frames": 115
+    },
+    {
+     "video": "ES2002c.avi",
+     "PASS": true,
+     "frames": 159
+    },
+    {
+     "video": "EN2005a.avi",
+     "PASS": true,
+     "frames": 239
+    },
+    {
+     "video": "ES2004b.avi",
+     "PASS": true,
+     "frames": 155
+    },
+    {
+     "video": "ES2005b.avi",
+     "PASS": true,
+     "frames": 153
+    },
+    {
+     "video": "EN2001e.avi",
+     "PASS": true,
+     "frames": 239
+    },
+    {
+     "video": "EN2009d.avi",
+     "PASS": true,
+     "frames": 240
+    },
+    {
+     "video": "ES2007a.avi",
+     "PASS": true,
+     "frames": 80
+    },
+    {
+     "video": "ES2006a.avi",
+     "PASS": true,
+     "frames": 85
+    },
+    {
+     "video": "ES2008a.avi",
+     "PASS": true,
+     "frames": 69
+    },
+    {
+     "video": "ES2007b.avi",
+     "PASS": true,
+     "frames": 112
+    },
+    {
+     "video": "ES2003d.avi",
+     "PASS": true,
+     "frames": 155
+    },
+    {
+     "video": "ES2004d.avi",
+     "PASS": true,
+     "frames": 147
+    },
+    {
+     "video": "ES2009a.avi",
+     "PASS": true,
+     "frames": 93
+    },
+    {
+     "video": "ES2006b.avi",
+     "PASS": true,
+     "frames": 145
+    },
+    {
+     "video": "ES2007d.avi",
+     "PASS": true,
+     "frames": 83
+    },
+    {
+     "video": "ES2009b.avi",
+     "PASS": true,
+     "frames": 96
+    },
+    {
+     "video": "ES2010a.avi",
+     "PASS": true,
+     "frames": 42
+    },
+    {
+     "video": "ES2003c.avi",
+     "PASS": true,
+     "frames": 149
+    },
+    {
+     "video": "ES2011a.avi",
+     "PASS": true,
+     "frames": 74
+    },
+    {
+     "video": "ES2004c.avi",
+     "PASS": true,
+     "frames": 150
+    },
+    {
+     "video": "ES2006d.avi",
+     "PASS": true,
+     "frames": 132
+    },
+    {
+     "video": "ES2008b.avi",
+     "PASS": true,
+     "frames": 139
+    },
+    {
+     "video": "ES2009d.avi",
+     "PASS": true,
+     "frames": 141
+    },
+    {
+     "video": "ES2011b.avi",
+     "PASS": true,
+     "frames": 106
+    },
+    {
+     "video": "ES2012a.avi",
+     "PASS": true,
+     "frames": 74
+    },
+    {
+     "video": "ES2013a.avi",
+     "PASS": true,
+     "frames": 55
+    },
+    {
+     "video": "ES2010d.avi",
+     "PASS": true,
+     "frames": 65
+    },
+    {
+     "video": "ES2005c.avi",
+     "PASS": true,
+     "frames": 153
+    },
+    {
+     "video": "ES2006c.avi",
+     "PASS": true,
+     "frames": 145
+    },
+    {
+     "video": "ES2010b.avi",
+     "PASS": true,
+     "frames": 117
+    },
+    {
+     "video": "ES2012d.avi",
+     "PASS": true,
+     "frames": 63
+    },
+    {
+     "video": "ES2011d.avi",
+     "PASS": true,
+     "frames": 132
+    },
+    {
+     "video": "ES2014a.avi",
+     "PASS": true,
+     "frames": 76
+    },
+    {
+     "video": "ES2008d.avi",
+     "PASS": true,
+     "frames": 175
+    },
+    {
+     "video": "ES2013b.avi",
+     "PASS": true,
+     "frames": 142
+    },
+    {
+     "video": "ES2008c.avi",
+     "PASS": true,
+     "frames": 139
+    },
+    {
+     "video": "ES2015a.avi",
+     "PASS": true,
+     "frames": 76
+    },
+    {
+     "video": "ES2013d.avi",
+     "PASS": true,
+     "frames": 126
+    },
+    {
+     "video": "ES2016a.avi",
+     "PASS": true,
+     "frames": 92
+    },
+    {
+     "video": "ES2012b.avi",
+     "PASS": true,
+     "frames": 149
+    },
+    {
+     "video": "ES2007c.avi",
+     "PASS": true,
+     "frames": 158
+    },
+    {
+     "video": "ES2010c.avi",
+     "PASS": true,
+     "frames": 123
+    },
+    {
+     "video": "ES2015b.avi",
+     "PASS": true,
+     "frames": 153
+    },
+    {
+     "video": "ES2009c.avi",
+     "PASS": true,
+     "frames": 130
+    },
+    {
+     "video": "ES2015d.avi",
+     "PASS": true,
+     "frames": 129
+    },
+    {
+     "video": "ES2014d.avi",
+     "PASS": true,
+     "frames": 194
+    },
+    {
+     "video": "ES2011c.avi",
+     "PASS": true,
+     "frames": 114
+    },
+    {
+     "video": "IB4001.avi",
+     "PASS": true,
+     "frames": 118
+    },
+    {
+     "video": "ES2014b.avi",
+     "PASS": true,
+     "frames": 154
+    },
+    {
+     "video": "IB4002.avi",
+     "PASS": true,
+     "frames": 125
+    },
+    {
+     "video": "ES2016d.avi",
+     "PASS": true,
+     "frames": 102
+    },
+    {
+     "video": "IB4005.avi",
+     "PASS": true,
+     "frames": 134
+    },
+    {
+     "video": "ES2012c.avi",
+     "PASS": true,
+     "frames": 147
+    },
+    {
+     "video": "IB4004.avi",
+     "PASS": true,
+     "frames": 158
+    },
+    {
+     "video": "IN1009.avi",
+     "PASS": true,
+     "frames": 84
+    },
+    {
+     "video": "ES2016b.avi",
+     "PASS": true,
+     "frames": 161
+    },
+    {
+     "video": "IN1002.avi",
+     "PASS": true,
+     "frames": 165
+    },
+    {
+     "video": "ES2014c.avi",
+     "PASS": true,
+     "frames": 151
+    },
+    {
+     "video": "IN1005.avi",
+     "PASS": true,
+     "frames": 186
+    },
+    {
+     "video": "ES2013c.avi",
+     "PASS": true,
+     "frames": 157
+    },
+    {
+     "video": "IN1001.avi",
+     "PASS": true,
+     "frames": 231
+    },
+    {
+     "video": "IS1000a.avi",
+     "PASS": true,
+     "frames": 100
+    },
+    {
+     "video": "ES2015c.avi",
+     "PASS": true,
+     "frames": 142
+    },
+    {
+     "video": "IN1008.avi",
+     "PASS": true,
+     "frames": 227
+    },
+    {
+     "video": "ES2016c.avi",
+     "PASS": true,
+     "frames": 154
+    },
+    {
+     "video": "IB4003.avi",
+     "PASS": true,
+     "frames": 135
+    },
+    {
+     "video": "IS1000c.avi",
+     "PASS": true,
+     "frames": 143
+    },
+    {
+     "video": "IB4010.avi",
+     "PASS": true,
+     "frames": 197
+    },
+    {
+     "video": "IS1000d.avi",
+     "PASS": true,
+     "frames": 174
+    },
+    {
+     "video": "IS1001d.avi",
+     "PASS": true,
+     "frames": 51
+    },
+    {
+     "video": "IS1001a.avi",
+     "PASS": true,
+     "frames": 59
+    },
+    {
+     "video": "IS1003a.avi",
+     "PASS": true,
+     "frames": 60
+    },
+    {
+     "video": "IN1016.avi",
+     "PASS": true,
+     "frames": 240
+    },
+    {
+     "video": "IS1002d.avi",
+     "PASS": true,
+     "frames": 83
+    },
+    {
+     "video": "IB4011.avi",
+     "PASS": true,
+     "frames": 161
+    },
+    {
+     "video": "IS1001c.avi",
+     "PASS": true,
+     "frames": 95
+    },
+    {
+     "video": "IS1004a.avi",
+     "PASS": true,
+     "frames": 53
+    },
+    {
+     "video": "IS1002b.avi",
+     "PASS": true,
+     "frames": 158
+    },
+    {
+     "video": "IN1012.avi",
+     "PASS": true,
+     "frames": 207
+    },
+    {
+     "video": "IS1005a.avi",
+     "PASS": true,
+     "frames": 68
+    },
+    {
+     "video": "IN1007.avi",
+     "PASS": true,
+     "frames": 160
+    },
+    {
+     "video": "IN1014.avi",
+     "PASS": true,
+     "frames": 246
+    },
+    {
+     "video": "IS1003b.avi",
+     "PASS": true,
+     "frames": 109
+    },
+    {
+     "video": "IS1004d.avi",
+     "PASS": true,
+     "frames": 130
+    },
+    {
+     "video": "IS1006a.avi",
+     "PASS": true,
+     "frames": 56
+    },
+    {
+     "video": "IS1004b.avi",
+     "PASS": true,
+     "frames": 144
+    },
+    {
+     "video": "IS1007a.avi",
+     "PASS": true,
+     "frames": 64
+    },
+    {
+     "video": "IS1003d.avi",
+     "PASS": true,
+     "frames": 139
+    },
+    {
+     "video": "IS1007b.avi",
+     "PASS": true,
+     "frames": 86
+    },
+    {
+     "video": "IS1006b.avi",
+     "PASS": true,
+     "frames": 143
+    },
+    {
+     "video": "IS1005b.avi",
+     "PASS": true,
+     "frames": 145
+    },
+    {
+     "video": "IS1008a.avi",
+     "PASS": true,
+     "frames": 63
+    },
+    {
+     "video": "IS1006c.avi",
+     "PASS": true,
+     "frames": 129
+    },
+    {
+     "video": "IS1000b.avi",
+     "PASS": true,
+     "frames": 156
+    },
+    {
+     "video": "IS1009a.avi",
+     "PASS": true,
+     "frames": 55
+    },
+    {
+     "video": "IS1008b.avi",
+     "PASS": true,
+     "frames": 117
+    },
+    {
+     "video": "IS1008c.avi",
+     "PASS": true,
+     "frames": 102
+    },
+    {
+     "video": "IS1007c.avi",
+     "PASS": true,
+     "frames": 140
+    },
+    {
+     "video": "IS1009b.avi",
+     "PASS": true,
+     "frames": 137
+    },
+    {
+     "video": "TS3003a.avi",
+     "PASS": true,
+     "frames": 100
+    },
+    {
+     "video": "IS1001b.avi",
+     "PASS": true,
+     "frames": 140
+    },
+    {
+     "video": "IS1002c.avi",
+     "PASS": true,
+     "frames": 138
+    },
+    {
+     "video": "IS1009c.avi",
+     "PASS": true,
+     "frames": 120
+    },
+    {
+     "video": "TS3003b.avi",
+     "PASS": true,
+     "frames": 147
+    },
+    {
+     "video": "IN1013.avi",
+     "PASS": true,
+     "frames": 209
+    },
+    {
+     "video": "TS3004b.avi",
+     "PASS": true,
+     "frames": 149
+    },
+    {
+     "video": "TS3004c.avi",
+     "PASS": true,
+     "frames": 198
+    },
+    {
+     "video": "TS3004d.avi",
+     "PASS": true,
+     "frames": 183
+    },
+    {
+     "video": "TS3005b.avi",
+     "PASS": true,
+     "frames": 162
+    },
+    {
+     "video": "TS3005c.avi",
+     "PASS": true,
+     "frames": 160
+    },
+    {
+     "video": "IS1003c.avi",
+     "PASS": true,
+     "frames": 124
+    },
+    {
+     "video": "TS3003c.avi",
+     "PASS": true,
+     "frames": 277
+    },
+    {
+     "video": "TS3005d.avi",
+     "PASS": true,
+     "frames": 177
+    },
+    {
+     "video": "TS3006b.avi",
+     "PASS": true,
+     "frames": 157
+    },
+    {
+     "video": "TS3006c.avi",
+     "PASS": true,
+     "frames": 169
+    },
+    {
+     "video": "IS1008d.avi",
+     "PASS": true,
+     "frames": 98
+    },
+    {
+     "video": "TS3006d.avi",
+     "PASS": true,
+     "frames": 198
+    },
+    {
+     "video": "TS3007b.avi",
+     "PASS": true,
+     "frames": 167
+    },
+    {
+     "video": "IS1006d.avi",
+     "PASS": true,
+     "frames": 122
+    },
+    {
+     "video": "IS1004c.avi",
+     "PASS": true,
+     "frames": 150
+    },
+    {
+     "video": "TS3007c.avi",
+     "PASS": true,
+     "frames": 161
+    },
+    {
+     "video": "TS3004a.avi",
+     "PASS": true,
+     "frames": 89
+    },
+    {
+     "video": "TS3006a.avi",
+     "PASS": true,
+     "frames": 83
+    },
+    {
+     "video": "TS3008b.avi",
+     "PASS": true,
+     "frames": 154
+    },
+    {
+     "video": "TS3008c.avi",
+     "PASS": true,
+     "frames": 167
+    },
+    {
+     "video": "TS3009b.avi",
+     "PASS": true,
+     "frames": 164
+    },
+    {
+     "video": "TS3008a.avi",
+     "PASS": true,
+     "frames": 90
+    },
+    {
+     "video": "TS3009c.avi",
+     "PASS": true,
+     "frames": 171
+    },
+    {
+     "video": "TS3010a.avi",
+     "PASS": true,
+     "frames": 69
+    },
+    {
+     "video": "TS3008d.avi",
+     "PASS": true,
+     "frames": 186
+    },
+    {
+     "video": "TS3007d.avi",
+     "PASS": true,
+     "frames": 188
+    },
+    {
+     "video": "IS1005c.avi",
+     "PASS": true,
+     "frames": 137
+    },
+    {
+     "video": "TS3012a.avi",
+     "PASS": true,
+     "frames": 57
+    },
+    {
+     "video": "TS3010b.avi",
+     "PASS": true,
+     "frames": 139
+    },
+    {
+     "video": "TS3010c.avi",
+     "PASS": true,
+     "frames": 142
+    },
+    {
+     "video": "TS3009d.avi",
+     "PASS": true,
+     "frames": 137
+    },
+    {
+     "video": "TS3010d.avi",
+     "PASS": true,
+     "frames": 128
+    },
+    {
+     "video": "TS3005a.avi",
+     "PASS": true,
+     "frames": 87
+    },
+    {
+     "video": "TS3011b.avi",
+     "PASS": true,
+     "frames": 148
+    },
+    {
+     "video": "IS1007d.avi",
+     "PASS": true,
+     "frames": 134
+    },
+    {
+     "video": "TS3011c.avi",
+     "PASS": true,
+     "frames": 159
+    },
+    {
+     "video": "TS3011d.avi",
+     "PASS": true,
+     "frames": 144
+    },
+    {
+     "video": "TS3012b.avi",
+     "PASS": true,
+     "frames": 163
+    },
+    {
+     "video": "TS3007a.avi",
+     "PASS": true,
+     "frames": 79
+    },
+    {
+     "video": "IS1009d.avi",
+     "PASS": true,
+     "frames": 128
+    },
+    {
+     "video": "TS3009a.avi",
+     "PASS": true,
+     "frames": 100
+    },
+    {
+     "video": "TS3011a.avi",
+     "PASS": true,
+     "frames": 101
+    }
+   ]
+  },
+  "errors": {
+   "PASS": true,
+   "n_errors": 0
+  },
+  "self_duplication_any": {
+   "PASS": true,
+   "doubled_videos": null,
+   "indeterminate_videos": null,
+   "detector_rows": 168
+  },
+  "duplication_trigger": {
+   "PASS": true,
+   "n_trigger_eligible": 76,
+   "n_indeterminate": 0
+  },
+  "chunkid_monotone": {
+   "PASS": true,
+   "violations": null
+  },
+  "detection_liveness": {
+   "verdict": "NOT RUN",
+   "PASS": null,
+   "records": 0,
+   "offered": 168,
+   "reason": "--liveness-min-fraction not provided; value comes from probe data"
+  },
+  "embed_integrity": {
+   "PASS": true,
+   "n": 14354,
+   "expected_dim": 384,
+   "tol": 0.001,
+   "bad_dim_idx": null,
+   "bad_norm_idx": null
+  },
+  "determinism_repeat": {
+   "verdict": "NOT RUN",
+   "PASS": null,
+   "records": 0,
+   "offered": null,
+   "reason": "no ::repeat record in this leg (sequential legs produce one; blast legs report NOT RUN)"
+  },
+  "frame_count_methods_agree": {
+   "PASS": true,
+   "disagreeing": null
+  },
+  "dropped_frame_attribution": {
+   "channel_alive": true,
+   "attribution": "no drop warnings",
+   "liveness_marker": "[entrypoint] RocketRide engine",
+   "drop_warnings": null,
+   "n_drop_warnings": 0
+  }
+ },
+ "provenance_leela": {
+  "run_id": "20260826T062336Z-104924",
+  "timestamp_utc": "2026-08-26T06:23:36Z",
+  "git_commit": "014686ab053a115d65c5e307228f34bb0708f0ea-dirty",
+  "image_digest": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+  "framework_version": "1.3.0",
+  "instance_type": "c7i.8xlarge",
+  "architecture": "Linux/x86_64",
+  "cpu_count": 32,
+  "ram_gb": 61.8,
+  "corpus_manifest_sha256": "f5a2255cc5c9ad8744c096c7267f7c8845182aec902213329eea4e3669e65c19",
+  "corpus_n_docs": 168,
+  "parser": "ffmpeg fps=1/15 + rfdetr(RF-DETR base, thr 0.3)",
+  "parser_config_hash": "f16cb645f66726de",
+  "chunk_config": {
+   "chunk_size": 4000,
+   "chunk_overlap": 0,
+   "splitter": "RecursiveCharacterTextSplitter",
+   "input_transform": "text + '\\n'"
+  },
+  "rocketride_engine_version": "3.3.1",
+  "duplication_patch_applied": false,
+  "duplication_patch_id": null,
+  "rocketride_sdk_version": "1.3.0",
+  "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+  "offered_concurrency": 16,
+  "configured_concurrency": 8,
+  "warmup_policy": "driver-side, 2 disjoint manifest warm rows, coverage proven per instance; LI sends concurrent in waves of max(2 x workers, leg concurrency) (Crossroad 40), RR tokens round-robin; per-send ledger in warmup_<stem>.json",
+  "timeout_s": 7200,
+  "mode": "blast"
+ },
+ "provenance_video": {
+  "pipe_sha256": "6330773fb63bf7f286563cc37b39a671e3b25c1874ae9bcfc4b936c9c2e5b911",
+  "manifest_sha256": "f5a2255cc5c9ad8744c096c7267f7c8845182aec902213329eea4e3669e65c19",
+  "posture": {
+   "name": "parity",
+   "tokens": 8,
+   "threads_config": null,
+   "threads_note": "unset -> engine CONST_DEFAULT_MAX_THREADS=64 (constants.py:48)",
+   "threads_env_expected": 4,
+   "threads_env_in_process_torch": 4
+  },
+  "identity_readback": {
+   "sdk": {
+    "package_version": "1.3.0",
+    "module_path": "/home/ssm-user/.venv/lib/python3.12/site-packages/rocketride/__init__.py",
+    "python_executable": "/home/ssm-user/.venv/bin/python",
+    "python_version": "3.12.13",
+    "verified_surface": {
+     "connect": [
+      "timeout"
+     ],
+     "use": [
+      "filepath",
+      "threads",
+      "ttl"
+     ],
+     "send": [
+      "data",
+      "mimetype",
+      "objinfo",
+      "token"
+     ],
+     "terminate": [
+      "token"
+     ],
+     "disconnect": []
+    },
+    "null_control": "fired (2/2)",
+    "ok": true,
+    "problems": null
+   },
+   "envprobe_project_id": "fd8cfee8-9eba-50ea-aedc-eacb109b924a",
+   "env_probe_schema": 2,
+   "rr": {
+    "rfdetr_import_ok": true,
+    "python_version": "3.12.13",
+    "python_executable": "/opt/rocketride/engine/engine",
+    "versions": {
+     "rfdetr": "1.5.2",
+     "torchvision": "0.25.0+cu128",
+     "transformers": "4.53.3",
+     "supervision": "0.30.0",
+     "timm": "1.0.28",
+     "sentence-transformers": "5.7.0",
+     "imageio-ffmpeg": "0.6.0"
+    },
+    "rfdetr_checkpoint_md5": "b4d3ce46099eaed50626ede388caf979",
+    "rfdetr_checkpoint_md5_ok": true
+   }
+  },
+  "thread_pins_by_arm": {
+   "PASS": true,
+   "arms": {
+    "rr": {
+     "within_arm": {
+      "PASS": true,
+      "readers": [
+       "rr_task"
+      ],
+      "disagreements": null,
+      "values_agreed": {
+       "OMP_NUM_THREADS": "4",
+       "MKL_NUM_THREADS": "4",
+       "OPENBLAS_NUM_THREADS": "4",
+       "VECLIB_MAXIMUM_THREADS": "4",
+       "NUMEXPR_NUM_THREADS": "4",
+       "TORCH_NUM_THREADS": "4",
+       "torch_num_threads": 4
+      }
+     },
+     "declared": {
+      "OMP_NUM_THREADS": "4",
+      "MKL_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "4",
+      "VECLIB_MAXIMUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "TORCH_NUM_THREADS": "4"
+     },
+     "declared_vs_measured_mismatch": null,
+     "expected": 4,
+     "declared_vs_expected_mismatch": null
+    }
+   },
+   "cross_arm_values": {
+    "rr": 4
+   },
+   "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm optima, difference recorded never failed (Crossroad 17)"
+  },
+  "task_census": {
+   "declared_tokens": 8,
+   "census_before": 0,
+   "census_after": 8,
+   "new_task_pids": [
+    356,
+    581,
+    806,
+    1031,
+    1256,
+    1481,
+    1706,
+    1930
+   ],
+   "project_ids": [
+    "e1561f78-4bd0-5105-afdb-cbf1aed714c0",
+    "6c317d73-bb23-5f1f-89dd-722989c53faa",
+    "b0a7b0d6-1b7d-550f-a9af-2bd0b81addcf",
+    "cf3304dc-f36f-5491-916a-287259be9f36",
+    "933c6d3b-ac4a-551f-a1f9-db8487fd3416",
+    "ab7f4b16-ee29-5139-9856-ae7faae90672",
+    "8d54ddef-c761-5b80-9052-71655f488786",
+    "8ecc564d-90de-57ff-a4e3-a2d343be3756"
+   ]
+  },
+  "network_mode": {
+   "rr": "host"
+  },
+  "image": {
+   "container": "rr",
+   "requested_tag": "rr:patched-video",
+   "image_id": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+   "rootfs_layer_count": 19,
+   "labels": "{\"benchmark.rocketride.constraints_cache_prewarmed\":\"1\",\"benchmark.rocketride.duplication_patch_applied\":\"1\",\"benchmark.rocketride.duplication_patch_id\":\"preventDefault-after-embedding-flush\",\"benchmark.rocketride.engine_version\":\"3.3.1\",\"org.opencontainers.image.version\":\"22.04\"}",
+   "lineage_declared": "Crossroad 33 (2026-08-22): rr:patched-video = a docker/Dockerfile.rocketride build PLUS one documented derived layer replacing working/nodes/env_probe (the instrument node; absent from the measured pipe, and carrying no requirements.txt so the engine constraints-cache key cannot move). A full rebuild was deliberately DEFERRED: it would re-resolve the floating ubuntu:22.04 base, the unpinned apt libc++/libunwind the engine ELF links, and the bootcheck constraints cache COPYed into the image, replacing the image that every RR probe number and the gate-3 arming run were measured on. PATH B re-baseline scheduled post-campaign with before/after fingerprints.",
+   "lineage_is_declared": true,
+   "lineage_note": "a declared string, not a measurement \u2014 it states how this image was produced; the image_id and layer count are the measured facts it must be read against"
+  },
+  "interval_s": 15,
+  "rr_write_path": "chunked-1MiB (2026-08-24, DIAG_M1_BLAST; the banked RR default SEQUENTIAL leg ran the whole-frame path \u2014 wall_s definition unchanged, wire shape differs and is disclosed)",
+  "frames_observed_method": "bracket-count",
+  "chunk_config_source": "measured from records (config literal never exported)"
+ }
+}

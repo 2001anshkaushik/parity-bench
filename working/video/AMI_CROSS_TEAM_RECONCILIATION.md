@@ -31,8 +31,10 @@ pattern's continuity), unverifiable from held objects.**
 Same KIND, different window. Hers: a deliberate **30 s idle window between
 warm-up and the barrier**, cgroup CPU quoted as cores (MATCHED_POSTURE §2).
 Ours: a cgroup-rate sample with instances live before the leg
-(`container_idle_cores`, 4 s sample; reported beside, never subtracted —
-driver_video.py:963, :1003-1015). Values at 16: ours 4.66–4.71
+(`container_idle_cores`; the AMI legs sampled **6 s** —
+`idle_burden.sample_s: 6.0` in all six landed exports — the films-era
+driver later shortened it to 4 s, driver_video.py:963; reported beside,
+never subtracted, :1003-1015). Values at 16: ours 4.66–4.71
 (DEFINITIVE idle table; films reproduced 4.657/4.656), hers 5.69 —
 **Δ≈1 core, UNRESOLVED** (window timing, master accounting, or her
 16-socket keepalives are candidates — HYPOTHESIS, not adjudicated). One
@@ -157,8 +159,11 @@ both sides of that comparison).
 | LI balanced 8×4 (25-Aug) | 13.676 / 13.434 | — | — | — | 2 | **never-quote for CPU** (collector defect; +6.0% on a different build) |
 
 Both prior beliefs CONFIRMED: RR 16×2 exists at 12.729/12.753 n=2; RR 32×1
-does not exist on AMI on our side. **In-repo gap, stated**: the AMI export
-files themselves are NOT committed (only the 08-23 run_manifest +
-run_plan.log are in-repo); the banked numbers live in the DEFINITIVE with
-exports box-side. If the reconciliation goes cross-team, landing the AMI
-exports the way the films results were landed is the first step.
+does not exist on AMI on our side. **In-repo gap — since CLOSED**: the
+exports behind all three cells are now landed from the S3 archive with
+per-file sha256 and contents-based identification
+(`results/AMI_LANDING.md`); the landed exports confirm every banked
+f/s/cores/util figure exactly, and this document's computed CPU-s/frame
+values are the exports' own recorded `cpu_s_per_frame` (2.304/2.312 at
+16×2, 2.601/2.579 at 8×4). The joined table is
+`AMI_CROSS_TEAM_TABLE.md`.

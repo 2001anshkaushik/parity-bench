@@ -552,6 +552,27 @@ byte-frozen (its sha `f5a2255c…` is run provenance).
    unfillable until the S3 exports are read (SSO expired this round —
    `aws sso login --profile rocketride`), which also converts derived
    spans to measured (bound: ±½ ulp of banked f/s).
+   **CLOSED next round (SSO restored): exports LANDED + table finished.**
+   All six banked passes identified BY CONTENTS across the archive's 43
+   exports (16×2 + default pairs in `mainrun_20260824T025550Z/`; 8×4
+   p1/p2 split across `apples_20260826T041510Z/` / `…052915Z/`; the
+   superseded 12.048 located in `equalconfig_20260824T213655Z/`).
+   Measured spans replaced derived (max delta +1.4 s, inside the stated
+   bound); cores/util/window confirmed exactly — no disagreement with
+   the DEFINITIVE; memory row filled on THREE bases per cell
+   (cgroup-cache / anon / RSS-sum, with the RSS-sum double-counting
+   caveat); $/1k now per-pass export values. NEW ARTIFACT FACTS on the
+   record (`results/AMI_LANDING.md`): both pass-1 exports carry
+   `errors PASS=false, n_errors=16` — classified from the records as
+   corpse rows of the launch that died at its first 16 blast sends
+   (SESSION_STATE:99's incident) and was resumed 07:42 (resume console
+   landed); all 16 videos completed OK in the same legs; census exact
+   168; measured quantities computed on the completed set. The landed
+   run_manifest reads `completed:false` (resume tool never flipped it)
+   and its ruled_values string is a stale 44-scale snapshot — the run's
+   ten env numbers match SESSION_STATE:294's launch line exactly. No
+   apples dir has a run_manifest (8×4 identity = export-embedded
+   provenance: posture read-backs, census 8→8, shared image digest).
 
 ## 5. Findings this session that belong in the (next) report
 

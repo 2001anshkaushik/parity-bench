@@ -1,0 +1,103 @@
+nohup: ignoring input
+lineage (from banked export, verbatim): Crossroad 33 (2026-08-22): rr:patched-video = a docker/Dockerfile.rocketride bui...
+corpus_dir=/home/ssm-user/parity-bench-video/corpus/ami/full [manifest meta]
+=== RESUME: RR default blast p1/p2 (posture default, env unset, ttl=0) ===
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+container rr [unset]: created=2026-08-24T07:42:27.929896759Z (fresh lifetime)
++ /home/ssm-user/.venv/bin/python working/video/driver_video.py --out-dir working/video/results/mainrun_20260824T025550Z --manifest working/video/ami_video_manifest.jsonl --corpus-dir /home/ssm-user/parity-bench-video/corpus/ami/full --arm rocketride --posture default --leg blast --n 168 --blast-concurrency 16 --rr-threads-env unset --pass 1 --image-lineage Crossroad 33 (2026-08-22): rr:patched-video = a docker/Dockerfile.rocketride build PLUS one documented derived layer replacing working/nodes/env_probe (the instrument node; absent from the measured pipe, and carrying no requirements.txt so the engine constraints-cache key cannot move). A full rebuild was deliberately DEFERRED: it would re-resolve the floating ubuntu:22.04 base, the unpinned apt libc++/libunwind the engine ELF links, and the bootcheck constraints cache COPYed into the image, replacing the image that every RR probe number and the gate-3 arming run were measured on. PATH B re-baseline scheduled post-campaign with before/after fingerprints.
+[driver] preflight: manifest
+[driver] preflight: corpus_dir=/home/ssm-user/parity-bench-video/corpus/ami/full [explicit (agrees with manifest meta)]
+[driver] preflight: container flags
+[driver] preflight: network mode {'rr': 'host'} (Crossroad 22: host, both arms)
+[driver] preflight: quiet box PASS foreign -0.0 vs threshold 2.0 — host busy 1.01 − containers 1.01 {'rr': 1.007} − ours 0.006 [instantaneous (/proc/stat busy − containers − ours)]; load1 1.15 (lagging, by-load1 foreign 0.11); 1 reading(s) over 4.1s, trend SINGLE READING
+[driver] preflight: read-backs (absence fails before agreement)
+[driver] preflight: SDK rocketride 1.3.0 at /home/ssm-user/.venv/lib/python3.12/site-packages/rocketride/__init__.py — entry points verified, null control fired
+[driver] preflight: RR thread env expected 'unset' — declared {}, in-process torch 16 (read back, fail-closed)
+[driver] RR: 1 token(s) live, posture default[tokens=1,threads=unset(engine-default-64)], 1 distinct project_id(s)
+[driver] census: 1 token(s) -> 1 new task process(es) [456] (declared==measured)
+[driver] idle burden: 1.24 cores with 1 instance(s) live = 3.9% of the box before any work (pre-instance baseline 1.007)
+[driver] preflight PASSED — rocketride_video default[tokens=1,threads=unset(engine-default-64)] leg=blast n=168
+[driver] cache eviction: rc=0 }
+[driver] warm-up: 2 disjoint items
+[driver] warm-up consumed 2 send(s) over 2 warm rows (2 first batch + 0 top-up; rows re-sent when exhausted — Crossroad 32; tokens round-robin (addressed, not accepted))
+[driver] warm-up ledger: warmup_rocketride_video_default_blast.json
+[driver] warm-up complete: tokens=[0] worker_pids=n/a
+[driver] FAIL EN2001a.avi: ConnectionError('Could not send request') (1 consecutive)
+[driver] FAIL EN2001b.avi: ConnectionError('Could not send request') (2 consecutive)
+[driver] FAIL EN2001d.avi: ConnectionError('Could not send request') (3 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2001e.avi: ConnectionError('Could not send request') (4 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2002a.avi: ConnectionError('Could not send request') (5 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2002b.avi: ConnectionError('Could not send request') (6 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2002c.avi: ConnectionError('Could not send request') (7 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2002d.avi: ConnectionError('Could not send request') (8 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2003a.avi: ConnectionError('Could not send request') (9 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2004a.avi: ConnectionError('Could not send request') (10 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2005a.avi: ConnectionError('Could not send request') (11 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2006a.avi: ConnectionError('Could not send request') (12 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2006b.avi: ConnectionError('Could not send request') (13 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2009b.avi: ConnectionError('Could not send request') (14 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2009c.avi: ConnectionError('Could not send request') (15 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] FAIL EN2009d.avi: ConnectionError('Could not send request') (16 consecutive)
+[driver] breaker: 3 consecutive failures — aborting leg (#32)
+[driver] terminate tk_f5432eed686b2 attempt 1: AttributeError("'NoneType' object has no attribute 'is_connected'")
+[driver] terminate tk_f5432eed686b2 attempt 2: AttributeError("'NoneType' object has no attribute 'is_connected'")
+[driver] WARNING — token tk_f5432eed686b2 could NOT be terminated and is ttl=0: a task process may be running INDEFINITELY in the rr container, burning ~1 idle core inside the cgroup the next leg measures. Verify before the next leg: docker exec rr ls /proc | grep -c "^[0-9]" (and compare the task census); a container restart clears it.
+[driver] export: working/video/results/mainrun_20260824T025550Z/export_rocketride_video_default_blast.json
+[driver] AT A GLANCE: rocketride_video default[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 16) / offered 168 | THROUGHPUT 0.0 frames/s (0.0x realtime), steady window undefined | SERVICE CPU 1.475 cores = 4.6% of 32 | IDLE BURDEN 1.241 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected unset / in-process torch 16 | gates PASS 2 · NOT RUN 3 · FAIL 3 | efficiency valid=True | COLLECTOR ok
+[driver] GATES FAILED: ['frames_census', 'errors', 'embed_integrity']
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed
+Future exception was never retrieved
+future: <Future finished exception=ConnectionError('Connection closed')>
+ConnectionError: Connection closed

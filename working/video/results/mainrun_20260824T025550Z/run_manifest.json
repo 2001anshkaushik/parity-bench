@@ -1,0 +1,32 @@
+{
+ "run_dir": "working/video/results/mainrun_20260824T025550Z",
+ "started_utc": "2026-08-24T02:55:50Z",
+ "git_sha": "62d92432c797dbf57a2b0063635468a22436cca6",
+ "dry_pass": false,
+ "numbers": {
+  "M_TOKENS": 16,
+  "LI_WORKERS": 8,
+  "WARM_N": 2,
+  "RR_THREADS_ENV": 2,
+  "RR_THREADS_ENV_applies_to": "parity posture only — rr restarted between postures (ruling 2026-08-21)",
+  "RR_DEFAULT_THREADS_ENV": "unset (engine default: what a user gets; read back in-process per leg)",
+  "LI_THREADS_ENV": 4,
+  "LIVENESS_MIN": 0.5,
+  "GATE3_RUN_ID": "probe_20260823_122005",
+  "BLAST_C": 16,
+  "DEFAULT_N": 168,
+  "SEQ_N": 5,
+  "PASSES": 2,
+  "MEASURED_N": 168
+ },
+ "images": {"rr": "rr:patched-video", "li": "li:video"},
+ "corpus": {"manifest": "working/video/ami_video_manifest.jsonl", "corpus_dir": "/home/ssm-user/parity-bench-video/corpus/ami/full",
+            "rule": "corpus_dir derives from _meta.corpus_dir (stamped after a full sha256 verify); an env CORPUS_DIR must agree with it; no tool carries a default that names a corpus (2026-08-23)",
+            "pdf_corpus": "/home/ssm-user/parity-bench-video/corpus/govdocs1/pdfs"},
+ "decisions": {
+  "ruled_values": "Crossroads 31/32 (2026-08-21): M_TOKENS=16, RR_THREADS_ENV=2 (parity; default posture unset), LI_WORKERS=8, LI_THREADS_ENV=1, WARM_N=16, BLAST_C=16, DEFAULT_N=44, PASSES=2 — if the numbers above differ, this run is NOT the ruled campaign",
+  "M_TOKENS_rationale": "working/video/RR_PARITY_CURVE.md — the full M x T curve including the faster M=32 we DECLINED (+3.3% throughput for 31% of the box idle and 32 model stacks); idle burden is reported beside every parity number, never subtracted",
+  "WARM_N_rationale": "Crossroad 32: warm rows may be re-sent across instances; warm-vs-measured disjointness is the invariant; the driver gates every instance observed serving"
+ },
+ "completed": false
+}
