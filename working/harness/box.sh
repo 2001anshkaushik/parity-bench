@@ -53,8 +53,12 @@
 #   box.sh start                     start instance, wait until SSM Online
 #   box.sh stop                      stop instance (disk survives)
 #   box.sh shell                     interactive SSM shell (for humans)
-#   box.sh run  '<cmd>'              one-shot command (single-line only)
-#   box.sh launch <name> '<cmd>'     long run: nohup on box, log ~/logs/<name>.log
+#   box.sh run  [--start] '<cmd>'    one-shot command (single-line only)
+#   box.sh launch [--start] <name> '<cmd>'  long run: nohup, log ~/logs/<name>.log
+#     --start (opt-in, NEVER default): if the box is stopped, start it, wait
+#     for instance-running, then poll DescribeInstanceInformation until the
+#     SSM agent reads Online before opening the session. Default OFF so a
+#     stopped box stays a visible fact unless the caller asked.
 #   box.sh tail <name> [lines]       tail that log (default 50)
 #   box.sh ps                        running launched jobs on the box
 #   box.sh sessions                  active SSM session count vs the cap
@@ -183,6 +187,20 @@ parse_rc() {  # $1 = session output; prints rc or returns 1
   printf '%s' "$rc"
 }
 
+# Three different failures must never read as one (2026-09-03 ruling: a
+# wrapper an agent drives unattended never reports a diagnosable condition
+# as an unknown one). Detected from the captured session output.
+diagnose_failure() {  # $1 = session output; prints one actionable line
+  local o="$1"
+  if printf '%s' "$o" | grep -qiE 'token.*(expired|invalid)|error when retrieving token|sso session.*expired'; then
+    echo "SSO token expired — run: aws sso login --profile $PROFILE   (or: box.sh login)"
+  elif printf '%s' "$o" | grep -qiE 'TargetNotConnected|is not connected'; then
+    echo "the box is stopped or unreachable (TargetNotConnected) — run: box.sh start   (or rerun with --start)"
+  else
+    echo "no exit marker in session output and no known failure signature matched — session may not have opened; read the output above"
+  fi
+}
+
 pipe_run() {
   local cmd="$1" out rc
   refuse_check "$cmd" || exit 3
@@ -193,10 +211,32 @@ pipe_run() {
   printf '%s\n' "$out"
   if ! rc=$(parse_rc "$out"); then
     transcript "$cmd" "NO_MARKER" "$out"
-    die "no exit marker in session output — session may not have opened"
+    die "$(diagnose_failure "$out")"
   fi
   transcript "$cmd" "$rc" "$out"
   return "$rc"
+}
+
+# --start support (opt-in, never default: a stopped box stays a VISIBLE
+# fact unless the caller asked). The PingStatus poll is the step that
+# matters — instance-running lands well before the SSM agent registers.
+start_flag() { [ "${1:-}" = "--start" ] && echo 1 || echo 0; }
+
+ensure_online() {
+  local s tries="${BOX_POLL_TRIES:-30}" slp="${BOX_POLL_SLEEP:-5}" i
+  s=$(state)
+  if [ "$s" != "running" ]; then
+    echo "starting instance ($s)..." >&2
+    "${A[@]}" ec2 start-instances --instance-ids "$INSTANCE" >/dev/null
+    "${A[@]}" ec2 wait instance-running --instance-ids "$INSTANCE"
+  fi
+  echo -n "waiting for SSM agent" >&2
+  for i in $(seq 1 "$tries"); do
+    if [ "$(ssm_online)" = "Online" ]; then echo " — Online" >&2; return 0; fi
+    echo -n "." >&2; sleep "$slp"
+  done
+  echo "" >&2
+  die "SSM agent not Online after $((tries * slp))s — refusing to open a session (the agent registers well after instance-running; box.sh status, then retry)"
 }
 
 # ---------- laptop-only self-test (touches no box) ----------------------
@@ -259,6 +299,26 @@ self_test() {
   chk "marker parse: extracts last __RC" "[ \"\$(parse_rc \$'noise\n__RC=0\nmore\n__RC=7')\" = 7 ]"
   chk "marker parse: missing marker fails" "! parse_rc 'no marker here' >/dev/null"
 
+  chk "diagnose: expired token -> sso login remedy" \
+    "diagnose_failure 'Error when retrieving token from sso: Token has expired and refresh failed' | grep -q 'aws sso login'"
+  chk "diagnose: TargetNotConnected -> box.sh start remedy" \
+    "diagnose_failure 'An error occurred (TargetNotConnected) when calling the StartSession operation: i-0775f33f3dc16f6af is not connected.' | grep -q 'box.sh start'"
+  chk "diagnose: unknown output -> no-marker message" \
+    "diagnose_failure 'some pty noise with no signatures' | grep -q 'no exit marker'"
+  chk "diagnose: unknown output does NOT claim a remedy" \
+    "! diagnose_failure 'some pty noise' | grep -qE 'sso login|box.sh start'"
+
+  chk "start_flag: --start -> 1" "[ \"\$(start_flag --start)\" = 1 ]"
+  chk "start_flag: command -> 0" "[ \"\$(start_flag 'git status')\" = 0 ]"
+  chk "start_flag: empty -> 0" "[ \"\$(start_flag '')\" = 0 ]"
+
+  chk "ensure_online: refuses on poll timeout (stubbed)" \
+    "! ( state(){ echo running; }; ssm_online(){ echo none; }; BOX_POLL_TRIES=2 BOX_POLL_SLEEP=0 ensure_online ) >/dev/null 2>&1"
+  chk "ensure_online: timeout message says not Online (stubbed)" \
+    "o=\$( ( state(){ echo running; }; ssm_online(){ echo none; }; BOX_POLL_TRIES=2 BOX_POLL_SLEEP=0 ensure_online ) 2>&1 || true ); printf '%s' \"\$o\" | grep -q 'not Online'"
+  chk "ensure_online: succeeds when agent Online (stubbed, no aws call)" \
+    "( state(){ echo running; }; ssm_online(){ echo Online; }; BOX_POLL_TRIES=2 BOX_POLL_SLEEP=0 ensure_online ) >/dev/null 2>&1"
+
   local td; td=$(mktemp -d)
   TRANSCRIPT_DIR="$td" transcript 'echo demo' 0 'demo-output' 2>/dev/null
   chk "transcript file written" "ls \"$td\"/transcript_*.log >/dev/null 2>&1"
@@ -278,18 +338,7 @@ case "${1:-}" in
     echo "instance: $INSTANCE  state: $(state)  ssm: $(ssm_online)  sessions: $(sessions_count)"
     ;;
   start)
-    s=$(state)
-    if [ "$s" != "running" ]; then
-      echo "starting ($s)..."
-      "${A[@]}" ec2 start-instances --instance-ids "$INSTANCE" >/dev/null
-      "${A[@]}" ec2 wait instance-running --instance-ids "$INSTANCE"
-    fi
-    echo -n "waiting for SSM agent"
-    for _ in $(seq 1 30); do
-      [ "$(ssm_online)" = "Online" ] && { echo " — Online"; exit 0; }
-      echo -n "."; sleep 5
-    done
-    die "SSM agent not Online after 150s"
+    ensure_online
     ;;
   stop)
     "${A[@]}" ec2 stop-instances --instance-ids "$INSTANCE" >/dev/null
@@ -299,13 +348,19 @@ case "${1:-}" in
     exec "${A[@]}" ssm start-session --target "$INSTANCE"
     ;;
   run)
-    [ $# -ge 2 ] || die "usage: box.sh run '<cmd>'"
-    pipe_run "$2"
+    shift
+    START=$(start_flag "${1:-}"); [ "$START" = 1 ] && shift
+    [ $# -ge 1 ] || die "usage: box.sh run [--start] '<cmd>'"
+    [ "$START" = 1 ] && ensure_online
+    pipe_run "$1"
     ;;
   launch)
-    [ $# -ge 3 ] || die "usage: box.sh launch <name> '<cmd>'"
-    name="$2"; cmd="$3"
+    shift
+    START=$(start_flag "${1:-}"); [ "$START" = 1 ] && shift
+    [ $# -ge 2 ] || die "usage: box.sh launch [--start] <name> '<cmd>'"
+    name="$1"; cmd="$2"
     refuse_check "$cmd" || exit 3
+    [ "$START" = 1 ] && ensure_online
     q=$(printf '%q' "$cmd")
     pipe_run "mkdir -p ~/logs && nohup bash -c $q > ~/logs/$name.log 2>&1 & echo launched $name pid \$!"
     ;;
@@ -323,6 +378,6 @@ case "${1:-}" in
     self_test
     ;;
   *)
-    sed -n '54,66p' "$0"; exit 1
+    sed -n '/^# Usage:/,/^set -euo/p' "$0" | sed '$d;s/^# \{0,1\}//'; exit 1
     ;;
 esac
