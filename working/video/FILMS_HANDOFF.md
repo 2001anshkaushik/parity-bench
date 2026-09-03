@@ -39,6 +39,20 @@
 > (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
 > walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
 > pin, so the >560px fraction stays non-derivable).
+> **BOX WRAPPER BUILT (2026-09-03, ruled): `working/harness/box.sh`**
+> (sha `7e9bafdc`, self-printed each run) — Leela's proven form adopted
+> verbatim (pty-piped start-session, __RC marker, nohup launch; runx
+> not adopted, untested) + our three additions: hard refusal list
+> (destructive patterns refused with the pattern named — never asks
+> itself; rr:patched-video called out as the irreplaceable object),
+> per-command UTC transcript (`~/.rocketride_box/`, the new evidence
+> surface), session-count guard (refuse ≥20 of the 25 cap; UNKNOWN
+> stated if DescribeSessions is denied). Standing rules enforced:
+> multi-line commands refused (committed scripts only, entry 25);
+> `export AWS_PROFILE` refused box-side. Laptop self-test 59/59
+> (every refusal pattern + null controls + marker parse + transcript).
+> End-to-end proof pending one run:
+> `bash working/harness/box.sh run 'git -C ~/parity-bench-video rev-parse HEAD'`.
 > Headline: at the ruled 16×2 posture, C=16, LlamaIndex +6.5% span /
 > +26.7% per measured core / **+3.9% per effective core** — near-equal
 > per-core cost with RocketRide's token model spending 4.66 cores idle;
