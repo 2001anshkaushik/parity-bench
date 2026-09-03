@@ -28,6 +28,17 @@
 > residual mechanism candidates, engine-first, with settlers and the
 > committed isolation control; and the open AMI CPU-per-frame question
 > (package + specific ask ready: `AMI_CROSS_TEAM_COVER.md`).**
+> Pre-500 planning input (2026-09-03): `PRE500_RUNBOOK_REVIEW.md` —
+> her access model (no permission we lack: interactive SSM only, her
+> docs say "No SendCommand"; her automation = box.sh piping stdin into
+> start-session under a pty), her runbook items mapped (ttl=0 beats her
+> TTL guard; nesting verified at pin; live S3 mirror = the one
+> adopt-worthy gap; **$/1k is COMPUTED in every films export already —
+> RR 16×2 $10.12/9.91, LI $9.39/9.41, default $40.35/40.65 — publication
+> is the only gap**), and her films500 runs to read before our 500
+> (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
+> walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
+> pin, so the >560px fraction stays non-derivable).
 > Headline: at the ruled 16×2 posture, C=16, LlamaIndex +6.5% span /
 > +26.7% per measured core / **+3.9% per effective core** — near-equal
 > per-core cost with RocketRide's token model spending 4.66 cores idle;
