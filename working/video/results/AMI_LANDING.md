@@ -114,6 +114,21 @@ canonical pins; that her runs consumed disk matching those pins is her
 own corpus_pin gate's claim (fail-closed, her mechanism), not
 re-proven here.
 
+## Box↔repo cross-check (2026-09-02) + two corroborating box-only artifacts
+
+The box-side comparison of `mainrun_20260824T025550Z/` against the repo
+came back **MATCH on exactly the 14 landed files and DIFFER on
+everything else — which is the correct result**: every DIFFER is a file
+the box holds and the repo deliberately does not (records jsonl, LI-leg
+files, dockerlogs, preflights). Byte identity of the landed set is
+thereby confirmed from the box side as well. Two box-only artifacts
+noted for the record, corroborating the errors-gate classification
+above: `records_rocketride_video_default_blast.jsonl.errored_073501Z`
+and `export_rocketride_video_default_blast.json.errored_092513Z` — the
+dead launch's own record/export files, renamed aside by the resume.
+Their timestamps bracket the resume console (07:42) exactly as the
+corpse-row classification requires. Left on the box.
+
 ## Manifest warts, stated
 
 1. `mainrun_20260824T025550Z/run_manifest.json` reads

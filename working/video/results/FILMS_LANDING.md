@@ -27,29 +27,92 @@ prefixes (~0.05–2.3 MB each). §4's absolute memory figures (RR anon
 those streams; the landed point artifacts carry the beside-note naming
 them (`memory_note`). They stay on S3 until ruled otherwise.
 
-## 2. Diagnosis artifacts — NOT ON S3; archive script committed, landing BLOCKED on one box paste
+## 2. Diagnosis artifacts — LANDED 2026-09-02 (13 files, both prefixes)
 
-Checked 2026-09-02: `s3://…/ansh/parity-failing-20260902/` and
-`s3://…/ansh/detector-parity-20260902/` are **EMPTY**, and no
-`*-20260902` prefix exists under `ansh/` — the archive step for
-`~/films_probe/parity_failing/` and `~/films_probe/detector_parity/`
-never ran (the campaign archive at `films-mainrun-20260901/` was cut
-2026-09-01 23:44Z, before the diagnosis probes ran). The dirs remain
-box-only. `probe/archive_films_diagnosis.sh` (committed, self-printing
-sha256, box instance role, refuses if either dir is missing) creates
-the two prefixes and prints per-file sha256 first; after that paste,
-the JSON verdicts land here AMI_LANDING-style (frames/PNGs may stay on
-S3 with pointers if bulky). What those artifacts back until then —
-relayed verbatim into the record, not yet committed:
+History: the stated prefixes were checked EMPTY earlier the same day
+(the campaign archive was cut 2026-09-01 23:44Z, before the diagnosis
+probes ran); `probe/archive_films_diagnosis.sh` was committed, the
+operator pasted it, and the box printed per-file sha256 before upload.
+The laptop fetch **matches all 13 box-printed hashes exactly** (hashes
+in §3a below). What each file proves:
 
-- `parity_failing/`: A==C EXACT byte-level frame parity on the three
-  failing films + manifest-sha same-input proof (§6 exclusion 1; the
-  committed Leagues A==B==C artifact covers the fourth film).
-- `detector_parity/`: the 35-film PNG mode/size census (§6 exclusion 2
-  and the 560px partition's size data), the Layer-1 build-identity
-  reads (§6 exclusion 4: torch/pillow/torchvision/numpy versions, torch
-  git/wheel identity, detr.py sha both containers), and the two
-  extracted side-test frames (v1, reusable).
+- `parity_failing/probe_frame_parity_{ABucketofBlood,
+  A_Study_In_Scarlet,HouseOnBareMountain}.json` — the A==C EXACT
+  byte-level frame parity on the three failing films with the
+  manifest-sha same-input proof (§6 exclusion 1; the committed Leagues
+  A==B==C artifact covers the fourth film).
+- `detector_parity/census_20260902T074527Z.json` (mode census) and
+  `census_20260902T080135Z.json` (extended size/dtype census) — the
+  all-RGB result (§6 exclusion 2) and the 560px size partition's data
+  (§6's 35/35 table).
+- `detector_parity/detr_engine.py` + `detr_li.py` — the two containers'
+  installed `rfdetr/detr.py`, and the landed pair hashes IDENTICALLY
+  (`d0cf8916…` both) — §6 exclusion 4's byte-identity claim is now a
+  committed byte-identity.
+- `detector_parity/side_{engine,li}.json` + `.err` — **the side test's
+  two side documents, READ 2026-09-02 (§4 below)** — each carrying the
+  full libs identity block (torch 2.10.0+cu128 git `449b1768…`, pillow
+  10.4.0, torchvision 0.25.0+cu128, numpy 2.5.2, detr sha `d0cf8916…`,
+  per-container site-packages paths) — the §6 exclusion-4 Layer-1
+  reads, now committed.
+- `detector_parity/{small,large}.png` — the two probe frames
+  (20000Leagues midpoint 320×240; HouseOnBareMountain midpoint
+  714×480), landed (172K+580K total made everything landable — nothing
+  left on S3 as pointer from these prefixes).
+
+## 2a. THE SIDE TEST, READ — verdict first
+
+**Ruling U is CONFIRMED in its verdict and REFINED in its mechanism;
+nothing is overturned.** The committed comparator
+(`probe_detector_parity.py --compare`) run over the two side documents
+(log-prefix lines mechanically stripped — rf-detr logs to stdout ahead
+of the JSON; the stripped lines are quoted in the run record):
+
+- **P1 (small, 20000Leagues 320×240): MET, stronger than predicted** —
+  arrays equal, raw scores **BIT-EQUAL at 9 dp** (max sorted delta
+  0.0), 300/300 raw detections, self-determinism nulls PASS both sides.
+- **P2 (large, HouseOnBareMountain 714×480): arrays equal and raw
+  scores BIT-EQUAL at 9 dp** — no divergence of any size, not even the
+  predicted %-scale. But the P2 instance turns out to be
+  **non-discriminating**: the frame was extracted at the film's
+  midpoint (`run_side_prediction.sh`, `-ss video_s/2` → sampled-frame
+  index 123), and the landed campaign records show the arms **AGREED
+  at that frame** (both `['person']` — matching the probe's own n=1
+  @0.3 three ways), while 113/248 of the film's frames diverged,
+  including indices 120 and 124 beside it. The arming-film selection
+  lesson (§10.4 of the DEFINITIVE), repeated at frame granularity:
+  the large frame was chosen by convenience (midpoint), not against
+  the records. (Caveat kept: a single `-ss` extract is not
+  byte-guaranteed to equal the campaign's fps-sampled frame 123; the
+  timestamp mapping and the three-way @0.3 agreement are the
+  correspondence evidence.)
+- **The falsifier as written does not cleanly fire** — it presupposed
+  the large frame would be a diverging instance; on an agreeing frame,
+  0.0 is what every candidate mechanism predicts.
+
+**What the test DID establish (new, real):** on identical bytes, in a
+single-inference context, the two containers' full
+load→resize→predict path is **bit-reproducible across containers** —
+300 raw scores to 9 dp on BOTH size classes, through the >560px
+downscale, with libs identical and weights MD5-matched. This
+**excludes any static, always-on stack difference** (a "the two
+containers' resize produces different pixels as a standing property"
+variant is dead): the campaign divergence requires something the probe
+context did not have — campaign execution context (thread state,
+allocator, load, serving path) and/or diverging-frame content. The
+probe cannot separate those two, because its frame is an agreeing one.
+**The decisive next instrument is the same probe pointed at a
+campaign-diverging frame** (House index 124, or the §6 anatomy frame
+10) — one box run, harness resumable.
+
+**Run warts, stated (neither voids the result):** (1) the engine-side
+run DOWNLOADED fresh weights (its `.err` shows the 355M fetch; rf-detr
+validated the canonical MD5) while the LI side used its cached file
+(MD5-correct) — same canonical weights by rf-detr's own gate, but the
+offline/`-w` cache mechanism did not hold on the engine side; (2) the
+side documents do NOT record `torch.get_num_threads()` — the design
+called for it, v2 did not write it; an instrument gap to close before
+the diverging-frame run, since thread state is a live candidate.
 
 ## 3. Landed-file hashes (sha256 at landing)
 
@@ -85,4 +148,22 @@ f5365d6bf26a40ba41ebb465e19357da1d0875a046293d1bfdc1347ce7ce1239  c-sweep-highc-
 6ff19cbfb31033cf8f32954890ef8544bf90c62e30f9b48da675f594c953a47b  c-sweep-highc-20260831/curve_rr_M16xT2_C16.json
 a53067d92621a60c341f547129f0d3507c344a636720a228d8a9c97fd6a51819  c-sweep-highc-20260831/curve_rr_M16xT2_C32.json
 8f1f95733c3a99822e7e975249357ca25595061b534cb029f57e033f647a3b38  c-sweep-highc-20260831/curve_rr_M16xT2_C8.json
+```
+
+## 3a. Diagnosis-archive hashes (box-printed pre-upload; laptop fetch MATCHED all 13)
+
+```
+0b1a110bca0941ae41552aaace3a611c638cd078972eaed7fc59629036ad6b88  detector-parity-20260902/census_20260902T074527Z.json
+9b0dc302360b07fa0b4dd6ddd5a3af1e6cf1c14ab9337068e491d2d75900f5f7  detector-parity-20260902/census_20260902T080135Z.json
+d0cf8916b8109bed319a8f458ffcd3c01a55421d43f2a1f66e8b6a9c95560c84  detector-parity-20260902/detr_engine.py
+d0cf8916b8109bed319a8f458ffcd3c01a55421d43f2a1f66e8b6a9c95560c84  detector-parity-20260902/detr_li.py
+11f2c99e12ee46ade7ca0b1ae9916add6eb9c4e89d7f8c1514a49cf53a2cbed5  detector-parity-20260902/large.png
+b7b9dff2f9351d3dce22657afbd3052157e0764b3e0d4e766d00675430389a99  detector-parity-20260902/side_engine.err
+02105062e39efe57660a88b1d8b7059b3b622fd2ab6227737565515412c52aaa  detector-parity-20260902/side_engine.json
+7811fb993524b13809188bd3cd7e3734e521e5071162958977748ed0f87644e2  detector-parity-20260902/side_li.err
+0cb2459ae7394e66c928103da70559267b5d9a497087741e7a2f8014e35add56  detector-parity-20260902/side_li.json
+a82a6b2f32eb57cbf44b1626f5010015743ee2bbd19110a7a17e80d4fbd9a2e8  detector-parity-20260902/small.png
+d9a673de875f59bba4927e49ae5e8baea307961e453bc4b89a00589966d8bf93  parity-failing-20260902/probe_frame_parity_ABucketofBlood.json
+b818f144f4a436b217a3e2bd5a2936aaa980a75e6b72c9741ff8aa4ad2c8802f  parity-failing-20260902/probe_frame_parity_A_Study_In_Scarlet.json
+e6b1585a132828e824ed7e907122e7e38003efcc78c8eaca070088d64a8a879b  parity-failing-20260902/probe_frame_parity_HouseOnBareMountain.json
 ```

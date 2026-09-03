@@ -269,12 +269,15 @@ the results dir); the §4/§5 sweep point artifacts are now LANDED
 verbatim at landing; hashes in `results/FILMS_LANDING.md`), with §4's
 absolute memory figures tracing to the S3-archived `memwatch_*.jsonl`
 streams those artifacts name (pointers in the landing note). The three
-failing-film parity artifacts, the mode/size census, and the Layer-1
-build-read outputs remain BOX-SIDE (`~/films_probe/parity_failing/`,
-`~/films_probe/detector_parity/`) — relayed verbatim, not yet landed;
-their stated S3 archive prefixes were checked EMPTY 2026-09-02, and
-`probe/archive_films_diagnosis.sh` (committed) creates them; landing
-follows that paste.
+failing-film parity artifacts, the mode/size census, the Layer-1
+build-read outputs (the side documents' libs blocks + the two
+byte-identical `detr_*.py` files), the two probe frames, and the side
+test's own results are **LANDED 2026-09-02**
+(`results/parity-failing-20260902/`, `results/detector-parity-20260902/`
+— 13 files, box-printed hashes matched on fetch; `results/
+FILMS_LANDING.md` §2/§2a). With that, every figure and claim in this
+document traces to a committed artifact EXCEPT §4's absolute memory
+readings, which trace to the named S3 memwatch streams.
 
 **Ruled (V): the 500-header probe was considered and NOT run.** The
 reasoning, recorded so this reads as ruled rather than overlooked: the
@@ -295,6 +298,35 @@ last run stopped on a fixed argument-contract defect. **Ruled (X): this
 paragraph goes upstream as the ticket, side-test harness attached; it
 is not a publication gate. FILED 2026-09-02 as Ticket 6,
 `working/upstream/RocketRide_Engine_Tickets.md`.**
+
+**SIDE TEST READ (2026-09-02, addendum).** The v2 run's crash was in the
+comparison step only — both side documents had already been written, and
+they were archived, landed, and read
+(`results/detector-parity-20260902/side_{engine,li}.json`; comparator =
+the committed `--compare`; full read: `results/FILMS_LANDING.md` §2a).
+Result: on identical bytes, **both frames — the 320×240 Leagues frame
+AND the 714×480 HouseOnBareMountain frame — come back ARRAYS EQUAL and
+RAW SCORES BIT-EQUAL at 9 dp** (max sorted delta 0.0, 300/300 raw
+detections, self-determinism nulls PASS, libs identical, weights
+MD5-matched). Two consequences, and one owned caveat. (1) **Ruling U
+stands unchanged** — the campaign's divergence is in the banked records;
+nothing here touches it. (2) **The mechanism candidates NARROW**: the
+full load→resize→predict path is bit-reproducible ACROSS the two
+containers in a single-inference context, so any static, always-on
+stack difference — "the two containers' resize produces different
+pixels as a standing property" — is now excluded by measurement; what
+remains is campaign execution context (thread state, allocator, load,
+serving path) and/or diverging-frame content. (3) The caveat, owned:
+the large frame maps by timestamp onto a frame the campaign arms
+AGREED on (records: index 123, both `['person']`, matching the probe's
+n=1 @0.3 — while 113/248 of the film's frames diverged, indices 120
+and 124 beside it), so the P2 branch could not have shown the
+mechanism regardless — the §10.4 selection lesson repeated at frame
+granularity. The decisive next instrument is the SAME probe pointed at
+a campaign-diverging frame (index 124, or the frame-10 anatomy frame),
+with `torch.get_num_threads()` recorded (a v2 omission). Run warts
+recorded in the landing note: the engine side re-downloaded the
+canonical weights (rf-detr MD5-validated) instead of using its cache.
 
 ## 7. Not publishable from this run, and why
 

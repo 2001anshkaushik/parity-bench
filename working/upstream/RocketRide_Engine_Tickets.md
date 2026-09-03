@@ -719,10 +719,29 @@ within noise; large frame → divergence appears inside `predict` after the resi
   the same code. (Which side sits closer to a canonical single-threaded reference is one
   decisive-instrument run away.)
 
+## Measured update (2026-09-02) — the attached instrument's first read
+
+The instrument ran (one process per container, single inference, identical PNG bytes):
+**both frames — 320×240 and 714×480 — returned ARRAYS EQUAL and RAW SCORES BIT-EQUAL at
+9 dp** (max sorted delta 0.0, 300/300 raw detections, determinism nulls PASS, libs
+identical, weights MD5-matched). This **excludes any static, always-on difference between
+the two software stacks** — in a clean single-inference context the full
+load→resize→predict path is bit-reproducible across the containers. The campaign
+divergence therefore requires something that context lacked: the serving-time execution
+environment (thread state, allocator, memory pressure, serving path) and/or
+frame content that the probe frame did not have (it maps onto a frame the production runs
+AGREED on — a selection accident, recorded). The discriminating run is the same
+instrument pointed at a frame the production runs diverged on, with
+`torch.get_num_threads()` recorded per side. This narrows the component line above:
+the divergence is a property of HOW the engine's serving context executes the identical
+detect path, not of the shipped libraries.
+
 ## Acceptance criteria
 
-1. On one identical >560px frame, raw-score parity across execution environments at ≤1e-5 —
-   or the runtime variable that produces the delta is named and documented.
+1. On one identical >560px frame **that production runs diverged on**, raw-score parity
+   across execution environments at ≤1e-5 — or the runtime variable that produces the
+   delta is named and documented. (First read, 2026-09-02: parity held at 0.0 on an
+   agreeing frame — see Measured update.)
 2. The detect path's resize is documented as execution-environment-sensitive (with the
    controlling variables), or pinned so identical inputs give identical detections.
 3. The attached instrument runs green (both size classes) on the fixed configuration.

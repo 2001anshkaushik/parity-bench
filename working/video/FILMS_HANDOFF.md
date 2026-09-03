@@ -34,20 +34,30 @@
 > - **X**: the open-mechanism paragraph goes upstream — FILED 2026-09-02
 >   as Ticket 6 in `working/upstream/RocketRide_Engine_Tickets.md`.
 >
-> **Open, carried forward:** (1) the ONE outstanding box paste —
-> `probe/archive_films_diagnosis.sh` archives
-> `~/films_probe/{parity_failing,detector_parity}` (their stated S3
-> prefixes were checked EMPTY; landing + banner decision follow);
+> **Open, carried forward:** (1) ~~the archive paste~~ **DONE
+> 2026-09-02** — 13 files landed, hashes matched
+> (`results/{parity-failing,detector-parity}-20260902/`), **and the
+> side test's unread results were READ**: both frames BIT-EQUAL at
+> 9 dp across containers (Ruling U CONFIRMED, mechanism REFINED — any
+> static stack difference excluded; the tested large frame turned out
+> to be a campaign-AGREEING frame, so context-vs-content is not yet
+> separated; `results/FILMS_LANDING.md` §2a). **The decisive next
+> instrument: the same probe on a campaign-DIVERGING frame (House
+> idx 124 or frame 10), with torch.get_num_threads() recorded** —
+> supersedes the old "complete the side test" carry;
 > (2) H16's boundary-drift cap, live and unsized for films (Ruling W;
 > settler = films-sized denominator ruled before data); (3) the films
 > char band — confounded by §6, settled only by an agreeing-detections
 > run (Ruling W); (4) the corpus-wide >560px fraction — NOT derivable
 > from held artifacts (her manifest records no resolution; Ruling V);
 > (5) the ~20% AMI CPU-per-frame gap with Leela/Shashi — package
-> assembled, item 9; (6) side-test completion next campaign (thread
-> settlers; instrument committed); (7) H7, model-server row, waterfront
-> flag — item 7; (8) box hygiene ruling pending (inventory delivered
-> 2026-09-02; nothing deleted).
+> assembled, item 9; (6) superseded by (1)'s next instrument;
+> (7) H7, model-server row, waterfront flag — item 7; (8) box hygiene
+> ruling pending (sizes in: films_probe 3.3G, films_corpus 29G,
+> anchor_7204 17M, ami full/closeup1/video 23G/7.7G/3.3G, govdocs1
+> EMPTY on this box, images 38.95G incl. an unlisted
+> rr:patched-video.pre-node-fix 15G + ws1-llamaindex 9.07G, build
+> cache 43.93G/13.92G reclaimable, 0 containers; nothing deleted).
 >
 > **Box state at close:** worktree `~/parity-bench-video` last committed
 > `646eaea` (the laptop is ahead — the box pulls before any reuse);
