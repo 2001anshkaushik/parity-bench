@@ -725,23 +725,38 @@ The instrument ran (one process per container, single inference, identical PNG b
 **both frames — 320×240 and 714×480 — returned ARRAYS EQUAL and RAW SCORES BIT-EQUAL at
 9 dp** (max sorted delta 0.0, 300/300 raw detections, determinism nulls PASS, libs
 identical, weights MD5-matched). This **excludes any static, always-on difference between
-the two software stacks** — in a clean single-inference context the full
-load→resize→predict path is bit-reproducible across the containers. The campaign
-divergence therefore requires something that context lacked: the serving-time execution
-environment (thread state, allocator, memory pressure, serving path) and/or
-frame content that the probe frame did not have (it maps onto a frame the production runs
-AGREED on — a selection accident, recorded). The discriminating run is the same
-instrument pointed at a frame the production runs diverged on, with
-`torch.get_num_threads()` recorded per side. This narrows the component line above:
-the divergence is a property of HOW the engine's serving context executes the identical
-detect path, not of the shipped libraries.
+the two software stacks**. (The 714×480 frame later proved to map onto a frame the
+production runs AGREED on — a selection accident, recorded — which motivated the
+decisive read below.)
 
-## Acceptance criteria
+## Measured update 2 (2026-09-03) — the decisive read: a KNOWN-DIVERGING frame, two thread conditions, still bit-identical
 
-1. On one identical >560px frame **that production runs diverged on**, raw-score parity
-   across execution environments at ≤1e-5 — or the runtime variable that produces the
-   delta is named and documented. (First read, 2026-09-02: parity held at 0.0 on an
-   agreeing frame — see Measured update.)
-2. The detect path's resize is documented as execution-environment-sensitive (with the
-   controlling variables), or pinned so identical inputs give identical detections.
-3. The attached instrument runs green (both size classes) on the fixed configuration.
+The instrument re-ran on the production-diverged anatomy frame (frame 10 of the 714×480
+film — production recorded 6 detections ≥0.3 on the engine deployment vs 5 on the
+reference), extracted through the deployments' own fps=1/15 sampling filter, under TWO
+recorded thread conditions: the standalone default (intraop 16) and the production
+pinning (all six BLAS/OMP vars = 2 → intraop 2), with a shared md5-verified weights file
+and a clean control frame beside it. **Every cell — 2 frames × 2 conditions × 2 sides —
+returned arrays equal and raw scores BIT-EQUAL at 9 dp (delta 0.0, 300/300 raw).**
+
+**Conclusion, measured**: the divergence is **CONTEXT-DEPENDENT** — not the pixels, not
+the resize, not the library build, not the thread count. Two identical detector paths
+produce different detections only when running inside the full deployments (concurrent
+inference, the serving path, accumulated process state over a long run are the remaining
+candidate classes). The isolation probe is attached as the control that rules out every
+static explanation.
+
+## Acceptance criteria (updated 2026-09-03 — raw-score parity in isolation is
+## already established; the question is the serving context)
+
+1. **Name the serving-context condition** that makes two identical detect paths diverge:
+   using the attached isolation probe as the control, reproduce the production
+   divergence in a controlled setting — candidate conditions, in the reporters' order of
+   suspicion: concurrent inference inside the serving process, the serving entrypoint
+   path itself, accumulated process state across a long run — and bisect to the
+   variable; or document the detect path as execution-context-sensitive with measured
+   bounds on the score shift.
+2. With the condition named: pin it so identical inputs give identical detections **in
+   deployment**, or publish operator guidance stating the sensitivity and its bounds.
+3. The attached isolation instrument stays green on the fixed configuration (it is
+   green today: 2026-09-03, both frames, both thread conditions, delta 0.0).

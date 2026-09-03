@@ -1,6 +1,10 @@
 # WS-1 Phase 2 — Archive Films Benchmark: RocketRide vs LlamaIndex
 
-**DRAFT (2026-09-02) — nothing here is published until Ansh reports it done.**
+**FINAL (2026-09-03).** The draft banner came off under the Ruling-Y
+close-out ("the DRAFT banner comes off after Task 1 lands"): the
+two-condition isolation result is landed and §6 is rewritten around it;
+every figure and claim traces to a committed artifact
+(`results/FILMS_LANDING.md`).
 Companion to `WS1_Phase2_Video_Benchmark_DEFINITIVE.md` (the AMI campaign,
 closed 2026-08-28). Campaign: 2026-09-01, box `i-0775f33f3dc16f6af`
 (c7i.8xlarge, 32 vCPU / 61 GiB), 9 legs, **0 errors, every per-leg gate
@@ -189,19 +193,23 @@ objects — to the last bit. RF-DETR, the detector both arms run from
 byte-identical code and weights, takes its input at up to 560 pixels on
 the long edge, so a film at or under that size reaches the detector
 exactly as decoded, and every such film agrees perfectly across arms. A
-bigger film has to be shrunk to fit first, and after that shrink the
-two sides part: the same objects come back with confidence scores
-shifted by fractions of a percent, which is enough to push a borderline
+bigger film has to be shrunk to fit first — and only above that size do
+the arms' results drift apart in production: same objects, confidence
+scores shifted by fractions of a percent, enough to push a borderline
 object over the 0.3 cutoff on one side and not the other. The split on
 this corpus is clean — all 8 films at or under 560px agree exactly, all
-27 above it diverge, no exceptions. Everything upstream is proven equal
-(identical frames in, identical libraries, identical weights), so the
-difference is born inside the shrink step; which runtime detail makes
-identical code produce slightly different pixels there — thread count,
-memory layout, allocator state — is the one question left open below.
-Why it matters: a detection-level figure compared across these two
-stacks is trustworthy at or below 560px and carries this caveat above
-it. Frame counts and the throughput results are untouched (§2.1).
+27 above it diverge, no exceptions. The obvious suspect — that the two
+sides shrink the frame slightly differently — is DISPROVEN by
+measurement: run in isolation, both sides shrink and score even a
+frame the campaign recorded as diverging **bit-identically**, at the
+default thread setting and at the campaign's alike. Everything about
+the detector is provably identical; the drift appears only while the
+arms are running the full 35-film workload. The difference therefore
+lives in the deployments — how each arm executes the same code under
+load — which is exactly what a benchmark of two deployed frameworks
+measures. A detection-level figure compared across these stacks is
+trustworthy at or below 560px and carries this caveat above it. Frame
+counts and the throughput results are untouched (§2.1).
 
 **cross_detection_agreement failed on 27 of 35 films in every cell; the
 8 passing films are exactly the films that need no downscale.** The
@@ -219,7 +227,7 @@ Anatomy: the arms find the **same objects at 0.5–5% shifted scores**
 score crosses the 0.3 threshold from opposite sides; the direction is
 systematic — **RR detects more on 22 films, LI on 5, equal on 8**.
 
-**Four mechanisms excluded, each by measurement**:
+**Five mechanisms excluded, each by measurement**:
 1. **Different frames** — killed by byte-level frame parity: A==C EXACT
    per-frame PNG hashes on three failing films (ABucketofBlood,
    HouseOnBareMountain, A_Study_In_Scarlet; manifest-sha same-input
@@ -238,11 +246,30 @@ systematic — **RR detects more on 22 films, LI on 5, equal on 8**.
    10.4.0, torchvision 0.25.0+cu128, rfdetr 1.5.2 with **byte-identical
    detr.py** (sha `d0cf8916…` both), and md5-verified identical weights
    on every instance of both arms.
+5. **Any static difference in how the two stacks execute the detect
+   path** — killed by the two-condition isolation probe (Ruling Y,
+   2026-09-03): one identical frame the campaign RECORDED AS DIVERGING
+   (the anatomy frame 10 below — campaign RR 6 detections ≥0.3 vs LI 5)
+   plus the clean control frame, through both containers' full
+   load→resize→predict paths, at the standalone thread default
+   (intraop 16) AND at the campaign's pinned value (intraop 2, via the
+   same per-container env mechanism the legs used): **arrays equal and
+   raw scores BIT-EQUAL at 9 dp in all four cells** (max sorted delta
+   0.0, 300/300 raw detections, weights md5-identical, determinism
+   nulls PASS; `results/detector-parity-y-20260902/`).
 
-**Verdict (Ruling U)**: two arms running identical code on identical
-inputs produce different detections above 560px. That is a **real
-cross-arm difference, not an instrument artifact**. Gate 3's strict
-verdict is CORRECT and stands: 27 films FAIL, 8 films PASS.
+**Verdict (Ruling U, strengthened by Ruling Y)**: the two arms running
+identical code on identical inputs produce different detections above
+560px **as deployed** — while the same detector paths are provably
+bit-identical in isolation, even on a frame that diverged in
+production, under both thread conditions. The divergence is
+**CONTEXT-DEPENDENT**: not the pixels, not the resize, not the library,
+not the thread count — it lives in how each arm executes the same code
+under campaign conditions. That is a **real cross-arm difference
+between the two deployments, not an instrument artifact** — and a
+difference in the deployments is precisely what a benchmark of two
+deployed frameworks measures. Gate 3's strict verdict is CORRECT and
+stands: 27 films FAIL, 8 films PASS.
 
 **How general is the 560px boundary?** Within our 35, 27 films (77%)
 sit above it — but that fraction is selection-weighted (duration×bytes
@@ -277,8 +304,9 @@ test's own results are **LANDED 2026-09-02**
 — 13 files, box-printed hashes matched on fetch; `results/
 FILMS_LANDING.md` §2/§2a). The memwatch streams behind §4's absolute
 memory readings are landed too (Ruling Z, 31 files, hashes in the
-landing note §3b). **Every figure and claim in this document now
-traces to a committed artifact — zero exceptions.**
+landing note §3b), and so are the Ruling-Y two-condition isolation
+artifacts (16 files, landing note §2b). **Every figure and claim in
+this document traces to a committed artifact — zero exceptions.**
 
 **Ruled (V): the 500-header probe was considered and NOT run.** The
 reasoning, recorded so this reads as ruled rather than overlooked: the
@@ -287,47 +315,49 @@ over her S3 prefix would generalize a finding on her data without her
 involvement; and the 77% figure is load-bearing for nothing this
 document asserts.
 
-**Open, bounded, not pursued this campaign**: the remaining candidates
-are properties of *how* each arm runs the same code — thread counts at
-inference time, batch shape, memory layout, allocator state. What would
-settle them: completing the single-frame side test (raw scores at
-threshold 0.001 on one identical frame per size class, with per-side
-`torch.get_num_threads()` captured in the same process), then a
-controlled thread-count sweep on that harness. The instrument exists
-(`probe/probe_detector_parity.py` + `probe/run_side_prediction.sh`); its
-last run stopped on a fixed argument-contract defect. **Ruled (X): this
-paragraph goes upstream as the ticket, side-test harness attached; it
-is not a publication gate. FILED 2026-09-02 as Ticket 6,
-`working/upstream/RocketRide_Engine_Tickets.md`.**
+**The closing result (Ruling Y, 2026-09-03) — the side test completed
+on a known-diverging frame, both thread conditions, and the divergence
+did not reproduce.** The anatomy frame itself (frame 10, the 6-vs-5
+example above), extracted through the arms' own fps=1/15 filter, ran
+through both containers' full load→resize→predict paths in isolation —
+at the standalone thread default and at the campaign's pinned value —
+and came back **bit-identical in every cell** (exclusion 5 above; the
+clean control frame repeated bit-equal beside it; artifacts and both
+comparator outputs: `results/detector-parity-y-20260902/`, read in
+`results/FILMS_LANDING.md` §2b). This caps the line of investigation
+(ruled): the mechanism question is no longer "which stack difference"
+— there is none — but "which deployment condition".
 
-**SIDE TEST READ (2026-09-02, addendum).** The v2 run's crash was in the
-comparison step only — both side documents had already been written, and
-they were archived, landed, and read
-(`results/detector-parity-20260902/side_{engine,li}.json`; comparator =
-the committed `--compare`; full read: `results/FILMS_LANDING.md` §2a).
-Result: on identical bytes, **both frames — the 320×240 Leagues frame
-AND the 714×480 HouseOnBareMountain frame — come back ARRAYS EQUAL and
-RAW SCORES BIT-EQUAL at 9 dp** (max sorted delta 0.0, 300/300 raw
-detections, self-determinism nulls PASS, libs identical, weights
-MD5-matched). Two consequences, and one owned caveat. (1) **Ruling U
-stands unchanged** — the campaign's divergence is in the banked records;
-nothing here touches it. (2) **The mechanism candidates NARROW**: the
-full load→resize→predict path is bit-reproducible ACROSS the two
-containers in a single-inference context, so any static, always-on
-stack difference — "the two containers' resize produces different
-pixels as a standing property" — is now excluded by measurement; what
-remains is campaign execution context (thread state, allocator, load,
-serving path) and/or diverging-frame content. (3) The caveat, owned:
-the large frame maps by timestamp onto a frame the campaign arms
-AGREED on (records: index 123, both `['person']`, matching the probe's
-n=1 @0.3 — while 113/248 of the film's frames diverged, indices 120
-and 124 beside it), so the P2 branch could not have shown the
-mechanism regardless — the §10.4 selection lesson repeated at frame
-granularity. The decisive next instrument is the SAME probe pointed at
-a campaign-diverging frame (index 124, or the frame-10 anatomy frame),
-with `torch.get_num_threads()` recorded (a v2 omission). Run warts
-recorded in the landing note: the engine side re-downloaded the
-canonical weights (rf-detr MD5-validated) instead of using its cache.
+**Residual candidates — the next campaign's inheritance, each with its
+settler** (the committed isolation probe,
+`probe/probe_detector_parity.py` + `probe/run_side_prediction_y.sh`,
+is the control instrument for all of them):
+1. **Concurrent inference load** (16 tasks/instances busy at once) —
+   settled by running the isolation probe while parallel predicts
+   saturate the same container, diffing against the isolation result.
+2. **The serving path itself** (the engine's in-task detect path under
+   its task server; LI's uvicorn worker path) — settled by driving
+   frame 10 through each arm's serving entrypoint in an otherwise idle
+   container (a one-file leg) and diffing against isolation.
+3. **Accumulated process state across a 35-film leg** (allocator
+   arenas, fragmentation, lazy initializations) — settled by
+   positional replay: the same film early vs late in a leg, or
+   per-frame score capture across one leg to locate divergence onset.
+4. Allocator/memory-layout under load is the mechanism class that
+   instruments 1 and 3 discriminate between.
+
+**Ruled (X, updated 2026-09-03): the upstream ticket now asks the
+serving-context question, with the isolation probe attached as the
+control that rules out every static explanation** (Ticket 6,
+`working/upstream/RocketRide_Engine_Tickets.md`; it is not a
+publication gate). Run history, for the record: the first Y run's
+engine side revealed — via the probe's own newly recorded thread
+fields — that it ran at the standalone default rather than the
+campaign posture (caught from the artifact, register entry 30); the
+two-condition design followed from that catch, and doubled the
+result's strength. The interim 2026-09-02 read (both v2 frames
+bit-equal, with the large frame later shown campaign-agreeing) is
+preserved in `results/FILMS_LANDING.md` §2a.
 
 ## 7. Not publishable from this run, and why
 
@@ -396,10 +426,13 @@ Ansh, and questions flow back the same way.
    both teams use; pass-to-pass spreads published (0.22–2.08%).
 2. **One box, one corpus** (35 films of one archive's profile;
    resolutions 320×240–1424×1072).
-3. **The §6 divergence is unexplained beyond its boundary** — pinned to
-   the downscale path by exclusion, mechanism inside identical code
-   unresolved; bounded (sub-percent score shifts; does not touch frame
-   counts or §2).
+3. **The §6 divergence's mechanism is bounded but not named** — five
+   exclusions pin it to execution context: the detect path is
+   bit-reproducible in isolation, even on a frame that diverged in
+   production, under both thread conditions (Ruling Y). WHICH
+   deployment condition triggers it is the next campaign's inheritance
+   (§6 residual candidates, settlers named); bounded (sub-percent score
+   shifts; does not touch frame counts or §2).
 4. **The arming lesson**: the staged gate-3 film was chosen for its
    byte-parity proof — which selected a ≤560px film, the one class that
    structurally cannot exhibit the divergence. The staging pass was real

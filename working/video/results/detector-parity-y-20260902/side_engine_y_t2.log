@@ -1,0 +1,3 @@
+[2026-09-03 04:43:39] [INFO] rf-detr - File rf-detr-base.pth already exists with correct MD5 hash.
+[2026-09-03 04:43:39] [INFO] rf-detr - Loading pretrain weights
+side engine: 2 frame(s) -> /tmp/ywork/side_engine_y_t2.json

@@ -4,8 +4,8 @@
 >
 > **Outcome.** The main run completed 2026-09-01 (9 legs, 0 errors, every
 > per-leg gate PASS/NOT-RUN), landed at `646eaea`, results written up in
-> `WS1_Phase2_Films_Benchmark_DEFINITIVE.md` (DRAFT banner stays until the
-> last diagnosis artifacts land — one box paste outstanding, below).
+> `WS1_Phase2_Films_Benchmark_DEFINITIVE.md` — **FINAL 2026-09-03**
+> (banner off under the Ruling-Y close-out; zero provenance exceptions).
 > Headline: at the ruled 16×2 posture, C=16, LlamaIndex +6.5% span /
 > +26.7% per measured core / **+3.9% per effective core** — near-equal
 > per-core cost with RocketRide's token model spending 4.66 cores idle;
@@ -65,7 +65,24 @@
 > dependence AND thread count excluded, stronger than V-C; T-2
 > one-condition divergence = thread-conditional, named; T-3 both =
 > original V-A/V-B; T-4 recorded cross-side mismatch voids that
-> condition's like-for-like). Awaiting the paste**;
+> condition's like-for-like). **RUN 2 REPORTED + LANDED 2026-09-03 —
+> VERDICT V-C AT T-1 STRENGTH, DECISIVE AND CAPPED**: all four cells
+> (2 frames × 2 conditions) arrays equal + raw scores BIT-EQUAL at
+> 9 dp, delta 0.0, on the anatomy frame production recorded as
+> DIVERGING; thread state recorded per side per condition (D: 16/16
+> both; T2: intraop 2 both); weights md5-identical; control repeated
+> clean. The divergence is CONTEXT-DEPENDENT — five exclusions now;
+> what remains is deployment execution (concurrency / serving path /
+> accumulated process state), inherited by the next campaign with
+> settlers named in §6. Ruling U STRENGTHENED; §6 rewritten; the
+> plain-language paragraph corrected (the shrink-differently line was
+> FALSIFIED); Ticket 6 updated (serving-context question, isolation
+> probe attached as control); register entry 30 (the not-like-for-like
+> probe caught from its own artifact); 16 artifacts landed
+> (`results/detector-parity-y-20260902/`). **The films DEFINITIVE is
+> FINAL — banner OFF 2026-09-03 under the close-out ruling; zero
+> provenance exceptions. Films is CLOSED; Ruling AA (box hygiene) is
+> UNBLOCKED and runs next.**;
 > (2) H16's boundary-drift cap, live and unsized for films (Ruling W;
 > settler = films-sized denominator ruled before data); (3) the films
 > char band — confounded by §6, settled only by an agreeing-detections
@@ -85,8 +102,8 @@
 > images 38.95G, cache 43.93G, 0 containers.)
 > **RULING Z DONE (2026-09-02)**: the 31 memwatch streams are landed
 > (~13 MB, hashes in FILMS_LANDING §3b) — **the films DEFINITIVE now
-> has ZERO provenance exceptions**. Banner: comes off when Ruling Y
-> reports (Z already landed) and Ansh says so.
+> has ZERO provenance exceptions**. Banner: OFF 2026-09-03 (Ruling-Y
+> close-out condition met and ruled).
 >
 > **Box state at close:** worktree `~/parity-bench-video` last committed
 > `646eaea` (the laptop is ahead — the box pulls before any reuse);

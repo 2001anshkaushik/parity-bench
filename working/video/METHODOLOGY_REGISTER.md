@@ -1137,3 +1137,38 @@ than rewritten from memory, which is entry 2's point in miniature.
 > one converted, guarded, or quarantined — the audit is part of the
 > finding, not a follow-up** (entry 6's consumer-grep rule, at the
 > level of transport).
+
+## 30. A probe that was not like-for-like — caught by its own artifact, not by anyone's memory (added 2026-09-03)
+
+> The side test's v2 run compared the two containers' detector paths and
+> found them bit-equal — with the thread state of neither side recorded.
+> The design had called for `torch.get_num_threads()` in the side doc;
+> v2 omitted it, and the omission was owned in the read-back. The fields
+> were added before the Ruling-Y run. Run 1's engine side then reported,
+> in its own output: intraop 16, interop 16, all six BLAS/OMP variables
+> null — **the standalone default, not the campaign's six-vars=2
+> posture**. Nobody remembered this; nobody had to. The artifact said it.
+>
+> The catch changed the experiment. A single-condition run would have
+> compared the stacks under thread state unlike the campaign's on both
+> sides, and any verdict would have carried an unstated assumption. The
+> redesign ran BOTH conditions — the default, preserving comparability
+> with v2, and the campaign's pinning (all six vars = 2 through the same
+> per-container mechanism the legs used) — with restated pre-registered
+> verdicts. The result (bit-equal in every cell, on a frame production
+> recorded as diverging) thereby excluded thread count as a standalone
+> mechanism INSTEAD of merely not testing it: the recording doubled the
+> strength of the finding (Ruling Y verdict, films DEFINITIVE §6;
+> Ansh's crediting ruling, 2026-09-03: the T2 condition was the
+> implementation side's addition after spotting the mismatch in the
+> engine side's own output).
+>
+> The rule: **a diagnostic probe records, inside its result artifact,
+> every execution condition its comparison depends on — and
+> like-for-like is established by READING those fields, never by
+> assuming the run inherited the posture someone intended.** A probe
+> whose conditions went unrecorded supports no like-for-like claim; a
+> probe that records them turns its own first mis-posed run into the
+> discovery that re-poses it. (Entry 25's read-back principle, applied
+> to instruments: the read-back is half the measurement — here it was
+> the half that saved the other half.)

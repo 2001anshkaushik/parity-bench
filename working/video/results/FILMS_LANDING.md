@@ -206,3 +206,59 @@ d01ef086ed6e8d6b46306d54d8a795b6be8e96101c14926c7e8d9e1421650ef5  c-sweep-highc-
 730309c232f26daecb04376cf9d33085e7eb793169df4ee02672fede33a7ec66  c-sweep-highc-20260831/memwatch_rr_M16xT2_C32.jsonl
 96b8ef06194c6338ff9603385af4323bc987bd0e1a4d54188db686b84e8c1e2c  c-sweep-highc-20260831/memwatch_rr_M16xT2_C8.jsonl
 ```
+
+## 2b. RULING Y — the discriminating frame, BOTH thread conditions: VERDICT V-C at T-1 strength (2026-09-03)
+
+**LANDED: `detector-parity-y-20260902/` (16 files, hashes below).** The
+committed comparator's own outputs (`compare_y.json`, `compare_y_t2.json`)
+record, in all four cells (2 frames × 2 conditions): **arrays equal, raw
+scores BIT-EQUAL at 9 dp, max sorted delta 0.0, 300/300 raw detections**,
+libs identical, weights md5 `b4d3ce46…` both sides (the shared file, no
+fetch possible). Conditions: D = default env (both sides recorded
+intraop 16 / interop 16, six vars null); T2 = all six vars = 2, the
+campaign's pinning mechanism (both sides recorded intraop 2 / interop 16).
+`frame10.png` (sha `83a02b92…`, REUSED from run 1 per the ruling) is the
+§6 anatomy frame — a frame the CAMPAIGN RECORDED AS DIVERGING (RR 6
+detections ≥0.3 vs LI 5, per-detection scores in the DEFINITIVE §6).
+`small.png` is the sha-pinned clean control; it repeated bit-equal in
+both conditions.
+
+**The ruling this lands**: the divergence is CONTEXT-DEPENDENT — not
+frame-dependent, not stack-dependent, not thread-count-dependent. Same
+bytes, same libs, same weights, same thread state, same frame the
+campaign says diverged: bit-identical output in isolation. The
+difference lives in how each arm EXECUTES the same code under campaign
+conditions (concurrency, serving path, accumulated process state).
+Ruling U is STRENGTHENED: gate 3 caught a real difference between the
+arms AS DEPLOYED — the detectors are provably identical in isolation,
+and the arms still diverge in production. This CAPS the line of
+investigation (Ruling Y: the last probe on the question).
+
+Run history: run 1's engine side, via the probe's newly recorded thread
+fields, revealed the run was at the standalone default (16) rather than
+the campaign posture — caught FROM THE ARTIFACT (register entry 30);
+the two-condition redesign followed. The LI side's first attempt failed
+only at the final write (uid 10002 vs the host-owned mount) — fixed
+with the 777 `liout/` subdir. The engine default-side doc was REUSED
+from run 1 (parse-verified); frame10 and the weights were reused
+hash-pinned; `rf-detr-base.pth` itself stays out of git and S3
+(canonical, md5-recorded in every side doc).
+
+```
+ea1fd0d4047428fece0c10adbf08f87ddeb665ae4f507609f322ef5d07cc4646  detector-parity-y-20260902/compare_y.json
+f223ab7fb5f7ddd8ae550cffde4c704ac2527ccce5a041dd6950837e84ea808d  detector-parity-y-20260902/compare_y_t2.json
+83a02b923d8c1aea116b1b68dbbb2cce0acbb33ef2d58f82b354b051149ed845  detector-parity-y-20260902/frame10.png
+b21ea1b6ad72574f26492e13c0cef87ed37a9a9f6d47c41aca3e8c2086770462  detector-parity-y-20260902/side_engine_y.err
+1a7fc96b35661bec2fc66317283e42f877c28417f93a0e48da534ba252b97112  detector-parity-y-20260902/side_engine_y.json
+23054bf840a337eb4e24a58f46a1c4c148d964afbab97975548a40d5947c8d3f  detector-parity-y-20260902/side_engine_y.log
+979949ecb5b3798a1a22135920eb0488a20f8c5837f6e387f7c180ceae209a24  detector-parity-y-20260902/side_engine_y_t2.err
+c4a6260f01eb8eebad9a7f067a84173eef449d8c42adc0380d8a7513aa01bd49  detector-parity-y-20260902/side_engine_y_t2.json
+1f9b4f86078dc2926d29c15f44bf97c8859279a978ffd6b2d35cd61480f3099b  detector-parity-y-20260902/side_engine_y_t2.log
+5ce8dd455a13c73ff396da34b50866d631d71ddb66aa8e4e7a0f894921642e08  detector-parity-y-20260902/side_li_y.err
+6b70b3df9f1b44da600ce7dc3e88f80de3b2b5239433064517db62d1945c9508  detector-parity-y-20260902/side_li_y.json
+310820d585199f7f634586092cec30e7eb33bbdae82afd2728daac9c0e5e67e9  detector-parity-y-20260902/side_li_y.log
+0b541a2a214875043562c20002d7d3611e717473da7ed19dbd8ee3c93d087639  detector-parity-y-20260902/side_li_y_t2.err
+7482d250415288ebea7a614dd85acdb854bfc62cbdee0e5f00b0962194ebeebf  detector-parity-y-20260902/side_li_y_t2.json
+ed8cd5e61e474ba75484975af5eb1d948233ecf39aaf50e6a9eda9ae2cd9bee3  detector-parity-y-20260902/side_li_y_t2.log
+a82a6b2f32eb57cbf44b1626f5010015743ee2bbd19110a7a17e80d4fbd9a2e8  detector-parity-y-20260902/small.png
+```

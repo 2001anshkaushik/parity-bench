@@ -1,0 +1,70 @@
+{
+ "libs_identical": true,
+ "libs_diff": null,
+ "torch_threads": {
+  "engine": {
+   "intraop": 16,
+   "interop": 16,
+   "captured": "after model construction, before first predict"
+  },
+  "li": {
+   "intraop": 16,
+   "interop": 16,
+   "captured": "after model construction, before first predict"
+  }
+ },
+ "thread_env": {
+  "engine": {
+   "OMP_NUM_THREADS": null,
+   "MKL_NUM_THREADS": null,
+   "OPENBLAS_NUM_THREADS": null,
+   "VECLIB_MAXIMUM_THREADS": null,
+   "NUMEXPR_NUM_THREADS": null,
+   "TORCH_NUM_THREADS": null
+  },
+  "li": {
+   "OMP_NUM_THREADS": null,
+   "MKL_NUM_THREADS": null,
+   "OPENBLAS_NUM_THREADS": null,
+   "VECLIB_MAXIMUM_THREADS": null,
+   "NUMEXPR_NUM_THREADS": null,
+   "TORCH_NUM_THREADS": null
+  }
+ },
+ "weights_md5": {
+  "engine": "b4d3ce46099eaed50626ede388caf979",
+  "li": "b4d3ce46099eaed50626ede388caf979"
+ },
+ "frames": [
+  {
+   "png": "small.png",
+   "pil_size": [
+    320,
+    240
+   ],
+   "verdict": "ARRAYS EQUAL, RAW SCORES BIT-EQUAL (9 dp) \u2014 no divergence at this frame",
+   "arrays_equal": true,
+   "raw_scores_equal": true,
+   "max_sorted_delta": 0.0,
+   "n_raw_detections": {
+    "engine": 300,
+    "li": 300
+   }
+  },
+  {
+   "png": "frame10.png",
+   "pil_size": [
+    714,
+    480
+   ],
+   "verdict": "ARRAYS EQUAL, RAW SCORES BIT-EQUAL (9 dp) \u2014 no divergence at this frame",
+   "arrays_equal": true,
+   "raw_scores_equal": true,
+   "max_sorted_delta": 0.0,
+   "n_raw_detections": {
+    "engine": 300,
+    "li": 300
+   }
+  }
+ ]
+}

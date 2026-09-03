@@ -1,0 +1,1 @@
+[2026-09-03 04:43:40] [WARNING] rf-detr - Model is not optimized for inference. Latency may be higher than expected. You can optimize the model for inference by calling model.optimize_for_inference().
