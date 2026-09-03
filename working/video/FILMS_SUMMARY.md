@@ -48,8 +48,11 @@ not competitor speed — dominate every measured gap: an untuned
 deployment runs ~4× below the engine's own attainable throughput, and
 each resident worker burns idle CPU (4.66 cores at 16 workers) before
 any work arrives, which is the entire difference between "27% worse
-per core" and "4% worse per core." Fix the defaults and the idle
-burn, and the engine is at performance parity for this workload.
+per core" and "4% worse per core." Fixing them closes most of the
+measured gap and brings per-core work cost within 4% of the comparison
+arm — not parity: the tuned throughput gap was still +6.5%, and
+removing the idle burn from a denominator does not remove it from the
+machine.
 Separately, detection reproducibility above 560px is an exposure: two
 correct deployments of the same stack can disagree on borderline
 detections in large video — a QA and audit-reproducibility risk, filed
