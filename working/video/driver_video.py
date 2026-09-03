@@ -78,6 +78,22 @@ PIPE_PATH = ROOT / 'working' / 'video' / 'benchmark_video_detect.pipe'
 MANIFEST_DEFAULT = ROOT / 'working' / 'video' / 'ami_video_manifest.jsonl'
 GENERATED_DIR = ROOT / 'working' / 'pipes' / 'generated'
 EMBED_MODEL = 'sentence-transformers/multi-qa-MiniLM-L6-cos-v1'
+
+# LI per-request ceiling, SIZED FOR THE 500 CORPUS (2026-09-03; was 7200).
+# A per-request timeout must bound QUEUE + SERVICE, and in kernel-accept
+# modes a queued film's wall can approach the whole leg span. Measured
+# bases: our films-35 per-film maxima 11.7 (LI 16x2) / 8.2 (RR 16x2) /
+# 27.5 (RR default) s per film-minute; the 500 corpus's longest film is
+# 11,314 s = 188.6 min (Leela's committed films500 per_doc @3967d9f4,
+# whose own max observed wall was 2,332 s at c32). Projections: LI 16x2
+# worst film ~2.2 ks (7200 already held 3.3x); an LI-DEFAULT 500 blast's
+# queue-wait can reach the leg span, ~6.4 h at a pessimistic 7 f/s ->
+# 7200 and 14400 both breachable hours into a leg. 43200 = ~2x that worst
+# projected span, ~20x the 16x2 worst film, and half Leela's 86,400
+# whole-run envelope — kills true hangs within half a day, never a legit
+# slow request. Single source: the urlopen call AND the provenance
+# timeout_s record read this constant.
+LI_HTTP_TIMEOUT_S = 43200
 BREAKER_K = 3
 THREAD_KEYS = ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS',
                'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS', 'TORCH_NUM_THREADS')
@@ -604,7 +620,7 @@ class LIArm:
                     data=fh, method='POST',
                     headers={'Content-Type': 'application/octet-stream',
                              'Content-Length': str(size)})
-                with urllib.request.urlopen(req, timeout=7200) as resp:
+                with urllib.request.urlopen(req, timeout=LI_HTTP_TIMEOUT_S) as resp:
                     return json.load(resp)
 
         body = await asyncio.to_thread(_post)
@@ -2369,7 +2385,7 @@ async def amain() -> int:
                        'proven per instance; LI sends concurrent in waves of '
                        'max(2 x workers, leg concurrency) (Crossroad 40), RR tokens '
                        'round-robin; per-send ledger in warmup_<stem>.json'),
-        timeout_s=7200,
+        timeout_s=LI_HTTP_TIMEOUT_S,
         parser=f'ffmpeg fps=1/{args.interval_s} + rfdetr(RF-DETR base, thr 0.3)',
         chunk_size=measured_chunk_size or -1,   # FROM RECORDS; -1 = no records, unmissable
         chunk_overlap=0,

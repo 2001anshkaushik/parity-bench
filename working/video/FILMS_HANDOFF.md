@@ -39,6 +39,26 @@
 > (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
 > walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
 > pin, so the >560px fraction stays non-derivable).
+> **FILMS-500 PREP ROUND DONE (2026-09-03, no legs)**: sequence + sizing
+> in `FILMS500_SEQUENCE.md`. LI ceiling FIXED: `LI_HTTP_TIMEOUT_S=43200`
+> (driver, both urlopen and the provenance record; sized from her
+> per_doc walls max 2,332 s / longest film 188.6 min / our measured
+> 27.5 s-per-film-min default worst / LI-default queue≈span risk; item-8
+> carryover CLOSED). Her OOM post-mortem READ (2d7533b: whole-film
+> frames in RAM + buffered uploads, died 97/498) — our LI lane immune BY
+> MECHANISM with cites (frames-on-disk k=1 pipeline.py:249-253;
+> streamed upload driver Ruling-4 block; spool via request.stream()); no
+> whole-film-frames-in-RAM path on either arm, disk is the scaling term.
+> Scripts committed (+x, self-sha): `probe/fetch_films500.sh` (091be447;
+> manifest-sha bd0c915e fail-closed, subset reuse by hardlink, per-file
+> verify), `probe/build_films500_manifest.sh` (319ab58f; Crossroad-23
+> frames through pinned ffmpeg e7e7fb30, P=12, resumable, NULL CONTROL =
+> the 35 knowns must reproduce the committed manifest or REFUSE),
+> `probe/mirror_films500.sh` (d7fd9dbc; her films_v2.sh:43 form —
+> mid-run sync of the run dir only, MIRROR_STOP sentinel). Box measured
+> via wrapper: 839 GB free, fetch ≈252 GB → ~587 GB after, spool ~60 GB
+> worst — comfortable. Run plan awaits Ansh's scope ruling (sequence
+> step 5).
 > **BOX WRAPPER BUILT (2026-09-03, ruled): `working/harness/box.sh`**
 > (sha `7e9bafdc`, self-printed each run) — Leela's proven form adopted
 > verbatim (pty-piped start-session, __RC marker, nohup launch; runx
