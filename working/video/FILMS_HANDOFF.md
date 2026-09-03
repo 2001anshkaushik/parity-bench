@@ -52,7 +52,20 @@
 > V-B inside-predict-with-thread-values / V-C context-dependent-and-
 > CAPS-the-line; thread state recorded, weights fetch impossible,
 > parse-verified artifacts, self-archiving); THE LAST PROBE on this
-> question either way, awaiting the paste**;
+> question either way. RUN 1 (2026-09-02): engine side COMPLETED —
+> and its doc revealed the probe ran at the STANDALONE thread default
+> (intraop/interop 16, six vars null), not the campaign's 2; LI side
+> ran fully and failed only at the final write (uid 10002 vs the
+> host-owned /data mount). WRAPPER REVISED (sha b2e48606): 777
+> liout/ write path; frame10/weights/engine-doc RESUMED sha/md5-
+> pinned; and per the thread finding the probe now runs BOTH
+> conditions — D (default env) and T2 (all six vars = 2, the
+> campaign's pinning mechanism) — with verdicts RESTATED
+> pre-registered in the script (T-1 both-bit-equal = context-
+> dependence AND thread count excluded, stronger than V-C; T-2
+> one-condition divergence = thread-conditional, named; T-3 both =
+> original V-A/V-B; T-4 recorded cross-side mismatch voids that
+> condition's like-for-like). Awaiting the paste**;
 > (2) H16's boundary-drift cap, live and unsized for films (Ruling W;
 > settler = films-sized denominator ruled before data); (3) the films
 > char band — confounded by §6, settled only by an agreeing-detections
