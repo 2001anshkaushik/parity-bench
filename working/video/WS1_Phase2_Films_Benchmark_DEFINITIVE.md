@@ -159,8 +159,8 @@ fail-closed per point):
 |---|---|---|---|---|---|---|
 | rr 8×4 | 8.32 | 26.03 | | li 8×4 | 10.105 | 26.76 |
 | rr 16×2 | **8.65** | 22.67 | | li 16×2 | **10.071** | 23.55 |
-| rr 32×1 | 6.859 | 17.55 | | li 4×8 | 8.577 | 22.65 |
-| rr 4×8 | 7.292 | 21.43 | | li 8×2 | 9.869 | 17.55 |
+| rr 32×1 | 6.859 | 17.55 ᶜ | | li 4×8 | 8.577 | 22.65 |
+| rr 4×8 | 7.292 | 21.43 | | li 8×2 | 9.869 | 17.55 ᶜ |
 | rr 8×2 | 8.128 | 19.45 | | li 8×8 (oversub) | 2.201 | 30.81 |
 | rr 16×4 (oversub) | 5.295 | 27.24 | | | | |
 
@@ -170,6 +170,18 @@ both at the highest CPU; half the thread spend (8×2) bought ~94% (RR) /
 ~97.7% (LI) of peak at 66–75% of the cores. LI 16×2 was chosen over the
 statistically-tied 8×4 (0.34% apart at n=1, against 2.8–5.5% run-to-run
 variance) for 12% less CPU and the matched-shape headline (Ruling M).
+
+ᶜ **Flagged 2026-09-03**: these two cells' CPU values are an exact
+duplicate — the landed point artifacts for rr 32×1 and li 8×2 both
+record cores 17.55 AND util 54.8% across different postures measured in
+different runs. The table is faithful to its artifacts; the coincidence
+is improbable and its cause unknown. The S3 sweep archive holds no raw
+CPU brackets to re-derive from (point + memory-stream objects only;
+the memory streams carry no CPU fields), so verification needs the
+box's `~/films_probe/posture_out/` raw files if they exist. Blast
+radius: these two non-selected matrix rows only — neither is the chosen
+posture, the C chain, or any headline figure, and both cells' f/s
+values are unaffected (distinct, from each point's own span).
 
 **C chain** (measured batch, ruled postures, in-flight confirmed = requested
 at every point): RR 8.21 → 9.059 → 9.127 f/s and LI 9.569 → 10.221 →
@@ -328,23 +340,49 @@ comparator outputs: `results/detector-parity-y-20260902/`, read in
 (ruled): the mechanism question is no longer "which stack difference"
 — there is none — but "which deployment condition".
 
+**The join that points at one arm (added 2026-09-03; n=1,
+directional).** Joining the landed probe result against the landed
+campaign records at the same frame: the isolated result's ≥0.3
+multiset is **exactly campaign-LI's** — five detections,
+{bottle×2, chair×2, person}, with scores matching the LI anatomy
+values above to the third decimal (.953 / .934 / .863 / .490 / .433) —
+while campaign-RR's record carries one additional detection at that
+frame. And the probe frame is the campaign's literal frame: its PNG
+sha256 equals the landed parity artifact's cell-A `frame_sha256[10]`
+exactly (`results/parity-failing-20260902/…HouseOnBareMountain.json`),
+so the Y result ran the campaign's bytes — proven, not constructed.
+Reading: **LI's serving context REPRODUCES isolation on this frame;
+the ENGINE's serving context is the perturbing side.** Scope, honestly:
+one frame, n=1, directional not decisive — but consistent with the
+corpus-level direction (RR detects more on 22 of 35 films), and it
+orders the candidate list below toward the engine arm. One recording
+note so nobody ever quotes a pair: the LI anatomy line above pairs
+labels to scores in a different order than the probe document does —
+the multisets are identical, the pairing difference is print-ordering,
+and no claim in this document uses a label-score pair.
+
 **Residual candidates — the next campaign's inheritance, each with its
 settler** (the committed isolation probe,
 `probe/probe_detector_parity.py` + `probe/run_side_prediction_y.sh`,
-is the control instrument for all of them):
-1. **Concurrent inference load** (16 tasks/instances busy at once) —
-   settled by running the isolation probe while parallel predicts
-   saturate the same container, diffing against the isolation result.
-2. **The serving path itself** (the engine's in-task detect path under
-   its task server; LI's uvicorn worker path) — settled by driving
-   frame 10 through each arm's serving entrypoint in an otherwise idle
-   container (a one-file leg) and diffing against isolation.
+is the control instrument for all of them; ordered by the join above —
+engine-side candidates lead):
+1. **The engine's serving path** (the in-task detect path under its
+   task server) — the frame-10 join points here first. Settled by
+   driving frame 10 through the engine's serving entrypoint in an
+   otherwise idle container (a one-file leg) and diffing against
+   isolation; the LI-side twin run is the expected-match control.
+2. **Concurrent inference load in the engine's task processes**
+   (16 tasks busy at once) — settled by running the isolation probe
+   while parallel predicts saturate the same container, diffing
+   against the isolation result.
 3. **Accumulated process state across a 35-film leg** (allocator
    arenas, fragmentation, lazy initializations) — settled by
    positional replay: the same film early vs late in a leg, or
    per-frame score capture across one leg to locate divergence onset.
 4. Allocator/memory-layout under load is the mechanism class that
-   instruments 1 and 3 discriminate between.
+   instruments 2 and 3 discriminate between. The LI serving path stays
+   on the list as the control run (the evidence for its innocence is
+   n=1).
 
 **Ruled (X, updated 2026-09-03): the upstream ticket now asks the
 serving-context question, with the isolation probe attached as the
@@ -372,8 +410,13 @@ preserved in `results/FILMS_LANDING.md` §2a.
 - **H16's boundary-drift cap** (0.5%/video) is live and unsized for films
   content — also stamped as a disclosure into every cross file; no gate-3
   verdict here leaned on it (exclusions ran 0–1 per film).
-- **Cross-team CPU-per-frame**: still blocked on the unresolved AMI-era
-  accounting discrepancy with Leela's team.
+- **Cross-team CPU-per-frame**: still unresolved, now characterized —
+  a stable ~19–20% CPU-s/frame gap at matched utilization on
+  byte-identical corpora (proven per-file, 168/168), our side the
+  outlier against two independently agreeing harnesses; a handover
+  package with a specific settling ask is assembled. Current state:
+  `AMI_CROSS_TEAM_COVER.md` (2026-09-03). No cross-team CPU figure is
+  publishable until it settles.
 
 **Ruled (W): the char band and the H16 cap are formally DEFERRED to the
 next campaign.** The band is settled only by a run whose detection sets

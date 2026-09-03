@@ -48,4 +48,7 @@ extra CPU goes; nothing else in this package does.
 
 Full reconciliation, corpus-identity proofs, idle-window and
 memory-basis cautions, and every HYPOTHESIS label:
-`AMI_CROSS_TEAM_RECONCILIATION.md`.
+`AMI_CROSS_TEAM_RECONCILIATION.md`. The Archive Films campaign report
+(`WS1_Phase2_Films_Benchmark_DEFINITIVE.md`, FINAL 2026-09-03) is the
+companion deliverable; its §7 points here as the current state of the
+cross-team CPU question.
