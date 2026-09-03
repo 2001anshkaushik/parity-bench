@@ -171,17 +171,19 @@ both at the highest CPU; half the thread spend (8×2) bought ~94% (RR) /
 statistically-tied 8×4 (0.34% apart at n=1, against 2.8–5.5% run-to-run
 variance) for 12% less CPU and the matched-shape headline (Ruling M).
 
-ᶜ **Flagged 2026-09-03**: these two cells' CPU values are an exact
-duplicate — the landed point artifacts for rr 32×1 and li 8×2 both
-record cores 17.55 AND util 54.8% across different postures measured in
-different runs. The table is faithful to its artifacts; the coincidence
-is improbable and its cause unknown. The S3 sweep archive holds no raw
-CPU brackets to re-derive from (point + memory-stream objects only;
-the memory streams carry no CPU fields), so verification needs the
-box's `~/films_probe/posture_out/` raw files if they exist. Blast
-radius: these two non-selected matrix rows only — neither is the chosen
-posture, the C chain, or any headline figure, and both cells' f/s
-values are unaffected (distinct, from each point's own span).
+ᶜ **Flagged, FINAL (2026-09-03)**: these two cells' CPU values are an
+exact duplicate — the landed point artifacts for rr 32×1 and li 8×2
+both record cores 17.55 AND util 54.8% across different postures
+measured in different runs. The table is faithful to its artifacts.
+The verification trail is exhausted: both the S3 sweep archive and the
+box's `~/films_probe/posture_out/` were checked and hold only the
+point artifacts and the memory streams (which carry no CPU fields) —
+no raw CPU brackets exist anywhere, so the duplicate cannot be
+re-derived and stays flagged as an improbable exact match of unknown
+cause. Blast radius: these two non-selected matrix rows only — neither
+is the chosen posture, the C chain, or any headline figure, and both
+cells' f/s values are unaffected (distinct, from each point's own
+span).
 
 **C chain** (measured batch, ruled postures, in-flight confirmed = requested
 at every point): RR 8.21 → 9.059 → 9.127 f/s and LI 9.569 → 10.221 →

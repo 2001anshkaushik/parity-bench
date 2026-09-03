@@ -6,19 +6,28 @@
 > per-leg gate PASS/NOT-RUN), landed at `646eaea`, results written up in
 > `WS1_Phase2_Films_Benchmark_DEFINITIVE.md` — **FINAL 2026-09-03**
 > (banner off under the Ruling-Y close-out; zero provenance exceptions).
-> Post-final fresh-read pass (2026-09-03, ruled): §6 gained the frame-10
-> JOIN (isolation ≡ campaign-LI exactly, multiset + 3dp scores + the
-> frame byte-pinned to the campaign via the parity artifact — the ENGINE
-> serving context is the perturbing side, n=1 directional; residual
-> candidates re-ordered engine-first); §7's cross-team bullet now points
-> at AMI_CROSS_TEAM_COVER.md (reciprocal line added there); §5 carries
-> the ᶜ flag on rr 32×1 / li 8×2 — their cores values are an exact
-> duplicate (17.55/54.8 in both landed artifacts), unverifiable
-> laptop-side (S3 archive has no raw CPU brackets; memwatch is
-> memory-only) — box check: `ls ~/films_probe/posture_out/` for raw
-> bracket files. NEW `FILMS_SUMMARY.md` — the one-page plain-language
-> layer above the DEFINITIVE (what ran, three findings with numbers,
-> product meaning, not-settled, where detail lives).
+> **CAMPAIGN FULLY CLOSED (2026-09-03).** Post-final fresh-read flags
+> ALL DISPOSITIONED: **F2 ADDED** — §6's closing result carries the
+> frame-10 JOIN (isolation ≡ campaign-LI exactly: multiset + 3dp
+> scores; probe frame byte-pinned to the campaign frame via the parity
+> artifact — the ENGINE serving context is the perturbing side, n=1,
+> directional; residual candidates re-ordered engine-first; the
+> label-score pairing note recorded). **F1 FIXED** — §7 ↔
+> `AMI_CROSS_TEAM_COVER.md` reciprocal pointers. **F3 FINAL,
+> unresolvable** — the rr 32×1 / li 8×2 cores duplicate (17.55/54.8 in
+> both landed artifacts): the S3 archive AND the box's posture_out/
+> were both checked and hold only point artifacts + memory streams; no
+> raw CPU brackets exist anywhere; the ᶜ flag stands as final, blast
+> radius the two non-selected rows. **`FILMS_SUMMARY.md`** is the
+> one-page plain-language layer above the DEFINITIVE. **No campaign
+> work remains on the box** (hygiene AA is ruled with its script
+> committed — housekeeping, runnable any time; its guards stand).
+> **A fresh session inherits ONLY the named items: H16's unsized cap
+> and the char band (Ruling W, settlers named); the corpus-wide >560px
+> fraction (not derivable from held artifacts, Ruling V); the §6
+> residual mechanism candidates, engine-first, with settlers and the
+> committed isolation control; and the open AMI CPU-per-frame question
+> (package + specific ask ready: `AMI_CROSS_TEAM_COVER.md`).**
 > Headline: at the ruled 16×2 posture, C=16, LlamaIndex +6.5% span /
 > +26.7% per measured core / **+3.9% per effective core** — near-equal
 > per-core cost with RocketRide's token model spending 4.66 cores idle;
