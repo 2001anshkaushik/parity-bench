@@ -43,30 +43,42 @@ count_one() {  # $1 = filename; appends one JSON line; prints timing
   # frame count via the null muxer's own final counter on stderr:
   frames=$("$FF" -nostdin -hide_banner -i "$f" -vf fps=1/15 -f null - 2>&1 \
            | grep -o 'frame=[[:space:]]*[0-9]*' | tail -1 | grep -o '[0-9]*')
-  dur=$("$HOME/.venv-floor/bin/python3" - "$f" <<'PYD'
+  # duration + WIDTH/HEIGHT in one ffprobe call — resolution feeds the
+  # 500-run's 560px partition check (and makes the corpus-wide >560px
+  # fraction derivable from OUR OWN artifact for the first time).
+  dwh=$("$HOME/.venv-floor/bin/python3" - "$f" <<'PYD'
 import subprocess, sys, json, os
 import imageio_ffmpeg
 ff = imageio_ffmpeg.get_ffmpeg_exe()
 probe = os.path.join(os.path.dirname(ff), 'ffprobe')
 if os.path.exists(probe):
-    out = subprocess.run([probe, '-v', 'error', '-show_entries', 'format=duration',
+    out = subprocess.run([probe, '-v', 'error',
+                          '-select_streams', 'v:0',
+                          '-show_entries', 'stream=width,height:format=duration',
                           '-of', 'json', sys.argv[1]], capture_output=True, text=True)
-    print(json.loads(out.stdout)['format']['duration'])
+    j = json.loads(out.stdout)
+    st = (j.get('streams') or [{}])[0]
+    print(j.get('format', {}).get('duration', ''), st.get('width', ''), st.get('height', ''))
 else:
-    print('')
+    print('  ')
 PYD
 )
+  dur=$(echo "$dwh" | awk '{print $1}')
+  w=$(echo "$dwh" | awk '{print $2}')
+  h=$(echo "$dwh" | awk '{print $3}')
   sha=$(sha256sum "$f" | awk '{print $1}')
   bytes=$(stat -c %s "$f")
   t1=$(date +%s)
   [ -n "$frames" ] || { echo "COUNT FAILED: $name" >&2; return 1; }
+  [ -n "$w" ] && [ -n "$h" ] || { echo "DIMENSIONS FAILED: $name" >&2; return 1; }
   "$HOME/.venv-floor/bin/python3" -c "
 import json,sys
 print(json.dumps({'file': sys.argv[1], 'sha256': sys.argv[2], 'bytes': int(sys.argv[3]),
                   'video_s': (float(sys.argv[4]) if sys.argv[4] else None),
-                  'expected_frames_measured': int(sys.argv[5])}))" \
-    "$name" "$sha" "$bytes" "$dur" "$frames" >> "$OUT.parts/$name.json"
-  echo "  $name: frames=$frames wall=$((t1-t0))s" >&2
+                  'expected_frames_measured': int(sys.argv[5]),
+                  'width': int(sys.argv[6]), 'height': int(sys.argv[7])}))" \
+    "$name" "$sha" "$bytes" "$dur" "$frames" "$w" "$h" >> "$OUT.parts/$name.json"
+  echo "  $name: frames=$frames ${w}x${h} wall=$((t1-t0))s" >&2
 }
 export -f count_one; export CORPUS OUT FF HOME
 
@@ -109,17 +121,38 @@ for name, s in subset.items():
 if mism:
     print('REFUSE — null control failed on the 35 knowns:', mism[:5]); raise SystemExit(3)
 print(f'null control: 35/35 subset films reproduce the committed manifest exactly')
+# Warm split — HER driver convention, adopted for cross-team join identity:
+# the frozen set's LAST TWO in queue order are warm (her ami30h.txt:5 states
+# the convention; her films500 README runs 498 measured + 2 warm; the tail
+# of archive_films_500.txt @3967d9f4 names them). Measured = the other 498,
+# matching her measured set exactly.
+WARM = {'submarine_alert.mp4', 'DominiqueIsDead1978.mp4'}
+missing_warm = WARM - {r['file'] for r in rows}
+if missing_warm:
+    print(f'REFUSE — designated warm films not in corpus: {missing_warm}'); raise SystemExit(3)
+for r in rows:
+    r['role'] = 'warm' if r['file'] in WARM else 'measured'
+rows.sort(key=lambda r: (r['role'] == 'warm', r['file']))  # measured first, warm last
+n_meas = sum(1 for r in rows if r['role'] == 'measured')
+above = [r for r in rows if max(r['width'], r['height']) > 560]
 meta = {'_meta': {'corpus_manifest_sha256':
         'bd0c915e28710322bace0549d7372dddea5578895333f143c67e04252e4e02a1',
         'ffmpeg_sha256': 'e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99',
-        'interval_s': 15, 'n_files': len(rows),
+        'interval_s': 15, 'n_files': len(rows), 'n_measured': n_meas, 'n_warm': len(WARM),
+        'warm_rule': 'last 2 of the frozen queue order (her driver convention; matches her 498+2 split)',
         'total_frames': sum(r['expected_frames_measured'] for r in rows),
-        'total_video_s': sum(r['video_s'] or 0 for r in rows)}}
+        'total_video_s': sum(r['video_s'] or 0 for r in rows),
+        'n_above_560px': len(above),
+        'note_560px': 'width/height measured per film via the pinned ffprobe; '
+                      'the corpus-wide >560px fraction is derivable from THIS '
+                      'artifact (it was not derivable from any held artifact before)'}}
 with open(out, 'w') as f:
     f.write(json.dumps(meta) + '\n')
     for r in rows: f.write(json.dumps(r) + '\n')
 m = meta['_meta']
-print(f"census: n={m['n_files']}  total_frames={m['total_frames']}  footage={m['total_video_s']/3600:.2f} h")
+print(f"census: n={m['n_files']} ({m['n_measured']} measured + {m['n_warm']} warm)  "
+      f"total_frames={m['total_frames']}  footage={m['total_video_s']/3600:.2f} h  "
+      f">560px: {m['n_above_560px']}/{m['n_files']}")
 print(f"manifest: {out}")
 PYA
 echo "DONE — commit the manifest from the box (entry-26 landing) or read it back."

@@ -39,8 +39,25 @@
 > (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
 > walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
 > pin, so the >560px fraction stays non-derivable).
-> **FILMS-500 PREP ROUND DONE (2026-09-03, no legs)**: sequence + sizing
-> in `FILMS500_SEQUENCE.md`. LI ceiling FIXED: `LI_HTTP_TIMEOUT_S=43200`
+> **FILMS-500 SCOPE RULED + PLAN BUILT (2026-09-03)**: cells = RR M16xT2
+> + LI N16xT2 ONLY, 498 measured, 2 blast passes; DEFAULT SKIPPED
+> (ruled reasoning baked in the plan: ~19 h/pass re-answers a question
+> answered twice at n=2, 0.77% spreads; her runbook has no default
+> cell); SEQ_N=5 NOT scaled (baked with reasoning); warm = her last-2
+> convention (498+2 = her measured set, join identity); $/1k PUBLISHED
+> as a results row (ruled; exports already carry it); cross-gate
+> failures on >560px PRE-STATED as the Ruling-U expectation — the
+> PARTITION CHECK is the finding surface (violation = exit 2 loud,
+> "THIS CHANGES RULING U"). Scripts: `run_plan_films500.sh` (903cf9f7),
+> `probe/run_films500_staging.sh` (56330dc2 — arming SPANS 560px:
+> Leagues control judged by the proven deriver + House expected-diverger
+> census + multi-film Ruling-R liveness; golden REUSED compare-mode),
+> `probe/build_films500_manifest.sh` amended (83428cd8 — width/height
+> per film via pinned ffprobe: the partition check's basis AND the
+> corpus-wide >560px fraction finally derivable from a held artifact;
+> warm-role marks). Projected wall ~20–22 h (per-cell table +
+> assumptions in FILMS500_SEQUENCE.md). Sequence steps 0–7 concrete
+> with STOPs and three walk-aways. LI ceiling FIXED: `LI_HTTP_TIMEOUT_S=43200`
 > (driver, both urlopen and the provenance record; sized from her
 > per_doc walls max 2,332 s / longest film 188.6 min / our measured
 > 27.5 s-per-film-min default worst / LI-default queue≈span risk; item-8
