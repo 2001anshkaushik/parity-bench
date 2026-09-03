@@ -19,13 +19,13 @@ DEFINITIVE's §5 tables at landing: all 31 match verbatim; the heads
 points additionally carry the inflight-9 realization facts §5 states.
 Source prefixes: `s3://rocketride-benchmark-data/ansh/<same name>/`.
 
-**Deliberately NOT landed (S3 pointers, large sample streams)**: the
-`memwatch_*.jsonl` per-second memory sample streams in the same three
-prefixes (~0.05–2.3 MB each). §4's absolute memory figures (RR anon
+**Memwatch streams — LANDED per Ruling Z (2026-09-02)**: all 31
+`memwatch_*.jsonl` per-second memory sample streams from the same three
+prefixes (~13 MB; hashes in §3b). §4's absolute memory figures (RR anon
 17.26→18.19 GB across C, anon sums 22.3/23.9/24.6 GB, memory.peak
-30/38/38 GB, LI flat 14.7–15.1 GB, the 0.92 GB/token fit) trace to
-those streams; the landed point artifacts carry the beside-note naming
-them (`memory_note`). They stay on S3 until ruled otherwise.
+30/38/38 GB, LI flat 14.7–15.1 GB, the 0.92 GB/token fit) now trace to
+committed streams — **zero provenance exceptions remain in the films
+DEFINITIVE**.
 
 ## 2. Diagnosis artifacts — LANDED 2026-09-02 (13 files, both prefixes)
 
@@ -166,4 +166,43 @@ a82a6b2f32eb57cbf44b1626f5010015743ee2bbd19110a7a17e80d4fbd9a2e8  detector-parit
 d9a673de875f59bba4927e49ae5e8baea307961e453bc4b89a00589966d8bf93  parity-failing-20260902/probe_frame_parity_ABucketofBlood.json
 b818f144f4a436b217a3e2bd5a2936aaa980a75e6b72c9741ff8aa4ad2c8802f  parity-failing-20260902/probe_frame_parity_A_Study_In_Scarlet.json
 e6b1585a132828e824ed7e907122e7e38003efcc78c8eaca070088d64a8a879b  parity-failing-20260902/probe_frame_parity_HouseOnBareMountain.json
+```
+
+## 3b. Memwatch streams — LANDED per Ruling Z (2026-09-02; zero provenance exceptions)
+
+31 `memwatch_*.jsonl` per-second sample streams (~13 MB), one per sweep
+point, backing §4's absolute memory figures. sha256:
+
+```
+74f45de4b7a66d00b49f0f569bbb92889ead74786999da8f498e102945719dea  posture-sweep-20260830/memwatch_li_N16xT2_C32.jsonl
+53236f601f60e3141546fd425c9d2972b963bcd09da28c6b77751a9074931fed  posture-sweep-20260830/memwatch_li_N4xT8_C8.jsonl
+2e02bf4c3f377dd829fea25d39932414212809065ed104067a205d6d309ef203  posture-sweep-20260830/memwatch_li_N8xT2_C16.jsonl
+8a776715c6e00f849a9656c8dec2fcb7e6b0d28f34b836425814db03e6a69843  posture-sweep-20260830/memwatch_li_N8xT4_C16.jsonl
+20116470a4b655eae7a73166edbf90e6807e9a52c2975f691c507c93539b653c  posture-sweep-20260830/memwatch_li_N8xT8_C16.jsonl
+cdf2c6f001eaad02b0d839af82faa9e3e2ac4db5c1add9d8335420d62841a264  posture-sweep-20260830/memwatch_rr_M16xT2_C32.jsonl
+233b58ab8b8fcc81a2ec0410e9c39273d559a527547751b4635f8719d95e7e09  posture-sweep-20260830/memwatch_rr_M16xT4_C32.jsonl
+e0028011152c5111924af4de7b980100523b69d345725042cf13e60aebe5c5ca  posture-sweep-20260830/memwatch_rr_M32xT1_C35.jsonl
+bedd51aadb1db106a3bf3b7c90ab466544c36885e9f47d13133eb3f645afa0c5  posture-sweep-20260830/memwatch_rr_M4xT8_C8.jsonl
+96d104140f5e6bb1c2563f75b4624ab218994170e718d67f74f6bc608307ab67  posture-sweep-20260830/memwatch_rr_M8xT2_C16.jsonl
+083e36a8b0e9be453551d5817f31af545d47b9ba89d3fd9dc5d4eec09fca4132  posture-sweep-20260830/memwatch_rr_M8xT4_C16.jsonl
+2fb441ba16513c9d573866474449ee963fe300ddd19075a0f45dd915142cb320  c-sweep-20260831/memwatch_li_N16xT2_C1.jsonl
+0a8cb2b9cf92e17ce2be131f094f911c91402afca52f3492b39a9c878d7a855a  c-sweep-20260831/memwatch_li_N16xT2_C16.jsonl
+be701a06436e1b6a6a49b08d715e8a763c0ca48ad4d05268763b3c105f49fcbf  c-sweep-20260831/memwatch_li_N16xT2_C2.jsonl
+71001606cdce80c1096a18312be1c2062755f9715695e018bb34e29590c11c93  c-sweep-20260831/memwatch_li_N16xT2_C32.jsonl
+74820f6528b92bdfee3773523afe804b3e64a200102eb7e339ef19064ff94410  c-sweep-20260831/memwatch_li_N16xT2_C4.jsonl
+cce93a04f13eb2efee4b0569a21e2393373421b609475459b914a1f3bc03ff97  c-sweep-20260831/memwatch_li_N16xT2_C8.jsonl
+afd1b6642a3042b75f1ed1a8f1e50271affe03299551a07bc279a856ed6dc3c6  c-sweep-20260831/memwatch_rr-default_C1.jsonl
+76c972abd3aeb33f8e548ef8d9dd3e56c8410257c1836e30029b529a82d60509  c-sweep-20260831/memwatch_rr-default_C2.jsonl
+609d86f01bf63024b0daf45136371933c0929f1c63a8c757fd433ae9cb97db93  c-sweep-20260831/memwatch_rr_M16xT2_C1.jsonl
+eb8a6ea35e991d9b17862b0f347844c45685f8339471ee42814a63dfd67f2081  c-sweep-20260831/memwatch_rr_M16xT2_C16.jsonl
+046336d01109d76487dd199786e2322a9bdf4fc41b3d63f853b9364f3ee26c77  c-sweep-20260831/memwatch_rr_M16xT2_C2.jsonl
+7b3a1c5fd62fbe1626fb161ec0a0309a37cc9d4715744f0a56c6b351c69a08da  c-sweep-20260831/memwatch_rr_M16xT2_C32.jsonl
+e66b681e8fade078b3057f92fbe028c666177967d6830822f7d2850e2d141e25  c-sweep-20260831/memwatch_rr_M16xT2_C4.jsonl
+9e84a20ec2483113a7e95e012663c5b6413632ad32af3da285d21e673a473a0e  c-sweep-20260831/memwatch_rr_M16xT2_C8.jsonl
+50470b3ef9a285cea39814d35915f821cacd319f197773829849bbb728950f8f  c-sweep-highc-20260831/memwatch_li_N16xT2_C16.jsonl
+2b5c8dcfa2e17b06a97a249eb092d379c8ba1c9558daff93c766d840c3c2b00a  c-sweep-highc-20260831/memwatch_li_N16xT2_C32.jsonl
+9483c911351802bd374cc3416e6544a06ababcfafcf6b29a946667849e5978b2  c-sweep-highc-20260831/memwatch_li_N16xT2_C8.jsonl
+d01ef086ed6e8d6b46306d54d8a795b6be8e96101c14926c7e8d9e1421650ef5  c-sweep-highc-20260831/memwatch_rr_M16xT2_C16.jsonl
+730309c232f26daecb04376cf9d33085e7eb793169df4ee02672fede33a7ec66  c-sweep-highc-20260831/memwatch_rr_M16xT2_C32.jsonl
+96b8ef06194c6338ff9603385af4323bc987bd0e1a4d54188db686b84e8c1e2c  c-sweep-highc-20260831/memwatch_rr_M16xT2_C8.jsonl
 ```

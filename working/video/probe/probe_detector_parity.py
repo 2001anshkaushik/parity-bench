@@ -218,7 +218,32 @@ def side(which: str, png_paths) -> int:
         sys.path.insert(0, '/app')              # the li:video image layout
         from li_video.pipeline import LlamaIndexVideoPipeline
     from rfdetr import RFDETRBase
+    # Ruling Y (2026-09-02): fail-closed weights. RFDETRBase() resolves
+    # rf-detr-base.pth from the CWD and silently DOWNLOADS on a miss (the
+    # v2 engine side fetched 355M despite the offline env). A probe that
+    # fetches is a probe that could fetch something else: refuse instead,
+    # and record the md5 of the file actually used so both sides are
+    # provably running the same bytes.
+    wpth = Path.cwd() / 'rf-detr-base.pth'
+    if not wpth.exists():
+        print(f'REFUSE: rf-detr-base.pth not in cwd ({Path.cwd()}) — the '
+              f'wrapper places the canonical weights beside the run; no '
+              f'fetch is permitted', file=sys.stderr)
+        raise SystemExit(3)
+    weights_md5 = hashlib.md5(wpth.read_bytes()).hexdigest()
     det = RFDETRBase()
+    import torch
+    # Ruling Y: the v2 side docs omitted the thread state the design
+    # called for; it is the leading candidate if scores differ on a
+    # diverging frame, so it rides in the doc.
+    torch_threads = {'intraop': torch.get_num_threads(),
+                     'interop': torch.get_num_interop_threads(),
+                     'captured': 'after model construction, '
+                                 'before first predict'}
+    thread_env = {k: os.environ.get(k) for k in (
+        'OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS',
+        'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS',
+        'TORCH_NUM_THREADS')}
     names = getattr(det, 'class_names', None) or {}
     frames = []
     for p in png_paths:
@@ -242,7 +267,9 @@ def side(which: str, png_paths) -> int:
             'array_sha256': hashlib.sha256(arr.tobytes()).hexdigest(),
             'array_shape': list(arr.shape), 'array_dtype': str(arr.dtype),
             'predict': _predict_dump(det, names, img, [0.001, 0.3])})
-    doc = {'side': which, 'libs': _lib_identity(), 'frames': frames}
+    doc = {'side': which, 'libs': _lib_identity(),
+           'weights_md5': weights_md5, 'torch_threads': torch_threads,
+           'thread_env': thread_env, 'frames': frames}
     return doc
 
 
@@ -333,7 +360,16 @@ def compare(engine_doc: dict, li_doc: dict) -> dict:
                        'verdict': 'CANNOT COMPARE — no li frame with this '
                                   'png sha'})
     return {'libs_identical': not libs_diff,
-            'libs_diff': libs_diff or None, 'frames': frames}
+            'libs_diff': libs_diff or None,
+            # Ruling Y: thread state and weights identity ride the verdict
+            # (None on pre-Y side docs — additive, never breaking).
+            'torch_threads': {'engine': engine_doc.get('torch_threads'),
+                              'li': li_doc.get('torch_threads')},
+            'thread_env': {'engine': engine_doc.get('thread_env'),
+                           'li': li_doc.get('thread_env')},
+            'weights_md5': {'engine': engine_doc.get('weights_md5'),
+                            'li': li_doc.get('weights_md5')},
+            'frames': frames}
 
 
 def self_test() -> int:

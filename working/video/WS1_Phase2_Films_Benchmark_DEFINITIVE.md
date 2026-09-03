@@ -275,9 +275,10 @@ byte-identical `detr_*.py` files), the two probe frames, and the side
 test's own results are **LANDED 2026-09-02**
 (`results/parity-failing-20260902/`, `results/detector-parity-20260902/`
 — 13 files, box-printed hashes matched on fetch; `results/
-FILMS_LANDING.md` §2/§2a). With that, every figure and claim in this
-document traces to a committed artifact EXCEPT §4's absolute memory
-readings, which trace to the named S3 memwatch streams.
+FILMS_LANDING.md` §2/§2a). The memwatch streams behind §4's absolute
+memory readings are landed too (Ruling Z, 31 files, hashes in the
+landing note §3b). **Every figure and claim in this document now
+traces to a committed artifact — zero exceptions.**
 
 **Ruled (V): the 500-header probe was considered and NOT run.** The
 reasoning, recorded so this reads as ruled rather than overlooked: the

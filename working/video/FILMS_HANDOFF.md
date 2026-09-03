@@ -44,7 +44,15 @@
 > separated; `results/FILMS_LANDING.md` §2a). **The decisive next
 > instrument: the same probe on a campaign-DIVERGING frame (House
 > idx 124 or frame 10), with torch.get_num_threads() recorded** —
-> supersedes the old "complete the side test" carry;
+> supersedes the old "complete the side test" carry — **RULED Y
+> (2026-09-02): the discriminating run is COMMITTED as
+> `probe/run_side_prediction_y.sh` (anatomy frame 10 chosen over idx
+> 124 — count divergence with recorded per-detection scores, exact
+> fps=1/15 pipeline extraction; pre-registered V-A preprocessing /
+> V-B inside-predict-with-thread-values / V-C context-dependent-and-
+> CAPS-the-line; thread state recorded, weights fetch impossible,
+> parse-verified artifacts, self-archiving); THE LAST PROBE on this
+> question either way, awaiting the paste**;
 > (2) H16's boundary-drift cap, live and unsized for films (Ruling W;
 > settler = films-sized denominator ruled before data); (3) the films
 > char band — confounded by §6, settled only by an agreeing-detections
@@ -53,11 +61,19 @@
 > (5) the ~20% AMI CPU-per-frame gap with Leela/Shashi — package
 > assembled, item 9; (6) superseded by (1)'s next instrument;
 > (7) H7, model-server row, waterfront flag — item 7; (8) box hygiene
-> ruling pending (sizes in: films_probe 3.3G, films_corpus 29G,
-> anchor_7204 17M, ami full/closeup1/video 23G/7.7G/3.3G, govdocs1
-> EMPTY on this box, images 38.95G incl. an unlisted
-> rr:patched-video.pre-node-fix 15G + ws1-llamaindex 9.07G, build
-> cache 43.93G/13.92G reclaimable, 0 containers; nothing deleted).
+> **RULED AA (2026-09-02)**: DELETE pre-node-fix image 15G +
+> reclaimable build cache 13.92G + closeup1 7.7G (duplicate, 62/62) +
+> anchor_7204 17M; KEEP rr:patched-video (not bit-reproducible),
+> li:video, li:video-anchor, ws1-llamaindex (Crossroad 19), subset
+> 29G, ami full+video — script `probe/box_hygiene_aa.sh` (fail-closed
+> KEEP guards + name/size containment re-check + Y-sequencing guard),
+> **runs AFTER Ruling Y's probe**. (Inventory: films_probe 3.3G,
+> films_corpus 29G, ami 23G/7.7G/3.3G, govdocs1 EMPTY on this box,
+> images 38.95G, cache 43.93G, 0 containers.)
+> **RULING Z DONE (2026-09-02)**: the 31 memwatch streams are landed
+> (~13 MB, hashes in FILMS_LANDING §3b) — **the films DEFINITIVE now
+> has ZERO provenance exceptions**. Banner: comes off when Ruling Y
+> reports (Z already landed) and Ansh says so.
 >
 > **Box state at close:** worktree `~/parity-bench-video` last committed
 > `646eaea` (the laptop is ahead — the box pulls before any reuse);
