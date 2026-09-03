@@ -97,7 +97,13 @@
 > li:video, li:video-anchor, ws1-llamaindex (Crossroad 19), subset
 > 29G, ami full+video — script `probe/box_hygiene_aa.sh` (fail-closed
 > KEEP guards + name/size containment re-check + Y-sequencing guard),
-> **runs AFTER Ruling Y's probe**. (Inventory: films_probe 3.3G,
+> **runs AFTER Ruling Y's probe**. Run 1 (2026-09-03) REFUSED as
+> designed on its own guard bug — bare `ws1-llamaindex` resolved to
+> the absent :latest (the image is `ws1-llamaindex:x86_64`); nothing
+> deleted. RE-ISSUED sha `8249c310`: tag fixed, every KEEP/DELETE name
+> now pinned to its inventoried image ID (mismatch = refuse), and the
+> three Phase-1 images in neither list (rr-engine:3.3.1, rr:patched,
+> rr:stock, ~1G each) printed as considered-and-kept. (Inventory: films_probe 3.3G,
 > films_corpus 29G, ami 23G/7.7G/3.3G, govdocs1 EMPTY on this box,
 > images 38.95G, cache 43.93G, 0 containers.)
 > **RULING Z DONE (2026-09-02)**: the 31 memwatch streams are landed
