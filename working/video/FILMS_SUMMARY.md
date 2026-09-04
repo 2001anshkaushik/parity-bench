@@ -32,8 +32,7 @@ Same detector, same code, same weights, byte-identical frames in: on
 video at or below the detector's 560-pixel input size, the two
 systems' detections are identical to the last bit; above it — where
 every frame must be shrunk first — their results drift by fractions of
-a percent, enough to flip borderline detections (27 of the 35 films
-affected). The obvious explanations are all disproven by measurement:
+a percent, enough to flip borderline detections (27 of the 35 films; measured corpus-wide since: 435 of all 500 films — 87% — sit above the edge). The obvious explanations are all disproven by measurement:
 in isolation the detector is provably bit-identical on both stacks,
 even on the exact frames that disagreed in production, at two thread
 settings. The drift appears only under the full production workload,

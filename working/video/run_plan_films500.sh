@@ -17,9 +17,14 @@
 #   (ruled): they exist for gate 8 (determinism repeat), uncontended
 #   per-film latency, and the speedup divisor — none of which scale with N.
 #
-#   WARM SPLIT: 498 measured + 2 warm (manifest role rows; her driver
-#   convention — last 2 of the frozen queue order — so our measured set
-#   matches her films500 measured set exactly, for cross-team joins).
+#   WARM SPLIT: 498 measured + 2 warm (manifest role rows). The warm
+#   pair is DERIVED at manifest build as corpus minus her measured 498
+#   (her committed per_doc @3967d9f4, mirrored in
+#   films500_her_measured_set.txt): yanks_are_coming + zontar — so our
+#   measured set equals hers BY CONSTRUCTION (diff=0), for cross-team
+#   joins. (The earlier "last 2 of queue order" reading was wrong —
+#   her convention is sorted order, and only her records are ground
+#   truth; builder v4.)
 #
 #   ARMING: read from run_films500_staging.sh's arming.json — a MULTI-FILM
 #   basis SPANNING the 560px boundary (§10.4 lesson): <=560 control must
@@ -27,8 +32,10 @@
 #   formula over both staged films. Never typed.
 #
 #   CROSS-GATE EXPECTATION, STATED BEFORE THE RUN (ruled, so nobody reads
-#   it as a failure): gate 3 WILL FAIL on the majority of the 500 — the
-#   560px partition predicts every film above the edge diverges. That is
+#   it as a failure): gate 3 WILL FAIL on ~433 of the 498 measured films
+#   — the landed manifest counts 435/500 above the 560px edge (detector
+#   basis; both warm films are above it too) and the partition predicts
+#   every one of them diverges. That is
 #   the expected, already-ruled outcome (Ruling U), NOT a stop condition,
 #   and this plan does not treat it as one. The check that matters is the
 #   PARTITION ITSELF: if films above 560px PASS, or films below it FAIL,
@@ -219,8 +226,9 @@ m = {
                                'computes efficiency.usd_per_1k_footage_hours, basis in-export '
                                '(1.428 USD/h / x_realtime x 1000)'),
  },
- 'cross_gate_expectation': ('STATED BEFORE THE RUN (ruled): gate 3 will FAIL on the majority '
-                            'of the 500 — every >560px film is expected to diverge (Ruling U). '
+ 'cross_gate_expectation': ('STATED BEFORE THE RUN (ruled): gate 3 will FAIL on ~433 of the '
+                            '498 measured films (landed manifest: 435/500 above the 560px edge, '
+                            'detector basis) — every >560px film is expected to diverge (Ruling U). '
                             'Expected outcome, NOT a stop condition; the finding surface is the '
                             'PARTITION CHECK (>560 diverging, <=560 clean) — a violation in '
                             'EITHER direction changes Ruling U and exits loudly.'),
@@ -235,7 +243,7 @@ print('run manifest:', sys.argv[1])
 PYMAN
 
 echo "=== FILMS-500 RUN: LI N${LI_INSTANCES}xT${LI_TENV} -> RR M${M_TOKENS}xT${RR_TENV}; C=$BLAST_C; N=$N_MEASURED; passes=$PASSES; seq_n=$SEQ_N; gate3=$GATE3_RUN_ID; liveness=$LIVENESS_MIN -> $OUT ===" | tee -a "$LOG"
-echo "=== EXPECTATION (ruled, stated before the run): gate 3 FAILS on most films — every >560px film is expected to diverge (Ruling U). The failing list will be LONG. Not a stop condition. The partition check at the end is the finding surface. ===" | tee -a "$LOG"
+echo "=== EXPECTATION (ruled, stated before the run): gate 3 FAILS on ~433 of 498 measured films (landed manifest: 435/500 above the 560px edge, detector basis) — every >560px film is expected to diverge (Ruling U). The failing list will be LONG. Not a stop condition. The partition check at the end is the finding surface. ===" | tee -a "$LOG"
 
 echo "--- 0. corpus verify (read-only, full sha256) ---" | tee -a "$LOG"
 run "$PY" working/video/fetch_ami_video.py --verify --manifest "$VIDEO_MANIFEST" --corpus-dir "$CORPUS_DIR"

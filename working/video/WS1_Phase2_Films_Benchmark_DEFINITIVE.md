@@ -285,18 +285,22 @@ difference in the deployments is precisely what a benchmark of two
 deployed frameworks measures. Gate 3's strict verdict is CORRECT and
 stands: 27 films FAIL, 8 films PASS.
 
-**How general is the 560px boundary?** Within our 35, 27 films (77%)
-sit above it — but that fraction is selection-weighted (duration×bytes
-strata over her corpus), not an estimate of the archive. **Her sealed
-500-film manifest records no resolution** (its per-film contract carries
-duration, bytes/sha, frames_counted, nominal_fps, license, audio —
-`team_docs_received/ARCHIVE_FILMS.md` §3 — and our subset builder
-consumed no dimension field), so the corpus-wide fraction above 560px is **not derivable from
-any artifact we hold**. Establishing it would take one read-only header
-probe over her 500 S3 objects (or her census EDA, if it captured
-dimensions — unverified). Until then, the finding's scope is: every
-measured film above 560px diverged, every one at or below did not, on
-this subset.
+**How general is the 560px boundary? MEASURED at the corpus
+(2026-09-04, superseding this paragraph's original "not derivable"
+claim): 435 of 500 films — 87% — sit above the edge on the detector
+basis**, from our own landed `films500_video_manifest.jsonl` (the
+500-campaign decode pass: dual-dimension census, dimension control
+passed against this document's committed census, and
+container == detector on all 500 — no SAR source blurs the basis).
+Within our 35, 27 (77%) sat above it: the subset, selection-weighted
+by duration×bytes strata, **under-represented the divergence-prone
+class**. Ruling V stands as reasoned — the 500-header probe over her
+S3 objects was still correctly NOT run; the number arrived from the
+decode pass the 500 campaign needed anyway, measured on our own
+artifact. The finding's measured scope: on the 35, every film above
+560px diverged and every one at or below did not; the 500 campaign's
+partition check tests the same prediction on its 433 measured films
+above the edge.
 
 **Where the §6 evidence lives** (provenance pass re-run 2026-09-02):
 the Leagues A==B==C parity and detect-text artifacts are COMMITTED
