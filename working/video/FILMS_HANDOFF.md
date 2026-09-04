@@ -39,6 +39,22 @@
 > (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
 > walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
 > pin, so the >560px fraction stays non-derivable).
+> **500-MANIFEST BUILT (2026-09-04) — census on the box, landing = next
+> STOP (sequence step 3)**: n=500 (498 measured + 2 warm), warm DERIVED
+> = yanks_are_coming + zontar_the_thing_from_venus (corpus minus her
+> per_doc measured set — our 498 ≡ hers by construction, diff=0; the
+> v3 bake had the wrong two films AND a title-column name, caught by
+> the guard, fixed in v4 sha 124fc5ef with the mirror file
+> films500_her_measured_set.txt); **total_frames=162,511** (est. was
+> 161,940, +0.35%); **footage=675.73 h** (hers probed 674.75);
+> **>560px on the DETECTOR basis: 435/500 = 87%** — the corpus-wide
+> fraction Ruling V could not derive, now measured from OUR artifact
+> (subset was 77%; expected gate-3 failing list ≈ 433/498 measured);
+> **container≠detector: 0/500 — NO SAR sources in the corpus**, first
+> held evidence, both dimension bases coincide corpus-wide. Both null
+> controls re-passed in the full assemble (37/37 counts+shas; 35/35
+> census dimensions). Manifest box-side, uncommitted — entry-26
+> landing before staging.
 > **MANIFEST RUN-1 FAILED ON A NONEXISTENT TOOL (2026-09-04, owned;
 > register entry 31)**: v1's width/height feature called ffprobe —
 > imageio_ffmpeg ships NONE (box binaries dir: ffmpeg-linux-x86_64-v7.0.2
