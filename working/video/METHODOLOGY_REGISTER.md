@@ -1172,3 +1172,36 @@ than rewritten from memory, which is entry 2's point in miniature.
 > discovery that re-poses it. (Entry 25's read-back principle, applied
 > to instruments: the read-back is half the measurement — here it was
 > the half that saved the other half.)
+
+## 31. A measured absence, unapplied at the site that needed it — and a new tool with no startup check (added 2026-09-04)
+
+> The box has no host ffmpeg and no ffprobe; imageio_ffmpeg's bundled
+> binary is the only decode path. That absence was measured long ago and
+> is written into the campaign's PRACTICE everywhere — every probe and
+> fetch tool resolves `imageio_ffmpeg.get_ffmpeg_exe()` precisely because
+> nothing else exists. Then the 500-manifest builder gained a
+> width/height feature that called `ffprobe` beside the bundled ffmpeg,
+> and the run failed 500 times out of 500 — including on films with
+> committed byte-parity artifacts — before being killed. The uniformity
+> was the tell (Ansh's diagnosis, confirmed from the binaries dir): a
+> codec problem is partial; a 100% failure spanning known-good files is a
+> missing binary.
+>
+> Two defects, both process: (1) a recorded fact was not applied at the
+> site that needed it — kin to entry 23, where the rule existed but lived
+> where the surprised reader never stands; here the fact lived in
+> practice and in memory, and the NEW code was written as if on a machine
+> with ffprobe. (2) The campaign's own convention is that a new tool
+> dependency gets a STARTUP check — this one had none, so the impossible
+> call burned through 300 films repeating itself instead of refusing once
+> with the tool named.
+>
+> The rules: **new code inherits the environment's measured absences,
+> not the author's home machine; and every new tool dependency refuses at
+> startup, by name, before the first item is attempted.** The fix (v2)
+> also collected the masked debt: the null control on the 35 knowns —
+> the entire reason to trust the 500 manifest — had never executed once,
+> and now runs as its own gated pre-step (KNOWNS_ONLY=1) before the 500
+> are attempted. Replacement mechanism proven before adoption: the pinned
+> package's own header meta (read_frames first yield) matched the
+> committed census exactly on three knowns spanning the 560px edge.

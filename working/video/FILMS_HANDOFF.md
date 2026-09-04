@@ -39,6 +39,21 @@
 > (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
 > walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
 > pin, so the >560px fraction stays non-derivable).
+> **MANIFEST RUN-1 FAILED ON A NONEXISTENT TOOL (2026-09-04, owned;
+> register entry 31)**: v1's width/height feature called ffprobe —
+> imageio_ffmpeg ships NONE (box binaries dir: ffmpeg-linux-x86_64-v7.0.2
+> alone); 500/500 DIMENSIONS FAILED incl. byte-parity-proven films; the
+> masked debt: the NULL CONTROL had never executed. Fetch itself had
+> COMPLETED (500 present). Builder v2 (sha bfd28864): dimensions +
+> duration from the PINNED binary's own header meta
+> (imageio_ffmpeg.read_frames first yield; _io.py:301-302 +
+> _parsing.py:180,:199-205), PROVEN against the committed census on
+> three knowns spanning the edge (Leagues 320x240, House 714x480,
+> JailBait 560x380 — exact; House duration cross-checks the films
+> manifest to 0.2 s); FAIL-FAST startup check (the mechanism runs once
+> before any worker; a missing tool refuses by name, never 500 times);
+> KNOWNS_ONLY=1 null-control pre-run (35 knowns, writes *.nullcheck
+> only, parts reused by the full run) — ruled to pass BEFORE the 500.
 > **FETCH RUN-1 DIED TO THE IDLE WATCHDOG (2026-09-03→04, owned)**: the
 > failure Leela's runbook names; v1 had no keepalive. Survived clean:
 > 105/500 verified (34 hardlinked + 71 fetched, 54.9 GB), ZERO partials
