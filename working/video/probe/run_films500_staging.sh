@@ -53,8 +53,18 @@ mkdir -p "$OUT"
 [ -d "$PDF_CORPUS" ] || { echo "NOT DONE — PDF_CORPUS=$PDF_CORPUS not a directory"; exit 1; }
 [ -d "$CORPUS_DIR" ] || { echo "NOT DONE — $CORPUS_DIR missing (fetch_films500.sh first)"; exit 1; }
 
-echo "== 0a. full sha256 verify + corpus_dir stamp on the 500 manifest (T item 5 form) =="
-"$PY" working/video/fetch_ami_video.py --stamp-corpus-dir --corpus-dir "$CORPUS_DIR" --manifest "$MANIFEST"
+echo "== 0a. corpus stamp/verify (2026-09-04: the full 263 GB sha pass ran >=7 h and fed the watchdog; a re-run must not re-pay it) =="
+if "$PY" -c "
+import json, sys
+meta = next(json.loads(l)['_meta'] for l in open('$MANIFEST') if '\"_meta\"' in l)
+sys.exit(0 if meta.get('corpus_dir') == '$CORPUS_DIR' else 1)" 2>/dev/null; then
+  echo "  stamp already present and matches $CORPUS_DIR (written after a completed full verify);"
+  echo "  running the fast size-only census instead (fail-closed; delete the stamp to force the full pass)"
+  "$PY" working/video/fetch_ami_video.py --manifest "$MANIFEST" --corpus-dir "$CORPUS_DIR"
+else
+  echo "  no stamp for $CORPUS_DIR — FIRST-TIME full sha256 verify + stamp (hours; single pass, by design)"
+  "$PY" working/video/fetch_ami_video.py --stamp-corpus-dir --corpus-dir "$CORPUS_DIR" --manifest "$MANIFEST"
+fi
 
 echo "== 0b. staged 2-row manifest (verbatim rows from the 500 manifest; span check fail-closed) =="
 "$PY" - "$MANIFEST" "$STAGING_MANIFEST" "$CONTROL" "$EXPECTED_DIVERGER" <<'PYSM'

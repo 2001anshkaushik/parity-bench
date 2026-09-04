@@ -119,12 +119,36 @@ fi
 CORPUS_DIR="${LOC_OUT%%$'\n'*}"; CORPUS_SRC="${LOC_OUT#*$'\n'}"
 [ -d "$CORPUS_DIR" ] || { echo "NOT DONE — CORPUS_DIR=$CORPUS_DIR is not a directory"; exit 1; }
 
+# PLAN-LEVEL LOCK (2026-09-04, after two concurrent campaigns started):
+# driver locks are per-arm; nothing stopped two whole plans. flock is held
+# for this process's lifetime and released on any death — no stale locks.
+LOCK="$HOME/.films500_plan.lock"
+exec 9>"$LOCK"
+if ! flock -n 9; then
+  echo "NOT DONE — another run_plan_films500 is ALIVE; two campaigns on one"
+  echo "corpus would collide over containers and ports at the first leg."
+  pgrep -af run_plan_films500.sh | grep -v "^$$ " | head -3 | sed 's/^/  other: /'
+  [ -f "$HOME/.films500_plan.current" ] && echo "  its run dir: $(cat "$HOME/.films500_plan.current" | cut -d' ' -f2-)"
+  exit 1
+fi
+
 OUT="working/video/results/films500_mainrun_$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$OUT"
+echo "$$ $OUT" > "$HOME/.films500_plan.current"
 LOG="$OUT/run_plan_films500.log"
+echo "plan lock held (pid $$); run dir $OUT" | tee -a "$LOG"
 echo "corpus: manifest=$VIDEO_MANIFEST corpus_dir=$CORPUS_DIR [$CORPUS_SRC]" | tee -a "$LOG"
-echo "MIRROR: launch beside this run —" | tee -a "$LOG"
-echo "  box.sh launch mirror500 'bash ~/parity-bench-video/working/video/probe/mirror_films500.sh $PWD/$OUT'" | tee -a "$LOG"
+
+# MIRROR SELF-LAUNCHED (2026-09-04, after the placeholder paste killed it):
+# no copy step, no placeholder — the plan starts the mirror against its own
+# out dir. Safe by the mirror's own contract: it stops on the MIRROR_STOP
+# sentinel (touched by this plan at completion) or when the run dir
+# vanishes; if the plan dies mid-run the mirror KEEPS syncing — that
+# resilience is the point.
+if [ "$PREFLIGHT_ONLY" != "1" ]; then
+  nohup bash working/video/probe/mirror_films500.sh "$PWD/$OUT" > "$OUT/mirror.log" 2>&1 &
+  echo "MIRROR self-launched (pid $!) -> ansh/films500-live-$(basename "$OUT")/; stops on $OUT/MIRROR_STOP" | tee -a "$LOG"
+fi
 
 run() {  # run_plan.sh:166-172 form — ${PIPESTATUS[0]}, never $?
   echo "+ $*" | tee -a "$LOG"
@@ -245,8 +269,52 @@ PYMAN
 echo "=== FILMS-500 RUN: LI N${LI_INSTANCES}xT${LI_TENV} -> RR M${M_TOKENS}xT${RR_TENV}; C=$BLAST_C; N=$N_MEASURED; passes=$PASSES; seq_n=$SEQ_N; gate3=$GATE3_RUN_ID; liveness=$LIVENESS_MIN -> $OUT ===" | tee -a "$LOG"
 echo "=== EXPECTATION (ruled, stated before the run): gate 3 FAILS on ~433 of 498 measured films (landed manifest: 435/500 above the 560px edge, detector basis) — every >560px film is expected to diverge (Ruling U). The failing list will be LONG. Not a stop condition. The partition check at the end is the finding surface. ===" | tee -a "$LOG"
 
-echo "--- 0. corpus verify (read-only, full sha256) ---" | tee -a "$LOG"
-run "$PY" working/video/fetch_ami_video.py --verify --manifest "$VIDEO_MANIFEST" --corpus-dir "$CORPUS_DIR"
+# STEP 0 REDESIGNED (2026-09-04): the full 263 GB single-threaded sha pass
+# ran >=7 h without finishing and fed the idle watchdog — and it guarded a
+# risk already retired twice (the fetch verified all 500 MISMATCHED=0; the
+# staging full-verified again and STAMPED the corpus dir; nothing writes
+# these files between runs). Default = FAST, still fail-closed on every
+# real mismatch class: stamp (enforced by corpus_locator above) + a full
+# stat census (all 500 present, size == manifest bytes) + a DETERMINISTIC
+# 5-film full-sha spot check (sorted indices 0, n/4, n/2, 3n/4, n-1).
+# FULL_VERIFY=1 runs the complete sha pass, parallel (12 workers).
+# The log states which mode ran.
+if [ "${FULL_VERIFY:-0}" = "1" ]; then
+  echo "--- 0. corpus check: FULL SHA mode (parallel x12; FULL_VERIFY=1) ---" | tee -a "$LOG"
+  run bash -c "\"$PY\" -c \"
+import json, sys
+for line in open('$VIDEO_MANIFEST'):
+    r = json.loads(line)
+    if 'file' in r: print(r['sha256'] + '  $CORPUS_DIR/' + r['file'])
+\" > /tmp/f500.sums && split -n l/12 /tmp/f500.sums /tmp/f500.sums. && ls /tmp/f500.sums.* | xargs -P 12 -I{} sha256sum -c --quiet {} && echo 'FULL SHA: 500/500 verified'"
+else
+  echo "--- 0. corpus check: FAST mode (stamp + full stat census + 5-film sha spot; FULL_VERIFY=1 for the full pass) ---" | tee -a "$LOG"
+  run "$PY" - "$VIDEO_MANIFEST" "$CORPUS_DIR" <<'PYV'
+import json, sys, os, hashlib
+manifest, corpus = sys.argv[1], sys.argv[2]
+rows = [json.loads(l) for l in open(manifest) if '"file"' in l]
+bad = []
+for r in rows:
+    p = os.path.join(corpus, r['file'])
+    if not os.path.exists(p): bad.append((r['file'], 'MISSING')); continue
+    sz = os.path.getsize(p)
+    if sz != r['bytes']: bad.append((r['file'], f"size {sz} != {r['bytes']}"))
+if bad:
+    print(f'NOT DONE — stat census failed on {len(bad)} file(s): {bad[:5]}'); raise SystemExit(1)
+print(f'stat census: {len(rows)}/{len(rows)} present, every size matches the manifest')
+srt = sorted(rows, key=lambda r: r['file'])
+picks = [srt[i] for i in (0, len(srt)//4, len(srt)//2, 3*len(srt)//4, len(srt)-1)]
+for r in picks:
+    h = hashlib.sha256()
+    with open(os.path.join(corpus, r['file']), 'rb') as f:
+        for chunk in iter(lambda: f.read(1 << 22), b''): h.update(chunk)
+    if h.hexdigest() != r['sha256']:
+        print(f"NOT DONE — SPOT SHA MISMATCH: {r['file']}"); raise SystemExit(1)
+    print(f"  spot sha OK: {r['file']}")
+print('corpus check FAST mode PASS (fail-closed: census + 5 spot shas; '
+      'stamp enforced by corpus_locator; FULL_VERIFY=1 for the complete pass)')
+PYV
+fi
 
 echo "--- 1. LlamaIndex N16xT2 ---" | tee -a "$LOG"
 start_rr unset
@@ -385,8 +453,9 @@ m['completed_utc'] = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
 json.dump(m, open(sys.argv[1], 'w'), indent=1)
 PYDONE
 
+touch "$OUT/MIRROR_STOP"
 echo "=== FILMS-500 RUN COMPLETE (cross_fail=$CROSS_FAIL [expected], partition_rc=$PARTITION_RC) — $OUT ===" | tee -a "$LOG"
-echo "Touch $OUT/MIRROR_STOP to end the mirror after the final sync." | tee -a "$LOG"
+echo "MIRROR_STOP touched — the self-launched mirror does its final sync and exits within one cycle." | tee -a "$LOG"
 echo "ENTRY 26 STOP-AND-LAND: the box commits $OUT and bundles; no laptop push onto this base until ls-remote confirms." | tee -a "$LOG"
 if [ "$PARTITION_RC" != "0" ]; then
   echo "*** PARTITION VIOLATION (rc=$PARTITION_RC) — THIS CHANGES RULING U ***" | tee -a "$LOG"

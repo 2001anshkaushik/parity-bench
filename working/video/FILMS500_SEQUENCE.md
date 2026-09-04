@@ -23,18 +23,27 @@ idle watchdog — the failure Leela's runbook names and v1 omitted)**:
 any near-idle long step carries a BOUNDED, SELF-TERMINATING keepalive
 (N × `timeout <s> md5sum /dev/zero`, no respawn parent — the unbounded
 respawning form contaminated the 18-Aug measured runs and is banned).
-Who needs one, ruled by CPU profile with evidence:
-- **fetch (step 1): YES** — hours of near-idle network wait; v2 carries
-  a 7200 s keepalive and 12 parallel workers (run-1 measured ~11–20
-  MB/s effective single-stream; parallel projects ~10–25 min).
-- **manifest decode (step 2): NO** — P=12 ffmpeg pegs 12 cores
-  throughout.
-- **staging (step 4) and campaign legs (step 6): NO** — detect keeps
-  lanes busy, the engine's own idle burn floors CPU at 4.66 cores
-  whenever rr is up, and the 35-campaign's 9.6 h overnight run never
-  tripped the watchdog (measured evidence).
-- **mirror (step 6, beside the campaign): NO** — it rides a busy box
-  and exits on its sentinel after the final sync.
+Who needs one, RE-RULED 2026-09-04 with the new measurement (the plan's
+step-0 full sha pass — 263 GB single-threaded, low CPU — ran ≥7 h
+unfinished and the watchdog killed the box; the earlier fetch-only
+ruling's evidence covered the 35-campaign profile, not 500-scale
+step 0):
+- **fetch (step 1): YES** — v2 carries a 7200 s bounded keepalive + 12
+  parallel workers.
+- **step 0 / staging 0a corpus verify: the tax is DELETED, not
+  kept-alive** — step 0 defaults to FAST (stamp + full stat census +
+  5-film sha spot, seconds; `FULL_VERIFY=1` for the parallel full
+  pass, CPU-heavy so self-protecting); staging 0a re-runs go size-only
+  when the stamp is present (the stamp was written after a completed
+  full verify) and only a FIRST-TIME stamp pays the full pass.
+- **manifest decode (step 2): NO** — P=12 ffmpeg pegs 12 cores.
+- **staging legs and campaign legs: NO** — detect keeps lanes busy,
+  rr's idle burn floors CPU at 4.66 cores when up, and the
+  35-campaign's 9.6 h overnight never tripped the watchdog (measured).
+- **mirror: NO** — rides a busy box; exits on its sentinel.
+No remaining step has a low-CPU stretch long enough to trip the
+watchdog; the keepalive stays fetch-only because everything else
+either burns CPU or now finishes in seconds.
 
 | # | step | how | mark |
 |---|---|---|---|
@@ -43,8 +52,8 @@ Who needs one, ruled by CPU profile with evidence:
 | 2 | Cut the 500 manifest (frames through pinned ffmpeg `e7e7fb30`, fps=1/15, P=12; width/height recorded — the partition check's basis and, for the first time, a held artifact the corpus-wide >560px fraction derives from; warm split = her last-2 convention, 498+2 matching her measured set; NULL CONTROL: the 35 knowns must reproduce the committed subset manifest or REFUSE) | `box.sh launch manifest500 'bash ~/parity-bench-video/working/video/probe/build_films500_manifest.sh'`; watch `box.sh tail manifest500` | **STOP** — read census (n=500 = 498+2, total_frames, footage h, >560px count) + the null-control line; **WALK-AWAY** (~0.5–2.5 h, self-calibrating) |
 | 3 | Land the manifest (box commits `films500_video_manifest.jsonl` + bundles; laptop lands, entry 26) | box commit via `box.sh run`, bundle, laptop fetch/verify/push | **STOP** — laptop re-reads the census from the landed file |
 | 4 | Staging (arming spans 560px: Leagues ≤560 control judged by the proven deriver; House >560 divergence EXPECTED and recorded; LIVENESS_MIN = Ruling-R formula over BOTH; golden REUSED in compare mode) | `box.sh launch stage500 'bash ~/parity-bench-video/working/video/probe/run_films500_staging.sh'`; watch `box.sh tail stage500` | **STOP** — read arming.json (armed, span basis, control verdict, diverger census, liveness_min); a NON-diverging House is itself a flag to Ansh; ~45–75 min |
-| 5 | Preflight-only pass of the plan (~15 min, wiring + read-backs, nothing measured) | `box.sh run 'cd ~/parity-bench-video && PREFLIGHT_ONLY=1 bash working/video/run_plan_films500.sh'` | **STOP** — read the preflight lines |
-| 6 | THE CAMPAIGN with the mirror beside it | `box.sh launch films500 'cd ~/parity-bench-video && bash working/video/run_plan_films500.sh'`; then read the OUT dir from `box.sh tail films500` and `box.sh launch mirror500 'bash ~/parity-bench-video/working/video/probe/mirror_films500.sh <OUT_abs_path>'` | **WALK-AWAY** (~20–22 h; mirror syncs every 300 s to `ansh/films500-live-<stamp>/`); periodic `box.sh tail films500` |
+| 5 | Preflight-only pass of the plan (~15 min: FAST step 0 in seconds + wiring/read-backs, nothing measured). MUST EXIT before step 6 — the plan-level lock refuses a second live plan, so an overlap is impossible rather than merely forbidden | `box.sh launch preflight500 'cd ~/parity-bench-video && PREFLIGHT_ONLY=1 bash working/video/run_plan_films500.sh'`; `box.sh tail preflight500` until `PREFLIGHT_ONLY COMPLETE` | **STOP** — read the preflight lines; confirm the process EXITED (`box.sh ps`) |
+| 6 | THE CAMPAIGN — the mirror is SELF-LAUNCHED by the plan against its own out dir (no copy step, no placeholder; it stops on the MIRROR_STOP sentinel the plan touches at completion, and if the plan dies mid-run the mirror keeps syncing — that is the point) | `box.sh launch films500 'cd ~/parity-bench-video && bash working/video/run_plan_films500.sh'` | **WALK-AWAY** (~20–22 h; live sync every 300 s to `ansh/films500-live-<stamp>/`); periodic `box.sh tail films500` |
 | 7 | Land + read | `box.sh run 'touch <OUT>/MIRROR_STOP'`; box commits OUT + bundles (entry-26 STOP-AND-LAND); laptop lands; partition_check.json is the first read | **STOP** — partition verdict first, then throughput, then the $/1k row |
 
 **Projected wall (from measured films-35 rates; ~161,940 frames at
