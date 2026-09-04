@@ -82,7 +82,9 @@ assert meta['corpus_manifest_sha256'].startswith('bd0c915e'), \
 assert meta['n_measured'] == 498 and meta['n_warm'] == 2, \
     f"NOT DONE — split {meta['n_measured']}+{meta['n_warm']} != 498+2"
 print(f"manifest meta OK: n={meta['n_files']} ({meta['n_measured']}+{meta['n_warm']}), "
-      f"frames={meta['total_frames']}, >560px {meta['n_above_560px']}/{meta['n_files']}")
+      f"frames={meta['total_frames']}, >560px(detector) "
+      f"{meta['n_above_560px_detector_basis']}/{meta['n_files']}, "
+      f"container!=detector: {meta['n_container_detector_mismatch']}")
 PYMF
 
 ARM_OUT="$("$PY" - "$ARMING" <<'PYARM'
@@ -313,7 +315,7 @@ dims = {}
 for line in open(manifest):
     r = json.loads(line)
     if 'file' in r:
-        dims[r['file']] = max(r['width'], r['height'])
+        dims[r['file']] = max(r['detector_width'], r['detector_height'])
 checks = []
 for cp in sorted(glob.glob(os.path.join(out, 'cross_parity_blast*.json'))):
     c = json.load(open(cp))

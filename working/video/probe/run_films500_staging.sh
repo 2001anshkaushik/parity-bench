@@ -68,7 +68,7 @@ for name, kind in ((control, 'control'), (diverger, 'expected-diverger')):
     r = rows.get(name)
     if r is None:
         print(f'REFUSE — staged film not in the 500 manifest: {name}'); raise SystemExit(3)
-    long_edge = max(r['width'], r['height'])
+    long_edge = max(r['detector_width'], r['detector_height'])
     if kind == 'control' and long_edge > 560:
         print(f'REFUSE — control {name} long edge {long_edge} > 560'); raise SystemExit(3)
     if kind == 'expected-diverger' and long_edge <= 560:
@@ -82,7 +82,7 @@ with open(dst, 'w') as f:
     f.write(json.dumps(smeta) + '\n')
     for r in sel: f.write(json.dumps(r) + '\n')
 print(f'staging manifest: {dst} — ' + '; '.join(
-    f"{r['file']} {r['width']}x{r['height']} ({r['staging_kind']})" for r in sel))
+    f"{r['file']} {r['detector_width']}x{r['detector_height']} ({r['staging_kind']})" for r in sel))
 PYSM
 "$PY" working/video/fetch_ami_video.py --verify --manifest "$STAGING_MANIFEST" --corpus-dir "$CORPUS_DIR"
 
