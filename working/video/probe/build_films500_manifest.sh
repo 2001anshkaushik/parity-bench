@@ -203,10 +203,25 @@ if mode == 'nullcheck':
         for r in rows: f.write(json.dumps(r) + '\n')
     print(f'nullcheck manifest: {out} (the real manifest was NOT written)')
     raise SystemExit(0)
-WARM = {'submarine_alert.mp4', 'DominiqueIsDead1978.mp4'}
-missing_warm = WARM - {r['file'] for r in rows}
-if missing_warm:
-    print(f'REFUSE — designated warm films not in corpus: {missing_warm}'); raise SystemExit(3)
+# WARM PAIR DERIVED, NEVER BAKED (v4, 2026-09-04, after the baked-name
+# refuse): warm = (this corpus's 500) MINUS (her measured 498, mirrored
+# from her committed per_doc at pin 3967d9f4 into
+# films500_her_measured_set.txt). The v3 bake took the set file's
+# title column and the wrong two films besides (her convention is
+# sorted-last-two, not queue-tail); deriving from her run's own records
+# makes our measured 498 equal hers BY CONSTRUCTION (verified: diff=0).
+her_path = 'working/video/films500_her_measured_set.txt'
+her = {l.strip() for l in open(her_path) if l.strip() and not l.startswith('#')}
+if len(her) != 498:
+    print(f'REFUSE — her measured mirror has {len(her)} names, expected 498 ({her_path})'); raise SystemExit(3)
+files = {r['file'] for r in rows}
+not_in_corpus = her - files
+if not_in_corpus:
+    print(f'REFUSE — her measured set names {len(not_in_corpus)} film(s) not in this corpus: {sorted(not_in_corpus)[:5]}'); raise SystemExit(3)
+WARM = files - her
+if len(WARM) != 2:
+    print(f'REFUSE — corpus minus her measured = {len(WARM)} film(s), expected exactly 2: {sorted(WARM)[:5]}'); raise SystemExit(3)
+print(f'warm pair DERIVED (corpus - her measured): {sorted(WARM)}')
 for r in rows:
     r['role'] = 'warm' if r['file'] in WARM else 'measured'
 rows.sort(key=lambda r: (r['role'] == 'warm', r['file']))
@@ -222,7 +237,8 @@ meta = {'_meta': {'corpus_manifest_sha256':
                               'defined on. The PARTITION uses detector_*. Knowns verified '
                               'against the census by the dimension control.'),
         'interval_s': 15, 'n_files': len(rows), 'n_measured': n_meas, 'n_warm': len(WARM),
-        'warm_rule': 'last 2 of the frozen queue order (her driver convention; matches her 498+2 split)',
+        'warm_rule': ('DERIVED at build: corpus 500 minus her measured 498 (her committed films500 per_doc @3967d9f4, mirrored as films500_her_measured_set.txt) — our measured set equals hers by construction'),
+        'warm_films': sorted(WARM),
         'total_frames': sum(r['expected_frames_measured'] for r in rows),
         'total_video_s': sum(r['video_s'] or 0 for r in rows),
         'n_above_560px_detector_basis': len(above),
