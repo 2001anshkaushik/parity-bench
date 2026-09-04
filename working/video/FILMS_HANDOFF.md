@@ -39,6 +39,24 @@
 > (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
 > walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
 > pin, so the >560px fraction stays non-derivable).
+> **FETCH RUN-1 DIED TO THE IDLE WATCHDOG (2026-09-03→04, owned)**: the
+> failure Leela's runbook names; v1 had no keepalive. Survived clean:
+> 105/500 verified (34 hardlinked + 71 fetched, 54.9 GB), ZERO partials
+> (every present file matches manifest bytes; resume skips verified
+> files by construction — first branch). Measured single-stream ~11–20
+> MB/s (54.9 GB in ≤85 min, bracketed from transcript + boot record;
+> per-file mtimes useless — aws cp stamps S3 LastModified, so v2 prints
+> its own per-file walls). fetch v2 (sha 60026bf5): BOUNDED
+> self-terminating keepalive (2× timeout-7200 md5sum /dev/zero, NO
+> respawn — the 18-Aug contamination form banned; expiry printed;
+> killed on success) + 12 parallel workers with the per-file surface
+> identical (skip-verified/hardlink/cp+sha), per-file timing printed,
+> census from a results log + presence sweep; projected ~10–25 min for
+> the remaining ~197 GB. Keepalive ruling recorded in the sequence:
+> fetch ONLY (manifest pass pegs 12 cores; staging/legs detect-busy +
+> rr idle floor 4.66 cores + the 35-campaign's 9.6 h never tripped it;
+> mirror rides a busy box). Bonus: the wrapper's refusal list fired on
+> a READ (`last -x shutdown`) — worked as designed, command rephrased.
 > **FILMS-500 SCOPE RULED + PLAN BUILT (2026-09-03)**: cells = RR M16xT2
 > + LI N16xT2 ONLY, 498 measured, 2 blast passes; DEFAULT SKIPPED
 > (ruled reasoning baked in the plan: ~19 h/pass re-answers a question

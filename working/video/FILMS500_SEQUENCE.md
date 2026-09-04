@@ -18,6 +18,24 @@ FAILS on the majority — every >560px film is expected to diverge
 Every box action through `working/harness/box.sh` (proven; transcript =
 evidence surface). Scripts committed, self-printed sha256.
 
+**KEEPALIVE RULE (added 2026-09-04 after the fetch died to the box's
+idle watchdog — the failure Leela's runbook names and v1 omitted)**:
+any near-idle long step carries a BOUNDED, SELF-TERMINATING keepalive
+(N × `timeout <s> md5sum /dev/zero`, no respawn parent — the unbounded
+respawning form contaminated the 18-Aug measured runs and is banned).
+Who needs one, ruled by CPU profile with evidence:
+- **fetch (step 1): YES** — hours of near-idle network wait; v2 carries
+  a 7200 s keepalive and 12 parallel workers (run-1 measured ~11–20
+  MB/s effective single-stream; parallel projects ~10–25 min).
+- **manifest decode (step 2): NO** — P=12 ffmpeg pegs 12 cores
+  throughout.
+- **staging (step 4) and campaign legs (step 6): NO** — detect keeps
+  lanes busy, the engine's own idle burn floors CPU at 4.66 cores
+  whenever rr is up, and the 35-campaign's 9.6 h overnight run never
+  tripped the watchdog (measured evidence).
+- **mirror (step 6, beside the campaign): NO** — it rides a busy box
+  and exits on its sentinel after the final sync.
+
 | # | step | how | mark |
 |---|---|---|---|
 | 0 | Box up + repo current | `box.sh run --start 'git -C ~/parity-bench-video pull --ff-only && git -C ~/parity-bench-video rev-parse HEAD'` | **STOP** — HEAD must be this commit |
