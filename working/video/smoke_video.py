@@ -317,10 +317,39 @@ async def _send_video(video: Path, port: int) -> dict:
     return drv.record_from_rr(result)
 
 
+def golden_same_input(gold: dict, fresh: dict):
+    """Entry-14 gate, extracted so a null control can fire on it: a
+    comparator that cannot prove same-input has not found a difference.
+    Returns None when the inputs are the same bytes; otherwise the
+    CANNOT-COMPARE message naming BOTH shas — and the caller must stop:
+    no downstream regression/drift claim may be printed (2026-09-04:
+    the second instrument this campaign to talk past its own refusal —
+    register entry 32)."""
+    if gold.get('video_sha16') == fresh['video_sha16']:
+        return None
+    return (f"CANNOT COMPARE — golden records {gold.get('video')} "
+            f"video_sha16={gold.get('video_sha16')}, presented file "
+            f"{fresh['video']} hashes {fresh['video_sha16']}: not the same "
+            f"input; no regression or drift claim is possible (entry 14)")
+
+
+def _golden_verdict_null_control():
+    bad = golden_same_input({'video': 'a', 'video_sha16': 'x' * 16},
+                            {'video': 'b', 'video_sha16': 'y' * 16})
+    assert bad is not None and 'CANNOT COMPARE' in bad \
+        and 'REGRESSION' not in bad, bad
+    ok = golden_same_input({'video': 'a', 'video_sha16': 'z' * 16},
+                           {'video': 'a', 'video_sha16': 'z' * 16})
+    assert ok is None, ok
+    say('  null control (golden verdict): sha mismatch -> CANNOT COMPARE '
+        'with both shas, no regression text; same-input -> passes through')
+
+
 def check_golden(golden_path: Path, video: Path, port: int, write: bool,
                  rr_container: str) -> dict:
     say(f'\nB. golden record — {video.name} through the measured pipe '
         f'({"WRITE mode" if write else "compare"})')
+    _golden_verdict_null_control()
     rec = asyncio.run(_send_video(video, port))
     # WRITTEN_UNDER (2026-08-22, added before the golden was first created).
     # The golden pins the measured pipe's ENTIRE output for one video. Without
@@ -350,8 +379,10 @@ def check_golden(golden_path: Path, video: Path, port: int, write: bool,
         fail(f'no golden at {golden_path} — create once with --write-golden after the probe')
         return {'error': 'golden missing'}
     gold = json.loads(golden_path.read_text())
-    if gold.get('video_sha16') != fresh['video_sha16']:
-        fail('golden was recorded from a DIFFERENT video file (sha mismatch)')
+    cc = golden_same_input(gold, fresh)
+    if cc is not None:
+        fail(cc)
+        return {'golden': str(golden_path), 'verdict': 'CANNOT_COMPARE'}
     d = gs.determinism_repeat(gold.get('chunk_sha256') or [], fresh['chunk_sha256'])
     if d['PASS'] is not True:
         # Name the conditions that moved, so a mismatch is a diagnosis and not a
@@ -553,15 +584,53 @@ def main() -> int:
         out['image_identity'] = check_image_identity(args.rr_container, Path(args.pdf_corpus))
 
     golden_video = args.golden_video
-    if golden_video is None:
+    golden_skip = None
+    if golden_video is None and not args.write_golden and Path(args.golden).exists():
+        # PIN FROM THE ARTIFACT (2026-09-04): in compare mode the golden
+        # names its own film — the shortest-item selector is WRITE-time
+        # only. A derived selector moved with the corpus twice this
+        # campaign (the warm pair; this golden: the 35-corpus shortest was
+        # HouseOnBareMountain, the 500-corpus shortest is Blackie — the
+        # smoke compared the wrong film and then talked past its own sha
+        # refusal). The manifest sha is checked BEFORE the ~2-minute send:
+        # a mismatch is CANNOT COMPARE (entry 14), never a regression
+        # claim.
+        _gold_head = json.loads(Path(args.golden).read_text())
+        _gname = _gold_head.get('video')
+        _, rows = drv.load_manifest(Path(args.manifest))
+        _row = next((r for r in rows if r.get('file') == _gname), None)
+        if _gname is None or _row is None:
+            fail(f'golden film {_gname!r} not found in the manifest — '
+                 f'CANNOT COMPARE (the golden pins its own film; this corpus '
+                 f'does not carry it)')
+            golden_skip = {'verdict': 'CANNOT_COMPARE',
+                           'reason': f'golden film {_gname!r} not in manifest'}
+        elif _row['sha256'][:16] != _gold_head.get('video_sha16'):
+            fail(f'CANNOT COMPARE — golden records {_gname} '
+                 f'video_sha16={_gold_head.get("video_sha16")}, the manifest '
+                 f'carries sha256[:16]={_row["sha256"][:16]} for the same '
+                 f'name: not the same bytes; no regression or drift claim is '
+                 f'possible, and the send is skipped')
+            golden_skip = {'verdict': 'CANNOT_COMPARE',
+                           'golden_sha16': _gold_head.get('video_sha16'),
+                           'manifest_sha16': _row['sha256'][:16]}
+        else:
+            golden_video = str(Path(args.corpus_dir) / _gname)
+            say(f'\n(golden video: pinned by the golden record itself — '
+                f'{_gname}; manifest sha16 matches the golden)')
+    if golden_video is None and golden_skip is None:
         _, rows = drv.load_manifest(Path(args.manifest))
         measured = [r for r in rows if r['role'] == 'measured']
         shortest = min(measured, key=lambda r: r.get('video_s') or 1e9)
         golden_video = str(Path(args.corpus_dir) / shortest['file'])
         say(f'\n(golden video: shortest measured item {shortest["file"]} '
-            f'{shortest.get("video_s")}s)')
-    out['golden'] = check_golden(Path(args.golden), Path(golden_video),
-                                 args.rr_port, args.write_golden, args.rr_container)
+            f'{shortest.get("video_s")}s — WRITE-mode selection, recorded '
+            f'into the golden)')
+    if golden_skip is not None:
+        out['golden'] = golden_skip
+    else:
+        out['golden'] = check_golden(Path(args.golden), Path(golden_video),
+                                     args.rr_port, args.write_golden, args.rr_container)
     out['readbacks'] = check_readbacks(args)
     out['thread_pins'] = asyncio.run(check_pins(args))
 

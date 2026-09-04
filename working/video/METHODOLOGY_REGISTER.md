@@ -1205,3 +1205,36 @@ than rewritten from memory, which is entry 2's point in miniature.
 > are attempted. Replacement mechanism proven before adoption: the pinned
 > package's own header meta (read_frames first yield) matched the
 > committed census exactly on three knowns spanning the 560px edge.
+
+## 32. A comparator that keeps talking after its own refusal — second instance, and the derived-selector class beneath it (added 2026-09-04)
+
+> The films-500 staging smoke compared the golden against the WRONG film
+> — its golden video was DERIVED ("shortest measured item"), and the
+> corpus change moved the answer (35-corpus: HouseOnBareMountain; the
+> 500-corpus: ACloseCallForBostonBlackie). The sha check caught the
+> mismatch and said so. Then the instrument kept going: it diffed the
+> two films' chunk lists anyway and printed "this is a REGRESSION, not a
+> configuration drift" — a conclusion drawn PAST its own refusal. Entry
+> 14 states the discipline (a comparator that cannot prove same-input
+> has not found a difference); this campaign has now produced two
+> instruments that implemented the check and continued past it: the
+> films cross-gate printed FAIL while the same-frames premise was still
+> unproven (resolved by measurement and Ruling U — the verdict happened
+> to survive), and now the golden compare printed REGRESSION on
+> different inputs (the verdict was nonsense). The rule the recurrence
+> adds to entry 14: **the same-input gate is extracted as its own
+> function, the caller RETURNS at its refusal, and a null control
+> asserts both that the refusal fires on mismatched inputs naming BOTH
+> shas and that no downstream verdict text can be emitted with it** —
+> implemented in smoke_video.golden_same_input + its null control, which
+> runs on every smoke.
+>
+> Beneath it, the week's third derived-selector bite (warm pair; golden
+> film; and the ffprobe absence as kin): **a value that must match a
+> corpus is either pinned to a committed artifact or derived at run time
+> from one, refuse-if-absent — never derived from a property ("shortest",
+> "last two") of a thing that can move.** The golden now pins itself: in
+> compare mode the film comes FROM the golden record's own video field,
+> the manifest sha is checked against the golden's recorded sha BEFORE
+> the two-minute send, and the shortest-item selector survives only in
+> write mode, where it records its choice into the artifact it creates.

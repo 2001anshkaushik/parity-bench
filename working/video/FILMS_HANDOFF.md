@@ -39,6 +39,27 @@
 > (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
 > walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
 > pin, so the >560px fraction stays non-derivable).
+> **STAGING RUN-1 FAILED AT THE GOLDEN (2026-09-04, owned; register
+> entry 32)**: the golden video was DERIVED ("shortest measured item")
+> — 35-corpus shortest = House (the golden's film), 500-corpus shortest
+> = Blackie — so the smoke compared the WRONG film, and after its own
+> sha refusal still printed "REGRESSION, not configuration drift"
+> (entry-14 shape, second instrument this campaign to talk past its
+> refusal; the first was the cross-gate's provisional FAIL before the
+> same-frames proof). FIXED, not re-written: the golden PINS ITSELF —
+> compare mode takes the film from the golden record's own video field,
+> checks the landed manifest's sha256[:16] against the golden's
+> video_sha16 BEFORE the send (verified laptop-side: House
+> 82f43744c5348555 matches full500 exactly), CANNOT COMPARE with both
+> shas named and an early return on any mismatch, null control fires on
+> every smoke; the shortest-selector survives only in write mode. A
+> PASS now means the pipe is provably unchanged since the 35 sizing
+> campaign on the same bytes; a FAIL is a real regression worth
+> stopping for. DERIVED-SELECTOR SWEEP: warm pair (fixed v4), golden
+> (fixed now), staging span films PINNED+manifest-verified, PDF fixture
+> pinned, LIVENESS derived-by-ruling (intentional), seq-5 = first-5 of
+> manifest order — derived but harmless (no cross-campaign consumer;
+> gate 8 within-leg) — documented, accepted.
 > **500-MANIFEST BUILT (2026-09-04) — census on the box, landing = next
 > STOP (sequence step 3)**: n=500 (498 measured + 2 warm), warm DERIVED
 > = yanks_are_coming + zontar_the_thing_from_venus (corpus minus her
