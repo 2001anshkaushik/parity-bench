@@ -39,6 +39,25 @@
 > (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
 > walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
 > pin, so the >560px fraction stays non-derivable).
+> **RULING 2026-09-06: PARTITION FINAL, THROUGHPUT HEADLINE HELD** (n=2,
+> spreads 5.1/5.7% = the +5.9% effect; pairs overlap). DRIFT MADE A
+> FINDING from records already held (position-in-leg fit): a FIRST-PASS
+> TRANSIENT settling to a PLATEAU that pass 2 inherits flat — RR p1
+> +4.8% first→last20% (Q1..Q4 4.98→5.26 s/foot-min) then p2 FLAT at
+> that level; LI p1 −8.5% then p2 FLAT at its better level. Pass 2 =
+> settled state (plateau pair LI 12.953 vs RR 11.609 = +11.6%), pass 1
+> = transient (12.249 vs 12.198 = +0.4% — the overlap explained). The
+> ruling's fresh-container-PER-PASS design would measure four transients
+> and never the plateau — CONTESTED with this measurement:
+> `run_films500_lifetimes.sh` bakes two FRESH lifetimes, arms ALTERNATED
+> (RR first), TWO passes each (p3 transient + p4 plateau, n=2/side both
+> regimes), container age at leg start + pass-in-lifetime in every
+> export (driver `--container-lifetime` → provenance_video), shared plan
+> lock, FAST step 0, self-mirror, throughput ONLY (no cross/partition).
+> Pre-registered: confirms = RR p3 +3..6% & p4 flat at p3's end, LI p3
+> −6..−9% & p4 flat; refutes = flat p3s / reversed signs / p4 still
+> drifting. ~15.5 h. FILMS500_RESULTS.md throughput clauses marked
+> DRAFT-pending; partition section FINAL; 35-film DEFINITIVE untouched.
 > **FILMS-500 COMPLETE + LANDED (2026-09-06): `FILMS500_RESULTS.md`.**
 > 6 legs × 498, 0 errors; box commit cc98ca6b, bundle 1882c0d4,
 > ff-merged. **Partition HELD EXACTLY: 433 diverging / 65 clean / 0

@@ -2056,6 +2056,13 @@ async def amain() -> int:
                          'VERBATIM in provenance beside the measured image id — e.g. the '
                          'derived-layer deviation on rr:patched-video. A tag is not an '
                          'identity.')
+    ap.add_argument('--container-lifetime', default=None,
+                    help='2026-09-06 (films-500 lifetime passes): a JSON object recorded '
+                         'verbatim in provenance_video.container_lifetime — the serving '
+                         'container(s)\' created time, AGE AT LEG START in seconds, and '
+                         'the pass index within this lifetime. The within-lifetime drift '
+                         '(RR degrades ~5%, LI improves ~8% across a first pass, then both '
+                         'plateau) makes container age a measured variable, not a confound.')
     ap.add_argument('--cross-label', default=None,
                     help='basis string stamped into the cross output (e.g. the default '
                          'posture is equal-work gates only, not a cross-arm performance '
@@ -2496,6 +2503,8 @@ async def amain() -> int:
             'task_census': pf.get('task_census'),
             'network_mode': pf.get('network_mode'),
             'image': image_provenance(svc_container, args.image_lineage),
+            'container_lifetime': (json.loads(args.container_lifetime)
+                                   if args.container_lifetime else None),
             'interval_s': args.interval_s,
             'rr_write_path': ('chunked-1MiB (2026-08-24, DIAG_M1_BLAST; the banked RR '
                               'default SEQUENTIAL leg ran the whole-frame path — wall_s '

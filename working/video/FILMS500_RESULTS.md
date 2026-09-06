@@ -18,7 +18,12 @@ produced exactly 433, no exceptions across 498 films, both passes.**
 The 87% edge fraction measured at manifest build (435/500, 433 measured)
 reproduced as the failing count to the film.
 
-## Throughput (banked, re-read)
+## Throughput (banked, re-read) — **DRAFT: n=2, spread ≈ effect size, pending the lifetime-controlled passes (ruling 2026-09-06)**
+
+> Every throughput clause below is held at DRAFT. The pass spreads (RR
+> 5.1%, LI 5.7%) equal the +5.9% effect, and the pairs overlap (RR's
+> faster pass 12.198 vs LI's slower pass 12.249). The partition section
+> above is FINAL and untouched by this.
 
 | cell | blast f/s p1/p2 | window f/s (n=482) | cores | util | idle |
 |---|---|---|---|---|---|
@@ -81,6 +86,42 @@ The idle burden is unchanged and still the whole story of the measured-
 core gap: 4.67 cores standing still, 15% of the box, reported beside
 every RR figure and never subtracted.
 
+## WITHIN-LIFETIME DRIFT — a FINDING (from the landed records; n=1 lifetime per arm)
+
+Per-film wall normalized to footage (s per footage-minute) against
+position in the leg (admit order), both arms, both passes — the cheapest
+measurement, free from records already held:
+
+| leg | Q1 · Q2 · Q3 · Q4 | first 20% → last 20% | slope (s/foot-min per position) |
+|---|---|---|---|
+| RR pass 1 | 4.98 · 4.92 · 5.09 · **5.26** | 5.10 → 5.34 = **+4.8%** | +0.00073 |
+| RR pass 2 | 5.30 · 5.33 · 5.37 · 5.33 | 5.38 → 5.40 = **+0.4% (flat)** | +0.00004 |
+| LI pass 1 | 5.07 · 5.16 · 5.12 · **4.82** | 5.19 → 4.75 = **−8.5%** | −0.00072 |
+| LI pass 2 | 4.66 · 4.74 · 4.85 · 4.80 | 4.79 → 4.77 = **−0.4% (flat)** | +0.00026 |
+
+**Shape: a first-pass TRANSIENT that settles into a PLATEAU which pass 2
+inherits flat.** RR's per-film cost rises through pass 1 (4.98 → 5.26)
+and then holds at that worse level for all of pass 2 (5.30–5.37); LI's
+falls through pass 1 (5.07 → 4.82, most of it in the last quarter) and
+holds at the better level (4.66–4.85). Neither continues drifting in
+pass 2. So the campaign's two passes are **not** two samples of one
+state — pass 1 is the transient, pass 2 the settled state — and the
+"5% spread" is the transient-to-plateau step, arm-specific in sign.
+RR's degradation-to-plateau is the same mechanism class §6's residual
+candidate #3 names (accumulated process state in the engine's serving
+context), now visible in throughput. LI's improvement is consistent
+with cache/JIT warmth taking hours at 16-lane pace. **n=1 lifetime per
+arm; the lifetime-controlled passes reproduce or refute it.**
+
+**Design consequence, contested with this measurement**: a
+fresh-container-per-pass design would measure four transients and never
+the plateau; the data-supported design is two passes per fresh lifetime,
+arms alternated (`run_films500_lifetimes.sh`). And the cleanest
+steady-state pairs the campaign already holds are the pass-2s: **LI
+12.953 vs RR 11.609 at plateau = +11.6%**, versus the pass-1 transient
+pair 12.249 vs 12.198 = +0.4% — the overlap the ruling names is the two
+transients crossing in opposite directions.
+
 ## (c) Pass spreads are 5% — and they are a directional within-lifetime trend, not noise
 
 RR 12.198 / 11.609 = **5.1%**; LI 12.249 / 12.953 = **5.7%** (vs 2.08% /
@@ -121,7 +162,7 @@ gap (same basis $1.428/h ÷ x_realtime × 1000). Both an order below the
 sizing report's default-cell $38–40 and near Leela's films500 SIZING
 LG $9.24 / RR-default $40.79 (different corpus, not a join).
 
-## Draft headline (NOT final — for the re-scoping ruling)
+## Draft headline — HELD (n=2, spread ≈ effect size; pending the lifetime-controlled passes; the partition clause is final)
 
 > At the ruled 16×2-vs-16×2 posture, C=16, on the full 498-measured-film
 > Archive Films corpus (675.7 h footage, RF-DETR base), two passes:
