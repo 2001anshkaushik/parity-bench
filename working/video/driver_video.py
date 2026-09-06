@@ -69,6 +69,7 @@ from harness.jsonl_stream import JsonlWriter, read_completed  # noqa: E402
 import sdk_identity                                    # noqa: E402
 from argtypes import bounded_float, positive_int, run_id  # noqa: E402 — entry 8
 from corpus_locator import resolve_corpus_dir                # noqa: E402 — 2026-08-23
+import lifetime_state                                        # noqa: E402 — 2026-09-06 fs-vs-process discriminator
 # One census, one minter — the probes' own functions (stdlib-only module):
 # the driver and probe_rr must count task processes and stamp project_ids the
 # same way, or 'declared==measured' means different things per tool.
@@ -1139,6 +1140,32 @@ def docker_inspect(container: str, fmt: str) -> Optional[str]:
         return None
 
 
+def lifetime_state_glance(state: dict) -> str:
+    """One log line per lifetime-state reading: docker-root free space, the
+    fragmentation proxy, and per-container spool + memory — the numbers the
+    lifetime pre-registration reads, visible in the run log as they land."""
+    h = state.get('host', {})
+    dr = (h.get('df') or {}).get('docker_root') or {}
+    mb = (h.get('frag') or {}).get('mb_groups') or {}
+    bits = [(f"docker_root free {dr.get('free_bytes', 0) / 2**30:.1f} GiB"
+             if dr.get('state') == 'measured' else f"docker_root df {dr.get('state')}"),
+            (f"frag avg-extent {mb.get('avg_free_extent_kb')} KiB, >=4MiB share "
+             f"{mb.get('free_share_in_extents_ge_4mib_lower_bound')}"
+             if mb.get('state') == 'measured' else f"frag {mb.get('state')}")]
+    conts = state.get('containers', {})
+    for c, rec in list(conts.items())[:2]:
+        sp = next(iter((rec.get('spool') or {}).values()), {})
+        pr = rec.get('procs') or {}
+        cg = rec.get('cgroup') or {}
+        bits.append(f"{c}: spool du {sp.get('du_kb')} KiB/{sp.get('n_files')} files, layer "
+                    f"{(rec.get('layer') or {}).get('size')}, cg anon "
+                    f"{(cg.get('anon') or 0) / 2**30:.2f} GiB, procs {pr.get('n')} rss "
+                    f"{(pr.get('vmrss_kb') or 0) / 2**20:.2f} GiB")
+    if len(conts) > 2:
+        bits.append(f'(+{len(conts) - 2} more containers in the export)')
+    return ' | '.join(bits)
+
+
 class _ConsumedContainerArg:
     """After service-set resolution, the raw args.{rr,li}_container attributes
     are REPLACED with this: any use (str, format, ==, bool, hash) RAISES.
@@ -2063,6 +2090,18 @@ async def amain() -> int:
                          'the pass index within this lifetime. The within-lifetime drift '
                          '(RR degrades ~5%, LI improves ~8% across a first pass, then both '
                          'plateau) makes container age a measured variable, not a confound.')
+    ap.add_argument('--spool-paths', default='/tmp',
+                    help='2026-09-06 TASK 1: comma-separated IN-CONTAINER paths the arm spools '
+                         'to (both arms /tmp: engine reader.py:425 media_*, LI service.py:164 '
+                         'ws1v_spool_*). Read at leg start and leg end into '
+                         'export.lifetime_state — df/du/file count/mounts of the spool, cgroup '
+                         'memory, per-process RSS/RssAnon/VmData, writable-layer size, host free '
+                         'space, the ext4 free-space fragmentation proxy, diskstats — the '
+                         'filesystem-vs-process discriminator for the within-lifetime drift.')
+    ap.add_argument('--fs-sample-s', type=bounded_float('fs-sample-s', 0.0, 300.0), default=5.0,
+                    help='period of the host-filesystem statvfs stream under the leg '
+                         '(fsstream_<stem>.jsonl; 0 disables) — spool high-water at the '
+                         'filesystem level, the one the churn hypothesis acts on')
     ap.add_argument('--cross-label', default=None,
                     help='basis string stamped into the cross output (e.g. the default '
                          'posture is equal-work gates only, not a cross-arm performance '
@@ -2321,6 +2360,23 @@ async def amain() -> int:
     collector_summary: Optional[dict] = None
     say(f'service CPU bracket: summing {len(svc_containers)} container cgroup(s): '
         f'{svc_containers if len(svc_containers) > 1 else svc_containers[0]}')
+    # Lifetime-state readings (ruling 2026-09-06, TASK 1): the spool filesystem
+    # and the process side at leg START, outside the CPU bracket, then a
+    # statvfs stream under the leg; the END reading is taken after the bracket
+    # closes and BEFORE arm.stop() ends the tokens whose memory it reads. A
+    # fresh container on the same dirty filesystem starts slow if the
+    # persisting slowdown is the filesystem, fast if it is process state.
+    spool_paths = [p for p in args.spool_paths.split(',') if p.strip()]
+    host_paths = {'corpus': str(args.corpus_dir), 'host_tmp': '/tmp', 'out_dir': str(out_dir)}
+    ls_start = lifetime_state.read_state(svc_containers, spool_paths, host_paths, 'leg_start')
+    say(f'lifetime_state leg_start: {lifetime_state_glance(ls_start)}')
+    ls_end = None
+    fs_sampler = None
+    if args.fs_sample_s > 0:
+        fs_sampler = lifetime_state.FsSampler(
+            {**host_paths, 'docker_root': ls_start['host'].get('docker_root') or '/var/lib/docker'},
+            out_dir / f'fsstream_{stem}.jsonl', args.fs_sample_s)
+        fs_sampler.start()
     cg_leg0 = containers_cpu_usage_usec(svc_containers)
     t_leg0 = time.monotonic()
     dr0 = resource.getrusage(resource.RUSAGE_SELF)
@@ -2333,6 +2389,13 @@ async def amain() -> int:
         leg_wall = time.monotonic() - t_leg0
         cg_leg1 = containers_cpu_usage_usec(svc_containers)
         dr1 = resource.getrusage(resource.RUSAGE_SELF)
+        # bracket closed, tokens still alive: the END reading sees their memory
+        try:
+            ls_end = lifetime_state.read_state(svc_containers, spool_paths, host_paths, 'leg_end')
+            say(f'lifetime_state leg_end: {lifetime_state_glance(ls_end)}')
+        except Exception as exc:   # a reading must never cost a 3.7 h leg its export
+            ls_end = {'phase': 'leg_end', 'state': f'unavailable: {exc!r}'}
+            say(f'WARNING: lifetime_state leg_end reading failed: {exc!r}')
     finally:
         # stop() terminates every token BEFORE disconnect (Ticket 4): a leg
         # that dies mid-flight must not leave tokens idle-spinning in the
@@ -2341,6 +2404,8 @@ async def amain() -> int:
         if collector:
             collector_summary = collector.stop()   # its own summary, kept in the export
         await arm.stop()
+    fs_stream = await fs_sampler.stop() if fs_sampler else None
+    mem_traj = lifetime_state.service_memory_trajectory(out_dir / f'collector_{stem}.jsonl')
     service_cpu_s = ((cg_leg1 - cg_leg0) / 1e6
                      if cg_leg0 is not None and cg_leg1 is not None else None)
     # Collector health as a first-class, LOUD value (ruling 2026-08-22).
@@ -2440,6 +2505,18 @@ async def amain() -> int:
         # one-line summary (ruling 2026-08-22).
         'collector_status': collector_status,
         'collector_summary': collector_summary,
+        # 2026-09-06 TASK 1: the filesystem-vs-process discriminator, leg start
+        # and leg end, plus the fs stream under the leg and the service role's
+        # memory trajectory from the collector stream (per-token growth vs
+        # persistent server growth — top_by_rss names which).
+        'lifetime_state': {
+            'basis': lifetime_state.BASIS,
+            'spool_paths': spool_paths,
+            'leg_start': ls_start,
+            'leg_end': ls_end,
+            'fs_stream': fs_stream,
+            'service_memory_trajectory': mem_traj,
+        },
         'n_offered': len(measured), 'n_records': len(records),
         'n_errors': len(records) - len(ok_records),
         'leg_wall_s': round(leg_wall, 1),

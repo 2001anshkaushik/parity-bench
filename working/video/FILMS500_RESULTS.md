@@ -107,20 +107,110 @@ holds at the better level (4.66–4.85). Neither continues drifting in
 pass 2. So the campaign's two passes are **not** two samples of one
 state — pass 1 is the transient, pass 2 the settled state — and the
 "5% spread" is the transient-to-plateau step, arm-specific in sign.
-RR's degradation-to-plateau is the same mechanism class §6's residual
-candidate #3 names (accumulated process state in the engine's serving
-context), now visible in throughput. LI's improvement is consistent
-with cache/JIT warmth taking hours at 16-lane pace. **n=1 lifetime per
-arm; the lifetime-controlled passes reproduce or refute it.**
+RR's degradation-to-plateau was first read as §6's residual candidate
+#3 (accumulated process state in the engine's serving context); the
+campaign's own collector streams narrow that reading — see "what the
+collector streams add" below. LI's improvement is consistent with
+cache warmth taking hours at 16-lane pace. **n=1 lifetime per arm; the
+lifetime-controlled passes reproduce or refute it.**
 
-**Design consequence, contested with this measurement**: a
-fresh-container-per-pass design would measure four transients and never
-the plateau; the data-supported design is two passes per fresh lifetime,
-arms alternated (`run_films500_lifetimes.sh`). And the cleanest
-steady-state pairs the campaign already holds are the pass-2s: **LI
-12.953 vs RR 11.609 at plateau = +11.6%**, versus the pass-1 transient
-pair 12.249 vs 12.198 = +0.4% — the overlap the ruling names is the two
-transients crossing in opposite directions.
+**Design consequence, contested with this measurement — contest
+ACCEPTED 2026-09-06**: a fresh-container-per-pass design would measure
+four transients and never the plateau; the design that runs is two
+passes per fresh lifetime, arms alternated, RR first
+(`run_films500_lifetimes.sh`) — the alternation also balances
+box-time-of-day across the two campaigns.
+
+**Same films, same order — content excluded (Ansh's check, verified
+from the records).** Both passes submit in the SAME manifest order:
+enqueue order equals the manifest order in pass 1 AND pass 2, 498/498
+positions identical, both arms (admit order differs only by C=16
+admission jitter: 452/498 RR, 456/498 LI). If the slowdown were content
+— heavier films later — both passes would show the same within-pass
+shape. RR pass 1 rises and RR pass 2 is flat on the same films in the
+same order. That is state, not content.
+
+**Basis note.** The table above normalizes by manifest `video_s`; the
+pre-registered reading tool (`probe/lifetimes_reading.py`) uses measured
+frames (footage = frames × 15 s, which keeps `TheSheik.mp4`, whose
+manifest `video_s` is 0.0). Same shape on the frames basis: RR p1 +3.6%
+→ p2 −0.2% (levels 5.094 → 5.375, +5.5%); LI p1 −9.8% → p2 −1.8% (5.091
+→ 4.804, −5.6%). Paired per-film log-ratio SE: 0.62% RR, 0.39% LI
+(n=498) — whole-pass levels resolve to well under 1%.
+
+**What the campaign's collector streams add (held data; service role,
+0.5 s ticks).** RR's service tree climbs **27 → 54 GiB RSS (cgroup anon
+20 → 47 GiB) across pass 1 — then resets to 27 GiB and climbs
+identically across pass 2 (27 → 53; anon 20 → 46)**: the per-token
+processes end with the ttl=0 tokens between passes, so the growth is per
+pass, ~+27 GiB per 498 films (~54 MB per film across 16 tokens). LI is
+flat at ~22 GiB throughout (anon 0.9 GiB). The cost plateau carried into
+RR pass 2 does **not** track that memory: pass 2 climbs the same way
+while its cost is flat. So per-token memory growth (allocator/arena/
+retained state in the task processes) is **excluded as the carrier** of
+the pass-1→pass-2 step. Whatever carries it persists across the token
+reset — the engine SERVER process (a bounded structure filling, then
+steady, is the textbook plateau shape), the container's filesystem view,
+the host filesystem, or the clock. The memory growth is a finding in its
+own right (at this rate a token reaches the 58 GiB cgroup limit in
+roughly 1,100 films) and is pre-registered to reproduce in p3/p4.
+
+**Two mechanisms, instrumented before the launch (TASK 1).** Ansh's
+alternative to process state: both arms spool every video to the
+container's `/tmp` and delete it (RR `engine/ai/common/avi/reader.py:425`
+`/tmp/media_*`, removed in `Reader.__del__`; LI `li_video/service.py:164`
+`/tmp/ws1v_spool_*`) — ~500 GB of write-and-delete churn per campaign on
+the overlay writable layer, i.e. the host filesystem under the docker
+root. Free-space scattering there is a monotone slowdown that PERSISTS
+into the next pass and is indistinguishable from process state from
+outside. The held data leans without deciding: LI improved under the same
+churn, and RR pass 2 stayed flat under 250 GB more of it — a filesystem
+mechanism has to saturate exactly at pass 1's end. **The lifetimes run
+discriminates**: a FRESH container on the SAME dirty filesystem starts
+slow if it is the filesystem, fast if it is process state. Every
+lifetimes export records, at leg start and leg end
+(`export.lifetime_state`, `working/video/lifetime_state.py`): the spool
+path's df/du/file count inside each container (a non-zero count at leg
+end is a spool leak), cgroup memory, every process's RSS/RssAnon/VmData
+with the top processes named (server vs token processes separable), the
+writable-layer size, host free space, the ext4 free-space fragmentation
+proxy (`/proc/fs/ext4/<dev>/mb_groups`: free fragments, average free
+extent, share of free space in ≥4 MiB extents; `e2freefrag` best-effort),
+`/proc/diskstats` (leg delta = churn volume) and a 5 s statvfs stream
+under the leg — spool high-water at the filesystem level. (The campaign
+never collected a per-film spool figure; the nearest held instrument was
+mem_watch's 5 s df in the sweep, not run in the campaign.)
+**Pre-registered read**: RR p3's opening quartile against the campaign
+p1's opening quartile (5.03 s/foot-min, frames basis): **≤ 5.13 =
+process side; ≥ 5.20 (near the p2 plateau 5.375) = filesystem side**;
+between = indeterminate at n=1; corroborated by the fragmentation proxy's
+direction across legs and by LI p3's opening quartile vs LI p1's (5.14 —
+a filesystem penalty adds on top of LI's cold start).
+
+**The +11.6% plateau pair is HYPOTHESIS, not finding (ruling
+2026-09-06).** The campaign's pass-2 pair — LI 12.953 vs RR 11.609 —
+rests on n=1 lifetime per arm and is LARGER than the +5.9% it would
+replace; a bigger claim on thinner evidence gets more suspicion, not
+less. It is the thing the lifetimes run tests; it does not lead until
+n=2 per side. The pass-1 transient pair (12.249 vs 12.198 = +0.4%) is the
+overlap the ruling names: two transients crossing in opposite directions.
+
+**Pre-registered, extended (TASK 2): is the plateau reproducible at
+all?** p4's level against the campaign p2's level (paired per film,
+log-ratio, frames basis; p2: RR 5.375, LI 4.804): **|Δ| ≤ 2% = same
+level** — a reproducible steady state at n=2 lifetimes per arm, and the
+plateau pair becomes quotable (still n=2); **|Δ| ≥ 3% = different
+level** — the plateau is lifetime-specific, neither pass is a stable
+production number, a finding in its own right that changes what this
+campaign can claim (no steady-state headline; per-lifetime ranges
+instead); 2–3% = not resolvable at one pair of lifetimes, no plateau
+claim either way. Drift bands (frames basis): RR p3 first→last-20% in
++1..+6% and p4 flat (|Δ| ≤ 2.5%) at p3's end level; LI p3 in −6..−13%
+and p4 flat; refutes = flat p3 (<1%), reversed sign, or p4 still
+drifting in the same direction (continuous degradation — a different and
+worse finding for RR). The reading is computed by
+`probe/lifetimes_reading.py`, committed before the run; its null control
+reproduces the campaign p1/p2 figures above.
 
 ## (c) Pass spreads are 5% — and they are a directional within-lifetime trend, not noise
 
@@ -139,13 +229,16 @@ independent replicates** (log: LI p1→p2 on the same 16 containers created
 **RR degrades across its lifetime; LI warms up.** Nothing in the measured
 environment differs to cause it — util is flat (96.9/97.1), cores flat
 (31.01/31.08), preleg load low both (3.59/4.58). LI getting faster on
-pass 2 is page-cache warmth (frames-on-disk reader re-reading a warm FS)
-and JIT/allocator settling. **RR getting slower on pass 2 over a ~7.4-hour
-leg is accumulated process state** — allocator arenas, fragmentation —
-which is precisely §6's residual-candidate #3 (the engine's serving
-context degrading over a long run) showing up in throughput, not just in
-detection scores. The spread is real, it is not symmetric noise, and its
-RR half points at the same open mechanism the detection divergence does.
+pass 2 is consistent with cache warmth (its memory is flat at ~22 GiB
+across both passes). RR getting slower was first read as accumulated
+process state — allocator arenas, fragmentation, §6's residual candidate
+#3 — but the campaign's collector streams show RR's per-token memory
+RESETS between passes (27 → 54 GiB in each pass) while the cost plateau
+carries over, so per-token process memory is excluded as the carrier
+(drift section above); the open candidates are the engine server
+process, the host filesystem's spool churn (Ansh's alternative,
+instrumented for the lifetimes run) and the clock. The spread is real,
+it is not symmetric noise, and its RR half is an open mechanism.
 **Consequence for the headline: quote pass means with the spread stated,
 and do not fix a sub-5% cross-arm claim without n>2 — the within-lifetime
 trend is the same size as the effect.**

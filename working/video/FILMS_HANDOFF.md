@@ -54,10 +54,36 @@
 > regimes), container age at leg start + pass-in-lifetime in every
 > export (driver `--container-lifetime` → provenance_video), shared plan
 > lock, FAST step 0, self-mirror, throughput ONLY (no cross/partition).
-> Pre-registered: confirms = RR p3 +3..6% & p4 flat at p3's end, LI p3
-> −6..−9% & p4 flat; refutes = flat p3s / reversed signs / p4 still
-> drifting. ~15.5 h. FILMS500_RESULTS.md throughput clauses marked
-> DRAFT-pending; partition section FINAL; 35-film DEFINITIVE untouched.
+> **DESIGN CONTEST ACCEPTED 2026-09-06** ("the measurement beats my
+> ruling"; the alternation also balances box-time-of-day). Pre-registered,
+> extended, on the FRAMES basis (reading tool committed before the run:
+> `probe/lifetimes_reading.py`, null control reproduces p1/p2): RR p3
+> +1..+6% & p4 flat ≤2.5%; LI p3 −6..−13% & p4 flat; refutes = flat /
+> reversed / p4 still drifting. **The +11.6% plateau pair is HYPOTHESIS**
+> (n=1 lifetime/arm, larger than the +5.9% it would replace — it is what
+> the run tests). Same-order check verified from records (enqueue order ==
+> manifest order in both passes, 498/498 both arms — state, not content).
+> **TASK 1 filesystem-vs-process discriminator** in EVERY export
+> (`export.lifetime_state`; new `working/video/lifetime_state.py`, driver
+> `--spool-paths/--fs-sample-s`): spool df/du/file-count inside each
+> container, cgroup memory, per-process RSS/RssAnon/VmData with top
+> processes named, writable-layer size, host free space, ext4 mb_groups
+> fragmentation proxy (+ e2freefrag best-effort), diskstats churn delta,
+> 5 s statvfs stream; pre/post-run host readings. Read = RR p3 opening
+> quartile vs campaign p1's 5.03 s/foot-min: ≤5.13 process, ≥5.20
+> filesystem. Held data already EXCLUDES per-token memory growth as the
+> carrier: RR service RSS 27→54 GiB (anon 20→47) climbs in EACH pass and
+> RESETS between them (ttl=0 tokens); p2 climbs identically with flat
+> cost — what persists is the engine server, the container fs view, the
+> host fs, or the clock (the ~54 MB/film per-token growth is itself a
+> finding, pre-registered to reproduce). **TASK 2 plateau-level case**:
+> p4 vs campaign p2 paired |Δ| ≤2% same level (reproducible steady
+> state; plateau pair quotable at n=2) / ≥3% different (lifetime-
+> specific; no stable production number — changes the claim) / 2–3%
+> unresolved. ~15.5 h. FILMS500_RESULTS.md throughput clauses
+> DRAFT-pending; partition FINAL; 35-film DEFINITIVE untouched. TASK 3
+> launch via the wrapper after this lands; launch read-back in the next
+> commit.
 > **FILMS-500 COMPLETE + LANDED (2026-09-06): `FILMS500_RESULTS.md`.**
 > 6 legs × 498, 0 errors; box commit cc98ca6b, bundle 1882c0d4,
 > ff-merged. **Partition HELD EXACTLY: 433 diverging / 65 clean / 0
