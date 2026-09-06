@@ -81,9 +81,39 @@
 > state; plateau pair quotable at n=2) / ≥3% different (lifetime-
 > specific; no stable production number — changes the claim) / 2–3%
 > unresolved. ~15.5 h. FILMS500_RESULTS.md throughput clauses
-> DRAFT-pending; partition FINAL; 35-film DEFINITIVE untouched. TASK 3
-> launch via the wrapper after this lands; launch read-back in the next
-> commit.
+> DRAFT-pending; partition FINAL; 35-film DEFINITIVE untouched.
+> **LAUNCHED 2026-09-06 09:03:39Z (TASK 3)** via the wrapper at box HEAD
+> d334fa2, script sha 2e8338d5 self-printed; run dir
+> `results/films500_lifetimes_20260906T090339Z`, plan lock held (pid
+> 1857), mirror self-launched (pid 1872) → `s3://…/ansh/films500-live-
+> films500_lifetimes_20260906T090339Z/`. Read-back: step 0 FAST PASS
+> 500/500 + 5 spot shas; **instrument check PASS** — host fs ext4 on
+> `/dev/root` (969 GiB, 603.5 free / 365.5 used), **mb_groups measured:
+> 603.4 GiB free in 14,510 extents, avg free extent 43,609 KiB (≈42.6
+> MiB), ≥99.36% of free space in ≥4 MiB extents — the filesystem starts
+> nearly unfragmented after the campaign's churn**; e2freefrag measured
+> (sudo -n); PSI io measured; ONE recorded absence: diskstats
+> ("root not in /proc/diskstats" — `/dev/root` is not the kernel device
+> name; churn VOLUME is not captured this run; used-bytes deltas from the
+> statvfs stream and pre/post-run readings stand in; follow-up fix =
+> resolve `/dev/root` via /proc/self/mountinfo maj:min, to land AFTER the
+> run — the box worktree is not touched mid-run). RR up in 5.0 s;
+> **container probe check PASS on the live arm**: spool /tmp 2 files /
+> 12 KiB on the writable layer, cg anon 0.06 GiB, 1 process = the engine
+> server `./engine ai/eaas.py --port=5565` (0.10 GiB) — the persistent
+> process the top_by_rss reading will separate from the per-token task
+> processes; writable layer 160 kB. Pass 3 container age at leg start 6
+> s (pass_in_lifetime 1). Driver preflight PASSED: quiet box (foreign
+> 0.03), 16 tokens → 16 task processes (declared==measured), idle burden
+> 4.65 cores = 14.5%, warm-up 2 items. Read-back 09:13:04Z (warm-up in
+> progress): the live rr container's /tmp held **19 spool files, 825,012
+> KiB (~806 MiB)** with 16 tokens decoding the warm films — the RR spool
+> IS container /tmp, measured, not inferred from reader.py — cg anon 15.99
+> GB, load1 7.22 rising; mirror cycle 2 synced 09:08:41Z. Next: leg_start
+> glance line in the log once the warm-up ends; walk-away ~15.5 h; then
+> entry-26 STOP-AND-LAND and `probe/lifetimes_reading.py --lifetimes
+> <landed dir>` for the pre-registered verdicts (the tool refuses to
+> issue verdicts unless its null control reproduces the campaign p1/p2).
 > **FILMS-500 COMPLETE + LANDED (2026-09-06): `FILMS500_RESULTS.md`.**
 > 6 legs × 498, 0 errors; box commit cc98ca6b, bundle 1882c0d4,
 > ff-merged. **Partition HELD EXACTLY: 433 diverging / 65 clean / 0
