@@ -39,6 +39,23 @@
 > (674.75 h scale truth; the LG OOM post-mortem at 2d7533b; per-film
 > walls vs our LI 7200 s ceiling; her committed 500-census is EMPTY at
 > pin, so the >560px fraction stays non-derivable).
+> **FILMS-500 COMPLETE + LANDED (2026-09-06): `FILMS500_RESULTS.md`.**
+> 6 legs × 498, 0 errors; box commit cc98ca6b, bundle 1882c0d4,
+> ff-merged. **Partition HELD EXACTLY: 433 diverging / 65 clean / 0
+> violations both passes (rc=0)** — Ruling U predicted 433, produced
+> 433. Throughput pass means LI 12.601 / RR 11.904 f/s (+5.9% span).
+> THE NUMBERS THAT MOVED: (a) both +24-25% vs 35 = ramp/drain geometry,
+> proven by span↔window gap collapse (35: +20/+15%; 500: +0.1/−0.3%);
+> (b) per-core BOTH WAYS recomputed — measured-core LI +26.7→+15.2%,
+> **effective-core LI +3.9% INVERTED to RR +1.9%** (RR now saturates at
+> 97% util, does marginally more per effective core — parity on the
+> work, RR under-fed at 35 overstated both halves); (c) 5% pass spreads
+> = DIRECTIONAL within-lifetime trend not noise (RR p2 SLOWER +4%
+> [accumulated process state, §6 residual #3], LI p2 FASTER −6% [cache
+> warm]) — headline must state the spread, no sub-5% claim at n=2;
+> (d) $/1k LI $7.58 RR $8.02 mean. Draft headline in the doc, NOT final
+> — re-scoping is Ansh's separate ruling; the 35-film DEFINITIVE stays
+> the sizing report UNTOUCHED.
 > **STAGING RUN-1 FAILED AT THE GOLDEN (2026-09-04, owned; register
 > entry 32)**: the golden video was DERIVED ("shortest measured item")
 > — 35-corpus shortest = House (the golden's film), 500-corpus shortest
