@@ -175,3 +175,51 @@ f/s/cores/util figure exactly, and this document's computed CPU-s/frame
 values are the exports' own recorded `cpu_s_per_frame` (2.304/2.312 at
 16×2, 2.601/2.579 at 8×4). The joined table is
 `AMI_CROSS_TEAM_TABLE.md`.
+
+## 9. The page-cache hypothesis for the ~20% (2026-09-06, from Shashi's films50 figures as relayed) — what the artifacts settle
+
+**Hypothesis (relayed)**: the AMI corpus (~23 GB) fits the 61 GB page
+cache while films (263 GB) cannot; if their AMI runs were warm and ours
+cold, that makes an AMI gap and no films gap. Shashi's films50 RR 16×2
+(12.52 f/s, 27.5 cores, 2.198 CPU-s/frame) sits 2.6% from our 12.198.
+
+What the held artifacts settle:
+- **Ours were cold, by construction, with proof.** Every leg evicts the
+  corpus with `posix_fadvise(DONTNEED)` and a read-back that refuses if a
+  sampled file still reads hot (`driver_video.py:2299-2310`,
+  `probe/drop_cache_fadvise.py`; in the driver since 56ee341 on
+  2026-08-20 — before the 24/26-Aug AMI runs). The per-leg proof lines are
+  in the S3 run logs (not landed); the landed AMI exports carry
+  `preleg_container_idle_cores` and the collector summaries and no cache
+  field; the per-tick streams (`mem_available`, `cg_current − cg_anon`)
+  are on S3, not landed.
+- **Theirs are unrecorded and uncontrolled.** Leela's harness at both pins
+  (aa817d9a, 3967d9f4; object reads only) has no drop_caches, fadvise,
+  vmtouch, prewarm or residency field — the only cache mentions are the
+  cgroup peak-memory basis notes (`cgroup_sampler.py:56`,
+  `v_metrics.py:141/191`). Whether her AMI runs were warm cannot be read
+  from held objects; with nothing evicting and 23 GB fitting, warm after
+  the first pass is the default expectation, not a measurement. Shashi's
+  `cache_resident_gb_before/after` exists only from films50 on.
+- **The gap's form does not admit it.** The discrepancy is engine-cgroup
+  CPU-s per frame at matched ~92% utilisation (§3). Corpus residency acts
+  on the client-side file reads — outside the engine cgroup on both
+  harnesses (our driver's sha pass and streamed send; her `send_files`
+  client) — and shows up as iowait and lost throughput, not as CPU
+  seconds; both sides ran ~92% util, so neither was I/O-starved. A warm
+  client cannot lower the engine's CPU per frame.
+- **It replicates where residency is impossible.** On films, Shashi's RR
+  16×2 does 2.198 CPU-s/frame against our 2.543 (+15.7%, the wave-
+  independent quantity; assumption stated in FILMS500_RESULTS.md's
+  cross-team cautions) at 86% vs 97% util; the span rates coincide (12.52
+  vs 12.198) only because his N=50 span is ramp/drain-depressed (3.1
+  waves) while ours is saturated at N=498. A third harness, a second
+  corpus, no possible residency, the same gap class.
+
+**Verdict**: not supported for the AMI gap, contradicted by the films
+replication; it does not answer the open question. The ask in §3 stands
+— per-stage CPU split on one identical file through both harnesses at
+the same posture, or one leg's cgroup sampler stream exchanged — with one
+cheaper item now available: their cores basis stated (engine cgroup over
+the leg with tokens live, idle burn included?) and, for any AMI rerun,
+their `cache_resident_gb_before/after` beside ours (cold, proven).

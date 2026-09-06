@@ -1238,3 +1238,38 @@ than rewritten from memory, which is entry 2's point in miniature.
 > the manifest sha is checked against the golden's recorded sha BEFORE
 > the two-minute send, and the shortest-item selector survives only in
 > write mode, where it records its choice into the artifact it creates.
+
+## 33. Two methods with one name — the probe isolated the leaf, the node calls the facade (added 2026-09-06)
+
+> The Ruling-Y isolation probe was built to run "the engine's exact
+> detect path" on a known-diverging frame, and it did run a detect path
+> inside the engine's container with the engine's own libraries: it
+> loaded the PNG exactly as the engine does (image.py:36-38, quoted) and
+> called `RFDETRBase().predict`, citing `detection.py:172` — "passes the
+> image untouched" — as the only arm-controlled step before the model.
+> Two thread conditions, bit-equal to LlamaIndex both times; verdict:
+> "context-dependent"; Ticket 6 asked the engine team to name the
+> serving-context condition. The line it cited is the BACKEND's `detect`.
+> The detect node (`nodes/detect/IInstance.py:107`) calls the FACADE's
+> `detect` (`Detector`, `detection.py:512-518`), which LANCZOS-downscales
+> any frame whose long edge exceeds `infer_edge=560` before the backend
+> ever sees it. Same file, same method name, one class apart. The
+> isolation was a faithful reproduction of LlamaIndex's path — which is
+> why it matched LlamaIndex.
+>
+> The class this adds to entry 30 (a probe not like-for-like, caught by
+> its own artifact): **an isolation probe is specified by walking the call
+> chain from the serving entry point (the node) inward to the model,
+> citing each hop, and it reproduces the FIRST arm-controlled
+> transformation it meets — never by starting at the model and reasoning
+> outward to "the only difference before predict".** The correction was
+> cheap once looked for: the boundary constant sat one grep away
+> (`infer_edge=560`); the one film at exactly 560 was already in the
+> corpus as the inclusive-boundary control (clean, as the helper's `<=`
+> requires); the campaign's own frame-10 scores differ at 10⁻², four
+> orders above the thread effect our own artifacts measured (10⁻⁷); and
+> the two passes per arm had already shown 996 bit-identical repeats, so
+> "variance under load" was never a live candidate. Confirmation is V-D
+> (`probe_wrapper_resize_parity.py`), pre-registered before it runs, with
+> the campaign's recorded outputs as the targets and CANNOT COMPARE as a
+> real outcome.

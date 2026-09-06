@@ -212,6 +212,52 @@ worse finding for RR). The reading is computed by
 `probe/lifetimes_reading.py`, committed before the run; its null control
 reproduces the campaign p1/p2 figures above.
 
+**Third mechanism — PAGE CACHE — pre-registered 2026-09-06 with pass 3 in
+flight (the commit time is the timestamp; no pass-3 record had been read).**
+Source: Shashi's films50 run (relayed; his doc is not held): his RR
+rep1→rep2 fell 187.8× → 159.7× with byte-identical output, probed live at
+11% iowait, six processes blocked on I/O, ~80% of his corpus resident, a
+gp3 root volume at its 125 MB/s ceiling; his mitigation is prewarm plus
+`cache_resident_gb_before/after` per cell. What our design already fixes
+and what the exports already record:
+- **Every leg starts corpus-COLD by construction, with proof**:
+  `posix_fadvise(DONTNEED)` over every corpus file and a read-back that
+  refuses if a sampled file still reads hot (`driver_video.py:2299-2310`,
+  `probe/drop_cache_fadvise.py`; in every leg since 2026-08-20, before
+  the AMI runs). A fresh container does not reset the host cache — our leg
+  start does, for the corpus.
+- The 263 GB corpus can never be resident in 61 GiB; each film is read
+  from disk once per pass by the driver's sha pass, recorded per film as
+  **`read_s`** (outside `wall_s`, inside the leg span). `read_s` per
+  footage-minute is **flat by position in all four campaign legs** (Q2–Q4
+  0.052–0.076 s/foot-min; Q1 ≈0.14 = sixteen cold starts at once) while
+  RR p1's cost rose: the corpus-side reads do not carry the drift.
+- The container's own page cache is in every collector stream
+  (`cg_current − cg_anon`): RR 7.15 → 5.98 GiB across p1 and 7.38 → 6.39
+  across p2 — squeezed by anon growth under the 58 GiB limit while ~8.9
+  GiB of spools are in flight, so some spool pages are evicted and
+  re-read during decode; host `mem_available` 34 → 15 GiB in both passes,
+  never under global pressure. **iowait, Dirty and Writeback are recorded
+  nowhere in our exports** — Ansh's once-a-minute `/proc/meminfo` sampler
+  supplies them; `probe/cachewatch_join.py` joins it (clock anchor = each
+  leg's `fsstream` row 0 `utc − t`, the leg start within ~1 s; leg end =
+  anchor + `leg_wall_s`; per-film windows from the monotonic stamps;
+  collector rows from the `.ready` mtime).
+- **Distinguishing prediction.** Page cache ⇒ within RR p3 the per-film
+  cost tracks iowait and the Cached/Dirty churn in time (cost correlates
+  with iowait, ρ ≥ 0.3, and iowait itself moves through the leg,
+  ρ(iowait, position) ≥ 0.3 — where both co-trend with position the
+  detrended residual correlation splits them; iowait moves only in the
+  rising legs), the cgroup file cache shrinks as it
+  did, and p4 shows the same — the campaign's flat p2 under an identical
+  cache squeeze already argues against it as the carrier. Process /
+  filesystem ⇒ cost rises with position while iowait and Cached are flat.
+  The p3 opening-quartile read does NOT separate page cache from process
+  state (both reset at leg start by design); the cachewatch join and the
+  cgroup file-cache trajectory do. Prewarm is not adopted: warm-start
+  (his) and cold-start-with-proof (ours) are different bases, stated
+  wherever the two are put side by side.
+
 ## (c) Pass spreads are 5% — and they are a directional within-lifetime trend, not noise
 
 RR 12.198 / 11.609 = **5.1%**; LI 12.249 / 12.953 = **5.7%** (vs 2.08% /
@@ -275,3 +321,109 @@ from the RR export; ±5% from (c). Every clause is scoped to THIS run's
 one configuration, as the 35-film headline was — and (c)'s spread caveat
 rides the throughput clause because the effect and the noise are the same
 size.
+
+## The 560px mechanism — located in the engine source (2026-09-06; confirmation probe pre-registered, not yet run)
+
+Shashi's determinism table (relayed via the operator, DATA; his document
+is not held) reports both his arms deterministic at a fixed thread count
+and every per-film digest changing across thread counts with totals
+moving ≤3 — BLAS reduction order in the last bits, a handful crossing 0.3.
+Assessed against everything we hold:
+
+- **Within-arm reproducibility under 16-lane load is total.** The
+  campaign's two passes per arm — same lifetime, same load, same order —
+  are bit-identical film by film: labels, full-precision scores,
+  detection counts and chunk shas, **498/498 RR and 498/498 LI, including
+  all 433 films above 560px**. The proposed "same frame, same arm, twice
+  under load" test is answered at 996 repeats: there is no run-to-run
+  variance to find. The divergence is deterministic and between arms
+  (433 both passes).
+- **The thread-count effect exists and is four orders of magnitude too
+  small.** Our own Ruling-Y artifacts show intraop 16 vs 2 moving the 7th
+  decimal (0.953240275 vs 0.953240395, both sides identically); the
+  campaign's frame-10 deltas are 10⁻²–10⁻¹ on the same objects (person
+  0.953 → 0.946, chair 0.490 → 0.449, bottle 0.433 → 0.385, plus a chair
+  at 0.318 crossing the threshold). Percent-level shifts are what a
+  different resampling of the input produces, not what reduction order
+  produces.
+- **The mechanism is in the engine's serving path, named from source.**
+  The detect node builds the engine's `Detector` facade
+  (`engine/nodes/detect/IGlobal.py:38-75`) and calls its `detect` on the
+  PNG-decoded frame (`IInstance.py:103-107`; lossless load,
+  `ai/common/image/image.py:13-27`). That facade downscales first:
+  `ai/common/models/vision/detection.py:60` declares the rfdetr backend
+  with `infer_edge=560`, `:466` stores it, and `Detector.detect`
+  (`:512-518`) runs `resize_for_inference(image, 560)` —
+  `dense_resize.py`: a strict no-op when the long edge is ≤ 560,
+  otherwise `Image.LANCZOS` to `floor(w·s) × floor(h·s)`, `s = 560/max(w,h)`
+  — and hands the downscaled image to the backend, mapping boxes back
+  afterwards. The source comment calls the downscale "lossless (boxes
+  mapped back)": lossless for coordinates, not for pixels or scores.
+  LlamaIndex (`li_video/pipeline.py:215`) hands RF-DETR the raw frame,
+  and RF-DETR applies its own resize. Two resampling pipelines above 560,
+  one below.
+- **It predicts every held fact.** Boundary exactly at 560 on the long
+  edge, inclusive: the one corpus film at exactly 560 (JailBait, 560×380)
+  is clean, 64 below are clean, 433 measured above diverge — the helper's
+  `<=` reproduced to the pixel; the 624×480 films Ansh cites are
+  downscaled to 560×430; the 381 films at 640×480 to 560×420.
+  Deterministic (no variance). Context-dependent in exactly the sense
+  measured: the Ruling-Y probe (`probe_detector_parity.py:36-75`) called
+  `RFDETRBase().predict` on the raw frame — it replicated the backend's
+  `detect` (`detection.py:172`, "passes the image untouched", the line
+  its own header cites) and never entered the facade's `detect` that the
+  node calls. Isolation was bit-equal to LI because it ran LI's path.
+  Register entry 33.
+- **Shashi's cross-arm caveat does not transfer.** His HS returns
+  1.4–3.6% fewer detections with a hypothesised YUV→RGB matrix difference
+  (BT.709 vs BT.601) and a height-based boundary (576/720). Our arms share
+  one pinned ffmpeg binary (`e7e7fb30…`), frames on failing films are
+  proven byte-identical (`probe_frame_parity` A==C EXACT), and our
+  boundary is a 560px long-edge rule that puts 624×480 films on the
+  diverging side — which the engine constant predicts and a colour matrix
+  would not. Not adopted.
+- **Confirmation, pre-registered (V-D), the cheapest possible, after the
+  lifetimes run lands and on Ansh's ruling**:
+  `probe/probe_wrapper_resize_parity.py` + `run_wrapper_resize_parity.sh`
+  (refuses while the plan lock is held), inside the rr container at the
+  campaign thread condition — frame 10 of HouseOnBareMountain (714×480,
+  sha 83a02b92…) through `resize_for_inference(·, 560)` → 560×376 →
+  `RFDETRBase().predict`. **CONFIRMS** if it reproduces the campaign RR
+  output for that frame (labels {bottle×2, chair×3, person}, scores
+  0.9464733 0.935210288 0.856113911 0.449365526 0.384643406 0.318114191 at
+  9 dp) while the raw frame reproduces the campaign LI output (5
+  detections, 0.953240395 …); the ≤560 control must be a no-op both ways;
+  every predict run twice; a thread condition other than 2 or a raw frame
+  that fails the LI baseline is CANNOT COMPARE, not a verdict. **REFUTES**
+  if the resized frame does not reproduce RR. About three minutes of box
+  time, one session, no engine change. If confirmed it replaces
+  "accumulated serving-context state" with a named code path, and Ticket
+  6's ask becomes concrete: make the facade's pre-downscale match the
+  model's own preprocessing, or document the deviation. The 35-film
+  DEFINITIVE §6 is FINAL and not edited here; its residual-candidate list
+  gets a one-paragraph addendum only on Ansh's ruling after V-D.
+
+## Cross-team joins — cautions (2026-09-06, from Shashi's films50 figures as relayed)
+
+- **His RR-vs-HS 1.58× carries a wave handicap he flags himself**: 50
+  films over 32 workers = 1.56 waves, HS capped near 78% util, 10.8
+  effective cores. His RR at 16 tokens runs 3.1 waves and is ramp/drain-
+  depressed too, less so. Our 498 films over 16 lanes has no wave effect
+  (span ≈ window, section (a)). Do not join his 1.58× to our +5.9%:
+  different competitor arm, different N, wave-limited.
+- **"2.6% apart on RR 16×2" is a throughput coincidence, not a
+  steady-state agreement.** His 12.52 f/s is a wave-depressed span at N=50
+  (our own 35→500 move was +24–25%, mostly ramp/drain) against our
+  saturated 12.198 at N=498. On the wave-independent quantity — CPU-s per
+  frame, cores ÷ f/s — his 2.198 versus our 2.543 is **+15.7%**, the same
+  class as the AMI gap (+19.3% at 16×2, +20.1% at 8×4), on the assumption
+  that his cores are the engine cgroup over the leg with the tokens live
+  (idle burn included), as ours are and as Leela's METRICS.md:75 states
+  for their harnesses. His engine reaches the same span rate at 86% util
+  because it spends ~14% less CPU per frame; ours saturates at 97%. The
+  cross-team CPU-per-frame question therefore replicates on a second
+  corpus and a third harness — and where no corpus can be resident.
+- **Warm-start versus cold-start bases.** His mitigation from films50
+  onward is prewarm with `cache_resident_gb_before/after` recorded; our
+  legs are cold by construction with proof. Neither is wrong; they are
+  different bases, stated wherever the two are put side by side.

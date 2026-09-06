@@ -746,6 +746,40 @@ inference, the serving path, accumulated process state over a long run are the r
 candidate classes). The isolation probe is attached as the control that rules out every
 static explanation.
 
+## Measured update 3 (2026-09-06) — the serving-context condition, located in source; confirmation probe attached
+
+The isolation instrument above called the backend's `detect`
+(`ai/common/models/vision/detection.py:172`, image untouched). The deployment's
+detect node calls the `Detector` facade (`nodes/detect/IGlobal.py:74` →
+`nodes/detect/IInstance.py:107`), whose `detect` (`detection.py:512-518`) first
+runs `ai/common/image/dense_resize.resize_for_inference(image,
+self._infer_max_edge)` with `_infer_max_edge = BACKENDS['rfdetr'].infer_edge = 560`
+(`:60`, `:466`): a strict no-op when the frame's long edge is ≤ 560, otherwise a
+`PIL.Image.LANCZOS` downscale to `floor(w·s) × floor(h·s)`, `s = 560/max(w,h)`,
+with boxes mapped back afterwards (`_rescale_to_original`). The backend (RF-DETR
+1.5.2) then applies its own resize to the already-downscaled image. The comment on
+the backend spec — "downscale to it is lossless (boxes mapped back)" — is true of
+coordinates and false of pixels and scores. This is the deployment-only
+transformation the isolation instrument never exercised (it reproduced the
+reference's path exactly, which is why it matched the reference).
+
+Held evidence that this is the mechanism: (1) the boundary is exactly the constant,
+inclusive — the one corpus film with a long edge of exactly 560 (560×380) agrees
+with the reference, 64 smaller films agree, 433 larger films differ; (2) it is
+deterministic — two full passes per deployment over 498 films are bit-identical
+within each deployment (labels, full-precision scores, counts), so thread or
+reduction-order noise is excluded; (3) the score deltas on the diverging frame are
+10⁻²–10⁻¹ on the same objects (0.953→0.946, 0.490→0.449, 0.433→0.385, a chair at
+0.318 crossing 0.3) — resampling-sized, not last-bit; the thread-count effect,
+measured on the same frame (intraop 16 vs 2), is 10⁻⁷.
+
+Attached confirmation (pre-registered, not yet run — waits for the box):
+`working/video/probe/probe_wrapper_resize_parity.py` — the diverging frame through
+`resize_for_inference(·, 560)` then `RFDETRBase().predict`, at the production thread
+condition; CONFIRMS if it reproduces the deployment's recorded output for that frame
+exactly (6 detections; scores listed in the probe) while the raw frame reproduces
+the reference's (5); a ≤560 control must be a no-op both ways.
+
 ## Acceptance criteria (updated 2026-09-03 — raw-score parity in isolation is
 ## already established; the question is the serving context)
 
@@ -760,3 +794,11 @@ static explanation.
    deployment**, or publish operator guidance stating the sensitivity and its bounds.
 3. The attached isolation instrument stays green on the fixed configuration (it is
    green today: 2026-09-03, both frames, both thread conditions, delta 0.0).
+4. **(added 2026-09-06, pending the attached V-D confirmation)** The facade's
+   pre-inference downscale (`Detector.detect` → `resize_for_inference` at
+   `infer_edge=560`) either matches the model's own preprocessing bit-for-bit — so a
+   frame yields the same detections whether or not it passes through the facade — or
+   is removed for backends that resize internally and return original-frame
+   coordinates, or is documented as a deployment-specific transformation with its
+   measured score effect (percent-level on >560px frames, threshold crossings
+   included). The spec comment "downscale to it is lossless" is corrected either way.

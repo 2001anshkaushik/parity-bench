@@ -137,6 +137,45 @@
 > entry-26 STOP-AND-LAND and `probe/lifetimes_reading.py --lifetimes
 > <landed dir>` for the pre-registered verdicts (the tool refuses to
 > issue verdicts unless its null control reproduces the campaign p1/p2).
+> **SHASHI'S FILMS50 ROUND (2026-09-06, analysis only; the running
+> campaign untouched).** FACT 3 → **the 560px mechanism is LOCATED IN THE
+> ENGINE SOURCE**: the detect node calls the `Detector` facade whose
+> `detect` LANCZOS-downscales any frame with long edge > `infer_edge=560`
+> before the backend (`detection.py:60,466,512-518`; `dense_resize.py`,
+> inclusive no-op at ≤560); LI and the Ruling-Y probe call
+> `RFDETRBase().predict` on the raw frame — the probe replicated the
+> backend's `detect` (:172), never the facade's (register entry 33).
+> Boundary reproduced to the pixel (JailBait 560×380 clean; 624×480 →
+> 560×430 diverging); deterministic (p1≡p2 within arm 498/498 both arms,
+> all 433 >560 films — the "same frame twice under load" test answered
+> at 996 repeats: no variance); deltas 10⁻² vs the measured thread effect
+> 10⁻⁷. Confirmation V-D pre-registered: `probe/probe_wrapper_resize_
+> parity.py` + `run_wrapper_resize_parity.sh` (frame 10 of House through
+> the engine resize must reproduce the campaign RR output exactly; refuses
+> while the plan lock is held) — **RUN ONLY AFTER THE LIFETIMES RUN LANDS
+> AND ON ANSH'S RULING**; ~3 min, one session. Shashi's YUV/height
+> hypothesis does not transfer (shared pinned ffmpeg, A==C EXACT, 560
+> long-edge rule). FACT 1 → the page-cache hypothesis for the AMI ~20% is
+> NOT supported: ours cold by construction with proof (every leg, since
+> 2026-08-20), hers unrecorded/uncontrolled at both pins, the gap is
+> engine-cgroup CPU-s/frame at matched util (residency acts client-side),
+> and it REPLICATES on films where residency is impossible (his 2.198 vs
+> our 2.543 = +15.7%; the 2.6% span agreement is his wave-depressed N=50
+> span vs our saturated 498) — `AMI_CROSS_TEAM_RECONCILIATION.md` §9; the
+> ask stands. FACT 2 → page cache added as the THIRD pre-registered
+> mechanism (p3 in flight, no p3 record read): cost tracks iowait/Cached
+> churn (ρ(cost,iowait) ≥ 0.3 with iowait itself moving; a detrended
+> residual splits a co-trend) vs flat iowait under a position rise;
+> already held: `read_s` per film (cold sha pass, flat by
+> position in all four legs), `cg_current−cg_anon` and `mem_available`
+> per tick, eviction proof per leg; join tool `probe/cachewatch_join.py`
+> (anchor = fsstream row 0 `utc − t`; leg end = anchor + leg_wall_s;
+> per-film windows from the monotonic stamps; collector anchor = .ready
+> mtime; formats kv / csv / meminfo-blocks, unrecognised lines counted).
+> FACT 4 → cross-team caution section in FILMS500_RESULTS.md (wave
+> handicap; warm/cold bases; do not join multiples). DEFINITIVE and
+> FILMS_SUMMARY untouched (a §6 addendum is Ansh's ruling after V-D);
+> Ticket 6 gains measured update 3 + criterion 4.
 > **FILMS-500 COMPLETE + LANDED (2026-09-06): `FILMS500_RESULTS.md`.**
 > 6 legs × 498, 0 errors; box commit cc98ca6b, bundle 1882c0d4,
 > ff-merged. **Partition HELD EXACTLY: 433 diverging / 65 clean / 0
