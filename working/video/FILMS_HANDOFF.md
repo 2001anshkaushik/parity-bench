@@ -109,8 +109,31 @@
 > progress): the live rr container's /tmp held **19 spool files, 825,012
 > KiB (~806 MiB)** with 16 tokens decoding the warm films — the RR spool
 > IS container /tmp, measured, not inferred from reader.py — cg anon 15.99
-> GB, load1 7.22 rising; mirror cycle 2 synced 09:08:41Z. Next: leg_start
-> glance line in the log once the warm-up ends; walk-away ~15.5 h; then
+> GB, load1 7.22 rising; mirror cycle 2 synced 09:08:41Z. Read-back
+> 09:33:55Z: still warm-up — NOT a hang: the campaign's own RR warm-up
+> ledgers say 16 sends × 128–186 s, 2 concurrent then 14 SEQUENTIAL
+> top-ups = 37.1 min (p1) / 39.9 min (p2), so the leg starts ≈09:42–
+> 09:44Z; box agrees (cgroup 7.45 cores busy = idle burn 4.65 + one film
+> decoding at 2 threads; driver alive, 0.6% CPU; engine log silent as in
+> the campaign). SPOOL LIFECYCLE MEASURED on the live arm: rr /tmp = 16
+> per-token `task-<id>.webhook_1-*.json` (3,952 B, mtimes 09:04:44–
+> 09:06:44 = token creation; task_engine.py:416) + exactly ONE
+> `media_*.avi` at a time whose size 844,728,506 B is byte-exact
+> `zontar_the_thing_from_venus.mp4` (the warm film in flight; mtime =
+> now) + 2 empty uv locks — one whole-film spool per send, removed after
+> each send, NO accumulation across 16+ sends. **IN-LEG PROOF 09:50:16Z**:
+> warm-up consumed 16 sends (ledger 09:46); RR pass 3 leg started
+> ≈09:46Z; the driver's `lifetime_state leg_start` reading FIRED —
+> "docker_root free 603.5 GiB | frag avg-extent 43547.0 KiB, >=4MiB
+> share 0.9937 | rr: spool du 76 KiB/18 files, layer 311kB, cg anon
+> 17.29 GiB, procs 17 rss 24.71 GiB" (17 = engine server + 16 token
+> processes, after the warm-up); fs stream live (41 rows at 5 s);
+> records 0 yet (first completions at ~6 min); rr cgroup 32.34 cores
+> busy (box saturated as in the campaign), load1 45.9; /tmp = 16
+> `media_*.avi` in flight (one whole-film spool per token, 9,296,224 KiB
+> ≈ 8.9 GiB) + 16 webhooks; mirror cycle 10 synced 09:48:48Z. Projected:
+> p3 ends ≈13:30Z, p4 ≈17:15Z, LI lifetime (bring-up + ~40 min warm-up +
+> two passes) ≈ 7.5 h → run complete ≈00:30–01:00Z 2026-09-07. Then
 > entry-26 STOP-AND-LAND and `probe/lifetimes_reading.py --lifetimes
 > <landed dir>` for the pre-registered verdicts (the tool refuses to
 > issue verdicts unless its null control reproduces the campaign p1/p2).
