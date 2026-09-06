@@ -1,0 +1,6445 @@
+{
+ "at_a_glance": "llamaindex_video workers[declared_workers=16] blast pass 2 records 498 (errors 0) / offered 498 | THROUGHPUT 12.953 frames/s (193.9x realtime), steady window 12.957 frames/s (n=482) | SERVICE CPU 28.45 cores = 88.9% of 32 | IDLE BURDEN 0.067 cores with 16 li_workers live = 0.2% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 2 | gates PASS 7 \u00b7 NOT RUN 1 \u00b7 FAIL 0 | efficiency valid=True | COLLECTOR ok",
+ "arm": "llamaindex_video",
+ "posture": "workers[declared_workers=16]",
+ "leg": "blast",
+ "pass": 2,
+ "submission_order": "manifest-seq: deterministic by meeting id, identical both arms; NOT longest-first \u2014 sorting to shorten the drain tail would benchmark our scheduler, not the frameworks (ruling 2026-08-20)",
+ "throughput": {
+  "total_span_s": 12501.1,
+  "total_frames": 161932,
+  "total_frames_per_s": 12.953,
+  "total_realtime_factor": 193.9,
+  "steady_window": {
+   "defined": true,
+   "window_start_ns": 19071631698967,
+   "window_end_ns": 31158745701667,
+   "window_wall_s": 12087.1,
+   "window_n": 482,
+   "window_frames": 156613,
+   "window_frames_per_s": 12.957,
+   "window_realtime_factor": 193.94,
+   "note": "window = [first in-flight==C, last in-flight>=C]; completions inside"
+  }
+ },
+ "efficiency": {
+  "valid": true,
+  "source": "container cgroup cpu.stat usage_usec bracketed around the leg \u2014 the same reader as the probes (#34: denominators from the container, never the driver)",
+  "service_cpu_s": 355650.4,
+  "effective_cores": 28.45,
+  "cpu_util_of_box": 0.889,
+  "box_cpus": 32,
+  "cpu_s_per_footage_min": 8.803,
+  "cpu_s_per_frame": 2.196,
+  "cpu_s_per_video": 714.2,
+  "cpu_s_per_detection": 0.4865,
+  "cpu_s_per_chunk": 8.681,
+  "n_detections": 731010,
+  "n_chunks": 40970,
+  "usd_per_1k_footage_hours": 7.36,
+  "usd_per_hour_basis": "1.428 (instance on-demand $/h; cost = $/h / x_realtime * 1000, her V5 definition)",
+  "idle_burden": {
+   "instances": 16,
+   "instance_kind": "li_workers",
+   "idle_cores_before_instances": 0.09,
+   "idle_cores_with_instances_live": 0.067,
+   "sample_s": 6.0,
+   "idle_share_of_box": 0.0021,
+   "box_cpus": 32,
+   "marginal_cores_per_instance": null,
+   "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+   "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve",
+   "idle_cpu_s_over_leg_if_additive": 837.6,
+   "idle_share_of_service_cpu_if_additive": 0.0024
+  },
+  "policy": "idle_burden is reported beside every figure above and never subtracted \u2014 additivity under load is unmeasured (Ticket 4)"
+ },
+ "driver_memory": {
+  "ru_maxrss_kb": 279396,
+  "basis": "getrusage(RUSAGE_SELF).ru_maxrss at export time \u2014 the driver process peak over the whole leg (KiB on Linux)"
+ },
+ "collector_status": "ok",
+ "collector_summary": {
+  "roles": {
+   "driver": {
+    "peak_rss_bytes": 240087040,
+    "peak_rss_mb": 228.96,
+    "peak_vms_bytes": 5005185024,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 3,
+    "peak_thread_count": 50,
+    "peak_cgroup_anon_mb": 279.66,
+    "peak_cgroup_current_mb": 36329.12,
+    "peak_cgroup_tasks": 91,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/snap.amazon-ssm-agent.amazon-ssm-agent.service",
+    "cgroup_samples": 25005,
+    "peak_fd_count": 48,
+    "distinct_pids_seen": 3,
+    "total_cpu_seconds": 1118.37,
+    "ctx_switches_voluntary": 256110,
+    "ctx_switches_involuntary": 1676,
+    "samples": 25005,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": 1931.42,
+    "rss_final_over_initial": 1.5209
+   },
+   "service": {
+    "peak_rss_bytes": 24467857408,
+    "peak_rss_mb": 23334.37,
+    "peak_vms_bytes": 113111244800,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 25,
+    "peak_thread_count": 941,
+    "peak_cgroup_anon_mb": 1047.77,
+    "peak_cgroup_current_mb": 3072.0,
+    "peak_cgroup_tasks": 97,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-577723c8d9a498a2b4dae52c2b2cfc638844338fa49d3d65dc564b86e07f138a.scope",
+    "cgroup_samples": 25005,
+    "peak_fd_count": 0,
+    "distinct_pids_seen": 514,
+    "total_cpu_seconds": 701246.87,
+    "ctx_switches_voluntary": 8734016,
+    "ctx_switches_involuntary": 503305,
+    "samples": 25005,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": -42177.25,
+    "rss_final_over_initial": 1.0072
+   }
+  },
+  "system": {
+   "compressor_delta_bytes": 0,
+   "swapouts_delta": 0,
+   "compressions_delta": 0,
+   "peak_system_mem_percent": 28.4
+  }
+ },
+ "n_offered": 498,
+ "n_records": 498,
+ "n_errors": 0,
+ "leg_wall_s": 12501.1,
+ "aborted_by_breaker": false,
+ "wall_s_order_stats": [
+  197.5,
+  209.2,
+  220.6,
+  233.6,
+  234.1,
+  243.3,
+  243.3,
+  244.6,
+  245.2,
+  247.2,
+  249.2,
+  249.7,
+  253.2,
+  253.4,
+  254.2,
+  256.3,
+  257.2,
+  259.0,
+  260.5,
+  260.9,
+  261.9,
+  263.5,
+  264.3,
+  265.1,
+  266.1,
+  267.7,
+  268.1,
+  268.1,
+  268.4,
+  268.5,
+  269.5,
+  269.7,
+  269.8,
+  271.6,
+  272.4,
+  272.9,
+  273.9,
+  274.6,
+  274.7,
+  275.3,
+  275.6,
+  276.1,
+  277.5,
+  278.0,
+  278.3,
+  278.3,
+  279.0,
+  279.1,
+  279.6,
+  279.8,
+  279.8,
+  279.9,
+  280.8,
+  281.0,
+  281.2,
+  281.5,
+  281.9,
+  281.9,
+  282.3,
+  282.7,
+  283.3,
+  283.5,
+  283.6,
+  284.2,
+  284.4,
+  284.7,
+  285.2,
+  285.2,
+  285.2,
+  285.5,
+  285.7,
+  286.2,
+  286.3,
+  286.4,
+  286.7,
+  287.1,
+  287.5,
+  287.9,
+  289.0,
+  289.2,
+  289.4,
+  289.9,
+  290.0,
+  290.2,
+  290.3,
+  292.4,
+  292.7,
+  292.9,
+  293.1,
+  293.4,
+  293.7,
+  293.9,
+  294.0,
+  294.1,
+  294.3,
+  294.4,
+  294.5,
+  294.6,
+  295.0,
+  296.4,
+  296.5,
+  296.9,
+  297.7,
+  297.9,
+  298.1,
+  298.1,
+  298.7,
+  299.5,
+  300.2,
+  300.4,
+  300.8,
+  301.0,
+  301.1,
+  301.2,
+  301.4,
+  302.1,
+  302.4,
+  303.3,
+  304.0,
+  304.5,
+  304.8,
+  305.1,
+  305.4,
+  305.4,
+  306.2,
+  306.3,
+  306.4,
+  306.4,
+  306.5,
+  306.9,
+  308.2,
+  308.8,
+  308.8,
+  309.6,
+  310.4,
+  310.7,
+  310.9,
+  311.1,
+  311.9,
+  312.9,
+  313.8,
+  314.5,
+  314.5,
+  314.6,
+  314.8,
+  315.0,
+  315.4,
+  315.8,
+  316.2,
+  316.2,
+  317.0,
+  317.1,
+  317.4,
+  317.4,
+  317.7,
+  318.2,
+  319.8,
+  321.0,
+  321.1,
+  321.4,
+  321.7,
+  322.6,
+  323.5,
+  323.7,
+  323.7,
+  323.9,
+  324.0,
+  324.1,
+  324.2,
+  324.3,
+  324.7,
+  324.9,
+  325.7,
+  326.6,
+  327.0,
+  327.2,
+  327.8,
+  328.0,
+  328.2,
+  328.7,
+  329.1,
+  329.2,
+  329.8,
+  329.9,
+  329.9,
+  330.8,
+  331.1,
+  331.5,
+  331.8,
+  331.9,
+  332.6,
+  332.9,
+  333.0,
+  333.0,
+  333.3,
+  333.4,
+  333.6,
+  334.1,
+  335.2,
+  335.3,
+  335.6,
+  336.0,
+  336.2,
+  337.2,
+  337.2,
+  337.9,
+  337.9,
+  338.2,
+  339.2,
+  339.9,
+  340.8,
+  340.9,
+  341.0,
+  341.0,
+  341.6,
+  341.9,
+  343.0,
+  343.7,
+  343.8,
+  343.9,
+  344.0,
+  345.9,
+  346.2,
+  346.6,
+  346.9,
+  347.1,
+  347.2,
+  347.6,
+  348.4,
+  348.7,
+  348.7,
+  348.9,
+  349.4,
+  349.6,
+  349.8,
+  350.1,
+  350.1,
+  350.4,
+  350.6,
+  351.3,
+  351.5,
+  351.9,
+  352.2,
+  352.6,
+  352.7,
+  352.7,
+  352.8,
+  353.5,
+  354.6,
+  354.9,
+  355.7,
+  355.9,
+  355.9,
+  356.1,
+  356.1,
+  356.2,
+  356.3,
+  356.5,
+  356.6,
+  358.1,
+  358.5,
+  358.8,
+  359.0,
+  359.3,
+  359.5,
+  360.1,
+  360.6,
+  361.3,
+  361.4,
+  362.0,
+  362.2,
+  362.4,
+  362.9,
+  363.2,
+  363.2,
+  363.4,
+  365.6,
+  366.3,
+  366.3,
+  366.8,
+  368.2,
+  369.2,
+  369.9,
+  370.3,
+  371.1,
+  371.1,
+  371.6,
+  371.6,
+  371.9,
+  372.3,
+  372.7,
+  372.9,
+  372.9,
+  373.0,
+  373.7,
+  374.7,
+  374.7,
+  375.1,
+  375.5,
+  376.5,
+  377.8,
+  377.9,
+  378.1,
+  378.6,
+  378.9,
+  379.7,
+  379.8,
+  380.4,
+  380.7,
+  380.8,
+  381.1,
+  381.1,
+  381.2,
+  381.4,
+  382.1,
+  382.2,
+  382.4,
+  383.1,
+  383.5,
+  383.7,
+  384.5,
+  384.8,
+  386.1,
+  386.5,
+  387.5,
+  387.6,
+  387.7,
+  387.8,
+  389.2,
+  389.3,
+  389.7,
+  390.0,
+  391.1,
+  391.7,
+  392.1,
+  392.2,
+  392.6,
+  392.7,
+  393.7,
+  393.8,
+  393.9,
+  394.2,
+  396.8,
+  397.1,
+  398.1,
+  398.4,
+  399.5,
+  399.8,
+  400.1,
+  400.1,
+  400.7,
+  401.2,
+  401.2,
+  401.3,
+  401.5,
+  401.5,
+  402.2,
+  402.4,
+  403.2,
+  403.4,
+  404.1,
+  404.1,
+  405.1,
+  405.3,
+  405.8,
+  406.4,
+  406.7,
+  407.4,
+  407.7,
+  408.6,
+  408.9,
+  409.2,
+  409.2,
+  410.8,
+  411.0,
+  411.5,
+  411.9,
+  412.2,
+  413.5,
+  413.9,
+  414.0,
+  414.5,
+  416.1,
+  416.6,
+  418.3,
+  418.3,
+  419.5,
+  420.2,
+  421.0,
+  421.4,
+  421.9,
+  422.1,
+  422.9,
+  423.0,
+  424.6,
+  425.0,
+  425.0,
+  426.2,
+  426.3,
+  426.6,
+  427.2,
+  427.2,
+  428.7,
+  430.5,
+  431.0,
+  432.0,
+  432.1,
+  434.3,
+  435.2,
+  435.9,
+  436.2,
+  436.5,
+  437.2,
+  437.5,
+  438.0,
+  438.0,
+  438.2,
+  440.6,
+  440.6,
+  440.6,
+  441.2,
+  441.5,
+  442.9,
+  443.7,
+  445.8,
+  446.3,
+  447.8,
+  452.2,
+  452.8,
+  453.9,
+  454.0,
+  455.4,
+  455.9,
+  456.0,
+  459.6,
+  463.0,
+  466.9,
+  467.3,
+  470.9,
+  471.0,
+  471.1,
+  472.4,
+  475.6,
+  476.7,
+  479.3,
+  479.5,
+  480.4,
+  480.7,
+  485.1,
+  489.9,
+  492.5,
+  492.6,
+  493.6,
+  500.2,
+  501.3,
+  512.8,
+  523.3,
+  525.5,
+  574.6,
+  580.8,
+  584.1,
+  666.0,
+  681.0,
+  697.7,
+  705.3,
+  731.7,
+  737.5,
+  745.0,
+  754.3,
+  759.4,
+  760.3,
+  770.3,
+  774.9,
+  775.3,
+  776.0,
+  782.9,
+  793.4,
+  799.2,
+  814.1,
+  821.8,
+  837.0,
+  842.3,
+  849.8,
+  858.7,
+  862.7,
+  866.9,
+  905.0,
+  935.1,
+  949.8,
+  964.4,
+  983.1,
+  988.5,
+  1009.5,
+  1019.5,
+  1046.3,
+  1049.4,
+  1065.7,
+  1106.8
+ ],
+ "latency_normalized": {
+  "wall_s_per_video_minute": [
+   2.8,
+   3.06,
+   3.24,
+   3.29,
+   3.38,
+   3.5,
+   3.51,
+   3.54,
+   3.61,
+   3.61,
+   3.73,
+   3.73,
+   3.74,
+   3.74,
+   3.75,
+   3.76,
+   3.77,
+   3.77,
+   3.77,
+   3.82,
+   3.82,
+   3.84,
+   3.87,
+   3.89,
+   3.89,
+   3.9,
+   3.9,
+   3.91,
+   3.92,
+   3.92,
+   3.92,
+   3.92,
+   3.93,
+   3.93,
+   3.93,
+   3.94,
+   3.97,
+   3.97,
+   3.97,
+   3.97,
+   3.98,
+   3.98,
+   4.0,
+   4.0,
+   4.0,
+   4.0,
+   4.0,
+   4.0,
+   4.01,
+   4.01,
+   4.02,
+   4.03,
+   4.03,
+   4.03,
+   4.03,
+   4.04,
+   4.04,
+   4.04,
+   4.05,
+   4.05,
+   4.06,
+   4.06,
+   4.06,
+   4.07,
+   4.07,
+   4.08,
+   4.08,
+   4.08,
+   4.08,
+   4.08,
+   4.09,
+   4.09,
+   4.09,
+   4.09,
+   4.09,
+   4.1,
+   4.11,
+   4.12,
+   4.12,
+   4.13,
+   4.13,
+   4.13,
+   4.13,
+   4.13,
+   4.14,
+   4.14,
+   4.15,
+   4.15,
+   4.16,
+   4.16,
+   4.16,
+   4.17,
+   4.17,
+   4.17,
+   4.18,
+   4.18,
+   4.18,
+   4.19,
+   4.19,
+   4.19,
+   4.2,
+   4.21,
+   4.21,
+   4.22,
+   4.22,
+   4.22,
+   4.22,
+   4.22,
+   4.23,
+   4.24,
+   4.24,
+   4.24,
+   4.25,
+   4.25,
+   4.25,
+   4.26,
+   4.26,
+   4.26,
+   4.27,
+   4.27,
+   4.27,
+   4.27,
+   4.27,
+   4.27,
+   4.27,
+   4.27,
+   4.28,
+   4.29,
+   4.29,
+   4.29,
+   4.3,
+   4.3,
+   4.31,
+   4.31,
+   4.31,
+   4.31,
+   4.31,
+   4.31,
+   4.31,
+   4.31,
+   4.32,
+   4.32,
+   4.32,
+   4.32,
+   4.33,
+   4.33,
+   4.33,
+   4.33,
+   4.33,
+   4.34,
+   4.34,
+   4.34,
+   4.34,
+   4.34,
+   4.34,
+   4.35,
+   4.35,
+   4.35,
+   4.35,
+   4.35,
+   4.35,
+   4.36,
+   4.36,
+   4.36,
+   4.36,
+   4.36,
+   4.36,
+   4.36,
+   4.36,
+   4.37,
+   4.37,
+   4.37,
+   4.37,
+   4.37,
+   4.38,
+   4.38,
+   4.38,
+   4.39,
+   4.39,
+   4.39,
+   4.39,
+   4.4,
+   4.4,
+   4.4,
+   4.41,
+   4.41,
+   4.41,
+   4.41,
+   4.41,
+   4.41,
+   4.41,
+   4.41,
+   4.42,
+   4.42,
+   4.42,
+   4.42,
+   4.42,
+   4.43,
+   4.43,
+   4.44,
+   4.44,
+   4.44,
+   4.45,
+   4.45,
+   4.45,
+   4.45,
+   4.46,
+   4.46,
+   4.46,
+   4.46,
+   4.46,
+   4.46,
+   4.47,
+   4.47,
+   4.47,
+   4.47,
+   4.47,
+   4.47,
+   4.48,
+   4.48,
+   4.48,
+   4.48,
+   4.48,
+   4.48,
+   4.48,
+   4.48,
+   4.48,
+   4.49,
+   4.49,
+   4.49,
+   4.49,
+   4.49,
+   4.49,
+   4.49,
+   4.49,
+   4.5,
+   4.5,
+   4.5,
+   4.5,
+   4.5,
+   4.5,
+   4.51,
+   4.51,
+   4.51,
+   4.51,
+   4.51,
+   4.52,
+   4.52,
+   4.52,
+   4.52,
+   4.52,
+   4.53,
+   4.53,
+   4.53,
+   4.53,
+   4.53,
+   4.54,
+   4.54,
+   4.54,
+   4.54,
+   4.55,
+   4.55,
+   4.55,
+   4.55,
+   4.55,
+   4.56,
+   4.56,
+   4.56,
+   4.57,
+   4.57,
+   4.57,
+   4.58,
+   4.58,
+   4.58,
+   4.58,
+   4.58,
+   4.58,
+   4.59,
+   4.59,
+   4.59,
+   4.59,
+   4.59,
+   4.6,
+   4.6,
+   4.61,
+   4.61,
+   4.61,
+   4.61,
+   4.62,
+   4.62,
+   4.62,
+   4.62,
+   4.62,
+   4.62,
+   4.63,
+   4.63,
+   4.63,
+   4.63,
+   4.64,
+   4.64,
+   4.64,
+   4.64,
+   4.64,
+   4.64,
+   4.64,
+   4.64,
+   4.64,
+   4.65,
+   4.65,
+   4.65,
+   4.65,
+   4.65,
+   4.66,
+   4.66,
+   4.66,
+   4.66,
+   4.66,
+   4.66,
+   4.67,
+   4.67,
+   4.67,
+   4.68,
+   4.68,
+   4.68,
+   4.68,
+   4.68,
+   4.68,
+   4.68,
+   4.68,
+   4.68,
+   4.68,
+   4.69,
+   4.69,
+   4.69,
+   4.69,
+   4.69,
+   4.69,
+   4.69,
+   4.7,
+   4.7,
+   4.7,
+   4.71,
+   4.71,
+   4.71,
+   4.72,
+   4.72,
+   4.72,
+   4.72,
+   4.73,
+   4.73,
+   4.73,
+   4.73,
+   4.73,
+   4.73,
+   4.73,
+   4.74,
+   4.74,
+   4.74,
+   4.74,
+   4.74,
+   4.75,
+   4.75,
+   4.75,
+   4.75,
+   4.76,
+   4.76,
+   4.77,
+   4.77,
+   4.78,
+   4.78,
+   4.78,
+   4.78,
+   4.79,
+   4.79,
+   4.79,
+   4.79,
+   4.79,
+   4.79,
+   4.79,
+   4.8,
+   4.8,
+   4.8,
+   4.8,
+   4.81,
+   4.81,
+   4.81,
+   4.81,
+   4.81,
+   4.82,
+   4.82,
+   4.82,
+   4.82,
+   4.83,
+   4.83,
+   4.83,
+   4.83,
+   4.85,
+   4.85,
+   4.85,
+   4.86,
+   4.86,
+   4.86,
+   4.86,
+   4.86,
+   4.87,
+   4.87,
+   4.88,
+   4.89,
+   4.89,
+   4.89,
+   4.89,
+   4.89,
+   4.9,
+   4.91,
+   4.91,
+   4.93,
+   4.93,
+   4.94,
+   4.95,
+   4.95,
+   4.99,
+   5.0,
+   5.0,
+   5.03,
+   5.04,
+   5.06,
+   5.06,
+   5.06,
+   5.1,
+   5.11,
+   5.18,
+   5.2,
+   5.22,
+   5.23,
+   5.23,
+   5.25,
+   5.26,
+   5.27,
+   5.28,
+   5.3,
+   5.33,
+   5.33,
+   5.42,
+   5.44,
+   5.48,
+   5.55,
+   5.63,
+   5.66,
+   5.71,
+   5.74,
+   5.76,
+   5.77,
+   5.8,
+   5.83,
+   5.83,
+   5.87,
+   6.04,
+   6.06,
+   6.08,
+   6.17,
+   6.18,
+   6.19,
+   6.25,
+   6.3,
+   6.31,
+   6.33,
+   6.38,
+   6.44,
+   6.52,
+   6.58,
+   6.64,
+   6.65,
+   6.68,
+   6.7,
+   6.72,
+   6.73,
+   6.8,
+   6.92,
+   7.09,
+   7.27,
+   7.3,
+   7.41,
+   7.55,
+   7.68,
+   8.2,
+   8.42,
+   8.79,
+   8.89,
+   9.21,
+   9.25,
+   9.48,
+   10.23,
+   10.36,
+   12.59,
+   13.36,
+   13.49,
+   14.05
+  ],
+  "note": "raw per-video wall_s and video_s_manifest are in every record; this normalization keeps the 6x duration confound visible",
+  "p50": 4.52,
+  "max": 14.05,
+  "n": 497,
+  "percentile_policy": "p50/max/n only below n=50 (no dressed percentiles)"
+ },
+ "preleg_load1": 6.28,
+ "preleg_container_idle_cores": {
+  "li_bal_0": 0.006,
+  "li_bal_1": 0.006,
+  "li_bal_2": 0.006,
+  "li_bal_3": 0.005,
+  "li_bal_4": 0.006,
+  "li_bal_5": 0.006,
+  "li_bal_6": 0.005,
+  "li_bal_7": 0.005,
+  "li_bal_8": 0.005,
+  "li_bal_9": 0.006,
+  "li_bal_10": 0.006,
+  "li_bal_11": 0.006,
+  "li_bal_12": 0.005,
+  "li_bal_13": 0.005,
+  "li_bal_14": 0.006,
+  "li_bal_15": 0.006
+ },
+ "preleg_foreign_excess": 1.06,
+ "quiet_box_override": null,
+ "driver_cpu": {
+  "cpu_s": 689.2,
+  "share_of_box": 0.0017,
+  "over_1pct": false
+ },
+ "gates": {
+  "frames_census": {
+   "PASS": true,
+   "arm": "llamaindex_video",
+   "n_records": 498,
+   "missing_videos": null,
+   "rows": [
+    {
+     "video": "ACloseCallForBostonBlackie.mp4",
+     "PASS": true,
+     "frames": 240
+    },
+    {
+     "video": "AdventureIsland.mp4",
+     "PASS": true,
+     "frames": 266
+    },
+    {
+     "video": "ABucketOfBlood1959.mp4",
+     "PASS": true,
+     "frames": 260
+    },
+    {
+     "video": "A_Study_In_Scarlet.mp4",
+     "PASS": true,
+     "frames": 285
+    },
+    {
+     "video": "20000LeaguesUndertheSea.mp4",
+     "PASS": true,
+     "frames": 395
+    },
+    {
+     "video": "AfricaScreams.mp4",
+     "PASS": true,
+     "frames": 316
+    },
+    {
+     "video": "ABucketofBlood.mp4",
+     "PASS": true,
+     "frames": 262
+    },
+    {
+     "video": "Apache_Blood.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "AbileneTown.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "ArchOfTriumph.mp4",
+     "PASS": true,
+     "frames": 375
+    },
+    {
+     "video": "AngelAndTheBadManVideoQualityUpgrade.mp4",
+     "PASS": true,
+     "frames": 382
+    },
+    {
+     "video": "AsYouLikeIt1936.mp4",
+     "PASS": true,
+     "frames": 386
+    },
+    {
+     "video": "Algiers_.mp4",
+     "PASS": true,
+     "frames": 396
+    },
+    {
+     "video": "Ace_of_Hearts_1921.mp4",
+     "PASS": true,
+     "frames": 297
+    },
+    {
+     "video": "ARomanceOfTheRedwoods.mp4",
+     "PASS": true,
+     "frames": 364
+    },
+    {
+     "video": "Assignment_Outer_Space.mp4",
+     "PASS": true,
+     "frames": 290
+    },
+    {
+     "video": "AStarIsBorn.mp4",
+     "PASS": true,
+     "frames": 444
+    },
+    {
+     "video": "AtWarWithTheArmy.mp4",
+     "PASS": true,
+     "frames": 362
+    },
+    {
+     "video": "AteneaFilmsPublicDomainTheInvincibleGladiator.mp4",
+     "PASS": true,
+     "frames": 364
+    },
+    {
+     "video": "AtomAgeVampire.mp4",
+     "PASS": true,
+     "frames": 345
+    },
+    {
+     "video": "Attack_From_Space.mp4",
+     "PASS": true,
+     "frames": 302
+    },
+    {
+     "video": "BattleBeyondTheSun.mp4",
+     "PASS": true,
+     "frames": 269
+    },
+    {
+     "video": "BattleshipPotemkin.mp4",
+     "PASS": true,
+     "frames": 291
+    },
+    {
+     "video": "Attack_of_the_Monsters.mp4",
+     "PASS": true,
+     "frames": 320
+    },
+    {
+     "video": "BattleofBloodIsland.mp4",
+     "PASS": true,
+     "frames": 283
+    },
+    {
+     "video": "BerlinSymphonyofaGreatCity.mp4",
+     "PASS": true,
+     "frames": 248
+    },
+    {
+     "video": "BehindGreenLights_high_Q_mp4.mp4",
+     "PASS": true,
+     "frames": 246
+    },
+    {
+     "video": "BeauIdeal.mp4",
+     "PASS": true,
+     "frames": 315
+    },
+    {
+     "video": "Billy_the_Kid_Wanted_1941.mp4",
+     "PASS": true,
+     "frames": 241
+    },
+    {
+     "video": "BeatTheDevil1953.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "Becky_Sharp_.mp4",
+     "PASS": true,
+     "frames": 334
+    },
+    {
+     "video": "Bird_of_Paradise_1932.mp4",
+     "PASS": true,
+     "frames": 322
+    },
+    {
+     "video": "BlackDragons.mp4",
+     "PASS": true,
+     "frames": 247
+    },
+    {
+     "video": "Black_Raven_movie.mp4",
+     "PASS": true,
+     "frames": 245
+    },
+    {
+     "video": "Bloodlust.mpeg.mp4",
+     "PASS": true,
+     "frames": 272
+    },
+    {
+     "video": "BlondeIce1948.mp4",
+     "PASS": true,
+     "frames": 296
+    },
+    {
+     "video": "Bluebeard.mp4",
+     "PASS": true,
+     "frames": 283
+    },
+    {
+     "video": "Bowery_at_Midnight.mp4",
+     "PASS": true,
+     "frames": 246
+    },
+    {
+     "video": "BloodyPitOfHorror.mp4",
+     "PASS": true,
+     "frames": 330
+    },
+    {
+     "video": "CC_1914_11_14_TilliesPuncturedRomance.mp4",
+     "PASS": true,
+     "frames": 286
+    },
+    {
+     "video": "BorntoWin.mp4",
+     "PASS": true,
+     "frames": 335
+    },
+    {
+     "video": "BloodontheSun.mp4",
+     "PASS": true,
+     "frames": 374
+    },
+    {
+     "video": "BloodyWednesday.mp4",
+     "PASS": true,
+     "frames": 384
+    },
+    {
+     "video": "C-Man.mp4",
+     "PASS": true,
+     "frames": 306
+    },
+    {
+     "video": "Cafune.mp4",
+     "PASS": true,
+     "frames": 369
+    },
+    {
+     "video": "CCandCompany.mp4",
+     "PASS": true,
+     "frames": 374
+    },
+    {
+     "video": "CaptainKidd_.mp4",
+     "PASS": true,
+     "frames": 355
+    },
+    {
+     "video": "ChelovekskinoapparatomManWithAMovieCamera.mp4",
+     "PASS": true,
+     "frames": 267
+    },
+    {
+     "video": "ChildBride.mp4",
+     "PASS": true,
+     "frames": 248
+    },
+    {
+     "video": "CarnivalOfSoulsVideoQualityUpgrade.mp4",
+     "PASS": true,
+     "frames": 311
+    },
+    {
+     "video": "BlackFist.mp4",
+     "PASS": true,
+     "frames": 377
+    },
+    {
+     "video": "CarnivalOfSouls1962.mp4",
+     "PASS": true,
+     "frames": 329
+    },
+    {
+     "video": "CarnivalofSouls.mp4",
+     "PASS": true,
+     "frames": 332
+    },
+    {
+     "video": "CrashoftheMoons.mp4",
+     "PASS": true,
+     "frames": 288
+    },
+    {
+     "video": "CreatureFromTheHauntedSea1961.mp4",
+     "PASS": true,
+     "frames": 298
+    },
+    {
+     "video": "CreatureFromTheHauntedSea.mp4",
+     "PASS": true,
+     "frames": 298
+    },
+    {
+     "video": "Cleopatra_1912.mp4",
+     "PASS": true,
+     "frames": 349
+    },
+    {
+     "video": "Cosmos_War_of_the_Planets.mp4",
+     "PASS": true,
+     "frames": 356
+    },
+    {
+     "video": "ConcreteCowboys.mp4",
+     "PASS": true,
+     "frames": 366
+    },
+    {
+     "video": "CurseOfTheSwampCreature1966_742.mp4",
+     "PASS": true,
+     "frames": 322
+    },
+    {
+     "video": "DanielBoone1936.mp4",
+     "PASS": true,
+     "frames": 303
+    },
+    {
+     "video": "DeadMenWalk.mp4",
+     "PASS": true,
+     "frames": 252
+    },
+    {
+     "video": "Daniel_Boone_-_Trail_Blazer.mp4",
+     "PASS": true,
+     "frames": 303
+    },
+    {
+     "video": "DeathRage.mp4",
+     "PASS": true,
+     "frames": 340
+    },
+    {
+     "video": "DeadManDrinking.mp4",
+     "PASS": true,
+     "frames": 354
+    },
+    {
+     "video": "Breaking_With_Old_Ideas.mp4",
+     "PASS": true,
+     "frames": 511
+    },
+    {
+     "video": "Crossroads_french_documentary_on_Robert_Johnson.mp4",
+     "PASS": true,
+     "frames": 379
+    },
+    {
+     "video": "Detour.mp4",
+     "PASS": true,
+     "frames": 271
+    },
+    {
+     "video": "Decay2012-TheLhcZombieFilmfullFilm.mp4",
+     "PASS": true,
+     "frames": 304
+    },
+    {
+     "video": "Dick_Tracy_Meets_Gruesome_1947.mp4",
+     "PASS": true,
+     "frames": 261
+    },
+    {
+     "video": "DiaryofaNudist.mp4",
+     "PASS": true,
+     "frames": 286
+    },
+    {
+     "video": "Destroy_All_Planets.mp4",
+     "PASS": true,
+     "frames": 360
+    },
+    {
+     "video": "DeviloftheDesertAgainstSonofHercules.mp4",
+     "PASS": true,
+     "frames": 369
+    },
+    {
+     "video": "DiaryOfANudistwidescreen.mp4",
+     "PASS": true,
+     "frames": 287
+    },
+    {
+     "video": "Cyrano_DeBergerac.mp4",
+     "PASS": true,
+     "frames": 452
+    },
+    {
+     "video": "Doomed_to_Die_1940.mp4",
+     "PASS": true,
+     "frames": 270
+    },
+    {
+     "video": "DoomsdayMachine1972.mp4",
+     "PASS": true,
+     "frames": 330
+    },
+    {
+     "video": "Dont_Look_in_theBasement.mp4",
+     "PASS": true,
+     "frames": 354
+    },
+    {
+     "video": "Dominique_638.mp4",
+     "PASS": true,
+     "frames": 380
+    },
+    {
+     "video": "DressedToKill1946.mp4",
+     "PASS": true,
+     "frames": 276
+    },
+    {
+     "video": "Drums_in_the_Deep_South.mp4",
+     "PASS": true,
+     "frames": 345
+    },
+    {
+     "video": "DrillerKillerUncut1979.mp4",
+     "PASS": true,
+     "frames": 368
+    },
+    {
+     "video": "EvilBrainFromOuterSpace.mp4",
+     "PASS": true,
+     "frames": 313
+    },
+    {
+     "video": "EndoftheWorld.mp4",
+     "PASS": true,
+     "frames": 345
+    },
+    {
+     "video": "Eegah.mp4",
+     "PASS": true,
+     "frames": 362
+    },
+    {
+     "video": "Eisenstein-October.mp4",
+     "PASS": true,
+     "frames": 409
+    },
+    {
+     "video": "Fear_in_the_Night.mp4",
+     "PASS": true,
+     "frames": 283
+    },
+    {
+     "video": "Fog_island_1945.mp4",
+     "PASS": true,
+     "frames": 274
+    },
+    {
+     "video": "FamilyEnforcer.mp4",
+     "PASS": true,
+     "frames": 358
+    },
+    {
+     "video": "FightingCaravans1931_368.mp4",
+     "PASS": true,
+     "frames": 323
+    },
+    {
+     "video": "FirstSpaceshipOnVenusMPEG.mp4",
+     "PASS": true,
+     "frames": 314
+    },
+    {
+     "video": "Fire_Monsters_Against_The_Son_of_Hercules.mp4",
+     "PASS": true,
+     "frames": 308
+    },
+    {
+     "video": "DoubleFeatureHell2theGrindhouseExperience.mp4",
+     "PASS": true,
+     "frames": 577
+    },
+    {
+     "video": "GetChristieLove.mp4",
+     "PASS": true,
+     "frames": 295
+    },
+    {
+     "video": "Go_for_Broke.mp4",
+     "PASS": true,
+     "frames": 361
+    },
+    {
+     "video": "GulliversTravels1939_201509.mp4",
+     "PASS": true,
+     "frames": 306
+    },
+    {
+     "video": "GulliversTravels720p_652.mp4",
+     "PASS": true,
+     "frames": 306
+    },
+    {
+     "video": "Grave_of_the_Vampire_movie.mp4",
+     "PASS": true,
+     "frames": 359
+    },
+    {
+     "video": "Gung_Ho.mp4",
+     "PASS": true,
+     "frames": 344
+    },
+    {
+     "video": "Haxan_tinted_and_subtitled.mp4",
+     "PASS": true,
+     "frames": 420
+    },
+    {
+     "video": "GreatExpectations1946.mp4",
+     "PASS": true,
+     "frames": 453
+    },
+    {
+     "video": "Hercules_Against_the_Moon_Men.mp4",
+     "PASS": true,
+     "frames": 348
+    },
+    {
+     "video": "DoubleFeatureHell6grindhouse2.mp4",
+     "PASS": true,
+     "frames": 603
+    },
+    {
+     "video": "Hercules_and_the_Tyrants_of_Babylon.mp4",
+     "PASS": true,
+     "frames": 341
+    },
+    {
+     "video": "HerculesUnchained.mp4",
+     "PASS": true,
+     "frames": 385
+    },
+    {
+     "video": "DoubleFeatureHell8grindhouse3.mp4",
+     "PASS": true,
+     "frames": 664
+    },
+    {
+     "video": "HisPrivateSecretary1933.mp4",
+     "PASS": true,
+     "frames": 241
+    },
+    {
+     "video": "HiDiddleDiddle.mp4",
+     "PASS": true,
+     "frames": 292
+    },
+    {
+     "video": "Hitch_Hiker.mp4",
+     "PASS": true,
+     "frames": 283
+    },
+    {
+     "video": "HighRisk.mp4",
+     "PASS": true,
+     "frames": 366
+    },
+    {
+     "video": "HisGirlFriday-1940.mp4",
+     "PASS": true,
+     "frames": 353
+    },
+    {
+     "video": "Holy_Terror_Podcast_Halloween.mp4",
+     "PASS": true,
+     "frames": 330
+    },
+    {
+     "video": "Gods_Gun.mp4",
+     "PASS": true,
+     "frames": 387
+    },
+    {
+     "video": "Hitchcock_Secret_Agent.mp4",
+     "PASS": true,
+     "frames": 344
+    },
+    {
+     "video": "GonewiththeWest.mp4",
+     "PASS": true,
+     "frames": 362
+    },
+    {
+     "video": "HouseOnBareMountain.mp4",
+     "PASS": true,
+     "frames": 248
+    },
+    {
+     "video": "Hollywood_Man.mp4",
+     "PASS": true,
+     "frames": 338
+    },
+    {
+     "video": "Horror_Hotel.mp4",
+     "PASS": true,
+     "frames": 304
+    },
+    {
+     "video": "HorrorExpresswithSpanishSubtitles.mp4",
+     "PASS": true,
+     "frames": 348
+    },
+    {
+     "video": "Horrors_of_Spider_Island.mp4",
+     "PASS": true,
+     "frames": 299
+    },
+    {
+     "video": "HorrorHotel1960.mp4",
+     "PASS": true,
+     "frames": 306
+    },
+    {
+     "video": "Horror_Express.mp4",
+     "PASS": true,
+     "frames": 352
+    },
+    {
+     "video": "HouseOnHauntedHill1959.mp4",
+     "PASS": true,
+     "frames": 298
+    },
+    {
+     "video": "HowAwfulAboutAllan.mp4",
+     "PASS": true,
+     "frames": 295
+    },
+    {
+     "video": "Inner_Sanctum_movie.mp4",
+     "PASS": true,
+     "frames": 248
+    },
+    {
+     "video": "Indiscreet.mp4",
+     "PASS": true,
+     "frames": 298
+    },
+    {
+     "video": "I_Love_Trouble_movie.mp4",
+     "PASS": true,
+     "frames": 377
+    },
+    {
+     "video": "In_Which_We_Serve.mp4",
+     "PASS": true,
+     "frames": 438
+    },
+    {
+     "video": "IslandOfLostWomen.mp4",
+     "PASS": true,
+     "frames": 263
+    },
+    {
+     "video": "JailBait.mp4",
+     "PASS": true,
+     "frames": 285
+    },
+    {
+     "video": "InvasionOfTheBeeGirlsWidescreenQualityUpgrade.mp4",
+     "PASS": true,
+     "frames": 340
+    },
+    {
+     "video": "IronAngel.mp4",
+     "PASS": true,
+     "frames": 324
+    },
+    {
+     "video": "InvasionOfTheBeeGirls.mp4",
+     "PASS": true,
+     "frames": 346
+    },
+    {
+     "video": "Jigsaw_.mp4",
+     "PASS": true,
+     "frames": 286
+    },
+    {
+     "video": "Jackie_Robinson_Story_The.mp4",
+     "PASS": true,
+     "frames": 307
+    },
+    {
+     "video": "ItSeemedLikeaGoodIdeaattheTimeMPEG2.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "Jamaica_Inn.mp4",
+     "PASS": true,
+     "frames": 395
+    },
+    {
+     "video": "Killers_from_space.mp4",
+     "PASS": true,
+     "frames": 284
+    },
+    {
+     "video": "JungleBook.mp4",
+     "PASS": true,
+     "frames": 420
+    },
+    {
+     "video": "KarateKidsUSA.mp4",
+     "PASS": true,
+     "frames": 356
+    },
+    {
+     "video": "Lady_Confesses.mp4",
+     "PASS": true,
+     "frames": 256
+    },
+    {
+     "video": "KingLearOrsonWellesWiFi.mp4",
+     "PASS": true,
+     "frames": 328
+    },
+    {
+     "video": "King_of_the_Zombies.mp4",
+     "PASS": true,
+     "frames": 269
+    },
+    {
+     "video": "ItCanBeDoneAmigo.mp4",
+     "PASS": true,
+     "frames": 392
+    },
+    {
+     "video": "LastWonanOnEarthColor.mp4",
+     "PASS": true,
+     "frames": 258
+    },
+    {
+     "video": "Kilimanjaro.mp4",
+     "PASS": true,
+     "frames": 452
+    },
+    {
+     "video": "Lady_X.mp4",
+     "PASS": true,
+     "frames": 363
+    },
+    {
+     "video": "LouisianaHussy_319.mp4",
+     "PASS": true,
+     "frames": 339
+    },
+    {
+     "video": "LadyofBurlesque.mp4",
+     "PASS": true,
+     "frames": 361
+    },
+    {
+     "video": "MajesticPicturesPublicDomainTheScarletLetter.mp4",
+     "PASS": true,
+     "frames": 278
+    },
+    {
+     "video": "LoveAffair.mp4",
+     "PASS": true,
+     "frames": 347
+    },
+    {
+     "video": "Intolerance.mp4",
+     "PASS": true,
+     "frames": 706
+    },
+    {
+     "video": "LifeWithFather.mp4",
+     "PASS": true,
+     "frames": 470
+    },
+    {
+     "video": "Ma_Barkers_Killer_Brood.mp4",
+     "PASS": true,
+     "frames": 358
+    },
+    {
+     "video": "MaybeIllComeHomeintheSpring.mp4",
+     "PASS": true,
+     "frames": 295
+    },
+    {
+     "video": "MesaOfLostWomen.mp4",
+     "PASS": true,
+     "frames": 276
+    },
+    {
+     "video": "Midnight.Manhunt.mp4",
+     "PASS": true,
+     "frames": 250
+    },
+    {
+     "video": "Mr._Wong_Detective.mp4",
+     "PASS": true,
+     "frames": 274
+    },
+    {
+     "video": "Mastertouch.mp4",
+     "PASS": true,
+     "frames": 369
+    },
+    {
+     "video": "Mr_Wong_in_Chinatown.mp4",
+     "PASS": true,
+     "frames": 282
+    },
+    {
+     "video": "Murder_At_The_Baskervilles.mp4",
+     "PASS": true,
+     "frames": 262
+    },
+    {
+     "video": "Milky_Way_movie.mp4",
+     "PASS": true,
+     "frames": 350
+    },
+    {
+     "video": "KingSolomonsMines1937.mp4",
+     "PASS": true,
+     "frames": 321
+    },
+    {
+     "video": "MurderOnFlight502.mp4",
+     "PASS": true,
+     "frames": 386
+    },
+    {
+     "video": "MyOutlawBrother.mp4",
+     "PASS": true,
+     "frames": 328
+    },
+    {
+     "video": "MyManGodfrey1936.mp4",
+     "PASS": true,
+     "frames": 379
+    },
+    {
+     "video": "NakedMassacre1976.mp4",
+     "PASS": true,
+     "frames": 341
+    },
+    {
+     "video": "OperationIVY1952.mp4",
+     "PASS": true,
+     "frames": 251
+    },
+    {
+     "video": "NothingSacred.mp4",
+     "PASS": true,
+     "frames": 297
+    },
+    {
+     "video": "Night.Of.The.Living.Dead_1080p.mp4",
+     "PASS": true,
+     "frames": 384
+    },
+    {
+     "video": "Oh_Mr.Porter_1937.mp4",
+     "PASS": true,
+     "frames": 323
+    },
+    {
+     "video": "ParlorBedroomandBath.mp4",
+     "PASS": true,
+     "frames": 290
+    },
+    {
+     "video": "Minesweeper_1943.mp4",
+     "PASS": true,
+     "frames": 263
+    },
+    {
+     "video": "PeliculasDeChaplin-1914.mp4",
+     "PASS": true,
+     "frames": 286
+    },
+    {
+     "video": "Our_Town.mp4",
+     "PASS": true,
+     "frames": 348
+    },
+    {
+     "video": "PhantomExpress.mp4",
+     "PASS": true,
+     "frames": 260
+    },
+    {
+     "video": "PhantasmagoriaTheater-AttackOfTheMushroomPeople1963147.mp4",
+     "PASS": true,
+     "frames": 320
+    },
+    {
+     "video": "OnlytheValaint.mp4",
+     "PASS": true,
+     "frames": 419
+    },
+    {
+     "video": "Phantom_From_Space.mp4",
+     "PASS": true,
+     "frames": 289
+    },
+    {
+     "video": "Phantom_of_Chinatown_1940.mp4",
+     "PASS": true,
+     "frames": 244
+    },
+    {
+     "video": "Phantom_Planet.mp4",
+     "PASS": true,
+     "frames": 328
+    },
+    {
+     "video": "Please_Murder_Me_movie.mp4",
+     "PASS": true,
+     "frames": 299
+    },
+    {
+     "video": "Port_of_New_York.mp4",
+     "PASS": true,
+     "frames": 323
+    },
+    {
+     "video": "QueenoftheAmazons.mp4",
+     "PASS": true,
+     "frames": 241
+    },
+    {
+     "video": "Napoleon_.mp4",
+     "PASS": true,
+     "frames": 476
+    },
+    {
+     "video": "PostmarkForDanger.mp4",
+     "PASS": true,
+     "frames": 309
+    },
+    {
+     "video": "QuevivaMexico.mp4",
+     "PASS": true,
+     "frames": 339
+    },
+    {
+     "video": "ProjectKill.mp4",
+     "PASS": true,
+     "frames": 375
+    },
+    {
+     "video": "PrisonersOfTheLostUniverse1983.mp4",
+     "PASS": true,
+     "frames": 378
+    },
+    {
+     "video": "PublicDomainAnsaFilmandBeaverChampionAttactionsDavidandGoliath1960.mp4",
+     "PASS": true,
+     "frames": 367
+    },
+    {
+     "video": "Quicksand_clear.mp4",
+     "PASS": true,
+     "frames": 316
+    },
+    {
+     "video": "Rocky_Mountain_Mystery_1935.mp4",
+     "PASS": true,
+     "frames": 262
+    },
+    {
+     "video": "ReturnoftheScarletPimpernel.mp4",
+     "PASS": true,
+     "frames": 306
+    },
+    {
+     "video": "Pygmalion.mp4",
+     "PASS": true,
+     "frames": 380
+    },
+    {
+     "video": "PublicDomainJollyFilmJosephandHisBrethren.mp4",
+     "PASS": true,
+     "frames": 404
+    },
+    {
+     "video": "Sabotage_1936.mp4",
+     "PASS": true,
+     "frames": 304
+    },
+    {
+     "video": "Scared_to_Death.mp4",
+     "PASS": true,
+     "frames": 269
+    },
+    {
+     "video": "Seven_Doors_to_Death.mp4",
+     "PASS": true,
+     "frames": 242
+    },
+    {
+     "video": "Saint_Louis_Bank_Robbery.mp4",
+     "PASS": true,
+     "frames": 355
+    },
+    {
+     "video": "SantaClausversusTheDevil.mp4",
+     "PASS": true,
+     "frames": 379
+    },
+    {
+     "video": "SherlockHolmesAndTheSecretWeapon1943.mp4",
+     "PASS": true,
+     "frames": 262
+    },
+    {
+     "video": "Sobaka.mp4",
+     "PASS": true,
+     "frames": 289
+    },
+    {
+     "video": "Sita_Sings_the_Blues.mp4",
+     "PASS": true,
+     "frames": 327
+    },
+    {
+     "video": "SilentNightBloodyNight1972.mp4",
+     "PASS": true,
+     "frames": 340
+    },
+    {
+     "video": "SilentNightBloodyNight.mp4",
+     "PASS": true,
+     "frames": 340
+    },
+    {
+     "video": "SonofHerculesTheLandofDarkness.mp4",
+     "PASS": true,
+     "frames": 322
+    },
+    {
+     "video": "StarOdysseyitalianStarWars1979.mp4",
+     "PASS": true,
+     "frames": 352
+    },
+    {
+     "video": "Smash-Up.mp4",
+     "PASS": true,
+     "frames": 412
+    },
+    {
+     "video": "Teaserama.mp4",
+     "PASS": true,
+     "frames": 268
+    },
+    {
+     "video": "StreetScene1931.mp4",
+     "PASS": true,
+     "frames": 314
+    },
+    {
+     "video": "StarWreckInThePirkining.mp4",
+     "PASS": true,
+     "frames": 414
+    },
+    {
+     "video": "Santa_Fe_Trail_movie.mp4",
+     "PASS": true,
+     "frames": 438
+    },
+    {
+     "video": "TarzanandtheTrappers.mp4",
+     "PASS": true,
+     "frames": 277
+    },
+    {
+     "video": "ScarletStreet.mp4",
+     "PASS": true,
+     "frames": 406
+    },
+    {
+     "video": "TeenagersFromOuterSpace1959.mp4",
+     "PASS": true,
+     "frames": 342
+    },
+    {
+     "video": "TheBeachGirlsAndTheMonster.mp4",
+     "PASS": true,
+     "frames": 264
+    },
+    {
+     "video": "ThatUncertainFeeling.mp4",
+     "PASS": true,
+     "frames": 333
+    },
+    {
+     "video": "TenGladiators.mp4",
+     "PASS": true,
+     "frames": 403
+    },
+    {
+     "video": "TheBeachcomber.mp4",
+     "PASS": true,
+     "frames": 350
+    },
+    {
+     "video": "TheCorpseVanishes.mp4",
+     "PASS": true,
+     "frames": 253
+    },
+    {
+     "video": "TheBigWheel.mp4",
+     "PASS": true,
+     "frames": 355
+    },
+    {
+     "video": "TheGeneral.mp4",
+     "PASS": true,
+     "frames": 269
+    },
+    {
+     "video": "TheChase_.mp4",
+     "PASS": true,
+     "frames": 339
+    },
+    {
+     "video": "TheFlyingDeuces.mp4",
+     "PASS": true,
+     "frames": 272
+    },
+    {
+     "video": "TheGhoul.mp4",
+     "PASS": true,
+     "frames": 275
+    },
+    {
+     "video": "TheDayOfTheTriffids.mp4",
+     "PASS": true,
+     "frames": 377
+    },
+    {
+     "video": "TheGhostTrain.mp4",
+     "PASS": true,
+     "frames": 325
+    },
+    {
+     "video": "TheIncrediblePetrifiedWorld.mp4",
+     "PASS": true,
+     "frames": 253
+    },
+    {
+     "video": "ShockerInternetDriveIn-Week13dementedDoubleFeature.mp4",
+     "PASS": true,
+     "frames": 710
+    },
+    {
+     "video": "TheLazarusSyndrome.mp4",
+     "PASS": true,
+     "frames": 289
+    },
+    {
+     "video": "TheGolem_893.mp4",
+     "PASS": true,
+     "frames": 406
+    },
+    {
+     "video": "ShockerInternetDriveIn-Week18aNaschyDoubleFeature.mp4",
+     "PASS": true,
+     "frames": 754
+    },
+    {
+     "video": "TheLimpingMan.mp4",
+     "PASS": true,
+     "frames": 303
+    },
+    {
+     "video": "TheMostDangerousGame.mp4",
+     "PASS": true,
+     "frames": 250
+    },
+    {
+     "video": "TheMagicSword.mp4",
+     "PASS": true,
+     "frames": 321
+    },
+    {
+     "video": "TheMarinesareComing.mp4",
+     "PASS": true,
+     "frames": 284
+    },
+    {
+     "video": "TheAtomicBrain.mp4",
+     "PASS": true,
+     "frames": 259
+    },
+    {
+     "video": "TheManWhoSavedTheWorldturkishStarWars1982.mp4",
+     "PASS": true,
+     "frames": 369
+    },
+    {
+     "video": "TheLittleShopOfHorrors1960_765.mp4",
+     "PASS": true,
+     "frames": 286
+    },
+    {
+     "video": "TheOver-the-HillGangRidesAgain.mp4",
+     "PASS": true,
+     "frames": 296
+    },
+    {
+     "video": "TheOvertheHillGang.mp4",
+     "PASS": true,
+     "frames": 281
+    },
+    {
+     "video": "TheNastyRabbit1964.mp4.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "The.Dark.Hour.mp4",
+     "PASS": true,
+     "frames": 274
+    },
+    {
+     "video": "TheLostZeppelin.mp4",
+     "PASS": true,
+     "frames": 287
+    },
+    {
+     "video": "ThePaintedHills.mp4",
+     "PASS": true,
+     "frames": 272
+    },
+    {
+     "video": "ThePhantomCreeps.mp4",
+     "PASS": true,
+     "frames": 313
+    },
+    {
+     "video": "TheNorthStar.mp4",
+     "PASS": true,
+     "frames": 422
+    },
+    {
+     "video": "ThePhantomoftheOpera.mp4",
+     "PASS": true,
+     "frames": 426
+    },
+    {
+     "video": "TheProudAndTheDamned-1972.mp4",
+     "PASS": true,
+     "frames": 385
+    },
+    {
+     "video": "TheScreamingSkull.mp4",
+     "PASS": true,
+     "frames": 269
+    },
+    {
+     "video": "TheProudandtheDamned_201511.mp4",
+     "PASS": true,
+     "frames": 385
+    },
+    {
+     "video": "TheSheBeast.mp4",
+     "PASS": true,
+     "frames": 316
+    },
+    {
+     "video": "TheSnowCreature.mp4",
+     "PASS": true,
+     "frames": 283
+    },
+    {
+     "video": "TheRedHouse.mp4",
+     "PASS": true,
+     "frames": 400
+    },
+    {
+     "video": "TheSphinx-1933.mp4",
+     "PASS": true,
+     "frames": 249
+    },
+    {
+     "video": "ThePyx.mp4",
+     "PASS": true,
+     "frames": 418
+    },
+    {
+     "video": "TheScarletPimpernel.mp4",
+     "PASS": true,
+     "frames": 371
+    },
+    {
+     "video": "TheSheik.mp4",
+     "PASS": true,
+     "frames": 344
+    },
+    {
+     "video": "TheSoutherner.mp4",
+     "PASS": true,
+     "frames": 367
+    },
+    {
+     "video": "TheSwap.mp4",
+     "PASS": true,
+     "frames": 326
+    },
+    {
+     "video": "TheStranger_0.mp4",
+     "PASS": true,
+     "frames": 365
+    },
+    {
+     "video": "TheTerror.mp4",
+     "PASS": true,
+     "frames": 316
+    },
+    {
+     "video": "TheTreasureOfJamaicaReef.mp4",
+     "PASS": true,
+     "frames": 369
+    },
+    {
+     "video": "TheWildWomenOfWongoVideoQualityUpgrade.mp4",
+     "PASS": true,
+     "frames": 288
+    },
+    {
+     "video": "TheWomanInGreen1945.mp4",
+     "PASS": true,
+     "frames": 258
+    },
+    {
+     "video": "TheWizardOfOz1925.mp4",
+     "PASS": true,
+     "frames": 340
+    },
+    {
+     "video": "The_Bat_Vincent_Price.mp4",
+     "PASS": true,
+     "frames": 326
+    },
+    {
+     "video": "TheYesterdayMachine1963.mp4",
+     "PASS": true,
+     "frames": 314
+    },
+    {
+     "video": "The_Atomic_Man_1955.mp4",
+     "PASS": true,
+     "frames": 309
+    },
+    {
+     "video": "The_Bold_Caballero.mp4",
+     "PASS": true,
+     "frames": 266
+    },
+    {
+     "video": "The_Fatal_Hour.mp4",
+     "PASS": true,
+     "frames": 265
+    },
+    {
+     "video": "The_Evil_Mind.mp4",
+     "PASS": true,
+     "frames": 272
+    },
+    {
+     "video": "TheYinandtheYangofMr.Go.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "The_Big_Combo_1955.mp4",
+     "PASS": true,
+     "frames": 350
+    },
+    {
+     "video": "The_Hoodlum.mp4",
+     "PASS": true,
+     "frames": 247
+    },
+    {
+     "video": "The_General_Buster_Keaton.mp4",
+     "PASS": true,
+     "frames": 315
+    },
+    {
+     "video": "The_Big_Lift.mp4",
+     "PASS": true,
+     "frames": 408
+    },
+    {
+     "video": "The_Mystery_of_Mr._Wong.mp4",
+     "PASS": true,
+     "frames": 282
+    },
+    {
+     "video": "TheWhiteWarrior1961.mp4",
+     "PASS": true,
+     "frames": 342
+    },
+    {
+     "video": "The_Killer_Shrews.mp4",
+     "PASS": true,
+     "frames": 276
+    },
+    {
+     "video": "The_Little_Shop_of_Horrors.mpeg.mp4",
+     "PASS": true,
+     "frames": 290
+    },
+    {
+     "video": "The_Hunchback_of_Notre_Dame.mp4",
+     "PASS": true,
+     "frames": 403
+    },
+    {
+     "video": "The_Scarlet_Clue.mp4",
+     "PASS": true,
+     "frames": 260
+    },
+    {
+     "video": "The_Pied_Piper_of_Hamelin.mp4",
+     "PASS": true,
+     "frames": 348
+    },
+    {
+     "video": "The_Scar_1948.mp4",
+     "PASS": true,
+     "frames": 330
+    },
+    {
+     "video": "The_Sign_OF_Four.mp4",
+     "PASS": true,
+     "frames": 291
+    },
+    {
+     "video": "The_Thirteenth_Guest.mp4",
+     "PASS": true,
+     "frames": 275
+    },
+    {
+     "video": "The_Sadist.mp4",
+     "PASS": true,
+     "frames": 367
+    },
+    {
+     "video": "The_Wasp_Women.mp4",
+     "PASS": true,
+     "frames": 290
+    },
+    {
+     "video": "TheyMadeMeAKiller.mp4",
+     "PASS": true,
+     "frames": 257
+    },
+    {
+     "video": "The_Second_Woman_.mp4",
+     "PASS": true,
+     "frames": 362
+    },
+    {
+     "video": "ThisisNotaTest.mp4",
+     "PASS": true,
+     "frames": 289
+    },
+    {
+     "video": "The_Son_of_Monte_Cristo.mp4",
+     "PASS": true,
+     "frames": 406
+    },
+    {
+     "video": "Trapped_.mp4",
+     "PASS": true,
+     "frames": 312
+    },
+    {
+     "video": "Timetable1956.mp4",
+     "PASS": true,
+     "frames": 321
+    },
+    {
+     "video": "Two_Dollar_Bettor_movie.mp4",
+     "PASS": true,
+     "frames": 286
+    },
+    {
+     "video": "U-67-TheSeaGhost.mp4",
+     "PASS": true,
+     "frames": 248
+    },
+    {
+     "video": "ThunderintheCity.mp4",
+     "PASS": true,
+     "frames": 348
+    },
+    {
+     "video": "UnderWesternStars.mp4",
+     "PASS": true,
+     "frames": 259
+    },
+    {
+     "video": "UpInTheAir.mp4",
+     "PASS": true,
+     "frames": 244
+    },
+    {
+     "video": "UnknownWorld.mp4",
+     "PASS": true,
+     "frames": 296
+    },
+    {
+     "video": "Vampyr1932.mp4",
+     "PASS": true,
+     "frames": 291
+    },
+    {
+     "video": "VengeanceValley.mp4",
+     "PASS": true,
+     "frames": 328
+    },
+    {
+     "video": "VoyagetothePlanetofPrehistoricWomen.mp4",
+     "PASS": true,
+     "frames": 318
+    },
+    {
+     "video": "Waltzes_from_Vienna.mp4",
+     "PASS": true,
+     "frames": 307
+    },
+    {
+     "video": "WarOfTheRobots.mp4",
+     "PASS": true,
+     "frames": 400
+    },
+    {
+     "video": "WolfBlood1925.mp4",
+     "PASS": true,
+     "frames": 268
+    },
+    {
+     "video": "WhereTheresAWill.mp4",
+     "PASS": true,
+     "frames": 306
+    },
+    {
+     "video": "Woman_on_the_Run.mp4",
+     "PASS": true,
+     "frames": 307
+    },
+    {
+     "video": "Yellowstone_.mp4",
+     "PASS": true,
+     "frames": 253
+    },
+    {
+     "video": "WorldGoneMad.mp4",
+     "PASS": true,
+     "frames": 284
+    },
+    {
+     "video": "WarOfTheWildcats-JohnWayne1943.mp4",
+     "PASS": true,
+     "frames": 391
+    },
+    {
+     "video": "Werewolf_In_A_Girls_Dormitory.mp4",
+     "PASS": true,
+     "frames": 333
+    },
+    {
+     "video": "We_Dive_at_Dawn_1943.mp4",
+     "PASS": true,
+     "frames": 372
+    },
+    {
+     "video": "Topper_Returns_41.mp4",
+     "PASS": true,
+     "frames": 353
+    },
+    {
+     "video": "Whistle_Stop.mp4",
+     "PASS": true,
+     "frames": 337
+    },
+    {
+     "video": "abe_lincoln_of_the_4th_ave.mp4",
+     "PASS": true,
+     "frames": 258
+    },
+    {
+     "video": "YoungLand.mp4",
+     "PASS": true,
+     "frames": 346
+    },
+    {
+     "video": "YoungandInnocentTheGirlWasYoung.mp4",
+     "PASS": true,
+     "frames": 328
+    },
+    {
+     "video": "aces_and_eights.mp4",
+     "PASS": true,
+     "frames": 245
+    },
+    {
+     "video": "amazing_adventure.mp4",
+     "PASS": true,
+     "frames": 248
+    },
+    {
+     "video": "airborne.mp4",
+     "PASS": true,
+     "frames": 332
+    },
+    {
+     "video": "bad_boy.mp4",
+     "PASS": true,
+     "frames": 261
+    },
+    {
+     "video": "amazing_mr_x.mp4",
+     "PASS": true,
+     "frames": 312
+    },
+    {
+     "video": "american_empire.mp4",
+     "PASS": true,
+     "frames": 323
+    },
+    {
+     "video": "behave_yourself_ipod.mp4",
+     "PASS": true,
+     "frames": 320
+    },
+    {
+     "video": "beyond_bengal.mp4",
+     "PASS": true,
+     "frames": 251
+    },
+    {
+     "video": "VirusFukkatsuNoHi1980.mp4",
+     "PASS": true,
+     "frames": 625
+    },
+    {
+     "video": "big_bluff.mp4",
+     "PASS": true,
+     "frames": 285
+    },
+    {
+     "video": "angel_and_the_badman.mp4",
+     "PASS": true,
+     "frames": 398
+    },
+    {
+     "video": "angel_on_my_shoulder.mp4",
+     "PASS": true,
+     "frames": 405
+    },
+    {
+     "video": "beneath_the_12-mile_reef.mp4",
+     "PASS": true,
+     "frames": 402
+    },
+    {
+     "video": "bowery_blitzkrieg.mp4",
+     "PASS": true,
+     "frames": 251
+    },
+    {
+     "video": "big_trees.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "Zeitgeist.Addendum.mp4",
+     "PASS": true,
+     "frames": 492
+    },
+    {
+     "video": "british_intelligence.mp4",
+     "PASS": true,
+     "frames": 241
+    },
+    {
+     "video": "born_to_the_saddle.mp4",
+     "PASS": true,
+     "frames": 300
+    },
+    {
+     "video": "brain_that_wouldnt_die.mp4",
+     "PASS": true,
+     "frames": 284
+    },
+    {
+     "video": "abraham_lincoln.mp4",
+     "PASS": true,
+     "frames": 339
+    },
+    {
+     "video": "boys_of_the_city.mp4",
+     "PASS": true,
+     "frames": 248
+    },
+    {
+     "video": "call_of_the_wilderness.mp4",
+     "PASS": true,
+     "frames": 252
+    },
+    {
+     "video": "brokenblossoms1919.mp4",
+     "PASS": true,
+     "frames": 355
+    },
+    {
+     "video": "call_of_the_yukon.mp4",
+     "PASS": true,
+     "frames": 266
+    },
+    {
+     "video": "calvary.mp4",
+     "PASS": true,
+     "frames": 252
+    },
+    {
+     "video": "captain_calamity.mp4",
+     "PASS": true,
+     "frames": 242
+    },
+    {
+     "video": "cavalcade_of_the_west.mp4",
+     "PASS": true,
+     "frames": 241
+    },
+    {
+     "video": "calendar_girl.mp4",
+     "PASS": true,
+     "frames": 352
+    },
+    {
+     "video": "cause_for_alarm_1951.mp4",
+     "PASS": true,
+     "frames": 295
+    },
+    {
+     "video": "cco_attackofthegiantleeches.mp4",
+     "PASS": true,
+     "frames": 249
+    },
+    {
+     "video": "cco_jackandthebeanstalk.mp4",
+     "PASS": true,
+     "frames": 327
+    },
+    {
+     "video": "cco_thegunandthepulpit.mp4",
+     "PASS": true,
+     "frames": 295
+    },
+    {
+     "video": "cco__HerculesandtheCaptiveWomen.mp4",
+     "PASS": true,
+     "frames": 377
+    },
+    {
+     "video": "club_paradise.mp4",
+     "PASS": true,
+     "frames": 247
+    },
+    {
+     "video": "charlie_chaplin_film_fest.mp4",
+     "PASS": true,
+     "frames": 310
+    },
+    {
+     "video": "corruption.mp4",
+     "PASS": true,
+     "frames": 240
+    },
+    {
+     "video": "convicts_code.mp4",
+     "PASS": true,
+     "frames": 251
+    },
+    {
+     "video": "city_of_missing_girls.mp4",
+     "PASS": true,
+     "frames": 285
+    },
+    {
+     "video": "cheers_for_miss_bishop.mp4",
+     "PASS": true,
+     "frames": 330
+    },
+    {
+     "video": "cco_TheGiantofMarathon.mp4",
+     "PASS": true,
+     "frames": 338
+    },
+    {
+     "video": "dick_tracy_detctive.mp4",
+     "PASS": true,
+     "frames": 244
+    },
+    {
+     "video": "dawn_of_the_great_divide.mp4",
+     "PASS": true,
+     "frames": 278
+    },
+    {
+     "video": "cco_virus.mp4",
+     "PASS": true,
+     "frames": 412
+    },
+    {
+     "video": "dead_people_ipod.mp4",
+     "PASS": true,
+     "frames": 358
+    },
+    {
+     "video": "delightfully_dangerous.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "double_exposure.mp4",
+     "PASS": true,
+     "frames": 250
+    },
+    {
+     "video": "dreams-that-money-can-buy.mp4",
+     "PASS": true,
+     "frames": 317
+    },
+    {
+     "video": "dishonored_lady.mp4",
+     "PASS": true,
+     "frames": 336
+    },
+    {
+     "video": "fatal_hour.mp4",
+     "PASS": true,
+     "frames": 244
+    },
+    {
+     "video": "cco_swordoflancelot.mp4",
+     "PASS": true,
+     "frames": 467
+    },
+    {
+     "video": "dressed_to_kill.mp4",
+     "PASS": true,
+     "frames": 286
+    },
+    {
+     "video": "farewell_to_arms.mp4",
+     "PASS": true,
+     "frames": 314
+    },
+    {
+     "video": "five_minutes_to_live.mp4",
+     "PASS": true,
+     "frames": 298
+    },
+    {
+     "video": "girl_o_my_dreams.mp4",
+     "PASS": true,
+     "frames": 251
+    },
+    {
+     "video": "frankenstein-1931-restored-movie-720p-hd.mp4",
+     "PASS": true,
+     "frames": 280
+    },
+    {
+     "video": "flight_to_nowhere.mp4",
+     "PASS": true,
+     "frames": 299
+    },
+    {
+     "video": "gammera.mp4",
+     "PASS": true,
+     "frames": 341
+    },
+    {
+     "video": "eternally_yours_ipod.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "great_commandment.mp4",
+     "PASS": true,
+     "frames": 321
+    },
+    {
+     "video": "gullivers_travels1939.mp4",
+     "PASS": true,
+     "frames": 291
+    },
+    {
+     "video": "harolddiddlebock.mp4",
+     "PASS": true,
+     "frames": 358
+    },
+    {
+     "video": "hells_house.mp4",
+     "PASS": true,
+     "frames": 273
+    },
+    {
+     "video": "house_of_secrets.mp4",
+     "PASS": true,
+     "frames": 273
+    },
+    {
+     "video": "house_on_haunted_hill_ipod.mp4",
+     "PASS": true,
+     "frames": 299
+    },
+    {
+     "video": "his_double_life.mp4",
+     "PASS": true,
+     "frames": 368
+    },
+    {
+     "video": "his_girl_friday.mp4",
+     "PASS": true,
+     "frames": 367
+    },
+    {
+     "video": "indestructible_man.mp4",
+     "PASS": true,
+     "frames": 284
+    },
+    {
+     "video": "ill_give_my_life.mp4",
+     "PASS": true,
+     "frames": 284
+    },
+    {
+     "video": "heartbeat.mp4",
+     "PASS": true,
+     "frames": 400
+    },
+    {
+     "video": "iron_mask.mp4",
+     "PASS": true,
+     "frames": 289
+    },
+    {
+     "video": "humanbondage.mp4",
+     "PASS": true,
+     "frames": 331
+    },
+    {
+     "video": "jungle_man.mp4",
+     "PASS": true,
+     "frames": 246
+    },
+    {
+     "video": "its_a_joke_son.mp4",
+     "PASS": true,
+     "frames": 253
+    },
+    {
+     "video": "kansas_pacific.mp4",
+     "PASS": true,
+     "frames": 287
+    },
+    {
+     "video": "dw_griffith_birth_of_a_nation.mp4",
+     "PASS": true,
+     "frames": 722
+    },
+    {
+     "video": "kid_dynamite.mp4",
+     "PASS": true,
+     "frames": 264
+    },
+    {
+     "video": "last_of_the_mohicans_1920.mp4",
+     "PASS": true,
+     "frames": 284
+    },
+    {
+     "video": "killer_diller.mp4",
+     "PASS": true,
+     "frames": 292
+    },
+    {
+     "video": "killer_dill.mp4",
+     "PASS": true,
+     "frames": 288
+    },
+    {
+     "video": "kansascityconfidencial.mp4",
+     "PASS": true,
+     "frames": 396
+    },
+    {
+     "video": "lil_abner.mp4",
+     "PASS": true,
+     "frames": 285
+    },
+    {
+     "video": "long_shot.mp4",
+     "PASS": true,
+     "frames": 270
+    },
+    {
+     "video": "lastmanonearth-1964.mp4",
+     "PASS": true,
+     "frames": 348
+    },
+    {
+     "video": "little_men.mp4",
+     "PASS": true,
+     "frames": 332
+    },
+    {
+     "video": "lost_world.mp4",
+     "PASS": true,
+     "frames": 272
+    },
+    {
+     "video": "little_lord_fauntleroy.mp4",
+     "PASS": true,
+     "frames": 403
+    },
+    {
+     "video": "impact.mp4",
+     "PASS": true,
+     "frames": 439
+    },
+    {
+     "video": "love_island.mp4",
+     "PASS": true,
+     "frames": 247
+    },
+    {
+     "video": "little_princess.mp4",
+     "PASS": true,
+     "frames": 371
+    },
+    {
+     "video": "lumberjack1944.mp4",
+     "PASS": true,
+     "frames": 255
+    },
+    {
+     "video": "machine_gun_mama_1944.mp4",
+     "PASS": true,
+     "frames": 240
+    },
+    {
+     "video": "mark_of_the_avenger_1938.mp4",
+     "PASS": true,
+     "frames": 270
+    },
+    {
+     "video": "hot_rod_girl_1956.mp4",
+     "PASS": true,
+     "frames": 316
+    },
+    {
+     "video": "made_for_each_other_film.mp4",
+     "PASS": true,
+     "frames": 362
+    },
+    {
+     "video": "million_dollar_weekend.mp4",
+     "PASS": true,
+     "frames": 288
+    },
+    {
+     "video": "missing_corpse.mp4",
+     "PASS": true,
+     "frames": 246
+    },
+    {
+     "video": "mr_reckless.mp4",
+     "PASS": true,
+     "frames": 263
+    },
+    {
+     "video": "mr_robinson_crusoe.mp4",
+     "PASS": true,
+     "frames": 282
+    },
+    {
+     "video": "murder_on_the_campus.mp4",
+     "PASS": true,
+     "frames": 278
+    },
+    {
+     "video": "nabonga_1944.mp4",
+     "PASS": true,
+     "frames": 285
+    },
+    {
+     "video": "my_pal_trigger.mp4",
+     "PASS": true,
+     "frames": 315
+    },
+    {
+     "video": "my_favorite_brunette.mp4",
+     "PASS": true,
+     "frames": 347
+    },
+    {
+     "video": "nancy_drew_reporter.mp4",
+     "PASS": true,
+     "frames": 271
+    },
+    {
+     "video": "neath_brooklyn_bridge.mp4",
+     "PASS": true,
+     "frames": 244
+    },
+    {
+     "video": "my_dear_secretary.mp4",
+     "PASS": true,
+     "frames": 377
+    },
+    {
+     "video": "last_time_i_saw_paris.mp4",
+     "PASS": true,
+     "frames": 463
+    },
+    {
+     "video": "my_love_for_yours_ipod.mp4",
+     "PASS": true,
+     "frames": 399
+    },
+    {
+     "video": "new_adventures_of_tarzan.mp4",
+     "PASS": true,
+     "frames": 281
+    },
+    {
+     "video": "mclintok_widescreen.mp4",
+     "PASS": true,
+     "frames": 507
+    },
+    {
+     "video": "non_stop_new_york.mp4",
+     "PASS": true,
+     "frames": 288
+    },
+    {
+     "video": "meet_john_doe.mp4",
+     "PASS": true,
+     "frames": 491
+    },
+    {
+     "video": "northwest_trail.mp4",
+     "PASS": true,
+     "frames": 241
+    },
+    {
+     "video": "ole_swimmin_hole.mp4",
+     "PASS": true,
+     "frames": 316
+    },
+    {
+     "video": "panthers_claw.mp4",
+     "PASS": true,
+     "frames": 282
+    },
+    {
+     "video": "miss_london_ltd_1943.mp4",
+     "PASS": true,
+     "frames": 380
+    },
+    {
+     "video": "phantom_ship.mp4",
+     "PASS": true,
+     "frames": 245
+    },
+    {
+     "video": "parachute_battalion.mp4",
+     "PASS": true,
+     "frames": 300
+    },
+    {
+     "video": "oliver_twist.mp4",
+     "PASS": true,
+     "frames": 284
+    },
+    {
+     "video": "parole_inc.mp4",
+     "PASS": true,
+     "frames": 285
+    },
+    {
+     "video": "planet_outlaws_ipod.mp4",
+     "PASS": true,
+     "frames": 274
+    },
+    {
+     "video": "panorama_ephemera2004.mp4",
+     "PASS": true,
+     "frames": 358
+    },
+    {
+     "video": "prison_mutiny_ipod.mp4",
+     "PASS": true,
+     "frames": 252
+    },
+    {
+     "video": "pot_o_gold.mp4",
+     "PASS": true,
+     "frames": 342
+    },
+    {
+     "video": "private_buckaroo_ipod.mp4",
+     "PASS": true,
+     "frames": 268
+    },
+    {
+     "video": "private_snuffy_smith.mp4",
+     "PASS": true,
+     "frames": 264
+    },
+    {
+     "video": "raiders_of_old_california_ipod.mp4",
+     "PASS": true,
+     "frames": 287
+    },
+    {
+     "video": "reefer_madness1938.mp4",
+     "PASS": true,
+     "frames": 273
+    },
+    {
+     "video": "renegade_girl.mp4",
+     "PASS": true,
+     "frames": 263
+    },
+    {
+     "video": "rain1932.mp4",
+     "PASS": true,
+     "frames": 375
+    },
+    {
+     "video": "rhythm_blues_review.mp4",
+     "PASS": true,
+     "frames": 286
+    },
+    {
+     "video": "road_to_happiness.mp4",
+     "PASS": true,
+     "frames": 296
+    },
+    {
+     "video": "rock_rock_rock.mp4",
+     "PASS": true,
+     "frames": 342
+    },
+    {
+     "video": "secret_weapon.mp4",
+     "PASS": true,
+     "frames": 271
+    },
+    {
+     "video": "second_chorus_1940.mp4",
+     "PASS": true,
+     "frames": 335
+    },
+    {
+     "video": "she_gods_of_shark_reef.mp4",
+     "PASS": true,
+     "frames": 252
+    },
+    {
+     "video": "seven_were_saved.mp4",
+     "PASS": true,
+     "frames": 288
+    },
+    {
+     "video": "penny_serenade.mp4",
+     "PASS": true,
+     "frames": 476
+    },
+    {
+     "video": "royal_wedding.mp4",
+     "PASS": true,
+     "frames": 366
+    },
+    {
+     "video": "rogues_tavern.mp4",
+     "PASS": true,
+     "frames": 277
+    },
+    {
+     "video": "shame_.mp4",
+     "PASS": true,
+     "frames": 328
+    },
+    {
+     "video": "slave_in_bondage.mp4",
+     "PASS": true,
+     "frames": 277
+    },
+    {
+     "video": "sos_your_aunt_emma_1942.mp4",
+     "PASS": true,
+     "frames": 249
+    },
+    {
+     "video": "steamboat_bill_ipod.mp4",
+     "PASS": true,
+     "frames": 277
+    },
+    {
+     "video": "publicmovies212.mp4",
+     "PASS": true,
+     "frames": 544
+    },
+    {
+     "video": "shock.mp4",
+     "PASS": true,
+     "frames": 278
+    },
+    {
+     "video": "submarine_alert.mp4",
+     "PASS": true,
+     "frames": 268
+    },
+    {
+     "video": "street_angel.mp4",
+     "PASS": true,
+     "frames": 362
+    },
+    {
+     "video": "take_me_back_to_oklahoma.mp4",
+     "PASS": true,
+     "frames": 244
+    },
+    {
+     "video": "suddenly.mp4",
+     "PASS": true,
+     "frames": 302
+    },
+    {
+     "video": "tarzan_and_the_green_goddess.mp4",
+     "PASS": true,
+     "frames": 270
+    },
+    {
+     "video": "tarzans_revenge.mp4",
+     "PASS": true,
+     "frames": 280
+    },
+    {
+     "video": "sundowners.mp4",
+     "PASS": true,
+     "frames": 316
+    },
+    {
+     "video": "teenagers_from_outerspace.mp4",
+     "PASS": true,
+     "frames": 342
+    },
+    {
+     "video": "the_contender_ipod.mp4",
+     "PASS": true,
+     "frames": 249
+    },
+    {
+     "video": "the_devils_party.mp4",
+     "PASS": true,
+     "frames": 261
+    },
+    {
+     "video": "the_bashful_bachelor.mp4",
+     "PASS": true,
+     "frames": 305
+    },
+    {
+     "video": "the_ghost_walks.mp4",
+     "PASS": true,
+     "frames": 254
+    },
+    {
+     "video": "the_gorilla.mp4",
+     "PASS": true,
+     "frames": 264
+    },
+    {
+     "video": "rockstar-2011.mp4",
+     "PASS": true,
+     "frames": 636
+    },
+    {
+     "video": "the_local_bad_man.mp4",
+     "PASS": true,
+     "frames": 249
+    },
+    {
+     "video": "the_million_dollar_kid.mp4",
+     "PASS": true,
+     "frames": 257
+    },
+    {
+     "video": "the_quiet_one.mp4",
+     "PASS": true,
+     "frames": 256
+    },
+    {
+     "video": "the_snow_queen_1959_animation.mp4",
+     "PASS": true,
+     "frames": 274
+    },
+    {
+     "video": "the_green_glove.mp4",
+     "PASS": true,
+     "frames": 355
+    },
+    {
+     "video": "they_raid_by_night.mp4",
+     "PASS": true,
+     "frames": 277
+    },
+    {
+     "video": "sunset_murder_case.mp4",
+     "PASS": true,
+     "frames": 241
+    },
+    {
+     "video": "the_stork_club.mp4",
+     "PASS": true,
+     "frames": 393
+    },
+    {
+     "video": "things_to_come_ipod.mp4",
+     "PASS": true,
+     "frames": 379
+    },
+    {
+     "video": "thepayoff.mp4",
+     "PASS": true,
+     "frames": 289
+    },
+    {
+     "video": "war_dogs.mp4",
+     "PASS": true,
+     "frames": 256
+    },
+    {
+     "video": "waterfront_lady_1935.mp4",
+     "PASS": true,
+     "frames": 273
+    },
+    {
+     "video": "under_california_stars.mp4",
+     "PASS": true,
+     "frames": 289
+    },
+    {
+     "video": "waterfront.mp4",
+     "PASS": true,
+     "frames": 255
+    },
+    {
+     "video": "white_zombie.mp4",
+     "PASS": true,
+     "frames": 261
+    },
+    {
+     "video": "transatlantic_tunnel.mp4",
+     "PASS": true,
+     "frames": 373
+    },
+    {
+     "video": "werewolf_washington.mp4",
+     "PASS": true,
+     "frames": 357
+    },
+    {
+     "video": "till_the_clouds_roll_by.mp4",
+     "PASS": true,
+     "frames": 541
+    },
+    {
+     "video": "the-grapes-of-wrath-1940.mp4",
+     "PASS": true,
+     "frames": 519
+    },
+    {
+     "video": "timber_queen.mp4",
+     "PASS": true,
+     "frames": 261
+    }
+   ]
+  },
+  "errors": {
+   "PASS": true,
+   "n_errors": 0
+  },
+  "self_duplication_any": {
+   "PASS": true,
+   "doubled_videos": null,
+   "indeterminate_videos": null,
+   "detector_rows": 498
+  },
+  "duplication_trigger": {
+   "PASS": true,
+   "n_trigger_eligible": 357,
+   "n_indeterminate": 0
+  },
+  "chunkid_monotone": {
+   "PASS": true,
+   "violations": null
+  },
+  "detection_liveness": {
+   "PASS": true,
+   "min_nonempty_fraction": 0.3848101265822785,
+   "aggregate_fraction": 0.9193,
+   "rows": [
+    {
+     "video": "ACloseCallForBostonBlackie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9875
+    },
+    {
+     "video": "AdventureIsland.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9135
+    },
+    {
+     "video": "ABucketOfBlood1959.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9731
+    },
+    {
+     "video": "A_Study_In_Scarlet.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9509
+    },
+    {
+     "video": "20000LeaguesUndertheSea.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7696
+    },
+    {
+     "video": "AfricaScreams.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9209
+    },
+    {
+     "video": "ABucketofBlood.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9885
+    },
+    {
+     "video": "Apache_Blood.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8599
+    },
+    {
+     "video": "AbileneTown.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9384
+    },
+    {
+     "video": "ArchOfTriumph.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9573
+    },
+    {
+     "video": "AngelAndTheBadManVideoQualityUpgrade.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9791
+    },
+    {
+     "video": "AsYouLikeIt1936.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9145
+    },
+    {
+     "video": "Algiers_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9444
+    },
+    {
+     "video": "Ace_of_Hearts_1921.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8855
+    },
+    {
+     "video": "ARomanceOfTheRedwoods.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9176
+    },
+    {
+     "video": "Assignment_Outer_Space.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9069
+    },
+    {
+     "video": "AStarIsBorn.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9482
+    },
+    {
+     "video": "AtWarWithTheArmy.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9641
+    },
+    {
+     "video": "AteneaFilmsPublicDomainTheInvincibleGladiator.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.967
+    },
+    {
+     "video": "AtomAgeVampire.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9043
+    },
+    {
+     "video": "Attack_From_Space.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9172
+    },
+    {
+     "video": "BattleBeyondTheSun.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8141
+    },
+    {
+     "video": "BattleshipPotemkin.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7698
+    },
+    {
+     "video": "Attack_of_the_Monsters.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7906
+    },
+    {
+     "video": "BattleofBloodIsland.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9081
+    },
+    {
+     "video": "BerlinSymphonyofaGreatCity.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8065
+    },
+    {
+     "video": "BehindGreenLights_high_Q_mp4.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9634
+    },
+    {
+     "video": "BeauIdeal.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9397
+    },
+    {
+     "video": "Billy_the_Kid_Wanted_1941.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8672
+    },
+    {
+     "video": "BeatTheDevil1953.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.972
+    },
+    {
+     "video": "Becky_Sharp_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9641
+    },
+    {
+     "video": "Bird_of_Paradise_1932.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8447
+    },
+    {
+     "video": "BlackDragons.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9474
+    },
+    {
+     "video": "Black_Raven_movie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9102
+    },
+    {
+     "video": "Bloodlust.mpeg.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8824
+    },
+    {
+     "video": "BlondeIce1948.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9764
+    },
+    {
+     "video": "Bluebeard.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.894
+    },
+    {
+     "video": "Bowery_at_Midnight.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9431
+    },
+    {
+     "video": "BloodyPitOfHorror.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8848
+    },
+    {
+     "video": "CC_1914_11_14_TilliesPuncturedRomance.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9091
+    },
+    {
+     "video": "BorntoWin.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9552
+    },
+    {
+     "video": "BloodontheSun.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9305
+    },
+    {
+     "video": "BloodyWednesday.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9297
+    },
+    {
+     "video": "C-Man.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9346
+    },
+    {
+     "video": "Cafune.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9241
+    },
+    {
+     "video": "CCandCompany.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9385
+    },
+    {
+     "video": "CaptainKidd_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9606
+    },
+    {
+     "video": "ChelovekskinoapparatomManWithAMovieCamera.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8015
+    },
+    {
+     "video": "ChildBride.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8589
+    },
+    {
+     "video": "CarnivalOfSoulsVideoQualityUpgrade.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9196
+    },
+    {
+     "video": "BlackFist.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9045
+    },
+    {
+     "video": "CarnivalOfSouls1962.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.921
+    },
+    {
+     "video": "CarnivalofSouls.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9006
+    },
+    {
+     "video": "CrashoftheMoons.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9583
+    },
+    {
+     "video": "CreatureFromTheHauntedSea1961.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9161
+    },
+    {
+     "video": "CreatureFromTheHauntedSea.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9161
+    },
+    {
+     "video": "Cleopatra_1912.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.957
+    },
+    {
+     "video": "Cosmos_War_of_the_Planets.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8708
+    },
+    {
+     "video": "ConcreteCowboys.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9672
+    },
+    {
+     "video": "CurseOfTheSwampCreature1966_742.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9161
+    },
+    {
+     "video": "DanielBoone1936.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8482
+    },
+    {
+     "video": "DeadMenWalk.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8889
+    },
+    {
+     "video": "Daniel_Boone_-_Trail_Blazer.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8482
+    },
+    {
+     "video": "DeathRage.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9088
+    },
+    {
+     "video": "DeadManDrinking.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9463
+    },
+    {
+     "video": "Breaking_With_Old_Ideas.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.953
+    },
+    {
+     "video": "Crossroads_french_documentary_on_Robert_Johnson.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8522
+    },
+    {
+     "video": "Detour.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.941
+    },
+    {
+     "video": "Decay2012-TheLhcZombieFilmfullFilm.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8816
+    },
+    {
+     "video": "Dick_Tracy_Meets_Gruesome_1947.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9732
+    },
+    {
+     "video": "DiaryofaNudist.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9615
+    },
+    {
+     "video": "Destroy_All_Planets.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.6972
+    },
+    {
+     "video": "DeviloftheDesertAgainstSonofHercules.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.897
+    },
+    {
+     "video": "DiaryOfANudistwidescreen.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9373
+    },
+    {
+     "video": "Cyrano_DeBergerac.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8982
+    },
+    {
+     "video": "Doomed_to_Die_1940.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9407
+    },
+    {
+     "video": "DoomsdayMachine1972.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9091
+    },
+    {
+     "video": "Dont_Look_in_theBasement.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9463
+    },
+    {
+     "video": "Dominique_638.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8974
+    },
+    {
+     "video": "DressedToKill1946.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9746
+    },
+    {
+     "video": "Drums_in_the_Deep_South.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8522
+    },
+    {
+     "video": "DrillerKillerUncut1979.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9239
+    },
+    {
+     "video": "EvilBrainFromOuterSpace.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9361
+    },
+    {
+     "video": "EndoftheWorld.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.771
+    },
+    {
+     "video": "Eegah.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9006
+    },
+    {
+     "video": "Eisenstein-October.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8068
+    },
+    {
+     "video": "Fear_in_the_Night.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9258
+    },
+    {
+     "video": "Fog_island_1945.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9489
+    },
+    {
+     "video": "FamilyEnforcer.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9413
+    },
+    {
+     "video": "FightingCaravans1931_368.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9598
+    },
+    {
+     "video": "FirstSpaceshipOnVenusMPEG.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8949
+    },
+    {
+     "video": "Fire_Monsters_Against_The_Son_of_Hercules.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8084
+    },
+    {
+     "video": "DoubleFeatureHell2theGrindhouseExperience.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9185
+    },
+    {
+     "video": "GetChristieLove.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9627
+    },
+    {
+     "video": "Go_for_Broke.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9141
+    },
+    {
+     "video": "GulliversTravels1939_201509.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7876
+    },
+    {
+     "video": "GulliversTravels720p_652.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8203
+    },
+    {
+     "video": "Grave_of_the_Vampire_movie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9415
+    },
+    {
+     "video": "Gung_Ho.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8459
+    },
+    {
+     "video": "Haxan_tinted_and_subtitled.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.6476
+    },
+    {
+     "video": "GreatExpectations1946.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9647
+    },
+    {
+     "video": "Hercules_Against_the_Moon_Men.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7759
+    },
+    {
+     "video": "DoubleFeatureHell6grindhouse2.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.932
+    },
+    {
+     "video": "Hercules_and_the_Tyrants_of_Babylon.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9238
+    },
+    {
+     "video": "HerculesUnchained.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9143
+    },
+    {
+     "video": "DoubleFeatureHell8grindhouse3.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9307
+    },
+    {
+     "video": "HisPrivateSecretary1933.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.971
+    },
+    {
+     "video": "HiDiddleDiddle.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9966
+    },
+    {
+     "video": "Hitch_Hiker.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.894
+    },
+    {
+     "video": "HighRisk.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8689
+    },
+    {
+     "video": "HisGirlFriday-1940.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9773
+    },
+    {
+     "video": "Holy_Terror_Podcast_Halloween.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9061
+    },
+    {
+     "video": "Gods_Gun.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9664
+    },
+    {
+     "video": "Hitchcock_Secret_Agent.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9506
+    },
+    {
+     "video": "GonewiththeWest.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8481
+    },
+    {
+     "video": "HouseOnBareMountain.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9718
+    },
+    {
+     "video": "Hollywood_Man.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9704
+    },
+    {
+     "video": "Horror_Hotel.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9211
+    },
+    {
+     "video": "HorrorExpresswithSpanishSubtitles.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8103
+    },
+    {
+     "video": "Horrors_of_Spider_Island.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8696
+    },
+    {
+     "video": "HorrorHotel1960.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.915
+    },
+    {
+     "video": "Horror_Express.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8835
+    },
+    {
+     "video": "HouseOnHauntedHill1959.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9161
+    },
+    {
+     "video": "HowAwfulAboutAllan.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9119
+    },
+    {
+     "video": "Inner_Sanctum_movie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9355
+    },
+    {
+     "video": "Indiscreet.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9866
+    },
+    {
+     "video": "I_Love_Trouble_movie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9629
+    },
+    {
+     "video": "In_Which_We_Serve.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9269
+    },
+    {
+     "video": "IslandOfLostWomen.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9582
+    },
+    {
+     "video": "JailBait.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9544
+    },
+    {
+     "video": "InvasionOfTheBeeGirlsWidescreenQualityUpgrade.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9412
+    },
+    {
+     "video": "IronAngel.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9444
+    },
+    {
+     "video": "InvasionOfTheBeeGirls.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9046
+    },
+    {
+     "video": "Jigsaw_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9336
+    },
+    {
+     "video": "Jackie_Robinson_Story_The.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9674
+    },
+    {
+     "video": "ItSeemedLikeaGoodIdeaattheTimeMPEG2.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9384
+    },
+    {
+     "video": "Jamaica_Inn.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8987
+    },
+    {
+     "video": "Killers_from_space.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8662
+    },
+    {
+     "video": "JungleBook.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7619
+    },
+    {
+     "video": "KarateKidsUSA.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9242
+    },
+    {
+     "video": "Lady_Confesses.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.875
+    },
+    {
+     "video": "KingLearOrsonWellesWiFi.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9024
+    },
+    {
+     "video": "King_of_the_Zombies.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9591
+    },
+    {
+     "video": "ItCanBeDoneAmigo.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.926
+    },
+    {
+     "video": "LastWonanOnEarthColor.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9341
+    },
+    {
+     "video": "Kilimanjaro.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9248
+    },
+    {
+     "video": "Lady_X.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9752
+    },
+    {
+     "video": "LouisianaHussy_319.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9587
+    },
+    {
+     "video": "LadyofBurlesque.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9612
+    },
+    {
+     "video": "MajesticPicturesPublicDomainTheScarletLetter.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.964
+    },
+    {
+     "video": "LoveAffair.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9798
+    },
+    {
+     "video": "Intolerance.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8045
+    },
+    {
+     "video": "LifeWithFather.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9894
+    },
+    {
+     "video": "Ma_Barkers_Killer_Brood.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9274
+    },
+    {
+     "video": "MaybeIllComeHomeintheSpring.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9424
+    },
+    {
+     "video": "MesaOfLostWomen.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8841
+    },
+    {
+     "video": "Midnight.Manhunt.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.948
+    },
+    {
+     "video": "Mr._Wong_Detective.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9562
+    },
+    {
+     "video": "Mastertouch.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9241
+    },
+    {
+     "video": "Mr_Wong_in_Chinatown.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9504
+    },
+    {
+     "video": "Murder_At_The_Baskervilles.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9695
+    },
+    {
+     "video": "Milky_Way_movie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9829
+    },
+    {
+     "video": "KingSolomonsMines1937.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8754
+    },
+    {
+     "video": "MurderOnFlight502.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9793
+    },
+    {
+     "video": "MyOutlawBrother.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9329
+    },
+    {
+     "video": "MyManGodfrey1936.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9815
+    },
+    {
+     "video": "NakedMassacre1976.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9765
+    },
+    {
+     "video": "OperationIVY1952.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8685
+    },
+    {
+     "video": "NothingSacred.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9461
+    },
+    {
+     "video": "Night.Of.The.Living.Dead_1080p.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9505
+    },
+    {
+     "video": "Oh_Mr.Porter_1937.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9319
+    },
+    {
+     "video": "ParlorBedroomandBath.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9793
+    },
+    {
+     "video": "Minesweeper_1943.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8973
+    },
+    {
+     "video": "PeliculasDeChaplin-1914.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9126
+    },
+    {
+     "video": "Our_Town.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9454
+    },
+    {
+     "video": "PhantomExpress.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9
+    },
+    {
+     "video": "PhantasmagoriaTheater-AttackOfTheMushroomPeople1963147.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.775
+    },
+    {
+     "video": "OnlytheValaint.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9403
+    },
+    {
+     "video": "Phantom_From_Space.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8512
+    },
+    {
+     "video": "Phantom_of_Chinatown_1940.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9508
+    },
+    {
+     "video": "Phantom_Planet.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9146
+    },
+    {
+     "video": "Please_Murder_Me_movie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9666
+    },
+    {
+     "video": "Port_of_New_York.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8947
+    },
+    {
+     "video": "QueenoftheAmazons.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9295
+    },
+    {
+     "video": "Napoleon_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9412
+    },
+    {
+     "video": "PostmarkForDanger.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9741
+    },
+    {
+     "video": "QuevivaMexico.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8643
+    },
+    {
+     "video": "ProjectKill.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9333
+    },
+    {
+     "video": "PrisonersOfTheLostUniverse1983.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8836
+    },
+    {
+     "video": "PublicDomainAnsaFilmandBeaverChampionAttactionsDavidandGoliath1960.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9455
+    },
+    {
+     "video": "Quicksand_clear.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.962
+    },
+    {
+     "video": "Rocky_Mountain_Mystery_1935.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9733
+    },
+    {
+     "video": "ReturnoftheScarletPimpernel.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9706
+    },
+    {
+     "video": "Pygmalion.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9658
+    },
+    {
+     "video": "PublicDomainJollyFilmJosephandHisBrethren.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9282
+    },
+    {
+     "video": "Sabotage_1936.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9572
+    },
+    {
+     "video": "Scared_to_Death.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.974
+    },
+    {
+     "video": "Seven_Doors_to_Death.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8926
+    },
+    {
+     "video": "Saint_Louis_Bank_Robbery.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9493
+    },
+    {
+     "video": "SantaClausversusTheDevil.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9446
+    },
+    {
+     "video": "SherlockHolmesAndTheSecretWeapon1943.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9504
+    },
+    {
+     "video": "Sobaka.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8754
+    },
+    {
+     "video": "Sita_Sings_the_Blues.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7339
+    },
+    {
+     "video": "SilentNightBloodyNight1972.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8176
+    },
+    {
+     "video": "SilentNightBloodyNight.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8265
+    },
+    {
+     "video": "SonofHerculesTheLandofDarkness.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8913
+    },
+    {
+     "video": "StarOdysseyitalianStarWars1979.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8892
+    },
+    {
+     "video": "Smash-Up.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9684
+    },
+    {
+     "video": "Teaserama.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9664
+    },
+    {
+     "video": "StreetScene1931.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.965
+    },
+    {
+     "video": "StarWreckInThePirkining.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8285
+    },
+    {
+     "video": "Santa_Fe_Trail_movie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9498
+    },
+    {
+     "video": "TarzanandtheTrappers.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7329
+    },
+    {
+     "video": "ScarletStreet.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9557
+    },
+    {
+     "video": "TeenagersFromOuterSpace1959.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9386
+    },
+    {
+     "video": "TheBeachGirlsAndTheMonster.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9432
+    },
+    {
+     "video": "ThatUncertainFeeling.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.979
+    },
+    {
+     "video": "TenGladiators.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9628
+    },
+    {
+     "video": "TheBeachcomber.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8914
+    },
+    {
+     "video": "TheCorpseVanishes.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9407
+    },
+    {
+     "video": "TheBigWheel.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9296
+    },
+    {
+     "video": "TheGeneral.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7546
+    },
+    {
+     "video": "TheChase_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9263
+    },
+    {
+     "video": "TheFlyingDeuces.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9485
+    },
+    {
+     "video": "TheGhoul.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7927
+    },
+    {
+     "video": "TheDayOfTheTriffids.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8833
+    },
+    {
+     "video": "TheGhostTrain.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9662
+    },
+    {
+     "video": "TheIncrediblePetrifiedWorld.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8379
+    },
+    {
+     "video": "ShockerInternetDriveIn-Week13dementedDoubleFeature.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.869
+    },
+    {
+     "video": "TheLazarusSyndrome.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9862
+    },
+    {
+     "video": "TheGolem_893.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8719
+    },
+    {
+     "video": "ShockerInternetDriveIn-Week18aNaschyDoubleFeature.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.87
+    },
+    {
+     "video": "TheLimpingMan.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9637
+    },
+    {
+     "video": "TheMostDangerousGame.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.868
+    },
+    {
+     "video": "TheMagicSword.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8318
+    },
+    {
+     "video": "TheMarinesareComing.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9542
+    },
+    {
+     "video": "TheAtomicBrain.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8726
+    },
+    {
+     "video": "TheManWhoSavedTheWorldturkishStarWars1982.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7561
+    },
+    {
+     "video": "TheLittleShopOfHorrors1960_765.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9685
+    },
+    {
+     "video": "TheOver-the-HillGangRidesAgain.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9797
+    },
+    {
+     "video": "TheOvertheHillGang.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9502
+    },
+    {
+     "video": "TheNastyRabbit1964.mp4.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9636
+    },
+    {
+     "video": "The.Dark.Hour.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9927
+    },
+    {
+     "video": "TheLostZeppelin.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8676
+    },
+    {
+     "video": "ThePaintedHills.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8419
+    },
+    {
+     "video": "ThePhantomCreeps.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8914
+    },
+    {
+     "video": "TheNorthStar.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9313
+    },
+    {
+     "video": "ThePhantomoftheOpera.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7559
+    },
+    {
+     "video": "TheProudAndTheDamned-1972.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9506
+    },
+    {
+     "video": "TheScreamingSkull.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8401
+    },
+    {
+     "video": "TheProudandtheDamned_201511.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.961
+    },
+    {
+     "video": "TheSheBeast.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8513
+    },
+    {
+     "video": "TheSnowCreature.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8799
+    },
+    {
+     "video": "TheRedHouse.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.865
+    },
+    {
+     "video": "TheSphinx-1933.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9759
+    },
+    {
+     "video": "ThePyx.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9234
+    },
+    {
+     "video": "TheScarletPimpernel.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9838
+    },
+    {
+     "video": "TheSheik.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9564
+    },
+    {
+     "video": "TheSoutherner.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9101
+    },
+    {
+     "video": "TheSwap.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9172
+    },
+    {
+     "video": "TheStranger_0.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9479
+    },
+    {
+     "video": "TheTerror.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8323
+    },
+    {
+     "video": "TheTreasureOfJamaicaReef.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7398
+    },
+    {
+     "video": "TheWildWomenOfWongoVideoQualityUpgrade.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8785
+    },
+    {
+     "video": "TheWomanInGreen1945.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9535
+    },
+    {
+     "video": "TheWizardOfOz1925.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8294
+    },
+    {
+     "video": "The_Bat_Vincent_Price.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9202
+    },
+    {
+     "video": "TheYesterdayMachine1963.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9108
+    },
+    {
+     "video": "The_Atomic_Man_1955.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8738
+    },
+    {
+     "video": "The_Bold_Caballero.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9173
+    },
+    {
+     "video": "The_Fatal_Hour.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9736
+    },
+    {
+     "video": "The_Evil_Mind.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9596
+    },
+    {
+     "video": "TheYinandtheYangofMr.Go.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9384
+    },
+    {
+     "video": "The_Big_Combo_1955.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9543
+    },
+    {
+     "video": "The_Hoodlum.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9474
+    },
+    {
+     "video": "The_General_Buster_Keaton.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9016
+    },
+    {
+     "video": "The_Big_Lift.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9534
+    },
+    {
+     "video": "The_Mystery_of_Mr._Wong.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9681
+    },
+    {
+     "video": "TheWhiteWarrior1961.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9561
+    },
+    {
+     "video": "The_Killer_Shrews.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.913
+    },
+    {
+     "video": "The_Little_Shop_of_Horrors.mpeg.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9483
+    },
+    {
+     "video": "The_Hunchback_of_Notre_Dame.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8065
+    },
+    {
+     "video": "The_Scarlet_Clue.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9692
+    },
+    {
+     "video": "The_Pied_Piper_of_Hamelin.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.977
+    },
+    {
+     "video": "The_Scar_1948.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9303
+    },
+    {
+     "video": "The_Sign_OF_Four.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9141
+    },
+    {
+     "video": "The_Thirteenth_Guest.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9564
+    },
+    {
+     "video": "The_Sadist.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9428
+    },
+    {
+     "video": "The_Wasp_Women.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9655
+    },
+    {
+     "video": "TheyMadeMeAKiller.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9455
+    },
+    {
+     "video": "The_Second_Woman_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9309
+    },
+    {
+     "video": "ThisisNotaTest.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9896
+    },
+    {
+     "video": "The_Son_of_Monte_Cristo.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9483
+    },
+    {
+     "video": "Trapped_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9391
+    },
+    {
+     "video": "Timetable1956.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9346
+    },
+    {
+     "video": "Two_Dollar_Bettor_movie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.965
+    },
+    {
+     "video": "U-67-TheSeaGhost.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9274
+    },
+    {
+     "video": "ThunderintheCity.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9655
+    },
+    {
+     "video": "UnderWesternStars.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9266
+    },
+    {
+     "video": "UpInTheAir.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9508
+    },
+    {
+     "video": "UnknownWorld.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7838
+    },
+    {
+     "video": "Vampyr1932.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7766
+    },
+    {
+     "video": "VengeanceValley.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9634
+    },
+    {
+     "video": "VoyagetothePlanetofPrehistoricWomen.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7484
+    },
+    {
+     "video": "Waltzes_from_Vienna.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9707
+    },
+    {
+     "video": "WarOfTheRobots.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.93
+    },
+    {
+     "video": "WolfBlood1925.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8396
+    },
+    {
+     "video": "WhereTheresAWill.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9869
+    },
+    {
+     "video": "Woman_on_the_Run.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9642
+    },
+    {
+     "video": "Yellowstone_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.917
+    },
+    {
+     "video": "WorldGoneMad.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9754
+    },
+    {
+     "video": "WarOfTheWildcats-JohnWayne1943.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9719
+    },
+    {
+     "video": "Werewolf_In_A_Girls_Dormitory.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9219
+    },
+    {
+     "video": "We_Dive_at_Dawn_1943.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9435
+    },
+    {
+     "video": "Topper_Returns_41.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9632
+    },
+    {
+     "video": "Whistle_Stop.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9466
+    },
+    {
+     "video": "abe_lincoln_of_the_4th_ave.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9651
+    },
+    {
+     "video": "YoungLand.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9798
+    },
+    {
+     "video": "YoungandInnocentTheGirlWasYoung.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9512
+    },
+    {
+     "video": "aces_and_eights.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9592
+    },
+    {
+     "video": "amazing_adventure.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9355
+    },
+    {
+     "video": "airborne.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9789
+    },
+    {
+     "video": "bad_boy.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9847
+    },
+    {
+     "video": "amazing_mr_x.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8558
+    },
+    {
+     "video": "american_empire.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9195
+    },
+    {
+     "video": "behave_yourself_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9656
+    },
+    {
+     "video": "beyond_bengal.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.761
+    },
+    {
+     "video": "VirusFukkatsuNoHi1980.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.88
+    },
+    {
+     "video": "big_bluff.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9368
+    },
+    {
+     "video": "angel_and_the_badman.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9397
+    },
+    {
+     "video": "angel_on_my_shoulder.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.963
+    },
+    {
+     "video": "beneath_the_12-mile_reef.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9627
+    },
+    {
+     "video": "bowery_blitzkrieg.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9721
+    },
+    {
+     "video": "big_trees.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9496
+    },
+    {
+     "video": "Zeitgeist.Addendum.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.5407
+    },
+    {
+     "video": "british_intelligence.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9419
+    },
+    {
+     "video": "born_to_the_saddle.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9633
+    },
+    {
+     "video": "brain_that_wouldnt_die.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9542
+    },
+    {
+     "video": "abraham_lincoln.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9499
+    },
+    {
+     "video": "boys_of_the_city.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9274
+    },
+    {
+     "video": "call_of_the_wilderness.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7302
+    },
+    {
+     "video": "brokenblossoms1919.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8423
+    },
+    {
+     "video": "call_of_the_yukon.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8534
+    },
+    {
+     "video": "calvary.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9048
+    },
+    {
+     "video": "captain_calamity.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9628
+    },
+    {
+     "video": "cavalcade_of_the_west.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9585
+    },
+    {
+     "video": "calendar_girl.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9915
+    },
+    {
+     "video": "cause_for_alarm_1951.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9729
+    },
+    {
+     "video": "cco_attackofthegiantleeches.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8755
+    },
+    {
+     "video": "cco_jackandthebeanstalk.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9541
+    },
+    {
+     "video": "cco_thegunandthepulpit.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9424
+    },
+    {
+     "video": "cco__HerculesandtheCaptiveWomen.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8249
+    },
+    {
+     "video": "club_paradise.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9636
+    },
+    {
+     "video": "charlie_chaplin_film_fest.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9516
+    },
+    {
+     "video": "corruption.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9667
+    },
+    {
+     "video": "convicts_code.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9681
+    },
+    {
+     "video": "city_of_missing_girls.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9509
+    },
+    {
+     "video": "cheers_for_miss_bishop.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9364
+    },
+    {
+     "video": "cco_TheGiantofMarathon.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8639
+    },
+    {
+     "video": "dick_tracy_detctive.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9549
+    },
+    {
+     "video": "dawn_of_the_great_divide.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9712
+    },
+    {
+     "video": "cco_virus.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8738
+    },
+    {
+     "video": "dead_people_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9106
+    },
+    {
+     "video": "delightfully_dangerous.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9524
+    },
+    {
+     "video": "double_exposure.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.976
+    },
+    {
+     "video": "dreams-that-money-can-buy.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8486
+    },
+    {
+     "video": "dishonored_lady.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9583
+    },
+    {
+     "video": "fatal_hour.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.959
+    },
+    {
+     "video": "cco_swordoflancelot.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.955
+    },
+    {
+     "video": "dressed_to_kill.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.972
+    },
+    {
+     "video": "farewell_to_arms.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8535
+    },
+    {
+     "video": "five_minutes_to_live.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9564
+    },
+    {
+     "video": "girl_o_my_dreams.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9522
+    },
+    {
+     "video": "frankenstein-1931-restored-movie-720p-hd.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9286
+    },
+    {
+     "video": "flight_to_nowhere.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9666
+    },
+    {
+     "video": "gammera.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9179
+    },
+    {
+     "video": "eternally_yours_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9636
+    },
+    {
+     "video": "great_commandment.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.947
+    },
+    {
+     "video": "gullivers_travels1939.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8282
+    },
+    {
+     "video": "harolddiddlebock.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9749
+    },
+    {
+     "video": "hells_house.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9744
+    },
+    {
+     "video": "house_of_secrets.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9304
+    },
+    {
+     "video": "house_on_haunted_hill_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9231
+    },
+    {
+     "video": "his_double_life.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7908
+    },
+    {
+     "video": "his_girl_friday.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9864
+    },
+    {
+     "video": "indestructible_man.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9437
+    },
+    {
+     "video": "ill_give_my_life.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9648
+    },
+    {
+     "video": "heartbeat.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.965
+    },
+    {
+     "video": "iron_mask.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8893
+    },
+    {
+     "video": "humanbondage.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9607
+    },
+    {
+     "video": "jungle_man.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8211
+    },
+    {
+     "video": "its_a_joke_son.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9723
+    },
+    {
+     "video": "kansas_pacific.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9233
+    },
+    {
+     "video": "dw_griffith_birth_of_a_nation.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8906
+    },
+    {
+     "video": "kid_dynamite.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9811
+    },
+    {
+     "video": "last_of_the_mohicans_1920.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8627
+    },
+    {
+     "video": "killer_diller.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9726
+    },
+    {
+     "video": "killer_dill.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9722
+    },
+    {
+     "video": "kansascityconfidencial.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9621
+    },
+    {
+     "video": "lil_abner.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9088
+    },
+    {
+     "video": "long_shot.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9778
+    },
+    {
+     "video": "lastmanonearth-1964.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9598
+    },
+    {
+     "video": "little_men.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9548
+    },
+    {
+     "video": "lost_world.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7206
+    },
+    {
+     "video": "little_lord_fauntleroy.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9553
+    },
+    {
+     "video": "impact.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9795
+    },
+    {
+     "video": "love_island.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9474
+    },
+    {
+     "video": "little_princess.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9623
+    },
+    {
+     "video": "lumberjack1944.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8902
+    },
+    {
+     "video": "machine_gun_mama_1944.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9208
+    },
+    {
+     "video": "mark_of_the_avenger_1938.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9519
+    },
+    {
+     "video": "hot_rod_girl_1956.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.981
+    },
+    {
+     "video": "made_for_each_other_film.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9613
+    },
+    {
+     "video": "million_dollar_weekend.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9306
+    },
+    {
+     "video": "missing_corpse.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9756
+    },
+    {
+     "video": "mr_reckless.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9696
+    },
+    {
+     "video": "mr_robinson_crusoe.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.6631
+    },
+    {
+     "video": "murder_on_the_campus.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9892
+    },
+    {
+     "video": "nabonga_1944.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7649
+    },
+    {
+     "video": "my_pal_trigger.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9175
+    },
+    {
+     "video": "my_favorite_brunette.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9769
+    },
+    {
+     "video": "nancy_drew_reporter.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9594
+    },
+    {
+     "video": "neath_brooklyn_bridge.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9672
+    },
+    {
+     "video": "my_dear_secretary.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9947
+    },
+    {
+     "video": "last_time_i_saw_paris.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9741
+    },
+    {
+     "video": "my_love_for_yours_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.99
+    },
+    {
+     "video": "new_adventures_of_tarzan.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7972
+    },
+    {
+     "video": "mclintok_widescreen.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9822
+    },
+    {
+     "video": "non_stop_new_york.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9618
+    },
+    {
+     "video": "meet_john_doe.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.943
+    },
+    {
+     "video": "northwest_trail.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.917
+    },
+    {
+     "video": "ole_swimmin_hole.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9778
+    },
+    {
+     "video": "panthers_claw.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9645
+    },
+    {
+     "video": "miss_london_ltd_1943.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9816
+    },
+    {
+     "video": "phantom_ship.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9429
+    },
+    {
+     "video": "parachute_battalion.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9767
+    },
+    {
+     "video": "oliver_twist.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9401
+    },
+    {
+     "video": "parole_inc.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9649
+    },
+    {
+     "video": "planet_outlaws_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.927
+    },
+    {
+     "video": "panorama_ephemera2004.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8101
+    },
+    {
+     "video": "prison_mutiny_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9722
+    },
+    {
+     "video": "pot_o_gold.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9737
+    },
+    {
+     "video": "private_buckaroo_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9851
+    },
+    {
+     "video": "private_snuffy_smith.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.947
+    },
+    {
+     "video": "raiders_of_old_california_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9443
+    },
+    {
+     "video": "reefer_madness1938.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.956
+    },
+    {
+     "video": "renegade_girl.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9278
+    },
+    {
+     "video": "rain1932.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.928
+    },
+    {
+     "video": "rhythm_blues_review.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.979
+    },
+    {
+     "video": "road_to_happiness.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9899
+    },
+    {
+     "video": "rock_rock_rock.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9854
+    },
+    {
+     "video": "secret_weapon.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9742
+    },
+    {
+     "video": "second_chorus_1940.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9761
+    },
+    {
+     "video": "she_gods_of_shark_reef.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.869
+    },
+    {
+     "video": "seven_were_saved.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9306
+    },
+    {
+     "video": "penny_serenade.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9601
+    },
+    {
+     "video": "royal_wedding.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9754
+    },
+    {
+     "video": "rogues_tavern.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9639
+    },
+    {
+     "video": "shame_.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9665
+    },
+    {
+     "video": "slave_in_bondage.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9531
+    },
+    {
+     "video": "sos_your_aunt_emma_1942.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9317
+    },
+    {
+     "video": "steamboat_bill_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9134
+    },
+    {
+     "video": "publicmovies212.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9688
+    },
+    {
+     "video": "shock.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9532
+    },
+    {
+     "video": "submarine_alert.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9179
+    },
+    {
+     "video": "street_angel.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8923
+    },
+    {
+     "video": "take_me_back_to_oklahoma.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9057
+    },
+    {
+     "video": "suddenly.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9901
+    },
+    {
+     "video": "tarzan_and_the_green_goddess.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8
+    },
+    {
+     "video": "tarzans_revenge.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8357
+    },
+    {
+     "video": "sundowners.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8956
+    },
+    {
+     "video": "teenagers_from_outerspace.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9474
+    },
+    {
+     "video": "the_contender_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9679
+    },
+    {
+     "video": "the_devils_party.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9272
+    },
+    {
+     "video": "the_bashful_bachelor.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9607
+    },
+    {
+     "video": "the_ghost_walks.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9488
+    },
+    {
+     "video": "the_gorilla.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.875
+    },
+    {
+     "video": "rockstar-2011.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9575
+    },
+    {
+     "video": "the_local_bad_man.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8876
+    },
+    {
+     "video": "the_million_dollar_kid.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9767
+    },
+    {
+     "video": "the_quiet_one.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.832
+    },
+    {
+     "video": "the_snow_queen_1959_animation.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.719
+    },
+    {
+     "video": "the_green_glove.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8592
+    },
+    {
+     "video": "they_raid_by_night.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9531
+    },
+    {
+     "video": "sunset_murder_case.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9378
+    },
+    {
+     "video": "the_stork_club.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9949
+    },
+    {
+     "video": "things_to_come_ipod.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8259
+    },
+    {
+     "video": "thepayoff.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9723
+    },
+    {
+     "video": "war_dogs.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9258
+    },
+    {
+     "video": "waterfront_lady_1935.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9927
+    },
+    {
+     "video": "under_california_stars.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9308
+    },
+    {
+     "video": "waterfront.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.902
+    },
+    {
+     "video": "white_zombie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.8889
+    },
+    {
+     "video": "transatlantic_tunnel.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9678
+    },
+    {
+     "video": "werewolf_washington.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9104
+    },
+    {
+     "video": "till_the_clouds_roll_by.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.963
+    },
+    {
+     "video": "the-grapes-of-wrath-1940.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9461
+    },
+    {
+     "video": "timber_queen.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9387
+    }
+   ]
+  },
+  "embed_integrity": {
+   "PASS": true,
+   "n": 40970,
+   "expected_dim": 384,
+   "tol": 0.001,
+   "bad_dim_idx": null,
+   "bad_norm_idx": null
+  },
+  "determinism_repeat": {
+   "verdict": "NOT RUN",
+   "PASS": null,
+   "records": 0,
+   "offered": null,
+   "reason": "no ::repeat record in this leg (sequential legs produce one; blast legs report NOT RUN)"
+  }
+ },
+ "provenance_leela": {
+  "run_id": "20260905T050454Z-77923",
+  "timestamp_utc": "2026-09-05T05:04:54Z",
+  "git_commit": "2711c26c9367e37bcbed68eb4149d5e8626cbd2e-dirty",
+  "image_digest": null,
+  "framework_version": "0.14.23",
+  "instance_type": "c7i.8xlarge",
+  "architecture": "Linux/x86_64",
+  "cpu_count": 32,
+  "ram_gb": 61.8,
+  "corpus_manifest_sha256": "c5a09a3462af7204001b38bcd7fad4d9568e26adddfb2471cca86a99c9a3de67",
+  "corpus_n_docs": 498,
+  "parser": "ffmpeg fps=1/15 + rfdetr(RF-DETR base, thr 0.3)",
+  "parser_config_hash": "f16cb645f66726de",
+  "chunk_config": {
+   "chunk_size": 4000,
+   "chunk_overlap": 0,
+   "splitter": "SentenceSplitter(native, char length function supplied)",
+   "input_transform": "text + '\\n'"
+  },
+  "rocketride_engine_version": "3.3.1",
+  "duplication_patch_applied": false,
+  "duplication_patch_id": null,
+  "rocketride_sdk_version": "1.3.0",
+  "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+  "offered_concurrency": 16,
+  "configured_concurrency": 16,
+  "warmup_policy": "driver-side, 2 disjoint manifest warm rows, coverage proven per instance; LI sends concurrent in waves of max(2 x workers, leg concurrency) (Crossroad 40), RR tokens round-robin; per-send ledger in warmup_<stem>.json",
+  "timeout_s": 43200,
+  "mode": "blast"
+ },
+ "provenance_video": {
+  "pipe_sha256": "6330773fb63bf7f286563cc37b39a671e3b25c1874ae9bcfc4b936c9c2e5b911",
+  "manifest_sha256": "c5a09a3462af7204001b38bcd7fad4d9568e26adddfb2471cca86a99c9a3de67",
+  "posture": {
+   "name": "workers",
+   "declared_workers": 16,
+   "threads_env_in_process_torch": 2,
+   "note": "LlamaIndex arm: uvicorn worker PROCESSES. No use(threads=) and no engine thread default exist here \u2014 the thread configuration is the six BLAS/OMP variables, read back in-process from every worker; threads_config/threads_note are RocketRide fields and are deliberately absent."
+  },
+  "identity_readback": {
+   "sdk": {
+    "skipped": "LI leg \u2014 the rocketride SDK is not on this path"
+   },
+   "li": {
+    "detect_impl": [
+     "rfdetr"
+    ],
+    "python_version": "3.12.13",
+    "versions": {
+     "rfdetr": "1.5.2",
+     "torch": "2.10.0+cu128",
+     "torchvision": "0.25.0+cu128",
+     "transformers": "4.53.3",
+     "supervision": "0.30.0",
+     "llama-index-core": "0.14.24",
+     "llama-index-embeddings-huggingface": "0.7.0",
+     "sentence-transformers": "5.7.0",
+     "imageio-ffmpeg": "0.6.0",
+     "fastapi": "0.141.1",
+     "uvicorn": "0.52.4"
+    },
+    "chunk_config_readback": {
+     "expected": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "per_worker": {
+      "li_worker_8802_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8803_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8804_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8805_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8806_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8807_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8808_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8809_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8810_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8811_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8812_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8813_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8814_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8815_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8816_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8817_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      }
+     }
+    },
+    "rfdetr_checkpoint_md5_by_container": {
+     "li_bal_0": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_1": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_2": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_3": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_4": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_5": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_6": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_7": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_8": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_9": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_10": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_11": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_12": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_13": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_14": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_15": "b4d3ce46099eaed50626ede388caf979"
+    },
+    "rfdetr_checkpoint_md5_ok": true
+   }
+  },
+  "thread_pins_by_arm": {
+   "PASS": true,
+   "arms": {
+    "li": {
+     "within_arm": {
+      "PASS": true,
+      "readers": [
+       "li_worker_8802_1",
+       "li_worker_8803_1",
+       "li_worker_8804_1",
+       "li_worker_8805_1",
+       "li_worker_8806_1",
+       "li_worker_8807_1",
+       "li_worker_8808_1",
+       "li_worker_8809_1",
+       "li_worker_8810_1",
+       "li_worker_8811_1",
+       "li_worker_8812_1",
+       "li_worker_8813_1",
+       "li_worker_8814_1",
+       "li_worker_8815_1",
+       "li_worker_8816_1",
+       "li_worker_8817_1"
+      ],
+      "disagreements": null,
+      "values_agreed": {
+       "OMP_NUM_THREADS": "2",
+       "MKL_NUM_THREADS": "2",
+       "OPENBLAS_NUM_THREADS": "2",
+       "VECLIB_MAXIMUM_THREADS": "2",
+       "NUMEXPR_NUM_THREADS": "2",
+       "TORCH_NUM_THREADS": "2",
+       "torch_num_threads": 2
+      }
+     },
+     "declared": {
+      "MKL_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "VECLIB_MAXIMUM_THREADS": "2",
+      "NUMEXPR_NUM_THREADS": "2",
+      "TORCH_NUM_THREADS": "2",
+      "OMP_NUM_THREADS": "2"
+     },
+     "declared_vs_measured_mismatch": null
+    }
+   },
+   "cross_arm_values": {
+    "li": 2
+   },
+   "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm optima, difference recorded never failed (Crossroad 17)"
+  },
+  "task_census": null,
+  "network_mode": {
+   "li_bal_0": "host",
+   "li_bal_1": "host",
+   "li_bal_2": "host",
+   "li_bal_3": "host",
+   "li_bal_4": "host",
+   "li_bal_5": "host",
+   "li_bal_6": "host",
+   "li_bal_7": "host",
+   "li_bal_8": "host",
+   "li_bal_9": "host",
+   "li_bal_10": "host",
+   "li_bal_11": "host",
+   "li_bal_12": "host",
+   "li_bal_13": "host",
+   "li_bal_14": "host",
+   "li_bal_15": "host"
+  },
+  "image": {
+   "container": "li_bal_0",
+   "requested_tag": "li:video",
+   "image_id": "sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95",
+   "rootfs_layer_count": 14,
+   "labels": "{}",
+   "lineage_declared": "docker/Dockerfile.llamaindex-video at the Ruling-L config (4000/0): FULL 149-pin freeze install from li_video/li_image_freeze.txt with a fail-closed build-time read-back (pip freeze == freeze file; b295dea), streaming reader (spool -> frames-on-disk -> k=1), chunk config read back per leg from every worker's /health by the driver preflight.",
+   "lineage_is_declared": true,
+   "lineage_note": "a declared string, not a measurement \u2014 it states how this image was produced; the image_id and layer count are the measured facts it must be read against"
+  },
+  "interval_s": 15,
+  "rr_write_path": null,
+  "frames_observed_method": "extractor-count",
+  "chunk_config_source": "measured from records (config literal never exported)"
+ }
+}

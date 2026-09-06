@@ -1,0 +1,109 @@
+{
+ "run_dir": "working/video/results/films500_mainrun_20260904T204852Z",
+ "campaign": "films500_mainrun",
+ "started_utc": "2026-09-04T20:48:52Z",
+ "git_sha": "2711c26c9367e37bcbed68eb4149d5e8626cbd2e",
+ "preflight_only": false,
+ "ruled_numbers": {
+  "scope_ruling": "2026-09-03: RR M16xT2 + LI N16xT2 ONLY at 500 films, 2 blast passes each. RR DEFAULT SKIPPED \u2014 ~19 h/pass to re-answer a question answered twice at n=2 (films-35 0.77 pct spread; AMI-168 0.77 pct); the out-of-box finding ships from those runs at their own N, N stated wherever it appears; her runbook defines no default-RocketRide cell. SEQ_N=5 NOT scaled with the corpus (gate 8 / uncontended latency / speedup divisor do not scale with N).",
+  "M_TOKENS": 16,
+  "RR_THREADS_ENV": 2,
+  "LI_INSTANCES": 16,
+  "LI_THREADS_ENV": 2,
+  "BLAST_C": 16,
+  "N_MEASURED": 498,
+  "SEQ_N": 5,
+  "PASSES": 2,
+  "WARM_N": 2,
+  "usd_per_1k_footage_hours": "PUBLISHED as a results row (ruled 2026-09-03): every export computes efficiency.usd_per_1k_footage_hours, basis in-export (1.428 USD/h / x_realtime x 1000)"
+ },
+ "cross_gate_expectation": "STATED BEFORE THE RUN (ruled): gate 3 will FAIL on ~433 of the 498 measured films (landed manifest: 435/500 above the 560px edge, detector basis) \u2014 every >560px film is expected to diverge (Ruling U). Expected outcome, NOT a stop condition; the finding surface is the PARTITION CHECK (>560 diverging, <=560 clean) \u2014 a violation in EITHER direction changes Ruling U and exits loudly.",
+ "arming": {
+  "armed": true,
+  "gate3_run_id": "films500-staging-20260904T091932Z-4b1d1f1e",
+  "basis": "MULTI-FILM, SPANS THE 560px RESOLUTION BOUNDARY (scope ruling 2026-09-03; unlike the 35-film campaign, whose staged set was a single sub-560px film \u2014 \u00a710.4 lesson): control 20000LeaguesUndertheSea.mp4 (<=560, strict agreement REQUIRED and measured) + HouseOnBareMountain.mp4 (>560, divergence EXPECTED per Ruling U and measured).",
+  "control": {
+   "film": "20000LeaguesUndertheSea.mp4",
+   "arming": {
+    "probe": "derive_gate3_arming",
+    "created_utc": "20260904T091932Z",
+    "git_head": "4b1d1f1eadaed007579aadbf9087645edbe3580b",
+    "gate3_run_id": "films-staging-20260904T091932Z-4b1d1f1e",
+    "film": "20000LeaguesUndertheSea.mp4",
+    "film_choice_reason": "first measured manifest row (deterministic; what --n 1 sends) AND the film whose frames are proven byte-identical A==B==C across the engine argv / LI pipe / LI file paths \u2014 committed probe_frame_parity artifact \u2014 so the same-frames precondition is strongest exactly here",
+    "agreement": {
+     "PASS": true,
+     "n_frames": 395,
+     "diverging_frames": null,
+     "n_diverging": 0,
+     "boundary_excluded_frames": null,
+     "n_boundary_excluded": 0,
+     "boundary_excluded_rate": 0.0,
+     "boundary_eps": 0.001,
+     "threshold": 0.3,
+     "max_boundary_rate": 0.005,
+     "scores_available": true
+    },
+    "score_treatment": "gate 3 compares SORTED LABEL MULTISETS only (gates_shared.py:842-843); scores are consulted solely on frames whose labels already diverge, as 6-decimal-rounded multisets for the boundary exclusion \u2014 sub-1e-6 cross-arm score differences are invisible to the verdict by design",
+    "near_threshold_census": {
+     "window": "abs(score - 0.3) <= 0.001 (the H16 boundary window)",
+     "rr": {
+      "n_detections_in_window": 3,
+      "frames": [
+       250,
+       362,
+       365
+      ]
+     },
+     "li": {
+      "n_detections_in_window": 3,
+      "frames": [
+       250,
+       362,
+       365
+      ]
+     },
+     "note": "H16 drift cap (0.5%/video) is LIVE and UNSIZED for films \u2014 this census is the film's measured exposure"
+    },
+    "liveness": {
+     "nonempty_frame_fraction_rr": 0.7696,
+     "nonempty_frame_fraction_li": 0.7696,
+     "liveness_min": 0.385,
+     "derivation": "RULING R: 0.5 x min(per-arm non-empty-frame fraction) measured on the staged film by the leg driver's own records \u2014 the measured minimum with a stated 2x margin. Single-film basis DISCLOSED; never a Corner-derived number on films content."
+    },
+    "armed": true
+   }
+  },
+  "expected_diverger": {
+   "film": "HouseOnBareMountain.mp4",
+   "n_frames": 248,
+   "n_diverging": 114,
+   "diverged_as_expected": true,
+   "note": "divergence here is the RULED expectation (Ruling U); ZERO divergence on this >560px film would itself be a finding to flag, not a pass to celebrate"
+  },
+  "liveness": {
+   "liveness_min": 0.3848101265822785,
+   "formula": "0.5 x min non-empty-frame fraction across BOTH staged films (Ruling R, multi-film basis)",
+   "per_film_fracs": {
+    "rr:20000LeaguesUndertheSea.mp4": 0.769620253164557,
+    "rr:HouseOnBareMountain.mp4": 0.9758064516129032,
+    "rr:20000LeaguesUndertheSea.mp4::repeat": 0.769620253164557,
+    "li:20000LeaguesUndertheSea.mp4": 0.769620253164557,
+    "li:HouseOnBareMountain.mp4": 0.9717741935483871,
+    "li:20000LeaguesUndertheSea.mp4::repeat": 0.769620253164557
+   }
+  },
+  "staged_utc": "20260904T091932Z"
+ },
+ "corpus": {
+  "manifest": "working/video/films500_video_manifest.jsonl",
+  "corpus_dir": "/home/ssm-user/films_corpus/full500",
+  "source_manifest_sha256_expected": "bd0c915e28710322bace0549d7372dddea5578895333f143c67e04252e4e02a1"
+ },
+ "disclosures": "DISCLOSURES: gate-3 strict FAILURES on >560px films are the RULED EXPECTATION (Ruling U; the partition check is the finding surface, not the failure count); char_conservation at the Phase-1 +/-2 pct default is band-cutting DATA (Ruling W deferral stands); the boundary-exclusion drift cap (0.5 pct/video) is LIVE and UNSIZED for films content (H16 open).",
+ "completed": true,
+ "cross_gates_failed": true,
+ "cross_gates_failed_note": "EXPECTED per the pre-run ruling (Ruling U at 500): gate-3 failures above 560px are the ruled outcome, not a defect \u2014 the partition check is the verdict surface",
+ "partition_check_rc": 0,
+ "completed_utc": "2026-09-05T15:01:37Z"
+}

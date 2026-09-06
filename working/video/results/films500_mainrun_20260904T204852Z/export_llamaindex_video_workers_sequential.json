@@ -1,0 +1,528 @@
+{
+ "at_a_glance": "llamaindex_video workers[declared_workers=16] sequential pass 1 records 6 (errors 0) / offered 5 | THROUGHPUT 1.834 frames/s (21.83x realtime), steady window undefined | SERVICE CPU 1.88 cores = 5.9% of 32 | IDLE BURDEN 0.069 cores with 16 li_workers live = 0.2% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 2 | gates PASS 8 \u00b7 NOT RUN 0 \u00b7 FAIL 0 | efficiency valid=True | COLLECTOR ok",
+ "arm": "llamaindex_video",
+ "posture": "workers[declared_workers=16]",
+ "leg": "sequential",
+ "pass": 1,
+ "submission_order": "manifest-seq: deterministic by meeting id, identical both arms; NOT longest-first \u2014 sorting to shorten the drain tail would benchmark our scheduler, not the frameworks (ruling 2026-08-20)",
+ "throughput": {
+  "total_span_s": 1044.7,
+  "total_frames": 1916,
+  "total_frames_per_s": 1.834,
+  "total_realtime_factor": 21.83,
+  "steady_window": {
+   "defined": false,
+   "reason": "sequential leg \u2014 no saturation window"
+  }
+ },
+ "efficiency": {
+  "valid": true,
+  "source": "container cgroup cpu.stat usage_usec bracketed around the leg \u2014 the same reader as the probes (#34: denominators from the container, never the driver)",
+  "service_cpu_s": 1964.2,
+  "effective_cores": 1.88,
+  "cpu_util_of_box": 0.0588,
+  "box_cpus": 32,
+  "cpu_s_per_footage_min": 5.168,
+  "cpu_s_per_frame": 1.025,
+  "cpu_s_per_video": 327.4,
+  "cpu_s_per_detection": 0.238,
+  "cpu_s_per_chunk": 4.224,
+  "n_detections": 8253,
+  "n_chunks": 465,
+  "usd_per_1k_footage_hours": 65.41,
+  "usd_per_hour_basis": "1.428 (instance on-demand $/h; cost = $/h / x_realtime * 1000, her V5 definition)",
+  "idle_burden": {
+   "instances": 16,
+   "instance_kind": "li_workers",
+   "idle_cores_before_instances": 0.094,
+   "idle_cores_with_instances_live": 0.069,
+   "sample_s": 6.0,
+   "idle_share_of_box": 0.0022,
+   "box_cpus": 32,
+   "marginal_cores_per_instance": null,
+   "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+   "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve",
+   "idle_cpu_s_over_leg_if_additive": 72.1,
+   "idle_share_of_service_cpu_if_additive": 0.0367
+  },
+  "policy": "idle_burden is reported beside every figure above and never subtracted \u2014 additivity under load is unmeasured (Ticket 4)"
+ },
+ "driver_memory": {
+  "ru_maxrss_kb": 88928,
+  "basis": "getrusage(RUSAGE_SELF).ru_maxrss at export time \u2014 the driver process peak over the whole leg (KiB on Linux)"
+ },
+ "collector_status": "ok",
+ "collector_summary": {
+  "roles": {
+   "driver": {
+    "peak_rss_bytes": 139403264,
+    "peak_rss_mb": 132.95,
+    "peak_vms_bytes": 2613600256,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 2,
+    "peak_thread_count": 35,
+    "peak_cgroup_anon_mb": 190.91,
+    "peak_cgroup_current_mb": 26348.86,
+    "peak_cgroup_tasks": 89,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/snap.amazon-ssm-agent.amazon-ssm-agent.service",
+    "cgroup_samples": 2093,
+    "peak_fd_count": 18,
+    "distinct_pids_seen": 2,
+    "total_cpu_seconds": 143.96,
+    "ctx_switches_voluntary": 22018,
+    "ctx_switches_involuntary": 15,
+    "samples": 2093,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": 10478.24,
+    "rss_final_over_initial": 1.0904
+   },
+   "service": {
+    "peak_rss_bytes": 23642607616,
+    "peak_rss_mb": 22547.35,
+    "peak_vms_bytes": 105824968704,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 17,
+    "peak_thread_count": 290,
+    "peak_cgroup_anon_mb": 921.4,
+    "peak_cgroup_current_mb": 948.29,
+    "peak_cgroup_tasks": 13,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-577723c8d9a498a2b4dae52c2b2cfc638844338fa49d3d65dc564b86e07f138a.scope",
+    "cgroup_samples": 2093,
+    "peak_fd_count": 0,
+    "distinct_pids_seen": 22,
+    "total_cpu_seconds": 17353.32,
+    "ctx_switches_voluntary": 1447665,
+    "ctx_switches_involuntary": 13468,
+    "samples": 2093,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": -56559.32,
+    "rss_final_over_initial": 0.9996
+   }
+  },
+  "system": {
+   "compressor_delta_bytes": 0,
+   "swapouts_delta": 0,
+   "compressions_delta": 0,
+   "peak_system_mem_percent": 27.4
+  }
+ },
+ "n_offered": 5,
+ "n_records": 6,
+ "n_errors": 0,
+ "leg_wall_s": 1044.7,
+ "aborted_by_breaker": false,
+ "wall_s_order_stats": [
+  124.1,
+  136.2,
+  154.4,
+  199.1,
+  203.0,
+  207.6
+ ],
+ "latency_normalized": {
+  "wall_s_per_video_minute": [
+   2.07,
+   2.1,
+   2.1,
+   2.19,
+   2.36
+  ],
+  "note": "raw per-video wall_s and video_s_manifest are in every record; this normalization keeps the 6x duration confound visible",
+  "p50": 2.1,
+  "max": 2.36,
+  "n": 5,
+  "percentile_policy": "p50/max/n only below n=50 (no dressed percentiles)"
+ },
+ "preleg_load1": 11.2,
+ "preleg_container_idle_cores": {
+  "li_bal_0": 0.006,
+  "li_bal_1": 0.006,
+  "li_bal_2": 0.005,
+  "li_bal_3": 0.006,
+  "li_bal_4": 0.006,
+  "li_bal_5": 0.005,
+  "li_bal_6": 0.006,
+  "li_bal_7": 0.006,
+  "li_bal_8": 0.006,
+  "li_bal_9": 0.006,
+  "li_bal_10": 0.006,
+  "li_bal_11": 0.006,
+  "li_bal_12": 0.006,
+  "li_bal_13": 0.006,
+  "li_bal_14": 0.006,
+  "li_bal_15": 0.006
+ },
+ "preleg_foreign_excess": 1.29,
+ "quiet_box_override": null,
+ "driver_cpu": {
+  "cpu_s": 6.4,
+  "share_of_box": 0.0002,
+  "over_1pct": false
+ },
+ "gates": {
+  "frames_census": {
+   "PASS": true,
+   "arm": "llamaindex_video",
+   "n_records": 5,
+   "missing_videos": null,
+   "rows": [
+    {
+     "video": "20000LeaguesUndertheSea.mp4",
+     "PASS": true,
+     "frames": 395
+    },
+    {
+     "video": "ABucketOfBlood1959.mp4",
+     "PASS": true,
+     "frames": 260
+    },
+    {
+     "video": "ABucketofBlood.mp4",
+     "PASS": true,
+     "frames": 262
+    },
+    {
+     "video": "ACloseCallForBostonBlackie.mp4",
+     "PASS": true,
+     "frames": 240
+    },
+    {
+     "video": "ARomanceOfTheRedwoods.mp4",
+     "PASS": true,
+     "frames": 364
+    }
+   ]
+  },
+  "errors": {
+   "PASS": true,
+   "n_errors": 0
+  },
+  "self_duplication_any": {
+   "PASS": true,
+   "doubled_videos": null,
+   "indeterminate_videos": null,
+   "detector_rows": 5
+  },
+  "duplication_trigger": {
+   "PASS": true,
+   "n_trigger_eligible": 4,
+   "n_indeterminate": 0
+  },
+  "chunkid_monotone": {
+   "PASS": true,
+   "violations": null
+  },
+  "detection_liveness": {
+   "PASS": true,
+   "min_nonempty_fraction": 0.3848101265822785,
+   "aggregate_fraction": 0.9119,
+   "rows": [
+    {
+     "video": "20000LeaguesUndertheSea.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7696
+    },
+    {
+     "video": "ABucketOfBlood1959.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9731
+    },
+    {
+     "video": "ABucketofBlood.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9885
+    },
+    {
+     "video": "ACloseCallForBostonBlackie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9875
+    },
+    {
+     "video": "ARomanceOfTheRedwoods.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9176
+    }
+   ]
+  },
+  "embed_integrity": {
+   "PASS": true,
+   "n": 413,
+   "expected_dim": 384,
+   "tol": 0.001,
+   "bad_dim_idx": null,
+   "bad_norm_idx": null
+  },
+  "determinism_repeat": {
+   "PASS": true,
+   "per_video": {
+    "20000LeaguesUndertheSea.mp4": {
+     "PASS": true,
+     "n_first": 52,
+     "n_repeat": 52,
+     "first_divergence_index": null
+    }
+   }
+  }
+ },
+ "provenance_leela": {
+  "run_id": "20260904T212621Z-16948",
+  "timestamp_utc": "2026-09-04T21:26:21Z",
+  "git_commit": "2711c26c9367e37bcbed68eb4149d5e8626cbd2e-dirty",
+  "image_digest": null,
+  "framework_version": "0.14.23",
+  "instance_type": "c7i.8xlarge",
+  "architecture": "Linux/x86_64",
+  "cpu_count": 32,
+  "ram_gb": 61.8,
+  "corpus_manifest_sha256": "c5a09a3462af7204001b38bcd7fad4d9568e26adddfb2471cca86a99c9a3de67",
+  "corpus_n_docs": 5,
+  "parser": "ffmpeg fps=1/15 + rfdetr(RF-DETR base, thr 0.3)",
+  "parser_config_hash": "f16cb645f66726de",
+  "chunk_config": {
+   "chunk_size": 4000,
+   "chunk_overlap": 0,
+   "splitter": "SentenceSplitter(native, char length function supplied)",
+   "input_transform": "text + '\\n'"
+  },
+  "rocketride_engine_version": "3.3.1",
+  "duplication_patch_applied": false,
+  "duplication_patch_id": null,
+  "rocketride_sdk_version": "1.3.0",
+  "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+  "offered_concurrency": 1,
+  "configured_concurrency": 16,
+  "warmup_policy": "driver-side, 2 disjoint manifest warm rows, coverage proven per instance; LI sends concurrent in waves of max(2 x workers, leg concurrency) (Crossroad 40), RR tokens round-robin; per-send ledger in warmup_<stem>.json",
+  "timeout_s": 43200,
+  "mode": "sequential"
+ },
+ "provenance_video": {
+  "pipe_sha256": "6330773fb63bf7f286563cc37b39a671e3b25c1874ae9bcfc4b936c9c2e5b911",
+  "manifest_sha256": "c5a09a3462af7204001b38bcd7fad4d9568e26adddfb2471cca86a99c9a3de67",
+  "posture": {
+   "name": "workers",
+   "declared_workers": 16,
+   "threads_env_in_process_torch": 2,
+   "note": "LlamaIndex arm: uvicorn worker PROCESSES. No use(threads=) and no engine thread default exist here \u2014 the thread configuration is the six BLAS/OMP variables, read back in-process from every worker; threads_config/threads_note are RocketRide fields and are deliberately absent."
+  },
+  "identity_readback": {
+   "sdk": {
+    "skipped": "LI leg \u2014 the rocketride SDK is not on this path"
+   },
+   "li": {
+    "detect_impl": [
+     "rfdetr"
+    ],
+    "python_version": "3.12.13",
+    "versions": {
+     "rfdetr": "1.5.2",
+     "torch": "2.10.0+cu128",
+     "torchvision": "0.25.0+cu128",
+     "transformers": "4.53.3",
+     "supervision": "0.30.0",
+     "llama-index-core": "0.14.24",
+     "llama-index-embeddings-huggingface": "0.7.0",
+     "sentence-transformers": "5.7.0",
+     "imageio-ffmpeg": "0.6.0",
+     "fastapi": "0.141.1",
+     "uvicorn": "0.52.4"
+    },
+    "chunk_config_readback": {
+     "expected": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "per_worker": {
+      "li_worker_8802_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8803_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8804_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8805_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8806_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8807_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8808_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8809_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8810_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8811_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8812_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8813_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8814_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8815_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8816_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8817_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      }
+     }
+    },
+    "rfdetr_checkpoint_md5_by_container": {
+     "li_bal_0": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_1": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_2": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_3": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_4": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_5": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_6": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_7": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_8": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_9": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_10": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_11": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_12": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_13": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_14": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_15": "b4d3ce46099eaed50626ede388caf979"
+    },
+    "rfdetr_checkpoint_md5_ok": true
+   }
+  },
+  "thread_pins_by_arm": {
+   "PASS": true,
+   "arms": {
+    "li": {
+     "within_arm": {
+      "PASS": true,
+      "readers": [
+       "li_worker_8802_1",
+       "li_worker_8803_1",
+       "li_worker_8804_1",
+       "li_worker_8805_1",
+       "li_worker_8806_1",
+       "li_worker_8807_1",
+       "li_worker_8808_1",
+       "li_worker_8809_1",
+       "li_worker_8810_1",
+       "li_worker_8811_1",
+       "li_worker_8812_1",
+       "li_worker_8813_1",
+       "li_worker_8814_1",
+       "li_worker_8815_1",
+       "li_worker_8816_1",
+       "li_worker_8817_1"
+      ],
+      "disagreements": null,
+      "values_agreed": {
+       "OMP_NUM_THREADS": "2",
+       "MKL_NUM_THREADS": "2",
+       "OPENBLAS_NUM_THREADS": "2",
+       "VECLIB_MAXIMUM_THREADS": "2",
+       "NUMEXPR_NUM_THREADS": "2",
+       "TORCH_NUM_THREADS": "2",
+       "torch_num_threads": 2
+      }
+     },
+     "declared": {
+      "MKL_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "VECLIB_MAXIMUM_THREADS": "2",
+      "NUMEXPR_NUM_THREADS": "2",
+      "TORCH_NUM_THREADS": "2",
+      "OMP_NUM_THREADS": "2"
+     },
+     "declared_vs_measured_mismatch": null
+    }
+   },
+   "cross_arm_values": {
+    "li": 2
+   },
+   "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm optima, difference recorded never failed (Crossroad 17)"
+  },
+  "task_census": null,
+  "network_mode": {
+   "li_bal_0": "host",
+   "li_bal_1": "host",
+   "li_bal_2": "host",
+   "li_bal_3": "host",
+   "li_bal_4": "host",
+   "li_bal_5": "host",
+   "li_bal_6": "host",
+   "li_bal_7": "host",
+   "li_bal_8": "host",
+   "li_bal_9": "host",
+   "li_bal_10": "host",
+   "li_bal_11": "host",
+   "li_bal_12": "host",
+   "li_bal_13": "host",
+   "li_bal_14": "host",
+   "li_bal_15": "host"
+  },
+  "image": {
+   "container": "li_bal_0",
+   "requested_tag": "li:video",
+   "image_id": "sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95",
+   "rootfs_layer_count": 14,
+   "labels": "{}",
+   "lineage_declared": "docker/Dockerfile.llamaindex-video at the Ruling-L config (4000/0): FULL 149-pin freeze install from li_video/li_image_freeze.txt with a fail-closed build-time read-back (pip freeze == freeze file; b295dea), streaming reader (spool -> frames-on-disk -> k=1), chunk config read back per leg from every worker's /health by the driver preflight.",
+   "lineage_is_declared": true,
+   "lineage_note": "a declared string, not a measurement \u2014 it states how this image was produced; the image_id and layer count are the measured facts it must be read against"
+  },
+  "interval_s": 15,
+  "rr_write_path": null,
+  "frames_observed_method": "extractor-count",
+  "chunk_config_source": "measured from records (config literal never exported)"
+ }
+}

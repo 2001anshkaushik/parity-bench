@@ -1,0 +1,23 @@
+{
+ "partition_holds": true,
+ "edge_px": 560,
+ "checks": [
+  {
+   "cross_file": "cross_parity_blast.json",
+   "n_above_diverging": 433,
+   "n_below_clean": 65,
+   "ABOVE_560_PASSING": [],
+   "BELOW_560_FAILING": [],
+   "missing_dimensions": []
+  },
+  {
+   "cross_file": "cross_parity_blast_p2.json",
+   "n_above_diverging": 433,
+   "n_below_clean": 65,
+   "ABOVE_560_PASSING": [],
+   "BELOW_560_FAILING": [],
+   "missing_dimensions": []
+  }
+ ],
+ "ruling": "HOLDS: the 560px partition reproduced at 500 \u2014 Ruling U stands, gate-3 failures above the edge are the ruled expectation."
+}

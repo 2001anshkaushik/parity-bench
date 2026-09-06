@@ -1,0 +1,460 @@
+{
+ "at_a_glance": "rocketride_video parity[tokens=16,threads=unset(engine-default-64)] sequential pass 1 records 6 (errors 0) / offered 5 | THROUGHPUT 2.081 frames/s (24.77x realtime), steady window undefined | SERVICE CPU 6.947 cores = 21.7% of 32 | IDLE BURDEN 4.623 cores with 16 rr_tokens live = 14.4% of the box before any work (beside, never subtracted) | thread env expected 2 / in-process torch 2 | gates PASS 9 \u00b7 NOT RUN 0 \u00b7 FAIL 0 | efficiency valid=True | COLLECTOR ok",
+ "arm": "rocketride_video",
+ "posture": "parity[tokens=16,threads=unset(engine-default-64)]",
+ "leg": "sequential",
+ "pass": 1,
+ "submission_order": "manifest-seq: deterministic by meeting id, identical both arms; NOT longest-first \u2014 sorting to shorten the drain tail would benchmark our scheduler, not the frameworks (ruling 2026-08-20)",
+ "throughput": {
+  "total_span_s": 920.8,
+  "total_frames": 1916,
+  "total_frames_per_s": 2.081,
+  "total_realtime_factor": 24.77,
+  "steady_window": {
+   "defined": false,
+   "reason": "sequential leg \u2014 no saturation window"
+  }
+ },
+ "efficiency": {
+  "valid": true,
+  "source": "container cgroup cpu.stat usage_usec bracketed around the leg \u2014 the same reader as the probes (#34: denominators from the container, never the driver)",
+  "service_cpu_s": 6396.6,
+  "effective_cores": 6.947,
+  "cpu_util_of_box": 0.2171,
+  "box_cpus": 32,
+  "cpu_s_per_footage_min": 16.829,
+  "cpu_s_per_frame": 3.339,
+  "cpu_s_per_video": 1066.1,
+  "cpu_s_per_detection": 0.7661,
+  "cpu_s_per_chunk": 10.573,
+  "n_detections": 8349,
+  "n_chunks": 605,
+  "usd_per_1k_footage_hours": 57.65,
+  "usd_per_hour_basis": "1.428 (instance on-demand $/h; cost = $/h / x_realtime * 1000, her V5 definition)",
+  "idle_burden": {
+   "instances": 16,
+   "instance_kind": "rr_tokens",
+   "idle_cores_before_instances": 1.007,
+   "idle_cores_with_instances_live": 4.623,
+   "sample_s": 6.0,
+   "idle_share_of_box": 0.1445,
+   "box_cpus": 32,
+   "marginal_cores_per_instance": 0.226,
+   "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+   "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve",
+   "idle_cpu_s_over_leg_if_additive": 4256.7,
+   "idle_share_of_service_cpu_if_additive": 0.6655
+  },
+  "policy": "idle_burden is reported beside every figure above and never subtracted \u2014 additivity under load is unmeasured (Ticket 4)"
+ },
+ "driver_memory": {
+  "ru_maxrss_kb": 68300,
+  "basis": "getrusage(RUSAGE_SELF).ru_maxrss at export time \u2014 the driver process peak over the whole leg (KiB on Linux)"
+ },
+ "collector_status": "ok",
+ "collector_summary": {
+  "roles": {
+   "driver": {
+    "peak_rss_bytes": 117166080,
+    "peak_rss_mb": 111.74,
+    "peak_vms_bytes": 288960512,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 2,
+    "peak_thread_count": 4,
+    "peak_cgroup_anon_mb": 166.26,
+    "peak_cgroup_current_mb": 4784.53,
+    "peak_cgroup_tasks": 60,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/snap.amazon-ssm-agent.amazon-ssm-agent.service",
+    "cgroup_samples": 1842,
+    "peak_fd_count": 18,
+    "distinct_pids_seen": 2,
+    "total_cpu_seconds": 44.8,
+    "ctx_switches_voluntary": 35288,
+    "ctx_switches_involuntary": 156,
+    "samples": 1842,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": -930.32,
+    "rss_final_over_initial": 0.9673
+   },
+   "service": {
+    "peak_rss_bytes": 27917754368,
+    "peak_rss_mb": 26624.45,
+    "peak_vms_bytes": 305880961024,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 18,
+    "peak_thread_count": 2824,
+    "peak_cgroup_anon_mb": 19012.34,
+    "peak_cgroup_current_mb": 20326.2,
+    "peak_cgroup_tasks": 2824,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-01dc0fdb5d078bcd13d25b3617165f377ba9551ecdd034734028eba148ba26e6.scope",
+    "cgroup_samples": 1842,
+    "peak_fd_count": 0,
+    "distinct_pids_seen": 23,
+    "total_cpu_seconds": 21988.87,
+    "ctx_switches_voluntary": 38627569,
+    "ctx_switches_involuntary": 21810,
+    "samples": 1842,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": 851839.69,
+    "rss_final_over_initial": 1.0481
+   }
+  },
+  "system": {
+   "compressor_delta_bytes": 0,
+   "swapouts_delta": 0,
+   "compressions_delta": 0,
+   "peak_system_mem_percent": 32.6
+  }
+ },
+ "n_offered": 5,
+ "n_records": 6,
+ "n_errors": 0,
+ "leg_wall_s": 920.8,
+ "aborted_by_breaker": false,
+ "wall_s_order_stats": [
+  108.5,
+  128.4,
+  158.5,
+  159.8,
+  172.5,
+  172.8
+ ],
+ "latency_normalized": {
+  "wall_s_per_video_minute": [
+   1.75,
+   1.76,
+   1.81,
+   1.98,
+   2.42
+  ],
+  "note": "raw per-video wall_s and video_s_manifest are in every record; this normalization keeps the 6x duration confound visible",
+  "p50": 1.81,
+  "max": 2.42,
+  "n": 5,
+  "percentile_policy": "p50/max/n only below n=50 (no dressed percentiles)"
+ },
+ "preleg_load1": 4.89,
+ "preleg_container_idle_cores": {
+  "rr": 1.007
+ },
+ "preleg_foreign_excess": 0.01,
+ "quiet_box_override": null,
+ "driver_cpu": {
+  "cpu_s": 9.5,
+  "share_of_box": 0.0003,
+  "over_1pct": false
+ },
+ "gates": {
+  "frames_census": {
+   "PASS": true,
+   "arm": "rocketride_video",
+   "n_records": 5,
+   "missing_videos": null,
+   "rows": [
+    {
+     "video": "20000LeaguesUndertheSea.mp4",
+     "PASS": true,
+     "frames": 395
+    },
+    {
+     "video": "ABucketOfBlood1959.mp4",
+     "PASS": true,
+     "frames": 260
+    },
+    {
+     "video": "ABucketofBlood.mp4",
+     "PASS": true,
+     "frames": 262
+    },
+    {
+     "video": "ACloseCallForBostonBlackie.mp4",
+     "PASS": true,
+     "frames": 240
+    },
+    {
+     "video": "ARomanceOfTheRedwoods.mp4",
+     "PASS": true,
+     "frames": 364
+    }
+   ]
+  },
+  "errors": {
+   "PASS": true,
+   "n_errors": 0
+  },
+  "self_duplication_any": {
+   "PASS": true,
+   "doubled_videos": null,
+   "indeterminate_videos": null,
+   "detector_rows": 5
+  },
+  "duplication_trigger": {
+   "PASS": true,
+   "n_trigger_eligible": 4,
+   "n_indeterminate": 0
+  },
+  "chunkid_monotone": {
+   "PASS": true,
+   "violations": null
+  },
+  "detection_liveness": {
+   "PASS": true,
+   "min_nonempty_fraction": 0.3848101265822785,
+   "aggregate_fraction": 0.9099,
+   "rows": [
+    {
+     "video": "20000LeaguesUndertheSea.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.7696
+    },
+    {
+     "video": "ABucketOfBlood1959.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9692
+    },
+    {
+     "video": "ABucketofBlood.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9809
+    },
+    {
+     "video": "ACloseCallForBostonBlackie.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9875
+    },
+    {
+     "video": "ARomanceOfTheRedwoods.mp4",
+     "PASS": true,
+     "nonempty_fraction": 0.9176
+    }
+   ]
+  },
+  "embed_integrity": {
+   "PASS": true,
+   "n": 543,
+   "expected_dim": 384,
+   "tol": 0.001,
+   "bad_dim_idx": null,
+   "bad_norm_idx": null
+  },
+  "determinism_repeat": {
+   "PASS": true,
+   "per_video": {
+    "20000LeaguesUndertheSea.mp4": {
+     "PASS": true,
+     "n_first": 62,
+     "n_repeat": 62,
+     "first_divergence_index": null
+    }
+   }
+  },
+  "frame_count_methods_agree": {
+   "PASS": true,
+   "disagreeing": null
+  },
+  "dropped_frame_attribution": {
+   "channel_alive": true,
+   "attribution": "no drop warnings",
+   "liveness_marker": "[entrypoint] RocketRide engine",
+   "drop_warnings": null,
+   "n_drop_warnings": 0
+  }
+ },
+ "provenance_leela": {
+  "run_id": "20260905T060228Z-131256",
+  "timestamp_utc": "2026-09-05T06:02:28Z",
+  "git_commit": "2711c26c9367e37bcbed68eb4149d5e8626cbd2e-dirty",
+  "image_digest": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+  "framework_version": "1.3.0",
+  "instance_type": "c7i.8xlarge",
+  "architecture": "Linux/x86_64",
+  "cpu_count": 32,
+  "ram_gb": 61.8,
+  "corpus_manifest_sha256": "c5a09a3462af7204001b38bcd7fad4d9568e26adddfb2471cca86a99c9a3de67",
+  "corpus_n_docs": 5,
+  "parser": "ffmpeg fps=1/15 + rfdetr(RF-DETR base, thr 0.3)",
+  "parser_config_hash": "f16cb645f66726de",
+  "chunk_config": {
+   "chunk_size": 3999,
+   "chunk_overlap": 0,
+   "splitter": "RecursiveCharacterTextSplitter",
+   "input_transform": "text + '\\n'"
+  },
+  "rocketride_engine_version": "3.3.1",
+  "duplication_patch_applied": false,
+  "duplication_patch_id": null,
+  "rocketride_sdk_version": "1.3.0",
+  "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+  "offered_concurrency": 1,
+  "configured_concurrency": 16,
+  "warmup_policy": "driver-side, 2 disjoint manifest warm rows, coverage proven per instance; LI sends concurrent in waves of max(2 x workers, leg concurrency) (Crossroad 40), RR tokens round-robin; per-send ledger in warmup_<stem>.json",
+  "timeout_s": 43200,
+  "mode": "sequential"
+ },
+ "provenance_video": {
+  "pipe_sha256": "6330773fb63bf7f286563cc37b39a671e3b25c1874ae9bcfc4b936c9c2e5b911",
+  "manifest_sha256": "c5a09a3462af7204001b38bcd7fad4d9568e26adddfb2471cca86a99c9a3de67",
+  "posture": {
+   "name": "parity",
+   "tokens": 16,
+   "threads_config": null,
+   "threads_note": "unset -> engine CONST_DEFAULT_MAX_THREADS=64 (constants.py:48)",
+   "threads_env_expected": 2,
+   "threads_env_in_process_torch": 2
+  },
+  "identity_readback": {
+   "sdk": {
+    "package_version": "1.3.0",
+    "module_path": "/home/ssm-user/.venv/lib/python3.12/site-packages/rocketride/__init__.py",
+    "python_executable": "/home/ssm-user/.venv/bin/python",
+    "python_version": "3.12.13",
+    "verified_surface": {
+     "connect": [
+      "timeout"
+     ],
+     "use": [
+      "filepath",
+      "threads",
+      "ttl"
+     ],
+     "send": [
+      "data",
+      "mimetype",
+      "objinfo",
+      "token"
+     ],
+     "pipe": [
+      "mime_type",
+      "objinfo",
+      "token"
+     ],
+     "terminate": [
+      "token"
+     ],
+     "disconnect": []
+    },
+    "null_control": "fired (2/2)",
+    "ok": true,
+    "problems": null
+   },
+   "envprobe_project_id": "98383dcc-7679-5d6e-b1f3-6fbeac4409ce",
+   "env_probe_schema": 2,
+   "rr": {
+    "rfdetr_import_ok": true,
+    "python_version": "3.12.13",
+    "python_executable": "/opt/rocketride/engine/engine",
+    "versions": {
+     "rfdetr": "1.5.2",
+     "torchvision": "0.25.0+cu128",
+     "transformers": "4.53.3",
+     "supervision": "0.30.0",
+     "timm": "1.0.28",
+     "sentence-transformers": "5.7.0",
+     "imageio-ffmpeg": "0.6.0"
+    },
+    "rfdetr_checkpoint_md5": "b4d3ce46099eaed50626ede388caf979",
+    "rfdetr_checkpoint_md5_ok": true
+   }
+  },
+  "thread_pins_by_arm": {
+   "PASS": true,
+   "arms": {
+    "rr": {
+     "within_arm": {
+      "PASS": true,
+      "readers": [
+       "rr_task"
+      ],
+      "disagreements": null,
+      "values_agreed": {
+       "OMP_NUM_THREADS": "2",
+       "MKL_NUM_THREADS": "2",
+       "OPENBLAS_NUM_THREADS": "2",
+       "VECLIB_MAXIMUM_THREADS": "2",
+       "NUMEXPR_NUM_THREADS": "2",
+       "TORCH_NUM_THREADS": "2",
+       "torch_num_threads": 2
+      }
+     },
+     "declared": {
+      "NUMEXPR_NUM_THREADS": "2",
+      "TORCH_NUM_THREADS": "2",
+      "OMP_NUM_THREADS": "2",
+      "MKL_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "VECLIB_MAXIMUM_THREADS": "2"
+     },
+     "declared_vs_measured_mismatch": null,
+     "expected": 2,
+     "declared_vs_expected_mismatch": null
+    }
+   },
+   "cross_arm_values": {
+    "rr": 2
+   },
+   "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm optima, difference recorded never failed (Crossroad 17)"
+  },
+  "task_census": {
+   "declared_tokens": 16,
+   "census_before": 0,
+   "census_after": 16,
+   "new_task_pids": [
+    349,
+    566,
+    783,
+    1000,
+    1217,
+    1434,
+    1651,
+    1868,
+    2085,
+    2302,
+    2519,
+    2736,
+    2953,
+    3170,
+    3387,
+    3604
+   ],
+   "project_ids": [
+    "c95ab13b-9002-57dd-96cc-845977bb5e73",
+    "b03a3897-82ce-533c-a3a5-4cb3924967ed",
+    "75984ebf-9d92-5ce1-9e66-69d747d8fdc9",
+    "0671c462-f5a9-5b68-814d-2bd6b1919bda",
+    "61e3c4e2-cb7e-54bf-b72c-bf2f519a6352",
+    "30755e7a-587d-5171-b774-82d474c623e0",
+    "eadba061-090e-54bd-b115-e02940d548b1",
+    "87421bef-2a61-5612-9d29-1f1cb65754c9",
+    "c52ce4d4-efd9-5ce5-9de8-68e8c4688070",
+    "24903dea-2f8d-5508-bfcc-c7fafaed0808",
+    "d4915d15-aee1-5f4c-b610-a40729a0f551",
+    "0a748338-31e7-5681-a640-b70a3376c12f",
+    "40e105ce-0ae7-55fe-8d1c-9224af5a7c52",
+    "b86d2a15-3128-5c66-b64f-9f234ede921a",
+    "2e22c9bb-ee36-5fd8-a306-558aa83b14b7",
+    "437ba57b-8524-532d-9e1c-6051623de973"
+   ]
+  },
+  "network_mode": {
+   "rr": "host"
+  },
+  "image": {
+   "container": "rr",
+   "requested_tag": "rr:patched-video",
+   "image_id": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+   "rootfs_layer_count": 19,
+   "labels": "{\"benchmark.rocketride.constraints_cache_prewarmed\":\"1\",\"benchmark.rocketride.duplication_patch_applied\":\"1\",\"benchmark.rocketride.duplication_patch_id\":\"preventDefault-after-embedding-flush\",\"benchmark.rocketride.engine_version\":\"3.3.1\",\"org.opencontainers.image.version\":\"22.04\"}",
+   "lineage_declared": "Crossroad 33 (2026-08-22): rr:patched-video = a docker/Dockerfile.rocketride build PLUS one documented derived layer replacing working/nodes/env_probe (the instrument node; absent from the measured pipe, and carrying no requirements.txt so the engine constraints-cache key cannot move). A full rebuild was deliberately DEFERRED: it would re-resolve the floating ubuntu:22.04 base, the unpinned apt libc++/libunwind the engine ELF links, and the bootcheck constraints cache COPYed into the image, replacing the image that every RR probe number and the gate-3 arming run were measured on. PATH B re-baseline scheduled post-campaign with before/after fingerprints.",
+   "lineage_is_declared": true,
+   "lineage_note": "a declared string, not a measurement \u2014 it states how this image was produced; the image_id and layer count are the measured facts it must be read against"
+  },
+  "interval_s": 15,
+  "rr_write_path": "chunked-1MiB (2026-08-24, DIAG_M1_BLAST; the banked RR default SEQUENTIAL leg ran the whole-frame path \u2014 wall_s definition unchanged, wire shape differs and is disclosed)",
+  "frames_observed_method": "bracket-count",
+  "chunk_config_source": "measured from records (config literal never exported)"
+ }
+}

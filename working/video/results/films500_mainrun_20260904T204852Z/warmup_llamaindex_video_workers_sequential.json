@@ -1,0 +1,396 @@
+{
+ "arm": "llamaindex_video",
+ "leg": "sequential",
+ "posture": "workers",
+ "policy": "1 wave(s) x 32 concurrent (max(2 x 16 workers, leg concurrency 1)) \u2014 Crossroad 40; warm SET re-sent per Crossroad 32; warmth gated on warm markers, Crossroad 41",
+ "gate": {
+  "rule": "warm markers via /health (Crossroad 41)",
+  "warm_workers": 16,
+  "declared_workers": 16,
+  "tokens_seen": null
+ },
+ "sends": [
+  {
+   "i": 0,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 704.61,
+   "error": null
+  },
+  {
+   "i": 1,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8803,
+   "token_index": null,
+   "wall_s": 939.56,
+   "error": null
+  },
+  {
+   "i": 2,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8804,
+   "token_index": null,
+   "wall_s": 677.913,
+   "error": null
+  },
+  {
+   "i": 3,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8805,
+   "token_index": null,
+   "wall_s": 933.449,
+   "error": null
+  },
+  {
+   "i": 4,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8806,
+   "token_index": null,
+   "wall_s": 695.684,
+   "error": null
+  },
+  {
+   "i": 5,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8807,
+   "token_index": null,
+   "wall_s": 924.777,
+   "error": null
+  },
+  {
+   "i": 6,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8808,
+   "token_index": null,
+   "wall_s": 673.915,
+   "error": null
+  },
+  {
+   "i": 7,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8809,
+   "token_index": null,
+   "wall_s": 916.041,
+   "error": null
+  },
+  {
+   "i": 8,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8810,
+   "token_index": null,
+   "wall_s": 698.45,
+   "error": null
+  },
+  {
+   "i": 9,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8811,
+   "token_index": null,
+   "wall_s": 924.848,
+   "error": null
+  },
+  {
+   "i": 10,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8812,
+   "token_index": null,
+   "wall_s": 674.424,
+   "error": null
+  },
+  {
+   "i": 11,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8813,
+   "token_index": null,
+   "wall_s": 921.263,
+   "error": null
+  },
+  {
+   "i": 12,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8814,
+   "token_index": null,
+   "wall_s": 684.193,
+   "error": null
+  },
+  {
+   "i": 13,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8815,
+   "token_index": null,
+   "wall_s": 918.502,
+   "error": null
+  },
+  {
+   "i": 14,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8816,
+   "token_index": null,
+   "wall_s": 686.182,
+   "error": null
+  },
+  {
+   "i": 15,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8817,
+   "token_index": null,
+   "wall_s": 929.664,
+   "error": null
+  },
+  {
+   "i": 16,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 694.608,
+   "error": null
+  },
+  {
+   "i": 17,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8803,
+   "token_index": null,
+   "wall_s": 943.301,
+   "error": null
+  },
+  {
+   "i": 18,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8804,
+   "token_index": null,
+   "wall_s": 692.105,
+   "error": null
+  },
+  {
+   "i": 19,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8805,
+   "token_index": null,
+   "wall_s": 937.137,
+   "error": null
+  },
+  {
+   "i": 20,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8806,
+   "token_index": null,
+   "wall_s": 683.819,
+   "error": null
+  },
+  {
+   "i": 21,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8807,
+   "token_index": null,
+   "wall_s": 920.512,
+   "error": null
+  },
+  {
+   "i": 22,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8808,
+   "token_index": null,
+   "wall_s": 688.959,
+   "error": null
+  },
+  {
+   "i": 23,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8809,
+   "token_index": null,
+   "wall_s": 911.595,
+   "error": null
+  },
+  {
+   "i": 24,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8810,
+   "token_index": null,
+   "wall_s": 685.287,
+   "error": null
+  },
+  {
+   "i": 25,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8811,
+   "token_index": null,
+   "wall_s": 920.425,
+   "error": null
+  },
+  {
+   "i": 26,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8812,
+   "token_index": null,
+   "wall_s": 689.183,
+   "error": null
+  },
+  {
+   "i": 27,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8813,
+   "token_index": null,
+   "wall_s": 925.409,
+   "error": null
+  },
+  {
+   "i": 28,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8814,
+   "token_index": null,
+   "wall_s": 699.383,
+   "error": null
+  },
+  {
+   "i": 29,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8815,
+   "token_index": null,
+   "wall_s": 922.868,
+   "error": null
+  },
+  {
+   "i": 30,
+   "row": "yanks_are_coming.mp4",
+   "serving_pid": 1,
+   "serving_port": 8816,
+   "token_index": null,
+   "wall_s": 699.888,
+   "error": null
+  },
+  {
+   "i": 31,
+   "row": "zontar_the_thing_from_venus.mp4",
+   "serving_pid": 1,
+   "serving_port": 8817,
+   "token_index": null,
+   "wall_s": 925.919,
+   "error": null
+  }
+ ],
+ "response_pid_distribution": {
+  "distinct_response_pids": 16,
+  "declared_workers": 16,
+  "sends": 32,
+  "per_pid_send_counts": {
+   "8802:1": 2,
+   "8803:1": 2,
+   "8804:1": 2,
+   "8805:1": 2,
+   "8806:1": 2,
+   "8807:1": 2,
+   "8808:1": 2,
+   "8809:1": 2,
+   "8810:1": 2,
+   "8811:1": 2,
+   "8812:1": 2,
+   "8813:1": 2,
+   "8814:1": 2,
+   "8815:1": 2,
+   "8816:1": 2,
+   "8817:1": 2
+  },
+  "busiest_worker_sends": 2,
+  "quietest_serving_worker_sends": 2,
+  "unserved_declared_pids": null,
+  "note": "REPORTED, NOT GATED (Crossroad 41). uvicorn workers are selected by the kernel at accept and /process_video does not block its event loop, so response-pid spread measures scheduling, not warmth. Warmth is gated on the service warm markers."
+ },
+ "declared_worker_pids": [
+  [
+   8802,
+   1
+  ],
+  [
+   8803,
+   1
+  ],
+  [
+   8804,
+   1
+  ],
+  [
+   8805,
+   1
+  ],
+  [
+   8806,
+   1
+  ],
+  [
+   8807,
+   1
+  ],
+  [
+   8808,
+   1
+  ],
+  [
+   8809,
+   1
+  ],
+  [
+   8810,
+   1
+  ],
+  [
+   8811,
+   1
+  ],
+  [
+   8812,
+   1
+  ],
+  [
+   8813,
+   1
+  ],
+  [
+   8814,
+   1
+  ],
+  [
+   8815,
+   1
+  ],
+  [
+   8816,
+   1
+  ],
+  [
+   8817,
+   1
+  ]
+ ],
+ "note": "pid identity is only comparable within ONE container lifetime (defect #23: pid reuse across restarts)"
+}

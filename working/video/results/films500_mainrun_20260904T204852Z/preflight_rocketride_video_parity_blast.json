@@ -1,0 +1,234 @@
+{
+ "preleg_load1": 3.59,
+ "preleg_container_idle_cores": {
+  "rr": 1.008
+ },
+ "preleg_own_process_cores": 0.005,
+ "preleg_foreign_excess": 0.01,
+ "preleg_quiet_box": {
+  "PASS": true,
+  "threshold": 2.0,
+  "readings": [
+   {
+    "load1": 3.59,
+    "host_busy_cores": 1.02,
+    "container_idle_cores": {
+     "rr": 1.008
+    },
+    "container_attributed": 1.01,
+    "own_process_cores": 0.005,
+    "foreign_now": 0.01,
+    "foreign_by_load1": 2.54,
+    "foreign_excess": 0.01,
+    "basis": "instantaneous (/proc/stat busy \u2212 containers \u2212 ours)"
+   }
+  ],
+  "n_readings": 1,
+  "trend": "SINGLE READING",
+  "settle_wall_s": 4.1,
+  "load1": 3.59,
+  "host_busy_cores": 1.02,
+  "container_idle_cores": {
+   "rr": 1.008
+  },
+  "container_attributed": 1.01,
+  "own_process_cores": 0.005,
+  "foreign_now": 0.01,
+  "foreign_by_load1": 2.54,
+  "foreign_excess": 0.01,
+  "basis": "instantaneous (/proc/stat busy \u2212 containers \u2212 ours)",
+  "note": "foreign = load1 minus our containers minus our own process tree; own_process_cores is CPU-seconds/window (a lower bound \u2014 load1 also counts uninterruptible sleep)"
+ },
+ "manifest_meta": {
+  "corpus_manifest_sha256": "bd0c915e28710322bace0549d7372dddea5578895333f143c67e04252e4e02a1",
+  "ffmpeg_sha256": "e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99",
+  "dimensions_source": "TWO bases per film, labelled (2026-09-04 ruling): container_* = coded stream size (read_frames header meta); detector_* = PIL .size of one decoded PNG via the arms' encode path \u2014 the basis the committed census used and the one RF-DETR's 560px edge is defined on. The PARTITION uses detector_*. Knowns verified against the census by the dimension control.",
+  "interval_s": 15,
+  "n_files": 500,
+  "n_measured": 498,
+  "n_warm": 2,
+  "warm_rule": "DERIVED at build: corpus 500 minus her measured 498 (her committed films500 per_doc @3967d9f4, mirrored as films500_her_measured_set.txt) \u2014 our measured set equals hers by construction",
+  "warm_films": [
+   "yanks_are_coming.mp4",
+   "zontar_the_thing_from_venus.mp4"
+  ],
+  "total_frames": 162511,
+  "total_video_s": 2432644.44,
+  "n_above_560px_detector_basis": 435,
+  "n_container_detector_mismatch": 0,
+  "note_560px": "the corpus-wide >560px fraction (detector basis) is derivable from THIS artifact",
+  "corpus_dir": "/home/ssm-user/films_corpus/full500",
+  "corpus_dir_stamped": {
+   "utc": "2026-09-04T09:00:53Z",
+   "proof": "sha256 verify 500/500 against this directory",
+   "previous": "/home/ssm-user/films_corpus/full500"
+  }
+ },
+ "readbacks": {
+  "rr_task": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  }
+ },
+ "identity": {
+  "sdk": {
+   "package_version": "1.3.0",
+   "module_path": "/home/ssm-user/.venv/lib/python3.12/site-packages/rocketride/__init__.py",
+   "python_executable": "/home/ssm-user/.venv/bin/python",
+   "python_version": "3.12.13",
+   "verified_surface": {
+    "connect": [
+     "timeout"
+    ],
+    "use": [
+     "filepath",
+     "threads",
+     "ttl"
+    ],
+    "send": [
+     "data",
+     "mimetype",
+     "objinfo",
+     "token"
+    ],
+    "pipe": [
+     "mime_type",
+     "objinfo",
+     "token"
+    ],
+    "terminate": [
+     "token"
+    ],
+    "disconnect": []
+   },
+   "null_control": "fired (2/2)",
+   "ok": true,
+   "problems": null
+  },
+  "envprobe_project_id": "d36e5a7a-13f1-59d9-9bc7-e0d609f7b877",
+  "env_probe_schema": 2,
+  "rr": {
+   "rfdetr_import_ok": true,
+   "python_version": "3.12.13",
+   "python_executable": "/opt/rocketride/engine/engine",
+   "versions": {
+    "rfdetr": "1.5.2",
+    "torchvision": "0.25.0+cu128",
+    "transformers": "4.53.3",
+    "supervision": "0.30.0",
+    "timm": "1.0.28",
+    "sentence-transformers": "5.7.0",
+    "imageio-ffmpeg": "0.6.0"
+   },
+   "rfdetr_checkpoint_md5": "b4d3ce46099eaed50626ede388caf979",
+   "rfdetr_checkpoint_md5_ok": true
+  }
+ },
+ "thread_pin_parity": {
+  "PASS": true,
+  "arms": {
+   "rr": {
+    "within_arm": {
+     "PASS": true,
+     "readers": [
+      "rr_task"
+     ],
+     "disagreements": null,
+     "values_agreed": {
+      "OMP_NUM_THREADS": "2",
+      "MKL_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "VECLIB_MAXIMUM_THREADS": "2",
+      "NUMEXPR_NUM_THREADS": "2",
+      "TORCH_NUM_THREADS": "2",
+      "torch_num_threads": 2
+     }
+    },
+    "declared": {
+     "NUMEXPR_NUM_THREADS": "2",
+     "TORCH_NUM_THREADS": "2",
+     "OMP_NUM_THREADS": "2",
+     "MKL_NUM_THREADS": "2",
+     "OPENBLAS_NUM_THREADS": "2",
+     "VECLIB_MAXIMUM_THREADS": "2"
+    },
+    "declared_vs_measured_mismatch": null,
+    "expected": 2,
+    "declared_vs_expected_mismatch": null
+   }
+  },
+  "cross_arm_values": {
+   "rr": 2
+  },
+  "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm optima, difference recorded never failed (Crossroad 17)"
+ },
+ "network_mode": {
+  "rr": "host"
+ },
+ "pipe_sha256": "6330773fb63bf7f286563cc37b39a671e3b25c1874ae9bcfc4b936c9c2e5b911",
+ "corpus_dir": "/home/ssm-user/films_corpus/full500",
+ "corpus_dir_source": "explicit (agrees with manifest meta)",
+ "manifest_sha256": "c5a09a3462af7204001b38bcd7fad4d9568e26adddfb2471cca86a99c9a3de67",
+ "task_census": {
+  "declared_tokens": 16,
+  "census_before": 0,
+  "census_after": 16,
+  "new_task_pids": [
+   6154,
+   6371,
+   6588,
+   6805,
+   7022,
+   7239,
+   7456,
+   7673,
+   7890,
+   8107,
+   8324,
+   8541,
+   8758,
+   8974,
+   9192,
+   9409
+  ],
+  "project_ids": [
+   "eec8ae3a-42aa-5c8c-a074-3d5a094cc1f5",
+   "7b6806b5-68c0-511b-9d6b-dad821d97448",
+   "a590c074-3854-5021-bac3-5dd060cafeff",
+   "50fdf6ba-73ef-58e6-9781-045d3c260d0e",
+   "6f0f5bc6-b233-50e7-8999-ed4109ee7ca8",
+   "a7078042-6d48-57f9-aabd-349fe51a46a6",
+   "48fca5c9-f645-5533-929c-811b4ede5e15",
+   "88f81825-e70c-5197-a011-24724e3d5f96",
+   "e5a9912b-3285-5584-aafd-5c988f9eadbc",
+   "6e3f1c40-5afb-5650-985e-301c876b2a32",
+   "c7d804d6-8e91-5662-9332-f514cf95c1c0",
+   "768cfc57-02f3-54a2-94fd-414617858971",
+   "d12e9a99-5040-5af3-99f3-bc323c5b887f",
+   "65f7fc32-4fee-567c-a3c3-88e64d183139",
+   "3b361f61-146b-52d1-985b-ad4f6d25087d",
+   "c1251b36-7269-5646-9d88-c7758e366e22"
+  ]
+ },
+ "idle_burden": {
+  "instances": 16,
+  "instance_kind": "rr_tokens",
+  "idle_cores_before_instances": 1.008,
+  "idle_cores_with_instances_live": 4.689,
+  "sample_s": 6.0,
+  "idle_share_of_box": 0.1465,
+  "box_cpus": 32,
+  "marginal_cores_per_instance": 0.23,
+  "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+  "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve"
+ },
+ "posture": "parity[tokens=16,threads=unset(engine-default-64)]",
+ "pass": 1
+}

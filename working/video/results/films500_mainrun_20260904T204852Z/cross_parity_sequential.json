@@ -1,0 +1,250 @@
+{
+ "basis": "ruled 16x2-vs-16x2 posture at 500 films \u2014 cross-arm comparison | DISCLOSURES: gate-3 strict FAILURES on >560px films are the RULED EXPECTATION (Ruling U; the partition check is the finding surface, not the failure count); char_conservation at the Phase-1 +/-2 pct default is band-cutting DATA (Ruling W deferral stands); the boundary-exclusion drift cap (0.5 pct/video) is LIVE and UNSIZED for films content (H16 open).",
+ "cross_detection_agreement": {
+  "PASS": false,
+  "armed_by_probe_run": "films500-staging-20260904T091932Z-4b1d1f1e",
+  "n_videos": 5,
+  "failing": [
+   "ABucketOfBlood1959.mp4",
+   "ABucketofBlood.mp4"
+  ],
+  "per_video": {
+   "20000LeaguesUndertheSea.mp4": {
+    "PASS": true,
+    "n_frames": 395,
+    "diverging_frames": null,
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
+   },
+   "ABucketOfBlood1959.mp4": {
+    "PASS": false,
+    "n_frames": 260,
+    "diverging_frames": [
+     2,
+     3,
+     4,
+     7,
+     8,
+     10,
+     11,
+     12,
+     17,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24,
+     25,
+     26,
+     28,
+     29,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     42,
+     43,
+     45,
+     50,
+     51,
+     52,
+     56,
+     59,
+     61,
+     67,
+     69,
+     72,
+     73,
+     75,
+     81,
+     84,
+     86,
+     87,
+     88,
+     89,
+     90,
+     91,
+     94,
+     97,
+     98
+    ],
+    "n_diverging": 126,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
+   },
+   "ABucketofBlood.mp4": {
+    "PASS": false,
+    "n_frames": 262,
+    "diverging_frames": [
+     2,
+     3,
+     4,
+     8,
+     10,
+     12,
+     17,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24,
+     25,
+     26,
+     27,
+     30,
+     34,
+     35,
+     37,
+     38,
+     39,
+     40,
+     42,
+     43,
+     44,
+     48,
+     49,
+     50,
+     51,
+     52,
+     54,
+     55,
+     56,
+     57,
+     60,
+     62,
+     63,
+     64,
+     66,
+     67,
+     68,
+     69,
+     70,
+     72,
+     73,
+     75,
+     76,
+     79,
+     86
+    ],
+    "n_diverging": 134,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
+   },
+   "ACloseCallForBostonBlackie.mp4": {
+    "PASS": true,
+    "n_frames": 240,
+    "diverging_frames": null,
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
+   },
+   "ARomanceOfTheRedwoods.mp4": {
+    "PASS": true,
+    "n_frames": 364,
+    "diverging_frames": null,
+    "n_diverging": 0,
+    "boundary_excluded_frames": null,
+    "n_boundary_excluded": 0,
+    "boundary_excluded_rate": 0.0,
+    "boundary_eps": 0.001,
+    "threshold": 0.3,
+    "max_boundary_rate": 0.005,
+    "scores_available": true
+   }
+  },
+  "score_triage_first_failure": {
+   "diagnostic_only": true,
+   "eps": 0.0001,
+   "n_frames_compared": 154,
+   "n_frames_count_mismatch": 106,
+   "max_paired_delta": 0.314386248588562,
+   "all_paired_within_eps": false
+  }
+ },
+ "char_conservation": {
+  "PASS": false,
+  "tol": 0.02,
+  "n_pairs": 5,
+  "worst_abs_deviation": 0.0457,
+  "rows": [
+   {
+    "video": "20000LeaguesUndertheSea.mp4",
+    "PASS": true,
+    "ratio_rr_over_li": 1.0011
+   },
+   {
+    "video": "ABucketOfBlood1959.mp4",
+    "PASS": false,
+    "ratio_rr_over_li": 1.0457
+   },
+   {
+    "video": "ABucketofBlood.mp4",
+    "PASS": false,
+    "ratio_rr_over_li": 1.0411
+   },
+   {
+    "video": "ACloseCallForBostonBlackie.mp4",
+    "PASS": true,
+    "ratio_rr_over_li": 0.9998
+   },
+   {
+    "video": "ARomanceOfTheRedwoods.mp4",
+    "PASS": true,
+    "ratio_rr_over_li": 1.0011
+   }
+  ]
+ },
+ "boundary_exclusions_total": 0,
+ "chunk_count_ratio": {
+  "gated": false,
+  "n_pairs": 5,
+  "ratio_min_median_max": [
+   1.192,
+   1.275,
+   1.422
+  ],
+  "per_video": {
+   "20000LeaguesUndertheSea.mp4": 1.192,
+   "ABucketOfBlood1959.mp4": 1.38,
+   "ABucketofBlood.mp4": 1.422,
+   "ACloseCallForBostonBlackie.mp4": 1.192,
+   "ARomanceOfTheRedwoods.mp4": 1.275
+  }
+ },
+ "n_rr": 5,
+ "n_li": 5,
+ "n_paired": 5,
+ "rr_chunk_config_measured": {
+  "chunk_size_max_observed": 3999,
+  "chunk_chars_median": 3354
+ },
+ "li_chunk_config_measured": {
+  "chunk_size_max_observed": 4000,
+  "chunk_chars_median": 3992
+ }
+}

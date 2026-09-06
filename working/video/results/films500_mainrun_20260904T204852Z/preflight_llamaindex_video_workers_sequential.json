@@ -1,0 +1,509 @@
+{
+ "preleg_load1": 11.2,
+ "preleg_container_idle_cores": {
+  "li_bal_0": 0.006,
+  "li_bal_1": 0.006,
+  "li_bal_2": 0.005,
+  "li_bal_3": 0.006,
+  "li_bal_4": 0.006,
+  "li_bal_5": 0.005,
+  "li_bal_6": 0.006,
+  "li_bal_7": 0.006,
+  "li_bal_8": 0.006,
+  "li_bal_9": 0.006,
+  "li_bal_10": 0.006,
+  "li_bal_11": 0.006,
+  "li_bal_12": 0.006,
+  "li_bal_13": 0.006,
+  "li_bal_14": 0.006,
+  "li_bal_15": 0.006
+ },
+ "preleg_own_process_cores": 0.068,
+ "preleg_foreign_excess": 1.29,
+ "preleg_quiet_box": {
+  "PASS": true,
+  "threshold": 2.0,
+  "readings": [
+   {
+    "load1": 11.2,
+    "host_busy_cores": 1.45,
+    "container_idle_cores": {
+     "li_bal_0": 0.006,
+     "li_bal_1": 0.006,
+     "li_bal_2": 0.005,
+     "li_bal_3": 0.006,
+     "li_bal_4": 0.006,
+     "li_bal_5": 0.005,
+     "li_bal_6": 0.006,
+     "li_bal_7": 0.006,
+     "li_bal_8": 0.006,
+     "li_bal_9": 0.006,
+     "li_bal_10": 0.006,
+     "li_bal_11": 0.006,
+     "li_bal_12": 0.006,
+     "li_bal_13": 0.006,
+     "li_bal_14": 0.006,
+     "li_bal_15": 0.006
+    },
+    "container_attributed": 0.09,
+    "own_process_cores": 0.068,
+    "foreign_now": 1.29,
+    "foreign_by_load1": 10.75,
+    "foreign_excess": 1.29,
+    "basis": "instantaneous (/proc/stat busy \u2212 containers \u2212 ours)"
+   }
+  ],
+  "n_readings": 1,
+  "trend": "SINGLE READING",
+  "settle_wall_s": 5.7,
+  "load1": 11.2,
+  "host_busy_cores": 1.45,
+  "container_idle_cores": {
+   "li_bal_0": 0.006,
+   "li_bal_1": 0.006,
+   "li_bal_2": 0.005,
+   "li_bal_3": 0.006,
+   "li_bal_4": 0.006,
+   "li_bal_5": 0.005,
+   "li_bal_6": 0.006,
+   "li_bal_7": 0.006,
+   "li_bal_8": 0.006,
+   "li_bal_9": 0.006,
+   "li_bal_10": 0.006,
+   "li_bal_11": 0.006,
+   "li_bal_12": 0.006,
+   "li_bal_13": 0.006,
+   "li_bal_14": 0.006,
+   "li_bal_15": 0.006
+  },
+  "container_attributed": 0.09,
+  "own_process_cores": 0.068,
+  "foreign_now": 1.29,
+  "foreign_by_load1": 10.75,
+  "foreign_excess": 1.29,
+  "basis": "instantaneous (/proc/stat busy \u2212 containers \u2212 ours)",
+  "note": "foreign = load1 minus our containers minus our own process tree; own_process_cores is CPU-seconds/window (a lower bound \u2014 load1 also counts uninterruptible sleep)"
+ },
+ "manifest_meta": {
+  "corpus_manifest_sha256": "bd0c915e28710322bace0549d7372dddea5578895333f143c67e04252e4e02a1",
+  "ffmpeg_sha256": "e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99",
+  "dimensions_source": "TWO bases per film, labelled (2026-09-04 ruling): container_* = coded stream size (read_frames header meta); detector_* = PIL .size of one decoded PNG via the arms' encode path \u2014 the basis the committed census used and the one RF-DETR's 560px edge is defined on. The PARTITION uses detector_*. Knowns verified against the census by the dimension control.",
+  "interval_s": 15,
+  "n_files": 500,
+  "n_measured": 498,
+  "n_warm": 2,
+  "warm_rule": "DERIVED at build: corpus 500 minus her measured 498 (her committed films500 per_doc @3967d9f4, mirrored as films500_her_measured_set.txt) \u2014 our measured set equals hers by construction",
+  "warm_films": [
+   "yanks_are_coming.mp4",
+   "zontar_the_thing_from_venus.mp4"
+  ],
+  "total_frames": 162511,
+  "total_video_s": 2432644.44,
+  "n_above_560px_detector_basis": 435,
+  "n_container_detector_mismatch": 0,
+  "note_560px": "the corpus-wide >560px fraction (detector basis) is derivable from THIS artifact",
+  "corpus_dir": "/home/ssm-user/films_corpus/full500",
+  "corpus_dir_stamped": {
+   "utc": "2026-09-04T09:00:53Z",
+   "proof": "sha256 verify 500/500 against this directory",
+   "previous": "/home/ssm-user/films_corpus/full500"
+  }
+ },
+ "readbacks": {
+  "li_worker_8802_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8803_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8804_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8805_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8806_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8807_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8808_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8809_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8810_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8811_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8812_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8813_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8814_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8815_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8816_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  },
+  "li_worker_8817_1": {
+   "env": {
+    "OMP_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "VECLIB_MAXIMUM_THREADS": "2",
+    "NUMEXPR_NUM_THREADS": "2",
+    "TORCH_NUM_THREADS": "2"
+   },
+   "torch_num_threads": 2
+  }
+ },
+ "identity": {
+  "sdk": {
+   "skipped": "LI leg \u2014 the rocketride SDK is not on this path"
+  },
+  "li": {
+   "detect_impl": [
+    "rfdetr"
+   ],
+   "python_version": "3.12.13",
+   "versions": {
+    "rfdetr": "1.5.2",
+    "torch": "2.10.0+cu128",
+    "torchvision": "0.25.0+cu128",
+    "transformers": "4.53.3",
+    "supervision": "0.30.0",
+    "llama-index-core": "0.14.24",
+    "llama-index-embeddings-huggingface": "0.7.0",
+    "sentence-transformers": "5.7.0",
+    "imageio-ffmpeg": "0.6.0",
+    "fastapi": "0.141.1",
+    "uvicorn": "0.52.4"
+   },
+   "chunk_config_readback": {
+    "expected": {
+     "chunk_size": 4000,
+     "chunk_overlap": 0,
+     "split_unit": "chars"
+    },
+    "per_worker": {
+     "li_worker_8802_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8803_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8804_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8805_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8806_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8807_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8808_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8809_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8810_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8811_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8812_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8813_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8814_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8815_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8816_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "li_worker_8817_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     }
+    }
+   },
+   "rfdetr_checkpoint_md5_by_container": {
+    "li_bal_0": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_1": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_2": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_3": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_4": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_5": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_6": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_7": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_8": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_9": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_10": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_11": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_12": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_13": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_14": "b4d3ce46099eaed50626ede388caf979",
+    "li_bal_15": "b4d3ce46099eaed50626ede388caf979"
+   },
+   "rfdetr_checkpoint_md5_ok": true
+  }
+ },
+ "thread_pin_parity": {
+  "PASS": true,
+  "arms": {
+   "li": {
+    "within_arm": {
+     "PASS": true,
+     "readers": [
+      "li_worker_8802_1",
+      "li_worker_8803_1",
+      "li_worker_8804_1",
+      "li_worker_8805_1",
+      "li_worker_8806_1",
+      "li_worker_8807_1",
+      "li_worker_8808_1",
+      "li_worker_8809_1",
+      "li_worker_8810_1",
+      "li_worker_8811_1",
+      "li_worker_8812_1",
+      "li_worker_8813_1",
+      "li_worker_8814_1",
+      "li_worker_8815_1",
+      "li_worker_8816_1",
+      "li_worker_8817_1"
+     ],
+     "disagreements": null,
+     "values_agreed": {
+      "OMP_NUM_THREADS": "2",
+      "MKL_NUM_THREADS": "2",
+      "OPENBLAS_NUM_THREADS": "2",
+      "VECLIB_MAXIMUM_THREADS": "2",
+      "NUMEXPR_NUM_THREADS": "2",
+      "TORCH_NUM_THREADS": "2",
+      "torch_num_threads": 2
+     }
+    },
+    "declared": {
+     "MKL_NUM_THREADS": "2",
+     "OPENBLAS_NUM_THREADS": "2",
+     "VECLIB_MAXIMUM_THREADS": "2",
+     "NUMEXPR_NUM_THREADS": "2",
+     "TORCH_NUM_THREADS": "2",
+     "OMP_NUM_THREADS": "2"
+    },
+    "declared_vs_measured_mismatch": null
+   }
+  },
+  "cross_arm_values": {
+   "li": 2
+  },
+  "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm optima, difference recorded never failed (Crossroad 17)"
+ },
+ "network_mode": {
+  "li_bal_0": "host",
+  "li_bal_1": "host",
+  "li_bal_2": "host",
+  "li_bal_3": "host",
+  "li_bal_4": "host",
+  "li_bal_5": "host",
+  "li_bal_6": "host",
+  "li_bal_7": "host",
+  "li_bal_8": "host",
+  "li_bal_9": "host",
+  "li_bal_10": "host",
+  "li_bal_11": "host",
+  "li_bal_12": "host",
+  "li_bal_13": "host",
+  "li_bal_14": "host",
+  "li_bal_15": "host"
+ },
+ "pipe_sha256": "6330773fb63bf7f286563cc37b39a671e3b25c1874ae9bcfc4b936c9c2e5b911",
+ "corpus_dir": "/home/ssm-user/films_corpus/full500",
+ "corpus_dir_source": "explicit (agrees with manifest meta)",
+ "manifest_sha256": "c5a09a3462af7204001b38bcd7fad4d9568e26adddfb2471cca86a99c9a3de67",
+ "idle_burden": {
+  "instances": 16,
+  "instance_kind": "li_workers",
+  "idle_cores_before_instances": 0.094,
+  "idle_cores_with_instances_live": 0.069,
+  "sample_s": 6.0,
+  "idle_share_of_box": 0.0022,
+  "box_cpus": 32,
+  "marginal_cores_per_instance": null,
+  "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+  "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve"
+ },
+ "posture": "workers[declared_workers=16]",
+ "pass": 1
+}
