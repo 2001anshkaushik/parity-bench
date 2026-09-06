@@ -403,6 +403,98 @@ Assessed against everything we hold:
   DEFINITIVE §6 is FINAL and not edited here; its residual-candidate list
   gets a one-paragraph addendum only on Ansh's ruling after V-D.
 
+## Workload above 560px — sized from source and held records (2026-09-06; TASK 1) and the facade's configurability (TASK 2)
+
+**The premise to check first: does the facade's downscale reduce the
+detector's work?** From the held RF-DETR 1.5.2 source (the Ruling-Y
+probe captured `detr.py` from BOTH containers; `detr_li.py` and
+`detr_engine.py` are byte-identical): `predict` converts each input with
+`F.to_tensor` → `F.normalize` → **`F.resize(img_tensor, (self.model.
+resolution, self.model.resolution))`** (`detr.py:379`) before inference —
+every input, whatever its size, becomes a 560×560 tensor for RFDETRBase.
+So the facade changes the pixels RF-DETR's own resize *starts from* (hence
+the scores), not the tensor the model consumes. Model work per frame is
+the same on both arms for every frame. What differs above 560 is
+preprocessing only: RR does LANCZOS(source → 560 long edge) *and then*
+RF-DETR's resize to 560²; LI does RF-DETR's resize from the source
+directly. RR pays an extra pass — a few milliseconds of PIL LANCZOS per
+frame against ~0.84 s of detection (estimate until V-D times it; it is a
+cost on RR's side, not a saving).
+
+**The quantity the premise points at, sized anyway.** Pixels handed to
+`rfdetr.predict`: per film the facade's area ratio runs 0.154–0.978
+(640×480 → 560×420 = 0.766, 381 films; 720×480 → 560×373 = 0.604;
+624×480 → 560×430 = 0.804), frames-weighted mean **0.750**; over the
+corpus RR hands RF-DETR 35.0 Gpx where LI hands 46.6 Gpx. That number is
+the input to RF-DETR's fixed-output resize, not the model's input; the
+model consumes 313,600 px per frame on both arms (50.8 Gpx over the
+corpus each).
+
+**Held measurements agree with the symmetric reading — the free
+within-campaign test.**
+
+| test (pass 2 unless stated) | result |
+|---|---|
+| LI `detect` stage, s per frame, by source resolution | 320×240 0.839 · 540×360 0.831 · **624×480 0.83 · 640×480 0.84 · 720×480 0.85** — flat across the edge (≤560 median 0.836, >560 0.839) |
+| LI `extract` stage (ffmpeg decode + PNG to disk), s per frame | ≤560 0.132 · >560 0.249 — the stage that scales with source pixels |
+| RR/LI per-film s-per-frame ratio, comparable resolutions across the edge | 540×360 (below) **1.106** · 640×480 (above) **1.114** · 720×480 (above) **1.113** — flat |
+| RR/LI ratio by class | p2: ≤560 1.168 (n=65) vs >560 1.121 (n=433); p1: 1.014 vs 0.989 |
+| where the class difference comes from | the 320×240 films (31 of the 65): RR/LI **1.214** — LI's extract stage is disproportionately cheap on tiny frames (LI 0.98 s/frame vs RR 1.19); RR's per-frame cost is less sensitive to source size (RR +7% from 320×240 to 640×480, LI +16%) |
+
+The RR/LI ratio does drop across the edge at the class level (−4% in
+pass 2), but the drop is carried entirely by the smallest-frame films
+through LI's decode/PNG stage, not by the detector; at comparable
+resolutions the ratio is flat, and LI's own detect stage — the only
+per-stage detector timing held — does not move with source size at all,
+which is what a fixed 560² model input predicts. Nothing in the held
+records shows RR doing less detector work above the edge. Downstream, RR
+does slightly *more*: its chunk count per film runs above LI's
+(RecursiveCharacterTextSplitter vs SentenceSplitter; the cross files'
+`chunk_count_ratio`), so its embedding stage embeds more chunks for the
+same text. No per-frame RR detect timing is held: the engine's per-frame
+debug line is off in the campaign images (both landed RR docker logs are
+13 lines).
+
+**What it does to the headline.** No correction toward RR is warranted.
+The feared reading — RR ~6% behind on span while doing less work per
+frame on 87% of the corpus — does not survive the source: the arms run
+the same model work per frame; above 560 RR does marginally more
+preprocessing and produces different scores. The +5.9% LI span figure
+stands as measured (held DRAFT for the lifetime reason, not for this);
+the report states the preprocessing difference and its direction
+beside it. V-D records the model-consumed tensor shape on both paths and
+times the LANCZOS pass, so the symmetry claim and RR's extra cost each
+get a measured number at the same time as the mechanism.
+
+**Configurability (TASK 2).** `infer_edge=560` is a **fixed constant**:
+it lives in the module-level `BACKENDS` table (`detection.py:60`);
+`Detector.__init__` (`:440-466`) takes `backend`, `model_name`,
+`device`, `threshold`, `prompt`, `revision` and reads the edge from the
+table with no parameter to override it — unlike the segmentation facade,
+whose `max_edge` is a constructor argument ("client-side; not part of
+identity", `segmentation.py:430-448`); the detect node's config surface
+(`nodes/detect/services.json`) exposes `detect.threshold`,
+`detect.prompt` and `detect.profile` only, and the node builds the
+facade from exactly those (`IGlobal.py:49-75`). It is not reachable from
+the pipe. The campaign pipe (`benchmark_video_detect.pipe`) wires only
+detect's text lane onward, so the node's annotated-JPEG emit path never
+runs (`IInstance.py:80`: image lane has no listener) — no second RR-side
+per-frame cost hides there. Options, none taken here:
+- **(A) LI applies the same LANCZOS pre-downscale before `predict`** — a
+  six-line change on our own arm (`li_video/pipeline.py:211-215`,
+  porting `resize_for_inference`). Like-for-like preprocessing; the
+  prediction is that gate 3 then passes corpus-wide (a corpus-scale
+  confirmation of the mechanism for free) and throughput moves within
+  noise. Candidate for the next campaign, not this one.
+- **(B) The engine drops or matches the facade's pre-downscale for
+  backends that resize internally** — Ticket 6 criterion 4; the engine
+  team's change, a new build, not comparable to the measured image.
+- **(C) Scope this campaign's claims**: same model work per frame both
+  arms (V-D measures it); different preprocessing above 560 on RR's side,
+  small and against RR; detection-equality claims scoped to ≤560px;
+  throughput claims stand with that sentence beside them.
+  Recommendation: (C) for this report, (A) for the next campaign.
+
 ## Cross-team joins — cautions (2026-09-06, from Shashi's films50 figures as relayed)
 
 - **His RR-vs-HS 1.58× carries a wave handicap he flags himself**: 50

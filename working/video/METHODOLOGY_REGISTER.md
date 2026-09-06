@@ -1255,7 +1255,10 @@ than rewritten from memory, which is entry 2's point in miniature.
 > any frame whose long edge exceeds `infer_edge=560` before the backend
 > ever sees it. Same file, same method name, one class apart. The
 > isolation was a faithful reproduction of LlamaIndex's path — which is
-> why it matched LlamaIndex.
+> why it matched LlamaIndex. **That is a probe measuring one arm twice**
+> (Ansh, 2026-09-06, accepting the finding): both "sides" ran the
+> reference's transformation chain, and their agreement measured the
+> reference's determinism, not the deployment's behaviour.
 >
 > The class this adds to entry 30 (a probe not like-for-like, caught by
 > its own artifact): **an isolation probe is specified by walking the call

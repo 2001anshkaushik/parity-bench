@@ -763,6 +763,16 @@ coordinates and false of pixels and scores. This is the deployment-only
 transformation the isolation instrument never exercised (it reproduced the
 reference's path exactly, which is why it matched the reference).
 
+Two facts that bound the impact: (a) `infer_edge` is a fixed constant — the
+`BACKENDS` table entry, read by `Detector.__init__` with no parameter to override it
+(unlike the segmentation facade's `max_edge` constructor argument), and absent from
+the node's config surface (`nodes/detect/services.json` exposes only threshold,
+prompt and profile) — so an operator cannot switch it off from a pipe; (b) RF-DETR
+resizes every input to a fixed `resolution × resolution` tensor before inference
+(`rfdetr/detr.py:379`, 1.5.2), so the facade changes the pixels that resize starts
+from — and therefore the scores — but not the model's input or its work per frame;
+the facade's LANCZOS pass is an extra cost on the deployment side, not a saving.
+
 Held evidence that this is the mechanism: (1) the boundary is exactly the constant,
 inclusive — the one corpus film with a long edge of exactly 560 (560×380) agrees
 with the reference, 64 smaller films agree, 433 larger films differ; (2) it is

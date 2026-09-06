@@ -43,6 +43,19 @@ results/detector-parity-y-20260902/frame10.png):
   CONTROL      : a <=560 frame (derived here from frame 10 at 357x240) must be a
                  NO-OP through resize_for_inference and predict identically both
                  ways. Every predict is run TWICE (self-determinism null).
+  WORKLOAD (TASK 3, 2026-09-06): alongside the verdict, record on EACH path the
+                 detector-visible pixel count — (i) the pixels handed to
+                 rfdetr.predict (raw 714x480 = 342,720; facade 560x376 = 210,560,
+                 x0.614) and (ii) the tensor the MODEL actually consumes, captured
+                 by a hook on the model's inference entry point during every
+                 predict. rfdetr 1.5.2 predict (held copy detr_li.py == detr_engine.py,
+                 byte-identical from both containers) does F.to_tensor -> F.normalize ->
+                 F.resize(img, (resolution, resolution)) (detr.py:379) before
+                 inference, so the pre-registered expectation is [1, 3, 560, 560] on
+                 BOTH paths = the model does the same work per frame on both arms;
+                 the facade changes the pixels rfdetr's resize starts from, not the
+                 model's input. The facade's LANCZOS pass is timed (median of 5) so
+                 the RR-side extra preprocessing has a measured number too.
 
 Modes: --side --frame frame10.png --out side_vd.json  (inside rr)
        --compare side_vd.json                          (laptop or box)
@@ -132,6 +145,57 @@ def _detections(preds) -> List[List[str]]:
     return [[n, f'{s:.9f}'] for n, s in rows]
 
 
+def _install_shape_hook(det) -> dict:
+    """Wrap the rfdetr model's inference entry points (eager `inference`,
+    optimized `inference_model`) so every predict records the tensor shape the
+    MODEL consumes — the detector-visible pixel count at the model. Absence of
+    a hookable target is recorded, never assumed away."""
+    rec = {'shapes': [], 'targets': [], 'resolution': getattr(getattr(det, 'model', None), 'resolution', None)}
+    m = getattr(det, 'model', None)
+
+    def _shape(x):
+        try:
+            return list(x.shape)
+        except Exception:
+            return 'unshaped'
+    # eager path (held detr.py:407): predictions = self.model.model(batch_tensor)
+    mm = getattr(m, 'model', None)
+    if mm is not None and hasattr(mm, 'register_forward_pre_hook'):
+        mm.register_forward_pre_hook(lambda mod, args: rec['shapes'].append(_shape(args[0]) if args else 'no-args'))
+        rec['targets'].append('model.model forward pre-hook (eager path, detr.py:407)')
+    # optimized path (detr.py:405): self.model.inference_model(...) — None unless optimize_for_inference() ran
+    fn = getattr(m, 'inference_model', None)
+    if callable(fn):
+        def wrapped(x, *a, _fn=fn, **k):
+            rec['shapes'].append(_shape(x))
+            return _fn(x, *a, **k)
+        m.inference_model = wrapped
+        rec['targets'].append('model.inference_model wrapper (optimized path, detr.py:405)')
+    rec['state'] = 'measured' if rec['targets'] else 'unavailable: neither model.model (module) nor inference_model to hook'
+    return rec
+
+
+def _take_shapes(hook: dict) -> List:
+    """Unique shapes recorded since the last take, in order; then clear."""
+    seen, out = set(), []
+    for s in hook['shapes']:
+        key = json.dumps(s)
+        if key not in seen:
+            seen.add(key)
+            out.append(s)
+    hook['shapes'].clear()
+    return out
+
+
+def workload_symmetric(wl: dict) -> Optional[bool]:
+    """True when the model consumed identical tensor shapes on the raw and the
+    facade-resized path; None when either side is unmeasured."""
+    a, b = wl.get('model_input_shapes_raw'), wl.get('model_input_shapes_resized')
+    if not a or not b:
+        return None
+    return a == b
+
+
 def _runs(det, image, thresholds=(0.3, 0.001)) -> dict:
     out = {}
     for thr in thresholds:
@@ -158,9 +222,25 @@ def side(frame_path: str, out_path: str) -> int:
     det = RFDETRBase()
     threads = {'intraop': torch.get_num_threads(), 'interop': torch.get_num_interop_threads(),
                'captured': 'after model construction, before first predict'}
-    small, noop = engine_resize(img)
+    hook = _install_shape_hook(det)
+    import inspect
+    import time
+    try:
+        src = inspect.getsource(type(det).predict).splitlines()
+        resize_lines = [l.strip() for l in src if 'resize' in l.lower() or 'resolution' in l.lower()]
+    except Exception as exc:
+        resize_lines = [f'unavailable: {exc!r}']
+    lanczos_ms = []
+    for _ in range(5):
+        t0 = time.perf_counter()
+        small, noop = engine_resize(img)
+        lanczos_ms.append((time.perf_counter() - t0) * 1000)
     control = img.resize((357, 240), resample=Image.LANCZOS)   # <=560: must be a no-op through the wrapper
     c_small, c_noop = engine_resize(control)
+    raw_runs = _runs(det, img)
+    shapes_raw = _take_shapes(hook)
+    resized_runs = _runs(det, small)
+    shapes_resized = _take_shapes(hook)
     rec = {
         'design': 'V-D wrapper-resize parity (2026-09-06); see module docstring',
         'libs': {'rfdetr': _ver('rfdetr'), 'torch': torch.__version__, 'torchvision': _ver('torchvision'),
@@ -170,7 +250,22 @@ def side(frame_path: str, out_path: str) -> int:
                   'engine_resized_size': list(small.size), 'engine_resize_noop': noop,
                   'engine_resized_array_sha256': _array_sha(small), 'raw_array_sha256': _array_sha(img),
                   'engine_helper': engine_helper_check(img),
-                  'raw': _runs(det, img), 'resized': _runs(det, small)},
+                  'raw': raw_runs, 'resized': resized_runs,
+                  # TASK 3 (2026-09-06): the detector-visible pixel count on each path
+                  'workload': {
+                      'pixels_to_predict_raw': img.size[0] * img.size[1],
+                      'pixels_to_predict_resized': small.size[0] * small.size[1],
+                      'ratio': round(small.size[0] * small.size[1] / (img.size[0] * img.size[1]), 4),
+                      'model_input_shapes_raw': shapes_raw,
+                      'model_input_shapes_resized': shapes_resized,
+                      'model_resolution': hook.get('resolution'),
+                      'hook_state': hook['state'], 'hook_targets': hook['targets'],
+                      'facade_lanczos_ms_median_of_5': round(sorted(lanczos_ms)[2], 2),
+                      'predict_resize_source_lines': resize_lines[:8],
+                      'basis': 'pixels_to_predict = the PIL image handed to rfdetr.predict; model_input_shapes = '
+                               'tensor shapes seen by the hooked model inference entry point during the two '
+                               'predicts per threshold (unique, in order); rfdetr resizes every input to '
+                               '(resolution, resolution) before inference (detr.py:379 in the held copy)'}},
         'control': {'size': list(control.size), 'engine_resize_noop': c_noop,
                     'raw': _runs(det, control), 'resized': _runs(det, c_small)},
     }
@@ -232,6 +327,16 @@ def compare(side_json: str) -> int:
     print(f'raw     vs campaign LI : {why_li}')
     print(f'resized vs campaign RR : {why_rr}')
     print(f"control (<=560) no-op both ways: {'PASS' if ctrl_ok else 'FAIL'}")
+    wl = fr.get('workload') or {}
+    if wl:
+        sym = workload_symmetric(wl)
+        print(f"WORKLOAD (TASK 3): pixels handed to predict raw {wl.get('pixels_to_predict_raw')} vs facade "
+              f"{wl.get('pixels_to_predict_resized')} (x{wl.get('ratio')}); model-consumed tensor shapes raw "
+              f"{wl.get('model_input_shapes_raw')} vs resized {wl.get('model_input_shapes_resized')} -> "
+              f"{'SYMMETRIC at the model (same work per frame on both arms)' if sym else ('ASYMMETRIC at the model' if sym is False else 'unmeasured (' + str(wl.get('hook_state')) + ')')}; "
+              f"model resolution {wl.get('model_resolution')}; facade LANCZOS {wl.get('facade_lanczos_ms_median_of_5')} ms")
+    else:
+        print('WORKLOAD (TASK 3): unavailable — side artifact predates the workload clause')
     if ok_rr and ctrl_ok:
         print('VERDICT: V-D CONFIRMS — the engine facade\'s LANCZOS pre-downscale to infer_edge=560 reproduces '
               'the campaign RR output on the diverging frame; the raw frame reproduces LI. Mechanism NAMED and '
@@ -255,9 +360,18 @@ def self_test() -> int:
     check('size rule: 560x380 is a NO-OP (JailBait — the exactly-560 film, clean)', engine_resize_size(560, 380) == (560, 380))
     check('size rule: 352x288 no-op (AMI); 357x240 no-op (control)',
           engine_resize_size(352, 288) == (352, 288) and engine_resize_size(357, 240) == (357, 240))
+    wl_sym = {'pixels_to_predict_raw': 342720, 'pixels_to_predict_resized': 210560, 'ratio': 0.6144,
+              'model_input_shapes_raw': [[1, 3, 560, 560]], 'model_input_shapes_resized': [[1, 3, 560, 560]],
+              'model_resolution': 560, 'hook_state': 'measured', 'facade_lanczos_ms_median_of_5': 4.2}
+    check('workload: identical model-consumed shapes -> SYMMETRIC', workload_symmetric(wl_sym) is True)
+    check('workload: different shapes -> ASYMMETRIC; unmeasured -> None',
+          workload_symmetric(dict(wl_sym, model_input_shapes_resized=[[1, 3, 560, 376]])) is False
+          and workload_symmetric(dict(wl_sym, model_input_shapes_raw=[])) is None)
+    check('pixels handed to predict on the House frame: 342,720 raw vs 210,560 facade (x0.614)',
+          714 * 480 == 342720 and 560 * 376 == 210560 and round(210560 / 342720, 3) == 0.614)
     good = {'torch_threads': {'intraop': 2},
             'frame': {'png_sha256': FRAME10_SHA16 + 'x' * 48, 'size': [714, 480], 'engine_resized_size': [560, 376],
-                      'engine_resize_noop': False, 'engine_helper': {'state': 'unavailable: test'},
+                      'engine_resize_noop': False, 'engine_helper': {'state': 'unavailable: test'}, 'workload': wl_sym,
                       'raw': {'0.3': {'detections': [[l, s] for l, s in zip(['person', 'chair', 'bottle', 'chair', 'bottle'], EXPECTED_LI['scores'])], 'self_deterministic': True}},
                       'resized': {'0.3': {'detections': [[l, s] for l, s in zip(['bottle', 'bottle', 'chair', 'chair', 'chair', 'person'], EXPECTED_RR['scores'])], 'self_deterministic': True}}},
             'control': {'engine_resize_noop': True, 'raw': {'0.3': {'detections': [], 'self_deterministic': True}},

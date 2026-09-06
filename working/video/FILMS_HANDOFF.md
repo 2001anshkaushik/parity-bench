@@ -176,6 +176,32 @@
 > handicap; warm/cold bases; do not join multiples). DEFINITIVE and
 > FILMS_SUMMARY untouched (a §6 addendum is Ansh's ruling after V-D);
 > Ticket 6 gains measured update 3 + criterion 4.
+> **FACT 3 ACCEPTED by Ansh 2026-09-06; TASKS 1–3 of the follow-up
+> round.** TASK 1 (workload above 560px): the premise "RR feeds its
+> detector a smaller image" is FALSE AT THE MODEL — the held RF-DETR
+> 1.5.2 source (`detr_li.py` ≡ `detr_engine.py`, captured from both
+> containers) resizes EVERY input to a fixed 560×560 tensor before
+> inference (`detr.py:379`); the facade changes the pixels that resize
+> starts from (the scores), not the model's work; RR pays an EXTRA
+> LANCZOS pass above 560 (ms per frame vs ~0.84 s detect). Sized anyway:
+> pixels handed to predict RR 35.0 vs LI 46.6 Gpx (facade area ratio
+> 0.154–0.978, frames-weighted 0.750); model-consumed 50.8 Gpx both.
+> Held-data test: LI detect stage FLAT across the edge (0.83–0.85
+> s/frame from 320×240 to 720×480); RR/LI ratio flat at comparable
+> resolutions (540×360 1.106 / 640×480 1.114 / 720×480 1.113); the
+> class-level ratio drop (p2 1.168 → 1.121) is carried by the 320×240
+> films where LI's extract stage is disproportionately cheap. NO
+> correction toward RR; the +5.9% LI span stands as measured with the
+> preprocessing difference stated beside it. TASK 2: `infer_edge=560` is
+> a FIXED CONSTANT (BACKENDS table; no `Detector` parameter; not in
+> `services.json`; unreachable from the pipe); options A (LI applies the
+> same pre-downscale — next campaign; predicts gate 3 passes corpus-wide)
+> / B (engine change, Ticket 6 criterion 4) / C (scope this report);
+> recommend C now, A next. TASK 3: V-D records the detector-visible pixel
+> count on each path (pixels to predict 342,720 vs 210,560; the
+> model-consumed tensor shape via a hook on rfdetr's inference entry
+> point, expected [1,3,560,560] both) and times the LANCZOS pass.
+> Register entry 33 carries "a probe measuring one arm twice".
 > **FILMS-500 COMPLETE + LANDED (2026-09-06): `FILMS500_RESULTS.md`.**
 > 6 legs × 498, 0 errors; box commit cc98ca6b, bundle 1882c0d4,
 > ff-merged. **Partition HELD EXACTLY: 433 diverging / 65 clean / 0
