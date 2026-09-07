@@ -84,7 +84,7 @@ def _num(v) -> Optional[float]:
         return None
 
 
-def parse_cachewatch(path: Path) -> Tuple[List[dict], dict]:
+def parse_cachewatch(path: Path, ncpu: int = 32) -> Tuple[List[dict], dict]:
     rows: List[dict] = []
     stats = {'lines': 0, 'unrecognised': 0, 'format': None}
     cur = None
@@ -124,6 +124,10 @@ def parse_cachewatch(path: Path) -> Tuple[List[dict], dict]:
                     cur[k] = _kb(v)
                 elif k.lower() in ('iowait', 'iowait_pct'):
                     cur['iowait'] = _num(v)
+            # same-line meminfo fields, as the 2026-09-06 sampler writes them:
+            # '<utc> MemFree: 447736 kB Cached: 27783548 kB Dirty: ... iowait=43239'
+            for k, v in re.findall(r'(Cached|MemFree|Dirty|Writeback):\s+(\d+)\s*kB', rest):
+                cur[k] = float(v)
             mc = re.search(r'\bcpu\s+(\d+(?:\s+\d+){3,})', rest)
             if mc:
                 cur['cpu'] = _cpu_ticks(mc.group(1))
@@ -151,6 +155,25 @@ def parse_cachewatch(path: Path) -> Tuple[List[dict], dict]:
                 r['iowait'] = 100.0 * dio / dtot
         prev = r
     rows.sort(key=lambda r: r['t'])
+    # A bare 'iowait=N' that only ever grows and exceeds 100 is the CUMULATIVE
+    # /proc/stat iowait tick counter (USER_HZ=100, summed over CPUs), not a
+    # percentage — the 2026-09-06 sampler writes it that way (43239 -> 825355
+    # over 15.6 h). Convert to percent-of-box per interval: dticks / (dt * 100 * ncpu).
+    io = [r['iowait'] for r in rows if r.get('iowait') is not None]
+    if len(io) >= 3 and max(io) > 100 and all(b >= a for a, b in zip(io, io[1:])):
+        stats['iowait_basis'] = f'cumulative ticks differenced, ncpu={ncpu}'
+        prev = None
+        for r in rows:
+            if r.get('iowait') is None:
+                continue
+            if prev is None:
+                prev, r['iowait'] = (r['t'], r['iowait']), None
+                continue
+            dt_s, dio = r['t'] - prev[0], r['iowait'] - prev[1]
+            prev = (r['t'], r['iowait'])
+            r['iowait'] = (100.0 * dio / (dt_s * 100.0 * ncpu)) if dt_s > 0 else None
+    else:
+        stats['iowait_basis'] = 'percent as logged'
     return rows, stats
 
 
@@ -381,6 +404,16 @@ def self_test() -> int:
         cwb, sb = parse_cachewatch(d / 'cw_b.csv')
         check('format (b) csv parsed', len(cwb) == 1 and cwb[0]['iowait'] == 4.5 and cwb[0]['Cached'] == 1000 and sb['format'] == 'csv')
         check('missing fsstream -> unavailable, no join', join_leg(d, 'li', 3, cw, fm).get('state') == 'unavailable')
+        # format (d): the 2026-09-06 sampler's real lines — same-line meminfo, cumulative iowait ticks
+        real = [f'2026-09-06T11:{11 + m:02d}:54Z MemFree: {447736 + m} kB Cached: 27783548 kB Dirty: 469900 kB Writeback: 0 kB  iowait={43239 + m * 1920}'
+                for m in range(0, 5)]
+        (d / 'cw_d.log').write_text('\n'.join(real) + '\n')
+        cwd_, sd = parse_cachewatch(d / 'cw_d.log', ncpu=32)
+        check("format (d): same-line 'Key: value kB' fields parsed; iowait=ticks recognised as CUMULATIVE and "
+              'differenced to percent-of-box (1920 ticks / 60 s / 32 cpus = 1.0%)',
+              len(cwd_) == 5 and cwd_[0]['Cached'] == 27783548 and cwd_[0]['iowait'] is None
+              and abs(cwd_[1]['iowait'] - 1.0) < 1e-9 and sd['iowait_basis'].startswith('cumulative')
+              and sd['unrecognised'] == 0)
         check('spearman: monotone +1, reversed -1', spearman([1, 2, 3, 4], [10, 20, 30, 40]) == 1.0 and spearman([1, 2, 3, 4], [4, 3, 2, 1]) == -1.0)
     sys.path.insert(0, str(HERE.parents[2]))
     from harness.static_names import probe_selftest_findings

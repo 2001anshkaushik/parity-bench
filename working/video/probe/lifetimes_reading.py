@@ -194,13 +194,20 @@ def verdicts(camp: dict, life: dict, fm) -> List[str]:
         lines.append(f'{arm.upper()} p3 drift {d3 * 100:+.1f}% (band {band[0] * 100:+.0f}..{band[1] * 100:+.0f}%) -> {v3}')
         if p4:
             d4 = p4['profile']['drift']
-            same_dir = (d4 > 0) == (band[0] > 0)
+            same_as_band = (d4 > 0) == (band[0] > 0)
+            # a pass 4 that reproduces pass 3's own within-pass profile at pass
+            # 3's level is a per-pass shape (e.g. the leg-start ramp), not drift
+            same_shape_as_p3 = (abs(d4 - d3) < 0.01
+                                and abs(p4['profile']['level'] / p3['profile']['last20'] - 1) < 0.01)
             if abs(d4) <= BANDS['p4_flat_abs']:
                 v4 = 'CONFIRMS (flat)'
-            elif same_dir:
-                v4 = 'REFUTES (p4 still drifting: continuous degradation/improvement)'
+            elif same_shape_as_p3:
+                v4 = ("REPEATABLE PASS-START SHAPE: p4 reproduces p3's within-pass profile (|d4-d3| < 1%) "
+                      "at p3's level — a per-pass effect, not lifetime drift")
+            elif same_as_band:
+                v4 = 'REFUTES (p4 still drifting in the pre-registered direction: continuous degradation/improvement)'
             else:
-                v4 = 'INDETERMINATE (p4 drifts against the p3 direction)'
+                v4 = 'INDETERMINATE (p4 drifts against the pre-registered direction)'
             lines.append(f'{arm.upper()} p4 drift {d4 * 100:+.1f}% (flat if |d| <= {BANDS["p4_flat_abs"] * 100:.1f}%) -> {v4}; '
                          f'p4 level {p4["profile"]["level"]:.3f} vs p3 last20 {p3["profile"]["last20"]:.3f} '
                          f'({(p4["profile"]["level"] / p3["profile"]["last20"] - 1) * 100:+.1f}%)')

@@ -241,10 +241,15 @@ def side(frame_path: str, out_path: str) -> int:
     shapes_raw = _take_shapes(hook)
     resized_runs = _runs(det, small)
     shapes_resized = _take_shapes(hook)
+    try:                                         # the checkpoint RFDETRBase() resolved from the cwd (offline)
+        weights_md5 = hashlib.md5(Path('rf-detr-base.pth').read_bytes()).hexdigest()
+    except OSError:
+        weights_md5 = None
     rec = {
         'design': 'V-D wrapper-resize parity (2026-09-06); see module docstring',
         'libs': {'rfdetr': _ver('rfdetr'), 'torch': torch.__version__, 'torchvision': _ver('torchvision'),
                  'pillow': _ver('PIL')},
+        'weights_md5': weights_md5, 'cwd': os.getcwd(),
         'torch_threads': threads, 'thread_env': env,
         'frame': {'png': os.path.basename(frame_path), 'png_sha256': sha, 'size': list(img.size), 'mode': img.mode,
                   'engine_resized_size': list(small.size), 'engine_resize_noop': noop,
@@ -298,12 +303,14 @@ def _match(det_rows: List[List[str]], expected: dict) -> Tuple[bool, str]:
         return False, 'scores unparsable'
 
 
-def compare(side_json: str) -> int:
+def compare(side_json: str, weights_md5: Optional[str] = None) -> int:
     d = json.loads(Path(side_json).read_text())
     fr, ct = d['frame'], d['control']
     refusals = []
     if not str(fr.get('png_sha256', '')).startswith(FRAME10_SHA16):
         refusals.append(f"frame sha {str(fr.get('png_sha256'))[:16]} != {FRAME10_SHA16}")
+    if weights_md5 and d.get('weights_md5') != weights_md5:
+        refusals.append(f"weights md5 {d.get('weights_md5')} != pinned {weights_md5} (the Y artifact's)")
     if d.get('torch_threads', {}).get('intraop') != 2:
         refusals.append(f"intraop {d.get('torch_threads', {}).get('intraop')} != 2 (campaign condition)")
     for name, blk in (('frame.raw', fr['raw']), ('frame.resized', fr['resized']),
@@ -396,6 +403,10 @@ def self_test() -> int:
         nl = json.loads(json.dumps(good)); nl['frame']['raw']['0.3']['detections'][0][1] = '0.500000000'
         p.write_text(json.dumps(nl))
         check('compare: CANNOT COMPARE when the raw frame fails the LI baseline', compare(str(p)) == 3)
+        wm = json.loads(json.dumps(good)); wm['weights_md5'] = 'abc'
+        p.write_text(json.dumps(wm))
+        check('compare: CANNOT COMPARE on a weights md5 mismatch; passes when the pin matches',
+              compare(str(p), 'def') == 3 and compare(str(p), 'abc') == 0)
     try:
         from PIL import Image
         im = Image.new('RGB', (714, 480), (10, 20, 30))
@@ -419,12 +430,13 @@ def main() -> int:
     ap.add_argument('--frame', default='frame10.png')
     ap.add_argument('--out', default='side_vd.json')
     ap.add_argument('--compare', default=None)
+    ap.add_argument('--weights-md5', default=None, help='pin: refuse unless the side recorded this checkpoint md5')
     ap.add_argument('--self-test', action='store_true')
     a = ap.parse_args()
     if a.self_test:
         return self_test()
     if a.compare:
-        return compare(a.compare)
+        return compare(a.compare, a.weights_md5)
     if a.side:
         return side(a.frame, a.out)
     ap.error('one of --side / --compare / --self-test')
