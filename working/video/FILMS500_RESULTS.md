@@ -55,28 +55,33 @@ throughput basis. Every figure below is the landed export's own field.
 5.1% / 5.7%). The campaign's 5% spreads were a property of THAT run, not
 of either framework.
 
-**Headline arithmetic (p3+p4 means; effective cores = measured cores
-minus each arm's own idle burden, RR 4.647, LI 0.063):**
+**Headline arithmetic (Ruling AB — FINAL; p3+p4 means; effective cores
+= measured cores minus each arm's own idle burden, RR 4.647, LI
+0.063). Three rows, not five: the measured-core gap and the CPU-s/frame
+gap are ONE quantity in two units, and $/1k is the span ratio in
+dollars at one $/h basis — each is labelled as one fact stated twice,
+never counted as two findings (TASK 1, 2026-09-07):**
 
-| basis | LI | RR | LI vs RR | campaign (p1+p2) | settled set (p2+p3+p4) |
-|---|---|---|---|---|---|
-| span f/s | **12.800** | **11.613** | **LI +10.2%** | +5.9% | +10.7% |
-| f/s per MEASURED core | 0.4411 | 0.3733 | **LI +18.1%** | +15.2% | +19.4% |
-| f/s per EFFECTIVE core | 0.4420 | 0.4389 | **LI +0.7%** (tie) | RR +1.9% | LI +1.8% |
-| CPU-s per frame (engine cgroup) | 2.268 | 2.679 | RR +18.1% | RR +8.9%… (p1-skewed) | — |
-| $/1k footage-hour | 7.46 / 7.45 | 8.18 / 8.25 | RR +10.3% | RR +5.8% | — |
+| basis (p3+p4) | LI | RR | LI vs RR | settled set p2+p3+p4 (campaign p1 EXCLUDED, Ruling AC) |
+|---|---|---|---|---|
+| **f/s per EFFECTIVE core** — the work itself, idle removed | 0.4420 | 0.4389 | **+0.7% — a statistical tie** | +1.8% |
+| f/s per MEASURED core — the cost a user pays, idle included | 0.4411 | 0.3733 | **LI +18.1%** | +19.4% |
+| ↳ *the same fact as* RR's CPU-s per frame: 2.679 vs 2.268 = RR +18.1% (one quantity, two units) | | | | |
+| span f/s | 12.800 | 11.613 | **LI +10.2%** | +10.7% |
+| ↳ *the same fact in dollars* ($1.428/h basis): $/1k footage-hour RR $8.22 vs LI $7.46 = +10.2% (not a second finding) | | | | |
 
-Per-pass effective-core pairs (LI vs RR): p1 0.4293 vs 0.4634 (RR
-+7.9%), p2 0.4564 vs 0.4393 (LI +3.9%), p3 0.4414 vs 0.4399 (LI +0.3%),
-p4 0.4427 vs 0.4379 (LI +1.1%). **The effective-core inversion at 500
-(RR +1.9%) was entirely the campaign's pass-1 pair**; on fresh lifetimes
-it is a tie with LI marginally ahead in both pairings. The number a
-product reader will use moved by 2.6 points toward LI and lands at
-parity. Per measured core — the cost a user pays — LI +18%: the idle
-burden (4.65 cores, 14.5% of the box, holding 16 tokens) is, as before,
-the whole of that gap. cross_fail=1 was expected and is unchanged.
+The sentence a product reader needs is the effective-core pairing: **the
+two engines do the work at the same cost per core, and the entire
+visible gap is 4.65 cores — 14.5% of the box — that RocketRide burns
+standing still holding 16 tokens.** Per-pass effective-core pairs (LI
+vs RR): p2 0.4564 vs 0.4393 (LI +3.9%), p3 0.4414 vs 0.4399 (LI +0.3%),
+p4 0.4427 vs 0.4379 (LI +1.1%); the campaign's p1 pair (0.4293 vs
+0.4634, RR +7.9%) is excluded from every mean as environmental (Ruling
+AC, below) — **the campaign's effective-core inversion (RR +1.9%) was
+carried entirely by that pair and is WITHDRAWN; the corrected figure is
+a tie.** cross_fail=1 was expected and is unchanged.
 
-## (a) Why both arms are faster at 500 than at 35 — ramp/drain geometry, confirmed
+## (a) Why both arms are faster at 500 than at 35 — ramp/drain geometry, confirmed — (computed on campaign pass means that include the EXCLUDED p1 pair, Ruling AC; the geometry finding stands, the means are superseded by the lifetimes table)
 
 Pass means: LI 12.601 vs 10.134 (+24%), RR 11.904 vs 9.512 (+25%). The
 mechanism is exactly the sizing report's ramp/drain geometry, and the
@@ -101,7 +106,7 @@ report's window numbers, arrived at as span.** LI's window barely moved
 higher at 500 — different film mix); the load-bearing fact is the gap
 collapse, and it holds for both arms.
 
-## (b) Per-core, both ways — the effective-core gap crossed zero
+## (b) Per-core, both ways — the effective-core gap crossed zero — WITHDRAWN (Ruling AC: the inversion was carried entirely by the excluded p1 pair; the corrected figure is a tie, headline table above; kept as the record)
 
 | | per MEASURED core | per EFFECTIVE core (idle removed) |
 |---|---|---|
@@ -422,7 +427,7 @@ it is not symmetric noise, and its RR half is an open mechanism.
 and do not fix a sub-5% cross-arm claim without n>2 — the within-lifetime
 trend is the same size as the effect.**
 
-## (d) $/1k footage-hour, per cell per pass (exports' own values)
+## (d) $/1k footage-hour, per cell per pass (exports' own values) — (means include the EXCLUDED p1 pair, Ruling AC; the FINAL figures are the lifetimes' $8.22 vs $7.46 — the span ratio in dollars, not a separate finding)
 
 | | pass 1 | pass 2 |
 |---|---|---|
@@ -434,29 +439,29 @@ gap (same basis $1.428/h ÷ x_realtime × 1000). Both an order below the
 sizing report's default-cell $38–40 and near Leela's films500 SIZING
 LG $9.24 / RR-default $40.79 (different corpus, not a join).
 
-## Headline — lifetime-controlled (landed 2026-09-07; pending Ansh's FINAL ruling; the partition clause is final)
+## Headline — FINAL (Ruling AB, 2026-09-07; lifetime-controlled; the partition clause is final)
 
 > At the ruled 16×2-vs-16×2 posture, C=16, on the full 498-measured-film
 > Archive Films corpus (675.7 h footage, RF-DETR base), on two FRESH
 > container lifetimes per arm with two passes each (spreads 0.9% RR,
-> 0.1% LI): **LlamaIndex delivered +10.2% span throughput** (12.800 vs
-> 11.613 f/s); **+18.1% per measured core** (idle included — the cost a
-> user pays); and **+0.7% per effective core** — a statistical tie on the
-> work itself once each arm's idle spin leaves its own denominator.
-> RocketRide saturates the box (97% util) and spends 4.65 cores (14.5%)
-> idle holding 16 tokens; that idle burden is the whole of the
-> measured-core gap. RocketRide costs $8.22 per 1,000 footage-hours to
-> LlamaIndex's $7.46 (+10%). Above 560px the arms differ in
-> preprocessing only — the engine's own pre-downscale, confirmed by V-D —
-> and the model does the same work per frame on both.
+> 0.1% LI): **the two engines do the work at the same cost per core —
+> +0.7% per effective core, a statistical tie — and the entire visible
+> gap is 4.65 cores, 14.5% of the box, that RocketRide burns standing
+> still holding 16 tokens.** That idle burden is what a user pays for:
+> **LlamaIndex +18.1% per measured core**, which is the same fact as
+> RocketRide's +18.1% CPU per frame; in throughput terms **LlamaIndex
+> +10.2% span** (12.800 vs 11.613 f/s), which at one machine price is
+> **$8.22 against $7.46 per 1,000 footage-hours**. Above 560px the arms
+> differ in preprocessing only — the engine's own pre-downscale,
+> confirmed by V-D — and the model does the same work per frame on both.
 
 Figures behind each clause: posture/C/corpus/N/footage from the run
-manifests and the landed 500 manifest (498 measured, 675.73 h); +10.2%,
-+18.1%, +0.7% and $/1k from the lifetimes exports (table above); 97% util
-and 4.65 idle from the RR exports; spreads from p3/p4. The campaign's
-one-lifetime draft (+5.9% / +15.2% / −1.9%) is superseded: its pass-1
-pair was an environmental outlier in both arms. Every clause is scoped
-to THIS configuration, as the 35-film headline was.
+manifests and the landed 500 manifest (498 measured, 675.73 h); +0.7%,
++18.1%, +10.2% and $/1k from the lifetimes exports (table above); 97%
+util and 4.65 idle from the RR exports; spreads from p3/p4. The
+campaign's one-lifetime draft (+5.9% / +15.2% / −1.9%) is superseded and
+its pass-1 pair excluded from every mean (Ruling AC). Every clause is
+scoped to THIS configuration, as the 35-film headline was.
 
 ## The 560px mechanism — located in the engine source (2026-09-06) and CONFIRMED by V-D (2026-09-07)
 

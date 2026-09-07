@@ -231,6 +231,83 @@
 > addendum (V-D) on his ruling; next-campaign candidates: LI applying the
 > facade pre-downscale (option A); a CPU-frequency/contention sampler
 > beside every leg.
+>
+> # ★ FILMS-500 CLOSED ON EVIDENCE — RULINGS AB / AC / AD, 2026-09-07 ★
+>
+> **AB — HEADLINE FINAL** on the lifetime-controlled passes: LI 12.800 vs
+> RR 11.613 f/s = +10.2% span; +18.1% per measured core (= RR +18.1%
+> CPU-s/frame, ONE fact in two units); +0.7% per effective core — a
+> statistical tie at spreads 0.91% / 0.14%; RR $8.22 vs LI $7.46 per 1k
+> footage-hour (the span ratio in dollars). Lead sentence = the
+> effective-core pairing: same cost per core on the work; the entire
+> visible gap is 4.65 cores (14.5% of the box) RR burns holding 16 tokens.
+> **AC — the campaign's p1 pair is EXCLUDED from every mean** as
+> environmental, named with its two facts (warm-up sends already 5–7% RR
+> fast / 6–10% LI slow before any pass state; same work in 5% fewer
+> engine-cgroup CPU-s at 97% util both) and stated as unexplained (no
+> CPU-frequency / host-contention instrument; sampler postdates it); the
+> campaign's effective-core inversion (RR +1.9%) was carried by that pair
+> and is WITHDRAWN — the corrected figure is a tie. **AD** — the ~2.5–3%
+> pass-start ramp (4/4 both arms) is normal warm-up shape, one line, no
+> section. Report: `WS1_Phase2_Films500_Benchmark_DEFINITIVE.md` (FINAL)
+> + `FILMS500_SUMMARY.md` (plain language); 35-film DEFINITIVE §6 gains
+> the ruled addendum (mechanism closed; entry 33); FILMS_SUMMARY finding
+> 3 and "Not settled" carry one-line settled notes. Double-count fixed
+> (measured-core ≡ CPU-s/frame; $/1k ≡ span in dollars — each labelled
+> as one fact). Manifest provenance: one line in the report (exports hash
+> the box's `_meta`-stamped working copy; measured rows proven identical
+> 498/498 on all eight legs) — recorded, not a defect.
+>
+> **OPEN ACROSS BOTH FILMS CAMPAIGNS (TASK 5 inventory — nothing carries
+> silently):**
+> 1. **H16's boundary-drift cap** — live, unsized for films (Ruling W;
+>    settler = a films-sized denominator ruled before data); conservative
+>    direction (PASS→FAIL only). Also the gate's mechanism defects from
+>    2026-08-27 (one-sided extras fire the exclusion; `label_multiset_
+>    agreement` has no committed test) — fix awaits a ruling.
+> 2. **The char band** (char_conservation ±2% default) — confounded by
+>    the 560px mechanism (different detections → different text); Ruling
+>    W deferral; settled only by an agreeing-detections run — i.e. by the
+>    next campaign with option A (LI applying the facade pre-downscale),
+>    which is also the like-for-like preprocessing configuration.
+> 3. **The cross-team CPU-per-frame gap** — AMI +19–20% vs Leela/Shashi;
+>    films +21.9% vs Shashi's RR 16×2 (2.68 vs 2.198) on fresh lifetimes;
+>    page cache excluded (§9 of the reconciliation); the ask stands
+>    (per-stage CPU split on one identical file, or an exchanged cgroup
+>    sampler stream, plus their cores basis) — handover via
+>    `AMI_CROSS_TEAM_COVER.md`; no cross-team CPU figure is publishable
+>    until settled; her post-pin AMI cells stay HYPOTHESIS until pins.
+> 4. **The campaign's p1 environmental anomaly** — unexplained (Ruling
+>    AC); the instrument gap is ours: no CPU-frequency / turbo / host-
+>    contention sampler beside a leg. Add one next campaign.
+> 5. **Per-token memory growth** — ~50 MB per film served, reset only with
+>    the token; 4/4 passes; Ticket 6 criterion 5 (engine's to answer);
+>    no throughput effect measured; bounds a token's lifetime at ~1,100
+>    films under a 58 GiB cgroup.
+> 6. **Ticket 6 itself** — the facade pre-downscale (criterion 4) and the
+>    "lossless" spec comment; filed with V-D attached; the engine team's.
+> 7. **Tooling follow-ups, none affecting any published figure**:
+>    `/proc/diskstats` device-name resolution (`/dev/root`; churn volume
+>    uncaptured); `age_at_leg_start_s` is age at DRIVER start (leg start
+>    = warm-up later; the fsstream row-0 utc is the leg anchor); a
+>    canonical manifest row hash (or committing the stamped file) so the
+>    exports' manifest sha matches the committed artifact; the LI client
+>    ceiling now 43,200 s; the driver's mime label.
+> 8. **Box housekeeping** — Ruling AA hygiene script (`probe/box_hygiene_
+>    aa.sh`, sha 8249c310, re-issued with image-ID pins) is ruled and
+>    committed but NOT reported run; the two preflight-only orphan dirs
+>    (`…092202Z` 16K, `…204156Z` 116K) await the ruling; the box was left
+>    clean of probe containers (rr removed by V-D's trap); the lifetimes
+>    run's `rf-detr-base.pth` copy sits untracked in the V-D out dir on
+>    the box (md5-pinned, reproducible from li:video).
+> 9. **35-film carry-overs unchanged**: F3 (rr 32×1 / li 8×2 cores
+>    duplicate, unresolvable, flagged ᶜ); H7 (concurrency probe counts
+>    M+1); the model-server row untested; the waterfront cluster flag;
+>    upstream `dap_client.py:229` ticket (entries 20/24).
+> 10. **Not run, by ruling**: the RR default cell at 500 (ships from
+>    35/168 at their own N); Ruling V's 500-header probe over her S3
+>    (superseded by our own manifest census, 435/500); sequential n=5
+>    not scaled (gate 8 within-leg only).
 > **FILMS-500 COMPLETE + LANDED (2026-09-06): `FILMS500_RESULTS.md`.**
 > 6 legs × 498, 0 errors; box commit cc98ca6b, bundle 1882c0d4,
 > ff-merged. **Partition HELD EXACTLY: 433 diverging / 65 clean / 0

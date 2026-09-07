@@ -202,6 +202,13 @@ batches.
 
 ## 6. The detection divergence — a real cross-arm difference (Ruling U)
 
+> **Addendum, ruled 2026-09-07 — the mechanism is CLOSED by the 500-film
+> campaign; see the end of this section.** The measurements below stand
+> as made. What the addendum supersedes is this section's reading of
+> them: the divergence was not "context-dependent" — the isolation probe
+> had reproduced the comparison arm's path on both sides (register entry
+> 33), and the deployment's own pre-inference downscale is the cause.
+
 **In plain terms.** On small videos the two arms detect the same
 objects — to the last bit. RF-DETR, the detector both arms run from
 byte-identical code and weights, takes its input at up to 560 pixels on
@@ -403,6 +410,48 @@ result's strength. The interim 2026-09-02 read (both v2 frames
 bit-equal, with the large frame later shown campaign-agreeing) is
 preserved in `results/FILMS_LANDING.md` §2a.
 
+**§6 ADDENDUM (ruled 2026-09-07; the 500-film campaign closed the
+mechanism this section left open).** The five exclusions above stand.
+The reading they supported — "context-dependent; which deployment
+condition" — is corrected: **the divergence is the engine's own
+pre-inference downscale.** The detect node calls the engine's `Detector`
+facade (`engine/nodes/detect/IGlobal.py:74`, `IInstance.py:107`), whose
+`detect` runs `resize_for_inference(image, infer_edge=560)` —
+`ai/common/models/vision/detection.py:60, :466, :512-518`;
+`ai/common/image/dense_resize.py`: a strict no-op when the long edge is
+≤ 560, otherwise a PIL LANCZOS downscale to `floor(w·s)×floor(h·s)`,
+`s = 560/max(w,h)` — and only then does RF-DETR apply its own resize to
+its fixed 560×560 input (`rfdetr/detr.py:379`, the byte-identical copy
+this section already cites). LlamaIndex hands RF-DETR the raw frame. Two
+resampling pipelines above 560px, one below. Exclusion 5's isolation
+probe called `RFDETRBase().predict` directly — the BACKEND's path — and
+so ran the comparison arm's transformation chain on both sides; it
+matched LlamaIndex because it was LlamaIndex's path (register entry 33:
+"a probe measuring one arm twice"). Confirmed by V-D (2026-09-07,
+`results/wrapper-resize-parity-20260907/`, box commit 844a990): the
+anatomy frame 10 above through the engine's own `resize_for_inference`
+(560×376) then `predict`, inside `rr:patched-video` at intraop 2,
+weights md5-pinned, reproduces campaign-RR's six detections **bit-equal
+at 9 dp** (0.946473300 0.935210288 0.856113911 0.449365526 0.384643406
+0.318114191); the raw frame reproduces campaign-LI's five; the ≤560
+control is a no-op both ways. At corpus scale the boundary is the
+constant, inclusive: on the 498 measured films, 433 above the edge
+diverge, 65 at or below agree, zero exceptions in both passes, the one
+film at exactly 560px (560×380) clean — predicted before the run
+(`results/films500_mainrun_20260904T204852Z/partition_check.json`). The
+work is symmetric: the model consumed a `[1,3,560,560]` tensor on both
+paths (measured by V-D); the facade's LANCZOS costs 4.6 ms per frame on
+the engine's side; throughput and frame counts are untouched, as §2.1
+said. The residual-candidate list above is retired: candidate 1 ("the
+engine's serving path") was correct in direction and is now named;
+candidates 2–4 are excluded (four passes across two container lifetimes
+are bit-identical within each arm on all 498 films). Ticket 6 carries
+measured updates 3–4 and the fix criterion. `infer_edge` is a fixed
+engine constant, unreachable from a pipe; the like-for-like
+configuration (the comparison arm applying the same pre-downscale) is
+the next campaign's candidate. Full account:
+`WS1_Phase2_Films500_Benchmark_DEFINITIVE.md` §5–§6.
+
 ## 7. Not publishable from this run, and why
 
 - **char_conservation / the films char band**: failed on all six cells,
@@ -475,7 +524,8 @@ Ansh, and questions flow back the same way.
    both teams use; pass-to-pass spreads published (0.22–2.08%).
 2. **One box, one corpus** (35 films of one archive's profile;
    resolutions 320×240–1424×1072).
-3. **The §6 divergence's mechanism is bounded but not named** — five
+3. **(SUPERSEDED 2026-09-07 — named and reproduced; §6 addendum.)
+   The §6 divergence's mechanism is bounded but not named** — five
    exclusions pin it to execution context: the detect path is
    bit-reproducible in isolation, even on a frame that diverged in
    production, under both thread conditions (Ruling Y). WHICH

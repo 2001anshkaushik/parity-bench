@@ -38,7 +38,9 @@ even on the exact frames that disagreed in production, at two thread
 settings. The drift appears only under the full production workload,
 and the evidence so far points at the engine's serving path as the
 side that departs. Frame counts and every throughput number above are
-unaffected.
+unaffected. *(Settled 2026-09-07 by the 500-film campaign: the drift is
+the engine's own pre-inference downscale of frames above 560 pixels,
+reproduced bit for bit — `FILMS500_SUMMARY.md`, finding 2.)*
 
 ## What it means for the product
 
@@ -59,9 +61,8 @@ upstream with a ready-made isolation test attached.
 
 ## Not settled
 
-Which serving-side condition triggers the big-video drift (the
-evidence points at the engine's serving path; the instruments to
-settle it are written and committed). And the cross-team question: our
+~~Which serving-side condition triggers the big-video drift~~ — settled
+2026-09-07 (finding 3's note). The cross-team question: our
 RocketRide runs ~19–20% more CPU per frame than two other teams
 measure at matched utilization on byte-identical data — a handover
 package with a specific ask is ready.
