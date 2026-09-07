@@ -1,0 +1,107 @@
+{
+ "phase": "prerun",
+ "taken_utc": "2026-09-06T09:04:03Z",
+ "containers": {},
+ "host": {
+  "df": {
+   "corpus": {
+    "path": "/home/ssm-user/films_corpus/full500",
+    "state": "measured",
+    "total_bytes": 1040442621952,
+    "free_bytes": 647988150272,
+    "avail_bytes": 647971373056,
+    "used_bytes": 392454471680,
+    "inodes_free": 128498170,
+    "inodes_total": 129024000,
+    "device": "/dev/root",
+    "fstype": "ext4",
+    "mount": "/"
+   },
+   "host_tmp": {
+    "path": "/tmp",
+    "state": "measured",
+    "total_bytes": 1040442621952,
+    "free_bytes": 647988150272,
+    "avail_bytes": 647971373056,
+    "used_bytes": 392454471680,
+    "inodes_free": 128498170,
+    "inodes_total": 129024000,
+    "device": "/dev/root",
+    "fstype": "ext4",
+    "mount": "/"
+   },
+   "out_dir": {
+    "path": "/home/ssm-user/parity-bench-video/working/video/results/films500_lifetimes_20260906T090339Z",
+    "state": "measured",
+    "total_bytes": 1040442621952,
+    "free_bytes": 647988150272,
+    "avail_bytes": 647971373056,
+    "used_bytes": 392454471680,
+    "inodes_free": 128498170,
+    "inodes_total": 129024000,
+    "device": "/dev/root",
+    "fstype": "ext4",
+    "mount": "/"
+   },
+   "docker_root": {
+    "path": "/var/lib/docker",
+    "state": "measured",
+    "total_bytes": 1040442621952,
+    "free_bytes": 647988150272,
+    "avail_bytes": 647971373056,
+    "used_bytes": 392454471680,
+    "inodes_free": 128498170,
+    "inodes_total": 129024000,
+    "device": "/dev/root",
+    "fstype": "ext4",
+    "mount": "/"
+   }
+  },
+  "docker_root": "/var/lib/docker",
+  "frag": {
+   "device": "/dev/root",
+   "fstype": "ext4",
+   "mount": "/",
+   "proc_fs_ext4_entries": [
+    "nvme0n1p1"
+   ],
+   "mb_groups": {
+    "source": "/proc/fs/ext4/nvme0n1p1/mb_groups",
+    "state": "measured",
+    "groups": 8000,
+    "free_blocks": 158188708,
+    "free_fragments": 14510,
+    "avg_free_extent_kb": 43608.2,
+    "hist_by_order": [
+     6744,
+     5514,
+     4786,
+     4142,
+     2682,
+     2213,
+     2053,
+     1785,
+     1085,
+     364,
+     409,
+     54,
+     53,
+     19096
+    ],
+    "free_share_in_extents_ge_4mib_lower_bound": 0.9936
+   },
+   "e2freefrag": {
+    "state": "measured (sudo -n)",
+    "text": "Device: /dev/root\nBlocksize: 4096 bytes\nTotal blocks: 262115579\nFree blocks: 158188708 (60.4%)\n\nMin. free extent: 4 KB \nMax. free extent: 2032512 KB\nAvg. free extent: 63508 KB\nNum. free extent: 9963\n\nHISTOGRAM OF FREE EXTENT SIZES:\nExtent Size Range :  Free extents   Free Blocks  Percent\n    4K...    8K-  :          1338          1338    0.00%\n    8K...   16K-  :          1039          2496    0.00%\n   16K...   32K-  :          1192          6341    0.00%\n   32K...   64K-  :          1888         21131    0.01%\n   64K...  128K-  :          1235         27009    0.02%\n  128K...  256K-  :           413         18030    0.01%\n  256K...  512K-  :           411         37174    0.02%\n  512K... 1024K-  :           492         89142    0.06%\n    1M...    2M-  :           725        277801    0.18%\n    2M...    4M-  :           305        211239    0.13%\n    4M...    8M-  :           384        549179    0.35%\n    8M...   16M-  :            11         28669    0.02%\n   16M...   32M-  :             8         50838    0.03%\n   32M...   64M-  :            11        119941    0.08%\n   64M...  128M-  :           175       2989861    1.89%\n  128M...  256M-  :             8        425876    0.27%\n  256M...  512M-  :            19       1733135    1.10%\n  512M... 1024M-  :             9       1706527    1.08%\n    1G...    2G-  :           300     149892981   94.76%\n"
+   }
+  },
+  "diskstats": {
+   "state": "unavailable: root not in /proc/diskstats"
+  },
+  "psi_io": {
+   "state": "measured",
+   "text": "some avg10=68.66 avg60=25.26 avg300=6.06 total=21468501\nfull avg10=68.66 avg60=25.26 avg300=6.06 total=21461139"
+  }
+ },
+ "read_cost_s": 0.23
+}

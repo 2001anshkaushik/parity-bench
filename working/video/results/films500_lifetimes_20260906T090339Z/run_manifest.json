@@ -1,0 +1,35 @@
+{
+ "run_dir": "working/video/results/films500_lifetimes_20260906T090339Z",
+ "campaign": "films500_lifetimes",
+ "throughput_only": true,
+ "started_utc": "2026-09-06T09:03:39Z",
+ "git_sha": "d334fa25267aadd2ed5b4a2146f762b0113a2757",
+ "design": {
+  "lifetimes": [
+   "RR fresh (passes 3,4)",
+   "LI fresh (passes 3,4)"
+  ],
+  "arm_order": "RR first (reversed vs campaign LI-first)",
+  "passes_per_lifetime": 2,
+  "first_pass_no": 3,
+  "C": 16,
+  "N_measured": 498,
+  "why": "campaign passes drifted within one lifetime: RR p1 +4.8pct first->last20pct then p2 flat; LI p1 -8.5pct then p2 flat (position fit on landed records)"
+ },
+ "pre_registered": {
+  "design_status": "contest ACCEPTED 2026-09-06 (two fresh lifetimes, two passes each, arms alternated RR first)",
+  "basis": "per-film wall_s per footage-minute, footage = measured frames x 15 s (frames basis, keeps TheSheik.mp4 whose manifest video_s is 0.0); position = enqueue order = manifest order (identical in both campaign passes, 498/498 both arms: content excluded); quartile and first/last-20pct means; cross-pass comparisons paired per film (log-ratio; campaign paired SE 0.62pct RR, 0.39pct LI); reading tool working/video/probe/lifetimes_reading.py committed before the run",
+  "drift_confirms": "RR p3 first->last20pct in +1..+6pct (campaign p1 +3.6pct frames basis) and p4 |drift| <= 2.5pct at p3 end level; LI p3 in -6..-13pct (campaign p1 -9.8pct) and p4 |drift| <= 2.5pct",
+  "drift_refutes": "flat p3 (|drift| < 1pct) on either arm; reversed sign; or p4 still drifting in the same direction (continuous degradation, a different and worse finding for RR)",
+  "n4_claims": "plateau LI-vs-RR at n=2/side separated from transient n=2/side; arm-order alternation removes box time (a transient tracking the ARM regardless of clock time is arm state; campaign RR p1 ran 05:04-08:45 UTC)",
+  "hypothesis_held": "the campaign plateau pair LI 12.953 vs RR 11.609 = +11.6pct is HYPOTHESIS (n=1 lifetime/arm, larger than the +5.9pct it would replace); this run tests it; it does not lead until n=2/side",
+  "mechanism_filesystem": "spool churn (~500 GB write-and-delete per campaign on the overlay writable layer = host fs under the docker root; RR reader.py:425 /tmp/media_*, LI service.py:164 /tmp/ws1v_spool_*) scatters free space; a FRESH container on the SAME dirty fs starts SLOW. PREDICTS RR p3 Q1 >= 5.20 s/foot-min (campaign p2 plateau 5.375; campaign p1 Q1 5.03) and the mb_groups fragmentation proxy worse at every leg end than start",
+  "mechanism_process": "accumulated engine process state (S6 residual 3). ALREADY NARROWED from the campaign collector streams: RR service RSS 27->54 GiB and cg_anon 20->47 GiB within EACH pass, RESET to 27 between passes (per-token processes end with the ttl=0 tokens); p2 climbs identically with FLAT cost, so per-token memory growth is NOT the carrier; what persists across the token reset is the engine SERVER process, the container fs view, the host fs, or the clock. PREDICTS (fresh server) RR p3 Q1 within 2pct of campaign p1 Q1 (4.93..5.13) then climbing; top_by_rss at leg end separates server from token growth",
+  "mechanism_read": "RR p3 opening quartile vs campaign p1 opening quartile: <= 5.13 process side; >= 5.20 filesystem side; between = indeterminate at n=1. Corroboration: frag proxy direction across legs; LI p3 Q1 vs LI p1 Q1 (5.14, a fs penalty adds on top of LI cold start)",
+  "memory_growth": "the per-pass climb is pre-registered to reproduce: p3 and p4 each start ~27 GiB and climb ~+27 GiB over 498 films (~54 MB per film across 16 tokens); p4 starting at p3 end level would mean the token processes persisted and the reset reading is wrong",
+  "plateau_level": "p4 level vs campaign p2 level, paired per film, log-ratio (p2: RR 5.375, LI 4.804): |delta| <= 2pct = SAME LEVEL, a reproducible steady state at n=2 lifetimes/arm, plateau pair quotable (still n=2); |delta| >= 3pct = DIFFERENT LEVEL, plateau lifetime-specific, neither pass a stable production number, a finding in its own right that changes what this campaign can claim (no steady-state headline; per-lifetime ranges); 2..3pct = not resolvable at one pair of lifetimes, no plateau claim either way"
+ },
+ "no_cross_gates": "partition settled: 433 predicted, 433 measured, 0 violations",
+ "completed": true,
+ "completed_utc": "2026-09-07T01:48:20Z"
+}

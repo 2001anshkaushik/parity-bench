@@ -1,0 +1,361 @@
+plan lock held (pid 1857); run dir working/video/results/films500_lifetimes_20260906T090339Z; corpus /home/ssm-user/films_corpus/full500 [manifest meta]
+MIRROR self-launched (pid 1872) -> ansh/films500-live-films500_lifetimes_20260906T090339Z/
+=== LIFETIME PASSES: RR fresh (p3,p4) -> LI fresh (p3,p4); C=16; N=498; liveness=0.3848101265822785; THROUGHPUT ONLY ===
+=== PRE-REGISTERED (frames basis): confirms = RR p3 first->last20% in +1..+6% & p4 flat (<=2.5%) at p3's end, LI p3 in -6..-13% & p4 flat; refutes = flat p3s (<1%) / reversed signs / p4 still drifting ===
+=== MECHANISM READ (TASK 1): RR p3 opening quartile vs campaign p1's 5.03 s/foot-min: <=5.13 = PROCESS side (fresh server starts fast), >=5.20 = FILESYSTEM side (fresh container on the dirty fs starts slow); export.lifetime_state carries spool/frag/memory at every leg start+end ===
+=== PLATEAU LEVEL (TASK 2): p4 vs campaign p2 paired |delta| <=2% = reproducible steady state (plateau pair quotable at n=2); >=3% = lifetime-specific plateau, no stable production number (changes the claim); 2-3% unresolved. The +11.6% plateau pair is HYPOTHESIS until then ===
+--- 0. corpus check: FAST mode (stat census + 5-film sha spot; stamp via locator) ---
++ /home/ssm-user/.venv/bin/python - working/video/films500_video_manifest.jsonl /home/ssm-user/films_corpus/full500
+corpus check FAST PASS: 500/500 census + 5 spot shas
+--- 0b. lifetime-state instrument check (fs-vs-process discriminator; entry-31 startup check) + pre-run host fs reading ---
++ /home/ssm-user/.venv/bin/python working/video/lifetime_state.py --check --paths corpus=/home/ssm-user/films_corpus/full500 host_tmp=/tmp out_dir=/home/ssm-user/parity-bench-video/working/video/results/films500_lifetimes_20260906T090339Z
+docker root: /var/lib/docker
+  corpus: /home/ssm-user/films_corpus/full500 dev=/dev/root fstype=ext4 free=603.5 GiB used=365.5 GiB of 969.0 GiB
+  host_tmp: /tmp dev=/dev/root fstype=ext4 free=603.5 GiB used=365.5 GiB of 969.0 GiB
+  out_dir: /home/ssm-user/parity-bench-video/working/video/results/films500_lifetimes_20260906T090339Z dev=/dev/root fstype=ext4 free=603.5 GiB used=365.5 GiB of 969.0 GiB
+  docker_root: /var/lib/docker dev=/dev/root fstype=ext4 free=603.5 GiB used=365.5 GiB of 969.0 GiB
+  frag proxy mb_groups: measured — free 603.4 GiB in 14510 extents, avg 43608.8 KiB, share in >=4 MiB extents >= 0.9936
+  frag tool e2freefrag: measured (sudo -n)
+  diskstats: unavailable: root not in /proc/diskstats | psi io: measured
+lifetime_state check: PASS (mandatory readings measured)
+pre-run host reading -> working/video/results/films500_lifetimes_20260906T090339Z/lifetime_state_prerun.json (3902 bytes)
+--- 1. RR M16xT2, FRESH lifetime, passes 3..4 ---
++ docker run -d --name rr --memory 58g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 --log-opt max-size=200m --network host rr:patched-video
+4a52e7b9d5e362f7e60c85a01c259d0df62b889337da959a0504b33b3f482cfc
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
++ /home/ssm-user/.venv/bin/python working/video/lifetime_state.py --check-containers rr --spool-paths /tmp
+  rr: spool overlay avail 603.5 GiB, du 12 KiB / 2 files, on writable layer=True; cg anon 0.06 GiB; procs 1 rss 0.10 GiB (top: './engine ai/eaas.py --host=0.0.0.0 --port=5565' 0.10 GiB); layer 160kB (virtual 9.67GB)
+lifetime_state container check: PASS
+RR pass 3: {"container": "rr", "lifetime_id": "rr-L2", "created": "2026-09-06T09:04:04.003125074Z", "age_at_leg_start_s": 6, "pass_in_lifetime": 1, "design": "fresh lifetime per arm, arms alternated vs the campaign (RR first), 2 passes per lifetime; pass 1 of a lifetime = transient, pass 2 = plateau (pre-registered)"}
++ /home/ssm-user/.venv/bin/python working/video/driver_video.py --out-dir working/video/results/films500_lifetimes_20260906T090339Z --manifest working/video/films500_video_manifest.jsonl --corpus-dir /home/ssm-user/films_corpus/full500 --arm rocketride --posture parity --leg blast --n 498 --blast-concurrency 16 --tokens 16 --rr-threads-env 2 --pass 3 --liveness-min-fraction 0.3848101265822785 --image-lineage Crossroad 33 (2026-08-22): rr:patched-video = a docker/Dockerfile.rocketride build PLUS one documented derived layer replacing working/nodes/env_probe; full rebuild deliberately DEFERRED (floating base); the image every RR number was measured on. --container-lifetime {"container": "rr", "lifetime_id": "rr-L2", "created": "2026-09-06T09:04:04.003125074Z", "age_at_leg_start_s": 6, "pass_in_lifetime": 1, "design": "fresh lifetime per arm, arms alternated vs the campaign (RR first), 2 passes per lifetime; pass 1 of a lifetime = transient, pass 2 = plateau (pre-registered)"} --spool-paths /tmp --fs-sample-s 5
+[driver] driver lock held: /tmp/driver_video_rocketride.lock (pid 2366)
+[driver] preflight: manifest
+[driver] preflight: corpus_dir=/home/ssm-user/films_corpus/full500 [explicit (agrees with manifest meta)]
+[driver] preflight: container flags
+[driver] preflight: network mode {'rr': 'host'} (Crossroad 22: host, both arms)
+[driver] preflight: quiet box PASS foreign 0.03 vs threshold 2.0 — host busy 1.04 − containers 1.01 {'rr': 1.007} − ours 0.006 [instantaneous (/proc/stat busy − containers − ours)]; load1 0.52 (lagging, by-load1 foreign -0.53); 1 reading(s) over 4.1s, trend SINGLE READING
+[driver] preflight: read-backs (absence fails before agreement)
+[driver] preflight: SDK rocketride 1.3.0 at /home/ssm-user/.venv/lib/python3.12/site-packages/rocketride/__init__.py — entry points verified, null control fired
+[driver] preflight: RR thread env expected 2 — declared {'TORCH_NUM_THREADS': '2', 'OMP_NUM_THREADS': '2', 'MKL_NUM_THREADS': '2', 'OPENBLAS_NUM_THREADS': '2', 'VECLIB_MAXIMUM_THREADS': '2', 'NUMEXPR_NUM_THREADS': '2'}, in-process torch 2 (read back, fail-closed)
+[driver] warm rows (2) < tokens (16): rows will be re-sent until every token has served (Crossroad 32; coverage gated)
+[driver] RR: 16 token(s) live, posture parity[tokens=16,threads=unset(engine-default-64)], 16 distinct project_id(s)
+[driver] RR write path: chunked 1 MiB per write request (send_files shape, data.py:551; whole-frame single-message path retired 2026-08-24 — DIAG_M1_BLAST)
+[driver] census: 16 token(s) -> 16 new task process(es) [373, 589, 807, 1023, 1241, 1458, 1675, 1892, 2109, 2326, 2543, 2760, 2977, 3194, 3411, 3627] (declared==measured)
+[driver] idle burden: 4.65 cores with 16 instance(s) live = 14.5% of the box before any work (pre-instance baseline 1.007)
+[driver] preflight PASSED — rocketride_video parity[tokens=16,threads=unset(engine-default-64)] leg=blast n=498
+[driver] cache eviction: rc=0 }
+[driver] warm-up: 2 disjoint items
+[driver] warm-up consumed 16 send(s) over 2 warm rows (2 first batch + 14 top-up; rows re-sent when exhausted — Crossroad 32; tokens round-robin (addressed, not accepted))
+[driver] warm-up ledger: warmup_rocketride_video_parity_blast_p3.json
+[driver] warm-up complete: tokens=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] worker_pids=n/a
+[driver] service CPU bracket: summing 1 container cgroup(s): rr
+[driver] lifetime_state leg_start: docker_root free 603.5 GiB | frag avg-extent 43547.0 KiB, >=4MiB share 0.9937 | rr: spool du 76 KiB/18 files, layer 311kB (virtual 9.67GB), cg anon 17.29 GiB, procs 17 rss 24.71 GiB
+[driver] stream residency: max 16 concurrent in-flight (cap = 16); sha pass off-loop via to_thread; no whole blob held (streaming refactor 2026-08-27, DIAG_M1_BLAST discipline kept)
+[driver] lifetime_state leg_end: docker_root free 603.4 GiB | frag avg-extent 43487.3 KiB, >=4MiB share 0.9936 | rr: spool du 76 KiB/18 files, layer 311kB (virtual 9.67GB), cg anon 43.48 GiB, procs 17 rss 51.00 GiB
+[driver] export: working/video/results/films500_lifetimes_20260906T090339Z/export_rocketride_video_parity_blast_p3.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=16,threads=unset(engine-default-64)] blast pass 3 records 498 (errors 0) / offered 498 | THROUGHPUT 11.665 frames/s (174.62x realtime), steady window 11.677 frames/s (n=482) | SERVICE CPU 31.171 cores = 97.4% of 32 | IDLE BURDEN 4.653 cores with 16 rr_tokens live = 14.5% of the box before any work (beside, never subtracted) | thread env expected 2 / in-process torch 2 | gates PASS 8 · NOT RUN 1 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+RR pass 4: {"container": "rr", "lifetime_id": "rr-L2", "created": "2026-09-06T09:04:04.003125074Z", "age_at_leg_start_s": 16530, "pass_in_lifetime": 2, "design": "fresh lifetime per arm, arms alternated vs the campaign (RR first), 2 passes per lifetime; pass 1 of a lifetime = transient, pass 2 = plateau (pre-registered)"}
++ /home/ssm-user/.venv/bin/python working/video/driver_video.py --out-dir working/video/results/films500_lifetimes_20260906T090339Z --manifest working/video/films500_video_manifest.jsonl --corpus-dir /home/ssm-user/films_corpus/full500 --arm rocketride --posture parity --leg blast --n 498 --blast-concurrency 16 --tokens 16 --rr-threads-env 2 --pass 4 --liveness-min-fraction 0.3848101265822785 --image-lineage Crossroad 33 (2026-08-22): rr:patched-video = a docker/Dockerfile.rocketride build PLUS one documented derived layer replacing working/nodes/env_probe; full rebuild deliberately DEFERRED (floating base); the image every RR number was measured on. --container-lifetime {"container": "rr", "lifetime_id": "rr-L2", "created": "2026-09-06T09:04:04.003125074Z", "age_at_leg_start_s": 16530, "pass_in_lifetime": 2, "design": "fresh lifetime per arm, arms alternated vs the campaign (RR first), 2 passes per lifetime; pass 1 of a lifetime = transient, pass 2 = plateau (pre-registered)"} --spool-paths /tmp --fs-sample-s 5
+[driver] driver lock held: /tmp/driver_video_rocketride.lock (pid 56101)
+[driver] preflight: manifest
+[driver] preflight: corpus_dir=/home/ssm-user/films_corpus/full500 [explicit (agrees with manifest meta)]
+[driver] preflight: container flags
+[driver] preflight: network mode {'rr': 'host'} (Crossroad 22: host, both arms)
+[driver] preflight: quiet box PASS foreign 0.01 vs threshold 2.0 — host busy 1.02 − containers 1.01 {'rr': 1.008} − ours 0.005 [instantaneous (/proc/stat busy − containers − ours)]; load1 5.8 (lagging, by-load1 foreign 4.75); 1 reading(s) over 4.1s, trend SINGLE READING
+[driver] preflight: read-backs (absence fails before agreement)
+[driver] preflight: SDK rocketride 1.3.0 at /home/ssm-user/.venv/lib/python3.12/site-packages/rocketride/__init__.py — entry points verified, null control fired
+[driver] preflight: RR thread env expected 2 — declared {'TORCH_NUM_THREADS': '2', 'OMP_NUM_THREADS': '2', 'MKL_NUM_THREADS': '2', 'OPENBLAS_NUM_THREADS': '2', 'VECLIB_MAXIMUM_THREADS': '2', 'NUMEXPR_NUM_THREADS': '2'}, in-process torch 2 (read back, fail-closed)
+[driver] warm rows (2) < tokens (16): rows will be re-sent until every token has served (Crossroad 32; coverage gated)
+[driver] RR: 16 token(s) live, posture parity[tokens=16,threads=unset(engine-default-64)], 16 distinct project_id(s)
+[driver] RR write path: chunked 1 MiB per write request (send_files shape, data.py:551; whole-frame single-message path retired 2026-08-24 — DIAG_M1_BLAST)
+[driver] census: 16 token(s) -> 16 new task process(es) [49969, 50186, 50403, 50619, 50837, 51054, 51271, 51488, 51705, 51922, 52138, 52356, 52573, 52790, 53007, 53223] (declared==measured)
+[driver] idle burden: 4.64 cores with 16 instance(s) live = 14.5% of the box before any work (pre-instance baseline 1.008)
+[driver] preflight PASSED — rocketride_video parity[tokens=16,threads=unset(engine-default-64)] leg=blast n=498
+[driver] cache eviction: rc=0 }
+[driver] warm-up: 2 disjoint items
+[driver] warm-up consumed 16 send(s) over 2 warm rows (2 first batch + 14 top-up; rows re-sent when exhausted — Crossroad 32; tokens round-robin (addressed, not accepted))
+[driver] warm-up ledger: warmup_rocketride_video_parity_blast_p4.json
+[driver] warm-up complete: tokens=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] worker_pids=n/a
+[driver] service CPU bracket: summing 1 container cgroup(s): rr
+[driver] lifetime_state leg_start: docker_root free 603.4 GiB | frag avg-extent 43454.7 KiB, >=4MiB share 0.9936 | rr: spool du 76 KiB/18 files, layer 311kB (virtual 9.67GB), cg anon 17.09 GiB, procs 17 rss 24.50 GiB
+[driver] stream residency: max 16 concurrent in-flight (cap = 16); sha pass off-loop via to_thread; no whole blob held (streaming refactor 2026-08-27, DIAG_M1_BLAST discipline kept)
+[driver] lifetime_state leg_end: docker_root free 603.4 GiB | frag avg-extent 43404.2 KiB, >=4MiB share 0.9936 | rr: spool du 76 KiB/18 files, layer 311kB (virtual 9.67GB), cg anon 40.65 GiB, procs 17 rss 48.17 GiB
+[driver] export: working/video/results/films500_lifetimes_20260906T090339Z/export_rocketride_video_parity_blast_p4.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=16,threads=unset(engine-default-64)] blast pass 4 records 498 (errors 0) / offered 498 | THROUGHPUT 11.56 frames/s (173.05x realtime), steady window 11.62 frames/s (n=482) | SERVICE CPU 31.038 cores = 97.0% of 32 | IDLE BURDEN 4.64 cores with 16 rr_tokens live = 14.5% of the box before any work (beside, never subtracted) | thread env expected 2 / in-process torch 2 | gates PASS 8 · NOT RUN 1 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+--- 2. LI N16xT2, FRESH lifetime, passes 3..4 ---
++ docker run -d --name li_bal_0 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+7a19a3ada0321319b186e6bebf08b5c614830d0a7cd463ec9be4acf2182dbc03
++ docker run -d --name li_bal_1 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8803 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+3cc7d72311127a0fbb5fde2a41ef58895d3f59f8e1f0e6c16327e0434979f0c5
++ docker run -d --name li_bal_2 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8804 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+4b026f88b6f888daa7e81c5e06c75c50a2fac12bec7ba329e13d13396794b95d
++ docker run -d --name li_bal_3 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8805 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+a884d8d79d8daff92938ae580d0538c3d459566949be4aeb882d147d46e7c2e4
++ docker run -d --name li_bal_4 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8806 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+55e452ae810574e00a009416e5043319327c13458f4abfe3cf6e8d5887c50478
++ docker run -d --name li_bal_5 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8807 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+531a5c558f3117776380cdfdfe1e0671886dff4a78a33264d8a89f9165870265
++ docker run -d --name li_bal_6 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8808 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+714f1fc8ae71cf5a21e257376868d8e66a597136a051c98464e45544bfc80f6a
++ docker run -d --name li_bal_7 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8809 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+aed31624fe5b80e954f43196b9ed70f2738fba3dbf6790aff67490c57b219dbe
++ docker run -d --name li_bal_8 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8810 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+1fe26844619144de8769a9f03b893e2337ecf8fdc329db58ba6a904992135c09
++ docker run -d --name li_bal_9 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8811 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+f95301dd067b94135b0455d1c2b8ccf88e1b53b20a22b7aa51fa7c0544fa7d72
++ docker run -d --name li_bal_10 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8812 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+0c382faceda87a3ba093a5eef5eb5accd8e27cc889d4915229c6e6c5bf1c284b
++ docker run -d --name li_bal_11 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8813 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+fda354b958e2071acba46067dd42af22b67fac72e369cff7006c25d54f6a5b3e
++ docker run -d --name li_bal_12 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8814 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+53396a2623f67dad4951016d69d082f82a7c540eb214eb433a73cb28fcb5d407
++ docker run -d --name li_bal_13 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8815 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+e1f2e0be0dd739e004173fe848bb59b28373011315d056e2927974b5e9515e1b
++ docker run -d --name li_bal_14 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8816 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+ada55d1b01bc3aa169bec4b2db8506a514e9c7eed46838ec2b1ad9d56ce33af5
++ docker run -d --name li_bal_15 --memory 3g -e OMP_NUM_THREADS=2 -e MKL_NUM_THREADS=2 -e OPENBLAS_NUM_THREADS=2 -e VECLIB_MAXIMUM_THREADS=2 -e NUMEXPR_NUM_THREADS=2 -e TORCH_NUM_THREADS=2 -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8817 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30
+29173e0a581714dc19b7f7d8d2f7c78bafab859f7e7428d835a7c8c513501d4e
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8802 --workers 1 --container li_bal_0 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8802,
+ "wall_s": 20.0,
+ "attempts": 5,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8803 --workers 1 --container li_bal_1 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8803,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8804 --workers 1 --container li_bal_2 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8804,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8805 --workers 1 --container li_bal_3 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8805,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8806 --workers 1 --container li_bal_4 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8806,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8807 --workers 1 --container li_bal_5 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8807,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8808 --workers 1 --container li_bal_6 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8808,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8809 --workers 1 --container li_bal_7 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8809,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8810 --workers 1 --container li_bal_8 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8810,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8811 --workers 1 --container li_bal_9 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8811,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8812 --workers 1 --container li_bal_10 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8812,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8813 --workers 1 --container li_bal_11 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8813,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8814 --workers 1 --container li_bal_12 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8814,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8815 --workers 1 --container li_bal_13 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8815,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8816 --workers 1 --container li_bal_14 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8816,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/probe/wait_ready.py --arm li --port 8817 --workers 1 --container li_bal_15 --deadline 1200
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8817,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}
++ /home/ssm-user/.venv/bin/python working/video/lifetime_state.py --check-containers li_bal_0,li_bal_15 --spool-paths /tmp
+  li_bal_0: spool overlay avail 603.4 GiB, du 32 KiB / 3 files, on writable layer=True; cg anon 0.79 GiB; procs 1 rss 1.19 GiB (top: 'python -m uvicorn li_video.service:app --host 0.0.0.0 --port' 1.19 GiB); layer 20.5kB (virtual 9.08GB)
+  li_bal_15: spool overlay avail 603.4 GiB, du 32 KiB / 3 files, on writable layer=True; cg anon 0.79 GiB; procs 1 rss 1.19 GiB (top: 'python -m uvicorn li_video.service:app --host 0.0.0.0 --port' 1.19 GiB); layer 20.5kB (virtual 9.08GB)
+lifetime_state container check: PASS
+LI pass 3: {"container": "li_bal_0", "lifetime_id": "li-L2", "created": "2026-09-06T18:16:54.455050982Z", "age_at_leg_start_s": 24, "pass_in_lifetime": 1, "design": "fresh lifetime per arm, arms alternated vs the campaign (RR first), 2 passes per lifetime; pass 1 of a lifetime = transient, pass 2 = plateau (pre-registered)"}
++ /home/ssm-user/.venv/bin/python working/video/driver_video.py --out-dir working/video/results/films500_lifetimes_20260906T090339Z --manifest working/video/films500_video_manifest.jsonl --corpus-dir /home/ssm-user/films_corpus/full500 --arm llamaindex --leg blast --n 498 --blast-concurrency 16 --pass 3 --li-ports 8802-8817 --li-containers li_bal_0,li_bal_1,li_bal_2,li_bal_3,li_bal_4,li_bal_5,li_bal_6,li_bal_7,li_bal_8,li_bal_9,li_bal_10,li_bal_11,li_bal_12,li_bal_13,li_bal_14,li_bal_15 --liveness-min-fraction 0.3848101265822785 --image-lineage docker/Dockerfile.llamaindex-video at the Ruling-L config (4000/0): FULL 149-pin freeze install with fail-closed read-back (b295dea), streaming reader (spool -> frames-on-disk -> k=1). --container-lifetime {"container": "li_bal_0", "lifetime_id": "li-L2", "created": "2026-09-06T18:16:54.455050982Z", "age_at_leg_start_s": 24, "pass_in_lifetime": 1, "design": "fresh lifetime per arm, arms alternated vs the campaign (RR first), 2 passes per lifetime; pass 1 of a lifetime = transient, pass 2 = plateau (pre-registered)"} --spool-paths /tmp --fs-sample-s 5
+[driver] driver lock held: /tmp/driver_video_llamaindex.lock (pid 112332)
+[driver] LI: warm_workers=16 declared=16 over 16 instance(s) [8802, 8803, 8804, 8805, 8806, 8807, 8808, 8809, 8810, 8811, 8812, 8813, 8814, 8815, 8816, 8817] detect_impl=rfdetr
+[driver] LI balanced mode: driver round-robins ports per send (kernel accept replaced — LI_SERVING_SKEW.md ruling)
+[driver] preflight: manifest
+[driver] preflight: corpus_dir=/home/ssm-user/films_corpus/full500 [explicit (agrees with manifest meta)]
+[driver] preflight: container flags
+[driver] preflight: network mode {'li_bal_0': 'host', 'li_bal_1': 'host', 'li_bal_2': 'host', 'li_bal_3': 'host', 'li_bal_4': 'host', 'li_bal_5': 'host', 'li_bal_6': 'host', 'li_bal_7': 'host', 'li_bal_8': 'host', 'li_bal_9': 'host', 'li_bal_10': 'host', 'li_bal_11': 'host', 'li_bal_12': 'host', 'li_bal_13': 'host', 'li_bal_14': 'host', 'li_bal_15': 'host'} (Crossroad 22: host, both arms)
+[driver] preflight: quiet box PASS foreign 0.06 vs threshold 2.0 — host busy 0.2 − containers 0.08 {'li_bal_0': 0.006, 'li_bal_1': 0.005, 'li_bal_2': 0.005, 'li_bal_3': 0.005, 'li_bal_4': 0.005, 'li_bal_5': 0.005, 'li_bal_6': 0.005, 'li_bal_7': 0.005, 'li_bal_8': 0.005, 'li_bal_9': 0.005, 'li_bal_10': 0.005, 'li_bal_11': 0.005, 'li_bal_12': 0.005, 'li_bal_13': 0.005, 'li_bal_14': 0.005, 'li_bal_15': 0.005} − ours 0.062 [instantaneous (/proc/stat busy − containers − ours)]; load1 6.67 (lagging, by-load1 foreign 6.26); 1 reading(s) over 5.5s, trend SINGLE READING
+[driver] preflight: read-backs (absence fails before agreement)
+[driver] idle burden: 0.06 cores with 16 instance(s) live = 0.2% of the box before any work (pre-instance baseline 0.081)
+[driver] preflight PASSED — llamaindex_video workers[declared_workers=16] leg=blast n=498
+[driver] cache eviction: rc=0 }
+[driver] warm-up: 2 disjoint items
+[driver] warm-up wave 1/2: 32 concurrent sends over 2 warm rows -> 16/16 worker pids observed
+[driver] warm-up consumed 32 send(s) over 2 warm rows (1 wave(s) x 32 concurrent (max(2 x 16 workers, leg concurrency 16)) — Crossroad 40; warm SET re-sent per Crossroad 32; warmth gated on warm markers, Crossroad 41)
+[driver] warm-up ledger: warmup_llamaindex_video_workers_blast_p3.json
+[driver] warm-up gate: 16/16 warm markers present (Crossroad 41)
+[driver] warm-up distribution (REPORTED, not gated): 16/16 distinct response pids over 32 sends; busiest 2, quietest 2 — kernel accept skew, published
+[driver] warm-up complete: tokens=n/a worker_pids=16
+[driver] service CPU bracket: summing 16 container cgroup(s): ['li_bal_0', 'li_bal_1', 'li_bal_2', 'li_bal_3', 'li_bal_4', 'li_bal_5', 'li_bal_6', 'li_bal_7', 'li_bal_8', 'li_bal_9', 'li_bal_10', 'li_bal_11', 'li_bal_12', 'li_bal_13', 'li_bal_14', 'li_bal_15']
+[driver] lifetime_state leg_start: docker_root free 603.4 GiB | frag avg-extent 42295.9 KiB, >=4MiB share 0.9936 | li_bal_0: spool du 32 KiB/3 files, layer 20.5kB (virtual 9.08GB), cg anon 0.93 GiB, procs 1 rss 1.36 GiB | li_bal_1: spool du 32 KiB/3 files, layer 20.5kB (virtual 9.08GB), cg anon 0.90 GiB, procs 1 rss 1.33 GiB | (+14 more containers in the export)
+[driver] stream residency: max 16 concurrent in-flight (cap = 16); sha pass off-loop via to_thread; no whole blob held (streaming refactor 2026-08-27, DIAG_M1_BLAST discipline kept)
+[driver] lifetime_state leg_end: docker_root free 603.4 GiB | frag avg-extent 43184.5 KiB, >=4MiB share 0.9934 | li_bal_0: spool du 32 KiB/3 files, layer 20.5kB (virtual 9.08GB), cg anon 0.87 GiB, procs 1 rss 1.31 GiB | li_bal_1: spool du 32 KiB/3 files, layer 20.5kB (virtual 9.08GB), cg anon 0.90 GiB, procs 1 rss 1.34 GiB | (+14 more containers in the export)
+[driver] export: working/video/results/films500_lifetimes_20260906T090339Z/export_llamaindex_video_workers_blast_p3.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=16] blast pass 3 records 498 (errors 0) / offered 498 | THROUGHPUT 12.791 frames/s (191.46x realtime), steady window 12.772 frames/s (n=482) | SERVICE CPU 29.044 cores = 90.8% of 32 | IDLE BURDEN 0.063 cores with 16 li_workers live = 0.2% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 2 | gates PASS 7 · NOT RUN 1 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+LI pass 4: {"container": "li_bal_0", "lifetime_id": "li-L2", "created": "2026-09-06T18:16:54.455050982Z", "age_at_leg_start_s": 13563, "pass_in_lifetime": 2, "design": "fresh lifetime per arm, arms alternated vs the campaign (RR first), 2 passes per lifetime; pass 1 of a lifetime = transient, pass 2 = plateau (pre-registered)"}
++ /home/ssm-user/.venv/bin/python working/video/driver_video.py --out-dir working/video/results/films500_lifetimes_20260906T090339Z --manifest working/video/films500_video_manifest.jsonl --corpus-dir /home/ssm-user/films_corpus/full500 --arm llamaindex --leg blast --n 498 --blast-concurrency 16 --pass 4 --li-ports 8802-8817 --li-containers li_bal_0,li_bal_1,li_bal_2,li_bal_3,li_bal_4,li_bal_5,li_bal_6,li_bal_7,li_bal_8,li_bal_9,li_bal_10,li_bal_11,li_bal_12,li_bal_13,li_bal_14,li_bal_15 --liveness-min-fraction 0.3848101265822785 --image-lineage docker/Dockerfile.llamaindex-video at the Ruling-L config (4000/0): FULL 149-pin freeze install with fail-closed read-back (b295dea), streaming reader (spool -> frames-on-disk -> k=1). --container-lifetime {"container": "li_bal_0", "lifetime_id": "li-L2", "created": "2026-09-06T18:16:54.455050982Z", "age_at_leg_start_s": 13563, "pass_in_lifetime": 2, "design": "fresh lifetime per arm, arms alternated vs the campaign (RR first), 2 passes per lifetime; pass 1 of a lifetime = transient, pass 2 = plateau (pre-registered)"} --spool-paths /tmp --fs-sample-s 5
+[driver] driver lock held: /tmp/driver_video_llamaindex.lock (pid 169654)
+[driver] LI: warm_workers=16 declared=16 over 16 instance(s) [8802, 8803, 8804, 8805, 8806, 8807, 8808, 8809, 8810, 8811, 8812, 8813, 8814, 8815, 8816, 8817] detect_impl=rfdetr
+[driver] LI balanced mode: driver round-robins ports per send (kernel accept replaced — LI_SERVING_SKEW.md ruling)
+[driver] preflight: manifest
+[driver] preflight: corpus_dir=/home/ssm-user/films_corpus/full500 [explicit (agrees with manifest meta)]
+[driver] preflight: container flags
+[driver] preflight: network mode {'li_bal_0': 'host', 'li_bal_1': 'host', 'li_bal_2': 'host', 'li_bal_3': 'host', 'li_bal_4': 'host', 'li_bal_5': 'host', 'li_bal_6': 'host', 'li_bal_7': 'host', 'li_bal_8': 'host', 'li_bal_9': 'host', 'li_bal_10': 'host', 'li_bal_11': 'host', 'li_bal_12': 'host', 'li_bal_13': 'host', 'li_bal_14': 'host', 'li_bal_15': 'host'} (Crossroad 22: host, both arms)
+[driver] preflight: quiet box PASS foreign 0.06 vs threshold 2.0 — host busy 0.2 − containers 0.08 {'li_bal_0': 0.005, 'li_bal_1': 0.005, 'li_bal_2': 0.005, 'li_bal_3': 0.005, 'li_bal_4': 0.005, 'li_bal_5': 0.005, 'li_bal_6': 0.005, 'li_bal_7': 0.005, 'li_bal_8': 0.005, 'li_bal_9': 0.005, 'li_bal_10': 0.005, 'li_bal_11': 0.005, 'li_bal_12': 0.005, 'li_bal_13': 0.005, 'li_bal_14': 0.005, 'li_bal_15': 0.005} − ours 0.061 [instantaneous (/proc/stat busy − containers − ours)]; load1 6.67 (lagging, by-load1 foreign 6.26); 1 reading(s) over 5.5s, trend SINGLE READING
+[driver] preflight: read-backs (absence fails before agreement)
+[driver] idle burden: 0.06 cores with 16 instance(s) live = 0.2% of the box before any work (pre-instance baseline 0.08)
+[driver] preflight PASSED — llamaindex_video workers[declared_workers=16] leg=blast n=498
+[driver] cache eviction: rc=0 }
+[driver] warm-up: 2 disjoint items
+[driver] warm-up wave 1/2: 32 concurrent sends over 2 warm rows -> 16/16 worker pids observed
+[driver] warm-up consumed 32 send(s) over 2 warm rows (1 wave(s) x 32 concurrent (max(2 x 16 workers, leg concurrency 16)) — Crossroad 40; warm SET re-sent per Crossroad 32; warmth gated on warm markers, Crossroad 41)
+[driver] warm-up ledger: warmup_llamaindex_video_workers_blast_p4.json
+[driver] warm-up gate: 16/16 warm markers present (Crossroad 41)
+[driver] warm-up distribution (REPORTED, not gated): 16/16 distinct response pids over 32 sends; busiest 2, quietest 2 — kernel accept skew, published
+[driver] warm-up complete: tokens=n/a worker_pids=16
+[driver] service CPU bracket: summing 16 container cgroup(s): ['li_bal_0', 'li_bal_1', 'li_bal_2', 'li_bal_3', 'li_bal_4', 'li_bal_5', 'li_bal_6', 'li_bal_7', 'li_bal_8', 'li_bal_9', 'li_bal_10', 'li_bal_11', 'li_bal_12', 'li_bal_13', 'li_bal_14', 'li_bal_15']
+[driver] lifetime_state leg_start: docker_root free 603.4 GiB | frag avg-extent 42879.7 KiB, >=4MiB share 0.9934 | li_bal_0: spool du 32 KiB/3 files, layer 20.5kB (virtual 9.08GB), cg anon 0.87 GiB, procs 1 rss 1.31 GiB | li_bal_1: spool du 32 KiB/3 files, layer 20.5kB (virtual 9.08GB), cg anon 0.90 GiB, procs 1 rss 1.34 GiB | (+14 more containers in the export)
+[driver] stream residency: max 16 concurrent in-flight (cap = 16); sha pass off-loop via to_thread; no whole blob held (streaming refactor 2026-08-27, DIAG_M1_BLAST discipline kept)
+[driver] lifetime_state leg_end: docker_root free 603.3 GiB | frag avg-extent 43043.4 KiB, >=4MiB share 0.9933 | li_bal_0: spool du 32 KiB/3 files, layer 20.5kB (virtual 9.08GB), cg anon 0.87 GiB, procs 1 rss 1.31 GiB | li_bal_1: spool du 32 KiB/3 files, layer 20.5kB (virtual 9.08GB), cg anon 0.90 GiB, procs 1 rss 1.34 GiB | (+14 more containers in the export)
+[driver] export: working/video/results/films500_lifetimes_20260906T090339Z/export_llamaindex_video_workers_blast_p4.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=16] blast pass 4 records 498 (errors 0) / offered 498 | THROUGHPUT 12.809 frames/s (191.73x realtime), steady window 12.794 frames/s (n=482) | SERVICE CPU 28.994 cores = 90.6% of 32 | IDLE BURDEN 0.062 cores with 16 li_workers live = 0.2% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 2 | gates PASS 7 · NOT RUN 1 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+post-run host reading -> working/video/results/films500_lifetimes_20260906T090339Z/lifetime_state_postrun.json (prerun vs postrun = the whole run's churn on the host fs)
+=== LIFETIME PASSES COMPLETE — working/video/results/films500_lifetimes_20260906T090339Z (mirror stops after its final sync). Entry-26 STOP-AND-LAND next. ===
