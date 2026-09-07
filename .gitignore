@@ -76,3 +76,4 @@ __pycache__/
 # working/results/*.json IS committed: it is the evidence behind every claim and is small.
 # *.jsonl is therefore NOT globally ignored; the one large one (the corpus manifest) is
 # already excluded by corpus/ above.
+.rocketride/
