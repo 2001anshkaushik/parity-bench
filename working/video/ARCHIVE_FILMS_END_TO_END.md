@@ -24,85 +24,92 @@ per measured core (the cost a user pays)   +18.1%  █████████�
 
 ## 2. Headline figures — three bases, one fact
 
-Source: `results/films500_lifetimes_20260906T090339Z/export_*.json` (means of
-passes 3 and 4; effective cores = service cores minus each arm's own
-measured idle burden). Three findings, not five: each indented row is the
-row above it in another unit.
+| metric | RocketRide | LlamaIndex | difference |
+|---|---|---|---|
+| **Frames/s per EFFECTIVE core** (the work itself, idle removed) | 0.4389 | 0.4420 | **LI +0.7% — a statistical tie** |
+| Frames/s per MEASURED core (the cost a user pays, idle included) | 0.3733 | 0.4411 | **LI +18.1%** |
+| ↳ the same fact as CPU-seconds per frame | 2.679 | 2.268 | RR +18.1% |
+| Span throughput (frames/s) | 11.613 | 12.800 | **LI +10.2%** |
+| ↳ the same fact in dollars: cost per 1,000 footage-hours ($, at $1.428/h) | 8.22 | 7.46 | RR +10.2% |
 
-| basis | unit | LlamaIndex | RocketRide | LI vs RR |
-|---|---|---|---|---|
-| **per EFFECTIVE core** — the work itself, idle removed | frames/s/core | 0.4420 | 0.4389 | **+0.7% — a statistical tie** |
-| per MEASURED core — the cost a user pays, idle included | frames/s/core | 0.4411 | 0.3733 | **LI +18.1%** |
-| ↳ the same fact as CPU-seconds per frame | CPU-s/frame | 2.268 | 2.679 | RR +18.1% |
-| span throughput | frames/s | 12.800 | 11.613 | **LI +10.2%** |
-| ↳ the same fact in dollars ($1.428/h) | $/1k footage-h | 7.46 | 8.22 | RR +10.2% |
+Source: `results/films500_lifetimes_20260906T090339Z/export_*.json`, means of
+passes 3 and 4 (decimal half-up rounding of the exports' own values);
+effective cores = service cores minus each arm's own measured idle burden.
+Three findings, not five: each indented row is the row above it in another
+unit.
 
 ## 3. Full metric set, 498 films — RocketRide vs LlamaIndex
 
-Means of the two fresh-lifetime passes unless a row says otherwise; per-leg
-values follow. Sources: the four lifetimes exports (`results/films500_lifetimes_
-20260906T090339Z/`), the campaign's sequential and pass-2 exports
-(`results/films500_mainrun_20260904T204852Z/`), `partition_check.json`,
-and `probe/films500_held_checks.py` for the derived rows.
+Means of the two fresh-lifetime passes unless a row says otherwise; the
+per-leg table follows. Direction is stated in words in every row; the
+source column, last, names the export field or reproducer behind it.
 
-| metric | unit | RocketRide | LlamaIndex | note / source |
+| metric | RocketRide | LlamaIndex | difference | source |
 |---|---|---|---|---|
 | **Scope** | | | | |
-| films measured per leg | count | 498 / 498 | 498 / 498 | `n_records` / `n_offered`, every leg |
-| footage | hours | 675.73 (corpus) | 675.73 | `films500_video_manifest.jsonl` `_meta` (498 measured + 2 warm films) |
-| frames per leg | count | 161,932 | 161,932 | `throughput.total_frames`; one frame per 15 s |
-| posture | — | 16 tokens × 2 threads | 16 instances × 2 threads | thread environment read back in-process, fail-closed |
-| client concurrency | lanes | 16 | 16 | the export's provenance field `offered_concurrency` |
-| passes | count | 2 per fresh lifetime (+ 2 in one campaign lifetime) | same | passes 3–4; campaign passes 1–2 |
+| Films measured per leg (count) | 498 / 498 | 498 / 498 | matched | `n_records` / `n_offered`, every leg |
+| Footage (hours; corpus, 498 measured + 2 warm) | 675.73 | 675.73 | matched | `films500_video_manifest.jsonl` `_meta` |
+| Frames per leg (count; one frame per 15 s) | 161,932 | 161,932 | matched | `throughput.total_frames` |
+| Posture | 16 tokens × 2 threads | 16 instances × 2 threads | matched | thread environment read back in-process, fail-closed |
+| Client concurrency (lanes) | 16 | 16 | matched | the export's provenance field `offered_concurrency` |
+| Passes (count) | 2 + 2 | 2 + 2 | matched | 2 per fresh lifetime (passes 3–4) + 2 in one campaign lifetime (passes 1–2) |
 | **Throughput** | | | | |
-| span | frames/s | 11.613 | 12.800 | `throughput.total_frames_per_s` |
-| steady window | frames/s (n) | 11.649 (n = 482) | 12.783 (n = 482) | `steady_window.window_frames_per_s`; n = completions inside the window |
-| realtime factor | × | 173.8 | 191.6 | `throughput.total_realtime_factor` |
-| leg wall clock | s | 13,944 | 12,651 | `throughput.total_span_s` (3.87 h / 3.51 h) |
-| sequential, uncontended (C = 1, n = 5, campaign) | frames/s | 2.081 | 1.834 | `export_*_sequential.json`; steady window undefined at C = 1 by design |
-| sequential per-film latency, p50 | s per video-minute | 1.81 | 2.10 | `latency_normalized.p50`, sequential legs |
+| Span throughput (frames/s) | 11.613 | 12.800 | LI +10.2% | `throughput.total_frames_per_s` |
+| Steady-window throughput (frames/s; n = 482) | 11.649 | 12.783 | LI +9.7% | `steady_window.window_frames_per_s`; n = completions inside the window |
+| Realtime factor (× footage time) | 173.8 | 191.6 | LI +10.2% | `throughput.total_realtime_factor` |
+| Leg wall clock (s) | 13,944 | 12,651 | RR +10.2% longer | `throughput.total_span_s` (3.87 h / 3.51 h) |
+| Sequential uncontended throughput (frames/s; C = 1, n = 5) | 2.081 | 1.834 | RR +13.5% | campaign `export_*_sequential.json`; the steady window is undefined at C = 1 by design |
+| Sequential per-film latency, p50 (s per video-minute) | 1.81 | 2.10 | LI +16% (RocketRide faster) | `latency_normalized.p50`, sequential legs |
 | **CPU** | | | | |
-| service cores | cores | 31.10 | 29.02 | `efficiency.effective_cores` (cgroup Δusage/Δt over the leg) |
-| utilisation of the box | % | 97.2 | 90.7 | `efficiency.cpu_util_of_box` |
-| idle burden, instances live, no work | cores | 4.647 | 0.063 | `efficiency.idle_burden.idle_cores_with_instances_live` |
-| effective cores (service minus idle) | cores | 26.46 | 28.96 | derived |
-| frames/s per measured core | frames/s/core | 0.3733 | 0.4411 | derived |
-| frames/s per effective core | frames/s/core | 0.4389 | 0.4420 | derived |
-| CPU-seconds per frame | CPU-s | 2.679 | 2.268 | `efficiency.cpu_s_per_frame` |
-| CPU-seconds per footage-minute | CPU-s | 10.74 | 9.09 | `efficiency.cpu_s_per_footage_min` |
+| Service cores (cgroup Δusage/Δt over the leg) | 31.10 | 29.02 | RR +7.2% | `efficiency.effective_cores` |
+| Utilisation of the box (%) | 97.2 | 90.7 | RR +6.5 pts | `efficiency.cpu_util_of_box` |
+| Idle burden (cores; instances live, no work) | 4.647 | 0.063 | RR 74× higher | `efficiency.idle_burden.idle_cores_with_instances_live` |
+| Effective cores (service minus idle) | 26.46 | 28.96 | LI +9.4% | derived |
+| Frames/s per measured core | 0.3733 | 0.4411 | LI +18.1% | derived |
+| Frames/s per effective core | 0.4389 | 0.4420 | LI +0.7% (tie) | derived |
+| CPU-seconds per frame | 2.679 | 2.268 | RR +18.1% | `efficiency.cpu_s_per_frame` |
+| CPU-seconds per footage-minute | 10.74 | 9.09 | RR +18.1% | `efficiency.cpu_s_per_footage_min` |
 | **Cost** | | | | |
-| cost per 1,000 footage-hours | $ | 8.22 | 7.46 | `efficiency.usd_per_1k_footage_hours` at $1.428/h |
+| Cost per 1,000 footage-hours ($, at $1.428/h) | 8.22 | 7.46 | RR +10.2% | `efficiency.usd_per_1k_footage_hours` |
 | **Memory** | | | | |
-| peak service RSS, process tree | GiB | 53.2 / 50.9 (p3 / p4) | 22.7 / 22.6 | `collector_summary.roles.service.peak_rss_bytes` |
-| peak cgroup anon | GiB | 45.5 / 43.1 | 1.08 / 1.08 | `collector_summary.roles.service.peak_cgroup_anon_mb` |
-| growth across a leg (first → last 5 min) | GiB | 26.7 → 52.5 (p3); 26.5 → 49.2 (p4) | 22.1 → 21.6; 21.8 → 21.6 | `lifetime_state.service_memory_trajectory.rss` |
-| per-film retention | MiB per film served | 52.9 (p3); 46.6 (p4) | −1.1; −0.4 | growth ÷ 498; resets when the tokens end |
-| spool high-water, host filesystem | GiB above leg start | 12.0 / 12.0 | 13.9 / 13.8 | `lifetime_state.fs_stream.paths.docker_root.max_used_minus_start` |
-| spool residue at leg end | files / KiB | 18 / 76 (no media files) | 3 / 32 per instance | `lifetime_state.leg_end.containers.*.spool` — no leak |
+| Peak service RSS, process tree (GiB; p3 / p4) | 53.2 / 50.8 | 22.7 / 22.6 | RR 2.3× higher | `collector_summary.roles.service.peak_rss_bytes` |
+| Peak cgroup anon (GiB; p3 / p4) | 45.5 / 43.1 | 1.08 / 1.08 | RR 41× higher | `collector_summary.roles.service.peak_cgroup_anon_mb` |
+| Growth across a leg (GiB, first → last 5 min; p3; p4) | 26.7 → 52.5; 26.5 → 49.2 | 22.1 → 21.6; 21.8 → 21.6 | RR grows +25.7 / +22.7 GiB; LI flat | `lifetime_state.service_memory_trajectory.rss` |
+| Per-film retention (MiB per film served; p3; p4) | 52.9; 46.6 | −1.1; −0.4 | RR retains; LI flat | growth ÷ 498; resets when the tokens end |
+| Spool high-water on the host fs (GiB above leg start; p3 / p4) | 12.0 / 12.0 | 13.9 / 13.8 | LI +15.6% | `lifetime_state.fs_stream.paths.docker_root.max_used_minus_start` |
+| Spool residue at leg end (files / KiB) | 18 / 76 (no media) | 3 / 32 per instance | — (no leak) | `lifetime_state.leg_end.containers.*.spool` |
 | **Correctness** | | | | |
-| films completed | count | 498 / 498, every leg | 498 / 498, every leg | `n_records` |
-| errors | count | 0 | 0 | `n_errors` |
-| per-leg gates | PASS / NOT RUN / FAIL | 8 / 1 / 0 (both legs) | 7 / 1 / 0 (both legs) | `gates`; NOT RUN = `determinism_repeat`, a sequential-leg gate (PASS there) |
-| within-arm determinism, pass 3 ≡ pass 4 | films identical | 498 / 498 | 498 / 498 | labels, full-precision scores, chunk shas (`films500_held_checks.py` A) |
-| within-arm determinism, campaign pass 2 ≡ pass 3 (two lifetimes, two days apart) | films identical | 498 / 498 | 498 / 498 | same |
-| cross-arm agreement, ≤ 560 px | films bit-identical | 65 / 65 | | `partition_check.json` (campaign, both passes); lifetimes pass 3: 0 differing |
-| cross-arm agreement, > 560 px | films diverging | 433 / 433 | | same; 0 violations either direction |
+| Films completed (count, every leg) | 498 / 498 | 498 / 498 | matched | `n_records` |
+| Errors (count) | 0 | 0 | matched | `n_errors` |
+| Per-leg gates (PASS / NOT RUN / FAIL; both legs) | 8 / 1 / 0 | 7 / 1 / 0 | no FAIL either side | `gates`; NOT RUN = `determinism_repeat`, a sequential-leg gate (PASS there) |
+| Determinism within arm, pass 3 ≡ pass 4 (films identical) | 498 / 498 | 498 / 498 | matched | labels, full-precision scores, chunk shas — `films500_held_checks.py` A |
+| Determinism across lifetimes, campaign p2 ≡ p3 (films identical) | 498 / 498 | 498 / 498 | matched | same; two container lifetimes, two days apart |
+| Cross-arm agreement ≤ 560 px (films bit-identical) | 65 of 65 | same films | matched | `partition_check.json`, both campaign passes; lifetimes pass 3: 0 differing |
+| Cross-arm agreement > 560 px (films diverging) | 433 of 433 | same films | differ (engine pre-downscale, §6) | same; 0 violations either direction |
 | **Reproducibility** | | | | |
-| pass-to-pass spread, fresh lifetime | % | 0.91 | 0.14 | passes 3 vs 4 |
-| across lifetimes, campaign pass 2 vs fresh-lifetime mean | % | +0.03 | −1.2 | 11.609 vs 11.613; 12.953 vs 12.800 |
+| Pass-to-pass spread, fresh lifetime (%) | 0.91 | 0.14 | LI tighter | passes 3 vs 4 |
+| Across lifetimes, campaign p2 vs fresh-lifetime mean (%) | +0.03 | −1.2 | both within 1.2% | 11.609 vs 11.613; 12.953 vs 12.800 |
 | **Not in the records** | | | | |
-| per-stage timings (extract / detect / embed) | — | absent | present (`stage_s`) | RocketRide records carry no stage timings; the stage-flatness evidence in §6 is LlamaIndex-side |
+| Per-stage timings (extract / detect / embed) | absent | present (`stage_s`) | — | RocketRide records carry no stage timings; the stage-flatness evidence in §6 is LlamaIndex-side |
 
-Per-leg detail (the settled campaign pass 2 shown for reference; the campaign's pass 1 is excluded, §8):
+Two memory rows, two instruments: **peak service RSS** is the collector's
+maximum over 0.5 s samples of the whole leg; **growth across a leg** is the
+same stream's first- and last-five-minute means — which is why the peak
+(53.2 GiB) sits above the end-of-leg mean (52.5 GiB). Both are
+given because the peak sizes the container and the growth names the
+mechanism.
 
-| leg | span f/s | window f/s | × realtime | wall s | service cores | util % | idle cores | CPU-s/frame | $/1k fh | peak RSS GiB | container age at driver start |
+Per-leg detail (the settled campaign pass 2 shown for reference; the
+campaign's pass 1 is excluded, §8):
+
+| leg | span f/s | window f/s | CPU-s/frame | $/1k fh | service cores | util % | idle cores | × realtime | wall s | peak RSS GiB | container age at driver start |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| RR pass 3 (fresh container) | 11.665 | 11.677 | 174.62 | 13,881 | 31.171 | 97.4 | 4.653 | 2.672 | 8.18 | 53.2 | 6 s |
-| RR pass 4 | 11.560 | 11.620 | 173.05 | 14,008 | 31.038 | 97.0 | 4.640 | 2.685 | 8.25 | 50.9 | 16,530 s |
-| RR campaign pass 2 (settled) | 11.609 | 11.613 | 173.77 | 13,949 | 31.084 | 97.1 | 4.656 | 2.678 | 8.22 | 54.3 | — |
-| LI pass 3 (fresh containers) | 12.791 | 12.772 | 191.46 | 12,660 | 29.044 | 90.8 | 0.063 | 2.271 | 7.46 | 22.7 | 24 s |
-| LI pass 4 | 12.809 | 12.794 | 191.73 | 12,642 | 28.994 | 90.6 | 0.062 | 2.264 | 7.45 | 22.6 | 13,563 s |
-| LI campaign pass 2 (settled) | 12.953 | 12.957 | 193.90 | 12,501 | 28.450 | 88.9 | 0.067 | 2.196 | 7.36 | 22.8 | — |
+| RR pass 3 (fresh container) | 11.665 | 11.677 | 2.672 | 8.18 | 31.171 | 97.4 | 4.653 | 174.62 | 13,881 | 53.2 | 6 s |
+| RR pass 4 | 11.560 | 11.620 | 2.685 | 8.25 | 31.038 | 97.0 | 4.640 | 173.05 | 14,008 | 50.8 | 16,530 s |
+| RR campaign pass 2 (settled) | 11.609 | 11.613 | 2.678 | 8.22 | 31.084 | 97.1 | 4.656 | 173.77 | 13,949 | 54.3 | — |
+| LI pass 3 (fresh containers) | 12.791 | 12.772 | 2.271 | 7.46 | 29.044 | 90.8 | 0.063 | 191.46 | 12,660 | 22.7 | 24 s |
+| LI pass 4 | 12.809 | 12.794 | 2.264 | 7.45 | 28.994 | 90.6 | 0.062 | 191.73 | 12,642 | 22.6 | 13,563 s |
+| LI campaign pass 2 (settled) | 12.953 | 12.957 | 2.196 | 7.36 | 28.450 | 88.9 | 0.067 | 193.90 | 12,501 | 22.8 | — |
 
 ## 4. Scope — a replicated, tuned, cold-start run of the full corpus
 
@@ -242,7 +249,7 @@ criterion 4: match, remove, or document the facade downscale).
 | **Reduction-order / thread-count variance under load** | run-to-run digest changes within an arm | **Zero.** Within each arm, pass 1 ≡ pass 2 (one lifetime), pass 3 ≡ pass 4 (a fresh lifetime), campaign pass 2 ≡ pass 3 (different lifetimes, two days apart): labels, full-precision scores, counts and chunk shas identical **498 / 498 on both arms, every pairing, including all 433 films above the edge** (`probe/films500_held_checks.py` A). The thread-count effect exists and measures 10⁻⁷ on the same frame (`results/detector-parity-y-20260902/`, intraop 16 vs 2); the divergence is 10⁻²–10⁻¹, deterministic, between arms. |
 | **Page cache** | I/O wait rising with cost; residency differences | Every leg starts corpus-cold by construction (fadvise eviction with a timed re-read proof, `driver_video.py:2299-2310`); the per-film cold read (`read_s`) is flat by position; a minute-by-minute `/proc/meminfo` sampler beside the lifetimes run, 938 rows joined (`probe/cachewatch_join.py`): **I/O wait ≤ 1.4% of the box, flat; ρ(cost, iowait) −0.12 … −0.03**. Exonerated. |
 | **Lifetime drift** (the campaign's pass 1 read as a transient settling into pass 2's plateau — pre-registered with confirming and refuting shapes) | fresh containers drifting like the campaign's pass 1 | **Refuted on its own terms** (`probe/lifetimes_reading.py`): fresh-container first passes RR −2.3%, LI −3.1% first → last fifth (bands +1..+6 / −6..−13); pass 4 reproduces pass 3's profile at the same level; pass 4 vs the campaign's pass 2: RR −0.04% (paired SE 0.57%), LI +1.32% (SE 0.77%) — the "plateau" is the norm and the campaign's pass 1 the anomaly (§8). The filesystem variant died with it: the ext4 free-space proxy is flat across ~1 TB of spool churn (`lifetime_state_prerun/postrun.json`); per-token memory climbed identically in every pass with flat cost. |
-| **Workload asymmetry above 560 px** (RocketRide feeding its detector a smaller image on 87% of the corpus) | RocketRide doing measurably less detector work above the edge | **The model's input is the same size on both paths — `[1, 3, 560, 560]`, measured (V-D)**; RocketRide does 4.64 ms *more* preprocessing per frame; LlamaIndex's detect stage is flat across source resolutions (0.831–0.850 s/frame from 320×240 to 720×480); the RR/LI cost ratio is flat across the edge at comparable resolutions (540×360 1.106 · 640×480 1.114 · 720×480 1.113) (`films500_held_checks.py` B). No correction toward RocketRide. |
+| **Workload asymmetry above 560 px** (RocketRide feeding its detector a smaller image on 87% of the corpus) | RocketRide doing measurably less detector work above the edge | **The model's input is the same size on both paths — `[1, 3, 560, 560]`, measured (V-D)**; RocketRide does 4.64 ms *more* preprocessing per frame; LlamaIndex's detect stage is flat across source resolutions (0.830–0.850 s/frame from 320×240 to 720×480); the RR/LI cost ratio is flat across the edge at comparable resolutions (540×360 1.106 · 640×480 1.114 · 720×480 1.113) (`films500_held_checks.py` B). No correction toward RocketRide. |
 
 ## 8. What remains open
 

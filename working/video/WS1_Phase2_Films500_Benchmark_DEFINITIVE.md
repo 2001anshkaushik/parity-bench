@@ -198,7 +198,7 @@ range 0.154–0.978), the model's do not (313,600 per frame, both arms).
 **RocketRide pays 4.64 ms of LANCZOS per frame above 560px** (median of
 5) against ~0.84 s of detection — ~0.5% of per-frame cost, on its side.
 Held measurements agree: LlamaIndex's per-stage `detect` time is flat
-across source resolution (0.831–0.85 s/frame from 320×240 to 720×480),
+across source resolution (0.830–0.850 s/frame from 320×240 to 720×480),
 and the RR/LI per-frame cost ratio is flat across the edge at comparable
 resolutions (540×360 1.106 · 640×480 1.114 · 720×480 1.113).
 
