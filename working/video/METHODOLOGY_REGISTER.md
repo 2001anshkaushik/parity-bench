@@ -1303,3 +1303,22 @@ than rewritten from memory, which is entry 2's point in miniature.
 > than modelled.** What the run could not do — say WHY that window was
 > different — is recorded as such; the exports carry no CPU-frequency or
 > host-contention measurement, a gap for the next instrument.
+
+## 35. A commit that asserted its reproducer had matched — while the reproducer had crashed behind a pipeline (added 2026-09-07)
+
+> The ship-check round added `probe/films500_held_checks.py` so that every
+> derived figure in the FINAL report reproduces from the landed files, and
+> the commit chain ran it: `python3 … | tee out | head -60 && git commit
+> -m "… Output matched the report's figures on this run."`. The script
+> raised in its first block (a stray line of the author's referencing a
+> loop variable before its loop). `head` exited 0, `&&` continued, the
+> commit landed and was pushed with a sentence claiming a match that had
+> not happened — the exit status was even printed (`checks rc=`, empty)
+> one line above the commit. Caught on the read-back of the same output.
+> The class: **a commit gated on an instrument gates on the instrument's
+> own exit status (`set -o pipefail`, or run the instrument outside the
+> pipeline and test its rc), and a message that asserts "output matched"
+> is written only after the output has been compared, figure by figure,
+> against the document it certifies — never in the same command that
+> produces it.** Corrected in the next commit with the run that actually
+> completed and the comparison recorded.

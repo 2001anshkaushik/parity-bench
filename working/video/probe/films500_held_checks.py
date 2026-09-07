@@ -70,8 +70,7 @@ def same(a: dict, b: dict) -> bool:
 def block_a(films):
     print('=== A. bit-identity within arm, across passes and lifetimes (labels+scores+chunks) ===')
     edge = {f: max(r['detector_width'], r['detector_height']) > 560 for f, r in films.items()}
-    legs = {(arm, 1): records(CAMP, arm, 1), (arm, 2): records(CAMP, arm, 2),
-            (arm, 3): records(LIFE, arm, 3), (arm, 4): records(LIFE, arm, 4)}
+    legs = {}
     for arm, tag in ((RR, 'RR'), (LI, 'LI')):
         legs.update({(arm, p): records(CAMP if p <= 2 else LIFE, arm, p) for p in (1, 2, 3, 4)})
         for (pa, pb, what) in ((1, 2, 'campaign p1 vs p2, one lifetime'), (3, 4, 'lifetimes p3 vs p4, one lifetime'),
