@@ -1,0 +1,4 @@
+[2026-09-07 03:23:42] [INFO] rf-detr - File rf-detr-base.pth already exists with correct MD5 hash.
+[2026-09-07 03:23:42] [INFO] rf-detr - Loading pretrain weights
+[2026-09-07 03:23:43] [WARNING] rf-detr - Model is not optimized for inference. Latency may be higher than expected. You can optimize the model for inference by calling model.optimize_for_inference().
+wrote /tmp/vd/side_vd.json: frame (714, 480) -> (560, 376) (noop=False); intraop 2; resized@0.3 [['person', '0.946473300'], ['chair', '0.935210288'], ['bottle', '0.856113911'], ['chair', '0.449365526'], ['bottle', '0.384643406'], ['chair', '0.318114191']]

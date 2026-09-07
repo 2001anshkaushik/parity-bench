@@ -1,0 +1,6 @@
+frame [714, 480] -> engine-resized [560, 376] (noop=False); engine helper: measured, pixels_equal=True
+raw     vs campaign LI : labels + scores bit-equal at 9 dp
+resized vs campaign RR : labels + scores bit-equal at 9 dp
+control (<=560) no-op both ways: PASS
+WORKLOAD (TASK 3): pixels handed to predict raw 342720 vs facade 210560 (x0.6144); model-consumed tensor shapes raw [[1, 3, 560, 560]] vs resized [[1, 3, 560, 560]] -> SYMMETRIC at the model (same work per frame on both arms); model resolution 560; facade LANCZOS 4.64 ms
+VERDICT: V-D CONFIRMS — the engine facade's LANCZOS pre-downscale to infer_edge=560 reproduces the campaign RR output on the diverging frame; the raw frame reproduces LI. Mechanism NAMED and REPRODUCED outside the serving context.
