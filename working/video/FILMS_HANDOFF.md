@@ -279,7 +279,10 @@
 >    until settled; her post-pin AMI cells stay HYPOTHESIS until pins.
 > 4. **The campaign's p1 environmental anomaly** — unexplained (Ruling
 >    AC); the instrument gap is ours: no CPU-frequency / turbo / host-
->    contention sampler beside a leg. Add one next campaign.
+>    contention sampler beside a leg. Add one next campaign — Shashi's
+>    harness already reads MHz and throttling (his doc :208), the read to
+>    adopt; its signature there (more CPU-s at the same cores = I/O-stall
+>    spinning) is the opposite of ours (fewer CPU-s = a faster processor).
 > 5. **Per-token memory growth** — ~50 MB per film served, reset only with
 >    the token; 4/4 passes; Ticket 6 criterion 5 (engine's to answer);
 >    no throughput effect measured; bounds a token's lifetime at ~1,100

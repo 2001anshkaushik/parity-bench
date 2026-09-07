@@ -95,6 +95,16 @@ the `313430f3` read. Rule stays the rule: record the sha AT clone time.
   to be read** (standing rule: `reference*` paths are never read). Recorded
   so it is never mistaken for the pinned clone. The pinned clone is
   `../team-repos/leela-bench_langgraph_prod` and nothing else.
+- **`VIDEO-FILMS50-RESULTS-2026-09-03.md` (Shashi, RocketRide vs
+  Haystack on the first 50 films of Leela's sealed corpus; run
+  `films50-20260903T183805Z`, box `i-0e8e460af8f139fa1`, tree `b451ef0`)
+  — received via Ansh's upload (`~/Downloads/`), copied byte-for-byte
+  2026-09-07, sha256
+  `467ff92f9140acc21ee8fe75955faff522eea0644a52395e3ad09b1965c267a9`,
+  14,880 bytes, 241 lines. DATA: cited by line in
+  `WS1_Phase2_Films500_Benchmark_DEFINITIVE.md` §10 and
+  `AMI_CROSS_TEAM_RECONCILIATION.md` §9. Its corpus seal
+  (`bd0c915e…`, :50) is ours.**
 - Working-tree caveat (2026-08-26): the 08-22 clone's tree carries local
   modifications to 12 tracked `.pipe` files (one-line JSON pretty-printed;
   +204/−21 lines). Origin IDENTIFIED same day: the Phase 1 format-on-save

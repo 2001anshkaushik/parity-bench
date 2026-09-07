@@ -45,8 +45,8 @@ frame). It is filed upstream with the fix stated.
 **3. Four plausible explanations died on measurement, which is why the
 numbers above can be trusted.** That the drift was floating-point noise
 under load — no: repeated passes of either system are bit-identical on
-every film, and the measured thread-count effect is ten thousand times
-smaller than the observed shifts. That the throughput gap was disk
+every film, and the measured thread-count effect is over ten thousand
+times smaller than the observed shifts. That the throughput gap was disk
 caching — no: a minute-by-minute sampler beside the run showed I/O wait
 under 1.5% and flat. That the systems drift over a long-lived container —
 no: fresh containers ran at exactly the settled level from their first
@@ -63,17 +63,24 @@ The 35-film findings stand and sharpen. Out of the box the engine still
 runs at a fraction of its own tuned speed (that number lives in the
 35-film report). Tuned, the engine's only measured disadvantage is the
 idle cost of its worker model — 4.65 cores at 16 workers before any work
-arrives — and removing it would bring the engine to parity on every
-throughput basis. Separately, the engine's pre-inference downscale means
+arrives. Removing it would bring the cost per core to parity, since the
+work itself already is; the throughput gap would close only to the
+extent the freed cores actually do work, which this campaign did not
+measure. Separately, the engine's pre-inference downscale means
 two correct deployments of the same detector can disagree on borderline
 objects in large video; that is now a named, reproducible behaviour with
 a one-line fix path rather than an open mystery.
 
 ## Not settled
 
-Why the machine ran ~5% faster for one system and slower for the other
-during one four-hour window of the first campaign — we lack a CPU-
-frequency or neighbour-load instrument, and the anomaly did not recur.
+Why each system's first pass in the first campaign ran off its own
+settled level — RocketRide's about 5% faster than settled RocketRide,
+LlamaIndex's about 5% slower than settled LlamaIndex, in two different
+windows two days apart, each already visible in that window's warm-up
+before any measured work began. It is not a comparison between the
+systems; it is two separate departures from each system's own norm,
+excluded from every figure above. We lack a CPU-frequency or
+neighbour-load instrument to explain either, and neither recurred.
 And the cross-team question stands: our RocketRide runs ~20% more CPU
 per frame than two other teams measure at matched utilization, on
 byte-identical data, now on two corpora; the handover package with its

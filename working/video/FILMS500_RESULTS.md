@@ -348,7 +348,9 @@ reproduces the campaign p1/p2 figures above.
 
 **Third mechanism — PAGE CACHE — pre-registered 2026-09-06 with pass 3 in
 flight (the commit time is the timestamp; no pass-3 record had been read).**
-Source: Shashi's films50 run (relayed; his doc is not held): his RR
+Source: Shashi's films50 run (his document is HELD since 2026-09-07:
+`team_docs_received/VIDEO-FILMS50-RESULTS-2026-09-03.md`, sha
+`467ff92f…`; the figures below are its :201–215): his RR
 rep1→rep2 fell 187.8× → 159.7× with byte-identical output, probed live at
 11% iowait, six processes blocked on I/O, ~80% of his corpus resident, a
 gp3 root volume at its 125 MB/s ceiling; his mitigation is prewarm plus
@@ -465,8 +467,9 @@ scoped to THIS configuration, as the 35-film headline was.
 
 ## The 560px mechanism — located in the engine source (2026-09-06) and CONFIRMED by V-D (2026-09-07)
 
-Shashi's determinism table (relayed via the operator, DATA; his document
-is not held) reports both his arms deterministic at a fixed thread count
+Shashi's determinism table (DATA; his document is HELD since 2026-09-07 at
+`team_docs_received/VIDEO-FILMS50-RESULTS-2026-09-03.md`, sha `467ff92f…`,
+the table at :139–154) reports both his arms deterministic at a fixed thread count
 and every per-film digest changing across thread counts with totals
 moving ≤3 — BLAS reduction order in the last bits, a handful crossing 0.3.
 Assessed against everything we hold:
@@ -654,7 +657,7 @@ per-frame cost hides there. Options, none taken here:
   throughput claims stand with that sentence beside them.
   Recommendation: (C) for this report, (A) for the next campaign.
 
-## Cross-team joins — cautions (2026-09-06, from Shashi's films50 figures as relayed)
+## Cross-team joins — cautions (2026-09-06; Shashi's films50 document HELD since 2026-09-07 — `team_docs_received/VIDEO-FILMS50-RESULTS-2026-09-03.md`, sha `467ff92f…`; the FINAL report's §10 carries the cited version, including his cores basis (:18–21), his rejected pipe-stall hypothesis (:175–196) and his four-run HS mean 122.1× cv 1.9% (:186))
 
 - **His RR-vs-HS 1.58× carries a wave handicap he flags himself**: 50
   films over 32 workers = 1.56 waves, HS capped near 78% util, 10.8

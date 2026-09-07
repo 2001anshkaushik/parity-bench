@@ -220,7 +220,12 @@ What the held artifacts settle:
 replication; it does not answer the open question. (Lifetime-controlled
 films figures, landed 2026-09-07: RR 2.672 / 2.685 CPU-s/frame on fresh
 lifetimes against Shashi's 2.198 — **+21.9%**; the campaign's +15.7%
-was flattered by its anomalous pass 1.) The ask in §3 stands
+was flattered by its anomalous pass 1. Shashi's document is held since
+2026-09-07 — `team_docs_received/VIDEO-FILMS50-RESULTS-2026-09-03.md`,
+sha `467ff92f…` — and states his cores basis as span-scoped cgroup with
+the tasks live (:18–21), the same as ours; his cache-cold rep 2, 2.604,
+is by his own reading an I/O-stall environment effect, not the
+comparator (:203–215).) The ask in §3 stands
 — per-stage CPU split on one identical file through both harnesses at
 the same posture, or one leg's cgroup sampler stream exchanged — with one
 cheaper item now available: their cores basis stated (engine cgroup over

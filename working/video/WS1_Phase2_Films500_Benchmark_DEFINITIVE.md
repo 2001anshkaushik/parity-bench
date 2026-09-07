@@ -83,6 +83,10 @@ arm's own idle burden (RR 4.647, LI 0.063).
 **The sentence a product reader needs: the two engines do the work at
 the same cost per core, and the entire visible gap is 4.65 cores — 14.5%
 of the box — that RocketRide burns standing still holding 16 tokens.**
+These figures cover all 498 films, above and below the 560px edge: the
+one preprocessing difference above it is measured symmetric at the model
+(the detector consumes a `[1, 3, 560, 560]` tensor on both paths) and
+costs RocketRide ~0.5% of per-frame time, in its own disfavour (§6).
 Per-pass effective-core pairs (LI vs RR): p3 0.4414 vs 0.4399 (+0.3%),
 p4 0.4427 vs 0.4379 (+1.1%), and the campaign's settled pass 2, 0.4564
 vs 0.4393 (+3.9%); the campaign's pass-1 pair (0.4293 vs 0.4634, RR
@@ -120,14 +124,21 @@ RR p1's ran at a median 152 s against 159 / 164 / 163 s in p2 / p3 / p4
 (−5 to −7%), LI p1's at 834 s against 757 / 791 / 782 (+6 to +10%);
 (ii) **it is CPU speed, not scheduling** — RR p1 did the same work in 5%
 fewer engine-cgroup CPU-seconds (2.543 vs 2.672–2.685 CPU-s/frame) at
-the same 97% utilisation. Opposite signs on the two arms, in windows two
-days apart (LI 2026-09-04 20:49–00:30Z, RR 09-05 04:20–08:45Z). Every
+the same 97% utilisation. Opposite signs on the two arms, each against
+its OWN settled level (not a cross-arm comparison), in windows two days
+apart — LI's beginning with its containers created 2026-09-04 20:49Z,
+RR's with its container created 09-05 05:04Z (campaign log). Every
 provenance scalar is identical across the four RR passes (image, thread
 env read back, task census 16 → 16, host networking, driver CPU share);
-pre-leg load shows no pattern (3.59 / 4.58 / 0.52 / 5.8). **Unexplained.
-What we lack**: no CPU-frequency, turbo or host-contention
-instrumentation in any export, and the memory sampler postdates the
-campaign. Not smoothed; not reproduced on n = 2 fresh lifetimes per arm.
+pre-leg load shows no pattern (3.59 / 4.58 / 0.52 / 5.8). The signature
+is the opposite of the one page-cache effect Shashi measured on the
+same corpus — his cold rep spent 18% MORE CPU-seconds for the same work
+at the same cores, spinning through I/O stalls (his doc :203–215) —
+whereas our pass 1 spent FEWER: not a stall, a faster processor for the
+same instructions. **Unexplained. What we lack**: no CPU-frequency,
+turbo or host-contention instrumentation in any export (his harness
+records MHz and throttling — the read to adopt), and the memory sampler
+postdates the campaign. Not smoothed; not reproduced on n = 2 fresh lifetimes per arm.
 (Ruling AD: the ~2.5–3% ramp over the first fifth of every pass,
 reproduced 4/4 on both arms, is normal warm-up shape and not a finding.)
 
@@ -245,18 +256,61 @@ the measured rows are proven byte-identical (every record's frames,
 duration, bytes and submitted sha equal the committed row, 498/498 on all
 eight blast legs). Recorded, not a defect. The `rf-detr-base.pth` V-D
 used is md5-pinned and reproducible from `li:video`, not landed.
+**Every derived figure in this report that is not a field of a landed
+export or record is reproduced by a committed script over the landed
+files**: `probe/lifetimes_reading.py` (the §4/§7 quartiles, drifts and
+plateau levels, with its campaign null control), `probe/cachewatch_join.py`
+(the §7 page-cache join) and `probe/films500_held_checks.py` (the
+within-arm and cross-lifetime identity counts, the partition on the
+lifetimes run, the RR/LI cost ratio by edge class and by resolution, the
+LI per-stage flatness, the warm-up send medians and CPU-s/frame behind
+§4, the corpus facade-reduction figures of §6, and the manifest-row
+identity check above); each prints its figures beside the file it read
+them from.
 
 ## 10. Cross-team joins — cautions
 
-- Shashi's films50 (relayed; document not held): his RR-vs-HS 1.58×
-  carries a wave handicap he flags (50 films / 32 workers = 1.56 waves,
-  HS ~78% util cap); his RR at 16 tokens runs 3.1 waves; ours has none —
-  do not join multiples. His "2.6% apart" span is a wave-depressed N = 50
-  span against our saturated N = 498; on the wave-independent quantity
-  the gap is **RR 2.68 vs his 2.198 CPU-s/frame = +21.9%** (assumption
-  stated: his cores are the engine cgroup with tokens live, as ours are).
-  Warm-start (his prewarm) vs cold-start-with-proof (ours) are different
-  bases.
+- **Shashi's films50 — held** (`team_docs_received/VIDEO-FILMS50-RESULTS-
+  2026-09-03.md`, sha `467ff92f…`, copied byte-for-byte 2026-09-07; run
+  `films50-20260903T183805Z`, box `i-0e8e460af8f139fa1`, tree `b451ef0`;
+  50 films = the first 50 rows of Leela's nested `archive_films_100`
+  from the **same sealed corpus as ours** — seal `bd0c915e…`, his doc
+  :49–52 — 73.9 footage-hours). The +21.9% is computed from his headline
+  table (:25, `rr-best-16x2-r1`: 12.52 f/s, 27.5 cores, 2.198 CPU-s/frame,
+  $7.60/1k fh) against our fresh-lifetime 2.679; his cores basis is
+  stated on his page — span-scoped cgroup with the tasks live, warm-up
+  excluded (:18–21) — the same basis as ours, no assumption needed. His
+  cache-cold rep 2 (:28, 2.604 CPU-s/frame) is **not** the comparator:
+  his page reads it as an environment effect — the same work in 18% more
+  CPU-seconds at the same 27.6 cores while OMP threads spin through I/O
+  stalls, cores at 3147 MHz and not throttled (:203–215) — and calls rep 1
+  the clean one; our runs never entered that regime (iowait ≤ 1.4%,
+  CPU-s/frame stable 2.672–2.685 across passes).
+- **Two of his measurements strengthen the wave caution better than our
+  assertion does.** His `hs-best-32x2` four-run mean is **122.1× with cv
+  1.9%** (:186), and he **tested and rejected his own pipe-stall
+  hypothesis**: a prefetch build (`HS_FRAME_PREFETCH=8` + page-cache
+  prewarm) produced byte-identical output on every film and left the
+  best cell unmoved (118.7 / 124.2 / 121.3 / 124.0×), so he attributes the
+  low HS utilisation to **the wave and tail** — 50 films over 32 workers
+  = 1.56 waves, the second wave on 18 workers, utilisation capped near
+  78%, 10.8 effective cores (:162–165, :175–196). His RR-vs-HS 1.58× and
+  his HS cost figures therefore carry that handicap by his own
+  measurement; do not join the multiples. His page holds that his RR
+  16×2 at 3.1 waves "does not suffer it" (:165); our own geometry says
+  the effect shrinks with waves but is not zero — at 35 films over 16
+  lanes (2.2 waves) our steady window ran 15–20% above the span, and at
+  498 films the two coincide (§2) — so his 12.52 f/s N = 50 span remains
+  a wave-depressed number against our saturated N = 498, and the
+  wave-independent CPU-per-frame is the comparison that survives.
+- Labelling caution: his page calls the corpus "1080p `.mp4`" (:6); our
+  per-film census of the same sealed corpus finds 640×480 dominant (381
+  of 500), 435 above 560px, maximum 1424×1072. Warm-start (his prewarm,
+  with `cache_resident_gb_before/after` recorded, :217–221) vs
+  cold-start-with-proof (ours) are different bases; his detection
+  caveat (HS 1.4–3.6% fewer detections; BT.709/601 hypothesis, :111–128)
+  does not transfer to our arms (§6; shared pinned ffmpeg, proven
+  byte-identical frames).
 - The cross-team CPU-per-frame question therefore stands on two corpora
   and three harnesses; page cache is excluded as its explanation
   (`AMI_CROSS_TEAM_RECONCILIATION.md` §9); the ask is unchanged
@@ -276,7 +330,7 @@ used is md5-pinned and reproducible from `li:video`, not landed.
 | Plan step-0 full corpus sha (≥7 h, low CPU) killed by the watchdog | FAST verify; plan lock; self-launched mirror | none — before any leg; two preflight-only orphan dirs |
 | The Ruling-Y isolation probe replicated the backend's `predict`, not the facade's `detect` (entry 33) | corrected by V-D | made the divergence read as context-dependent; the 35-film measurements unaffected, its §6 reading corrected |
 | Pre-registered mechanism read's baseline was the anomalous pass 1 | declared VOID | none — the rule fired and was set aside on a pre-stated premise |
-| V-D runner v1 could not find the engine interpreter | v2 reuses the Y runner's capability search + weights pin + EXIT trap | none — refused; one rr container left running ~2 h, removed |
+| V-D runner v1 could not find the engine interpreter | v2 reuses the Y runner's capability search + weights pin + EXIT trap | none — refused; one rr container left running ~10 min, removed before v2 |
 | `/proc/diskstats` device name (`/dev/root`) | absence recorded | churn volume not captured; no figure depends on it |
 | `age_at_leg_start_s` is age at DRIVER start (leg start follows the ~40 min warm-up) | label only; the fsstream row-0 utc is the leg anchor | none |
 | Join tool: tied correlations read as indeterminate; sampler's iowait parsed as percent | both fixed before any run data was read; self-tests | none |
