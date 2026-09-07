@@ -196,6 +196,36 @@ chk('RR p1 +5% vs settled', pct(r1['span'], settled_rr), 'RocketRide 5% fast', t
 chk('RR p1 5% fewer CPU-s', -pct(r1['cpf'], r2['cpf']), '5% fewer CPU-seconds', tol=0.6)
 chk('per-film ~50 MB', ((r3['last'] - r3['first']) + (r4['last'] - r4['first'])) / 2 * 1024 / 498, '~50 MB per film', tol=5)
 chk('26.5 → 49–52 GiB', r4['first'], '26.5 → 49–52 GiB')
+
+print('=== §4: gates, arms, preflight, reproduce ===')
+cx = json.loads((C / 'cross_parity_blast.json').read_text()); cx2 = json.loads((C / 'cross_parity_blast_p2.json').read_text())
+e1 = ex(C, RR, 'blast'); g1 = e1['gates']
+chk('liveness threshold 0.385', g1['detection_liveness']['min_nonempty_fraction'], '≥ 0.385'); chk('liveness aggregate 0.921', g1['detection_liveness']['aggregate_fraction'], '0.921 RR')
+chk('embed dim 384', g1['embed_integrity']['expected_dim'], 'dimension 384'); chk('embed norm tol 0.001', g1['embed_integrity']['tol'], 'within 0.001'); chk('RR vectors 53,522', g1['embed_integrity']['n'], '53,522'); chk('LI vectors 40,970', ex(C, LI, 'blast')['gates']['embed_integrity']['n'], '40,970')
+chk('trigger-eligible 428', g1['duplication_trigger']['n_trigger_eligible'], '428 trigger-eligible')
+pv = next(iter(cx['cross_detection_agreement']['per_video'].values()))
+chk('boundary eps 0.001', pv['boundary_eps'], 'within 0.001 of the 0.3'); chk('boundary cap 0.5%', pv['max_boundary_rate'] * 100, 'capped at 0.5%'); chk('gate 3 failing 433 both passes', len(cx['cross_detection_agreement']['failing']), 'FAIL on 433 of 498'); assert len(cx2['cross_detection_agreement']['failing']) == 433
+chk('boundary exclusions 49', cx['boundary_exclusions_total'], '49 frames boundary-excluded'); assert cx2['boundary_exclusions_total'] == 49
+chk('char tol 2%', cx['char_conservation']['tol'] * 100, 'tol 2%'); chk('char worst 6.1%', cx['char_conservation']['worst_abs_deviation'] * 100, 'worst deviation 6.1%'); chk('char pairs 498', cx['char_conservation']['n_pairs'], '498 pairs')
+lo, md, hi = cx['chunk_count_ratio']['ratio_min_median_max']; chk('chunk ratio min', lo, '1.114 / 1.292 / 1.482', expect='1.114'); chk('chunk ratio median', md, '1.292', expect='1.292'); chk('chunk ratio max', hi, '1.482', expect='1.482')
+chk('chunk medians RR 3,344', cx['rr_chunk_config_measured']['chunk_chars_median'], '3,344'); chk('chunk medians LI 3,992', cx['li_chunk_config_measured']['chunk_chars_median'], '3,992'); chk('chunk max 4000', cx['rr_chunk_config_measured']['chunk_size_max_observed'], 'max 4000')
+pcj = json.loads((C / 'partition_check.json').read_text()); assert all(ch['n_above_diverging'] == 433 and ch['n_below_clean'] == 65 and ch['ABOVE_560_PASSING'] == [] and ch['BELOW_560_FAILING'] == [] and ch['missing_dimensions'] == [] for ch in pcj['checks'])
+chk('partition holds text', None, 'HOLDS both passes: 433 / 65, 0 / 0 violations, 0 missing dimensions')
+lc = (L / 'launch_console.log').read_text(); assert 'vs threshold 2.0' in lc and 'foreign 0.03' in lc and 'foreign 0.01' in lc and '(declared==measured)' in lc and 'cache eviction: rc=0' in lc
+chk('quiet-box threshold 2.0', None, '≤ 2.0 cores (this run: 0.03 and 0.01)')
+pvid = e1['provenance_video']; assert pvid['image']['image_id'].startswith('sha256:b7f51acc'); assert 'duplication_patch_applied' in pvid['image']['labels']
+assert ex(C, LI, 'blast')['provenance_video']['image']['image_id'].startswith('sha256:0a52afcb'); assert pvid['identity_readback']['sdk']['package_version'] == '1.3.0'
+assert pvid['task_census']['declared_tokens'] == 16 and pvid['task_census']['census_after'] == 16
+assert len(ex(C, LI, 'blast')['provenance_video']['thread_pins_by_arm']['arms']['li']['within_arm']['readers']) == 16
+vdj = json.loads((RES / 'wrapper-resize-parity-20260907' / 'side_vd.json').read_text()); assert vdj['weights_md5'].startswith('b4d3ce46')
+for lit in ('bd0c915e', '54186c24', '075fc35b', 'c5a09a34', 'e7e7fb30', 'b7f51acc', '0a52afcb', 'b4d3ce46', '646eaea', 'cc98ca6b', '1882c0d4', '10b1e76b', '405d3c6', 'dbe874bb', '844a990', '746208ce', 'bracket-count-overlap-stripped', 'frames_observed_naive_upper_bound'):
+    chk(f'identifier {lit}', None, lit)
+man_m = [json.loads(l) for l in (V / 'films500_video_manifest.jsonl').read_text().splitlines() if l.strip()][0]['_meta']
+assert man_m['corpus_manifest_sha256'].startswith('bd0c915e') and man_m['ffmpeg_sha256'].startswith('e7e7fb30')
+import hashlib; assert hashlib.sha256((V / 'films500_video_manifest.jsonl').read_bytes()).hexdigest().startswith('075fc35b'); assert pvid['manifest_sha256'].startswith('c5a09a34')
+rec0 = next(iter(H_.records(C, RR, 1).values())); assert rec0['frames_observed_method'] == 'bracket-count-overlap-stripped' and 'frames_observed_naive_upper_bound' in rec0
+chk('naive 416 vs 395 (35-film DEFINITIVE §9; the frame-parity artifact)', None, '416 where the engine')
+
 print(f'\n{n_ok} checks passed, {len(fails)} failed')
 for f in fails: print('  FAIL', f)
 sys.exit(1 if fails else 0)
