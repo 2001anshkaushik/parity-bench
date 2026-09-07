@@ -52,7 +52,7 @@ and `probe/films500_held_checks.py` for the derived rows.
 | footage | hours | 675.73 (corpus) | 675.73 | `films500_video_manifest.jsonl` `_meta` (498 measured + 2 warm films) |
 | frames per leg | count | 161,932 | 161,932 | `throughput.total_frames`; one frame per 15 s |
 | posture | — | 16 tokens × 2 threads | 16 instances × 2 threads | thread environment read back in-process, fail-closed |
-| client concurrency | lanes | 16 | 16 | `provenance_leela.offered_concurrency` |
+| client concurrency | lanes | 16 | 16 | the export's provenance field `offered_concurrency` |
 | passes | count | 2 per fresh lifetime (+ 2 in one campaign lifetime) | same | passes 3–4; campaign passes 1–2 |
 | **Throughput** | | | | |
 | span | frames/s | 11.613 | 12.800 | `throughput.total_frames_per_s` |
