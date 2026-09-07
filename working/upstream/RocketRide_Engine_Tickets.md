@@ -790,6 +790,22 @@ condition; CONFIRMS if it reproduces the deployment's recorded output for that f
 exactly (6 detections; scores listed in the probe) while the raw frame reproduces
 the reference's (5); a ≤560 control must be a no-op both ways.
 
+## Measured update 4 (2026-09-07) — CONFIRMED: the facade's pre-downscale reproduces the deployment output exactly
+
+The attached probe ran inside the deployment image at the production thread
+condition (intraop 2), checkpoint md5 `b4d3ce46…` pinned to the isolation
+instrument's: the diverging frame through the facade's own
+`resize_for_inference(·, 560)` (the engine helper, imported by path, matched the
+probe's port pixel-for-pixel; 714×480 → 560×376) then `RFDETRBase().predict`
+reproduced the deployment's recorded output **bit-equal at 9 dp** (six detections:
+0.946473300 0.935210288 0.856113911 0.449365526 0.384643406 0.318114191); the raw
+frame reproduced the reference's (five: 0.953240395 …); a ≤560 control was a no-op
+both ways; every predict matched itself when run twice. Measured alongside: the
+model consumed a `[1, 3, 560, 560]` tensor on both paths (forward pre-hook at the
+eager call site), so the facade changes scores, not model work; the LANCZOS pass
+costs 4.6 ms per frame. Criterion 1 is met by measurement; criterion 4 is the
+fix's acceptance test.
+
 ## Acceptance criteria (updated 2026-09-03 — raw-score parity in isolation is
 ## already established; the question is the serving context)
 
@@ -812,3 +828,10 @@ the reference's (5); a ≤560 control must be a no-op both ways.
    coordinates, or is documented as a deployment-specific transformation with its
    measured score effect (percent-level on >560px frames, threshold crossings
    included). The spec comment "downscale to it is lossless" is corrected either way.
+5. **(added 2026-09-07, a separate observation from the same runs)** Per-token
+   process memory grows ~50 MB per film served and does not return until the token
+   ends: 16 live tokens climbed 26.5 → 49–52 GiB RSS (cgroup anon 19 → 42–45 GiB)
+   over 498 films in every one of four passes, resetting only with the tokens
+   (ttl=0). At that rate a token reaches a 58 GiB cgroup limit in ~1,100 films.
+   Throughput did not degrade with it in these runs. Name what a token retains per
+   task, or bound it.

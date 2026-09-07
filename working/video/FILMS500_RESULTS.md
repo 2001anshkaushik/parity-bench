@@ -3,9 +3,24 @@
 Campaign `films500_mainrun_20260904T204852Z`, landed at box commit
 `cc98ca6b`, bundle sha `1882c0d4…`, ff-merged to `origin/video-bench`.
 Six legs, 498 measured films each, 0 errors, every per-leg gate PASS or
-NOT RUN. **NOT the sizing report** — the 35-film DEFINITIVE stays as
-written; re-scoping is Ansh's separate ruling. Every figure below is
+NOT RUN. **Lifetimes run** `films500_lifetimes_20260906T090339Z` (four
+legs, landed 2026-09-07 at box commit 405d3c6, bundle `dbe874bb…`) and
+**V-D** (`wrapper-resize-parity-20260907`, box commit 844a990) landed
+the same way. **NOT the sizing report** — the 35-film DEFINITIVE stays
+as written; re-scoping is Ansh's separate ruling. Every figure below is
 re-read from the landed exports/records, not the run log.
+
+*Manifest provenance, recorded (2026-09-07).* Every export from both runs
+carries `manifest_sha256 = c5a09a34…` while the committed
+`films500_video_manifest.jsonl` hashes `075fc35b…`: the box's working
+copy differs from the committed file by its `_meta` line only (`git diff`
+on the box: 1 line; the corpus locator's `--stamp-corpus-dir` writes
+`_meta.corpus_dir` there, `corpus_locator.py:19-35`). The measured rows
+the runs used are byte-identical to the committed ones: every record's
+`expected_frames`, `video_s_manifest`, `bytes` and `submitted_sha256`
+match the committed manifest row for its film, 498/498 on all eight
+blast legs. The driver hashes the file, not the rows; a canonical row
+hash (or committing the stamped file) is a follow-up, not a change now.
 
 ## Partition (the finding surface) — HELD exactly
 
@@ -18,21 +33,48 @@ produced exactly 433, no exceptions across 498 films, both passes.**
 The 87% edge fraction measured at manifest build (435/500, 433 measured)
 reproduced as the failing count to the film.
 
-## Throughput (banked, re-read) — **DRAFT: n=2, spread ≈ effect size, pending the lifetime-controlled passes (ruling 2026-09-06)**
+## Throughput — LIFETIME-CONTROLLED (landed 2026-09-07; n=2 fresh lifetimes per arm) — pending Ansh's FINAL ruling on the headline
 
-> Every throughput clause below is held at DRAFT. The pass spreads (RR
-> 5.1%, LI 5.7%) equal the +5.9% effect, and the pairs overlap (RR's
-> faster pass 12.198 vs LI's slower pass 12.249). The partition section
-> above is FINAL and untouched by this.
+The lifetimes run (`results/films500_lifetimes_20260906T090339Z`, box
+commit 405d3c6, bundle `dbe874bb…`, ff-merged; two FRESH container
+lifetimes, RR first then LI, two passes each, 498 films, 0 errors, every
+gate PASS or NOT RUN) replaces the campaign's one-lifetime pair as the
+throughput basis. Every figure below is the landed export's own field.
 
-| cell | blast f/s p1/p2 | window f/s (n=482) | cores | util | idle |
+| leg | span f/s | window f/s (n=482) | cores | util | idle cores | CPU-s/frame | $/1k fh | container age at driver start |
+|---|---|---|---|---|---|---|---|---|
+| RR p3 (fresh) | **11.665** | 11.677 | 31.171 | 97.4% | 4.653 | 2.672 | 8.18 | 6 s |
+| RR p4 | **11.560** | 11.620 | 31.038 | 97.0% | 4.640 | 2.685 | 8.25 | 16,530 s |
+| LI p3 (fresh) | **12.791** | 12.772 | 29.044 | 90.8% | 0.063 | 2.271 | 7.46 | 24 s |
+| LI p4 | **12.809** | 12.794 | 28.994 | 90.6% | 0.062 | 2.264 | 7.45 | 13,563 s |
+| campaign RR p1 / p2 (one lifetime) | 12.198 / 11.609 | 12.254 / 11.613 | 31.013 / 31.084 | 96.9 / 97.1% | 4.689 / 4.656 | 2.543 / 2.678 | 7.82 / 8.22 | — |
+| campaign LI p1 / p2 (one lifetime) | 12.249 / 12.953 | 12.212 / 12.957 | 28.604 / 28.450 | 89.4 / 88.9% | 0.071 / 0.067 | 2.335 / 2.196 | 7.79 / 7.36 | — |
+| sequential (campaign, n=5) | LI 1.834 · RR 2.081 | — | 1.88 · 6.95 | 5.9 / 21.7% | — | — | — | — |
+
+**Pass spreads collapsed to AMI class: RR 0.91%, LI 0.14%** (campaign:
+5.1% / 5.7%). The campaign's 5% spreads were a property of THAT run, not
+of either framework.
+
+**Headline arithmetic (p3+p4 means; effective cores = measured cores
+minus each arm's own idle burden, RR 4.647, LI 0.063):**
+
+| basis | LI | RR | LI vs RR | campaign (p1+p2) | settled set (p2+p3+p4) |
 |---|---|---|---|---|---|
-| LI N16×T2 | 12.249 / 12.953 | 12.212 / 12.957 | 28.604 / 28.45 | 89.4 / 88.9% | 0.071 / 0.067 |
-| RR M16×T2 | 12.198 / 11.609 | 12.254 / 11.613 | 31.013 / 31.084 | 96.9 / 97.1% | 4.689 / 4.656 |
-| sequential (n=5) | LI 1.834 · RR 2.081 | — | 1.88 · 6.95 | 5.9 / 21.7% | — |
+| span f/s | **12.800** | **11.613** | **LI +10.2%** | +5.9% | +10.7% |
+| f/s per MEASURED core | 0.4411 | 0.3733 | **LI +18.1%** | +15.2% | +19.4% |
+| f/s per EFFECTIVE core | 0.4420 | 0.4389 | **LI +0.7%** (tie) | RR +1.9% | LI +1.8% |
+| CPU-s per frame (engine cgroup) | 2.268 | 2.679 | RR +18.1% | RR +8.9%… (p1-skewed) | — |
+| $/1k footage-hour | 7.46 / 7.45 | 8.18 / 8.25 | RR +10.3% | RR +5.8% | — |
 
-cross_fail=1 (expected). Pass means: **LI 12.601 f/s, RR 11.904** —
-LI +5.9% span.
+Per-pass effective-core pairs (LI vs RR): p1 0.4293 vs 0.4634 (RR
++7.9%), p2 0.4564 vs 0.4393 (LI +3.9%), p3 0.4414 vs 0.4399 (LI +0.3%),
+p4 0.4427 vs 0.4379 (LI +1.1%). **The effective-core inversion at 500
+(RR +1.9%) was entirely the campaign's pass-1 pair**; on fresh lifetimes
+it is a tie with LI marginally ahead in both pairings. The number a
+product reader will use moved by 2.6 points toward LI and lands at
+parity. Per measured core — the cost a user pays — LI +18%: the idle
+burden (4.65 cores, 14.5% of the box, holding 16 tokens) is, as before,
+the whole of that gap. cross_fail=1 was expected and is unchanged.
 
 ## (a) Why both arms are faster at 500 than at 35 — ramp/drain geometry, confirmed
 
@@ -86,7 +128,94 @@ The idle burden is unchanged and still the whole story of the measured-
 core gap: 4.67 cores standing still, 15% of the box, reported beside
 every RR figure and never subtracted.
 
-## WITHIN-LIFETIME DRIFT — a FINDING (from the landed records; n=1 lifetime per arm)
+## THE LIFETIMES RUN'S PRE-REGISTERED READING (landed 2026-09-07) — the transient-plateau account is WITHDRAWN
+
+`probe/lifetimes_reading.py --lifetimes results/films500_lifetimes_20260906T090339Z`
+(null control reproduced the campaign p1/p2 figures first; frames basis,
+enqueue order = manifest order in all four legs):
+
+| leg | Q1 · Q2 · Q3 · Q4 (s/foot-min) | first 20% → last 20% | level |
+|---|---|---|---|
+| RR p3 (fresh) | 5.372 · 5.287 · 5.405 · 5.356 | 5.501 → 5.374 = **−2.3%** | 5.354 |
+| RR p4 | 5.401 · 5.297 · 5.444 · 5.351 | 5.506 → 5.362 = −2.6% | 5.372 |
+| LI p3 (fresh) | 4.875 · 4.888 · 4.827 · 4.913 | 5.025 → 4.869 = **−3.1%** | 4.876 |
+| LI p4 | 4.875 · 4.883 · 4.789 · 4.902 | 5.007 → 4.863 = −2.9% | 4.862 |
+
+Verdicts, by the bands written before the run: **RR p3 REFUTES**
+(reversed sign: −2.3% against the pre-registered +1..+6%); **LI p3 does
+not confirm** (−3.1%, outside −6..−13%); both p4s reproduce their p3's
+own within-pass profile at the same level (|Δdrift| < 1%, level within
+0.1%) — a **repeatable pass-start shape**, not lifetime drift: the first
+20% of every pass runs ~2.5–3% slower than the last 20% on both arms,
+fresh container or aged (the sixteen cold starts; the campaign's `read_s`
+Q1 effect), and nothing rises after it. **Plateau level: p4 vs campaign
+p2 = RR −0.04% (paired SE 0.57%), LI +1.32% (SE 0.77%) — SAME LEVEL on
+both arms.** So the campaign's pass 2 and both lifetimes passes are one
+steady state — RR 5.35–5.38 s/foot-min (11.56–11.67 f/s), LI 4.80–4.88
+(12.79–12.95 f/s) — and **the campaign's pass-1 pair is the anomaly**
+(RR p1 5.09, +5% fast; LI p1 5.09, −5% slow and improving through the
+pass). The transient-plateau reading below is withdrawn: pass 1 was not
+a transient settling into pass 2's level; pass 2 was the norm and pass 1
+was off it.
+
+**The mechanism read is VOID, its premise having failed.** By its rule
+(RR p3 opening quartile 5.372 ≥ 5.20) it fires "filesystem side" — but
+the rule took the campaign's pass-1 opening quartile (5.03) as the normal
+fresh start, and that is the quantity the run showed to be anomalous:
+the fresh container opened at the steady level. The three mechanisms
+have nothing to carry. Filesystem: the ext4 free-space proxy is flat
+across the whole run (avg free extent 43,608 → 43,082 KiB, ≥4 MiB share
+0.9936 → 0.9933, free fragments 14,510 → 14,684 after ~1 TB of spool
+churn; docker-root free 603.5 → 603.3 GiB; `lifetime_state_prerun/
+postrun.json`). Process memory: the per-token climb reproduced in every
+pass — RR RSS 26.7 → 52.5 GiB (p3) and 26.5 → 49.2 (p4), cgroup anon
+19.2 → 44.8 and 19.0 → 41.6, the token processes at 3.4–3.6 GiB each at
+leg end, the server small — with flat cost; **that growth is a confirmed
+finding at n=4 and is not the carrier of anything**. Page cache: the next
+section. Spool: rr `/tmp` at leg end held 18 files / 76 KiB (16 webhooks
++ 2 locks, zero `media_*`) both passes — no leak; LI 3 files / 32 KiB per
+instance; the fs stream's spool high-water was 12.0 GiB (RR) / 13.9 GiB
+(LI) above the leg-start level. One recorded absence: `/proc/diskstats`
+(the `/dev/root` name), so churn volume is not captured.
+
+**Page cache (TASK 4, from the sampler started beside the run).**
+`probe/cachewatch_join.py`: 938 rows parsed (1 unrecognised line — the
+`nohup` banner), 2026-09-06 11:11:54Z → 09-07 02:49:05Z, iowait read as
+the cumulative `/proc/stat` counter and differenced to percent-of-box.
+Coverage: RR p3 from 62% in (147 rows), RR p4 / LI p3 / LI p4 fully (233
+/ 211 / 211). iowait quartiles: RR p3 – / 0.07 / 0.06 / 0.08 %; RR p4
+0.22 / 0.08 / 0.04 / 0.11; LI p3 1.39 / 0.52 / 0.57 / 0.63; LI p4 1.36 /
+0.50 / 0.55 / 0.69 — never above ~1.4% of the box (the LI leg-start
+sixteen-way cold burst), flat after it. Cached: 30 → 18.7 GiB through
+each RR pass (the anon climb squeezing host cache, as in the campaign),
+38 → 44 GiB through LI; Dirty 300–370 MiB (RR), 100–260 (LI). ρ(cost,
+iowait) −0.12 / −0.11 / −0.08 / −0.03; ρ(cost, position) −0.13 / −0.09 /
+−0.02 / −0.02: nothing moved and nothing correlated. **Page cache is
+exonerated for this run.** The sampler cannot speak to the campaign's
+legs (it started 22 h after they ended).
+
+**The remaining outlier — the campaign's RR pass 1 (12.198 f/s).** No
+fresh-lifetime RR pass reaches it (11.665, 11.560); it is now the only
+RR pass off the steady state. From held records: every provenance scalar
+is identical across the four RR passes (image `b7f51acc`, thread env 2
+read back, task census 16 → 16, host networking, driver CPU share 0.2%);
+pre-leg load1 3.59 / 4.58 / 0.52 / 5.8 shows no pattern; container age
+is the same at p1 and p3 (fresh). Two held facts place the anomaly
+outside the pass: **(i) it predates the pass** — RR p1's sixteen
+warm-up sends ran at a median 152 s against 159 / 164 / 163 s for p2 /
+p3 / p4 (−5 to −7%), before any pass-1 state could exist; **(ii) it is
+CPU speed, not scheduling** — the pass did the same work in 5% fewer
+engine-cgroup CPU-seconds (2.543 vs 2.672–2.685 CPU-s/frame at the same
+97% util). LI's campaign pass 1 is the mirror image: warm-up sends at a
+median 834 s against 757 / 791 / 782 s (+6–10% slow) and a within-pass
+improvement. Both campaign pass-1 windows were anomalous from their
+first warm send, in opposite directions: an environmental effect on the
+box (CPU frequency / turbo headroom or host contention — HYPOTHESIS;
+nothing in our exports measures it, and the sampler did not exist then).
+**Unexplained beyond that; not smoothed; not reproduced on n=2 fresh
+lifetimes per arm.**
+
+## WITHIN-LIFETIME DRIFT — the campaign's reading (2026-09-06), WITHDRAWN by the lifetimes run (see above; kept as the record of what was pre-registered)
 
 Per-film wall normalized to footage (s per footage-minute) against
 position in the leg (admit order), both arms, both passes — the cheapest
@@ -257,8 +386,12 @@ and what the exports already record:
   cgroup file-cache trajectory do. Prewarm is not adopted: warm-start
   (his) and cold-start-with-proof (ours) are different bases, stated
   wherever the two are put side by side.
+- **Result (landed 2026-09-07)**: the prediction had nothing to act on —
+  cost flat, iowait flat and ≤1.4% of the box, no correlation (the
+  lifetimes reading section carries the join figures). Exonerated for
+  this run; silent on the campaign's legs.
 
-## (c) Pass spreads are 5% — and they are a directional within-lifetime trend, not noise
+## (c) Pass spreads are 5% — and they are a directional within-lifetime trend, not noise — WITHDRAWN 2026-09-07 (the fresh lifetimes reproduced pass 2, not pass 1; spreads 0.91% / 0.14%; the campaign's pass-1 windows were environmental outliers — see the lifetimes reading above)
 
 RR 12.198 / 11.609 = **5.1%**; LI 12.249 / 12.953 = **5.7%** (vs 2.08% /
 0.22% at 35). This needs an account before any headline fixes, and the
@@ -301,28 +434,31 @@ gap (same basis $1.428/h ÷ x_realtime × 1000). Both an order below the
 sizing report's default-cell $38–40 and near Leela's films500 SIZING
 LG $9.24 / RR-default $40.79 (different corpus, not a join).
 
-## Draft headline — HELD (n=2, spread ≈ effect size; pending the lifetime-controlled passes; the partition clause is final)
+## Headline — lifetime-controlled (landed 2026-09-07; pending Ansh's FINAL ruling; the partition clause is final)
 
 > At the ruled 16×2-vs-16×2 posture, C=16, on the full 498-measured-film
-> Archive Films corpus (675.7 h footage, RF-DETR base), two passes:
-> **LlamaIndex delivered +5.9% span throughput** (12.601 vs 11.904 f/s
-> pass means, ±5% pass spread); **+15.2% per measured core** (idle
-> included — the cost a user pays); and **−1.9% per effective core** —
-> i.e. **RocketRide is fractionally ahead on the work itself once each
-> arm's idle spin leaves its own denominator**, a statistical tie at this
-> spread. RocketRide saturates the box (97% util) and spends 4.67 cores
-> (15%) idle holding 16 tokens; that idle burden is the entire
-> measured-core gap.
+> Archive Films corpus (675.7 h footage, RF-DETR base), on two FRESH
+> container lifetimes per arm with two passes each (spreads 0.9% RR,
+> 0.1% LI): **LlamaIndex delivered +10.2% span throughput** (12.800 vs
+> 11.613 f/s); **+18.1% per measured core** (idle included — the cost a
+> user pays); and **+0.7% per effective core** — a statistical tie on the
+> work itself once each arm's idle spin leaves its own denominator.
+> RocketRide saturates the box (97% util) and spends 4.65 cores (14.5%)
+> idle holding 16 tokens; that idle burden is the whole of the
+> measured-core gap. RocketRide costs $8.22 per 1,000 footage-hours to
+> LlamaIndex's $7.46 (+10%). Above 560px the arms differ in
+> preprocessing only — the engine's own pre-downscale, confirmed by V-D —
+> and the model does the same work per frame on both.
 
 Figures behind each clause: posture/C/corpus/N/footage from the run
-manifest + landed 500 manifest (498 measured, 675.73 h); +5.9% from pass
-means 12.601/11.904; +15.2% and −1.9% from (b); 97% util and 4.67 idle
-from the RR export; ±5% from (c). Every clause is scoped to THIS run's
-one configuration, as the 35-film headline was — and (c)'s spread caveat
-rides the throughput clause because the effect and the noise are the same
-size.
+manifests and the landed 500 manifest (498 measured, 675.73 h); +10.2%,
++18.1%, +0.7% and $/1k from the lifetimes exports (table above); 97% util
+and 4.65 idle from the RR exports; spreads from p3/p4. The campaign's
+one-lifetime draft (+5.9% / +15.2% / −1.9%) is superseded: its pass-1
+pair was an environmental outlier in both arms. Every clause is scoped
+to THIS configuration, as the 35-film headline was.
 
-## The 560px mechanism — located in the engine source (2026-09-06; confirmation probe pre-registered, not yet run)
+## The 560px mechanism — located in the engine source (2026-09-06) and CONFIRMED by V-D (2026-09-07)
 
 Shashi's determinism table (relayed via the operator, DATA; his document
 is not held) reports both his arms deterministic at a fixed thread count
@@ -403,6 +539,21 @@ Assessed against everything we hold:
   DEFINITIVE §6 is FINAL and not edited here; its residual-candidate list
   gets a one-paragraph addendum only on Ansh's ruling after V-D.
 
+**V-D RESULT (run 2026-09-07 03:23Z inside `rr:patched-video`, intraop 2,
+weights md5 `b4d3ce46…` pinned to the Ruling-Y artifact; landed at
+`results/wrapper-resize-parity-20260907/`, box commit 844a990):
+CONFIRMED.** The frame through the engine's own
+`resize_for_inference(·, 560)` — the engine helper imported by path
+agrees with the port pixel-for-pixel, 714×480 → 560×376 — then
+`RFDETRBase().predict` reproduces the campaign RR output **bit-equal at
+9 dp**: person 0.946473300, chair 0.935210288, bottle 0.856113911, chair
+0.449365526, bottle 0.384643406, chair 0.318114191 (six detections); the
+raw frame reproduces the campaign LI output bit-equal (five detections,
+0.953240395 …); the ≤560 control is a no-op both ways; every predict was
+run twice and matched itself. The engine facade's LANCZOS pre-downscale
+to `infer_edge=560` is the mechanism of the 560px partition, named in
+source and reproduced outside the serving context.
+
 ## Workload above 560px — sized from source and held records (2026-09-06; TASK 1) and the facade's configurability (TASK 2)
 
 **The premise to check first: does the facade's downscale reduce the
@@ -460,11 +611,14 @@ The feared reading — RR ~6% behind on span while doing less work per
 frame on 87% of the corpus — does not survive the source: the arms run
 the same model work per frame; above 560 RR does marginally more
 preprocessing and produces different scores. The +5.9% LI span figure
-stands as measured (held DRAFT for the lifetime reason, not for this);
-the report states the preprocessing difference and its direction
-beside it. V-D records the model-consumed tensor shape on both paths and
-times the LANCZOS pass, so the symmetry claim and RR's extra cost each
-get a measured number at the same time as the mechanism.
+stands as measured; the report states the preprocessing difference and
+its direction beside it. **Measured by V-D (2026-09-07)**: the model
+consumed `[1, 3, 560, 560]` on BOTH paths (forward pre-hook on RF-DETR's
+module at the eager call site) — pixels handed to `predict` 342,720 raw
+vs 210,560 facade (×0.614), model input identical — **workload SYMMETRIC
+at the model**; the facade's LANCZOS pass cost 4.64 ms (median of 5)
+against ~0.84 s of detection per frame: RR's extra preprocessing above
+560 is ~0.5% of per-frame cost, on RR's side.
 
 **Configurability (TASK 2).** `infer_edge=560` is a **fixed constant**:
 it lives in the module-level `BACKENDS` table (`detection.py:60`);

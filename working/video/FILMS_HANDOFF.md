@@ -202,6 +202,35 @@
 > model-consumed tensor shape via a hook on rfdetr's inference entry
 > point, expected [1,3,560,560] both) and times the LANCZOS pass.
 > Register entry 33 carries "a probe measuring one arm twice".
+> **LIFETIMES RUN LANDED 2026-09-07 (box 405d3c6, bundle dbe874bb) + V-D
+> LANDED (box 844a990, bundle 746208ce); all figures re-read from the
+> landed files (mirror shas matched).** THE PRE-REGISTRATION REFUTED THE
+> LIFETIME ACCOUNT ON ITS OWN TERMS — transient→plateau WITHDRAWN: RR p3
+> −2.3% first→last20 (reversed sign), LI p3 −3.1% (outside band); p4
+> reproduces p3's shape on both arms (a ~2.5–3% pass-start ramp, not
+> drift); spreads 0.91% / 0.14%; plateau level p4 vs campaign p2 −0.04% /
+> +1.32% = SAME LEVEL — the campaign's p2 and both lifetimes passes are
+> one steady state; the campaign's p1 pair was the anomaly (RR fast, LI
+> slow). Mechanism read VOID (its baseline was the anomaly); fs proxy flat
+> across ~1 TB of churn; per-token memory climb reproduced 4/4 with flat
+> cost (Ticket 6 criterion 5); no spool leak; page cache EXONERATED for
+> this run (938 cachewatch rows joined: iowait ≤1.4%, flat, ρ≈0; silent on
+> the campaign). HEADLINE (lifetime-controlled, pending FINAL): **LI +10.2%
+> span (12.800 vs 11.613), +18.1% per measured core, +0.7% per effective
+> core (tie — the campaign's −1.9% inversion was the p1 pair), RR +18%
+> CPU-s/frame, RR +10% $/1k**; settled set p2+p3+p4: +10.7 / +19.4 /
+> +1.8. RR p1 outlier: environmental, predates the pass (its warm-up sends
+> 5–7% faster; LI p1's 6–10% slower), same work in 5% fewer CPU-s —
+> UNEXPLAINED beyond that (no CPU-frequency/contention instrument;
+> register entry 34). V-D: **CONFIRMED bit-equal at 9 dp both ways**;
+> workload SYMMETRIC at the model ([1,3,560,560] both paths; LANCZOS 4.64
+> ms); Ticket 6 update 4. Manifest provenance: exports' manifest sha =
+> the box's `_meta`-stamped copy (corpus_locator stamp); measured rows
+> proven identical 498/498 on all eight legs. Box left clean (rr
+> removed). NEXT: Ansh's FINAL ruling on the headline; the DEFINITIVE §6
+> addendum (V-D) on his ruling; next-campaign candidates: LI applying the
+> facade pre-downscale (option A); a CPU-frequency/contention sampler
+> beside every leg.
 > **FILMS-500 COMPLETE + LANDED (2026-09-06): `FILMS500_RESULTS.md`.**
 > 6 legs × 498, 0 errors; box commit cc98ca6b, bundle 1882c0d4,
 > ff-merged. **Partition HELD EXACTLY: 433 diverging / 65 clean / 0

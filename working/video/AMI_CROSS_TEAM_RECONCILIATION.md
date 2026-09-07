@@ -217,7 +217,10 @@ What the held artifacts settle:
   corpus, no possible residency, the same gap class.
 
 **Verdict**: not supported for the AMI gap, contradicted by the films
-replication; it does not answer the open question. The ask in §3 stands
+replication; it does not answer the open question. (Lifetime-controlled
+films figures, landed 2026-09-07: RR 2.672 / 2.685 CPU-s/frame on fresh
+lifetimes against Shashi's 2.198 — **+21.9%**; the campaign's +15.7%
+was flattered by its anomalous pass 1.) The ask in §3 stands
 — per-stage CPU split on one identical file through both harnesses at
 the same posture, or one leg's cgroup sampler stream exchanged — with one
 cheaper item now available: their cores basis stated (engine cgroup over

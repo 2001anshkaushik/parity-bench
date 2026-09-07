@@ -1275,4 +1275,31 @@ than rewritten from memory, which is entry 2's point in miniature.
 > "variance under load" was never a live candidate. Confirmation is V-D
 > (`probe_wrapper_resize_parity.py`), pre-registered before it runs, with
 > the campaign's recorded outputs as the targets and CANNOT COMPARE as a
-> real outcome.
+> real outcome. **Ran 2026-09-07: CONFIRMED bit-equal at 9 dp both ways.**
+
+## 34. A pre-registration refuted on its own terms — and the warm-up ledger as the instrument that placed the anomaly (added 2026-09-07)
+
+> The campaign's two passes per arm drifted 5% in opposite directions
+> within one container lifetime, and a position fit on the records gave
+> a coherent story: pass 1 a transient, pass 2 the settled plateau. It
+> was written down before the lifetimes run with its confirming and
+> refuting shapes. The run refuted it on its own terms: fresh lifetimes
+> showed no first-pass drift (RR −2.3%, LI −3.1%, a pass-start ramp that
+> pass 4 reproduced exactly), spreads collapsed to 0.9% / 0.1%, and the
+> "plateau" turned out to be the norm — three of four RR passes and three
+> of four LI passes sit at one level; the campaign's pass-1 pair was the
+> anomaly. Two disciplines paid: **pre-registration**, without which the
+> transient story would have been fitted to the new data rather than
+> killed by it (the mechanism read even fired "filesystem side" by its
+> rule — and could be declared VOID only because its premise, that pass
+> 1's opening quartile was the normal fresh start, was itself a
+> pre-stated assumption); and **the warm-up ledger**, kept per send in
+> every leg for a different reason (coverage), which placed the anomaly
+> OUTSIDE the pass: RR's pass-1 warm sends were 5–7% faster and LI's
+> 6–10% slower than every later warm-up — before any pass state existed.
+> The rule: **a pass-level anomaly is first checked against the leg's
+> warm-up sends; a difference that is already present there is
+> environmental, not mechanistic, and is reported as unexplained rather
+> than modelled.** What the run could not do — say WHY that window was
+> different — is recorded as such; the exports carry no CPU-frequency or
+> host-contention measurement, a gap for the next instrument.
