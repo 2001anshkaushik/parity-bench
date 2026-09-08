@@ -21,7 +21,9 @@ its evidence trail is `working/video/WS1_Phase2_Films_Benchmark_DEFINITIVE.md` �
 
 **Type:** Bug · **Severity:** High (silent data duplication) · **Component:** `nodes/embedding_transformer`
 
-**Affects:** the file is **byte-identical at `server-v3.2.0`, `v3.2.1`, `v3.2.2`, `v3.3.0`, `v3.3.1` and current `HEAD` (`1138936`)** — every tagged release since 3.2.0, **and unfixed at HEAD today.**
+**Affects:** the file is **byte-identical at `server-v3.2.0`, `v3.2.1`, `v3.2.2`, `v3.3.0`, `v3.3.1` and `1138936`** (the clone HEAD when this ticket was written, 2026-08-21) — every tagged release since 3.2.0.
+
+**Status 2026-09-08 `[VERIFIED — source, read-only; register entry 1: a source trace is not a measurement]`:** upstream commit `ee952ba3` (`fix(embedding_transformer): deliver each flushed batch exactly once (#2062)`, authored 2026-08-21 13:26 PDT, closes upstream #2051) addresses exactly this mechanism: `writeDocuments()` now flushes at `maxDocuments` and then **always** returns `preventDefault()`, with a docstring on `_flushDocuments()` explaining why `close()` keeps forwarding (`Parent::close()`). The file at `develop` HEAD `51e4b86` (2026-09-08) is sha256 `b79424af…` with two `preventDefault`; at `server-v3.3.1` and in our bundle it is `23216a6a…` with one. **The fix is on `develop` only — reachable from no `server-v*` tag** (`git tag --contains ee952ba3` lists only client prerelease tags), and `server-v3.3.1` (`a0817cc6`, 2026-07-06) is still the newest server release, **so it is unfixed for every user today.** Our build-time patch (`RR_DUP_PATCH=1`, `preventDefault-after-embedding-flush`) is **source-equivalent** to `ee952ba3` at this node — same behaviour on the buffer path, the flush path, `close()`, an empty argument, an over-full argument and an exception inside the flush (`preventDefault()` raises in `rocketlib/filters.py`, so both end on the same raise); detail in `DOCS_HANDOFF.md` §2.5. The dates are close to this filing's; **causality is not established and is not claimed** — only that the upstream commit exists, what it changes, and where it is reachable.
 
 **Found by:** three independent benchmark harnesses, separately, across three corpora.
 
@@ -163,7 +165,8 @@ now a permanent gate in all three harnesses.
 
 - [ ] A document producing ≥ `maxDocuments` chunks emits its chunk list exactly once
 - [ ] `test_embedding_transformer_flush.py` lands with the fix (currently 2/7 failing on stock, 7/7 passing patched)
-- [ ] Fix applied at HEAD; backport decision recorded for tags ≥ 3.2.0
+- [x] Fix applied at HEAD — `ee952ba3` on `develop` (verified 2026-09-08 against `51e4b86`); **backport decision NOT recorded** — no tag carries it
+- [ ] A release tag (`server-v3.3.2` or later) that contains `ee952ba3`
 
 ## Workaround in use today
 
@@ -190,7 +193,7 @@ markers and the presence of a human MIT header.
 **Title:** Native batch API leaves ~50% of allocated cores idle on real-world document mixes — 45% throughput cost versus per-document submission
 
 **Type:** Performance / Architecture · **Severity:** High · **Component:** batch scheduler / `send_files` dispatch
-**Affects:** 3.3.1 (patched build — this is independent of `BUG_CHUNK_DUPLICATION`)
+**Affects:** 3.3.1 (patched build — this is independent of `BUG_CHUNK_DUPLICATION`). *Re-checked 2026-09-08 at `develop` HEAD `51e4b86`: the cited `engLib/task/core/pipetask.process.cpp` is unchanged since `server-v3.3.1` (the only `engLib/task/core` changes are `execute.cpp` +6 and `task.cpp` +38 lines, from the Crashpad and storage-identity commits, not the dispatch queue). No source-level change addresses this ticket at HEAD.*
 **Measured by:** three independent harnesses; isolated by a controlled single-variable experiment
 
 > **Scope note.** This ticket reports a **measurement and an acceptance test**, not a design.
@@ -361,7 +364,7 @@ ordering and granularity:
 
 **Type:** Bug · **Severity:** High (silent configuration no-op affecting every text pipeline) · **Component:** `nodes/preprocessor_langchain`
 
-**Affects:** `langchain.py` is **byte-identical at `server-v3.3.1` and current `HEAD` (`1138936`)** — unfixed at HEAD today. (Older tags not checked for this file.)
+**Affects:** `langchain.py` is **byte-identical at `server-v3.3.1` and `1138936`** — and, re-checked 2026-09-08, **still byte-identical at `develop` HEAD `51e4b86`** (sha256 `534c0d4f…` at all three) — unfixed at HEAD today. (Older tags not checked for this file. `preprocessor_langchain/services.json` and its README changed since 3.3.1; the splitter code did not.)
 
 **Found by:** a benchmark harness whose source-derived chunk-size prediction (512) lost to its own record measurements (≈4000); the discrepancy was traced to this mechanism and reproduced.
 
@@ -453,7 +456,7 @@ values that were never in effect.
 
 **Type:** Performance · **Severity:** Medium, rising with multiplexing (the idle cost scales with the number of loaded pipelines; measurement bias in any CPU-accounted deployment) · **Component:** engine core + task subprocess (the split between eaas server and task processes is in the sweep's per-process deltas — see Open questions)
 
-**Affects:** engine 3.3.1 (release binary, Linux x64), measured 2026-08-21 twice: single-engine idle (1.002 cores) and the Phase 2 concurrency sweep (M = 1/2/4/8/16 loaded pipelines, the six BLAS/OMP variables at 8). Not source-diffed across versions (the spin is in compiled code or the served python's event loop; the reproduction is behavioural).
+**Affects:** engine 3.3.1 (release binary, Linux x64). *Re-checked 2026-09-08: behavioural, not source-diffable; no statement about `develop` HEAD is possible from source.* Measured 2026-08-21 twice: single-engine idle (1.002 cores) and the Phase 2 concurrency sweep (M = 1/2/4/8/16 loaded pipelines, the six BLAS/OMP variables at 8). Not source-diffed across versions (the spin is in compiled code or the served python's event loop; the reproduction is behavioural).
 
 ## Summary
 

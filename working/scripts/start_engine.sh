@@ -54,6 +54,7 @@ cd "$ENGINE_DIR"
 nohup ./engine ai/eaas.py --host="$HOST" --port="$PORT" >>"$LOG" 2>&1 &
 ENGINE_PID=$!
 echo "$ENGINE_PID" >"$PIDFILE"
+echo "$PORT" >"$ROOT/logs/engine.port"   # the port THIS engine serves; the suite binds to pid+port, never to a bare :5565
 echo "started pid $ENGINE_PID -> $LOG"
 
 # Readiness uses /version, not /ping. /ping requires auth and answers 401, which proves only that
