@@ -84,8 +84,25 @@ def fact(label, cond, got=''):
     print(f'  {"PASS" if cond else "FAIL"}  {label}  {got}')
 
 
+UNV = '[UNVERIFIED — no artifact; do not quote]'
+
+
 def unver(label, why):
     unverifiable.append(f'{label} — {why}')
+
+
+def chk_unverified(label, figure):
+    """A figure no committed artifact reproduces must carry the UNVERIFIED label on the same
+    line, everywhere it appears (Advisor R4, 2026-09-08). Listed under UNVERIFIABLE as well, so
+    the reader sees what is not checked; FAILS if the figure appears anywhere unlabelled."""
+    global n_ok
+    lines = [l for l in TEXT.splitlines() if figure in l]
+    ok = bool(lines) and all(UNV in l for l in lines)
+    n_ok += ok
+    if not ok:
+        fails.append(f'{label}: {figure!r} {"absent" if not lines else "appears WITHOUT the UNVERIFIED label"}')
+    print(f'  {"PASS" if ok else "FAIL"}  {label}: {figure} carries {UNV} on {len(lines)} line(s)')
+    unverifiable.append(f'{label} — labelled, not checked: {figure}')
 
 
 def load(p: Path):
@@ -193,6 +210,12 @@ def section_2():
     for p in BATCHED:
         e = load(p)['provenance']['engine']; fact(f'{p.name[:38]} engine block label_raw "1" (never carried the false field)', e['label_raw'] == '1' and e['duplication_patch_applied'] is True)
     fact('correction artifact committed (provenance_correction_20260818)', bool(list(RES.glob('provenance_correction_20260818__*.json'))))
+    fact('§2.4 no longer claims the four batched exports carried the false field', 'The same holds for `…155557Z` and all four' not in TEXT)
+    chk('§2.4 R1 correction present', None, 'Only the two `smoke50_parser_in__20260818T*` exports ever carried the false field')
+    chk('§2.4 names the Advisor claim as wrong', None, "the Advisor's original claim here was wrong")
+    art = json.loads(sorted(RES.glob('provenance_correction_20260818__*.json'))[-1].read_text())['data']
+    fact('correction artifact: exactly the two smoke50 exports changed', sorted(art['summary']['changed']) == sorted(p.name for p in (S18, S18B)))
+    chk('§2.4 artifact counts: 2 corrected', len(art['summary']['changed']), '2 corrected'); chk('§2.4 artifact counts: 9 unchanged', len(art['summary']['unchanged']), '9 unchanged')
 
 
 def section_3():
@@ -288,32 +311,57 @@ def section_4_7():
     chk('§7.1 median 8', st.median(c18), 'median 8'); chk('§7.1 p95 74 (nearest-rank)', q_nearest(c18, 0.95), 'p95 74', expect='74'); chk('§7.1 max 1377', max(c18), '**max 1377**')
     chk('§7.1 p95-to-max 18.6×', max(c18) / q_nearest(c18, 0.95), '18.6×')
     chk('§4.1 4000/200 defaults', 4000, '4000/200'); fact('declared chunk_config 4000/200 in provenance', load(S18)['provenance_leela'][RR]['chunk_config'] == {'chunk_size': 4000, 'chunk_overlap': 200, 'splitter': 'RecursiveCharacterTextSplitter', 'input_transform': "text + '\\n'"})
-    unver('§4.1 mean chunk chars ~3326–3468, max ~3993', 'cited from query_phase1_chunks_20260820T223826Z.json, which is not under working/results on this branch')
-    unver('§7.1 slowest 1% carry 58.6% of all service seconds', 'no service-seconds artifact is committed; the per-document latency share (completion−submit) is 17.1% on run10k_p2_blast_v2 and is NOT the same quantity')
-    unver('§6.1 engine burns 1.004 cores idle', 'measured live from /proc/<pid>/stat; no committed artifact')
-    unver('§3.3 LOC 557 vs 179, COSMIC 4 CFP', 'no LOC/COSMIC artifact under working/results')
-    unver('§3.6 RocketRide post-leg reading 135.3 MB', 'a post-leg point sample; no committed artifact names it')
-    unver('§6.2 Tika reference 0.599 s/doc', 'no committed timing artifact')
-    unver('§1.1 video 2.443 / 12.729 f/s, 5.21×, 0.19%', 'video-campaign figures; checked by working/video/probe/end_to_end_figures_check.py, not here')
+    print('--- R4: figures with no artifact must carry the UNVERIFIED label wherever they appear ---')
+    chk_unverified('§4.1 mean chunk chars', '3326–3468'); chk_unverified('§4.1 max chunk chars', '~3993')
+    chk_unverified('§6.1 idle burden', '1.004 cores'); chk_unverified('§3.3 LOC', '557 vs 179')
+    chk_unverified('§3.6 post-leg reading', '135.3 MB'); chk_unverified('§6.2 Tika price', '0.599 s/doc')
+    chk_unverified('§7.1 struck tail share', '58.6%')
+    rec = [r for r in jl(RES / 'run10k_p2_blast_v2' / 'perdoc_rr_blast.jsonl') if r.get('ok')]
+    lat = sorted(((r['completion_ns'] - r['submit_ns']) / 1e9 for r in rec), reverse=True)
+    top = lat[:math.ceil(0.01 * len(lat))]
+    chk('§7.1 nearest computable analogue: top-1% share of summed latency', sum(top) / sum(lat) * 100, '**17.1%**')
+    chk('§7.1 the analogue is named as a different quantity', None, 'it is a **different quantity**')
+    print('--- §1.1 the video finding, from the 24-Aug exports ---')
+    VM = ROOT / 'working' / 'video' / 'results' / 'mainrun_20260824T025550Z'
+    vx = lambda n: json.loads((VM / f'export_rocketride_video_{n}.json').read_text())
+    d1, d2, p1, p2 = vx('default_blast'), vx('default_blast_p2'), vx('parity_blast'), vx('parity_blast_p2')
+    sp = lambda e: e['throughput']['total_frames_per_s']; ut = lambda e: e['efficiency']['cpu_util_of_box']
+    chk('§1.1 default 2.443 f/s', sp(d1), '2.443 f/s'); chk('§1.1 default ~18.8%', ut(d1) * 100, '~18.8%')
+    chk('§1.1 parity 12.729 f/s', sp(p1), '12.729 f/s'); chk('§1.1 parity 91.7%', ut(p1) * 100, '91.7%')
+    chk('§1.1 5.21× on span', sp(p1) / sp(d1), '5.21× on span'); chk('§1.1 spread 0.19%', (sp(p2) - sp(p1)) / sp(p1) * 100, 'spread 0.19%')
+    fact('§1.1 p2 spans as labelled (2.446, 12.753)', sp(d2) == 2.446 and sp(p2) == 12.753)
 
 
 def section_5_8():
     print('=== §5 / §8: branch facts and the register, from git and the tree ===')
-    added = [l for l in git('diff', '--name-status', 'origin/video-bench', 'origin/main', '--', 'working/results').splitlines()]
-    chk('§5.1 128 main-only files under working/results', len(added), '**128 files under `working/results/`**'); fact('all 128 are additions on main', all(l.startswith('A\t') for l in added))
-    fact('box.sh is video-bench-only (D in the video-bench→main diff)', git('diff', '--name-status', 'origin/video-bench', 'origin/main', '--', 'working/harness/box.sh').startswith('D'))
+    # §5.1 describes the fork state the handoff was written against: video-bench at 87b957d,
+    # main at c06673a. Later landings move origin/video-bench (the correction artifact alone
+    # makes the live diff 129), so the facts are pinned to those commits.
+    FORK_VB, FORK_MAIN = '87b957d', 'c06673a'
+    fact('origin/main is still the fork-era main (c06673a)', git('rev-parse', 'origin/main').startswith(FORK_MAIN))
+    added = [l for l in git('diff', '--name-status', FORK_VB, FORK_MAIN, '--', 'working/results').splitlines()]
+    chk('§5.1 128 main-only files under working/results (at 87b957d vs c06673a)', len(added), '**128 files under `working/results/`**'); fact('all 128 are additions on main', all(l.startswith('A\t') for l in added))
+    fact('box.sh is video-bench-only (D in the video-bench→main diff at the fork state)', git('diff', '--name-status', FORK_VB, FORK_MAIN, '--', 'working/harness/box.sh').startswith('D'))
     chk('§5.1 fork point 17f77aa', None, '17f77aa'); fact('merge-base of main and video-bench is 17f77aa', git('merge-base', 'origin/main', 'origin/video-bench').startswith('17f77aa'))
     tree = git('ls-tree', '-r', '--name-only', '17f77aa')
     fact('17f77aa already carried the docs driver, arms, batched arm, smoke and rederive', all(p in tree for p in ('weekend_worker.py', 'working/scripts/smoke50_parser_in.py', 'working/scripts/exp_batched_blast.py', 'working/scripts/smoke_phase2.py', 'working/scripts/rederive_gates.py')))
-    mod = git('diff', '--name-status', 'origin/video-bench', 'origin/main', '--', 'working/harness/gates_shared.py', 'working/harness/provenance_leela.py', 'working/harness/collector_proc.py', 'working/harness/static_names.py', 'working/nodes/env_probe/IInstance.py')
+    mod = git('diff', '--name-status', FORK_VB, FORK_MAIN, '--', 'working/harness/gates_shared.py', 'working/harness/provenance_leela.py', 'working/harness/collector_proc.py', 'working/harness/static_names.py', 'working/nodes/env_probe/IInstance.py')
     fact('main is older on the five shared harness files (all M in the video-bench→main diff)', mod.count('M\t') == 5, mod.replace('\n', ' '))
     fact('main:132 held the literal False', 'duplication_patch_applied": False' in git('show', 'origin/main:working/harness/provenance_leela.py').splitlines()[131])
-    fact('origin/video-bench:140 held the literal False', 'duplication_patch_applied": False' in git('show', 'origin/video-bench:working/harness/provenance_leela.py').splitlines()[139])
-    chk('§2.4 main line 132', None, '`main` line 132'); chk('§2.4 video-bench line 140', None, '`video-bench` line 140')
+    fact('video-bench:140 at 87b957d held the literal False', 'duplication_patch_applied": False' in git('show', '87b957d:working/harness/provenance_leela.py').splitlines()[139])
+    fact('the literal is gone from HEAD provenance_leela.build()', '"duplication_patch_applied": False' not in (ROOT / 'working/harness/provenance_leela.py').read_text().split('def build(')[1].split('def check(')[0])
+    chk('§2.4 main line 132', None, '`main` line 132'); chk('§2.4 video-bench line 140', None, '`video-bench` line 140 (at 87b957d)')
     vc = ROOT / 'working' / 'scripts' / 'verify_corpus_manifest.py'
     fact('verify_corpus_manifest.py:41 is the --subset flag line', 'subset = "--subset" in sys.argv[1:]' in line(vc, 41)); chk('§5.4 :41', None, '`:41`')
     fact('verify_corpus_manifest.py:35-37 resolve manifest and corpus paths', 'corpus_manifest.jsonl' in line(vc, 36) and 'govdocs1' in line(vc, 37)); chk('§5.4 :35-37', None, '`:35-37`')
     fact('fetch_govdocs.py committed', (ROOT / 'working' / 'scripts' / 'fetch_govdocs.py').exists())
+    CMD = "./working/harness/box.sh run 'ls ~/parity-bench/corpus/govdocs1/pdfs | wc -l; df -h /; cd ~/parity-bench && ~/.venv/bin/python working/scripts/verify_corpus_manifest.py'"
+    chk('§5.4 the single-line box command', None, CMD)
+    fact('§5.4 the unrunnable multi-line form is gone', "box.sh 'ls ~/parity-bench" not in TEXT)
+    oc = (ROOT / 'working' / 'docs' / 'overnight_corpus_check.txt').read_text()
+    fact('overnight_corpus_check.txt records VERDICT: MATCH with 0/0/0', 'VERDICT: MATCH' in oc and 'missing          : 0' in oc and 'extra            : 0' in oc and 'changed          : 0' in oc and 'files on disk    : 10000' in oc)
+    chk('§5.4 verdict quoted', None, 'VERDICT: MATCH — corpus is byte-identical to the manifest'); chk('§5.4 10000 on disk', 10000, '`10000` on disk'); chk('§5.4 603G available', None, '603G available')
+    fact('§5.4 names the subcommand and the multi-line refusal', 'refuses any multi-line string' in TEXT and '`run` for a one-shot' in TEXT)
     reg = REGISTER.read_text().splitlines()
     chk('§8.6 register 35 entries', sum(bool(re.match(r'## \d+\. ', l)) for l in reg), '**35 entries**')
     fact('register entry 2 at :24', reg[23].startswith('## 2. Self-consistency is not evidence')); chk('§2.5 METHODOLOGY_REGISTER.md:24', None, 'METHODOLOGY_REGISTER.md:24')

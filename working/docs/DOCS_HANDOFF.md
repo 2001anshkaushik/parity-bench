@@ -43,12 +43,14 @@ The banked docs comparison is **a tuned LlamaIndex against RocketRide's default 
 
 1. Whether the **current stock engine** fixes duplication natively. This is the re-run's question, and no test of it exists. (§2.5)
 2. Where RocketRide's posture optimum sits for a parse-bound workload. Unknown; the video 5.21× does not transfer. (§6.1)
-3. Whether GovDocs1 is still on the box, and at what SHA. (§5.4)
+3. ~~Whether GovDocs1 is still on the box, and at what SHA.~~ **Resolved 2026-09-08:** on the box, byte-identical to the manifest — 10000 on disk / 0 missing / 0 extra / 0 changed / VERDICT MATCH (§5.4).
 4. Whether the docs metric set survives contact with a multi-token posture. (§6.3)
 
 ### The first decision
 
 **Do not run anything yet.** The first decision is §10.1 — fix `provenance_leela.py` before any leg runs, because every run made against it produces a false comparability record. It is a ten-line fix and it gates the campaign.
+
+*Status 2026-09-08: done — d98aa7c (label read; None when unreadable, never False) and 4029eab (check() scoped by arm, Advisor R2), landed on `video-bench` and merged into `docs-bench`. The corrected 18-Aug blocks are in `working/results/provenance_correction_20260818__*.json`. See the correction in §2.4: the defect was narrower than this document first claimed.*
 
 ---
 
@@ -56,7 +58,7 @@ The banked docs comparison is **a tuned LlamaIndex against RocketRide's default 
 
 ### 1.1 What the claim is
 
-The video campaign measured RocketRide's throughput ceiling as **per-token, not architectural**: default posture (1 token, thread env unset) at 2.443 f/s and ~18.8% box utilisation, against parity posture (16 tokens, six BLAS/OMP vars = 2) at 12.729 f/s and 91.7% — **5.21× on span, pass-to-pass spread 0.19%**. `[PRIOR-RECORD — the campaign figures live in working/video/WS1_Phase2_Video_Benchmark_DEFINITIVE.md; confirm there before quoting]`
+The video campaign measured RocketRide's throughput ceiling as **per-token, not architectural**: default posture (1 token, thread env unset) at 2.443 f/s and ~18.8% box utilisation, against parity posture (16 tokens, six BLAS/OMP vars = 2) at 12.729 f/s and 91.7% — **5.21× on span, pass-to-pass spread 0.19%**. `[VERIFIED 2026-09-08 from working/video/results/mainrun_20260824T025550Z/export_rocketride_video_{default,parity}_blast{,_p2}.json: spans 2.443 / 2.446 and 12.729 / 12.753 f/s, cpu_util_of_box 0.1884 and 0.9165, ratio 5.21, pass-to-pass spread 0.19%; the docs figure checker recomputes them on every run]`
 
 That finding is dated **24 August**. The docs runs are dated **16–18 August**. It was never applied to documents.
 
@@ -171,7 +173,7 @@ This also sizes the re-run: any duplication test needs a corpus slice that actua
 
 ### 2.4 🚩 The exports lie about patch status — and it is still live
 
-`working/harness/provenance_leela.py` hardcodes the field as a literal: `[VERIFIED 2026-09-07]`
+`working/harness/provenance_leela.py` hardcoded the field as a literal — the code as it stood on 7 Sep, quoted here as the record of the defect (do not quote the value): `[VERIFIED 2026-09-07]`
 
 ```python
 "rocketride_engine_version": "3.3.1",
@@ -182,7 +184,7 @@ This also sizes the re-run: any duplication test needs a corpus slice that actua
 "duplication_patch_id": None,
 ```
 
-`main` line 132, `video-bench` line 140. **Unconditional. Never fixed. Live on both branches today.**
+`main` line 132, `video-bench` line 140 (at 87b957d). **Unconditional from 17 Aug to 7 Sep on both branches.** Fixed 2026-09-07 in d98aa7c (on `video-bench` from ea04db2's push, and on `docs-bench`); `main` still carries it.
 
 The tell that it carries no information: it reports `False` on the **LlamaIndex arm too**, which has no RocketRide engine to patch. A field that fires identically on an arm that cannot have the property is a harness defect, not a measurement — the same signature the campaign already learned to read from the gate-contradiction root cause.
 
@@ -194,11 +196,13 @@ The tell that it carries no information: it reports `False` on the **LlamaIndex 
 | `sha256:073b43d8…` | `rr:patched` | in `smoke_phase2__20260818T035559Z` and `…074453Z` — `label_raw=1`, fixture `repeat_factor=1` |
 | `sha256:3d2f1f43…` | `ws1-llamaindex:x86_64` | in every 18-Aug artifact |
 
-`smoke50_parser_in__20260818T094225Z__a5fd8e2033b7.json` records `provenance_leela/rocketride_pdf/image_digest = sha256:073b43d8…` — **the patched digest** — while the same file's `duplication_patch_applied` reads `False`. The same holds for `…155557Z` and all four `exp_batched_blast__20260818T*` exports.
+`smoke50_parser_in__20260818T094225Z__a5fd8e2033b7.json` records `provenance_leela/rocketride_pdf/image_digest = sha256:073b43d8…` — **the patched digest** — while the same file's `duplication_patch_applied` reads `False`. The same holds for `…155557Z`.
+
+**Correction, 2026-09-08 (Advisor ruling R1 — the Advisor's original claim here was wrong).** This section first stated that the false field was also carried by all four `exp_batched_blast__20260818T*` exports. It was not. Those four exports **never had a `provenance_leela` block**: they were written through `experiment_common.provenance()`, whose engine block **reads** the image label at run time and records `duplication_patch_applied: true`, `label_raw: "1"` beside the `rr:patched` digest — correct all along. **Only the two `smoke50_parser_in__20260818T*` exports ever carried the false field.** `rederive_gates` and the three `smoke_phase2` exports carry no `provenance_leela` block either. The image-digest attribution above and the halved-maximum corroboration in §2.2(c) were verified independently of this claim and stand unchanged. `[VERIFIED 2026-09-08 — working/results/provenance_correction_20260818__*.json enumerates every 18-Aug export with its status: 2 corrected, 9 unchanged with the reason]`
 
 Corroborated independently by §2.2(c): the halved corpus maximum. Metadata and output shape agree.
 
-**Ruling.** The 18-Aug measured docs runs were on `rr:patched`. Their exports' `duplication_patch_applied: False` is false. This matters beyond bookkeeping: Leela's `check()` treats that field as load-bearing for comparability, so anyone applying his rule to our exports concludes our headline run is not comparable with his patched runs — when in fact both are patched. **We owe him a correction, and the fix gates the re-run (§10.1).**
+**Ruling.** The 18-Aug measured docs runs were on `rr:patched`. The two smoke50 exports' `duplication_patch_applied: False` is false — never quote that value from them; cite the correction artifact or the `image_digest`. This matters beyond bookkeeping: Leela's `check()` treats that field as load-bearing for comparability, so anyone applying his rule to our exports concludes our headline run is not comparable with his patched runs — when in fact both are patched. **We owe him a correction, and the fix gates the re-run (§10.1).** *Status 2026-09-08: the fix has landed (d98aa7c, 4029eab); the correction to Leela is drafted, not sent — AUTOMATION_CONTRACT.md red item 3.*
 
 ### 2.5 What a test of the CURRENT stock engine would have to show
 
@@ -295,7 +299,7 @@ With the §3.2 qualifier attached, every time.
 
 **Data isolation** (`exp_data_isolation__20260817T065922Z` null control + `…072129Z` disjoint): cross-tenant chunks / docs / vectors all **0** on both arms, with the null control at overlap 1.0 proving the detector can see shared content.
 
-**Lines of code, as-built**: 3.1× (557 vs 179) by LOC, 2.7× by semantic units, 4.9× by canonical bytes. COSMIC functional size **4 CFP on both arms**. `[PRIOR-RECORD]`
+**Lines of code, as-built**: 3.1× (557 vs 179) by LOC, 2.7× by semantic units, 4.9× by canonical bytes. COSMIC functional size **4 CFP on both arms**. `[UNVERIFIED — no artifact; do not quote]` — no LOC/COSMIC artifact exists under `working/results`; re-measure before any of these figures is used.
 
 ⚠️ Both isolation runs are **17-Aug, pre-Phase-2** — different images (`500c5d77`/`6699e9d4`), stock engine, no cpuset. Do not table them beside 18-Aug throughput without saying so.
 
@@ -331,7 +335,7 @@ Why this is the strongest thing the docs phase produced:
 
 * Any `peakRSS` from before commit `e1167121` — summed per-process RSS, over-counted, and the bias **scales with process count**, so even the LI/RR ratio is unsalvageable.
 * **84,960.6 MB** for RocketRide — a summing artifact against a 58 GB cap. The number surviving *is* the proof it is not a footprint.
-* **"RocketRide ~6.9× lighter"** — both sides were post-leg point samples taken after the leg closed. RocketRide's post-leg reading was 135.3 MB against a true sampled peak of 16,397.0 MB. Quote 1.42× from the 10k blast.
+* **"RocketRide ~6.9× lighter"** — both sides were post-leg point samples taken after the leg closed. RocketRide's post-leg reading was 135.3 MB (that reading itself is `[UNVERIFIED — no artifact; do not quote]` — a point sample no committed file records) against a true sampled peak of 16,397.0 MB (`run10k/sampler_rr_blast.summary.json`). Quote 1.42× from the 10k blast.
 * **RocketRide `blast_batchpos` latency from `run10k_p2_blast_v2`** — corrupted at *every* `warm_n`. `enqueue_ns` was stamped once before both runners, so RocketRide's batch-open stamp predates its own leg by the whole LlamaIndex leg. Measured stale gap: **2,388.6s** on RocketRide, 0.3s on LlamaIndex. The `warm_n=64` closed-loop figures are the valid ones.
 * **The 371 `PipeException` failures** as a RocketRide reliability result. Self-inflicted: the submission-gap check returned exactly **1800.0s** at index 9,629 — precisely our own client deadline — against the engine's 900s default idle ttl. The engine did what it documents. This is a harness footnote, never a product finding.
 * **The gate FAIL verdicts on the 18-Aug per-document blast** — census printed "offered 9975 = successful 0" on both arms despite 9,975 records existing on disk. The gate path evaluated the empty sequential record set. Use `rederive_gates__20260818T140635Z__ef789985f863.json` instead.
@@ -349,7 +353,7 @@ The engine's own settings therefore filter to `{}` and the splitter runs at **La
 
 `strlen`, the profile values, `mode`, and the node's own `chunk_size`/`chunk_overlap` lines are **all dead config**. Only `separators` survives the filter.
 
-This vindicated Phase 1 rather than damaging it: the docs arm's exported 4000/200 and its `chunk_config_parity` gate matched deployed reality. The measured records agree — mean chunk chars ~3326–3468, max ~3993, the 4000 ceiling showing through. `[PRIOR-RECORD from query_phase1_chunks_20260820T223826Z.json; the median-8-chunks/doc figure is VERIFIED 2026-09-07 from the committed per-document records]`
+This vindicated Phase 1 rather than damaging it: the docs arm's exported 4000/200 and its `chunk_config_parity` gate matched deployed reality. The measured records agree — mean chunk chars ~3326–3468, max ~3993, the 4000 ceiling showing through `[UNVERIFIED — no artifact; do not quote]` (cited from `query_phase1_chunks_20260820T223826Z.json`, which is not in the repo; re-derive from the committed chunk records before quoting). The median-8-chunks/doc figure is `[VERIFIED 2026-09-07 from the committed per-document records]`.
 
 ### 4.2 What it does to a chunk-conservation gate on documents
 
@@ -436,17 +440,19 @@ Cut `docs-bench` on the box as a **third worktree** (`~/parity-bench-docs`), mat
 * The 18-Aug measured slice records `corpus_manifest_sha256 = 22177c33c3651fceceef99ba5c5c2d89f9bbe270dddc23e9943c6e20b421508c`, `corpus_n_docs = 9975`.
 * The full 10,000-document corpus sha from the 16-Aug era is recorded as `03692bf6a4d5d549` `[PRIOR-RECORD]`.
 
-⚠️ **Whether GovDocs1 is still on the box is UNVERIFIED and cannot be checked from a laptop.** The box has since taken a 1 TB volume and run a 262 GiB films corpus. First box command of the campaign, before anything else:
+The box has since taken a 1 TB volume and run a 262 GiB films corpus, so residency had to be checked from the box. The command, in the only form `box.sh` accepts:
 
 ```bash
-./working/harness/box.sh 'ls ~/parity-bench/corpus/govdocs1/pdfs | wc -l; \
-  df -h /; \
-  cd ~/parity-bench && ~/.venv/bin/python working/scripts/verify_corpus_manifest.py'
+./working/harness/box.sh run 'ls ~/parity-bench/corpus/govdocs1/pdfs | wc -l; df -h /; cd ~/parity-bench && ~/.venv/bin/python working/scripts/verify_corpus_manifest.py'
 ```
+
+⚠️ **Command contract, learned on 7 Sep (the form this document first gave could not run):** `box.sh` takes a *subcommand* — `run` for a one-shot (add `--start` if the box is stopped) — and **refuses any multi-line string** (entry 25: long blocks go to the box as committed scripts that print their own sha). Backslash-newlines inside the single quotes are literal newlines, so the three statements must sit on ONE line. And `~/.venv/bin/python` **is** correct on the box even though the laptop's venv is `../.venv` — the two machines differ, and `autoland.sh` proves its interpreter by importing psutil for exactly that reason.
+
+**Result, 2026-09-08 07:39 UTC** `[VERIFIED — box.sh transcript ~/.rocketride_box/transcript_20260908.log; copy in working/docs/overnight_corpus_check.txt]`: `10000` on disk; `/dev/root 969G, 367G used, 603G available`; `mode: FULL`, `manifest entries: 10000`, `files on disk: 10000`, `missing: 0`, `extra: 0`, `changed: 0`, **`VERDICT: MATCH — corpus is byte-identical to the manifest`**, `__RC=0`. The box was stopped afterwards.
 
 ⚠️ **Flag contract, verified — do not add `--full`.** `verify_corpus_manifest.py` takes **only** `--subset`; full verification is the **default with no flag** (`main()` does `subset = "--subset" in sys.argv[1:]`, `:41`). It resolves its own paths: manifest `working/results/corpus_manifest.jsonl`, corpus `corpus/govdocs1/pdfs` (`:35-37`). `--subset` verifies only files present on disk and does **not** gate on missing — it is the same gate, scoped, and it is the wrong one here. `[VERIFIED 2026-09-07]`
 
-Expect `10000 on disk / 0 missing / 0 extra / 0 changed / VERDICT MATCH`. Anything else, re-fetch with `--verify` before a single leg runs. Do **not** trust a fetcher log line that reports its own arithmetic — that exact defect once truncated zip 040 at 48 of 248 members while printing `DONE total_pdfs=10000`.
+Expected `10000 on disk / 0 missing / 0 extra / 0 changed / VERDICT MATCH` — and that is what it reported. Anything else on a future re-check, re-fetch with `--verify` before a single leg runs. Do **not** trust a fetcher log line that reports its own arithmetic — that exact defect once truncated zip 040 at 48 of 248 members while printing `DONE total_pdfs=10000`.
 
 ---
 
@@ -464,7 +470,7 @@ The document pipeline's cost centre is **Tika parse** (JVM, in the engine) plus 
 
 **Ruling.** The posture sweep must be run **fresh on documents**, over M tokens × the six BLAS/OMP vars, each point at C ≥ M so lanes actually saturate. Symmetric method, per-arm optimum, full matrix published beside the chosen values — the same shape settled for video (Crossroad 17). Do not carry a video value across.
 
-⚠️ **Watch the idle burden.** The engine burns **1.004 cores doing nothing** (measured, `/proc/<pid>/stat` delta over 5s on an idle box). If that spin is per-token rather than per-server, M=16 costs 16 of 32 cores before any work starts — and on documents, where the box is not inference-saturated, that overhead is proportionally far more expensive than it was on video. **Measure whether the spin is per-server or per-token in the first sweep point.** `[PRIOR-RECORD on the 1.004 figure; the per-token question is open in both campaigns]`
+⚠️ **Watch the idle burden.** The engine burns **1.004 cores doing nothing** (a `/proc/<pid>/stat` delta over 5s on an idle box; the figure is `[UNVERIFIED — no artifact; do not quote]` — no committed file records that reading, so re-measure it at the first sweep point). If that spin is per-token rather than per-server, M=16 costs 16 of 32 cores before any work starts — and on documents, where the box is not inference-saturated, that overhead is proportionally far more expensive than it was on video. **Measure whether the spin is per-server or per-token in the first sweep point.** `[the 1.004 figure is UNVERIFIED — no artifact; the per-token question is open in both campaigns]`
 
 ### 6.2 There is no docs analogue for cross-arm detection agreement
 
@@ -477,7 +483,7 @@ What can be gated instead, in descending strength:
 1. **Determinism** — each arm against itself across blast and sequential legs. Strict, full chunk-hash-list equality. Transfers unchanged and is the strongest docs gate available.
 2. **Census / structure / embed integrity** — transfer unchanged.
 3. **Char conservation** — transfers in form only; band must be re-derived (§4.2).
-4. **Independent reference (Tika)** — the only gate that catches a *deterministic* defect, since census, structure and determinism all pass on a doubled document. Priced at 0.599 s/doc, so sample it (`SMOKE_TIKA_SAMPLE=200`, deterministic stride) and **print the denominator**.
+4. **Independent reference (Tika)** — the only gate that catches a *deterministic* defect, since census, structure and determinism all pass on a doubled document. Priced at 0.599 s/doc `[UNVERIFIED — no artifact; do not quote]` (no committed timing artifact; re-time before sizing the sample), so sample it (`SMOKE_TIKA_SAMPLE=200`, deterministic stride) and **print the denominator**.
 
 **Do not invent a cross-arm content gate to fill gate 3's slot.** Different parsers legitimately extract different text; a gate on that measures the parsers, not the frameworks, and would fire constantly.
 
@@ -503,7 +509,7 @@ Three lessons, each bought with real time. They are not general advice; each nam
 
 **Films cost:** the corpus was staged and sized before anyone measured how much resolution varied across archival prints, and resolution turned out to be the axis that mattered — it drove the 560px mechanism (§7.2).
 
-**The docs axes are page count and extraction difficulty.** Both are already known to be brutal in GovDocs1: `[VERIFIED 2026-09-07]` chunks/doc runs median 8, p95 74, **max 1377** — a p95-to-max ratio of 18.6×. And the slowest 1% of documents carry **58.6% of all service seconds** `[PRIOR-RECORD]`.
+**The docs axes are page count and extraction difficulty.** Both are already known to be brutal in GovDocs1: `[VERIFIED 2026-09-07]` chunks/doc runs median 8, p95 74, **max 1377** — a p95-to-max ratio of 18.6×. And the corpus has a heavy service-time tail: the slowest few documents carry a disproportionate share of the leg. A figure for that share was previously quoted here (58.6% of all service seconds); it is `[UNVERIFIED — no artifact; do not quote]` and is struck. The nearest *computable* analogue from the committed records — the top 1% of documents' share of summed per-document latency (completion − submit) in `run10k_p2_blast_v2/perdoc_rr_blast.jsonl` — is **17.1%**, and it is a **different quantity**: latency under C=32 includes queue wait and is not service seconds. Measure service seconds directly in the re-run before sizing anything on the tail.
 
 **Cure:** stratify the staging set over page-count and extraction-difficulty terciles before sizing anything, exactly as the films subset was stratified over duration × bytes. A smoke set drawn from zip 000 alone is **not** representative of all 40 zips — this already bit once: the 200-doc runs used `SMOKE_CORPUS_GLOB='000_*.pdf'` while the 10k runs used all 40, so docs/s differences between them are partly corpus mix, not scale.
 
@@ -527,7 +533,7 @@ The checker (`working/video/probe/end_to_end_figures_check.py`) mechanically ver
 
 **Cure:** author the docs figure checker **in the campaign's first week**, before the first measured leg, and add a check the moment a figure enters any document. A figure that has never been checked is a figure that has never been checked, whether it was written on day 1 or day 30.
 
-This session is itself an argument for it: the `duplication_patch_applied` field (§2.4) has read `False` in every measured docs export since 17 August, and it took a targeted cross-reference against image digests to catch it.
+This session is itself an argument for it: the `duplication_patch_applied` field (§2.4) read `False` in the two `smoke50_parser_in` 18-Aug exports — do not quote that value from them; and note the §2.4 correction: not "every measured docs export", as this sentence first said — and it took a targeted cross-reference against image digests to catch it.
 
 ---
 
@@ -547,7 +553,7 @@ Inherited, non-negotiable, and all of them were bought with a lost round.
 
 **6. The register.** `working/video/METHODOLOGY_REGISTER.md`, **35 entries**, `## N. Title` heading style. `[VERIFIED 2026-09-07]` **Consult it before designing anything.** It is not a log; it is the list of ways this campaign has already been wrong.
 
-**7. Public actions.** Anything that will be publicly visible — issues, PRs, pushes to public repos, published copy — must be verified and shown for **manual approval** before it goes out. Never authorise an executor to publish inside an autonomous block. ⚠️ **`2001anshkaushik/parity-bench` is a PUBLIC repository.** Every push to it is a public action.
+**7. Public actions.** *Superseded 2026-09-08 by `working/docs/AUTOMATION_CONTRACT.md`, which retires manual approval on pushes: a push goes through `working/harness/autoland.sh` (Amber — seven fail-closed gates, ls-remote read-back), and exactly three RED items still stop for Ansh: modifying or deleting an existing artifact or image; `--force`, branch deletion, history rewrite; anything that reaches a person (issues, PRs, messages, published copy).* ⚠️ **`2001anshkaushik/parity-bench` is a PUBLIC repository.** Every push to it is a public action — which is why it is gated, not why it is manual.
 
 ---
 
@@ -590,9 +596,9 @@ Listed so a docs session recognises them if they surface, and does not adopt the
 
 ### 10.2 Then, in order
 
-1. Cut `docs-bench` per §5.3; import the 128 artifacts; `ls-remote` to verify. **Public repo — show the push for approval first.**
-2. Verify the corpus on the box per §5.4. Nothing runs until `VERDICT MATCH`.
-3. Author the docs figure checker (§7.3) **before** the first measured leg.
+1. Cut `docs-bench` per §5.3; import the 128 artifacts; `ls-remote` to verify. *Done 2026-09-07/08 — 5093681 (import, paths enumerated), landed through `autoland.sh` (gate 7 is the `ls-remote` read-back).*
+2. Verify the corpus on the box per §5.4. Nothing runs until `VERDICT MATCH`. *Done 2026-09-08 — MATCH.*
+3. Author the docs figure checker (§7.3) **before** the first measured leg. *Done 2026-09-07 — `working/docs/probe/docs_figures_check.py`; it gates every figure in this document.*
 4. Build the stock-engine duplication test with its null control (§2.5). This is re-run goal 1 and it is cheap — it needs a fixture, not a 10k leg.
 5. Only then design the posture sweep (§6.1). This is re-run goal 2 and it is the expensive half.
 

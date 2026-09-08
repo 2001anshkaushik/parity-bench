@@ -1,0 +1,121 @@
+OVERNIGHT CORPUS CHECK — DOCS_HANDOFF.md §5.4 — attempted 2026-09-08T02:54:42Z from the laptop
+Branch: docs-bench @ 5093681
+
+Pre-check: ./working/harness/box.sh status
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+
+aws: [ERROR]: Error when retrieving token from sso: Token has expired and refresh failed
+instance: i-0775f33f3dc16f6af  state:   ssm: none  sessions: UNKNOWN
+(exit 0)
+
+==================================================================
+ATTEMPT 1 — the command EXACTLY as written in §5.4 (no 'run' subcommand; the
+backslash-newline continuations sit INSIDE the single quotes, so the string
+carries two literal newlines):
+
+./working/harness/box.sh 'ls ~/parity-bench/corpus/govdocs1/pdfs | wc -l; \
+  df -h /; \
+  cd ~/parity-bench && ~/.venv/bin/python working/scripts/verify_corpus_manifest.py'
+--- output:
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+Usage:
+  box.sh login                     SSO login (opens browser, human approves)
+  box.sh status                    instance state + SSM ping + session count
+  box.sh start                     start instance, wait until SSM Online
+  box.sh stop                      stop instance (disk survives)
+  box.sh shell                     interactive SSM shell (for humans)
+  box.sh run  [--start] '<cmd>'    one-shot command (single-line only)
+  box.sh launch [--start] <name> '<cmd>'  long run: nohup, log ~/logs/<name>.log
+    --start (opt-in, NEVER default): if the box is stopped, start it, wait
+    for instance-running, then poll DescribeInstanceInformation until the
+    SSM agent reads Online before opening the session. Default OFF so a
+    stopped box stays a visible fact unless the caller asked.
+  box.sh tail <name> [lines]       tail that log (default 50)
+  box.sh ps                        running launched jobs on the box
+  box.sh sessions                  active SSM session count vs the cap
+  box.sh self-test                 laptop-only checks; touches no box
+(exit 1)
+
+==================================================================
+ATTEMPT 2 — same string, with the 'run' subcommand box.sh's usage requires:
+--- output:
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+REFUSED (long block): multi-line command — long blocks go to the box as committed scripts with a self-printed sha (entry 25), never inline.
+(exit 3)
+
+==================================================================
+ATTEMPT 3 — 'run' with the three statements joined on ONE line (box.sh refuses
+multi-line strings by design, entry 25):
+
+./working/harness/box.sh run 'ls ~/parity-bench/corpus/govdocs1/pdfs | wc -l; df -h /; cd ~/parity-bench && ~/.venv/bin/python working/scripts/verify_corpus_manifest.py'
+--- output:
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+sessions: UNKNOWN (DescribeSessions denied or unavailable) — proceeding; hygiene rests on our own explicit exits
+
+aws: [ERROR]: Error when retrieving token from sso: Token has expired and refresh failed
+transcript: /Users/ansh/.rocketride_box/transcript_20260908.log
+box.sh: SSO token expired — run: aws sso login --profile rocketride   (or: box.sh login)
+(exit 1)
+
+==================================================================
+RESULT: see the verdict line at the bottom (written by the session after reading the above).
+
+VERDICT: NOT VERIFIED — no session reached the box. Corpus residency and the
+manifest verdict remain UNVERIFIED (DOCS_HANDOFF.md §5.4 open item 3 stands).
+
+Why: the laptop's AWS SSO token for profile 'rocketride' has expired and cannot
+refresh ("Token has expired and refresh failed"). Renewing it is a human,
+browser-approved action (box.sh login / aws sso login --profile rocketride) and
+was NOT attempted by the overnight session. Nothing was sent to the box; no
+session was opened; no instance was started (--start was not passed).
+
+Two defects in §5.4's command as written, found before the token stopped us:
+  1. It omits box.sh's 'run' subcommand — as written it prints usage, exit 1
+     (ATTEMPT 1).
+  2. The backslash-newlines sit inside the single quotes, so the string carries
+     two literal newlines and box.sh REFUSES it as a multi-line block, exit 3
+     (ATTEMPT 2) — its own entry-25 rule.
+The runnable form is ATTEMPT 3's single line. After 'box.sh login', rerun:
+
+  ./working/harness/box.sh run 'ls ~/parity-bench/corpus/govdocs1/pdfs | wc -l; df -h /; cd ~/parity-bench && ~/.venv/bin/python working/scripts/verify_corpus_manifest.py'
+
+Expect: 10000 on disk / 0 missing / 0 extra / 0 changed / VERDICT MATCH.
+Anything else: re-fetch with --verify before a single leg runs.
+Transcript of tonight's attempt: ~/.rocketride_box/transcript_20260908.log
+
+==================================================================
+RE-RUN 2026-09-08 (SSO logged in; Advisor R5: Amber, --start, stop when done) — box.sh transcript, verbatim:
+
+=== corpus check launched 2026-09-08T07:38:56Z from d98aa7c ===
+$ ./working/harness/box.sh run --start 'ls ~/parity-bench/corpus/govdocs1/pdfs | wc -l; df -h /; cd ~/parity-bench && ~/.venv/bin/python working/scripts/verify_corpus_manifest.py'
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+starting instance (stopped)...
+waiting for SSM agent — Online
+sessions: 0 active (cap 25, refuse threshold 20)
+
+Starting session with SessionId: ansh.kaushik@rocketride.ai-e6osinu9s5tft4ckjdsqplivea
+ls ~/parity-bench/corpus/govdocs1/pdfs | wc -l; df -h /; cd ~/parity-bench && ~/.venv/bin/python working/scripts/verify_corpus_manifest.py
+echo "__RC=$?"
+exit
+^D$ ls ~/parity-bench/corpus/govdocs1/pdfs | wc -l; df -h /; cd ~/parity-bench && ~/.venv/bin/python working/scripts/verify_corpus_manifest.py
+echo "__RC=$?"
+exit
+10000
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root       969G  367G  603G  38% /
+mode             : FULL
+manifest entries : 10000
+files on disk    : 10000
+missing          : 0
+extra            : 0
+changed          : 0
+VERDICT: MATCH — corpus is byte-identical to the manifest
+$ __RC=0
+$ 
+
+Exiting session with sessionId: ansh.kaushik@rocketride.ai-e6osinu9s5tft4ckjdsqplivea.
+transcript: /Users/ansh/.rocketride_box/transcript_20260908.log
+(box.sh run exit 0)
+
+box.sh stop issued at 2026-09-08T07:54:04Z; status read back: stopping.
+VERDICT (2026-09-08): MATCH — 10000 on disk / 0 missing / 0 extra / 0 changed. §5.4 open item 3 is resolved.

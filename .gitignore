@@ -77,3 +77,6 @@ __pycache__/
 # *.jsonl is therefore NOT globally ignored; the one large one (the corpus manifest) is
 # already excluded by corpus/ above.
 .rocketride/
+
+# RocketRide SDK-generated agent pointer (ROCKETRIDE:BEGIN/END block pointing at the untracked .rocketride/docs); the campaign rules live in .claude/rules/campaign.md
+.claude/rules/rocketride.md
