@@ -471,7 +471,7 @@ Two terms, at different rates, in different processes. `rr:patched` (3.3.1 + the
 | 8 | 2.988 | 1.090 | 1.898 | 3.026 | 0.230–0.250 |
 | 16 | 5.201 | 1.185 | 4.016 | 5.246 | 0.247–0.260 |
 
-Least squares over the six points: **0.98 + 0.261 × M** cores, residual ≤ 0.08 at every point. Each idle task subprocess runs ~200–227 threads and holds ~1.08–1.11 GiB resident; the serving process holds 30–31 threads throughout.
+Least squares over the six points: **0.98 + 0.261 × M** cores, residual ≤ 0.08 at every point. Each idle task subprocess runs ~200–227 threads and holds ~1.05–1.08 GiB resident; the serving process holds 30–31 threads throughout.
 
 **Where the burn is — answered by the per-process attribution** (the ticket's open questions 1 and 3): the ~1.0-core term is in the **serving process** (pid 1, `engine ai/eaas.py`) with nothing loaded; the per-pipeline term is **inside each task subprocess** (`engine ai/node.py`), not in the server's bookkeeping — the task subprocesses account for 4.02 of the 5.20 cores at M=16. The serving term is not perfectly flat: it rose from 1.015 to 1.185 across 0 → 16 loaded pipelines (~0.011 core per pipeline of server-side cost on top of the task's own 0.25).
 
