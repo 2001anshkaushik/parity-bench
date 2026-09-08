@@ -52,6 +52,10 @@ working/results/selftest/
 *.safetensors
 *.bin
 *.onnx
+# *.pth added 2026-08-27: rf-detr-base.pth (372 MB) appeared at the repo root and at
+# working/video/probe/ during the reader-equivalence proof; a checkpoint must never
+# enter the repo — identity is the md5 read-back (RFDETR_BASE_MD5), not the bytes.
+*.pth
 .cache/
 huggingface/
 
@@ -73,3 +77,6 @@ __pycache__/
 # *.jsonl is therefore NOT globally ignored; the one large one (the corpus manifest) is
 # already excluded by corpus/ above.
 .rocketride/
+
+# RocketRide SDK-generated agent pointer (ROCKETRIDE:BEGIN/END block pointing at the untracked .rocketride/docs); the campaign rules live in .claude/rules/campaign.md
+.claude/rules/rocketride.md
