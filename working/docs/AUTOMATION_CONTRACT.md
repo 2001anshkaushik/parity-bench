@@ -128,6 +128,7 @@ Each has cost this campaign real rounds. They are not hypothetical.
 
 ### Standing rules
 
+- **No asserted counts in commit messages, ever** (ruled 2026-09-08). A message names *what* changed; the artifacts and checker outputs carry the numbers. Two messages already in history assert counts that were wrong by the time they landed (a checker run reported as 236 where 239 ran; a test run reported as 107 where 105 ran) — a message is written before the run it describes is compared, and cannot be corrected without a rewrite we never do. No checker enforces this; it is a rule about writing, and the two wrong messages stay in history as the reason.
 - **Prompts carry hypothesis + evidence, never an open-ended task.** Open-ended prompts produced this campaign's weakest answers.
 - **Anything not explicitly reported as done is PENDING.** Never assume a command ran.
 - **Own errors plainly.** If a command you handed over was wrong, name it and correct it. This document exists partly because a `--full` flag that did not exist was handed over and caught on read-back.
