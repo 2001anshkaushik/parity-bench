@@ -1,0 +1,404 @@
+{
+ "_meta": {
+  "name": "provenance_correction_20260818",
+  "written_utc": "20260908T025206Z",
+  "payload_sha256_12": "6c66a48ae7e5",
+  "host": "Anshs-MacBook-Pro.local",
+  "user": "ansh",
+  "pid": 59782,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "correction_of": "duplication_patch_applied / duplication_patch_id inside every provenance_leela arm block of the 20260818 exports",
+  "defect": "working/harness/provenance_leela.py build() hardcoded \"duplication_patch_applied\": False from 17 Aug to 7 Sep 2026 (main:140, video-bench:140, unconditional); the 18-Aug measured docs runs were on rr:patched. Fixed 2026-09-07 to read the image label; None when unreadable, never False. DOCS_HANDOFF.md \u00a72.4 / \u00a710.1.",
+  "originals_untouched": true,
+  "derivation_rule": "A copy of one `provenance_leela` arm block with the two patch fields re-derived from\nthe digest -> label table and a `duplication_patch_source` saying how. Same value rule as\n`provenance_leela._patch_state`; an unevidenced digest is None on both fields.",
+  "digest_label_evidence": {
+   "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90": {
+    "label_raw": "1",
+    "tag": "rr:patched",
+    "duplication_patch_id": "preventDefault-after-embedding-flush",
+    "evidenced_by": [
+     "exp_batched_blast__20260818T041814Z__f787e0e8aa06.json",
+     "exp_batched_blast__20260818T051318Z__cf4ea7674609.json",
+     "exp_batched_blast__20260818T075451Z__44d9a05dd11e.json",
+     "exp_batched_blast__20260818T150551Z__373adce246fc.json",
+     "smoke_phase2__20260818T035559Z__5131e250d300.json",
+     "smoke_phase2__20260818T074453Z__ca62d2e2ee9d.json"
+    ]
+   },
+   "sha256:5e83c803b529f31b296132cc34133000c55f9ee8846858190fd6c0e8eaf64c0d": {
+    "label_raw": "0",
+    "tag": "rr:stock",
+    "duplication_patch_id": null,
+    "evidenced_by": [
+     "smoke_phase2__20260818T035137Z__4a2b2bb35b79.json"
+    ]
+   }
+  },
+  "exports": [
+   {
+    "export": "exp_batched_blast__20260818T041814Z__f787e0e8aa06.json",
+    "path_in_repo": "working/results/exp_batched_blast__20260818T041814Z__f787e0e8aa06.json",
+    "original_sha256": "24d7b9ab84fbea784804a2cbebad34812f038465eb18e8c5c52cf20f02f743f9",
+    "status": "unchanged",
+    "reason": "carries no provenance_leela block (written through experiment_common.provenance(), whose engine block READS the image label; nothing false to correct)",
+    "engine_block_as_recorded": {
+     "duplication_patch_applied": true,
+     "duplication_patch_id": "preventDefault-after-embedding-flush",
+     "label_raw": "1"
+    }
+   },
+   {
+    "export": "exp_batched_blast__20260818T051318Z__cf4ea7674609.json",
+    "path_in_repo": "working/results/exp_batched_blast__20260818T051318Z__cf4ea7674609.json",
+    "original_sha256": "4e6e100737666eb862bb909efb5cdde4972dc87949613963eda594f632d57f2e",
+    "status": "unchanged",
+    "reason": "carries no provenance_leela block (written through experiment_common.provenance(), whose engine block READS the image label; nothing false to correct)",
+    "engine_block_as_recorded": {
+     "duplication_patch_applied": true,
+     "duplication_patch_id": "preventDefault-after-embedding-flush",
+     "label_raw": "1"
+    }
+   },
+   {
+    "export": "exp_batched_blast__20260818T075451Z__44d9a05dd11e.json",
+    "path_in_repo": "working/results/exp_batched_blast__20260818T075451Z__44d9a05dd11e.json",
+    "original_sha256": "fe12290158dc7cb2b27f9beabfeccd27756c48f55004061c8c91f7eb250887ff",
+    "status": "unchanged",
+    "reason": "carries no provenance_leela block (written through experiment_common.provenance(), whose engine block READS the image label; nothing false to correct)",
+    "engine_block_as_recorded": {
+     "duplication_patch_applied": true,
+     "duplication_patch_id": "preventDefault-after-embedding-flush",
+     "label_raw": "1"
+    }
+   },
+   {
+    "export": "exp_batched_blast__20260818T150551Z__373adce246fc.json",
+    "path_in_repo": "working/results/exp_batched_blast__20260818T150551Z__373adce246fc.json",
+    "original_sha256": "8c4fde33b39e593660d814ab92155294dcc8bccf07ee51dfeecbdc3ac22e0098",
+    "status": "unchanged",
+    "reason": "carries no provenance_leela block (written through experiment_common.provenance(), whose engine block READS the image label; nothing false to correct)",
+    "engine_block_as_recorded": {
+     "duplication_patch_applied": true,
+     "duplication_patch_id": "preventDefault-after-embedding-flush",
+     "label_raw": "1"
+    }
+   },
+   {
+    "export": "rederive_gates__20260818T140635Z__ef789985f863.json",
+    "path_in_repo": "working/results/rederive_gates__20260818T140635Z__ef789985f863.json",
+    "original_sha256": "bf648ed81e97954186fd23dcfd35a4690bc5a4caf96cb62cdc69f95c1227f1b7",
+    "status": "unchanged",
+    "reason": "carries neither a provenance_leela block nor an engine provenance block"
+   },
+   {
+    "export": "smoke50_parser_in__20260818T094225Z__a5fd8e2033b7.json",
+    "path_in_repo": "working/results/smoke50_parser_in__20260818T094225Z__a5fd8e2033b7.json",
+    "original_sha256": "497f3bfe80db8c6a6a4524c02c560354f0a9a43cb46fb4a2604d6d1baa799ee6",
+    "status": "corrected",
+    "arms": {
+     "llamaindex_http_pdf": {
+      "image_digest": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",
+      "before": {
+       "duplication_patch_applied": false,
+       "duplication_patch_id": null
+      },
+      "after": {
+       "duplication_patch_applied": null,
+       "duplication_patch_id": null
+      },
+      "changed": true,
+      "check_before": {
+       "PASS": true,
+       "missing_fields": [],
+       "exempted": [
+        "duplication_patch_id"
+       ],
+       "note": "complete"
+      },
+      "check_after": {
+       "PASS": false,
+       "missing_fields": [
+        "duplication_patch_applied",
+        "duplication_patch_id"
+       ],
+       "exempted": [],
+       "note": "INCOMPLETE PROVENANCE \u2014 run is not publishable"
+      },
+      "corrected_provenance_leela": {
+       "run_id": "20260818T094225Z-2860617",
+       "timestamp_utc": "2026-08-18T09:42:25Z",
+       "git_commit": "9b7c654bfb0bb7a83e558f321bc71c0f9398c398-dirty",
+       "image_digest": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",
+       "framework_version": "0.14.23",
+       "instance_type": "c7i.8xlarge",
+       "architecture": "Linux/x86_64",
+       "cpu_count": 32,
+       "ram_gb": 61.8,
+       "corpus_manifest_sha256": "22177c33c3651fceceef99ba5c5c2d89f9bbe270dddc23e9943c6e20b421508c",
+       "corpus_n_docs": 9975,
+       "parser": "pypdf",
+       "parser_config_hash": "07a71129650fcb04",
+       "chunk_config": {
+        "chunk_size": 4000,
+        "chunk_overlap": 200,
+        "splitter": "RecursiveCharacterTextSplitter",
+        "input_transform": "text + '\\n'"
+       },
+       "rocketride_engine_version": "3.3.1",
+       "duplication_patch_applied": null,
+       "duplication_patch_id": null,
+       "rocketride_sdk_version": "1.3.0",
+       "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+       "offered_concurrency": 32,
+       "configured_concurrency": 24,
+       "warmup_policy": "metric-side, first 0 completions excluded (perf_window by completion rank)",
+       "timeout_s": 1800,
+       "mode": "sequential+blast",
+       "duplication_patch_source": "no label reading of image sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f exists in any 20260818 artifact (the LlamaIndex image carries no RocketRide patch label) \u2014 UNKNOWN, not asserted"
+      }
+     },
+     "rocketride_pdf": {
+      "image_digest": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+      "before": {
+       "duplication_patch_applied": false,
+       "duplication_patch_id": null
+      },
+      "after": {
+       "duplication_patch_applied": true,
+       "duplication_patch_id": "preventDefault-after-embedding-flush"
+      },
+      "changed": true,
+      "check_before": {
+       "PASS": true,
+       "missing_fields": [],
+       "exempted": [
+        "duplication_patch_id"
+       ],
+       "note": "complete"
+      },
+      "check_after": {
+       "PASS": true,
+       "missing_fields": [],
+       "exempted": [],
+       "note": "complete"
+      },
+      "corrected_provenance_leela": {
+       "run_id": "20260818T094225Z-2860617",
+       "timestamp_utc": "2026-08-18T09:42:25Z",
+       "git_commit": "9b7c654bfb0bb7a83e558f321bc71c0f9398c398-dirty",
+       "image_digest": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+       "framework_version": "1.3.0",
+       "instance_type": "c7i.8xlarge",
+       "architecture": "Linux/x86_64",
+       "cpu_count": 32,
+       "ram_gb": 61.8,
+       "corpus_manifest_sha256": "22177c33c3651fceceef99ba5c5c2d89f9bbe270dddc23e9943c6e20b421508c",
+       "corpus_n_docs": 9975,
+       "parser": "tika-3.2.3",
+       "parser_config_hash": "7296887fd1a81cb9",
+       "chunk_config": {
+        "chunk_size": 4000,
+        "chunk_overlap": 200,
+        "splitter": "RecursiveCharacterTextSplitter",
+        "input_transform": "text + '\\n'"
+       },
+       "rocketride_engine_version": "3.3.1",
+       "duplication_patch_applied": true,
+       "duplication_patch_id": "preventDefault-after-embedding-flush",
+       "rocketride_sdk_version": "1.3.0",
+       "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+       "offered_concurrency": 32,
+       "configured_concurrency": "unset (engine default)",
+       "warmup_policy": "metric-side, first 0 completions excluded (perf_window by completion rank)",
+       "timeout_s": 1800,
+       "mode": "sequential+blast",
+       "duplication_patch_source": "re-derived 2026-09-07: image_digest sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90 (rr:patched) carries label benchmark.rocketride.duplication_patch_applied='1', read by docker inspect at run time and recorded in ['exp_batched_blast__20260818T041814Z__f787e0e8aa06.json', 'exp_batched_blast__20260818T051318Z__cf4ea7674609.json', 'exp_batched_blast__20260818T075451Z__44d9a05dd11e.json', 'exp_batched_blast__20260818T150551Z__373adce246fc.json', 'smoke_phase2__20260818T035559Z__5131e250d300.json', 'smoke_phase2__20260818T074453Z__ca62d2e2ee9d.json']"
+      }
+     }
+    }
+   },
+   {
+    "export": "smoke50_parser_in__20260818T155557Z__4c468512ae75.json",
+    "path_in_repo": "working/results/smoke50_parser_in__20260818T155557Z__4c468512ae75.json",
+    "original_sha256": "1820819975bbb90fca34915605a11ed19ef236f462cc39866bdf1c984bcaa75e",
+    "status": "corrected",
+    "arms": {
+     "llamaindex_http_pdf": {
+      "image_digest": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",
+      "before": {
+       "duplication_patch_applied": false,
+       "duplication_patch_id": null
+      },
+      "after": {
+       "duplication_patch_applied": null,
+       "duplication_patch_id": null
+      },
+      "changed": true,
+      "check_before": {
+       "PASS": true,
+       "missing_fields": [],
+       "exempted": [
+        "duplication_patch_id"
+       ],
+       "note": "complete"
+      },
+      "check_after": {
+       "PASS": false,
+       "missing_fields": [
+        "duplication_patch_applied",
+        "duplication_patch_id"
+       ],
+       "exempted": [],
+       "note": "INCOMPLETE PROVENANCE \u2014 run is not publishable"
+      },
+      "corrected_provenance_leela": {
+       "run_id": "20260818T155556Z-75637",
+       "timestamp_utc": "2026-08-18T15:55:56Z",
+       "git_commit": "58027a661c65ebd24e879a0e0fd7b16011fac5ba-dirty",
+       "image_digest": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",
+       "framework_version": "0.14.23",
+       "instance_type": "c7i.8xlarge",
+       "architecture": "Linux/x86_64",
+       "cpu_count": 32,
+       "ram_gb": 61.8,
+       "corpus_manifest_sha256": "c24463e72d9efba104deacd7838cfbb76be411e2d837371a9e42d8dd83b85308",
+       "corpus_n_docs": 200,
+       "parser": "pypdf",
+       "parser_config_hash": "07a71129650fcb04",
+       "chunk_config": {
+        "chunk_size": 4000,
+        "chunk_overlap": 200,
+        "splitter": "RecursiveCharacterTextSplitter",
+        "input_transform": "text + '\\n'"
+       },
+       "rocketride_engine_version": "3.3.1",
+       "duplication_patch_applied": null,
+       "duplication_patch_id": null,
+       "rocketride_sdk_version": "1.3.0",
+       "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+       "offered_concurrency": 4,
+       "configured_concurrency": 24,
+       "warmup_policy": "metric-side, first 0 completions excluded (perf_window by completion rank)",
+       "timeout_s": 1800,
+       "mode": "sequential+blast",
+       "duplication_patch_source": "no label reading of image sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f exists in any 20260818 artifact (the LlamaIndex image carries no RocketRide patch label) \u2014 UNKNOWN, not asserted"
+      }
+     },
+     "rocketride_pdf": {
+      "image_digest": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+      "before": {
+       "duplication_patch_applied": false,
+       "duplication_patch_id": null
+      },
+      "after": {
+       "duplication_patch_applied": true,
+       "duplication_patch_id": "preventDefault-after-embedding-flush"
+      },
+      "changed": true,
+      "check_before": {
+       "PASS": true,
+       "missing_fields": [],
+       "exempted": [
+        "duplication_patch_id"
+       ],
+       "note": "complete"
+      },
+      "check_after": {
+       "PASS": true,
+       "missing_fields": [],
+       "exempted": [],
+       "note": "complete"
+      },
+      "corrected_provenance_leela": {
+       "run_id": "20260818T155556Z-75637",
+       "timestamp_utc": "2026-08-18T15:55:56Z",
+       "git_commit": "58027a661c65ebd24e879a0e0fd7b16011fac5ba-dirty",
+       "image_digest": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+       "framework_version": "1.3.0",
+       "instance_type": "c7i.8xlarge",
+       "architecture": "Linux/x86_64",
+       "cpu_count": 32,
+       "ram_gb": 61.8,
+       "corpus_manifest_sha256": "c24463e72d9efba104deacd7838cfbb76be411e2d837371a9e42d8dd83b85308",
+       "corpus_n_docs": 200,
+       "parser": "tika-3.2.3",
+       "parser_config_hash": "7296887fd1a81cb9",
+       "chunk_config": {
+        "chunk_size": 4000,
+        "chunk_overlap": 200,
+        "splitter": "RecursiveCharacterTextSplitter",
+        "input_transform": "text + '\\n'"
+       },
+       "rocketride_engine_version": "3.3.1",
+       "duplication_patch_applied": true,
+       "duplication_patch_id": "preventDefault-after-embedding-flush",
+       "rocketride_sdk_version": "1.3.0",
+       "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+       "offered_concurrency": 4,
+       "configured_concurrency": "unset (engine default)",
+       "warmup_policy": "metric-side, first 0 completions excluded (perf_window by completion rank)",
+       "timeout_s": 1800,
+       "mode": "sequential+blast",
+       "duplication_patch_source": "re-derived 2026-09-07: image_digest sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90 (rr:patched) carries label benchmark.rocketride.duplication_patch_applied='1', read by docker inspect at run time and recorded in ['exp_batched_blast__20260818T041814Z__f787e0e8aa06.json', 'exp_batched_blast__20260818T051318Z__cf4ea7674609.json', 'exp_batched_blast__20260818T075451Z__44d9a05dd11e.json', 'exp_batched_blast__20260818T150551Z__373adce246fc.json', 'smoke_phase2__20260818T035559Z__5131e250d300.json', 'smoke_phase2__20260818T074453Z__ca62d2e2ee9d.json']"
+      }
+     }
+    }
+   },
+   {
+    "export": "smoke_phase2__20260818T035137Z__4a2b2bb35b79.json",
+    "path_in_repo": "working/results/smoke_phase2__20260818T035137Z__4a2b2bb35b79.json",
+    "original_sha256": "2ceecf4865e7abf55a7780ea5ce1305d2b94d944e1be6eec40a54996974b280a",
+    "status": "unchanged",
+    "reason": "carries no provenance_leela block (written through experiment_common.provenance(), whose engine block READS the image label; nothing false to correct)",
+    "engine_block_as_recorded": {
+     "duplication_patch_applied": false,
+     "duplication_patch_id": null,
+     "label_raw": "0"
+    }
+   },
+   {
+    "export": "smoke_phase2__20260818T035559Z__5131e250d300.json",
+    "path_in_repo": "working/results/smoke_phase2__20260818T035559Z__5131e250d300.json",
+    "original_sha256": "fe4d6b780904cca3b3c802ca1463500b6cdf6853a7470ec045ae6eb1e1b34aa3",
+    "status": "unchanged",
+    "reason": "carries no provenance_leela block (written through experiment_common.provenance(), whose engine block READS the image label; nothing false to correct)",
+    "engine_block_as_recorded": {
+     "duplication_patch_applied": true,
+     "duplication_patch_id": "preventDefault-after-embedding-flush",
+     "label_raw": "1"
+    }
+   },
+   {
+    "export": "smoke_phase2__20260818T074453Z__ca62d2e2ee9d.json",
+    "path_in_repo": "working/results/smoke_phase2__20260818T074453Z__ca62d2e2ee9d.json",
+    "original_sha256": "21adecad327bd9c140d3c05b3aa872e3267a570225cc06ea03175deda1428a44",
+    "status": "unchanged",
+    "reason": "carries no provenance_leela block (written through experiment_common.provenance(), whose engine block READS the image label; nothing false to correct)",
+    "engine_block_as_recorded": {
+     "duplication_patch_applied": true,
+     "duplication_patch_id": "preventDefault-after-embedding-flush",
+     "label_raw": "1"
+    }
+   }
+  ],
+  "summary": {
+   "n_exports": 10,
+   "changed": [
+    "smoke50_parser_in__20260818T094225Z__a5fd8e2033b7.json",
+    "smoke50_parser_in__20260818T155557Z__4c468512ae75.json"
+   ],
+   "unchanged": [
+    "exp_batched_blast__20260818T041814Z__f787e0e8aa06.json",
+    "exp_batched_blast__20260818T051318Z__cf4ea7674609.json",
+    "exp_batched_blast__20260818T075451Z__44d9a05dd11e.json",
+    "exp_batched_blast__20260818T150551Z__373adce246fc.json",
+    "rederive_gates__20260818T140635Z__ef789985f863.json",
+    "smoke_phase2__20260818T035137Z__4a2b2bb35b79.json",
+    "smoke_phase2__20260818T035559Z__5131e250d300.json",
+    "smoke_phase2__20260818T074453Z__ca62d2e2ee9d.json"
+   ]
+  }
+ }
+}
