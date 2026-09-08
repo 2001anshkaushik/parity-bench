@@ -1,0 +1,1049 @@
+{
+ "_meta": {
+  "name": "smoke50_parser_in",
+  "written_utc": "20260818T094225Z",
+  "payload_sha256_12": "a5fd8e2033b7",
+  "host": "ip-172-31-13-86",
+  "user": "ssm-user",
+  "pid": 2860617,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "n_offered": 9975,
+  "threads": [
+   [
+    1,
+    16
+   ]
+  ],
+  "arms": {
+   "llamaindex_http_pdf": {
+    "census": {
+     "successful": 0,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": false,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "determinism_unproven": 0,
+    "independent_hash_failures": 0,
+    "independent_reference": {
+     "available": null,
+     "unavailable_reason": null,
+     "covered": 0,
+     "successful": 0,
+     "ran": false,
+     "full_coverage": true
+    },
+    "content_suspect": 0,
+    "records": []
+   },
+   "rocketride_pdf": {
+    "census": {
+     "successful": 0,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": false,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "determinism_unproven": 0,
+    "independent_hash_failures": 0,
+    "independent_reference": {
+     "available": true,
+     "unavailable_reason": null,
+     "covered": 0,
+     "successful": 0,
+     "ran": false,
+     "full_coverage": true
+    },
+    "content_suspect": 0,
+    "records": []
+   }
+  },
+  "pipeline": {
+   "file": "product_pdf.pipe",
+   "nodes": [
+    "webhook",
+    "parse",
+    "preprocessor_langchain",
+    "embedding_transformer",
+    "response_documents"
+   ],
+   "sha256_raw": "bd775051ff5e43453dd4c0e4e1db465b34467cc3645047e077e75d0b262c823c",
+   "sha256_canonical": "f61165f7cf7ab1dbb30e0cc145d34dcdcbdc048fc90c3756d570fa217faa584b"
+  },
+  "corpus": {
+   "source": "govdocs1",
+   "glob": "*.pdf",
+   "rule": "sorted(*.pdf)[:N]",
+   "n": 9975,
+   "sha256": "22177c33c3651fceceef99ba5c5c2d89f9bbe270dddc23e9943c6e20b421508c",
+   "first": "000_000009.pdf",
+   "last": "040_040911.pdf"
+  },
+  "self_duplication": {
+   "llamaindex_http_pdf": {
+    "checked": 0,
+    "duplicated_docs": 0,
+    "factors": [],
+    "docs": {},
+    "duplicated_frac": null,
+    "PASS": false,
+    "vacuous": true
+   },
+   "rocketride_pdf": {
+    "checked": 0,
+    "duplicated_docs": 0,
+    "factors": [],
+    "docs": {},
+    "duplicated_frac": null,
+    "PASS": false,
+    "vacuous": true
+   }
+  },
+  "warm_up": {
+   "llamaindex_http_pdf": {
+    "docs": 25,
+    "ok": 25,
+    "seconds": 56.51,
+    "disjoint_from_measured": true,
+    "policy": "driver-side, disjoint, excluded (Leela WARM=25)"
+   },
+   "rocketride_pdf": {
+    "docs": 25,
+    "ok": 25,
+    "seconds": 115.76,
+    "disjoint_from_measured": true,
+    "policy": "driver-side, disjoint, excluded (Leela WARM=25)"
+   }
+  },
+  "breaker": null,
+  "provenance_leela": {
+   "llamaindex_http_pdf": {
+    "run_id": "20260818T094225Z-2860617",
+    "timestamp_utc": "2026-08-18T09:42:25Z",
+    "git_commit": "9b7c654bfb0bb7a83e558f321bc71c0f9398c398-dirty",
+    "image_digest": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",
+    "framework_version": "0.14.23",
+    "instance_type": "c7i.8xlarge",
+    "architecture": "Linux/x86_64",
+    "cpu_count": 32,
+    "ram_gb": 61.8,
+    "corpus_manifest_sha256": "22177c33c3651fceceef99ba5c5c2d89f9bbe270dddc23e9943c6e20b421508c",
+    "corpus_n_docs": 9975,
+    "parser": "pypdf",
+    "parser_config_hash": "07a71129650fcb04",
+    "chunk_config": {
+     "chunk_size": 4000,
+     "chunk_overlap": 200,
+     "splitter": "RecursiveCharacterTextSplitter",
+     "input_transform": "text + '\\n'"
+    },
+    "rocketride_engine_version": "3.3.1",
+    "duplication_patch_applied": false,
+    "duplication_patch_id": null,
+    "rocketride_sdk_version": "1.3.0",
+    "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+    "offered_concurrency": 32,
+    "configured_concurrency": 24,
+    "warmup_policy": "metric-side, first 0 completions excluded (perf_window by completion rank)",
+    "timeout_s": 1800,
+    "mode": "sequential+blast"
+   },
+   "rocketride_pdf": {
+    "run_id": "20260818T094225Z-2860617",
+    "timestamp_utc": "2026-08-18T09:42:25Z",
+    "git_commit": "9b7c654bfb0bb7a83e558f321bc71c0f9398c398-dirty",
+    "image_digest": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+    "framework_version": "1.3.0",
+    "instance_type": "c7i.8xlarge",
+    "architecture": "Linux/x86_64",
+    "cpu_count": 32,
+    "ram_gb": 61.8,
+    "corpus_manifest_sha256": "22177c33c3651fceceef99ba5c5c2d89f9bbe270dddc23e9943c6e20b421508c",
+    "corpus_n_docs": 9975,
+    "parser": "tika-3.2.3",
+    "parser_config_hash": "7296887fd1a81cb9",
+    "chunk_config": {
+     "chunk_size": 4000,
+     "chunk_overlap": 200,
+     "splitter": "RecursiveCharacterTextSplitter",
+     "input_transform": "text + '\\n'"
+    },
+    "rocketride_engine_version": "3.3.1",
+    "duplication_patch_applied": false,
+    "duplication_patch_id": null,
+    "rocketride_sdk_version": "1.3.0",
+    "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+    "offered_concurrency": 32,
+    "configured_concurrency": "unset (engine default)",
+    "warmup_policy": "metric-side, first 0 completions excluded (perf_window by completion rank)",
+    "timeout_s": 1800,
+    "mode": "sequential+blast"
+   }
+  },
+  "pinned": {
+   "workers": 24,
+   "threads": 1,
+   "blast_concurrency": 32,
+   "send_modes": [
+    "sequential",
+    "blast"
+   ],
+   "warm_n": {
+    "primary": 0,
+    "secondary": 64,
+    "placement": "metric-side, by completion rank (perf_window; settled 2026-08-14)"
+   },
+   "embedding_dim": {
+    "source": "probed from each arm's loaded model, one doc pre-span",
+    "per_arm": {
+     "llamaindex_http_pdf": 384,
+     "rocketride_pdf": 384
+    }
+   },
+   "torch_threads_measured": {
+    "llamaindex_http_pdf": {
+     "source": "/health from each live uvicorn worker (external mode)",
+     "per_worker_intra_interop": [
+      [
+       1,
+       16
+      ]
+     ],
+     "thread_env_in_worker": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1"
+     }
+    },
+    "rocketride_pdf": {
+     "source": "env_probe node inside the engine task process, separate one-shot pipe (a3_env.pipe); measured pipe untouched",
+     "pid": 1115844,
+     "env": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1"
+     },
+     "os_cpu_count": 32,
+     "threads_alive": 5,
+     "torch_num_threads": 1,
+     "torch_num_interop_threads": 16,
+     "torch_version": "2.10.0+cu128"
+    }
+   },
+   "service_mode": "external containers",
+   "memory_sources": {
+    "llamaindex_http_pdf:sequential": {
+     "summed_process_rss_peak_mb": 26072.23,
+     "summed_process_rss_note": "peak of a SUM of per-process RSS (collector.py:360,378). Shared copy-on-write pages are counted once per mapping process, so with N forked workers this OVER-counts by roughly the sharing factor. NOT comparable to Leela's or Shashi's figures.",
+     "comparable_to_teammates": "cgroup_anon_mb",
+     "comparable_note": "Leela reads cgroup memory.stat anon (cgroup_sampler.py:55-62); Shashi reads the Docker API memory_stats.stats.rss, else usage-file (cstats.py:132-140). Both are cgroup-level: the kernel charges a shared page once per cgroup, not once per process. Quote anon against theirs.",
+     "cgroup": {
+      "cgroup": "/sys/fs/cgroup/system.slice/docker-f2d9a48746f60e7c68968f8ca80798ef4a6d3e7b0fdef14c23aaf8b5299a9877.scope",
+      "current_bytes": 17955635200,
+      "peak_bytes": 19004272640,
+      "max_bytes": 62277025792,
+      "anon_bytes": 17167134720,
+      "file_bytes": 626442240,
+      "shmem_bytes": 98304,
+      "kernel_bytes": 161308672,
+      "current_mb": 17123.8,
+      "peak_mb": 18123.9,
+      "anon_mb": 16371.9,
+      "file_mb": 597.4,
+      "max_mb": 59392.0,
+      "docker_stats_equivalent_mb": 16959.7
+     },
+     "cgroup_anon_mb": 16371.9,
+     "cgroup_peak_mb": 18123.9,
+     "cgroup_limit_mb": 59392.0,
+     "sharing_factor_summed_over_anon": 1.59,
+     "summed_process_pss_peak_mb": null,
+     "peak_process_count": 26,
+     "peak_thread_count": 98,
+     "distinct_pids_seen": 26,
+     "leg": "sequential",
+     "cgroup_anon_peak_mb": 16371.86,
+     "cgroup_current_peak_mb": 17123.83,
+     "cgroup_peak_tasks": 98,
+     "cgroup_samples_in_leg": 1,
+     "quote_this": "cgroup_anon_peak_mb",
+     "tasks_per_process_at_peak": 3.8,
+     "sharing_factor_sampled": 1.59,
+     "cgroup_sampling": {
+      "anon_mb": "point sample taken at end of this leg \u2014 NOT a peak",
+      "current_mb": "point sample taken at end of this leg \u2014 NOT a peak",
+      "peak_mb": "kernel high-water mark, unsampled, cumulative since container start or last reset \u2014 spans ALL legs, not just this one"
+     },
+     "sharing_factor_note": "valid for the sequential leg only (26 processes at peak). Do not apply it to another leg's summed RSS \u2014 the over-count scales with the number of processes sharing pages."
+    },
+    "rocketride_pdf:sequential": {
+     "summed_process_rss_peak_mb": 2245.74,
+     "summed_process_rss_note": "peak of a SUM of per-process RSS (collector.py:360,378). Shared copy-on-write pages are counted once per mapping process, so with N forked workers this OVER-counts by roughly the sharing factor. NOT comparable to Leela's or Shashi's figures.",
+     "comparable_to_teammates": "cgroup_anon_mb",
+     "comparable_note": "Leela reads cgroup memory.stat anon (cgroup_sampler.py:55-62); Shashi reads the Docker API memory_stats.stats.rss, else usage-file (cstats.py:132-140). Both are cgroup-level: the kernel charges a shared page once per cgroup, not once per process. Quote anon against theirs.",
+     "cgroup": {
+      "cgroup": "/sys/fs/cgroup/system.slice/docker-e3752682e8f35689af43817c205bfc20f9a830377943cbcd8dce0b8dbdd906e2.scope",
+      "current_bytes": 10093121536,
+      "peak_bytes": 19470209024,
+      "max_bytes": 62277025792,
+      "anon_bytes": 1806876672,
+      "file_bytes": 7923003392,
+      "shmem_bytes": 0,
+      "kernel_bytes": 361238528,
+      "current_mb": 9625.6,
+      "peak_mb": 18568.2,
+      "anon_mb": 1723.2,
+      "file_mb": 7556.0,
+      "max_mb": 59392.0,
+      "docker_stats_equivalent_mb": 2069.6
+     },
+     "cgroup_anon_mb": 1723.2,
+     "cgroup_peak_mb": 18568.2,
+     "cgroup_limit_mb": 59392.0,
+     "sharing_factor_summed_over_anon": 1.3,
+     "summed_process_pss_peak_mb": null,
+     "peak_process_count": 2,
+     "peak_thread_count": 238,
+     "distinct_pids_seen": 2,
+     "leg": "sequential",
+     "cgroup_anon_peak_mb": 1723.17,
+     "cgroup_current_peak_mb": 9625.55,
+     "cgroup_peak_tasks": 238,
+     "cgroup_samples_in_leg": 1,
+     "quote_this": "cgroup_anon_peak_mb",
+     "tasks_per_process_at_peak": 119.0,
+     "sharing_factor_sampled": 1.3,
+     "cgroup_sampling": {
+      "anon_mb": "point sample taken at end of this leg \u2014 NOT a peak",
+      "current_mb": "point sample taken at end of this leg \u2014 NOT a peak",
+      "peak_mb": "kernel high-water mark, unsampled, cumulative since container start or last reset \u2014 spans ALL legs, not just this one"
+     },
+     "sharing_factor_note": "valid for the sequential leg only (2 processes at peak). Do not apply it to another leg's summed RSS \u2014 the over-count scales with the number of processes sharing pages."
+    },
+    "llamaindex_http_pdf:blast": {
+     "summed_process_rss_peak_mb": 27317.69,
+     "summed_process_rss_note": "peak of a SUM of per-process RSS (collector.py:360,378). Shared copy-on-write pages are counted once per mapping process, so with N forked workers this OVER-counts by roughly the sharing factor. NOT comparable to Leela's or Shashi's figures.",
+     "comparable_to_teammates": "cgroup_anon_mb",
+     "comparable_note": "Leela reads cgroup memory.stat anon (cgroup_sampler.py:55-62); Shashi reads the Docker API memory_stats.stats.rss, else usage-file (cstats.py:132-140). Both are cgroup-level: the kernel charges a shared page once per cgroup, not once per process. Quote anon against theirs.",
+     "cgroup": {
+      "cgroup": "/sys/fs/cgroup/system.slice/docker-f2d9a48746f60e7c68968f8ca80798ef4a6d3e7b0fdef14c23aaf8b5299a9877.scope",
+      "current_bytes": 18358435840,
+      "peak_bytes": 19309572096,
+      "max_bytes": 62277025792,
+      "anon_bytes": 17567969280,
+      "file_bytes": 626450432,
+      "shmem_bytes": 102400,
+      "kernel_bytes": 162426880,
+      "current_mb": 17508.0,
+      "peak_mb": 18415.0,
+      "anon_mb": 16754.1,
+      "file_mb": 597.4,
+      "max_mb": 59392.0,
+      "docker_stats_equivalent_mb": 17343.8
+     },
+     "cgroup_anon_mb": 16754.1,
+     "cgroup_peak_mb": 18415.0,
+     "cgroup_limit_mb": 59392.0,
+     "sharing_factor_summed_over_anon": 1.63,
+     "summed_process_pss_peak_mb": null,
+     "peak_process_count": 26,
+     "peak_thread_count": 98,
+     "distinct_pids_seen": 27,
+     "leg": "blast",
+     "cgroup_anon_peak_mb": 17594.39,
+     "cgroup_current_peak_mb": 18355.66,
+     "cgroup_peak_tasks": 98,
+     "cgroup_samples_in_leg": 4763,
+     "quote_this": "cgroup_anon_peak_mb",
+     "tasks_per_process_at_peak": 3.8,
+     "sharing_factor_sampled": 1.55,
+     "cgroup_sampling": {
+      "anon_mb": "point sample taken at end of this leg \u2014 NOT a peak",
+      "current_mb": "point sample taken at end of this leg \u2014 NOT a peak",
+      "peak_mb": "kernel high-water mark, unsampled, cumulative since container start or last reset \u2014 spans ALL legs, not just this one"
+     },
+     "sharing_factor_note": "valid for the blast leg only (26 processes at peak). Do not apply it to another leg's summed RSS \u2014 the over-count scales with the number of processes sharing pages."
+    },
+    "rocketride_pdf:blast": {
+     "summed_process_rss_peak_mb": 40465.81,
+     "summed_process_rss_note": "peak of a SUM of per-process RSS (collector.py:360,378). Shared copy-on-write pages are counted once per mapping process, so with N forked workers this OVER-counts by roughly the sharing factor. NOT comparable to Leela's or Shashi's figures.",
+     "comparable_to_teammates": "cgroup_anon_mb",
+     "comparable_note": "Leela reads cgroup memory.stat anon (cgroup_sampler.py:55-62); Shashi reads the Docker API memory_stats.stats.rss, else usage-file (cstats.py:132-140). Both are cgroup-level: the kernel charges a shared page once per cgroup, not once per process. Quote anon against theirs.",
+     "cgroup": {
+      "cgroup": "/sys/fs/cgroup/system.slice/docker-e3752682e8f35689af43817c205bfc20f9a830377943cbcd8dce0b8dbdd906e2.scope",
+      "current_bytes": 8407789568,
+      "peak_bytes": 23197265920,
+      "max_bytes": 62277025792,
+      "anon_bytes": 134963200,
+      "file_bytes": 7922999296,
+      "shmem_bytes": 0,
+      "kernel_bytes": 347103232,
+      "current_mb": 8018.3,
+      "peak_mb": 22122.6,
+      "anon_mb": 128.7,
+      "file_mb": 7556.0,
+      "max_mb": 59392.0,
+      "docker_stats_equivalent_mb": 462.3
+     },
+     "cgroup_anon_mb": 128.7,
+     "cgroup_peak_mb": 22122.6,
+     "cgroup_limit_mb": 59392.0,
+     "sharing_factor_summed_over_anon": 314.42,
+     "summed_process_pss_peak_mb": null,
+     "peak_process_count": 6,
+     "peak_thread_count": 384,
+     "distinct_pids_seen": 27,
+     "leg": "blast",
+     "cgroup_anon_peak_mb": 14018.76,
+     "cgroup_current_peak_mb": 21963.9,
+     "cgroup_peak_tasks": 387,
+     "cgroup_samples_in_leg": 7183,
+     "quote_this": "cgroup_anon_peak_mb",
+     "tasks_per_process_at_peak": 64.5,
+     "sharing_factor_sampled": 2.89,
+     "cgroup_sampling": {
+      "anon_mb": "point sample taken at end of this leg \u2014 NOT a peak",
+      "current_mb": "point sample taken at end of this leg \u2014 NOT a peak",
+      "peak_mb": "kernel high-water mark, unsampled, cumulative since container start or last reset \u2014 spans ALL legs, not just this one"
+     },
+     "sharing_factor_note": "valid for the blast leg only (6 processes at peak). Do not apply it to another leg's summed RSS \u2014 the over-count scales with the number of processes sharing pages."
+    }
+   },
+   "legs_run": [
+    "blast"
+   ],
+   "tika_sample_size": 200,
+   "tika_sample_note": "0/None = every document. A positive value is a deterministic stride sample; the covered count per arm is in arms.*.independent_reference.",
+   "cost_available": true,
+   "cost_unavailable_reason": null,
+   "cost_sampler": {
+    "source": "psutil ProcessCollector (out-of-process, dead-PID roll-forward)",
+    "interval_s": 0.5,
+    "scope": "service process tree only, driver excluded",
+    "pluggable": "box/Docker mode consumes Leela's cgroup_sampler JSONL via metrics_shared.series_from_cgroup_jsonl"
+   },
+   "driver_affinity_cpus": 8,
+   "host_cpu_count": 32,
+   "rocketride_client": {
+    "ROCKETRIDE_URI": {
+     "source": "harness default (matches both engine images)",
+     "value": "http://127.0.0.1:5565",
+     "resolved_websocket": "ws://127.0.0.1:5565/task/service"
+    },
+    "ROCKETRIDE_APIKEY": {
+     "source": "harness default (matches both engine images)",
+     "sha256_8": "08846e81"
+    },
+    "loopback": true
+   },
+   "raw_records_dir": "/home/ssm-user/parity-bench/working/results/run10k_p2_blast_v2"
+  },
+  "gate_verdicts": {
+   "llamaindex_http_pdf": {
+    "shashi": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "expected": 9975,
+       "recorded": 0,
+       "n_missing": 9975,
+       "missing": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "n_duplicates": 0,
+       "duplicates": [],
+       "n_unexpected": 0,
+       "unexpected": [],
+       "n_silent_empty": 0,
+       "silent_empty": [],
+       "PASS": false
+      },
+      "structure": {
+       "docs_checked": 0,
+       "n_bad": 0,
+       "reasons": [],
+       "expected_dim": 384,
+       "norm_ok": false,
+       "duplication": {
+        "n_duplicated": 0,
+        "duplicated_docs": [],
+        "max_repeat_factor": 1,
+        "n_over_chunk_trigger": 0,
+        "PASS": true
+       },
+       "PASS": false
+      },
+      "determinism": {
+       "label_a": "sequential",
+       "label_b": "blast",
+       "compared": 0,
+       "identical": 0,
+       "n_mismatched": 0,
+       "mismatched": [],
+       "n_unproven": 0,
+       "unproven": [],
+       "PASS": false
+      }
+     }
+    },
+    "leela": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "offered": 9975,
+       "records": 0,
+       "silent": 9975,
+       "duplicate_docs": [],
+       "missing_docs": null,
+       "unexpected_docs": null,
+       "completed": 0,
+       "failed_by_reason": {},
+       "unexpected_failures": 0,
+       "unexpected_failure_docs": [],
+       "PASS": false
+      },
+      "structure": {
+       "bad_docs": {},
+       "completed_empty": [],
+       "PASS": true
+      },
+      "determinism": {
+       "compared": 0,
+       "mismatch_docs": [],
+       "n_mismatch": 0,
+       "only_in_a": [],
+       "only_in_b": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "PASS": false
+      }
+     }
+    },
+    "union": {
+     "PASS": false,
+     "note": "conjunction of both suites over identical records"
+    }
+   },
+   "rocketride_pdf": {
+    "shashi": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "expected": 9975,
+       "recorded": 0,
+       "n_missing": 9975,
+       "missing": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "n_duplicates": 0,
+       "duplicates": [],
+       "n_unexpected": 0,
+       "unexpected": [],
+       "n_silent_empty": 0,
+       "silent_empty": [],
+       "PASS": false
+      },
+      "structure": {
+       "docs_checked": 0,
+       "n_bad": 0,
+       "reasons": [],
+       "expected_dim": 384,
+       "norm_ok": false,
+       "duplication": {
+        "n_duplicated": 0,
+        "duplicated_docs": [],
+        "max_repeat_factor": 1,
+        "n_over_chunk_trigger": 0,
+        "PASS": true
+       },
+       "PASS": false
+      },
+      "determinism": {
+       "label_a": "sequential",
+       "label_b": "blast",
+       "compared": 0,
+       "identical": 0,
+       "n_mismatched": 0,
+       "mismatched": [],
+       "n_unproven": 0,
+       "unproven": [],
+       "PASS": false
+      }
+     }
+    },
+    "leela": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "offered": 9975,
+       "records": 0,
+       "silent": 9975,
+       "duplicate_docs": [],
+       "missing_docs": null,
+       "unexpected_docs": null,
+       "completed": 0,
+       "failed_by_reason": {},
+       "unexpected_failures": 0,
+       "unexpected_failure_docs": [],
+       "PASS": false
+      },
+      "structure": {
+       "bad_docs": {},
+       "completed_empty": [],
+       "PASS": true
+      },
+      "determinism": {
+       "compared": 0,
+       "mismatch_docs": [],
+       "n_mismatch": 0,
+       "only_in_a": [],
+       "only_in_b": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "PASS": false
+      }
+     }
+    },
+    "union": {
+     "PASS": false,
+     "note": "conjunction of both suites over identical records"
+    }
+   },
+   "cross_arm": {
+    "workload_ratio_rr_over_li": {
+     "ratio": null,
+     "PASS": false,
+     "why": "a side produced no chunks"
+    },
+    "normalization_parity": {
+     "a_norm_ok": false,
+     "b_norm_ok": false,
+     "PASS": false
+    },
+    "chunk_config_parity": {
+     "a": [
+      4000,
+      200
+     ],
+     "b": [
+      4000,
+      200
+     ],
+     "PASS": true
+    },
+    "PASS": false
+   }
+  },
+  "cross_arm": [],
+  "metrics": {
+   "module": "working/harness/metrics_shared.py",
+   "platform": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "native_x86_64": true
+   },
+   "publishable": true,
+   "not_publishable_reason": null,
+   "arms": {
+    "llamaindex_http_pdf": {
+     "sequential_warm0": {
+      "error": "0 completions <= warm_n=0",
+      "warm_n": 0,
+      "mode": "closed-loop",
+      "peak_summed_process_rss_mb": null,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the sequential window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "sequential_warm64": {
+      "error": "0 completions <= warm_n=64",
+      "warm_n": 64,
+      "mode": "closed-loop",
+      "peak_summed_process_rss_mb": null,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the sequential window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "blast_warm0": {
+      "mode": "closed-loop",
+      "warm_n": 0,
+      "successful_in_window": 9974,
+      "window_docs": 9975,
+      "window_span_s": 2381.162,
+      "successful_chunks": 194873,
+      "docs_per_s": 4.1887,
+      "chunks_per_s": 81.8394,
+      "window_t0_ns": 1787040172223866380,
+      "window_t1_ns": 1787042553386282392,
+      "latency": {
+       "n": 9974,
+       "p50": 3.0583,
+       "p90": 17.6899,
+       "p95": 28.209,
+       "p99": 69.1388,
+       "max": 456.14,
+       "mean": 7.5959,
+       "failed_items": 1,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 0
+      },
+      "cpu_s": 45009.7,
+      "cpu_s_per_doc": 4.5127,
+      "cpu_s_per_chunk": 0.23097,
+      "effective_cores": 18.902,
+      "cost_samples_in_window": 4762,
+      "cpu_utilization": 0.7876,
+      "cpu_utilization_valid": true,
+      "available_cpus": 24,
+      "client_concurrency": 32,
+      "peak_summed_process_rss_mb": 27317.7,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the blast window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "blast_warm64": {
+      "mode": "closed-loop",
+      "warm_n": 64,
+      "successful_in_window": 9910,
+      "window_docs": 9911,
+      "window_span_s": 2375.653,
+      "successful_chunks": 194581,
+      "docs_per_s": 4.1715,
+      "chunks_per_s": 81.9063,
+      "window_t0_ns": 1787040177733401153,
+      "window_t1_ns": 1787042553386282392,
+      "latency": {
+       "n": 9910,
+       "p50": 3.081,
+       "p90": 17.8124,
+       "p95": 28.5281,
+       "p99": 69.1388,
+       "max": 456.14,
+       "mean": 7.6358,
+       "failed_items": 1,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 64
+      },
+      "cpu_s": 44901.78,
+      "cpu_s_per_doc": 4.531,
+      "cpu_s_per_chunk": 0.23076,
+      "effective_cores": 18.901,
+      "cost_samples_in_window": 4751,
+      "cpu_utilization": 0.7875,
+      "cpu_utilization_valid": true,
+      "available_cpus": 24,
+      "client_concurrency": 32,
+      "peak_summed_process_rss_mb": 27317.7,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the blast window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "blast_batchpos_warm0": {
+      "mode": "open-loop-blast",
+      "warm_n": 0,
+      "successful_in_window": 9974,
+      "window_docs": 9975,
+      "window_span_s": 2381.499,
+      "successful_chunks": 194873,
+      "docs_per_s": 4.1881,
+      "chunks_per_s": 81.8279,
+      "window_t0_ns": 1787040171887441372,
+      "window_t1_ns": 1787042553386282392,
+      "latency": {
+       "n": 9974,
+       "p50": 1154.9383,
+       "p90": 2098.7847,
+       "p95": 2245.326,
+       "p99": 2346.9847,
+       "max": 2381.4988,
+       "mean": 1147.5779,
+       "failed_items": 1,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 0
+      },
+      "cpu_s": 45009.7,
+      "cpu_s_per_doc": 4.5127,
+      "cpu_s_per_chunk": 0.23097,
+      "effective_cores": 18.9,
+      "cost_samples_in_window": 4763,
+      "cpu_utilization": 0.7875,
+      "cpu_utilization_valid": true,
+      "available_cpus": 24,
+      "client_concurrency": 32,
+      "peak_summed_process_rss_mb": 27317.7,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the blast_batchpos window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "blast_batchpos_warm64": {
+      "mode": "open-loop-blast",
+      "warm_n": 64,
+      "successful_in_window": 9910,
+      "window_docs": 9911,
+      "window_span_s": 2375.653,
+      "successful_chunks": 194581,
+      "docs_per_s": 4.1715,
+      "chunks_per_s": 81.9063,
+      "window_t0_ns": 1787040177733401153,
+      "window_t1_ns": 1787042553386282392,
+      "latency": {
+       "n": 9910,
+       "p50": 1161.1788,
+       "p90": 2100.8717,
+       "p95": 2245.6613,
+       "p99": 2346.9847,
+       "max": 2381.4988,
+       "mean": 1154.9689,
+       "failed_items": 1,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 64
+      },
+      "cpu_s": 44901.78,
+      "cpu_s_per_doc": 4.531,
+      "cpu_s_per_chunk": 0.23076,
+      "effective_cores": 18.901,
+      "cost_samples_in_window": 4751,
+      "cpu_utilization": 0.7875,
+      "cpu_utilization_valid": true,
+      "available_cpus": 24,
+      "client_concurrency": 32,
+      "peak_summed_process_rss_mb": 27317.7,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the blast_batchpos window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     }
+    },
+    "rocketride_pdf": {
+     "sequential_warm0": {
+      "error": "0 completions <= warm_n=0",
+      "warm_n": 0,
+      "mode": "closed-loop",
+      "peak_summed_process_rss_mb": null,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the sequential window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "sequential_warm64": {
+      "error": "0 completions <= warm_n=64",
+      "warm_n": 64,
+      "mode": "closed-loop",
+      "peak_summed_process_rss_mb": null,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the sequential window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "blast_warm0": {
+      "mode": "closed-loop",
+      "warm_n": 0,
+      "successful_in_window": 9936,
+      "window_docs": 9975,
+      "window_span_s": 3578.954,
+      "successful_chunks": 205399,
+      "docs_per_s": 2.7762,
+      "chunks_per_s": 57.3908,
+      "window_t0_ns": 1787042560451510516,
+      "window_t1_ns": 1787046139405776651,
+      "latency": {
+       "n": 9936,
+       "p50": 4.7847,
+       "p90": 18.5329,
+       "p95": 31.2137,
+       "p99": 104.6546,
+       "max": 283.66,
+       "mean": 9.8239,
+       "failed_items": 39,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 0
+      },
+      "cpu_s": 59445.75,
+      "cpu_s_per_doc": 5.9829,
+      "cpu_s_per_chunk": 0.28942,
+      "effective_cores": 16.61,
+      "cost_samples_in_window": 7158,
+      "cpu_utilization": 0.6921,
+      "cpu_utilization_valid": true,
+      "available_cpus": 24,
+      "client_concurrency": 32,
+      "peak_summed_process_rss_mb": 40465.8,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the blast window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "blast_warm64": {
+      "mode": "closed-loop",
+      "warm_n": 64,
+      "successful_in_window": 9872,
+      "window_docs": 9911,
+      "window_span_s": 3568.486,
+      "successful_chunks": 205090,
+      "docs_per_s": 2.7664,
+      "chunks_per_s": 57.4725,
+      "window_t0_ns": 1787042570919470376,
+      "window_t1_ns": 1787046139405776651,
+      "latency": {
+       "n": 9872,
+       "p50": 4.8043,
+       "p90": 18.6147,
+       "p95": 31.5362,
+       "p99": 105.0102,
+       "max": 283.66,
+       "mean": 9.8664,
+       "failed_items": 39,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 64
+      },
+      "cpu_s": 59244.6,
+      "cpu_s_per_doc": 6.0013,
+      "cpu_s_per_chunk": 0.28887,
+      "effective_cores": 16.602,
+      "cost_samples_in_window": 7137,
+      "cpu_utilization": 0.6918,
+      "cpu_utilization_valid": true,
+      "available_cpus": 24,
+      "client_concurrency": 32,
+      "peak_summed_process_rss_mb": 40465.8,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the blast window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "blast_batchpos_warm0": {
+      "mode": "open-loop-blast",
+      "warm_n": 0,
+      "successful_in_window": 9936,
+      "window_docs": 9975,
+      "window_span_s": 5967.518,
+      "successful_chunks": 205399,
+      "docs_per_s": 1.665,
+      "chunks_per_s": 34.4195,
+      "window_t0_ns": 1787040171887441372,
+      "window_t1_ns": 1787046139405776651,
+      "latency": {
+       "n": 9936,
+       "p50": 4060.4951,
+       "p90": 5419.5511,
+       "p95": 5622.7866,
+       "p99": 5762.6199,
+       "max": 5869.6703,
+       "mean": 4042.1334,
+       "failed_items": 39,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 0
+      },
+      "cpu_s": 59459.58,
+      "cpu_s_per_doc": 5.9843,
+      "cpu_s_per_chunk": 0.28948,
+      "effective_cores": 9.964,
+      "cost_samples_in_window": 7172,
+      "cpu_utilization": 0.4152,
+      "cpu_utilization_valid": true,
+      "available_cpus": 24,
+      "client_concurrency": 32,
+      "peak_summed_process_rss_mb": 40465.8,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the blast_batchpos window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     },
+     "blast_batchpos_warm64": {
+      "mode": "open-loop-blast",
+      "warm_n": 64,
+      "successful_in_window": 9872,
+      "window_docs": 9911,
+      "window_span_s": 3568.486,
+      "successful_chunks": 205090,
+      "docs_per_s": 2.7664,
+      "chunks_per_s": 57.4725,
+      "window_t0_ns": 1787042570919470376,
+      "window_t1_ns": 1787046139405776651,
+      "latency": {
+       "n": 9872,
+       "p50": 4069.262,
+       "p90": 5423.2171,
+       "p95": 5623.9191,
+       "p99": 5762.6287,
+       "max": 5869.6703,
+       "mean": 4052.8122,
+       "failed_items": 39,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 64
+      },
+      "cpu_s": 59244.6,
+      "cpu_s_per_doc": 6.0013,
+      "cpu_s_per_chunk": 0.28887,
+      "effective_cores": 16.602,
+      "cost_samples_in_window": 7137,
+      "cpu_utilization": 0.6918,
+      "cpu_utilization_valid": true,
+      "available_cpus": 24,
+      "client_concurrency": 32,
+      "peak_summed_process_rss_mb": 40465.8,
+      "peak_summed_process_rss_note": "peak of a SUM of per-process RSS over the blast_batchpos window; shared pages counted once per process. NOT a footprint, NOT comparable across legs with different process counts."
+     }
+    }
+   },
+   "available_cpus": {
+    "by_arm": {
+     "llamaindex_http_pdf": 24,
+     "rocketride_pdf": 24
+    },
+    "source_by_arm": {
+     "llamaindex_http_pdf": "cgroup cpuset.cpus.effective of container 'li' (pid 6557) = '0-23' \u2014 MEASURED",
+     "rocketride_pdf": "cgroup cpuset.cpus.effective of container 'rr' (pid 1743832) = '0-23' \u2014 MEASURED"
+    },
+    "driver_affinity_cpus": 8,
+    "host_cpu_count": 32
+   }
+  }
+ }
+}

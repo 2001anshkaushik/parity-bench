@@ -1,0 +1,503 @@
+{
+ "_meta": {
+  "name": "exp_fault_isolation",
+  "written_utc": "20260817T064530Z",
+  "payload_sha256_12": "9497165fe2a1",
+  "host": "ip-172-31-13-86",
+  "user": "ssm-user",
+  "pid": 1993,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "experiment": "fault_isolation",
+  "method_source": "Shashi bench.py:526 (protocol, scoreboard); Leela m4_m5_faults.py:13-66 (blast radius, surfacing classifier)",
+  "protocol": {
+   "good_docs": 6,
+   "poison_docs": 1,
+   "poison": "valid %PDF-1.7 header, 65536B random body",
+   "poison_position": 3,
+   "send_mode": "blast",
+   "concurrency": 7,
+   "recovery_docs": 1,
+   "attribution_window_s": 60.0
+  },
+  "protocol_deviations": [
+   "send shape: N individual sends at C=len(batch); Shashi and Leela both issue ONE batched send_files. A batched call can fail as one unit where N sends fail individually."
+  ],
+  "container_restarts": {
+   "llamaindex": {
+    "restarted": true,
+    "restart_s": 0.6
+   },
+   "rocketride": {
+    "restarted": true,
+    "restart_s": 0.5
+   }
+  },
+  "corpus": {
+   "source": "govdocs1",
+   "glob": "000_*.pdf",
+   "rule": "sorted(000_*.pdf)[:7]",
+   "good": [
+    "000_000009.pdf",
+    "000_000010.pdf",
+    "000_000011.pdf",
+    "000_000012.pdf",
+    "000_000013.pdf",
+    "000_000015.pdf"
+   ],
+   "recovery": [
+    "000_000016.pdf"
+   ],
+   "sha256": "6e84f181fd21e14804156be9bd98a2507e23bbf53c5799c4a909acc729d4fa97"
+  },
+  "provenance": {
+   "pipeline": {
+    "file": "product_pdf.pipe",
+    "nodes": [
+     "webhook",
+     "parse",
+     "preprocessor_langchain",
+     "embedding_transformer",
+     "response_documents"
+    ],
+    "sha256_raw": "bd775051ff5e43453dd4c0e4e1db465b34467cc3645047e077e75d0b262c823c",
+    "sha256_canonical": "f61165f7cf7ab1dbb30e0cc145d34dcdcbdc048fc90c3756d570fa217faa584b"
+   },
+   "platform": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "publishable": true
+   },
+   "engine": {
+    "duplication_patch_applied": false,
+    "duplication_patch_note": "stock 3.3.1. Leela's aws-bench a5c3b5d patches nodes/embedding_transformer/IInstance.py to add preventDefault() after _flushDocuments(); we have NOT applied it. Measured exposure on our corpus: 5/199 documents at repeat_factor 2. A patched-engine result is not comparable with this one."
+   },
+   "mode": {
+    "external": true,
+    "li_container": "li",
+    "rr_container": "rr",
+    "port": 8801
+   },
+   "image_digests": {
+    "llamaindex": "sha256:6699e9d4a4e5f65796d866ed47ac790bad4ab55651f0069a4b5bc9387a6ae390|ws1-llamaindex:x86_64|2026-08-17T06:44:23.741360523Z",
+    "rocketride": "sha256:500c5d777ba6171467a376f3d3947d14828ccb8959cf26b7e5602be71d01064c|rr-engine:3.3.1|2026-08-17T06:44:24.195708887Z"
+   }
+  },
+  "arms": {
+   "llamaindex_http_pdf": {
+    "batch_survived": true,
+    "good_docs_total": 6,
+    "good_docs_ok": 6,
+    "collateral_failures": 0,
+    "service_alive_after": true,
+    "recovery_ok": true,
+    "recovery_docs": 1,
+    "surfacing": {
+     "error_surfaced_by_server": {
+      "poison-x.pdf": true
+     },
+     "failure_only_inferred_by_client": {
+      "poison-x.pdf": false
+     },
+     "all_errors_surfaced": true,
+     "fault_docs_that_failed": 1,
+     "fault_docs_total": 1,
+     "poison_unexpectedly_succeeded": []
+    },
+    "blast_radius": {
+     "per_fault": {
+      "poison-x.pdf": {
+       "fault_outcome": "service_error",
+       "collateral_count": 0,
+       "collateral_docs": [],
+       "time_to_next_success_s": 0.09,
+       "no_success_after_fault": false
+      }
+     },
+     "total_collateral": 0,
+     "window_s": 60.0,
+     "PASS_zero_blast": true
+    },
+    "chunks_from_batch": 25,
+    "good_doc_reasons": {},
+    "PASS": true,
+    "failed_checks": [],
+    "records": [
+     {
+      "doc": "000_000009.pdf",
+      "submit_ns": 1786949079413842051,
+      "completion_ns": 1786949080350289913,
+      "n_chunks": 7,
+      "chunk_sha256": [
+       "f1648b7d764cbac03b8de3322fec887bcbfc9866c417d577f266b1171dae1860",
+       "7f415182f7916620f79a30112d07d3c650ba0c24ca7dc7ddab32df1049269caf",
+       "0a9f3717a073e9f9d413962c91d0161fe53a3098ec7f60951e8d7e3f24a6741d",
+       "0e9fd3d1abb74dd17ca79890b22620e0dc057a628cab1808d18d210774882edc",
+       "543ff9cdf7f0dc804e071c3df3ed15e4feffae22d5b661bdd2daf5c9a4ab4724",
+       "14f0b2322e47441ccd49ef20f97accb80da81d9102fd55aa4ba27cbe3934e126",
+       "3be946a0fa6568e204953a866e38086343d2f6dbe05b80abcb4cc483c50acb75"
+      ],
+      "total_chars": 26995,
+      "vector_sha256": [
+       "594517df7ed6daf1be071b52236a0cd8b16bb6c17fc92586c0a17fc9354c2ec5",
+       "4d8436428aaa4460bb09339a8d33a41bcd6503d1645afedddc2a19882343cc1d",
+       "7cf012b4089a50bd02ab384752d13bbb5d5db4e7ee4f80b469ca1b96895ce6a3",
+       "77f9083514cfb46530fb3398a8adcb7016dc91998d8ef82de03081aa6c7e10f5",
+       "fa6e9f5bbb297e805f5aa15a8cefe70a8eb9252c91e7a680465ac03978b87d27",
+       "bd7436159e4865e43935b596d2498e2e600ee586b2812378453257ee7c0a75ae",
+       "e5ddfb3212c6311ddeb60a8c090ef77a38b63ad492c0ffbfac1a1c844173ba5b"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "000_000010.pdf",
+      "submit_ns": 1786949079414636266,
+      "completion_ns": 1786949080063799058,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "69929f6c47b7f8c7b0614d0b5646ea06f91f448fa7215139835cdd838a601af3",
+       "9105244e3cc17309802d3839e20e7028f9f8329c71892d55f13878286437ddbf",
+       "1f507bbbbd478e744e9a2698794586365c4b9a6613b3507f36c7bbdb96250387",
+       "5552af224ee3c508b338424e4f911e44955f9c315127ccca34efeeb0c60b4a52"
+      ],
+      "total_chars": 12100,
+      "vector_sha256": [
+       "1b2000acfcf782a98cbbb84fed9e3186b61c859361f9db333c704bf05d790e52",
+       "ed51c979aad9476c7012dfb2985edf66b4543ab83232907bfd827ebbcfd4959e",
+       "803a37fe78a863011c52ec75637b3043d4ca5ddab18e3b3464b33a4969f23927",
+       "6bafefc888f55068c877ab87dcedc880d291fcffe4e4234c1470a77d68bae42c"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "000_000011.pdf",
+      "submit_ns": 1786949079415141090,
+      "completion_ns": 1786949079604305773,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "08683142c388fe2e00ef1cfb347228f5867d0878eceafad916f81de5023370c9"
+      ],
+      "total_chars": 273,
+      "vector_sha256": [
+       "6fd1339933c731f28d251dddcae313551caf7a8dbdfe68e0beb0720479b74053"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "poison-x.pdf",
+      "submit_ns": 1786949079415626864,
+      "completion_ns": 1786949079514710686,
+      "ok": false,
+      "reason": "service_error",
+      "n_chunks": 0,
+      "chunk_sha256": [],
+      "error": "parse_failed",
+      "error_class": "parse_failed"
+     },
+     {
+      "doc": "000_000012.pdf",
+      "submit_ns": 1786949079416454652,
+      "completion_ns": 1786949080172864988,
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "89e068f2ac7f1b9a055f8d6e5f7cd3dc488942078f34988ca4fc4fb04556f4df",
+       "508988990e15ba6bad6bb795346e9d3888e445db9522298bd9a8b715313bdbec",
+       "34a2cfd57dfa4efe749a38c199a0e62629d5939573a7a9f5c590272e93196d45",
+       "c31ba2e691da69c5c49b3184550a12b34d6f7d130974893f5b1b4d0aa565d975",
+       "81384d95ba1505fcb25e5b4f2210a3ded8e59883d67bee943162f6449e5000d6"
+      ],
+      "total_chars": 17041,
+      "vector_sha256": [
+       "fbf93c777b7bab1f1a2bc391c35bd73411f0cb02d105ce7b21961b95ac962df8",
+       "79645b04a2755e226007836ed4ddf8f136f53993606044bdf46c67bb34899418",
+       "632800d2b51258b6c81e122942d7b02430e8f42e3e08f3e933a26f01822c0fd0",
+       "6d6385812e058dee6ee1d1623c64570cb58b73fea704adced4c30ba9b3c5b366",
+       "40b2ce5d1284f73210fd5cda660df992619e4a2a4d8ed668ef7f731e6b146432"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "000_000013.pdf",
+      "submit_ns": 1786949079417776556,
+      "completion_ns": 1786949080042793556,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "4deb977adff892feefa908151734394f4985213a564e036626069aab697b74ea",
+       "99e045d6d5a80b39252b4931d1a13c05d3e99693c6638fc36d9b2fe594accae2",
+       "c9c7c0a8e142c866bdec8d39e46c1241a3f0f3205e604d60ad5b2ba4970fd51d",
+       "49d18a4c1d6b236e4d1d61b0d52a140b869b6accba33b90363906f7617412330"
+      ],
+      "total_chars": 14694,
+      "vector_sha256": [
+       "5cc0ff0300f1a507502bde5d41aaa91ff1a7b504fc119d2fe942fd28e2d59568",
+       "cb2b321447c571360738b34995d9732da66bd2306a7e5213b542529ab5100643",
+       "95b0517d6072467eb103c2658d68819d4605f7f2c04f5ff091038f1f3ef483b9",
+       "69b079209b7905cd83836c777f9c48a685667630f29c412f09cabf21a57d5148"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "000_000015.pdf",
+      "submit_ns": 1786949079418519702,
+      "completion_ns": 1786949080064785975,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "89045ec46cf0b08f3133eca5aeb34b5f47ee5ae42ffd180e6a69608045139ca4",
+       "aac24cae918f40755132d98ddc295ce39d661a6772312e19e61a3317486d2bf0",
+       "bd87756d846692858674793ac42684748920ddc8410a0526bac22a1dab40a031",
+       "032c7fd30ac5bfb1de38f0f50463b86a85c6b550f418e3d804ab65df76515069"
+      ],
+      "total_chars": 13733,
+      "vector_sha256": [
+       "1cb9bd53666b1e64d6b770748766b20dca5b4aa2b87b36f0e6de32381c05ed52",
+       "272897d30777dbce784b0a2a1558f1ed6957589a576335587572bdd50e2e6420",
+       "225e30b3ab072764eefce3a872a6ca29a060bd8e30c05a142e7ecae4eabc5360",
+       "a3a5b79108ae42aab95964aaaa75dcf33824391352e0f7dc6bd3b58c78a63255"
+      ],
+      "ok": true,
+      "reason": "completed"
+     }
+    ],
+    "recovery_records": [
+     {
+      "doc": "000_000016.pdf",
+      "submit_ns": 1786949080388584120,
+      "completion_ns": 1786949080994369567,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "08ed9c3501749d5d3055bcbc22c3b6ae9b36bce55e02e2b8aecdb2b93dd5da76",
+       "bfc377f35ad179ff9e38eba2863c156cdf33bc7684cabbe62e96cd5eb293b5d4",
+       "b02fa461400cd85376106ce2b54c968a5c039137210d6dc55db8b8f23cb6f15c",
+       "3c7b406e760f440c71990d3c9667a1ef3306b2a6cce81d358f96a1b810c2dcd8"
+      ],
+      "total_chars": 13600,
+      "vector_sha256": [
+       "1477a4ae10f259bcab978c711da4a7765d73bcc9cb420a3779c31580f0649241",
+       "a6ff4da728a954cf8208e0ac6d301cfc20270408710427ec5c01eb3cac1cc5d0",
+       "7fb83e9f7be93e79a666f8710318633dff1ec68dd14a3c9f3d010bbcd5dbf03a",
+       "551d73bc3b439bcc80df29fd070d1ef006508ae6b4753285d644e2ad9ef15d39"
+      ],
+      "ok": true,
+      "reason": "completed"
+     }
+    ]
+   },
+   "rocketride_pdf": {
+    "batch_survived": true,
+    "good_docs_total": 6,
+    "good_docs_ok": 6,
+    "collateral_failures": 0,
+    "service_alive_after": true,
+    "recovery_ok": true,
+    "recovery_docs": 1,
+    "surfacing": {
+     "error_surfaced_by_server": {
+      "poison-x.pdf": false
+     },
+     "failure_only_inferred_by_client": {
+      "poison-x.pdf": true
+     },
+     "all_errors_surfaced": false,
+     "fault_docs_that_failed": 1,
+     "fault_docs_total": 1,
+     "poison_unexpectedly_succeeded": []
+    },
+    "blast_radius": {
+     "per_fault": {
+      "poison-x.pdf": {
+       "fault_outcome": "no_documents",
+       "collateral_count": 0,
+       "collateral_docs": [],
+       "time_to_next_success_s": 0.62,
+       "no_success_after_fault": false
+      }
+     },
+     "total_collateral": 0,
+     "window_s": 60.0,
+     "PASS_zero_blast": true
+    },
+    "chunks_from_batch": 28,
+    "good_doc_reasons": {},
+    "PASS": true,
+    "failed_checks": [],
+    "records": [
+     {
+      "doc": "poison-x.pdf",
+      "submit_ns": 1786949099110584116,
+      "completion_ns": 1786949099336333478,
+      "n_chunks": 0,
+      "chunk_sha256": [],
+      "total_chars": 0,
+      "vector_sha256": [],
+      "ok": false,
+      "reason": "no_documents"
+     },
+     {
+      "doc": "000_000011.pdf",
+      "submit_ns": 1786949099110552038,
+      "completion_ns": 1786949099957816361,
+      "n_chunks": 1,
+      "chunk_sha256": [
+       "26a41f95119d94ebff70cd09b415504291fb1db701a998db4d7c6d96aaa44bd3"
+      ],
+      "total_chars": 281,
+      "vector_sha256": [
+       "6fd1339933c731f28d251dddcae313551caf7a8dbdfe68e0beb0720479b74053"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "000_000013.pdf",
+      "submit_ns": 1786949099110640032,
+      "completion_ns": 1786949100166819577,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "d09bef5f8c9a3c7d083977bedead46ebde96a9babaebfcc914c035f6e6b72a18",
+       "ee6b3e51ca780d152f29fe418d04648587b14da67587095388fae57663a62f2d",
+       "84c66bfbc32d01fa98d46d7a63678286d96c0c91d602e23bf0e39c8fc595f5aa",
+       "c5ef2b01323c45ce343d2f67c2b3b1ec390dbfbd03a9b8f884c7581f5e35de7e"
+      ],
+      "total_chars": 14286,
+      "vector_sha256": [
+       "0d82158f635a0046a571cf76cfa3fb361e0a0ffd5bbae6776879dc0aa635ed7e",
+       "0615a7cd6bbb71a94ea4c8e5425bf38836cacf18d13b6e509fa283951283c734",
+       "09d4a51ac41cadeb7fa83ead2f5d71adae8ce3805170ab84dccfa52de31929f0",
+       "cc7ae9b83edb810214d8daa1b269240223d24ab31daa284bf0b4052459bbdce7"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "000_000015.pdf",
+      "submit_ns": 1786949099110669906,
+      "completion_ns": 1786949100175592515,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "968eab8fb7e2fd9c74c503cb2664a4144d93fb26ceb4f79f60913c15b99e73db",
+       "e0ec05fde0ac167ee57a8854d731801d059f9b0cb40853c1d513dd89cf37583e",
+       "5f4b9f0b92ac0a6900179bad23795c7a71edcd7b6a3d85c7c03192e15c218a40",
+       "0fdf59fd7e28a10e35cabd7752c0acb0d012390cf8d89592d71dc10072b1ab69"
+      ],
+      "total_chars": 13502,
+      "vector_sha256": [
+       "280dff39ca6879b6234da48a65c8a2004ecef4e685e466d7daf5dae3684cfe88",
+       "f24747ddf2f97a2f6b59f762f6a9f20fae0a0af1e3a3dd4a61f2e3d630781415",
+       "908ecde5b90d612f68ba0f6b83e9bb7f719bab9ff593b87d96caef91c2ebe53d",
+       "eabcfc7511aa2dba82a9bee7821ed44c7abeada6916d5725898575f756ebd705"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "000_000010.pdf",
+      "submit_ns": 1786949099110508428,
+      "completion_ns": 1786949100178635793,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "7554508d32dda37ade72a5e86cde0b9b52784e54c58a7adaf3496f86481dde57",
+       "994414cafb9e20c08ad6eacf7f8ffd13d877a242c2da062a258af95d5e72b5a9",
+       "b9f86e017e827c9897b706b32b3d5228e4c52240eeea459fa3659b27abe49d17",
+       "014a1dd068e90d797a72cfa83f34d16be14781de4385a877e3d7ae5ae50e7f76"
+      ],
+      "total_chars": 11998,
+      "vector_sha256": [
+       "883c0fdd24646ab5e8bfb7c629a6762e42bb3b7b1a1df2688213430e9f3a2db1",
+       "92bae7d1f9530416093e6390b9e3f3129a714bc757f8c318b5bff3924054f767",
+       "d095c37128ab87cdb64c452cab88d3d70e0c7d31ae4f894e34d63bf09007749a",
+       "f4eef8d19e29bc02714e2c1935f4f04874744eeaef8b52755afbcfd83d6fa44a"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "000_000012.pdf",
+      "submit_ns": 1786949099110613479,
+      "completion_ns": 1786949100365040619,
+      "n_chunks": 5,
+      "chunk_sha256": [
+       "0b42989a05f8908cee4f9c8561957194c5036f6180878fc9fe4f728cabd75f99",
+       "d48434733d1cd1fe45448b2b3b684f0604f248bd3af59188f9a271e205d6a3cb",
+       "820a136fa604b3341bc3676afb92bbb39454d1f91b3b9238b76cff80af73344a",
+       "e65a535ffbdec98c3e97b73b886365136c0411605b669c4852ea82ad326c200f",
+       "3db36dfc99f01dad92371ce8cb2fa9706bbecccf178b2f8da34a73e3c3cd3e8d"
+      ],
+      "total_chars": 16547,
+      "vector_sha256": [
+       "0dc3fe590289c0df946f9e634d3af6df4d63a3b0d1b2d84553d3abae7f8fa21d",
+       "03caa32a32aebbd96265a3153d5af4a593a29ff9b01fc8d27a930b50ee852ff2",
+       "6abcdea26dfca608a07275103c1aece4e5f1e4d53d8aa81a2d50a0f7cb4ffaa4",
+       "2711e8e9079862f92c53479c93d76e7f814b0eb0bf5fba75a7297f8bd63a60e8",
+       "b86791c6188c1562449905b9381ce54af041f9adc9d01ffcd3252f94c69a5838"
+      ],
+      "ok": true,
+      "reason": "completed"
+     },
+     {
+      "doc": "000_000009.pdf",
+      "submit_ns": 1786949099110363751,
+      "completion_ns": 1786949100792920639,
+      "n_chunks": 10,
+      "chunk_sha256": [
+       "bba1ccd423493e1acd692546c3ab968eb1af99cff03f3c805c74fc7be77eed0e",
+       "1e89deb357f8a4fd60374ef1c637029f6ed59573de37a44115f7e90b9d11335d",
+       "f311b287bcef704795ab47b03e0676b2cb88ff1cf538b6234cbabf67db47fbf2",
+       "f1d78d3149e579b7a056793fbca21f74ac7bec21558ce81e38976823910b941c",
+       "059e94e8a1681c047f379e42da498cb0918ad449379dd58a54cc23fc752f7958",
+       "1306d9e8c7083b526e4bb6d95fd9c4e4541b28e768e2b1c1d8580d5e14ca8a67",
+       "da1a88640031c1207714c7b96613a11654d8a7158de46e6a6591c205f3fa6f3b",
+       "ca240a50dda88ca511532acdf8d44bf92664d0a6eddc7a41e03c5bfb4ddf0dce",
+       "79d11d33f961e40f53c429228e83760b0351f6ddd84c055e25aceb9b8eb22c73",
+       "8cc0b03339195762ad2967c292f5421452b63ca9fe28e92dd19167a700100cc6"
+      ],
+      "total_chars": 35514,
+      "vector_sha256": [
+       "e08e58cdbee6f31078786e2ac58a856fd0a2d18b6a64f8585175aed897a4662e",
+       "fc1194bfe9723f6079acb0b29db10b4f4e4faac7ef9f2dbdd27aa134b34bd32a",
+       "80a5cbe2585363570519748e41cadd8149c6def471ceed6f5810f347f18581b7",
+       "e9d9f48bed4667db44f23acda109026e9b17d30377c31c2b5616bfde237820c3",
+       "5d592f41280011681c4e116c4d2f608f3dde260ef1eb9dbdbc5ac8541a3a4634",
+       "d17b4dd076c733f1908e1b0d764da84b657bd129b76d8f60ad06f874b7dd72e6",
+       "1c50978261b20737fd4098dc9d87f416ca60b1040da0a5fbebf8273ad9985d4f",
+       "cd468f84d1109f89b38e5209c3c4c4facd1dd998ae16b48e8bf6b6160ffda771",
+       "55c460c204753e0e3b19d194d960cc64ae054aa431ba9a92e1e68e1db66fbe13",
+       "54814abda0894b031d9fe7504c8e0e6175da22b50a780df5d419b9e09f66c469"
+      ],
+      "ok": true,
+      "reason": "completed"
+     }
+    ],
+    "recovery_records": [
+     {
+      "doc": "000_000016.pdf",
+      "submit_ns": 1786949123913381242,
+      "completion_ns": 1786949124976441579,
+      "n_chunks": 4,
+      "chunk_sha256": [
+       "a8712ab02f5b7ca0db303f5421dd4fbd66c122e6f74129751e4b608598d83205",
+       "9e309d396cfa3b4325da1d81ff2cc362652df7cdc42f92809e530534e62e2ff9",
+       "19a13e810178c25bbfb29943cf06952794c01a885186fc51acbf03ad7044bee2",
+       "64d4f1c61522d752e11a5f1cc0192625ec3bebe056f6a098e1fccae88bfa5f53"
+      ],
+      "total_chars": 13461,
+      "vector_sha256": [
+       "e37d876a09d9ddd4c969726acdd5493d18cabe533d227d86cf45cf9abef676de",
+       "bdd4bc2fb4a1e070e4dd890f952488bab52f69be33e92e41c351039064edcc50",
+       "864226a0aeac009b9916a3ed3b4054465c8d9eb28d62d4bd42fe86e1f061a0a2",
+       "c11feeca64fa4d198b9234b69205c2870e2ceec54bbf8bfb7b8e2f7d457db69b"
+      ],
+      "ok": true,
+      "reason": "completed"
+     }
+    ]
+   }
+  },
+  "all_arms_pass": true
+ }
+}

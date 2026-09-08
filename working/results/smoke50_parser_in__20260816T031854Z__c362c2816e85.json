@@ -1,0 +1,651 @@
+{
+ "_meta": {
+  "name": "smoke50_parser_in",
+  "written_utc": "20260816T031854Z",
+  "payload_sha256_12": "c362c2816e85",
+  "host": "ip-172-31-13-86",
+  "user": "ssm-user",
+  "pid": 2494930,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "n_offered": 10000,
+  "threads": [
+   [
+    1,
+    16
+   ]
+  ],
+  "arms": {
+   "llamaindex_http_pdf": {
+    "census": {
+     "successful": 0,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": false,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "determinism_unproven": 0,
+    "independent_hash_failures": 0,
+    "independent_reference": {
+     "available": null,
+     "unavailable_reason": null,
+     "covered": 0,
+     "successful": 0,
+     "ran": false,
+     "full_coverage": true
+    },
+    "content_suspect": 0,
+    "records": []
+   },
+   "rocketride_pdf": {
+    "census": {
+     "successful": 0,
+     "expected": 0,
+     "unexpected": 0
+    },
+    "census_ok": false,
+    "structure_failures": 0,
+    "determinism_failures": 0,
+    "determinism_unproven": 0,
+    "independent_hash_failures": 0,
+    "independent_reference": {
+     "available": true,
+     "unavailable_reason": null,
+     "covered": 0,
+     "successful": 0,
+     "ran": false,
+     "full_coverage": true
+    },
+    "content_suspect": 0,
+    "records": []
+   }
+  },
+  "pipeline": {
+   "file": "product_pdf.pipe",
+   "nodes": [
+    "webhook",
+    "parse",
+    "preprocessor_langchain",
+    "embedding_transformer",
+    "response_documents"
+   ],
+   "sha256_raw": "bd775051ff5e43453dd4c0e4e1db465b34467cc3645047e077e75d0b262c823c",
+   "sha256_canonical": "f61165f7cf7ab1dbb30e0cc145d34dcdcbdc048fc90c3756d570fa217faa584b"
+  },
+  "corpus": {
+   "source": "govdocs1",
+   "glob": "*.pdf",
+   "rule": "sorted(*.pdf)[:N]",
+   "n": 10000,
+   "sha256": "03692bf6a4d5d5490025255a70a16b309dc90280e83275897b4003e9216df7f7",
+   "first": "000_000009.pdf",
+   "last": "040_040987.pdf"
+  },
+  "pinned": {
+   "workers": 32,
+   "threads": 1,
+   "blast_concurrency": 32,
+   "send_modes": [
+    "sequential",
+    "blast"
+   ],
+   "warm_n": {
+    "primary": 64,
+    "secondary": 25,
+    "placement": "metric-side, by completion rank (perf_window; settled 2026-08-14)"
+   },
+   "embedding_dim": {
+    "source": "probed from each arm's loaded model, one doc pre-span",
+    "per_arm": {
+     "llamaindex_http_pdf": 384,
+     "rocketride_pdf": 384
+    }
+   },
+   "torch_threads_measured": {
+    "llamaindex_http_pdf": {
+     "source": "/health from each live uvicorn worker (external mode)",
+     "per_worker_intra_interop": [
+      [
+       1,
+       16
+      ]
+     ],
+     "thread_env_in_worker": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1"
+     }
+    },
+    "rocketride_pdf": {
+     "source": "env_probe node inside the engine task process, separate one-shot pipe (a3_env.pipe); measured pipe untouched",
+     "pid": 2453932,
+     "env": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1"
+     },
+     "os_cpu_count": 32,
+     "threads_alive": 5,
+     "torch_num_threads": 1,
+     "torch_num_interop_threads": 16,
+     "torch_version": "2.10.0+cu128"
+    }
+   },
+   "service_mode": "external containers",
+   "memory_sources": {
+    "llamaindex_http_pdf": {
+     "summed_process_rss_peak_mb": 34703.67,
+     "summed_process_rss_note": "peak of a SUM of per-process RSS (collector.py:360,378). Shared copy-on-write pages are counted once per mapping process, so with N forked workers this OVER-counts by roughly the sharing factor. NOT comparable to Leela's or Shashi's figures.",
+     "comparable_to_teammates": "cgroup_anon_mb",
+     "comparable_note": "Leela reads cgroup memory.stat anon (cgroup_sampler.py:55-62); Shashi reads the Docker API memory_stats.stats.rss, else usage-file (cstats.py:132-140). Both are cgroup-level: the kernel charges a shared page once per cgroup, not once per process. Quote anon against theirs.",
+     "cgroup": {
+      "cgroup": "/sys/fs/cgroup/system.slice/docker-8a8f79f35512e3ed40423c25919a94d88907dc5960fd211fcb291fda5fa62177.scope",
+      "current_bytes": 22342832128,
+      "peak_bytes": 23263944704,
+      "max_bytes": 62277025792,
+      "anon_bytes": 22177570816,
+      "file_bytes": 4440064,
+      "shmem_bytes": 131072,
+      "kernel_bytes": 160563200,
+      "current_mb": 21307.8,
+      "peak_mb": 22186.2,
+      "anon_mb": 21150.2,
+      "file_mb": 4.2,
+      "docker_stats_equivalent_mb": 21305.6
+     },
+     "cgroup_anon_mb": 21150.2,
+     "cgroup_peak_mb": 22186.2,
+     "sharing_factor_summed_over_anon": 1.64,
+     "summed_process_pss_peak_mb": null,
+     "peak_process_count": 34
+    },
+    "rocketride_pdf": {
+     "summed_process_rss_peak_mb": 1513.82,
+     "summed_process_rss_note": "peak of a SUM of per-process RSS (collector.py:360,378). Shared copy-on-write pages are counted once per mapping process, so with N forked workers this OVER-counts by roughly the sharing factor. NOT comparable to Leela's or Shashi's figures.",
+     "comparable_to_teammates": "cgroup_anon_mb",
+     "comparable_note": "Leela reads cgroup memory.stat anon (cgroup_sampler.py:55-62); Shashi reads the Docker API memory_stats.stats.rss, else usage-file (cstats.py:132-140). Both are cgroup-level: the kernel charges a shared page once per cgroup, not once per process. Quote anon against theirs.",
+     "cgroup": {
+      "cgroup": "/sys/fs/cgroup/system.slice/docker-733d049e8614a2a2ee9a28ea48979dd48a5bf1c09d0e71b37874e702188abc6a.scope",
+      "current_bytes": 9271574528,
+      "peak_bytes": 18434985984,
+      "max_bytes": 62277025792,
+      "anon_bytes": 1075167232,
+      "file_bytes": 7859896320,
+      "shmem_bytes": 0,
+      "kernel_bytes": 335495168,
+      "current_mb": 8842.1,
+      "peak_mb": 17581.0,
+      "anon_mb": 1025.4,
+      "file_mb": 7495.8,
+      "docker_stats_equivalent_mb": 1397.1
+     },
+     "cgroup_anon_mb": 1025.4,
+     "cgroup_peak_mb": 17581.0,
+     "sharing_factor_summed_over_anon": 1.48,
+     "summed_process_pss_peak_mb": null,
+     "peak_process_count": 2
+    }
+   },
+   "legs_run": [
+    "blast"
+   ],
+   "tika_sample_size": 200,
+   "tika_sample_note": "0/None = every document. A positive value is a deterministic stride sample; the covered count per arm is in arms.*.independent_reference.",
+   "cost_available": true,
+   "cost_unavailable_reason": null,
+   "cost_sampler": {
+    "source": "psutil ProcessCollector (out-of-process, dead-PID roll-forward)",
+    "interval_s": 0.5,
+    "scope": "service process tree only, driver excluded",
+    "pluggable": "box/Docker mode consumes Leela's cgroup_sampler JSONL via metrics_shared.series_from_cgroup_jsonl"
+   },
+   "available_cpus": 32,
+   "rocketride_client": {
+    "ROCKETRIDE_URI": {
+     "source": "harness default (matches both engine images)",
+     "value": "http://127.0.0.1:5565",
+     "resolved_websocket": "ws://127.0.0.1:5565/task/service"
+    },
+    "ROCKETRIDE_APIKEY": {
+     "source": "harness default (matches both engine images)",
+     "sha256_8": "08846e81"
+    },
+    "loopback": true
+   },
+   "raw_records_dir": "/home/ssm-user/parity-bench/working/results/run10k"
+  },
+  "gate_verdicts": {
+   "llamaindex_http_pdf": {
+    "shashi": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "expected": 10000,
+       "recorded": 0,
+       "n_missing": 10000,
+       "missing": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "n_duplicates": 0,
+       "duplicates": [],
+       "n_unexpected": 0,
+       "unexpected": [],
+       "n_silent_empty": 0,
+       "silent_empty": [],
+       "PASS": false
+      },
+      "structure": {
+       "docs_checked": 0,
+       "n_bad": 0,
+       "reasons": [],
+       "expected_dim": 384,
+       "norm_ok": false,
+       "duplication": {
+        "n_duplicated": 0,
+        "duplicated_docs": [],
+        "max_repeat_factor": 1,
+        "n_over_chunk_trigger": 0,
+        "PASS": true
+       },
+       "PASS": false
+      },
+      "determinism": {
+       "label_a": "sequential",
+       "label_b": "blast",
+       "compared": 0,
+       "identical": 0,
+       "n_mismatched": 0,
+       "mismatched": [],
+       "n_unproven": 0,
+       "unproven": [],
+       "PASS": false
+      }
+     }
+    },
+    "leela": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "offered": 10000,
+       "records": 0,
+       "silent": 10000,
+       "duplicate_docs": [],
+       "missing_docs": null,
+       "unexpected_docs": null,
+       "completed": 0,
+       "failed_by_reason": {},
+       "unexpected_failures": 0,
+       "unexpected_failure_docs": [],
+       "PASS": false
+      },
+      "structure": {
+       "bad_docs": {},
+       "completed_empty": [],
+       "PASS": true
+      },
+      "determinism": {
+       "compared": 0,
+       "mismatch_docs": [],
+       "n_mismatch": 0,
+       "only_in_a": [],
+       "only_in_b": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "PASS": false
+      }
+     }
+    },
+    "union": {
+     "PASS": false,
+     "note": "conjunction of both suites over identical records"
+    }
+   },
+   "rocketride_pdf": {
+    "shashi": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "expected": 10000,
+       "recorded": 0,
+       "n_missing": 10000,
+       "missing": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "n_duplicates": 0,
+       "duplicates": [],
+       "n_unexpected": 0,
+       "unexpected": [],
+       "n_silent_empty": 0,
+       "silent_empty": [],
+       "PASS": false
+      },
+      "structure": {
+       "docs_checked": 0,
+       "n_bad": 0,
+       "reasons": [],
+       "expected_dim": 384,
+       "norm_ok": false,
+       "duplication": {
+        "n_duplicated": 0,
+        "duplicated_docs": [],
+        "max_repeat_factor": 1,
+        "n_over_chunk_trigger": 0,
+        "PASS": true
+       },
+       "PASS": false
+      },
+      "determinism": {
+       "label_a": "sequential",
+       "label_b": "blast",
+       "compared": 0,
+       "identical": 0,
+       "n_mismatched": 0,
+       "mismatched": [],
+       "n_unproven": 0,
+       "unproven": [],
+       "PASS": false
+      }
+     }
+    },
+    "leela": {
+     "PASS": false,
+     "checks": {
+      "census": {
+       "offered": 10000,
+       "records": 0,
+       "silent": 10000,
+       "duplicate_docs": [],
+       "missing_docs": null,
+       "unexpected_docs": null,
+       "completed": 0,
+       "failed_by_reason": {},
+       "unexpected_failures": 0,
+       "unexpected_failure_docs": [],
+       "PASS": false
+      },
+      "structure": {
+       "bad_docs": {},
+       "completed_empty": [],
+       "PASS": true
+      },
+      "determinism": {
+       "compared": 0,
+       "mismatch_docs": [],
+       "n_mismatch": 0,
+       "only_in_a": [],
+       "only_in_b": [
+        "000_000009.pdf",
+        "000_000010.pdf",
+        "000_000011.pdf",
+        "000_000012.pdf",
+        "000_000013.pdf",
+        "000_000015.pdf",
+        "000_000016.pdf",
+        "000_000018.pdf",
+        "000_000019.pdf",
+        "000_000020.pdf",
+        "000_000021.pdf",
+        "000_000022.pdf",
+        "000_000024.pdf",
+        "000_000025.pdf",
+        "000_000026.pdf"
+       ],
+       "PASS": false
+      }
+     }
+    },
+    "union": {
+     "PASS": false,
+     "note": "conjunction of both suites over identical records"
+    }
+   },
+   "cross_arm": {
+    "workload_ratio_rr_over_li": {
+     "ratio": null,
+     "PASS": false,
+     "why": "a side produced no chunks"
+    },
+    "normalization_parity": {
+     "a_norm_ok": false,
+     "b_norm_ok": false,
+     "PASS": false
+    },
+    "chunk_config_parity": {
+     "a": [
+      4000,
+      200
+     ],
+     "b": [
+      4000,
+      200
+     ],
+     "PASS": true
+    },
+    "PASS": false
+   }
+  },
+  "cross_arm": [],
+  "metrics": {
+   "module": "working/harness/metrics_shared.py",
+   "platform": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "native_x86_64": true
+   },
+   "publishable": true,
+   "not_publishable_reason": null,
+   "arms": {
+    "llamaindex_http_pdf": {
+     "sequential_warm64": {
+      "error": "0 completions <= warm_n=64",
+      "warm_n": 64,
+      "mode": "closed-loop"
+     },
+     "sequential_warm25": {
+      "error": "0 completions <= warm_n=25",
+      "warm_n": 25,
+      "mode": "closed-loop"
+     },
+     "blast_warm64": {
+      "mode": "open-loop-blast",
+      "warm_n": 64,
+      "successful_in_window": 9936,
+      "window_docs": 9936,
+      "window_span_s": 1552.333,
+      "successful_chunks": 194993,
+      "docs_per_s": 6.4007,
+      "chunks_per_s": 125.6129,
+      "window_t0_ns": 1786846299332579984,
+      "window_t1_ns": 1786847851665132953,
+      "latency": {
+       "n": 9936,
+       "p50": 2.0532,
+       "p90": 10.9543,
+       "p95": 17.6221,
+       "p99": 44.0702,
+       "max": 396.4608,
+       "mean": 4.9436,
+       "failed_items": 0,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 64
+      },
+      "cpu_s": 47359.7,
+      "cpu_s_per_doc": 4.7665,
+      "cpu_s_per_chunk": 0.24288,
+      "effective_cores": 30.509,
+      "peak_rss_mb": 36427.1,
+      "cost_samples_in_window": 3104,
+      "cpu_utilization": 0.9534,
+      "cpu_utilization_valid": true,
+      "available_cpus": 32
+     },
+     "blast_warm25": {
+      "mode": "open-loop-blast",
+      "warm_n": 25,
+      "successful_in_window": 9975,
+      "window_docs": 9975,
+      "window_span_s": 1554.67,
+      "successful_chunks": 195198,
+      "docs_per_s": 6.4162,
+      "chunks_per_s": 125.5559,
+      "window_t0_ns": 1786846296994664384,
+      "window_t1_ns": 1786847851665132953,
+      "latency": {
+       "n": 9975,
+       "p50": 2.0497,
+       "p90": 10.932,
+       "p95": 17.5707,
+       "p99": 44.0702,
+       "max": 396.4608,
+       "mean": 4.9302,
+       "failed_items": 0,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 25
+      },
+      "cpu_s": 47435.89,
+      "cpu_s_per_doc": 4.7555,
+      "cpu_s_per_chunk": 0.24301,
+      "effective_cores": 30.512,
+      "peak_rss_mb": 36427.1,
+      "cost_samples_in_window": 3109,
+      "cpu_utilization": 0.9535,
+      "cpu_utilization_valid": true,
+      "available_cpus": 32
+     }
+    },
+    "rocketride_pdf": {
+     "sequential_warm64": {
+      "error": "0 completions <= warm_n=64",
+      "warm_n": 64,
+      "mode": "closed-loop"
+     },
+     "sequential_warm25": {
+      "error": "0 completions <= warm_n=25",
+      "warm_n": 25,
+      "mode": "closed-loop"
+     },
+     "blast_warm64": {
+      "mode": "open-loop-blast",
+      "warm_n": 64,
+      "successful_in_window": 9921,
+      "window_docs": 9936,
+      "window_span_s": 2463.548,
+      "successful_chunks": 297819,
+      "docs_per_s": 4.0271,
+      "chunks_per_s": 120.8903,
+      "window_t0_ns": 1786847865248730716,
+      "window_t1_ns": 1786850328796400910,
+      "latency": {
+       "n": 9921,
+       "p50": 1120.1246,
+       "p90": 2014.6658,
+       "p95": 2150.4519,
+       "p99": 2242.4415,
+       "max": 2308.7229,
+       "mean": 1110.4618,
+       "failed_items": 15,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 64
+      },
+      "cpu_s": 56783.16,
+      "cpu_s_per_doc": 5.7235,
+      "cpu_s_per_chunk": 0.19066,
+      "effective_cores": 23.049,
+      "peak_rss_mb": 84960.6,
+      "cost_samples_in_window": 4927,
+      "cpu_utilization": 0.7203,
+      "cpu_utilization_valid": true,
+      "available_cpus": 32
+     },
+     "blast_warm25": {
+      "mode": "open-loop-blast",
+      "warm_n": 25,
+      "successful_in_window": 9960,
+      "window_docs": 9975,
+      "window_span_s": 2466.454,
+      "successful_chunks": 298038,
+      "docs_per_s": 4.0382,
+      "chunks_per_s": 120.8366,
+      "window_t0_ns": 1786847862342497399,
+      "window_t1_ns": 1786850328796400910,
+      "latency": {
+       "n": 9960,
+       "p50": 1116.9239,
+       "p90": 2013.1954,
+       "p95": 2150.3808,
+       "p99": 2242.4415,
+       "max": 2308.7229,
+       "mean": 1106.136,
+       "failed_items": 15,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 25
+      },
+      "cpu_s": 56870.45,
+      "cpu_s_per_doc": 5.7099,
+      "cpu_s_per_chunk": 0.19082,
+      "effective_cores": 23.058,
+      "peak_rss_mb": 84960.6,
+      "cost_samples_in_window": 4933,
+      "cpu_utilization": 0.7205,
+      "cpu_utilization_valid": true,
+      "available_cpus": 32
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,540 @@
+{
+ "_meta": {
+  "name": "rederive_gates",
+  "written_utc": "20260818T140635Z",
+  "payload_sha256_12": "ef789985f863",
+  "host": "ip-172-31-13-86",
+  "user": "ssm-user",
+  "pid": 2419542,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "experiment": "rederive_gates",
+  "run_dir": "working/results/run10k_p2_blast_v2",
+  "offered": 9975,
+  "source_note": "pure re-derivation from per-document JSONL already on disk; no service was contacted",
+  "arms": {
+   "llamaindex_http_pdf": {
+    "legs": {
+     "sequential": "0 records",
+     "blast": "9975 records"
+    },
+    "gate_basis": "blast",
+    "self_duplication": {
+     "checked": 9872,
+     "duplicated_docs": 0,
+     "factors": [],
+     "docs": {},
+     "duplicated_frac": 0.0,
+     "PASS": true,
+     "vacuous": false
+    },
+    "gate_verdicts": {
+     "shashi": {
+      "PASS": true,
+      "checks": {
+       "census": {
+        "expected": 9975,
+        "recorded": 9975,
+        "n_missing": 0,
+        "missing": [],
+        "n_duplicates": 0,
+        "duplicates": [],
+        "n_unexpected": 0,
+        "unexpected": [],
+        "n_silent_empty": 0,
+        "silent_empty": [],
+        "PASS": true
+       },
+       "structure": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 9975,
+        "reason": "vector fields are not persisted in per-doc JSONL"
+       },
+       "determinism": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 9975,
+        "reason": "requires both legs' records"
+       }
+      },
+      "not_run": [
+       "determinism",
+       "structure"
+      ]
+     },
+     "leela": {
+      "PASS": false,
+      "checks": {
+       "census": {
+        "offered": 9975,
+        "records": 9975,
+        "silent": 0,
+        "duplicate_docs": [],
+        "missing_docs": null,
+        "unexpected_docs": null,
+        "completed": 9872,
+        "failed_by_reason": {
+         "unknown": 102,
+         "RemoteDisconnected": 1
+        },
+        "unexpected_failures": 103,
+        "unexpected_failure_docs": [
+         "000_000164.pdf",
+         "000_000357.pdf",
+         "001_001657.pdf",
+         "002_002014.pdf",
+         "002_002103.pdf",
+         "002_002189.pdf",
+         "002_002400.pdf",
+         "002_002472.pdf",
+         "002_002477.pdf",
+         "002_002978.pdf",
+         "003_003010.pdf",
+         "003_003113.pdf",
+         "003_003358.pdf",
+         "003_003421.pdf",
+         "003_003988.pdf"
+        ],
+        "PASS": false
+       },
+       "structure": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 9975,
+        "reason": "identity and vector fields are not persisted in per-doc JSONL"
+       },
+       "determinism": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 9975,
+        "reason": "requires both legs' records"
+       }
+      },
+      "not_run": [
+       "determinism",
+       "structure"
+      ]
+     },
+     "union": {
+      "PASS": false,
+      "not_run": [
+       "determinism",
+       "structure"
+      ],
+      "note": "conjunction of both suites over identical records; NOT-RUN gates are excluded from the conjunction and listed, never counted as failures"
+     }
+    },
+    "metrics": {
+     "blast_warm0": {
+      "mode": "closed-loop",
+      "warm_n": 0,
+      "successful_in_window": 9974,
+      "window_docs": 9975,
+      "window_span_s": 2381.162,
+      "successful_chunks": 194873,
+      "docs_per_s": 4.1887,
+      "chunks_per_s": 81.8394,
+      "window_t0_ns": 1787040172223866380,
+      "window_t1_ns": 1787042553386282392,
+      "latency": {
+       "n": 9974,
+       "p50": 3.0583,
+       "p90": 17.6899,
+       "p95": 28.209,
+       "p99": 69.1388,
+       "max": 456.14,
+       "mean": 7.5959,
+       "failed_items": 1,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 0
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "blast_warm64": {
+      "mode": "closed-loop",
+      "warm_n": 64,
+      "successful_in_window": 9910,
+      "window_docs": 9911,
+      "window_span_s": 2375.653,
+      "successful_chunks": 194581,
+      "docs_per_s": 4.1715,
+      "chunks_per_s": 81.9063,
+      "window_t0_ns": 1787040177733401153,
+      "window_t1_ns": 1787042553386282392,
+      "latency": {
+       "n": 9910,
+       "p50": 3.081,
+       "p90": 17.8124,
+       "p95": 28.5281,
+       "p99": 69.1388,
+       "max": 456.14,
+       "mean": 7.6358,
+       "failed_items": 1,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 64
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "blast_batchpos_corrected_warm0": {
+      "mode": "open-loop-blast",
+      "warm_n": 0,
+      "successful_in_window": 9974,
+      "window_docs": 9975,
+      "window_span_s": 2381.162,
+      "successful_chunks": 194873,
+      "docs_per_s": 4.1887,
+      "chunks_per_s": 81.8394,
+      "window_t0_ns": 1787040172223866380,
+      "window_t1_ns": 1787042553386282392,
+      "latency": {
+       "n": 9974,
+       "p50": 1154.6019,
+       "p90": 2098.4483,
+       "p95": 2244.9896,
+       "p99": 2346.6482,
+       "max": 2381.1624,
+       "mean": 1147.2415,
+       "failed_items": 1,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 0
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window",
+      "basis": "DERIVED (defect #39): the recorded enqueue_ns predates this arm's leg by stale_stamp_gap_s \u2014 under a client-pool blast the first admission IS the batch open, so min(admit_ns) replaces it. Batch-position latency includes in-batch queue wait by definition; comparable with Leela's derived column only."
+     },
+     "blast_batchpos_corrected_warm64": {
+      "mode": "open-loop-blast",
+      "warm_n": 64,
+      "successful_in_window": 9910,
+      "window_docs": 9911,
+      "window_span_s": 2375.653,
+      "successful_chunks": 194581,
+      "docs_per_s": 4.1715,
+      "chunks_per_s": 81.9063,
+      "window_t0_ns": 1787040177733401153,
+      "window_t1_ns": 1787042553386282392,
+      "latency": {
+       "n": 9910,
+       "p50": 1160.8424,
+       "p90": 2100.5352,
+       "p95": 2245.3249,
+       "p99": 2346.6482,
+       "max": 2381.1624,
+       "mean": 1154.6324,
+       "failed_items": 1,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 64
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window",
+      "basis": "DERIVED (defect #39): the recorded enqueue_ns predates this arm's leg by stale_stamp_gap_s \u2014 under a client-pool blast the first admission IS the batch open, so min(admit_ns) replaces it. Batch-position latency includes in-batch queue wait by definition; comparable with Leela's derived column only."
+     }
+    },
+    "batchpos_correction": {
+     "corrected_batch_open": "min(admit_ns) over this arm's own rows",
+     "stale_stamp_gap_s": 0.3,
+     "basis": "DERIVED (defect #39): the recorded enqueue_ns predates this arm's leg by stale_stamp_gap_s \u2014 under a client-pool blast the first admission IS the batch open, so min(admit_ns) replaces it. Batch-position latency includes in-batch queue wait by definition; comparable with Leela's derived column only."
+    }
+   },
+   "rocketride_pdf": {
+    "legs": {
+     "sequential": "0 records",
+     "blast": "9975 records"
+    },
+    "gate_basis": "blast",
+    "self_duplication": {
+     "checked": 9847,
+     "duplicated_docs": 0,
+     "factors": [],
+     "docs": {},
+     "duplicated_frac": 0.0,
+     "PASS": true,
+     "vacuous": false
+    },
+    "gate_verdicts": {
+     "shashi": {
+      "PASS": true,
+      "checks": {
+       "census": {
+        "expected": 9975,
+        "recorded": 9975,
+        "n_missing": 0,
+        "missing": [],
+        "n_duplicates": 0,
+        "duplicates": [],
+        "n_unexpected": 0,
+        "unexpected": [],
+        "n_silent_empty": 0,
+        "silent_empty": [],
+        "PASS": true
+       },
+       "structure": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 9975,
+        "reason": "vector fields are not persisted in per-doc JSONL"
+       },
+       "determinism": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 9975,
+        "reason": "requires both legs' records"
+       }
+      },
+      "not_run": [
+       "determinism",
+       "structure"
+      ]
+     },
+     "leela": {
+      "PASS": false,
+      "checks": {
+       "census": {
+        "offered": 9975,
+        "records": 9975,
+        "silent": 0,
+        "duplicate_docs": [],
+        "missing_docs": null,
+        "unexpected_docs": null,
+        "completed": 9847,
+        "failed_by_reason": {
+         "unknown": 89,
+         "TimeoutError": 39
+        },
+        "unexpected_failures": 128,
+        "unexpected_failure_docs": [
+         "000_000164.pdf",
+         "000_000282.pdf",
+         "000_000344.pdf",
+         "000_000357.pdf",
+         "000_000859.pdf",
+         "001_001657.pdf",
+         "002_002014.pdf",
+         "002_002103.pdf",
+         "002_002189.pdf",
+         "002_002472.pdf",
+         "002_002477.pdf",
+         "002_002489.pdf",
+         "002_002978.pdf",
+         "003_003010.pdf",
+         "003_003071.pdf"
+        ],
+        "PASS": false
+       },
+       "structure": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 9975,
+        "reason": "identity and vector fields are not persisted in per-doc JSONL"
+       },
+       "determinism": {
+        "verdict": "NOT RUN",
+        "PASS": null,
+        "records": 0,
+        "offered": 9975,
+        "reason": "requires both legs' records"
+       }
+      },
+      "not_run": [
+       "determinism",
+       "structure"
+      ]
+     },
+     "union": {
+      "PASS": false,
+      "not_run": [
+       "determinism",
+       "structure"
+      ],
+      "note": "conjunction of both suites over identical records; NOT-RUN gates are excluded from the conjunction and listed, never counted as failures"
+     }
+    },
+    "metrics": {
+     "blast_warm0": {
+      "mode": "closed-loop",
+      "warm_n": 0,
+      "successful_in_window": 9936,
+      "window_docs": 9975,
+      "window_span_s": 3578.954,
+      "successful_chunks": 205399,
+      "docs_per_s": 2.7762,
+      "chunks_per_s": 57.3908,
+      "window_t0_ns": 1787042560451510516,
+      "window_t1_ns": 1787046139405776651,
+      "latency": {
+       "n": 9936,
+       "p50": 4.7847,
+       "p90": 18.5329,
+       "p95": 31.2137,
+       "p99": 104.6546,
+       "max": 283.66,
+       "mean": 9.8239,
+       "failed_items": 39,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 0
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "blast_warm64": {
+      "mode": "closed-loop",
+      "warm_n": 64,
+      "successful_in_window": 9872,
+      "window_docs": 9911,
+      "window_span_s": 3568.486,
+      "successful_chunks": 205090,
+      "docs_per_s": 2.7664,
+      "chunks_per_s": 57.4725,
+      "window_t0_ns": 1787042570919470376,
+      "window_t1_ns": 1787046139405776651,
+      "latency": {
+       "n": 9872,
+       "p50": 4.8043,
+       "p90": 18.6147,
+       "p95": 31.5362,
+       "p99": 105.0102,
+       "max": 283.66,
+       "mean": 9.8664,
+       "failed_items": 39,
+       "label": "true service latency",
+       "mode": "closed-loop",
+       "warm_n": 64
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window"
+     },
+     "blast_batchpos_corrected_warm0": {
+      "mode": "open-loop-blast",
+      "warm_n": 0,
+      "successful_in_window": 9936,
+      "window_docs": 9975,
+      "window_span_s": 3578.954,
+      "successful_chunks": 205399,
+      "docs_per_s": 2.7762,
+      "chunks_per_s": 57.3908,
+      "window_t0_ns": 1787042560451510516,
+      "window_t1_ns": 1787046139405776651,
+      "latency": {
+       "n": 9936,
+       "p50": 1671.9311,
+       "p90": 3030.987,
+       "p95": 3234.2225,
+       "p99": 3374.0559,
+       "max": 3481.1063,
+       "mean": 1653.5693,
+       "failed_items": 39,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 0
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window",
+      "basis": "DERIVED (defect #39): the recorded enqueue_ns predates this arm's leg by stale_stamp_gap_s \u2014 under a client-pool blast the first admission IS the batch open, so min(admit_ns) replaces it. Batch-position latency includes in-batch queue wait by definition; comparable with Leela's derived column only."
+     },
+     "blast_batchpos_corrected_warm64": {
+      "mode": "open-loop-blast",
+      "warm_n": 64,
+      "successful_in_window": 9872,
+      "window_docs": 9911,
+      "window_span_s": 3568.486,
+      "successful_chunks": 205090,
+      "docs_per_s": 2.7664,
+      "chunks_per_s": 57.4725,
+      "window_t0_ns": 1787042570919470376,
+      "window_t1_ns": 1787046139405776651,
+      "latency": {
+       "n": 9872,
+       "p50": 1680.6979,
+       "p90": 3034.653,
+       "p95": 3235.355,
+       "p99": 3374.0647,
+       "max": 3481.1063,
+       "mean": 1664.2482,
+       "failed_items": 39,
+       "label": "batch-position latency \u2014 includes queue wait",
+       "mode": "open-loop-blast",
+       "warm_n": 64
+      },
+      "cpu_s": null,
+      "cpu_s_per_doc": null,
+      "cpu_s_per_chunk": null,
+      "effective_cores": null,
+      "peak_rss_mb": null,
+      "cpu_utilization": null,
+      "cpu_utilization_valid": null,
+      "cost_note": "no cost samples resolved to this window",
+      "basis": "DERIVED (defect #39): the recorded enqueue_ns predates this arm's leg by stale_stamp_gap_s \u2014 under a client-pool blast the first admission IS the batch open, so min(admit_ns) replaces it. Batch-position latency includes in-batch queue wait by definition; comparable with Leela's derived column only."
+     }
+    },
+    "batchpos_correction": {
+     "corrected_batch_open": "min(admit_ns) over this arm's own rows",
+     "stale_stamp_gap_s": 2388.6,
+     "basis": "DERIVED (defect #39): the recorded enqueue_ns predates this arm's leg by stale_stamp_gap_s \u2014 under a client-pool blast the first admission IS the batch open, so min(admit_ns) replaces it. Batch-position latency includes in-batch queue wait by definition; comparable with Leela's derived column only."
+    }
+   }
+  },
+  "PASS": false,
+  "failed": [
+   "llamaindex_http_pdf: leela suite FAIL",
+   "rocketride_pdf: leela suite FAIL"
+  ]
+ }
+}
