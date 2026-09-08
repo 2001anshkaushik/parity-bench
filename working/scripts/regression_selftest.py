@@ -54,13 +54,65 @@ def check(name, incident, fn):
             print(f"  FAIL  {name:36s} {type(e).__name__}: {e}")
 
 
-def engine_up():
+def our_engine_port() -> int:
+    """The port working/scripts/start_engine.sh recorded in logs/engine.port (default 5565).
+    Three engines were found on this laptop on 2026-09-08 (ours, a stray copy of our bundle on
+    :5565, a desktop-app engine on :5566); the suite binds to OUR pid on OUR port."""
+    f = ROOT / "logs" / "engine.port"
+    try:
+        return int(f.read_text().strip())
+    except Exception:
+        return 5565
+
+
+def engine_up(port: int | None = None):
+    port = port or our_engine_port()
     try:
         import urllib.request
-        urllib.request.urlopen("http://127.0.0.1:5565/version", timeout=5).read()
+        urllib.request.urlopen(f"http://127.0.0.1:{port}/version", timeout=5).read()
         return True
     except Exception:
         return False
+
+
+def our_engine_on_port(port: int | None = None):
+    """Is the listener on OUR port the BENCHMARK's engine — the one working/scripts/start_engine.sh
+    recorded in logs/engine.pid, running our bundle binary? Returns (True, detail) or
+    (False, reason).
+
+    2026-09-08 (register 8, presence vs plausibility): "something answers /version on :5565 and
+    engine/ exists" accepted a foreign instance — pid 33576, parented by launchd, started
+    2026-08-31 from another project's shell with its stdout on /dev/null — and the thread probe
+    then failed opaquely against it for a week. A foreign or unidentifiable engine is not a
+    test failure and not a pass: the test SKIPS, naming the reason, and gate 3's skip budget
+    turns that into a visible refusal rather than a silent narrowing of coverage (entry 27)."""
+    import subprocess as sp
+    port = port or our_engine_port()
+    pidfile = ROOT / "logs" / "engine.pid"
+    if not pidfile.exists():
+        return False, "logs/engine.pid absent — no engine was started by working/scripts/start_engine.sh"
+    try:
+        recorded = int(pidfile.read_text().strip())
+    except ValueError:
+        return False, f"logs/engine.pid is not a pid: {pidfile.read_text()!r}"
+    out = sp.run(["lsof", "-nP", f"-iTCP:{port}", "-sTCP:LISTEN", "-t"], capture_output=True, text=True).stdout
+    holders = [int(x) for x in out.split() if x.strip().isdigit()]
+    if not holders:
+        return False, f"nothing is listening on :{port} (logs/engine.port) — start ours: bash working/scripts/start_engine.sh"
+    if recorded not in holders:
+        cmd = sp.run(["ps", "-o", "lstart=,command=", "-p", str(holders[0])], capture_output=True, text=True).stdout.strip()
+        return False, (f"the :{port} listener is pid {holders[0]}, not the pid in logs/engine.pid ({recorded}) — a "
+                       f"FOREIGN or stale engine ({cmd[:90]}). Start ours: bash working/scripts/start_engine.sh")
+    cmd = sp.run(["ps", "-o", "command=", "-p", str(recorded)], capture_output=True, text=True).stdout.strip()
+    # start_engine.sh runs `./engine ai/eaas.py` from the bundle directory, so identity is the
+    # binary name PLUS the process's working directory (lsof cwd), or the absolute path.
+    cwd_out = sp.run(["lsof", "-a", "-p", str(recorded), "-d", "cwd", "-Fn"], capture_output=True, text=True).stdout
+    cwd = next((l[1:] for l in cwd_out.splitlines() if l.startswith("n")), "")
+    bundle = ROOT / "engine"
+    ours = ("ai/eaas.py" in cmd) and (str(bundle / "engine") in cmd or (cmd.startswith("./engine ") and cwd == str(bundle)))
+    if not ours:
+        return False, f"pid {recorded} holds :{port} but is not our bundle binary: {cmd[:90]} (cwd {cwd})"
+    return True, f"pid {recorded} = logs/engine.pid, holds :{port} (logs/engine.port), runs {bundle / 'engine'} (cwd {cwd})"
 
 
 # ---------------------------------------------------------------- 1. NUL truncation
@@ -216,9 +268,19 @@ def t_thread_settings_matched():
     assert "len(med) >= 3" in src, "the gate no longer requires n>=3 (n=1 passes trivially)"
     # An engine answering on :5565 is NOT the same as THIS tree being able to drive one — a bare
     # clone has no engine/ (PROVISIONING §1) yet still sees a neighbouring engine on the port, and
-    # then fails opaquely inside probe_env. Require both, or skip.
+    # then fails opaquely inside probe_env. Require both, or skip. And (2026-09-08) the engine must
+    # be OURS — the pid start_engine.sh recorded, holding the port, running our bundle — else SKIP
+    # with the reason named; a foreign instance is neither a pass nor a failure of this tree.
     if not engine_up() or not (ROOT / "engine").is_dir():
+        print("        skip reason: no engine on :5565 or no engine/ bundle in this tree")
         return "skip"
+    ours, why = our_engine_on_port()
+    if not ours:
+        print(f"        skip reason: {why}")
+        return "skip"
+    print(f"        engine identity: {why}")
+    # The probe subprocess inherits this; the SDK lets a set environment variable win over .env.
+    os.environ["ROCKETRIDE_URI"] = f"http://127.0.0.1:{our_engine_port()}"
     import importlib.util
     spec = importlib.util.spec_from_file_location("mr", ROOT / "matched_replication.py")
     m = importlib.util.module_from_spec(spec)
