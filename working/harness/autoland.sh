@@ -14,16 +14,22 @@
 #
 # GATES, in order, all fail-closed:
 #   0  shape: on a branch, origin reachable (fetched), index CLEAN, explicit paths,
-#      HEAD not behind origin/<branch> (a claimed base is never pushed onto — entry 26)
+#      HEAD not behind origin/<branch> (a claimed base is never pushed onto — entry 26);
+#      then the paths are staged and the SINGLE-SOURCE files are checked against the
+#      other campaign branch (AUTOMATION_CONTRACT.md identical or only-behind in the
+#      merge direction video-bench -> docs-bench; DOCS_HANDOFF.md canonical on docs-bench,
+#      a marked stub anywhere else)
 #   1  APPEND-ONLY: refuse any modification/deletion/rename under working/results/
 #   2  static undefined-name gate over changed python (imports static_names, never
 #      runs it as a script — it has no __main__ and would exit 0 doing nothing)
 #   3  the test suite, against a BASELINE: refuse a failure not baselined, refuse a
 #      baselined failure that now passes (update the baseline deliberately), refuse a
-#      runner that did not complete. rc alone is insufficient: the runner returns 1
-#      for a baselined failure.
+#      runner that did not complete, refuse MORE SKIPS than the baseline allows (a
+#      skipped test is a path the suite did not run — entry 27). rc alone is
+#      insufficient: the runner returns 1 for a baselined failure.
 #   4  figure_guard over the prose that will go public (its own null control first)
-#   5  commit
+#   5  figure_guard over the COMMIT MESSAGE, then commit — a message is public and
+#      permanent, so a never-quote figure in it is refused before the commit exists
 #   6  push — never --force; first push of a branch sets upstream explicitly
 #   7  ls-remote read-back  <-- the landing proof
 #
@@ -150,12 +156,73 @@ else
   echo "  origin/$BRANCH does not exist yet — this will be the branch's first push (upstream will be set)"
 fi
 
-# ------------------------------------------------------- gate 1: append-only artifacts
-say "gate 1 — measurement artifacts are append-only"
 if ! git add -- ${PATHS[@]+"${PATHS[@]}"}; then
   git reset -q
   die "git add failed on the given paths (missing, or ignored — an ignored path needs a deliberate decision, not a silent add)"
 fi
+
+# ---- single-source files (2026-09-08). Two campaign branches carry the same operating
+# documents; a stale copy on one of them is a session reading the wrong document. The
+# merge direction is video-bench -> docs-bench ONLY (as-is merge), so:
+#   IDENTICAL paths: on the SOURCE branch the other side may only be BEHIND (its copy is a
+#     version already in this branch's history); on the DESTINATION or any other branch
+#     the copy must equal origin/video-bench's exactly — edit it there and merge forward.
+#   CANONICAL-OR-STUB paths: docs-bench carries the document; every other branch carries
+#     a marked stub, so no prose on the wrong branch can be mistaken for the briefing.
+CAMPAIGN_SRC="video-bench"; CAMPAIGN_DST="docs-bench"
+SINGLE_SOURCE_IDENTICAL=("working/docs/AUTOMATION_CONTRACT.md")
+SINGLE_SOURCE_CANONICAL_OR_STUB=("working/docs/DOCS_HANDOFF.md")
+STUB_MARKER="<!-- DOCS_HANDOFF_STUB: the document lives on docs-bench -->"
+blob_at() {  # $1 = INDEX | HEAD | any ref, $2 = path -> blob id or empty
+  if [[ "$1" == "INDEX" ]]; then git rev-parse -q --verify ":$2" 2>/dev/null || true
+  else git rev-parse -q --verify "$1:$2" 2>/dev/null || true; fi
+}
+blob_is_stub() { git cat-file -p "$1" | head -1 | grep -qF "$STUB_MARKER"; }
+blob_in_history() {  # $1 blob, $2 path: is this blob any committed version of $path on HEAD?
+  local c
+  for c in $(git log --format=%H HEAD -- "$2"); do
+    [[ "$(blob_at "$c" "$2")" == "$1" ]] && return 0
+  done
+  return 1
+}
+say "gate 0b — single-source files against the other campaign branch"
+if [[ "$BRANCH" == "$CAMPAIGN_SRC" ]]; then OTHER="$CAMPAIGN_DST"; ROLE="source"; else OTHER="$CAMPAIGN_SRC"; ROLE="destination"; fi
+[[ "$BRANCH" == "$CAMPAIGN_SRC" || "$BRANCH" == "$CAMPAIGN_DST" ]] || echo "  $BRANCH is not a campaign branch — held to the destination rule against origin/$CAMPAIGN_SRC"
+if git rev-parse -q --verify "refs/remotes/origin/$OTHER" >/dev/null; then
+  for sp in "${SINGLE_SOURCE_IDENTICAL[@]}"; do
+    mine="$(blob_at INDEX "$sp")"; head_="$(blob_at HEAD "$sp")"; theirs="$(blob_at "refs/remotes/origin/$OTHER" "$sp")"
+    if [[ -z "$mine" && -n "$head_" ]]; then git reset -q; die "$sp is being DELETED on $BRANCH — it is a single-source file carried by both campaign branches"; fi
+    if [[ -z "$mine" && -z "$theirs" ]]; then echo "  $sp: absent on both $BRANCH and origin/$OTHER"; continue; fi
+    if [[ -z "$mine" ]]; then echo "  $sp: absent on $BRANCH, present on origin/$OTHER — not yet carried here"; continue; fi
+    if [[ "$mine" == "$theirs" ]]; then echo "  $sp: identical to origin/$OTHER"; continue; fi
+    if [[ "$ROLE" == "source" && -n "$theirs" ]] && blob_in_history "$theirs" "$sp"; then
+      echo "  $sp: origin/$OTHER is BEHIND (its copy is an earlier version in this branch's history) — merge $CAMPAIGN_SRC -> $CAMPAIGN_DST as-is to converge"; continue
+    fi
+    git reset -q
+    if [[ "$ROLE" == "source" ]]; then
+      die "$sp on origin/$OTHER carries a version that is NOT in $BRANCH's history — a foreign edit on the destination branch. The merge direction is $CAMPAIGN_SRC -> $CAMPAIGN_DST only; the other copy must be reconciled by hand (never merged back)."
+    else
+      die "$sp differs from origin/$CAMPAIGN_SRC. Single-source rule: edit it on $CAMPAIGN_SRC and merge it forward (as-is); it is never edited on $BRANCH."
+    fi
+  done
+  for sp in "${SINGLE_SOURCE_CANONICAL_OR_STUB[@]}"; do
+    mine="$(blob_at INDEX "$sp")"; head_="$(blob_at HEAD "$sp")"
+    if [[ -z "$mine" && -n "$head_" ]]; then git reset -q; die "$sp is being DELETED on $BRANCH"; fi
+    if [[ -z "$mine" ]]; then echo "  $sp: absent on $BRANCH"; continue; fi
+    if [[ "$BRANCH" == "$CAMPAIGN_DST" ]]; then
+      if blob_is_stub "$mine"; then git reset -q; die "$sp on $CAMPAIGN_DST is a STUB — $CAMPAIGN_DST is the canonical home; a stub here leaves no document anywhere"; fi
+      echo "  $sp: canonical on $CAMPAIGN_DST"
+    else
+      if ! blob_is_stub "$mine"; then git reset -q; die "$sp on $BRANCH is not the stub — only $CAMPAIGN_DST carries the document; every other branch carries a stub whose first line is: $STUB_MARKER"; fi
+      echo "  $sp: stub on $BRANCH (canonical copy is on $CAMPAIGN_DST)"
+    fi
+  done
+else
+  echo "  origin/$OTHER does not exist — nothing to compare against"
+fi
+
+# ------------------------------------------------------- gate 1: append-only artifacts
+say "gate 1 — measurement artifacts are append-only"
 # Anything but A (added) under working/results/ is a change to evidence: M, D, R, T, C.
 VIOLATIONS="$(git diff --cached --name-status -- working/results/ | awk '$1 !~ /^A/ {print $0}' || true)"
 if [[ -n "$VIOLATIONS" ]]; then
@@ -207,13 +274,18 @@ say "gate 3 — test suite against the baseline"
 [[ -f "$RUNNER" ]]   || { git reset -q; die "$RUNNER is absent. A missing gate is not a passing gate."; }
 [[ -f "$BASELINE" ]] || { git reset -q; die "$BASELINE is absent. Gate 3 cannot tell a known failure from a new one without it."; }
 echo "  baselined failures (from $BASELINE — a listed test that starts passing is also refused):"
-"$PY" - "$BASELINE" <<'PYEOF'
+if ! "$PY" - "$BASELINE" <<'PYEOF'
 import json, sys
-b = json.load(open(sys.argv[1]))
+try:
+    b = json.load(open(sys.argv[1]))
+except Exception as e:
+    print(f"    {sys.argv[1]} is not valid JSON: {e}"); sys.exit(1)
 for k, v in (b.get("failing") or {}).items():
     print(f"    {k}  [since {v.get('since_commit','?')}, baselined at {b.get('baselined_at_commit','?')}] {v.get('reason','')[:120]}")
 if not b.get("failing"): print("    (none)")
+print(f"    max_skipped: {b.get('max_skipped', 'ABSENT')}")
 PYEOF
+then git reset -q; die "$BASELINE is not valid JSON — a gate whose baseline cannot be read cannot tell a known failure from a new one"; fi
 SUITE_OUT="$(mktemp -t autoland_suite.XXXXXX)"
 echo "  running: $PY $RUNNER"
 T0=$(date +%s); set +e; "$PY" "$RUNNER" >"$SUITE_OUT" 2>&1; SUITE_RC=$?; set -e
@@ -221,15 +293,22 @@ echo "  runner rc=$SUITE_RC in $(( $(date +%s) - T0 ))s; tail of output:"
 tail -n 12 "$SUITE_OUT" | sed 's/^/    | /'
 if ! "$PY" - "$BASELINE" "$SUITE_OUT" "$SUITE_RC" <<'PYEOF'
 import json, re, sys
-base = set((json.load(open(sys.argv[1])).get("failing") or {}).keys())
+bl = json.load(open(sys.argv[1]))
+base = set((bl.get("failing") or {}).keys())
 out = open(sys.argv[2], errors="replace").read(); rc = int(sys.argv[3])
-completed = re.search(r"^\s*\d+ passed, \d+ failed", out, re.M) is not None
+summ = re.search(r"^\s*(\d+) passed, (\d+) failed, (\d+) skipped", out, re.M)
+completed = summ is not None
+skipped = int(summ.group(3)) if summ else None
 failing = set(re.findall(r"^\s*FAILED (\S+?):", out, re.M))
 new = sorted(failing - base); fixed = sorted(base - failing)
-print(f"  parsed: completed={completed} rc={rc} failing={sorted(failing)} baseline={sorted(base)}")
+print(f"  parsed: completed={completed} rc={rc} failing={sorted(failing)} baseline={sorted(base)} skipped={skipped} max_skipped={bl.get('max_skipped')!r}")
 bad = []
 if not completed:
     bad.append("the runner did not print its summary line — it crashed or was cut off; a suite that did not complete proves nothing (entry 35)")
+if "max_skipped" not in bl:
+    bad.append(f"{sys.argv[1]} has no max_skipped — a suite with an unbounded skip count is a suite whose coverage is unknown (entry 27); record today's skip count")
+elif skipped is not None and skipped > int(bl["max_skipped"]):
+    bad.append(f"{skipped} test(s) SKIPPED, baseline allows {bl['max_skipped']} — the suite ran fewer live paths than it did when baselined (engine down on :5565? engine/ absent?). A green run on fewer paths is a narrower claim, not a pass (entry 27)")
 if new:
     bad.append(f"NEW failure(s) not in the baseline: {new}")
 if fixed:
@@ -246,7 +325,7 @@ then
   git reset -q; die "suite gate refused. Read the runner output — do not re-run hoping."
 fi
 rm -f "$SUITE_OUT"
-echo "  suite: only baselined failures present, runner completed"
+echo "  suite: only baselined failures present, skips within budget, runner completed"
 
 # ------------------------------------------------------------ gate 4: figure guard
 say "gate 4 — figure guard (never-quote figures) over everything this push makes public"
@@ -275,7 +354,13 @@ if [[ "$MODE" == "dry" ]]; then
   exit 0
 fi
 
-say "gate 5 — commit"
+say "gate 5 — commit message through figure_guard, then commit"
+MSG_FILE="$(mktemp -t autoland_msg.XXXXXX)"; printf '%s\n' "$MSG" > "$MSG_FILE"
+if ! "$PY" "$GUARD" --message-file "$MSG_FILE"; then
+  rm -f "$MSG_FILE"; git reset -q
+  die "the COMMIT MESSAGE carries an uncaveated never-quote figure. A message is public and permanent (no rewrite, ever), so it is refused BEFORE the commit is created. Caveat the figure in the message or drop it."
+fi
+rm -f "$MSG_FILE"
 git commit -q -m "$MSG"
 LOCAL="$(git rev-parse HEAD)"
 echo "  $LOCAL  $(git log -1 --format=%s)"

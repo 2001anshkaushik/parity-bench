@@ -31,6 +31,10 @@ this script REFUSES it. A gate that has never refused anything is not known to w
 exits 3 if the null control passes (i.e. if the gate failed to fire), which is the
 inverse-failure case that would otherwise leave a broken checker green forever.
 
+`--message-file FILE` scans a COMMIT MESSAGE with the same patterns and window; autoland
+gate 5 runs it before the commit is created. A message is public and permanent — it cannot
+be corrected without a history rewrite we will never do — so it is the worse exposure.
+
 Exit codes:  0 clean · 1 violation found · 2 usage/IO error · 3 null control did not fire
 """
 from __future__ import annotations
@@ -145,16 +149,26 @@ def scan(path: Path) -> List[str]:
     return problems
 
 
+def scan_message(path: Path) -> List[str]:
+    """A commit message is prose that is public, permanent and unremovable without a history
+    rewrite we will never do — a worse exposure than a file, not a lesser one. Same patterns,
+    same caveat window, labelled as the message so the refusal says where it was found."""
+    return [m.replace(f"{path}:", "commit message, line ", 1) for m in scan(path)]
+
+
+def _seeded_lines() -> List[str]:
+    return [f"RocketRide peakRSS was 84,960.6 MB and 6.9x lighter; 52.8 matched 52.9; "
+            f"371 failures; blast_batchpos p50; duplication_patch_applied: False; 314.5s; "
+            f"docs_per_s_DO_NOT_QUOTE.  <- {fid} / {what}" for fid, _pat, what, _why in BANNED]
+
+
 def null_control() -> int:
-    """The gate must REFUSE a file built to be refused. Otherwise it is not known to work."""
-    body = ["# null control — every banned figure, deliberately uncaveated", ""]
-    for fid, _pat, what, _why in BANNED:
-        body.append(f"RocketRide peakRSS was 84,960.6 MB and 6.9x lighter; 52.8 matched 52.9; "
-                    f"371 failures; blast_batchpos p50; duplication_patch_applied: False; 314.5s; "
-                    f"docs_per_s_DO_NOT_QUOTE.  <- {fid} / {what}")
+    """The gate must REFUSE a file built to be refused, AND a commit message built to be
+    refused. Otherwise it is not known to work."""
     with tempfile.TemporaryDirectory() as d:
         p = Path(d) / "null_control.md"
-        p.write_text("\n".join(body), encoding="utf-8")
+        p.write_text("\n".join(["# null control — every banned figure, deliberately uncaveated", ""]
+                               + _seeded_lines()), encoding="utf-8")
         found = scan(p)
         fired = {m.split("[")[1].split("]")[0] for m in found if "[" in m}
         missing = [fid for fid, *_ in BANNED if fid not in fired]
@@ -165,7 +179,27 @@ def null_control() -> int:
                 print(f"  - {m}", file=sys.stderr)
             print("\nThe gate is broken. A clean run from here proves nothing.", file=sys.stderr)
             return 3
-    print(f"NULL CONTROL PASSED — all {len(BANNED)} patterns fired on the seeded file.")
+        m = Path(d) / "null_control_message.txt"
+        m.write_text("\n".join(["subject: a message built to be refused", ""] + _seeded_lines()),
+                     encoding="utf-8")
+        mfound = scan_message(m)
+        mfired = {x.split("[")[1].split("]")[0] for x in mfound if "[" in x}
+        mmissing = [fid for fid, *_ in BANNED if fid not in mfired]
+        if mmissing or not all(x.startswith("commit message, line ") for x in mfound):
+            print("NULL CONTROL FAILED — the commit-message path did not fire on a message "
+                  f"built to trip it: missing {mmissing}", file=sys.stderr)
+            return 3
+        # the clean twin of the message path: a caveated message must pass
+        c = Path(d) / "caveated_message.txt"
+        c.write_text("subject\n\nThe 84,960.6 MB reading is a summing artifact — never quote it.\n",
+                     encoding="utf-8")
+        if scan_message(c):
+            print("NULL CONTROL FAILED — the commit-message path refused a CAVEATED message; "
+                  "a gate that refuses everything is as broken as one that refuses nothing",
+                  file=sys.stderr)
+            return 3
+    print(f"NULL CONTROL PASSED — all {len(BANNED)} patterns fired on the seeded file and on "
+          f"the seeded commit message; the caveated message passed.")
     return 0
 
 
@@ -180,10 +214,29 @@ def main() -> int:
                     help="explicit paths to scan instead of deriving from git")
     ap.add_argument("--null-control", action="store_true",
                     help="prove the gate can refuse, then exit")
+    ap.add_argument("--message-file", default=None,
+                    help="scan a COMMIT MESSAGE (a file holding the message text) instead of prose files")
     a = ap.parse_args()
 
     if a.null_control:
         return null_control()
+
+    if a.message_file is not None:
+        mp = Path(a.message_file)
+        if not mp.is_file():
+            print(f"figure_guard: message file {mp} not found", file=sys.stderr)
+            return 2
+        problems = scan_message(mp)
+        if problems:
+            print(f"\nFIGURE GUARD: REFUSED — {len(problems)} uncaveated never-quote figure(s) in "
+                  f"the COMMIT MESSAGE\n", file=sys.stderr)
+            for p in problems:
+                print(p + "\n", file=sys.stderr)
+            print("A commit message is public and permanent. Caveat the figure in the message, "
+                  "or leave it out.", file=sys.stderr)
+            return 1
+        print("FIGURE GUARD: commit message clean.")
+        return 0
 
     if a.paths is not None:
         targets = [Path(p) for p in a.paths if Path(p).suffix.lower() in SCANNED_SUFFIXES]

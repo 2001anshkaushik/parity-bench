@@ -4,6 +4,8 @@
   "parsed_from": "the runner's trailing '    FAILED <name>: <reason>' lines",
   "baselined_utc": "2026-09-08",
   "baselined_at_commit": "d98aa7c",
+  "max_skipped": 0,
+  "_max_skipped_why": "Skips allowed before gate 3 refuses. Baselined 2026-09-08 with the engine up on 127.0.0.1:5565 (3.3.1.35) and engine/ present: 0 skipped. A SKIP is a path the suite did not run; a green run on fewer paths is a narrower claim (register entry 27), so more skips than this refuse — raise it deliberately, never by re-running until it passes.",
   "failing": {
     "thread_settings_matched": {
       "since_commit": "87b957d",

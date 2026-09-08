@@ -55,20 +55,31 @@ cat > "$REPO/working/scripts/regression_selftest.py" <<'PYEOF'
 # FAKE runner for the autoland self-test: same output SHAPE as the real one, driven by env.
 import os, sys
 fails = [f for f in os.environ.get("FAKE_FAILS", "").split() if f]
+skips = int(os.environ.get("FAKE_SKIPS", "0"))
 if os.environ.get("FAKE_CRASH") == "1":
     raise RuntimeError("runner crashed before its summary")
 print("  PASS  content_sanity                      ok")
+for i in range(skips): print(f"  SKIP  {('skipped_%d' % i):36s} engine down")
 for f in fails: print(f"  FAIL  {f:36s} injected")
-print(f"  {1} passed, {len(fails)} failed, 0 skipped, 0 xfail (known open upstream), 0 xpass")
+print(f"  {1} passed, {len(fails)} failed, {skips} skipped, 0 xfail (known open upstream), 0 xpass")
 for f in fails: print(f"    FAILED {f}: injected failure")
 sys.exit(1 if fails else 0)
 PYEOF
 cat > "$REPO/working/harness/suite_baseline.json" <<'JEOF'
 {"runner": "working/scripts/regression_selftest.py", "baselined_at_commit": "sandbox",
+ "max_skipped": 0,
  "failing": {"thread_settings_matched": {"since_commit": "sandbox", "reason": "baselined in the sandbox"}}}
 JEOF
+STUB='<!-- DOCS_HANDOFF_STUB: the document lives on docs-bench -->'
+printf '%s\n# stub\nThe document lives on docs-bench.\n' "$STUB" > "$REPO/working/docs/DOCS_HANDOFF.md"
+echo "contract v1" > "$REPO/working/docs/AUTOMATION_CONTRACT.md"
 G add -A >/dev/null; G commit -q -m "sandbox init"
 G remote add origin "$ORIGIN"; G push -q -u origin video-bench
+# the destination campaign branch: canonical DOCS_HANDOFF, same contract
+G checkout -q -b docs-bench
+printf '# DOCS HANDOFF (canonical)\nreal briefing prose.\n' > "$REPO/working/docs/DOCS_HANDOFF.md"
+G add -A >/dev/null; G commit -q -m "docs-bench: canonical handoff"; G push -q -u origin docs-bench
+G checkout -q video-bench
 BASE_OK="FAKE_FAILS=thread_settings_matched"   # the runner state under which gate 3 must pass
 
 echo "=== A1: interpreter is PROVEN by importing psutil"
@@ -183,6 +194,68 @@ git -C "$REPO2" checkout -q -b feature; echo x > "$REPO2/f.txt"
 OUT="$(cd "$REPO2" && env AUTOLAND_NO_LOG=1 PYBIN="$PY" FAKE_FAILS=thread_settings_matched bash "$AUTOLAND" --dry-run "m" f.txt 2>&1)"; RC=$?
 chk "A4 no known origin branch at all: base falls back to HEAD" $([[ $RC -eq 0 ]] && has 'base: .*\(HEAD'; echo $?) "rc=$RC $OUT"
 
+echo "=== gate 0b: single-source files against the other campaign branch"
+G checkout -q video-bench; clean_tree
+echo "x" > "$REPO/ss.txt"
+run_al "$BASE_OK" --dry-run "m" ss.txt
+chk "0b identical contract on both branches passes, and says so" $([[ $RC -eq 0 ]] && has 'AUTOMATION_CONTRACT.md: identical to origin/docs-bench' && has 'DOCS_HANDOFF.md: stub on video-bench'; echo $?) "rc=$RC $OUT"
+clean_tree
+echo "contract v2 (edited on the SOURCE branch)" > "$REPO/working/docs/AUTOMATION_CONTRACT.md"
+run_al "$BASE_OK" --dry-run "m" working/docs/AUTOMATION_CONTRACT.md
+chk "0b source branch ahead, destination behind -> passes with the merge-forward note" $([[ $RC -eq 0 ]] && has 'origin/docs-bench is BEHIND'; echo $?) "rc=$RC $OUT"
+clean_tree
+printf '# prose on the wrong branch\nlooks like the briefing\n' > "$REPO/working/docs/DOCS_HANDOFF.md"
+run_al "$BASE_OK" --dry-run "m" working/docs/DOCS_HANDOFF.md
+chk "0b REFUSES non-stub DOCS_HANDOFF prose on video-bench" $([[ $RC -ne 0 ]] && has 'is not the stub'; echo $?) "rc=$RC $OUT"
+chk "0b refusal restores a clean index"        $([[ -z "$(G diff --cached --name-only)" ]]; echo $?)
+clean_tree
+G rm -q working/docs/AUTOMATION_CONTRACT.md; G reset -q
+run_al "$BASE_OK" --dry-run "m" working/docs/AUTOMATION_CONTRACT.md
+chk "0b REFUSES deleting the contract"         $([[ $RC -ne 0 ]] && has 'being DELETED'; echo $?) "rc=$RC $OUT"
+clean_tree
+G checkout -q docs-bench
+echo "y" > "$REPO/ss2.txt"
+run_al "$BASE_OK" --dry-run "m" ss2.txt
+chk "0b docs-bench clean twin: canonical handoff + identical contract passes" $([[ $RC -eq 0 ]] && has 'DOCS_HANDOFF.md: canonical on docs-bench' && has 'identical to origin/video-bench'; echo $?) "rc=$RC $OUT"
+clean_tree
+echo "contract edited on the DESTINATION" > "$REPO/working/docs/AUTOMATION_CONTRACT.md"
+run_al "$BASE_OK" --dry-run "m" working/docs/AUTOMATION_CONTRACT.md
+chk "0b REFUSES editing the contract on docs-bench (wrong direction)" $([[ $RC -ne 0 ]] && has 'edit it on video-bench and merge it forward'; echo $?) "rc=$RC $OUT"
+clean_tree
+printf '%s\n# stub\n' "$STUB" > "$REPO/working/docs/DOCS_HANDOFF.md"
+run_al "$BASE_OK" --dry-run "m" working/docs/DOCS_HANDOFF.md
+chk "0b REFUSES a stub DOCS_HANDOFF on docs-bench (no document anywhere)" $([[ $RC -ne 0 ]] && has 'is a STUB'; echo $?) "rc=$RC $OUT"
+clean_tree
+G checkout -q video-bench
+
+echo "=== gate 3: skip budget (entry 27)"
+echo "x" > "$REPO/sk.txt"
+run_al "FAKE_FAILS=thread_settings_matched" "FAKE_SKIPS=1" --dry-run "m" sk.txt
+chk "gate 3 REFUSES more skips than the baseline allows" $([[ $RC -ne 0 ]] && has 'SKIPPED, baseline allows 0'; echo $?) "rc=$RC $OUT"
+chk "gate 3 the skip refusal names entry 27"   $(has 'entry 27'; echo $?)
+cp "$REPO/working/harness/suite_baseline.json" "$TMP/bl.orig"
+sed 's/"max_skipped": 0/"max_skipped": 1/' "$TMP/bl.orig" > "$REPO/working/harness/suite_baseline.json"
+run_al "FAKE_FAILS=thread_settings_matched" "FAKE_SKIPS=1" --dry-run "m" sk.txt
+chk "gate 3 clean twin: skips within a raised budget pass" $([[ $RC -eq 0 ]] && has 'skipped=1 max_skipped=1'; echo $?) "rc=$RC $OUT"
+grep -v max_skipped "$TMP/bl.orig" > "$REPO/working/harness/suite_baseline.json"
+run_al "FAKE_FAILS=thread_settings_matched" --dry-run "m" sk.txt
+chk "gate 3 REFUSES a baseline with no max_skipped (unbounded coverage)" $([[ $RC -ne 0 ]] && has 'no max_skipped'; echo $?) "rc=$RC $OUT"
+echo '{not json' > "$REPO/working/harness/suite_baseline.json"
+run_al "FAKE_FAILS=thread_settings_matched" --dry-run "m" sk.txt
+chk "gate 3 REFUSES an unparseable baseline cleanly (no traceback exit)" $([[ $RC -eq 1 ]] && has 'not valid JSON'; echo $?) "rc=$RC $OUT"
+cp "$TMP/bl.orig" "$REPO/working/harness/suite_baseline.json"
+clean_tree
+
+echo "=== gate 5: the commit message through figure_guard, before the commit exists"
+echo "z0" > "$REPO/msg.txt"
+HEAD_BEFORE="$(G rev-parse HEAD)"
+run_al "$BASE_OK" "peakRSS reached 84,960.6 MB on the 10k run" msg.txt
+chk "gate 5 REFUSES a never-quote figure in the COMMIT MESSAGE" $([[ $RC -ne 0 ]] && has 'COMMIT MESSAGE'; echo $?) "rc=$RC $OUT"
+chk "gate 5 refusal happens BEFORE the commit (HEAD unchanged)" $([[ "$(G rev-parse HEAD)" == "$HEAD_BEFORE" ]]; echo $?)
+chk "gate 5 refusal leaves the index clean"    $([[ -z "$(G diff --cached --name-only)" ]]; echo $?)
+run_al "$BASE_OK" "the 84,960.6 MB reading is a summing artifact — never quote it" msg.txt
+chk "gate 5 clean twin: a caveated message lands" $([[ $RC -eq 0 ]] && has 'commit message clean' && has 'AUTOLAND: LANDED'; echo $?) "rc=$RC $OUT"
+
 echo "=== gates 5/6/7 for real, against the local bare origin"
 G checkout -q video-bench; clean_tree
 echo "landed" > "$REPO/land.txt"
@@ -229,6 +302,14 @@ run_al "$BASE_OK" "should not be proven" z.txt
 chk "gate 7 REFUSES when ls-remote disagrees with the pushed sha (rc non-zero)" $([[ $RC -ne 0 ]] && has 'landing not proven'; echo $?) "rc=$RC $OUT"
 chk "gate 7 printed both shas"                   $(has 'local : ' && has 'origin: '; echo $?)
 rm -f "$ORIGIN/hooks/post-receive"
+
+echo "=== gate 0b: a foreign edit of the contract on the destination branch"
+git -C "$CLONE" fetch -q origin; git -C "$CLONE" checkout -q docs-bench
+echo "contract edited on docs-bench by someone else" > "$CLONE/working/docs/AUTOMATION_CONTRACT.md"
+git -C "$CLONE" add -A; git -C "$CLONE" commit -q -m "foreign edit"; git -C "$CLONE" push -q origin docs-bench
+G checkout -q video-bench; echo "w" > "$REPO/w.txt"
+run_al "$BASE_OK" --dry-run "m" w.txt
+chk "0b REFUSES on video-bench when docs-bench carries a contract version not in its history" $([[ $RC -ne 0 ]] && has 'foreign edit'; echo $?) "rc=$RC $OUT"
 
 echo
 echo "self-test: $OK pass, $BAD fail"
