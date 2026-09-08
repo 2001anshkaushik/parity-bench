@@ -188,6 +188,24 @@ def layer3_artifacts() -> None:
                 check(f"artifact {e['export'][:40]} / {arm}: None on the LlamaIndex digest", blk["duplication_patch_applied"] is None)
             check(f"artifact {e['export'][:40]} / {arm}: source stated", bool(blk.get("duplication_patch_source")))
     check("artifact re-emits at least the two smoke50 exports (4 arm blocks)", n_blocks >= 4, str(n_blocks))
+    # Post-R2 supersession (2026-09-08): the newest artifact must be the recomputed one, name
+    # what it supersedes, and show the LlamaIndex arm PASSING with the exemption listed.
+    if art.get("supersedes"):
+        sup = art["supersedes"]
+        check("newest artifact names the artifact it supersedes", (RESULTS / sup["artifact"]).exists() and sup["artifact"] != arts[-1].name, str(sup.get("artifact")))
+        check("newest artifact says WHY it supersedes (pre-R2 check on the LI arm)", "pre-R2" in sup.get("why", "") and "append-only" in sup.get("why", ""))
+        check("newest artifact declares its check semantics", "arm=" in (art.get("check_semantics") or {}).get("check_after", ""))
+        for e in art["exports"]:
+            for arm, r in (e.get("arms") or {}).items():
+                if arm.startswith("llamaindex"):
+                    ca = r["check_after"]
+                    check(f"artifact {e['export'][:40]} / {arm}: post-R2 check_after PASSES", ca["PASS"] is True, str(ca))
+                    check(f"artifact {e['export'][:40]} / {arm}: exemption LISTED for both patch fields", ca.get("exempted") == sorted(pvl.PATCH_FIELDS), str(ca.get("exempted")))
+                    check(f"artifact {e['export'][:40]} / {arm}: marked not_applicable_no_engine", r["corrected_provenance_leela"].get("duplication_patch_source") == pvl.NOT_APPLICABLE)
+                elif arm.startswith("rocketride"):
+                    check(f"artifact {e['export'][:40]} / {arm}: post-R2 check_after PASSES with nothing exempted", r["check_after"]["PASS"] is True and r["check_after"]["exempted"] == [], str(r["check_after"]))
+    else:
+        print(f"  NOTE  newest artifact {arts[-1].name} predates the post-R2 recomputation (its LI check_after is the pre-R2 reading) — the superseding artifact lives on docs-bench")
     check("artifact: the two smoke50_parser_in exports are the ones that changed",
           sorted(art["summary"]["changed"]) == sorted(n for n in art["summary"]["changed"] if n.startswith("smoke50_parser_in__20260818"))
           and len(art["summary"]["changed"]) == 2, str(art["summary"]["changed"]))
