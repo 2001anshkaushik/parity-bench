@@ -1,0 +1,13 @@
+{
+  "_what": "Tests in working/scripts/regression_selftest.py that are KNOWN to fail on this tree. autoland.sh gate 3 refuses a failure NOT listed here, and refuses when a listed test starts PASSING until this file is updated deliberately. The runner's exit status alone cannot gate: it returns 1 for a baselined failure.",
+  "runner": "working/scripts/regression_selftest.py",
+  "parsed_from": "the runner's trailing '    FAILED <name>: <reason>' lines",
+  "baselined_utc": "2026-09-08",
+  "baselined_at_commit": "d98aa7c",
+  "failing": {
+    "thread_settings_matched": {
+      "since_commit": "87b957d",
+      "reason": "JSONDecodeError inside matched_replication.engine_threads()/llama_threads() (a live thread probe answers non-JSON). Fails identically at 87b957d and d98aa7c with the engine up on :5565 (3.3.1.35) and engine/ present, so the test does not take its skip path. Advisor ruling R3 2026-09-08: baseline it; do not fix it in the landing task and do not let it block landing."
+    }
+  }
+}
