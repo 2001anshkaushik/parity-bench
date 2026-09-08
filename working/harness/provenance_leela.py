@@ -13,9 +13,22 @@ before it can be raised.
 RULES FOLLOWED HERE:
   * a field we cannot determine is `None`, never a plausible-looking guess. His check treats
     None as missing, which is the correct outcome — an unknown field must fail, not pass.
-  * `duplication_patch_applied` is False for us and that is load-bearing: he builds patched by
-    default (`RR_DUP_PATCH=1`), we build stock, and a patched result is not comparable with an
-    unpatched one.
+  * `duplication_patch_applied` is READ from the image label
+    `benchmark.rocketride.duplication_patch_applied` (written by docker/Dockerfile.rocketride),
+    the same mechanism `experiment_common._engine_patch_state()` uses. It is load-bearing: a
+    patched result is not comparable with an unpatched one, and this field is the only thing
+    in the block that says which one produced the numbers.
+
+    HISTORY (2026-09-07, DOCS_HANDOFF.md §2.4 / §10.1): from 17 Aug to 7 Sep this file
+    hardcoded `"duplication_patch_applied": False` as a literal. Every measured docs export in
+    that window carries a false record — including the 18-Aug 10k runs, which ran on
+    `rr:patched` (image digest sha256:073b43d8…, label_raw "1" in the same day's
+    smoke_phase2 exports) — and the field read False on the LlamaIndex arm too, which has no
+    engine to patch. A field that fires identically on an arm that cannot have the property
+    carries no information. An unreadable label is recorded as None, NEVER False: None fails
+    the check as missing (correct for an unknown); False asserts a fact we did not measure.
+    The corrected 18-Aug blocks are re-emitted in the `provenance_correction_20260818` result;
+    the original exports are untouched.
 """
 from __future__ import annotations
 
@@ -98,6 +111,59 @@ def _image_digest(container: Optional[str]) -> Optional[str]:
     return _run(["docker", "inspect", "-f", "{{.Image}}", container])
 
 
+PATCH_LABEL = "benchmark.rocketride.duplication_patch_applied"
+PATCH_ID_LABEL = "benchmark.rocketride.duplication_patch_id"
+
+
+def _docker_label(container: str, key: str) -> Optional[str]:
+    """One image label of a running container, or None when docker/the container/the label
+    cannot be read. Module-level so a test can substitute it without a docker daemon."""
+    out = _run(["docker", "inspect", "-f", "{{index .Config.Labels \"%s\"}}" % key, container])
+    if out in (None, "", "<no value>"):
+        return None
+    return out
+
+
+def _patch_state(container: Optional[str]) -> Dict[str, Any]:
+    """`duplication_patch_applied` / `duplication_patch_id`, READ from the image label.
+
+    Contract (DOCS_HANDOFF.md §10.1): label "1" -> True with the id label; label "0" -> False;
+    anything else — no container, docker unreachable, label absent (the LlamaIndex image, or
+    an engine image that predates the patch build), or several containers disagreeing — is
+    None on BOTH fields, never False. `duplication_patch_source` says how the value was
+    obtained so a reader can tell "measured stock" from "could not read".
+
+    `container` may be a comma-joined list (the video driver passes every service container);
+    every named container is read and the value is used only when they all agree.
+    """
+    if not container:
+        return {"duplication_patch_applied": None, "duplication_patch_id": None,
+                "duplication_patch_source": "no container to inspect (driver-managed mode) — UNKNOWN"}
+    names = [c.strip() for c in container.split(",") if c.strip()]
+    raws = {c: _docker_label(c, PATCH_LABEL) for c in names}
+    seen = {v for v in raws.values() if v is not None}
+    if not seen:
+        return {"duplication_patch_applied": None, "duplication_patch_id": None,
+                "duplication_patch_source": (f"label {PATCH_LABEL} unreadable or absent on "
+                                             f"{names} — UNKNOWN, not the same as unpatched")}
+    if len(seen) > 1:
+        return {"duplication_patch_applied": None, "duplication_patch_id": None,
+                "duplication_patch_source": (f"label {PATCH_LABEL} disagrees across {raws} — "
+                                             "ambiguous, recorded as UNKNOWN")}
+    raw = seen.pop()
+    holder = next(c for c, v in raws.items() if v == raw)
+    if raw == "1":
+        return {"duplication_patch_applied": True,
+                "duplication_patch_id": _docker_label(holder, PATCH_ID_LABEL),
+                "duplication_patch_source": f"label {PATCH_LABEL}={raw!r} on {holder!r}"}
+    if raw == "0":
+        return {"duplication_patch_applied": False, "duplication_patch_id": None,
+                "duplication_patch_source": f"label {PATCH_LABEL}={raw!r} on {holder!r}"}
+    return {"duplication_patch_applied": None, "duplication_patch_id": None,
+            "duplication_patch_source": (f"label {PATCH_LABEL}={raw!r} on {holder!r} is neither "
+                                         "'0' nor '1' — UNKNOWN")}
+
+
 def build(*, arm: str, mode: str, corpus_sha: str, corpus_n: int,
           offered_concurrency: Optional[int], configured_concurrency: Optional[int],
           warmup_policy: str, timeout_s: Optional[float],
@@ -126,11 +192,10 @@ def build(*, arm: str, mode: str, corpus_sha: str, corpus_n: int,
             json.dumps({"parser": parser}, sort_keys=True).encode()).hexdigest()[:16],
         "chunk_config": chunk_config,
         "rocketride_engine_version": "3.3.1",
-        # STOCK. Leela builds patched by default (RR_DUP_PATCH=1). Measured exposure on our
-        # corpus: 5/199 documents at repeat_factor 2. A patched result is not comparable
-        # with this one, and this field is the only thing in the file that says so.
-        "duplication_patch_applied": False,
-        "duplication_patch_id": None,
+        # READ from the image label (see module docstring, HISTORY). Never a literal: the
+        # literal False this line carried from 17 Aug to 7 Sep 2026 mis-recorded every
+        # measured docs export, patched engine and LlamaIndex arm alike.
+        **_patch_state(container),
         "rocketride_sdk_version": _pkg("rocketride"),
         "embedding_model": embedding_model,
         "offered_concurrency": offered_concurrency,
@@ -147,7 +212,9 @@ def check(record: Dict[str, Any]) -> Dict[str, Any]:
 
     `duplication_patch_id` is legitimately None on a stock build, so a naive port of his check
     would mark every honest stock run unpublishable. It is exempted ONLY when
-    `duplication_patch_applied` is explicitly False — an unset patch flag still fails.
+    `duplication_patch_applied` is explicitly False (a label READ as "0") — an unset patch
+    flag (None: label unreadable) still fails on both fields, which is the intended outcome
+    for an unknown.
     """
     exempt = set()
     if record.get("duplication_patch_applied") is False:
