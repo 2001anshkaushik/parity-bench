@@ -356,6 +356,20 @@ def section_5_8():
     fact('§2.6: 17-Aug engine block read no label (stock, label_raw None)', load(FAULT)['provenance']['engine'].get('label_raw') is None)
     unver('§2.5 upstream facts (tag/HEAD/commit shas, file sha256s)', 'read from a blobless clone of rocketride-org/rocketride-server on 2026-09-08; the clone is not committed — re-derive with `git ls-remote` / `git show` against the shas quoted')
     unver('§2.6 box residency', 'from the 2026-09-08 box.sh transcript (~/.rocketride_box/transcript_20260908.log), not from a committed artifact')
+    print('=== §6.1: sweep point zero — the idle-spin probe artifact ===')
+    PD = RES / 'probe_idle_spin_docs__20260908T090314Z'
+    pj = json.loads((PD / 'idlespin_result.json').read_text()); pts = {p['M']: p for p in pj['points']}
+    fact('probe artifact: verdict STOPPED_NULL_CONTROL_FAILED', pj['verdict'] == 'STOPPED_NULL_CONTROL_FAILED')
+    fact('probe artifact: image is rr:patched 073b43d8, cpuset 0-23, NanoCpus 0, six thread vars =1', pj['container']['image_id'].startswith('sha256:073b43d8') and pj['container']['cpuset_readback'] == '0-23' and pj['container']['nano_cpus_readback'] == 0 and sorted(pj['container']['env_readback']) == sorted(f'{k}=1' for k in ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS', 'TORCH_NUM_THREADS')))
+    fact('probe artifact: no work sent; predictions pre-registered', pj['posture']['work_sent'] is False and 'H_server' in pj['preregistered'] and 'H_token' in pj['preregistered'])
+    chk('§6.1 probe sha 4d5721a9', None, '4d5721a9…'); fact('artifact probe sha matches the landed script', pj['probe_sha256'] == __import__('hashlib').sha256((ROOT / 'working/scripts/probe_idle_spin_docs.py').read_bytes()).hexdigest())
+    chk('§6.1 M=0 sum', pts[0]['sum_cores'], '| 0 | 1.013 | 1.013 |', expect='1.013'); chk('§6.1 M=0 cgroup', pts[0]['cgroup_cores'], '| 1.021 |')
+    chk('§6.1 M=1 sum', pts[1]['sum_cores'], '| 1 | 1.253 | 1.023 |'); fact('§6.1 M=1 server 1.023', agrees(pts[1]['server_cores'], '1.023')); chk('§6.1 M=1 task', pts[1]['task_cores'], '0.230 (one'); chk('§6.1 M=1 cgroup', pts[1]['cgroup_cores'], '| 1.264 |')
+    t1 = [p for p in pts[1]['windows'][1]['per_process'] if p['role'] == 'task']
+    chk('§6.1 task threads', t1[0]['threads'], '226 threads'); chk('§6.1 task RSS GiB', t1[0]['rss_kb'] / 1024 / 1024, '1.10 GiB RSS'); fact('§6.1 exactly one task process at M=1', len(t1) == 1)
+    chk('§6.1 load1 before', pj['host_load1_before'], '`load1` 0.07', expect='0.07'); chk('§6.1 null band', None, '[0.85, 1.20]'); fact('null control recorded as FAILED at 1.253', pj['null_control']['PASS'] is False and pj['null_control']['M1_sum_cores'] == 1.253)
+    fact('the sweep was NOT run (only M=0 and M=1 recorded)', sorted(pts) == [0, 1])
+    chk('§6.1 extrapolation 4.7 stated as unmeasured', 1.013 + 0.23 * 16, 'near 4.7 cores', tol=0.06)
     print('=== §5 / §8: branch facts and the register, from git and the tree ===')
     # §5.1 describes the fork state the handoff was written against: video-bench at 87b957d,
     # main at c06673a. Later landings move origin/video-bench (the correction artifact alone

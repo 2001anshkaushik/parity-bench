@@ -483,6 +483,15 @@ The document pipeline's cost centre is **Tika parse** (JVM, in the engine) plus 
 
 ⚠️ **Watch the idle burden.** The engine burns **1.004 cores doing nothing** (a `/proc/<pid>/stat` delta over 5s on an idle box; the figure is `[UNVERIFIED — no artifact; do not quote]` — no committed file records that reading, so re-measure it at the first sweep point). If that spin is per-token rather than per-server, M=16 costs 16 of 32 cores before any work starts — and on documents, where the box is not inference-saturated, that overhead is proportionally far more expensive than it was on video. **Measure whether the spin is per-server or per-token in the first sweep point.** `[the 1.004 figure is UNVERIFIED — no artifact; the per-token question is open in both campaigns]`
 
+**Sweep point zero, first attempt (2026-09-08)** `[VERIFIED — working/results/probe_idle_spin_docs__20260908T090314Z/{idlespin_result.json,box_session_transcript.txt}; probe working/scripts/probe_idle_spin_docs.py, sha256 4d5721a9…]`. The docs posture exactly (`rr:patched` = `sha256:073b43d8…`, `--cpuset-cpus 0-23` read back, `NanoCpus` 0, the six thread variables at 1 read back from the container, `product_pdf.pipe`, no work sent, host `load1` 0.07 before), predictions pre-registered and printed before any sample. Per-process `/proc/<pid>/stat` over 6 s windows, cgroup `cpu.stat` beside it:
+
+| M | sum (cores) | serving process (pid 1) | task subprocess | cgroup cross-check |
+|---|---|---|---|---|
+| 0 | 1.013 | 1.013 | — | 1.021 |
+| 1 | 1.253 | 1.023 | 0.230 (one `node.py` process, 226 threads, 1.10 GiB RSS) | 1.264 |
+
+**The null control did not pass and the sweep was not run.** The pre-registered check was "M=1 reproduces ~1.004 within [0.85, 1.20]"; M=1 read 1.253, so the probe stopped after M=1 as its own rule required. What the two points say, read plainly: the serving process alone idles at 1.013 cores with zero pipelines loaded — that is the ~1.0 figure — and the first loaded pipeline adds 0.230 cores inside its task subprocess, the same shape Ticket 4 measured on the video pipe at threads=8 (0.99 + 0.26·M). So "1.004 with one token" was very likely a zero-token (server-only) reading, and the null control was specified against the wrong M. **Not interpreted further:** whether the per-token increment stays ~0.23 to M=16 (which would put the M=16 idle floor near 4.7 cores, not 1 and not 16) is exactly what the sweep would have measured, and a band widened after looking would defeat the pre-registration. Re-scope the null control (M=0 against ~1.0, or M=1 against Ticket 4's 1.25–1.28) and re-run; the probe is landed and the point costs about ten minutes of box time.
+
 ### 6.2 There is no docs analogue for cross-arm detection agreement
 
 Gate 3 compared label multisets between arms at zero tolerance — possible only because **both video arms shared the same detector and the same pinned `imageio-ffmpeg 0.6.0`.**

@@ -1,0 +1,213 @@
+{
+ "probe": "probe_idle_spin_docs.py",
+ "probe_sha256": "4d5721a94740eaf5d0f5db77f0c64ca0f446b26724200e516b5fe3d12c760fd5",
+ "utc": "2026-09-08T09:03:14Z",
+ "preregistered": {
+  "H_server": "idle cores ~ 1.0 at every M (the spin lives in the serving process)",
+  "H_token": "idle cores ~ M (every task subprocess spins)",
+  "null_control": {
+   "M": 1,
+   "expect_cores": 1.004,
+   "band": [
+    0.85,
+    1.2
+   ],
+   "rule": "outside the band: the probe measures something else; stop after M=1, do not run the sweep"
+  },
+  "prior_not_prediction": "Ticket 4 (video pipe, threads=8): 0.99 + 0.26*M cores",
+  "decision_rule": "per-server if max over M of (sum_cores - sum_cores[M=0]) < 0.5 and per-process shows the spin in the serving process; per-token if sum_cores grows by >= 0.5 per added token on average and per-process shows it in the task subprocesses; otherwise MIXED \u2014 report the slope"
+ },
+ "posture": {
+  "image": "rr:patched",
+  "cpuset": "0-23",
+  "thread_env": {
+   "OMP_NUM_THREADS": "1",
+   "MKL_NUM_THREADS": "1",
+   "OPENBLAS_NUM_THREADS": "1",
+   "VECLIB_MAXIMUM_THREADS": "1",
+   "NUMEXPR_NUM_THREADS": "1",
+   "TORCH_NUM_THREADS": "1"
+  },
+  "pipe": "working/pipes/product_pdf.pipe",
+  "work_sent": false,
+  "settle_s": 25.0,
+  "window_s": 6.0,
+  "sweep": [
+   1,
+   2,
+   4,
+   8,
+   16
+  ]
+ },
+ "clk_tck": 100,
+ "host_load1_before": 0.07,
+ "container": {
+  "container_id": "dc8e1cdc250899b927b085386e6e0ed7e4b0d12d47d00f5bcf7651a6d06700ac",
+  "image_id": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "cpuset_readback": "0-23",
+  "nano_cpus_readback": 0,
+  "memory_readback": 62277025792,
+  "env_readback": [
+   "TORCH_NUM_THREADS=1",
+   "OMP_NUM_THREADS=1",
+   "MKL_NUM_THREADS=1",
+   "OPENBLAS_NUM_THREADS=1",
+   "VECLIB_MAXIMUM_THREADS=1",
+   "NUMEXPR_NUM_THREADS=1"
+  ],
+  "image_labels": {
+   "benchmark.rocketride.constraints_cache_prewarmed": "1",
+   "benchmark.rocketride.duplication_patch_applied": "1",
+   "benchmark.rocketride.duplication_patch_id": "preventDefault-after-embedding-flush",
+   "benchmark.rocketride.engine_version": "3.3.1",
+   "org.opencontainers.image.version": "22.04"
+  }
+ },
+ "ready": {
+  "ready": true,
+  "arm": "rr",
+  "port": 5565,
+  "wall_s": 15.0,
+  "attempts": 4
+ },
+ "null_control": {
+  "M1_sum_cores": 1.253,
+  "band": [
+   0.85,
+   1.2
+  ],
+  "expect": 1.004,
+  "PASS": false,
+  "note": "does NOT reproduce ~1.004 \u2014 sweep not interpretable, stopped"
+ },
+ "points": [
+  {
+   "M": 0,
+   "tokens_open": 0,
+   "use_wall_s": 0.0,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 1,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 30,
+       "rss_kb": 105796,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.013
+      }
+     ],
+     "sum_cores": 1.013,
+     "by_role": {
+      "server": 1.013
+     },
+     "cgroup_cores": 1.021
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 1,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 30,
+       "rss_kb": 105796,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.013
+      }
+     ],
+     "sum_cores": 1.013,
+     "by_role": {
+      "server": 1.013
+     },
+     "cgroup_cores": 1.021
+    }
+   ],
+   "sum_cores": 1.013,
+   "cgroup_cores": 1.021,
+   "server_cores": 1.013,
+   "task_cores": 0.0,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  },
+  {
+   "M": 1,
+   "tokens_open": 1,
+   "use_wall_s": 36.4,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 2,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 111696,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.025
+      },
+      {
+       "pid": 705,
+       "ppid": 1,
+       "threads": 227,
+       "rss_kb": 1157884,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-8d0449e8.webhook_1-2jlbrimv.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.228
+      }
+     ],
+     "sum_cores": 1.253,
+     "by_role": {
+      "server": 1.025,
+      "task": 0.228
+     },
+     "cgroup_cores": 1.264
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 2,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 111696,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.023
+      },
+      {
+       "pid": 705,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1157816,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-8d0449e8.webhook_1-2jlbrimv.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.23
+      }
+     ],
+     "sum_cores": 1.253,
+     "by_role": {
+      "server": 1.023,
+      "task": 0.23
+     },
+     "cgroup_cores": 1.264
+    }
+   ],
+   "sum_cores": 1.253,
+   "cgroup_cores": 1.264,
+   "server_cores": 1.023,
+   "task_cores": 0.23,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  }
+ ],
+ "verdict": "STOPPED_NULL_CONTROL_FAILED"
+}

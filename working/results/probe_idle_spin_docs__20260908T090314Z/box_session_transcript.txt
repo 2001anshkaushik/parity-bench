@@ -1,0 +1,497 @@
+=== TASK 6 box session launched 2026-09-08T09:02:47Z; expected probe sha 4d5721a94740eaf5d0f5db77f0c64ca0f446b26724200e516b5fe3d12c760fd5 ===
+--- step 1: pull the video-bench worktree, verify branch + sha, quiet box, no containers, self-test
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+starting instance (stopped)...
+waiting for SSM agent — Online
+sessions: 0 active (cap 25, refuse threshold 20)
+
+Starting session with SessionId: ansh.kaushik@rocketride.ai-zop64fvvgej56b4cj7in8gc4iq
+$ cd ~/parity-bench-video && echo "branch=$(git rev-parse --abbrev-ref HEAD)" && git pull --ff-only 2>&1 | tail -2 && echo "HEAD=$(git rev-parse --short HEAD)" && sha256sum working/scripts/probe_idle_spin_docs.py && echo "containers: $(docker ps -a --format "{{.Names}}" | tr "\n" " ")" && uptime && ~/.venv/bin/python working/scripts/probe_idle_spin_docs.py --self-test | tail -1
+echo "__RC=$?"
+exit
+branch=video-bench
+ create mode 100644 working/scripts/probe_idle_spin_docs.py
+ create mode 100644 working/scripts/provenance_correction_20260818.py
+HEAD=921c899
+4d5721a94740eaf5d0f5db77f0c64ca0f446b26724200e516b5fe3d12c760fd5  working/scripts/probe_idle_spin_docs.py
+containers: 
+ 09:03:10 up 0 min,  0 users,  load average: 0.08, 0.02, 0.01
+self-test: 16 pass, 0 fail
+$ __RC=0
+$ 
+
+Exiting session with sessionId: ansh.kaushik@rocketride.ai-zop64fvvgej56b4cj7in8gc4iq.
+transcript: /Users/ansh/.rocketride_box/transcript_20260908.log
+(step 1 exit 0)
+--- step 2: launch
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+sessions: 0 active (cap 25, refuse threshold 20)
+
+Starting session with SessionId: ansh.kaushik@rocketride.ai-b4x89edrc985seeetd76ltxzya
+$ mkdir -p ~/logs && nohup bash -c cd\ ~/parity-bench-video\ \&\&\ ~/.venv/bin/python\ working/scripts/probe_idle_spin_docs.py\ --out\ ~/logs/idlespin_result.json > ~/logs/idlespin.log 2>&1 & echo launched idlespin pid $!
+echo "__RC=$?"
+exit
+launched idlespin pid 1528
+$ __RC=0
+$ 
+
+Exiting session with sessionId: ansh.kaushik@rocketride.ai-b4x89edrc985seeetd76ltxzya.
+transcript: /Users/ansh/.rocketride_box/transcript_20260908.log
+(launch exit 0)
+--- step 3: poll
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+(eval):12: character not in range
+--- step 4: full log
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+sessions: 0 active (cap 25, refuse threshold 20)
+
+Starting session with SessionId: ansh.kaushik@rocketride.ai-k5lkx7a4kuqe475rls5zqreqkq
+$ tail -n 4000 ~/logs/idlespin.log
+echo "__RC=$?"
+exit
+nohup: ignoring input
+probe_idle_spin_docs sha256: 4d5721a94740eaf5d0f5db77f0c64ca0f446b26724200e516b5fe3d12c760fd5
+{
+ "PREREGISTERED_BEFORE_ANY_SAMPLE": {
+  "H_server": "idle cores ~ 1.0 at every M (the spin lives in the serving process)",
+  "H_token": "idle cores ~ M (every task subprocess spins)",
+  "null_control": {
+   "M": 1,
+   "expect_cores": 1.004,
+   "band": [
+    0.85,
+    1.2
+   ],
+   "rule": "outside the band: the probe measures something else; stop after M=1, do not run the sweep"
+  },
+  "prior_not_prediction": "Ticket 4 (video pipe, threads=8): 0.99 + 0.26*M cores",
+  "decision_rule": "per-server if max over M of (sum_cores - sum_cores[M=0]) < 0.5 and per-process shows the spin in the serving process; per-token if sum_cores grows by >= 0.5 per added token on average and per-process shows it in the task subprocesses; otherwise MIXED \u2014 report the slope"
+ },
+ "probe_sha256": "4d5721a94740eaf5d0f5db77f0c64ca0f446b26724200e516b5fe3d12c760fd5"
+}
+{
+ "container": {
+  "container_id": "dc8e1cdc250899b927b085386e6e0ed7e4b0d12d47d00f5bcf7651a6d06700ac",
+  "image_id": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "cpuset_readback": "0-23",
+  "nano_cpus_readback": 0,
+  "memory_readback": 62277025792,
+  "env_readback": [
+   "TORCH_NUM_THREADS=1",
+   "OMP_NUM_THREADS=1",
+   "MKL_NUM_THREADS=1",
+   "OPENBLAS_NUM_THREADS=1",
+   "VECLIB_MAXIMUM_THREADS=1",
+   "NUMEXPR_NUM_THREADS=1"
+  ],
+  "image_labels": {
+   "benchmark.rocketride.constraints_cache_prewarmed": "1",
+   "benchmark.rocketride.duplication_patch_applied": "1",
+   "benchmark.rocketride.duplication_patch_id": "preventDefault-after-embedding-flush",
+   "benchmark.rocketride.engine_version": "3.3.1",
+   "org.opencontainers.image.version": "22.04"
+  }
+ }
+}
+M=0: 0 token(s) open (use() wall 0.0s); settling 25.0s
+{
+ "POINT": {
+  "M": 0,
+  "tokens_open": 0,
+  "use_wall_s": 0.0,
+  "sum_cores": 1.013,
+  "cgroup_cores": 1.021,
+  "server_cores": 1.013,
+  "task_cores": 0.0,
+  "java_cores": 0.0,
+  "other_cores": 0.0
+ },
+ "per_process_window2": [
+  {
+   "pid": 1,
+   "ppid": 0,
+   "role": "server",
+   "threads": 30,
+   "rss_kb": 105796,
+   "cores": 1.013,
+   "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565"
+  }
+ ]
+}
+M=1: 1 token(s) open (use() wall 36.4s); settling 25.0s
+{
+ "POINT": {
+  "M": 1,
+  "tokens_open": 1,
+  "use_wall_s": 36.4,
+  "sum_cores": 1.253,
+  "cgroup_cores": 1.264,
+  "server_cores": 1.023,
+  "task_cores": 0.23,
+  "java_cores": 0.0,
+  "other_cores": 0.0
+ },
+ "per_process_window2": [
+  {
+   "pid": 1,
+   "ppid": 0,
+   "role": "server",
+   "threads": 31,
+   "rss_kb": 111696,
+   "cores": 1.023,
+   "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565"
+  },
+  {
+   "pid": 705,
+   "ppid": 1,
+   "role": "task",
+   "threads": 226,
+   "rss_kb": 1157816,
+   "cores": 0.23,
+   "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/t"
+  }
+ ]
+}
+{
+ "NULL_CONTROL": {
+  "M1_sum_cores": 1.253,
+  "band": [
+   0.85,
+   1.2
+  ],
+  "expect": 1.004,
+  "PASS": false,
+  "note": "does NOT reproduce ~1.004 \u2014 sweep not interpretable, stopped"
+ }
+}
+wrote /home/ssm-user/logs/idlespin_result.json
+{
+ "FINAL": {
+  "verdict": "STOPPED_NULL_CONTROL_FAILED",
+  "null_control": {
+   "M1_sum_cores": 1.253,
+   "band": [
+    0.85,
+    1.2
+   ],
+   "expect": 1.004,
+   "PASS": false,
+   "note": "does NOT reproduce ~1.004 \u2014 sweep not interpretable, stopped"
+  },
+  "classification": null
+ }
+}
+rr_idleprobe
+rr_idleprobe
+$ __RC=0
+$ 
+
+Exiting session with sessionId: ansh.kaushik@rocketride.ai-k5lkx7a4kuqe475rls5zqreqkq.
+transcript: /Users/ansh/.rocketride_box/transcript_20260908.log
+(tail exit 0)
+--- step 5: result json
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+sessions: 0 active (cap 25, refuse threshold 20)
+
+Starting session with SessionId: ansh.kaushik@rocketride.ai-ynciyb6jrfr7l6doo4s3ys8cny
+$ cat ~/logs/idlespin_result.json; echo; docker ps -a --format "{{.Names}} {{.Status}}"
+echo "__RC=$?"
+exit
+{
+ "probe": "probe_idle_spin_docs.py",
+ "probe_sha256": "4d5721a94740eaf5d0f5db77f0c64ca0f446b26724200e516b5fe3d12c760fd5",
+ "utc": "2026-09-08T09:03:14Z",
+ "preregistered": {
+  "H_server": "idle cores ~ 1.0 at every M (the spin lives in the serving process)",
+  "H_token": "idle cores ~ M (every task subprocess spins)",
+  "null_control": {
+   "M": 1,
+   "expect_cores": 1.004,
+   "band": [
+    0.85,
+    1.2
+   ],
+   "rule": "outside the band: the probe measures something else; stop after M=1, do not run the sweep"
+  },
+  "prior_not_prediction": "Ticket 4 (video pipe, threads=8): 0.99 + 0.26*M cores",
+  "decision_rule": "per-server if max over M of (sum_cores - sum_cores[M=0]) < 0.5 and per-process shows the spin in the serving process; per-token if sum_cores grows by >= 0.5 per added token on average and per-process shows it in the task subprocesses; otherwise MIXED \u2014 report the slope"
+ },
+ "posture": {
+  "image": "rr:patched",
+  "cpuset": "0-23",
+  "thread_env": {
+   "OMP_NUM_THREADS": "1",
+   "MKL_NUM_THREADS": "1",
+   "OPENBLAS_NUM_THREADS": "1",
+   "VECLIB_MAXIMUM_THREADS": "1",
+   "NUMEXPR_NUM_THREADS": "1",
+   "TORCH_NUM_THREADS": "1"
+  },
+  "pipe": "working/pipes/product_pdf.pipe",
+  "work_sent": false,
+  "settle_s": 25.0,
+  "window_s": 6.0,
+  "sweep": [
+   1,
+   2,
+   4,
+   8,
+   16
+  ]
+ },
+ "clk_tck": 100,
+ "host_load1_before": 0.07,
+ "container": {
+  "container_id": "dc8e1cdc250899b927b085386e6e0ed7e4b0d12d47d00f5bcf7651a6d06700ac",
+  "image_id": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "cpuset_readback": "0-23",
+  "nano_cpus_readback": 0,
+  "memory_readback": 62277025792,
+  "env_readback": [
+   "TORCH_NUM_THREADS=1",
+   "OMP_NUM_THREADS=1",
+   "MKL_NUM_THREADS=1",
+   "OPENBLAS_NUM_THREADS=1",
+   "VECLIB_MAXIMUM_THREADS=1",
+   "NUMEXPR_NUM_THREADS=1"
+  ],
+  "image_labels": {
+   "benchmark.rocketride.constraints_cache_prewarmed": "1",
+   "benchmark.rocketride.duplication_patch_applied": "1",
+   "benchmark.rocketride.duplication_patch_id": "preventDefault-after-embedding-flush",
+   "benchmark.rocketride.engine_version": "3.3.1",
+   "org.opencontainers.image.version": "22.04"
+  }
+ },
+ "ready": {
+  "ready": true,
+  "arm": "rr",
+  "port": 5565,
+  "wall_s": 15.0,
+  "attempts": 4
+ },
+ "null_control": {
+  "M1_sum_cores": 1.253,
+  "band": [
+   0.85,
+   1.2
+  ],
+  "expect": 1.004,
+  "PASS": false,
+  "note": "does NOT reproduce ~1.004 \u2014 sweep not interpretable, stopped"
+ },
+ "points": [
+  {
+   "M": 0,
+   "tokens_open": 0,
+   "use_wall_s": 0.0,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 1,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 30,
+       "rss_kb": 105796,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.013
+      }
+     ],
+     "sum_cores": 1.013,
+     "by_role": {
+      "server": 1.013
+     },
+     "cgroup_cores": 1.021
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 1,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 30,
+       "rss_kb": 105796,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.013
+      }
+     ],
+     "sum_cores": 1.013,
+     "by_role": {
+      "server": 1.013
+     },
+     "cgroup_cores": 1.021
+    }
+   ],
+   "sum_cores": 1.013,
+   "cgroup_cores": 1.021,
+   "server_cores": 1.013,
+   "task_cores": 0.0,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  },
+  {
+   "M": 1,
+   "tokens_open": 1,
+   "use_wall_s": 36.4,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 2,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 111696,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.025
+      },
+      {
+       "pid": 705,
+       "ppid": 1,
+       "threads": 227,
+       "rss_kb": 1157884,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-8d0449e8.webhook_1-2jlbrimv.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.228
+      }
+     ],
+     "sum_cores": 1.253,
+     "by_role": {
+      "server": 1.025,
+      "task": 0.228
+     },
+     "cgroup_cores": 1.264
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 2,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 111696,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.023
+      },
+      {
+       "pid": 705,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1157816,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-8d0449e8.webhook_1-2jlbrimv.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.23
+      }
+     ],
+     "sum_cores": 1.253,
+     "by_role": {
+      "server": 1.023,
+      "task": 0.23
+     },
+     "cgroup_cores": 1.264
+    }
+   ],
+   "sum_cores": 1.253,
+   "cgroup_cores": 1.264,
+   "server_cores": 1.023,
+   "task_cores": 0.23,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  }
+ ],
+ "verdict": "STOPPED_NULL_CONTROL_FAILED"
+}
+$ __RC=0
+$ 
+
+Exiting session with sessionId: ansh.kaushik@rocketride.ai-ynciyb6jrfr7l6doo4s3ys8cny.
+transcript: /Users/ansh/.rocketride_box/transcript_20260908.log
+(run exit 0)
+--- step 6: stop
+box.sh sha256: 55b2d891742225761d05110c1a70beb2345981a7e8b164c6554b9219c9d07a1f
+stop requested (disk survives; box.sh start to resume)
+(stop exit 0)
+=== done 2026-09-08T09:35:51Z ===
