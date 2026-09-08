@@ -10,6 +10,8 @@ Three layers, cheapest first, and the planted-defect control runs before the cle
 checker that cannot fail is never allowed to pass:
   1. `build()` with the docker label reader stubbed: every branch of the contract.
   2. The module source carries no `"duplication_patch_applied": False` literal.
+  4. check() is scoped by arm (Advisor R2): a RocketRide arm missing the patch fields
+     FAILS; a LlamaIndex arm with None PASSES with the exemption LISTED in the output.
   3. Over the committed 18-Aug exports (when present in working/results — they live on main
      and docs-bench, not on video-bench before the import) and the committed correction
      artifact: on every arm whose image_digest matches a patched image, the re-emitted field
@@ -124,7 +126,8 @@ def layer2_source() -> None:
     body = inspect.getsource(pvl.build)
     check("build() carries no `\"duplication_patch_applied\": False` literal",
           not re.search(r'"duplication_patch_applied"\s*:\s*False', body))
-    check("build() delegates to _patch_state(container)", "**_patch_state(container)" in body)
+    check("build() delegates to _patch_state(container), scoped by is_rocketride_arm(arm)",
+          "_patch_state(container) if is_rocketride_arm(arm)" in body and "NOT_APPLICABLE" in body)
     whole = (HERE / "provenance_leela.py").read_text()
     lits = [l for l in whole.splitlines() if re.search(r'"duplication_patch_applied"\s*:\s*False', l)
             and not l.lstrip().startswith(("#", "hardcoded"))]
@@ -199,10 +202,76 @@ def layer3_artifacts() -> None:
                   hashlib.sha256(p.read_bytes()).hexdigest() == e["original_sha256"])
 
 
+def layer4_arm_scoped_check() -> None:
+    """Advisor R2 (2026-09-08): check() exempts the two patch fields for an arm with no
+    RocketRide image and LISTS the exemption; a RocketRide arm missing them still FAILS."""
+    print("layer 4: check() arm-scoped exemption, both directions")
+    A, I = pvl.PATCH_LABEL, pvl.PATCH_ID_LABEL
+    pid = "preventDefault-after-embedding-flush"
+
+    def build_arm(arm, container, labels):
+        orig = pvl._docker_label
+        pvl._docker_label = lambda c, k: (labels.get(c) or {}).get(k)
+        try:
+            return pvl.build(arm=arm, mode="test", corpus_sha="x", corpus_n=1, offered_concurrency=1,
+                             configured_concurrency=1, warmup_policy="none", timeout_s=1, parser="p",
+                             chunk_size=4000, chunk_overlap=200, embedding_model="m", container=container)
+        finally:
+            pvl._docker_label = orig
+
+    def complete(block):   # fill every non-patch REQUIRED field so only the patch fields decide
+        b = dict(block)
+        for k in pvl.REQUIRED:
+            if k not in pvl.PATCH_FIELDS and (b.get(k) is None or b.get(k) == ""):
+                b[k] = "filled"
+        return b
+
+    # direction 1: a RocketRide arm missing the fields still FAILS, nothing exempted
+    rr = complete(build_arm("rocketride_pdf", "rr", {}))          # label unreadable -> None
+    r = pvl.check(rr, arm="rocketride_pdf")
+    check("RR arm, label unreadable -> None on both fields", rr["duplication_patch_applied"] is None and rr["duplication_patch_id"] is None)
+    check("RR arm, None -> check FAILS", r["PASS"] is False, str(r))
+    check("RR arm, None -> both patch fields listed missing", set(pvl.PATCH_FIELDS) <= set(r["missing_fields"]), str(r["missing_fields"]))
+    check("RR arm, None -> nothing exempted", r["exempted"] == [], str(r["exempted"]))
+    r2 = pvl.check(rr)                                             # arm inferred from the record
+    check("RR arm without arm= -> still FAILS (no not_applicable marker on it)", r2["PASS"] is False and r2["exempted"] == [])
+    rr_marked = dict(rr, duplication_patch_source=pvl.NOT_APPLICABLE)
+    r3 = pvl.check(rr_marked, arm="rocketride_pdf")
+    check("RR arm carrying the not_applicable marker, arm= given -> arm wins, still FAILS", r3["PASS"] is False and r3["exempted"] == [], str(r3))
+    rr_ok = complete(build_arm("rocketride_pdf", "rr", {"rr": {A: "1", I: pid}}))
+    check("RR arm, label '1' -> check PASSES with nothing exempted", pvl.check(rr_ok, arm="rocketride_pdf")["PASS"] is True and pvl.check(rr_ok, arm="rocketride_pdf")["exempted"] == [])
+    rr_stock = complete(build_arm("rocketride_pdf", "rr", {"rr": {A: "0"}}))
+    rs = pvl.check(rr_stock, arm="rocketride_pdf")
+    check("RR arm, label '0' -> PASSES, only the id exempted, reason listed", rs["PASS"] is True and rs["exempted"] == ["duplication_patch_id"] and "stock" in rs["exemption_reasons"]["duplication_patch_id"], str(rs))
+
+    # direction 2: a LlamaIndex arm with None PASSES, with the exemption listed
+    li = build_arm("llamaindex_http_pdf", "li", {"li": {A: "1", I: pid}})   # even a stray label is not read
+    check("LI arm -> applied None (never False, never read from a label)", li["duplication_patch_applied"] is None)
+    check("LI arm -> id None", li["duplication_patch_id"] is None)
+    check("LI arm -> source is not_applicable_no_engine", li["duplication_patch_source"] == pvl.NOT_APPLICABLE, repr(li.get("duplication_patch_source")))
+    li = complete(li)
+    l1 = pvl.check(li, arm="llamaindex_http_pdf")
+    check("LI arm, arm= given -> check PASSES", l1["PASS"] is True, str(l1))
+    check("LI arm -> both patch fields listed as exempted", l1["exempted"] == sorted(pvl.PATCH_FIELDS), str(l1["exempted"]))
+    check("LI arm -> exemption reason names the scope", all(pvl.NOT_APPLICABLE in v for v in l1["exemption_reasons"].values()), str(l1["exemption_reasons"]))
+    check("LI arm -> nothing else missing", l1["missing_fields"] == [], str(l1["missing_fields"]))
+    l2 = pvl.check(li)                                             # arm inferred from the marker
+    check("LI arm without arm= -> marker infers the scope, PASSES with exemption listed", l2["PASS"] is True and l2["exempted"] == sorted(pvl.PATCH_FIELDS), str(l2))
+    li_unmarked = {k: v for k, v in li.items() if k != "duplication_patch_source"}
+    l3 = pvl.check(li_unmarked)
+    check("LI-shaped block WITHOUT the marker and without arm= -> FAILS (no scope claimed, none granted)", l3["PASS"] is False and l3["exempted"] == [], str(l3))
+    # a LlamaIndex arm missing some OTHER required field must still fail: the exemption is narrow
+    li_gap = dict(li); li_gap["corpus_manifest_sha256"] = None
+    l4 = pvl.check(li_gap, arm="llamaindex_http_pdf")
+    check("LI arm missing an unrelated field -> FAILS on that field only", l4["PASS"] is False and l4["missing_fields"] == ["corpus_manifest_sha256"], str(l4["missing_fields"]))
+    check("is_rocketride_arm: video arm names", pvl.is_rocketride_arm("rocketride_video_parity") and not pvl.is_rocketride_arm("llamaindex_video_workers") and not pvl.is_rocketride_arm(None))
+
+
 def main() -> int:
     layer1_contract()
     layer2_source()
     layer3_artifacts()
+    layer4_arm_scoped_check()
     print(f"\n{_n - len(_fails)} passed, {len(_fails)} failed")
     for f in _fails:
         print("  FAIL", f)
