@@ -337,12 +337,31 @@ def section_4_7():
 
 
 def section_5_8():
+    print('=== §2.5 / §2.6: Q1 closed from the release tag; the equivalence verdict; image residency ===')
+    dk = (ROOT / 'docker' / 'Dockerfile.rocketride').read_text()
+    fact('Dockerfile pins the server-v3.3.1 release tarball', 'releases/download/server-v3.3.1/rocketride-server-v3.3.1-linux-x64.tar.gz' in dk)
+    fact('Dockerfile ENGINE_SHA256 d8dad45b…', 'ENGINE_SHA256=d8dad45bd084c65443ddb5907965ee1c8424f82fa5dcd5b11476ed66ce0281d8' in dk); chk('§2.5 tarball sha d8dad45b', None, '`d8dad45b…`')
+    fact('Dockerfile ENGINE_BIN_SHA256 95768e26…', 'ENGINE_BIN_SHA256=95768e2640df2d34dd6dfea2e456f36da03ad80b091f9d057c116dfe748d9747' in dk); chk('§2.5 binary sha 95768e26', None, '95768e26…')
+    fact('Dockerfile patch: exactly one preventDefault before, two after', "grep -c 'preventDefault' \"$F\")\" = \"1\"" in dk and "grep -c 'preventDefault' \"$F\")\" = \"2\"" in dk)
+    fact('Dockerfile patch anchors on the flush comment + 8-space call', '# Flush the documents$' in dk and 'self\\._flushDocuments\\(\\)$' in dk)
+    for lit in ('`server-v3.3.1`', '`a0817cc6`', '`23216a6a…`', '`b79424af…`', '`ee952ba3`', '`51e4b86`', '`1138936`', 'EQUIVALENT', 'Q1 — is it fixed in what a customer runs? NO. CLOSED.', 'off the critical path', 'different provenance class'):
+        chk(f'§2.5 literal {lit}', None, lit)
+    pe = load(S18)['provenance_leela'][RR]
+    fact('our engine reports 3.3.1 (export)', pe['rocketride_engine_version'] == '3.3.1')
+    for lit in ('`rr-engine:3.3.1`', '`sha256:500c5d77…`', '`sha256:6699e9d4…`', '`sha256:b7f51acc…`', 'is not.'):
+        chk(f'§2.6 literal {lit}', None, lit)
+    d17 = load(FAULT)['provenance']['image_digests']
+    fact('§2.6: 500c5d77 is tagged rr-engine:3.3.1 in the 17-Aug exports', d17['rocketride'].split('|')[1] == 'rr-engine:3.3.1' and d17['rocketride'].startswith('sha256:500c5d77'))
+    fact('§2.6: 6699e9d4 is the 17-Aug ws1-llamaindex:x86_64 build in the exports', d17['llamaindex'].split('|')[1] == 'ws1-llamaindex:x86_64' and d17['llamaindex'].startswith('sha256:6699e9d4') and d17['llamaindex'].split('|')[2].startswith('2026-08-17'))
+    fact('§2.6: 17-Aug engine block read no label (stock, label_raw None)', load(FAULT)['provenance']['engine'].get('label_raw') is None)
+    unver('§2.5 upstream facts (tag/HEAD/commit shas, file sha256s)', 'read from a blobless clone of rocketride-org/rocketride-server on 2026-09-08; the clone is not committed — re-derive with `git ls-remote` / `git show` against the shas quoted')
+    unver('§2.6 box residency', 'from the 2026-09-08 box.sh transcript (~/.rocketride_box/transcript_20260908.log), not from a committed artifact')
     print('=== §5 / §8: branch facts and the register, from git and the tree ===')
     # §5.1 describes the fork state the handoff was written against: video-bench at 87b957d,
     # main at c06673a. Later landings move origin/video-bench (the correction artifact alone
     # makes the live diff 129), so the facts are pinned to those commits.
     FORK_VB, FORK_MAIN = '87b957d', 'c06673a'
-    fact('origin/main is still the fork-era main (c06673a)', git('rev-parse', 'origin/main').startswith(FORK_MAIN))
+    fact('the fork-era main c06673a is an ancestor of origin/main (main moved on 2026-09-08 by cherry-pick, never rewritten)', git('merge-base', '--is-ancestor', FORK_MAIN, 'origin/main') == '' and git('rev-parse', '--verify', FORK_MAIN + '^{commit}') != '')
     added = [l for l in git('diff', '--name-status', FORK_VB, FORK_MAIN, '--', 'working/results').splitlines()]
     chk('§5.1 128 main-only files under working/results (at 87b957d vs c06673a)', len(added), '**128 files under `working/results/`**'); fact('all 128 are additions on main', all(l.startswith('A\t') for l in added))
     fact('box.sh is video-bench-only (D in the video-bench→main diff at the fork state)', git('diff', '--name-status', FORK_VB, FORK_MAIN, '--', 'working/harness/box.sh').startswith('D'))
@@ -351,7 +370,7 @@ def section_5_8():
     fact('17f77aa already carried the docs driver, arms, batched arm, smoke and rederive', all(p in tree for p in ('weekend_worker.py', 'working/scripts/smoke50_parser_in.py', 'working/scripts/exp_batched_blast.py', 'working/scripts/smoke_phase2.py', 'working/scripts/rederive_gates.py')))
     mod = git('diff', '--name-status', FORK_VB, FORK_MAIN, '--', 'working/harness/gates_shared.py', 'working/harness/provenance_leela.py', 'working/harness/collector_proc.py', 'working/harness/static_names.py', 'working/nodes/env_probe/IInstance.py')
     fact('main is older on the five shared harness files (all M in the video-bench→main diff)', mod.count('M\t') == 5, mod.replace('\n', ' '))
-    fact('main:132 held the literal False', 'duplication_patch_applied": False' in git('show', 'origin/main:working/harness/provenance_leela.py').splitlines()[131])
+    fact('main:132 at c06673a held the literal False (main carries the fix from d5c3f4f on)', 'duplication_patch_applied": False' in git('show', 'c06673a:working/harness/provenance_leela.py').splitlines()[131] and '"duplication_patch_applied": False' not in git('show', 'origin/main:working/harness/provenance_leela.py').split('def build(')[1].split('def check(')[0])
     fact('video-bench:140 at 87b957d held the literal False', 'duplication_patch_applied": False' in git('show', '87b957d:working/harness/provenance_leela.py').splitlines()[139])
     fact('the literal is gone from HEAD provenance_leela.build()', '"duplication_patch_applied": False' not in (ROOT / 'working/harness/provenance_leela.py').read_text().split('def build(')[1].split('def check(')[0])
     chk('§2.4 main line 132', None, '`main` line 132'); chk('§2.4 video-bench line 140', None, '`video-bench` line 140 (at 87b957d)')

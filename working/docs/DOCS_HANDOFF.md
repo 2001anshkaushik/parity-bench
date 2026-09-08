@@ -41,7 +41,7 @@ The banked docs comparison is **a tuned LlamaIndex against RocketRide's default 
 
 ### Open
 
-1. Whether the **current stock engine** fixes duplication natively. This is the re-run's question, and no test of it exists. (§2.5)
+1. ~~Whether the **current stock engine** fixes duplication natively.~~ **Split and half-closed 2026-09-08 (§2.5):** Q1, what a customer runs — NO, the newest release `server-v3.3.1` is our engine and carries the defect; CLOSED from source. Q2, upstream — fixed on `develop` only (`ee952ba3`, no tag), and our patch is EQUIVALENT to that fix; the Q2 experiment is off the critical path.
 2. Where RocketRide's posture optimum sits for a parse-bound workload. Unknown; the video 5.21× does not transfer. (§6.1)
 3. ~~Whether GovDocs1 is still on the box, and at what SHA.~~ **Resolved 2026-09-08:** on the box, byte-identical to the manifest — 10000 on disk / 0 missing / 0 extra / 0 changed / VERDICT MATCH (§5.4).
 4. Whether the docs metric set survives contact with a multi-token posture. (§6.3)
@@ -143,7 +143,7 @@ The LlamaIndex arm was tuned — 24 workers, thread-pinned, warm-started. The Ro
 
 `repeat_factor` 2 → 1, `self_duplication` 5/5 → 0/5. `[VERIFIED 2026-09-07 — both artifacts committed: smoke_phase2__20260818T035137Z__4a2b2bb35b79.json records expect_patch=False, label_raw=0, all five records repeat_factor=2; smoke_phase2__20260818T035559Z__5131e250d300.json records expect_patch=True, label_raw=1, all five repeat_factor=1]`
 
-**Exact halving is the strongest available proof** — the patch removes precisely the phantom copy and nothing else. A patch that changed chunking would not land on 2.000 five times.
+**Exact halving is the strongest available proof** — the patch removes precisely the phantom copy and nothing else. A patch that changed chunking would not land on 2.000 five times. *And the patch is source-equivalent to upstream's own fix on `develop` (§2.5, verified 2026-09-08) — a patched number is a preview of the fixed engine's behaviour at this node, not a benchmark-only construct.*
 
 **(c) The corpus maximum at 10k scale.** New this session, and it corroborates (b) by a completely different route — output shape rather than metadata: `[VERIFIED 2026-09-07 from the committed per-document records]`
 
@@ -204,14 +204,24 @@ Corroborated independently by §2.2(c): the halved corpus maximum. Metadata and 
 
 **Ruling.** The 18-Aug measured docs runs were on `rr:patched`. The two smoke50 exports' `duplication_patch_applied: False` is false — never quote that value from them; cite the correction artifact or the `image_digest`. This matters beyond bookkeeping: Leela's `check()` treats that field as load-bearing for comparability, so anyone applying his rule to our exports concludes our headline run is not comparable with his patched runs — when in fact both are patched. **We owe him a correction, and the fix gates the re-run (§10.1).** *Status 2026-09-08: the fix has landed (d98aa7c, 4029eab); the correction to Leela is drafted, not sent — AUTOMATION_CONTRACT.md red item 3.*
 
-### 2.5 What a test of the CURRENT stock engine would have to show
+### 2.5 Goal 1 splits in two: what a customer runs, and what upstream has done
 
-The re-run's question is not "does our patch work" — that is answered (§2.2). It is **"does the engine now fix it natively."** Four things, in order, and the fourth is not optional.
+The re-run's question is not "does our patch work" — that is answered (§2.2). It was written as one question, "does the *current* stock engine fix it natively" — but "current" is not a single unknown. Established 2026-09-08 from source, read-only, no build `[VERIFIED 2026-09-08 — source; a source trace is not a measurement, register entry 1]`:
 
-1. **Source check.** `grep -c preventDefault` on the *current* shipping engine's `nodes/embedding_transformer/IInstance.py`. Stock 3.3.1 returns 1. A return of 2, or any equivalent guard on the flush path, is the source-level fix. Read the flush path, do not trust the count alone — a different fix shape would not change the count.
-2. **Artifact check.** Build the current engine with **no patch of ours applied** and run the five-document fixture. Fixed ⟺ all five return `repeat_factor=1` *without* `RR_DUP_PATCH`.
+**Q1 — is it fixed in what a customer runs? NO. CLOSED.** The newest server release is the tag `server-v3.3.1` (commit `a0817cc6`, 2026-07-06); its `/version` hash `a0817cc6` is exactly what our engine reports (3.3.1.35). The only server-release activity since is a re-publish of `server-v3.3.0-prerelease` (2026-09-08), older. `nodes/src/nodes/embedding_transformer/IInstance.py` is byte-identical at `server-v3.3.1`, at `1138936` (the 21-Aug clone HEAD) and in our shipped bundle `engine/nodes/embedding_transformer/IInstance.py` — sha256 `23216a6a…`, **one** `preventDefault`, the flush path unguarded. The engine under test still carries the defect, and so does every release a customer can download today. The benchmark's question is closed by the release tag, not by a run.
+
+**Q2 — has upstream fixed it? On `develop` only, in no tag.** Commit `ee952ba3` (2026-08-21, "deliver each flushed batch exactly once (#2062)") rewrites `writeDocuments()` — sha256 `b79424af…`, **two** `preventDefault` — on `develop`, reachable from HEAD `51e4b86` (2026-09-08) and from no `server-v*` tag. `langchain.py` (Ticket 3) is unchanged at that HEAD. Q2 is **not on the critical path**: nothing a customer runs contains it.
+
+**Patch equivalence — our `rr:patched` is a faithful preview of the upstream fix.** Compared line by line `[VERIFIED 2026-09-08 — source]`: ours inserts `return self.preventDefault()` after `self._flushDocuments()` (the Dockerfile's awk, anchored on the `# Flush the documents` comment and the 8-space call, guarded to exactly one `preventDefault` before and two after); upstream inverts the test to `if len(self.documents) >= self.maxDocuments: self._flushDocuments()` and then always `return self.preventDefault()`. In 3.3.1's `rocketlib/filters.py`, `preventDefault()` **raises** `APERR(Ec.PreventDefault)`, so in both versions the buffer path raises without flushing, the flush path flushes then raises, `close()` flushes stragglers with no `preventDefault` in either (upstream's docstring says why: it would skip `Parent::close()`), an empty `documents` argument behaves identically, a list that alone exceeds `maxDocuments` is flushed whole in both (neither chunks to 64), and an exception inside `_flushDocuments()` propagates from the same point in both, leaving the buffer unflushed in both. The `<`/`>=` inversion is exhaustive over the integers. **EQUIVALENT — no input distinguishes them at this node.** Our awk touches exactly the one site (the `close()` flush carries a different comment and is left alone), and `IGlobal.py` / `sentenceTransformer.py` are unchanged between `server-v3.3.1` and HEAD, so the preview is exact for the node. It is a preview of the *fix*, not of the *engine*: HEAD is 646 commits past 3.3.1 in everything else.
+
+**The Q2 experiment, if it is ever wanted — off the critical path.** Four things, in order, and the fourth is not optional:
+
+1. **Source check.** `grep -c preventDefault` on the built engine's `nodes/embedding_transformer/IInstance.py`, and read the flush path — a different fix shape would not change the count. (Done for `develop` HEAD: 2, shape above.)
+2. **Artifact check.** Build the `develop` engine with **no patch of ours applied** and run the five-document fixture. Fixed ⟺ all five return `repeat_factor=1` *without* `RR_DUP_PATCH`.
 3. **Scale check.** `self_duplication` = 0 over the eligible ≥64-chunk denominator (§2.3), not over the corpus.
-4. **Null control — mandatory.** The identical test run against a known-stock 3.3.1 image must report `repeat_factor=2` on the same five documents. Without it, step 2 is a check that can only pass: a broken fixture, a mis-wired lane, or a document set with nothing eligible all produce "no duplication found". `rr:stock` at `sha256:5e83c803…` is the null-control image if it still exists on the box; if not, rebuild it with `RR_DUP_PATCH=0`.
+4. **Null control — mandatory.** The identical test run against `rr:stock` (`sha256:5e83c803…`, on the box) must report `repeat_factor=2` on the same five documents. Without it, step 2 is a check that can only pass: a broken fixture, a mis-wired lane, or a document set with nothing eligible all produce "no duplication found".
+
+⚠️ **It cannot use our Dockerfile's path.** `docker/Dockerfile.rocketride` downloads the `server-v3.3.1` release tarball (sha256 `d8dad45b…`) and verifies the extracted engine binary against `ENGINE_BIN_SHA256 = 95768e26…`; a `develop` build is a source build with no release tarball and no binary sha to verify against — a **different provenance class** that needs its own scoping (what is built, from which commit, how the binary is identified) before any of its numbers can sit beside a 3.3.1 number. Not scoped here.
 
 **Precedent:** this is register entry 2 ("self-consistency is not evidence — the check must cross an independence boundary"), `working/video/METHODOLOGY_REGISTER.md:24`.
 
@@ -222,10 +232,11 @@ The re-run's question is not "does our patch work" — that is answered (§2.2).
 | `rr:stock` | `sha256:5e83c803…` | 3.3.1, `RR_DUP_PATCH=0`, `label_raw=0`, grep 1. The null control. `[VERIFIED]` |
 | `rr:patched` | `sha256:073b43d8…` | 3.3.1 + `preventDefault-after-embedding-flush`, `label_raw=1`, grep 2. Every 18-Aug docs number rides this. `[VERIFIED]` |
 | `ws1-llamaindex:x86_64` | `sha256:3d2f1f43…` | The docs LlamaIndex arm. No pin-locked Dockerfile — a rebuild resolves differently and cannot reproduce it. **Do not delete.** `[VERIFIED digest; PRIOR-RECORD on the no-rebuild ruling — Crossroad 19]` |
-| two 17-Aug images | `sha256:500c5d77…`, `sha256:6699e9d4…` | Pre-Phase-2. Carry the fault-isolation and data-isolation runs. `[VERIFIED digests; arm attribution unchecked]` |
-| `rr:patched-video` | — | The baked video image. **Not bit-reproducible**, and on `box.sh`'s hard refusal list. Every RocketRide number in both video campaigns rides it. Never remove. `[PRIOR-RECORD]` |
+| `rr-engine:3.3.1` | `sha256:500c5d77…` | The 17-Aug RocketRide arm of the fault-isolation and data-isolation runs (tag `rr-engine:3.3.1`, created 2026-08-15 05:49 UTC, stock — the exports' engine block reads `label_raw` None). Present on the box. `[VERIFIED 2026-09-08 — the three 17-Aug exports' image_digests and the box's docker images; the Advisor identifies it as Leela's Phase-1 build — PRIOR-RECORD on that attribution]` |
+| the 17-Aug `ws1-llamaindex:x86_64` | `sha256:6699e9d4…` | The 17-Aug LlamaIndex arm of the same runs (tag `ws1-llamaindex:x86_64`, created 2026-08-17 06:44 UTC). **Not on the box today**: the tag was rebuilt on 18-Aug as `3d2f1f43…` and this build is untagged and gone, so the 17-Aug isolation runs' LlamaIndex arm cannot be re-driven on its own image. `[VERIFIED 2026-09-08 — exports' image_digests; absent from the box's docker images]` |
+| `rr:patched-video` | `sha256:b7f51acc…` | The baked video image (2026-08-22). **Not bit-reproducible**, and on `box.sh`'s hard refusal list. Every RocketRide number in both video campaigns rides it. Never remove. `[VERIFIED digest and residency 2026-09-08; PRIOR-RECORD on the no-rebuild ruling]` |
 
-Box residency of all of these is **UNVERIFIED** — see §5.4.
+Box residency `[VERIFIED 2026-09-08 — box.sh transcript]`: `rr:stock`, `rr:patched`, `rr:patched-video`, `ws1-llamaindex:x86_64` (`3d2f1f43…`), `rr-engine:3.3.1` (`500c5d77…`), `li:video`, `li:video-anchor` are all present; `6699e9d4…` is not. The image labels read back as expected: `rr:stock` `duplication_patch_applied=0`, `rr:patched` and `rr:patched-video` `=1`. The 3.3.1 engine inside `rr:stock` / `rr:patched` is the `server-v3.3.1` release (§2.5 Q1); no image on the box carries the upstream `develop` fix.
 
 ---
 
