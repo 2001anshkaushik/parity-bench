@@ -116,10 +116,37 @@ def our_engine_on_port(port: int | None = None):
 
 
 # ---------------------------------------------------------------- 1. NUL truncation
+def nul_verdict(out) -> tuple[str, str]:
+    """The decision of the NUL test, as a pure function of the pipeline's response, so the
+    empty case can be null-controlled without an engine (2026-09-08, Advisor Task 3).
+
+    Returns (verdict, detail): 'skip' when the response carries NO document — a pipeline that
+    ran nothing proves nothing about truncation and must never read as the known failure —
+    'fail' when a document came back truncated (the known open bug), 'pass' when intact."""
+    docs = out.get("documents") if isinstance(out, dict) else None
+    if not docs:
+        return "skip", (f"pipeline returned no documents (response keys {sorted(out) if isinstance(out, dict) else type(out).__name__}) — "
+                        "nothing ran, so truncation cannot be judged; this is NOT the known failure")
+    got = docs[0].get("page_content", "")
+    if got == "AAAA\x00BBBB":
+        return "pass", "9 chars round-tripped intact"
+    return "fail", f"NUL TRUNCATION STILL PRESENT: sent 9 chars, got {len(got)} ({got!r}). See publishable/BUG_NUL_TRUNCATION.md"
+
+
 def t_nul_truncation():
-    """Session 13: page_content silently truncated at the first NUL; embedding was correct."""
+    """Session 13: page_content silently truncated at the first NUL; embedding was correct.
+
+    2026-09-08: an EMPTY response used to read as this known failure (got '' != expected) — on a
+    laptop whose engine could not run any pipeline the XFAIL was vacuous. Now the pipeline must
+    return a document before the test may conclude anything; empty SKIPS with the reason."""
     if not engine_up():
+        print("        skip reason: no engine on our port")
         return "skip"
+    ours, why = our_engine_on_port()
+    if not ours:
+        print(f"        skip reason: {why}")
+        return "skip"
+    os.environ["ROCKETRIDE_URI"] = f"http://127.0.0.1:{our_engine_port()}"
     import asyncio
     from rocketride import RocketRideClient
 
@@ -137,11 +164,30 @@ def t_nul_truncation():
             except Exception: pass
             await c.disconnect()
         return out
-    out = asyncio.run(go())
-    got = (out.get("documents") or [{}])[0].get("page_content", "")
-    assert got == "AAAA\x00BBBB", (
-        f"NUL TRUNCATION STILL PRESENT: sent 9 chars, got {len(got)} ({got!r}). "
-        f"See publishable/BUG_NUL_TRUNCATION.md")
+    try:
+        out = asyncio.run(go())
+    except Exception as e:
+        # A pipe that never opened is a pipeline that never ran — the same empty case.
+        print(f"        skip reason: pipeline did not run ({type(e).__name__}: {str(e).splitlines()[0][:90]})")
+        return "skip"
+    verdict, detail = nul_verdict(out)
+    if verdict == "skip":
+        print(f"        skip reason: {detail}")
+        return "skip"
+    assert verdict == "pass", detail
+
+
+def t_empty_response_never_concludes():
+    """Null control for nul_verdict (2026-09-08), both directions, no engine: an empty or
+    document-less response must SKIP; a truncated document must FAIL; an intact one must PASS.
+    A test that concludes from nothing is worse than a red one (register entry 2)."""
+    assert nul_verdict({"name": "x", "path": "", "objectId": "y"})[0] == "skip", "no 'documents' key read as a verdict"
+    assert nul_verdict({"documents": []})[0] == "skip", "an empty documents list read as a verdict"
+    assert nul_verdict({})[0] == "skip", "an empty response read as a verdict"
+    assert nul_verdict(None)[0] == "skip", "a None response read as a verdict"
+    v, d = nul_verdict({"documents": [{"page_content": "AAAA"}]})
+    assert v == "fail" and "TRUNCATION" in d, f"a truncated document did not FAIL: {v} {d}"
+    assert nul_verdict({"documents": [{"page_content": "AAAA\x00BBBB"}]})[0] == "pass", "an intact document did not PASS"
 
 
 # ---------------------------------------------------------------- 2. engine matched by PID
@@ -158,10 +204,23 @@ def t_engine_pid_not_name():
         return "skip"
     pid = m.RocketArm._engine_pid()
     assert pid is not None, "engine PID did not resolve while the engine is up"
-    out = subprocess.run(["lsof", "-nP", "-iTCP:5565", "-sTCP:LISTEN"],
+    # 2026-09-08: the harness's lookup is port-bound (5565); if the pid it resolves is not the
+    # engine start_engine.sh recorded, the test is looking at a FOREIGN engine and a pass would
+    # be about that engine, not ours — SKIP with the reason (register 8). The lookup's own
+    # port-binding is recorded as a finding in the handoff, not fixed here.
+    try:
+        recorded = int((ROOT / "logs" / "engine.pid").read_text().strip())
+    except Exception:
+        recorded = None
+    if recorded != pid:
+        print(f"        skip reason: weekend_worker resolved engine pid {pid} (port-bound lookup on :5565), "
+              f"but the benchmark's engine is pid {recorded} on :{our_engine_port()} — a foreign engine is not a pass")
+        return "skip"
+    port = our_engine_port()
+    out = subprocess.run(["lsof", "-nP", f"-iTCP:{port}", "-sTCP:LISTEN"],
                          capture_output=True, text=True).stdout
     holders = [l.split()[1] for l in out.splitlines()[1:] if len(l.split()) > 1]
-    assert str(pid) in holders, f"resolved PID {pid} does not hold port 5565 ({holders})"
+    assert str(pid) in holders, f"resolved PID {pid} does not hold port {port} ({holders})"
 
 
 # ---------------------------------------------------------------- 3. non-fatal content gate
@@ -514,6 +573,8 @@ def t_artifact_protected_content():
 if __name__ == "__main__":
     print("=" * 92); print("REGRESSION SELFTEST — one test per defect that produced a wrong number")
     print("=" * 92)
+    check("empty_response_never_concludes", "empty/absent response -> skip, never a verdict",
+          t_empty_response_never_concludes)
     check("nul_truncation", "page_content truncated at first NUL", t_nul_truncation)
     check("engine_pid_not_name", "engine matched by PID, not name", t_engine_pid_not_name)
     check("gate_non_fatal", "one bad doc must not end a phase", t_gate_non_fatal)
