@@ -1,11 +1,11 @@
 {
  "_meta": {
   "name": "provenance_correction_20260818",
-  "written_utc": "20260908T025206Z",
-  "payload_sha256_12": "6c66a48ae7e5",
+  "written_utc": "20260908T025550Z",
+  "payload_sha256_12": "edb65ecdba81",
   "host": "Anshs-MacBook-Pro.local",
   "user": "ansh",
-  "pid": 59782,
+  "pid": 61591,
   "schema": "resultio/1"
  },
  "data": {
@@ -84,6 +84,13 @@
      "duplication_patch_id": "preventDefault-after-embedding-flush",
      "label_raw": "1"
     }
+   },
+   {
+    "export": "rederive_gates__20260818T135345Z__7da260d6017f.json",
+    "path_in_repo": "working/results/rederive_gates__20260818T135345Z__7da260d6017f.json",
+    "original_sha256": "8d013d04f780ee6a2e665e6fa04e65968407c108cb35f94c540f49bdd8c9e5dd",
+    "status": "unchanged",
+    "reason": "carries neither a provenance_leela block nor an engine provenance block"
    },
    {
     "export": "rederive_gates__20260818T140635Z__ef789985f863.json",
@@ -384,7 +391,7 @@
    }
   ],
   "summary": {
-   "n_exports": 10,
+   "n_exports": 11,
    "changed": [
     "smoke50_parser_in__20260818T094225Z__a5fd8e2033b7.json",
     "smoke50_parser_in__20260818T155557Z__4c468512ae75.json"
@@ -394,6 +401,7 @@
     "exp_batched_blast__20260818T051318Z__cf4ea7674609.json",
     "exp_batched_blast__20260818T075451Z__44d9a05dd11e.json",
     "exp_batched_blast__20260818T150551Z__373adce246fc.json",
+    "rederive_gates__20260818T135345Z__7da260d6017f.json",
     "rederive_gates__20260818T140635Z__ef789985f863.json",
     "smoke_phase2__20260818T035137Z__4a2b2bb35b79.json",
     "smoke_phase2__20260818T035559Z__5131e250d300.json",
