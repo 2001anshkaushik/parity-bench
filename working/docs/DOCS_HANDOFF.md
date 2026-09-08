@@ -503,7 +503,7 @@ Three lessons, each bought with real time. They are not general advice; each nam
 
 **Films cost:** the corpus was staged and sized before anyone measured how much resolution varied across archival prints, and resolution turned out to be the axis that mattered — it drove the 560px mechanism (§7.2).
 
-**The docs axes are page count and extraction difficulty.** Both are already known to be brutal in GovDocs1: `[VERIFIED 2026-09-07]` chunks/doc runs median 8, p95 74, **max 1377** — a p95-to-max ratio of 18×. And the slowest 1% of documents carry **58.6% of all service seconds** `[PRIOR-RECORD]`.
+**The docs axes are page count and extraction difficulty.** Both are already known to be brutal in GovDocs1: `[VERIFIED 2026-09-07]` chunks/doc runs median 8, p95 74, **max 1377** — a p95-to-max ratio of 18.6×. And the slowest 1% of documents carry **58.6% of all service seconds** `[PRIOR-RECORD]`.
 
 **Cure:** stratify the staging set over page-count and extraction-difficulty terciles before sizing anything, exactly as the films subset was stratified over duration × bytes. A smoke set drawn from zip 000 alone is **not** representative of all 40 zips — this already bit once: the 200-doc runs used `SMOKE_CORPUS_GLOB='000_*.pdf'` while the 10k runs used all 40, so docs/s differences between them are partly corpus mix, not scale.
 
