@@ -91,18 +91,22 @@ def unver(label, why):
     unverifiable.append(f'{label} — {why}')
 
 
-def chk_unverified(label, figure):
+labelled_standing: list[str] = []; labelled_struck: list[str] = []
+
+
+def chk_unverified(label, figure, struck=False):
     """A figure no committed artifact reproduces must carry the UNVERIFIED label on the same
-    line, everywhere it appears (Advisor R4, 2026-09-08). Listed under UNVERIFIABLE as well, so
-    the reader sees what is not checked; FAILS if the figure appears anywhere unlabelled."""
+    line, everywhere it appears (Advisor R4, 2026-09-08). FAILS if the figure appears anywhere
+    unlabelled. Counted two ways so the summary and any report agree: a figure still QUOTED
+    (with the label) versus a figure STRUCK from the text (kept only to say it was struck)."""
     global n_ok
     lines = [l for l in TEXT.splitlines() if figure in l]
     ok = bool(lines) and all(UNV in l for l in lines)
     n_ok += ok
     if not ok:
         fails.append(f'{label}: {figure!r} {"absent" if not lines else "appears WITHOUT the UNVERIFIED label"}')
-    print(f'  {"PASS" if ok else "FAIL"}  {label}: {figure} carries {UNV} on {len(lines)} line(s)')
-    unverifiable.append(f'{label} — labelled, not checked: {figure}')
+    print(f'  {"PASS" if ok else "FAIL"}  {label}: {figure} carries {UNV} on {len(lines)} line(s){" (struck)" if struck else ""}')
+    (labelled_struck if struck else labelled_standing).append(f'{label}: {figure}')
 
 
 def load(p: Path):
@@ -315,7 +319,7 @@ def section_4_7():
     chk_unverified('§4.1 mean chunk chars', '3326–3468'); chk_unverified('§4.1 max chunk chars', '~3993')
     chk_unverified('§6.1 idle burden', '1.004 cores'); chk_unverified('§3.3 LOC', '557 vs 179')
     chk_unverified('§3.6 post-leg reading', '135.3 MB'); chk_unverified('§6.2 Tika price', '0.599 s/doc')
-    chk_unverified('§7.1 struck tail share', '58.6%')
+    chk_unverified('§7.1 struck tail share', '58.6%', struck=True)
     rec = [r for r in jl(RES / 'run10k_p2_blast_v2' / 'perdoc_rr_blast.jsonl') if r.get('ok')]
     lat = sorted(((r['completion_ns'] - r['submit_ns']) / 1e9 for r in rec), reverse=True)
     top = lat[:math.ceil(0.01 * len(lat))]
@@ -380,8 +384,13 @@ def main(argv=None) -> int:
     if missing:
         print('ARTIFACTS MISSING (this branch does not carry the 18-Aug results — run on docs-bench or main):'); [print('  ', m.name) for m in missing]; return 2
     control(); section_1(); section_2(); section_3(); section_4_7(); section_5_8()
-    print(f'\n{n_ok} checks passed, {len(fails)} failed; {len(unverifiable)} figures UNVERIFIABLE (listed, not failed)')
+    n_lab = len(labelled_standing) + len(labelled_struck)
+    print(f'\n{n_ok} checks passed, {len(fails)} failed; {n_lab} figures carry the UNVERIFIED label '
+          f'({len(labelled_standing)} artifact-less figures still quoted with the label + {len(labelled_struck)} struck); '
+          f'{len(unverifiable)} other figures listed unverifiable')
     for f in fails: print('  FAIL', f)
+    for u in labelled_standing: print('  LABELLED (artifact-less, quoted with the label)', u)
+    for u in labelled_struck: print('  LABELLED (struck from the text)', u)
     for u in unverifiable: print('  UNVERIFIABLE', u)
     return 1 if fails else 0
 
