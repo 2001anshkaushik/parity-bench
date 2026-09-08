@@ -1,31 +1,44 @@
 #!/usr/bin/env python3
-"""probe_idle_spin_docs — SWEEP POINT ZERO for the docs re-run: is the engine's idle spin
-per-SERVER or per-TOKEN? (DOCS_HANDOFF.md §6.1; Ticket 4 left it open for the docs posture.)
+"""probe_idle_spin_docs — SWEEP POINT ZERO for the docs re-run: what does the engine burn idle,
+and how does it scale with the number of loaded pipelines (tokens)? (DOCS_HANDOFF.md §6.1;
+Ticket 4.)
 
 Not a measured leg. Nothing is sent. The docs posture is reproduced exactly (PHASE1_CARRYOVER
 §docker run): `rr:patched`, `--cpuset-cpus 0-23 --memory 58g`, the six BLAS/OMP variables at 1,
 `-p 5565:5565`. M tokens are opened on the docs pipeline (product_pdf.pipe, one FRESH
 project_id per token so the engine spawns one task subprocess each), NO work is sent, the
 container settles, and CPU is sampled as /proc/<pid>/stat deltas for EVERY process in the
-container over >= 5 s windows, plus the container cgroup's cpu.stat as the cross-check. M in
-{0, 1, 2, 4, 8, 16}: M=0 is the server floor, M=1 the null control.
+container over >= 5 s windows, plus the container cgroup's cpu.stat as the cross-check.
+M in {0, 1, 2, 4, 8, 16}.
 
-PRE-REGISTERED (printed before any sample is taken, and written into the output first):
-  H_server : idle cores ~ 1.0 at every M — the spin lives in the serving process.
-  H_token  : idle cores ~ M — every task subprocess spins; at M=16 half the box burns before a
-             document is read, and the quiet-box preflight cannot exclude a floor that scales.
-  NULL CONTROL: M=1 must reproduce ~1.004 cores (the one-token reading in §6.1) — band
-  [0.85, 1.20]. Outside the band the probe is measuring something else; it STOPS after M=1 and
-  the sweep is not run, per the ruling.
-  PRIOR (not a prediction, context only): Ticket 4 measured 0.99 + 0.26*M cores at threads=8
-  on the video pipe — neither hypothesis cleanly.
+PRE-REGISTRATION v2 (2026-09-08, Advisor R9/R10) — printed before any sample and written into
+the output first. It SUPERSEDES ON THE RECORD the v1 pre-registration carried by
+working/results/probe_idle_spin_docs__20260908T090314Z (probe sha 4d5721a9…), which is left
+untouched: v1's null control asked M=1 to reproduce the ~1.0 one-token figure and refused a
+reading of 1.253 — the control worked; the HYPOTHESIS was malformed (the ~1.0 figure is the
+M=0 server floor, and v1's two hypotheses — flat ~1.0 at every M, or ~M cores — were both
+wrong). v1's readings: M=0 sum 1.013 (server 1.013), M=1 sum 1.253 (server 1.023, task 0.230).
+  model      idle_cores = A + B*M,  A ~ 1.02 (serving process, fixed),  B ~ 0.23 (per task subprocess)
+  point      M=16 predicted 4.70; ACCEPT if within [4.2, 5.2]; REFUTED outside
+  shape      server_cores stays flat across all M — within +-10% of 1.02 at every M; if the server
+             term grows with M the two-term model is wrong even if the sum fits
+  linearity  B computed pairwise between adjacent M (delta sum / delta M); roughly constant means
+             every pairwise B within [0.115, 0.345] (0.23 +-50%); otherwise the model is wrong
+             even if the endpoints fit
+  null       M=0 must reproduce 1.013 within [0.85, 1.20] — the control, on the M=0 reading
+  out-of-sample  the films campaign held 16 tokens and read ~4.65-4.66 idle cores (different
+             corpus, campaign, instrumentation); the model predicts 4.70 there — stated so the
+             comparison is fixed before the sweep, not chosen after
+  If the null control fails: STOP after M=0, report, never widen a band. If M=16 lands outside
+  [4.2, 5.2]: the model is REFUTED and reported as such — no fitting to it.
 
 Every reading is per-process (pid, ppid, threads, rss, cores, argv) — which process holds the
-spin matters as much as how much — and the sum, and the cgroup delta. Runs ON THE BOX from the
-video-bench worktree (the helpers live in working/video/probe):
+burden matters as much as how much — and the sum, and the cgroup delta. A and B are fitted by
+least squares over all points AFTER the rules are applied, with the residual at every point.
+Runs ON THE BOX from the video-bench worktree:
   ~/.venv/bin/python working/scripts/probe_idle_spin_docs.py --out <path.json>
 It prints its own sha256 first (entry 25). --self-test exercises the arithmetic and the
-verdict logic on canned /proc/stat shapes (register 27: producer-built fixtures), no docker.
+verdict logic on canned shapes (register 27: producer-built fixtures), no docker.
 """
 from __future__ import annotations
 
@@ -53,14 +66,24 @@ THREAD_ENV_KEYS = ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS',
 CLK_TCK = 100  # Linux USER_HZ on x86_64; read back from getconf on the box and recorded
 
 PREREG = {
-    'H_server': 'idle cores ~ 1.0 at every M (the spin lives in the serving process)',
-    'H_token': 'idle cores ~ M (every task subprocess spins)',
-    'null_control': {'M': 1, 'expect_cores': 1.004, 'band': [0.85, 1.20],
-                     'rule': 'outside the band: the probe measures something else; stop after M=1, do not run the sweep'},
-    'prior_not_prediction': 'Ticket 4 (video pipe, threads=8): 0.99 + 0.26*M cores',
-    'decision_rule': ('per-server if max over M of (sum_cores - sum_cores[M=0]) < 0.5 and per-process shows the '
-                      'spin in the serving process; per-token if sum_cores grows by >= 0.5 per added token on '
-                      'average and per-process shows it in the task subprocesses; otherwise MIXED — report the slope'),
+    'version': 2,
+    'supersedes': {'artifact': 'working/results/probe_idle_spin_docs__20260908T090314Z',
+                   'probe_sha256': '4d5721a94740eaf5d0f5db77f0c64ca0f446b26724200e516b5fe3d12c760fd5',
+                   'why': ('v1 asked M=1 to reproduce the ~1.0 one-token figure within [0.85, 1.20] and refused 1.253. '
+                           'The control worked; the hypothesis was malformed: ~1.0 is the M=0 server floor (v1 read '
+                           '1.013 at M=0), and neither v1 hypothesis (flat ~1.0, or ~M cores) matches v1\'s own two '
+                           'points. Superseded on the record, never amended.')},
+    'model': 'idle_cores = A + B*M; A ~ 1.02 (serving process, fixed); B ~ 0.23 (per task subprocess)',
+    'A_expected': 1.02, 'B_expected': 0.23,
+    'point': {'M': 16, 'predicted_cores': 4.70, 'accept_band': [4.2, 5.2], 'outside': 'REFUTED — do not fit to it'},
+    'shape': {'rule': 'server_cores within +-10% of 1.02 at every M', 'band': [0.918, 1.122],
+              'outside': 'two-term model wrong even if the sum fits'},
+    'linearity': {'rule': 'pairwise B = (sum[M2]-sum[M1])/(M2-M1) between adjacent M within [0.115, 0.345] (0.23 +-50%)',
+                  'band': [0.115, 0.345], 'outside': 'model wrong even if the endpoints fit'},
+    'null_control': {'M': 0, 'expect_cores': 1.013, 'band': [0.85, 1.20],
+                     'rule': 'outside the band: the probe measures something else; stop after M=0, never widen a band'},
+    'out_of_sample': {'films_16_tokens_idle_cores': [4.65, 4.66], 'model_predicts': 4.70,
+                      'note': 'films campaign, different corpus/campaign/instrumentation; fixed here before the sweep'},
 }
 
 
@@ -87,34 +110,65 @@ def cores_from_ticks(t0: int, t1: int, elapsed_s: float, clk_tck: int = CLK_TCK)
     return round((t1 - t0) / clk_tck / elapsed_s, 3)
 
 
-def classify(points: list[dict]) -> dict:
-    """points: [{'M': m, 'sum_cores': x, 'server_cores': s, 'task_cores': t}] with M=0 first.
-    Applies PREREG['decision_rule'] mechanically."""
+def fit_ab(points: list[dict]) -> dict:
+    """Least squares of sum_cores on M over every point; residual per point."""
+    ms = [p['M'] for p in points]; ys = [p['sum_cores'] for p in points]
+    n = len(ms); mx = sum(ms) / n; my = sum(ys) / n
+    sxx = sum((m - mx) ** 2 for m in ms)
+    b = sum((m - mx) * (y - my) for m, y in zip(ms, ys)) / sxx if sxx else float('nan')
+    a = my - b * mx
+    return {'A': round(a, 3), 'B': round(b, 3),
+            'residuals': {p['M']: round(p['sum_cores'] - (a + b * p['M']), 3) for p in points}}
+
+
+def evaluate(points: list[dict]) -> dict:
+    """Apply PREREG v2 mechanically. points: [{'M', 'sum_cores', 'server_cores', 'task_cores'}], M=0 first."""
     by_m = {p['M']: p for p in points}
-    if 0 not in by_m or len(points) < 2:
-        return {'verdict': 'INSUFFICIENT', 'reason': 'need M=0 and at least one M>0 point'}
-    base = by_m[0]['sum_cores']
-    growth = {m: round(p['sum_cores'] - base, 3) for m, p in by_m.items() if m > 0}
-    max_growth = max(growth.values())
-    mmax = max(growth)
-    slope = round(growth[mmax] / mmax, 3) if mmax else 0.0
-    task_share_at_max = (by_m[mmax]['task_cores'] / by_m[mmax]['sum_cores']) if by_m[mmax]['sum_cores'] else 0.0
-    if max_growth < 0.5 and task_share_at_max < 0.5:
-        verdict = 'PER_SERVER'
-    elif slope >= 0.5 and task_share_at_max >= 0.5:
-        verdict = 'PER_TOKEN'
+    out: dict = {'preregistration_version': PREREG['version']}
+    if 0 not in by_m:
+        return {**out, 'verdict': 'INSUFFICIENT', 'reason': 'no M=0 point'}
+    nc = null_control_verdict(by_m[0]['sum_cores'])
+    out['null_control'] = nc
+    if not nc['PASS']:
+        return {**out, 'verdict': 'STOPPED_NULL_CONTROL_FAILED'}
+    ms = sorted(by_m)
+    lo, hi = PREREG['shape']['band']
+    shape = {m: by_m[m]['server_cores'] for m in ms}
+    shape_ok = all(lo <= v <= hi for v in shape.values())
+    out['shape'] = {'server_cores_by_M': shape, 'band': [lo, hi], 'PASS': shape_ok}
+    pw = {}
+    for m1, m2 in zip(ms, ms[1:]):
+        pw[f'{m1}->{m2}'] = round((by_m[m2]['sum_cores'] - by_m[m1]['sum_cores']) / (m2 - m1), 3)
+    blo, bhi = PREREG['linearity']['band']
+    lin_ok = bool(pw) and all(blo <= v <= bhi for v in pw.values())
+    out['linearity'] = {'pairwise_B': pw, 'band': [blo, bhi], 'PASS': lin_ok}
+    pt = PREREG['point']
+    if pt['M'] in by_m:
+        v = by_m[pt['M']]['sum_cores']; plo, phi = pt['accept_band']
+        out['point'] = {'M': pt['M'], 'predicted': pt['predicted_cores'], 'measured': v, 'band': [plo, phi], 'PASS': plo <= v <= phi}
     else:
-        verdict = 'MIXED'
-    return {'verdict': verdict, 'server_floor_M0': base, 'growth_over_M0': growth,
-            'slope_cores_per_token_to_Mmax': slope, 'task_share_at_Mmax': round(task_share_at_max, 3),
-            'rule': PREREG['decision_rule']}
+        out['point'] = {'M': pt['M'], 'PASS': None, 'reason': 'M=16 not measured'}
+    out['fit'] = fit_ab(points)
+    if pt['M'] in by_m:
+        ofs = PREREG['out_of_sample']
+        out['out_of_sample'] = {'films_16_tokens': ofs['films_16_tokens_idle_cores'], 'measured_M16': by_m[pt['M']]['sum_cores'],
+                                'reproduced': (ofs['films_16_tokens_idle_cores'][0] - 0.25) <= by_m[pt['M']]['sum_cores'] <= (ofs['films_16_tokens_idle_cores'][1] + 0.25),
+                                'note': 'reproduced = M=16 within 0.25 core of the films reading; a statement, not a rule'}
+    if out['point']['PASS'] is None:
+        out['verdict'] = 'INCOMPLETE'
+    elif out['point']['PASS'] and shape_ok and lin_ok:
+        out['verdict'] = 'MODEL_ACCEPTED'
+    else:
+        failed = [k for k, ok in (('point', out['point']['PASS']), ('shape', shape_ok), ('linearity', lin_ok)) if not ok]
+        out['verdict'] = 'MODEL_REFUTED'; out['failed_rules'] = failed
+    return out
 
 
-def null_control_verdict(m1_sum: float) -> dict:
+def null_control_verdict(m0_sum: float) -> dict:
     lo, hi = PREREG['null_control']['band']
-    ok = lo <= m1_sum <= hi
-    return {'M1_sum_cores': m1_sum, 'band': [lo, hi], 'expect': PREREG['null_control']['expect_cores'],
-            'PASS': ok, 'note': 'reproduces the one-token reading' if ok else 'does NOT reproduce ~1.004 — sweep not interpretable, stopped'}
+    ok = lo <= m0_sum <= hi
+    return {'M0_sum_cores': m0_sum, 'band': [lo, hi], 'expect': PREREG['null_control']['expect_cores'],
+            'PASS': ok, 'note': 'reproduces the M=0 reading' if ok else 'does NOT reproduce 1.013 at M=0 — stopped, band not widened'}
 
 
 # ---------------------------------------------------------------- container plumbing
@@ -269,7 +323,7 @@ async def amain(args) -> int:
                 points.append(pt)
                 print(json.dumps({'POINT': {k: v for k, v in pt.items() if k != 'windows'},
                                   'per_process_window2': [{k: p[k] for k in ('pid', 'ppid', 'role', 'threads', 'rss_kb', 'cores')} | {'args': p['args'][:70]} for p in w2['per_process']]}, indent=1), flush=True)
-                if m == 1:
+                if m == 0:
                     nc = null_control_verdict(pt['sum_cores'])
                     out['null_control'] = nc
                     print(json.dumps({'NULL_CONTROL': nc}, indent=1), flush=True)
@@ -277,9 +331,9 @@ async def amain(args) -> int:
                         out['points'] = points; out['verdict'] = 'STOPPED_NULL_CONTROL_FAILED'
                         return 3
             out['points'] = points
-            out['classification'] = classify([{'M': p['M'], 'sum_cores': p['sum_cores'], 'server_cores': p['server_cores'], 'task_cores': p['task_cores']} for p in points])
-            out['verdict'] = out['classification']['verdict']
-            print(json.dumps({'CLASSIFICATION': out['classification']}, indent=1), flush=True)
+            out['evaluation'] = evaluate([{'M': p['M'], 'sum_cores': p['sum_cores'], 'server_cores': p['server_cores'], 'task_cores': p['task_cores']} for p in points])
+            out['verdict'] = out['evaluation']['verdict']
+            print(json.dumps({'EVALUATION': out['evaluation']}, indent=1), flush=True)
             return 0
         finally:
             for tok in tokens:
@@ -295,7 +349,7 @@ async def amain(args) -> int:
         if args.out:
             Path(args.out).write_text(json.dumps(out, indent=1))
             print(f'wrote {args.out}')
-        print(json.dumps({'FINAL': {k: out.get(k) for k in ('verdict', 'null_control', 'classification')}}, indent=1), flush=True)
+        print(json.dumps({'FINAL': {k: out.get(k) for k in ('verdict', 'null_control', 'evaluation')}}, indent=1), flush=True)
         if not args.keep:
             container_down()
 
@@ -311,20 +365,30 @@ def self_test() -> int:
     chk('comm with spaces/parentheses does not break the parse', parse_stat_ticks('7 (engine (x) y) R 1 ' + line.split(') S 1 ', 1)[1]) == 200)
     chk('unparseable stat -> None', parse_stat_ticks('<failed rc=1>') is None)
     chk('cores arithmetic: 600 ticks over 6 s at 100 Hz = 1.0 core', cores_from_ticks(1000, 1600, 6.0, 100) == 1.0)
-    chk('null control passes at 1.004', null_control_verdict(1.004)['PASS'] is True)
-    chk('null control passes at 1.18 (inside band)', null_control_verdict(1.18)['PASS'] is True)
-    chk('null control FAILS at 1.3', null_control_verdict(1.3)['PASS'] is False)
+    chk('null control passes at 1.013 (M=0)', null_control_verdict(1.013)['PASS'] is True)
+    chk('null control FAILS at 1.253 (the v1 M=1 reading is not an M=0 reading)', null_control_verdict(1.253)['PASS'] is False)
     chk('null control FAILS at 0.5', null_control_verdict(0.5)['PASS'] is False)
-    server = [{'M': m, 'sum_cores': 1.0 + 0.02 * m, 'server_cores': 1.0, 'task_cores': 0.02 * m} for m in (0, 1, 2, 4, 8, 16)]
-    chk('classify: flat ~1.0 with the spin in the server -> PER_SERVER', classify(server)['verdict'] == 'PER_SERVER')
-    token = [{'M': m, 'sum_cores': 1.0 + 1.0 * m, 'server_cores': 1.0, 'task_cores': 1.0 * m} for m in (0, 1, 2, 4, 8, 16)]
-    chk('classify: +1 core per token in the tasks -> PER_TOKEN', classify(token)['verdict'] == 'PER_TOKEN')
-    mixed = [{'M': m, 'sum_cores': 0.99 + 0.26 * m, 'server_cores': 0.99, 'task_cores': 0.26 * m} for m in (0, 1, 2, 4, 8, 16)]
-    chk('classify: Ticket-4 shape (0.99 + 0.26*M) -> MIXED, slope reported', classify(mixed)['verdict'] == 'MIXED' and abs(classify(mixed)['slope_cores_per_token_to_Mmax'] - 0.26) < 0.01)
-    chk('classify: without M=0 -> INSUFFICIENT', classify(token[1:])['verdict'] == 'INSUFFICIENT')
+    model = [{'M': m, 'sum_cores': round(1.02 + 0.23 * m, 3), 'server_cores': 1.02, 'task_cores': round(0.23 * m, 3)} for m in (0, 1, 2, 4, 8, 16)]
+    ev = evaluate(model)
+    chk('evaluate: the model shape -> MODEL_ACCEPTED, A~1.02 B~0.23', ev['verdict'] == 'MODEL_ACCEPTED' and abs(ev['fit']['A'] - 1.02) < 0.01 and abs(ev['fit']['B'] - 0.23) < 0.01)
+    chk('evaluate: films out-of-sample reproduced at 4.70', ev['out_of_sample']['reproduced'] is True)
+    flat = [{'M': m, 'sum_cores': 1.02, 'server_cores': 1.02, 'task_cores': 0.0} for m in (0, 1, 2, 4, 8, 16)]
+    chk('evaluate: flat ~1.0 (v1 H_server) -> MODEL_REFUTED on point and linearity', evaluate(flat)['verdict'] == 'MODEL_REFUTED' and set(evaluate(flat)['failed_rules']) == {'point', 'linearity'})
+    per_token = [{'M': m, 'sum_cores': 1.0 + 1.0 * m, 'server_cores': 1.0, 'task_cores': 1.0 * m} for m in (0, 1, 2, 4, 8, 16)]
+    chk('evaluate: ~M cores (v1 H_token) -> MODEL_REFUTED', evaluate(per_token)['verdict'] == 'MODEL_REFUTED')
+    grow = [{'M': m, 'sum_cores': round(1.02 + 0.23 * m, 3), 'server_cores': round(1.02 + 0.23 * m, 3), 'task_cores': 0.0} for m in (0, 1, 2, 4, 8, 16)]
+    chk('evaluate: sum fits but the SERVER term grows -> MODEL_REFUTED on shape', evaluate(grow)['verdict'] == 'MODEL_REFUTED' and 'shape' in evaluate(grow)['failed_rules'])
+    bent = [{'M': 0, 'sum_cores': 1.02, 'server_cores': 1.02, 'task_cores': 0.0}, {'M': 1, 'sum_cores': 1.02, 'server_cores': 1.02, 'task_cores': 0.0},
+            {'M': 2, 'sum_cores': 1.02, 'server_cores': 1.02, 'task_cores': 0.0}, {'M': 4, 'sum_cores': 1.02, 'server_cores': 1.02, 'task_cores': 0.0},
+            {'M': 8, 'sum_cores': 1.02, 'server_cores': 1.02, 'task_cores': 0.0}, {'M': 16, 'sum_cores': 4.70, 'server_cores': 1.02, 'task_cores': 3.68}]
+    chk('evaluate: endpoints fit but B is not constant -> MODEL_REFUTED on linearity', evaluate(bent)['verdict'] == 'MODEL_REFUTED' and 'linearity' in evaluate(bent)['failed_rules'])
+    chk('evaluate: null control failure at M=0 -> STOPPED', evaluate([{'M': 0, 'sum_cores': 1.5, 'server_cores': 1.5, 'task_cores': 0.0}])['verdict'] == 'STOPPED_NULL_CONTROL_FAILED')
+    chk('evaluate: without M=16 -> INCOMPLETE', evaluate(model[:-1])['verdict'] == 'INCOMPLETE')
+    chk('prereg v2 names the superseded artifact and its probe sha', PREREG['supersedes']['artifact'].endswith('090314Z') and PREREG['supersedes']['probe_sha256'].startswith('4d5721a9'))
+    chk('prereg v2 point band and null band are the ruled ones', PREREG['point']['accept_band'] == [4.2, 5.2] and PREREG['null_control']['band'] == [0.85, 1.20] and PREREG['null_control']['M'] == 0)
     chk('role: pid 1 is the server', role_of({'pid': 1, 'args': 'x'}) == 'server')
     chk('role: node.py is a task', role_of({'pid': 9, 'args': '/opt/x/python ai/node.py t1'}) == 'task')
-    chk('preregistration is written before sampling (it is a module constant, printed first)', 'H_server' in PREREG and 'H_token' in PREREG and PREREG['null_control']['band'] == [0.85, 1.20])
+    chk('preregistration is written before sampling (module constant, printed first)', PREREG['version'] == 2 and 'model' in PREREG)
     chk('sha256 of self is printed', len(sha256_self()) == 64)
     print(f'self-test: {ok} pass, {bad} fail')
     return 0 if bad == 0 else 1
