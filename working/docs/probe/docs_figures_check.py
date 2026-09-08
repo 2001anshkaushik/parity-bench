@@ -362,7 +362,7 @@ def section_5_8():
     fact('probe artifact: verdict STOPPED_NULL_CONTROL_FAILED', pj['verdict'] == 'STOPPED_NULL_CONTROL_FAILED')
     fact('probe artifact: image is rr:patched 073b43d8, cpuset 0-23, NanoCpus 0, six thread vars =1', pj['container']['image_id'].startswith('sha256:073b43d8') and pj['container']['cpuset_readback'] == '0-23' and pj['container']['nano_cpus_readback'] == 0 and sorted(pj['container']['env_readback']) == sorted(f'{k}=1' for k in ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'VECLIB_MAXIMUM_THREADS', 'NUMEXPR_NUM_THREADS', 'TORCH_NUM_THREADS')))
     fact('probe artifact: no work sent; predictions pre-registered', pj['posture']['work_sent'] is False and 'H_server' in pj['preregistered'] and 'H_token' in pj['preregistered'])
-    chk('§6.1 probe sha 4d5721a9', None, '4d5721a9…'); fact('artifact probe sha matches the landed script', pj['probe_sha256'] == __import__('hashlib').sha256((ROOT / 'working/scripts/probe_idle_spin_docs.py').read_bytes()).hexdigest())
+    chk('§6.1 probe sha 4d5721a9', None, '4d5721a9…'); fact('090314Z artifact carries the v1 probe sha 4d5721a9 (superseded; the script has since changed)', pj['probe_sha256'].startswith('4d5721a94740eaf5d0f5db77f0c64ca0f446b26724200e516b5fe3d12c760fd5'))
     chk('§6.1 M=0 sum', pts[0]['sum_cores'], '| 0 | 1.013 | 1.013 |', expect='1.013'); chk('§6.1 M=0 cgroup', pts[0]['cgroup_cores'], '| 1.021 |')
     chk('§6.1 M=1 sum', pts[1]['sum_cores'], '| 1 | 1.253 | 1.023 |'); fact('§6.1 M=1 server 1.023', agrees(pts[1]['server_cores'], '1.023')); chk('§6.1 M=1 task', pts[1]['task_cores'], '0.230 (one'); chk('§6.1 M=1 cgroup', pts[1]['cgroup_cores'], '| 1.264 |')
     t1 = [p for p in pts[1]['windows'][1]['per_process'] if p['role'] == 'task']
@@ -370,6 +370,33 @@ def section_5_8():
     chk('§6.1 load1 before', pj['host_load1_before'], '`load1` 0.07', expect='0.07'); chk('§6.1 null band', None, '[0.85, 1.20]'); fact('null control recorded as FAILED at 1.253', pj['null_control']['PASS'] is False and pj['null_control']['M1_sum_cores'] == 1.253)
     fact('the sweep was NOT run (only M=0 and M=1 recorded)', sorted(pts) == [0, 1])
     chk('§6.1 extrapolation 4.7 stated as unmeasured', 1.013 + 0.23 * 16, 'near 4.7 cores', tol=0.06)
+    print('=== §6.1: the sweep artifact (104211Z) ===')
+    PS = RES / 'probe_idle_spin_docs__20260908T104211Z'
+    sj = json.loads((PS / 'idlespin_result.json').read_text()); spts = {p['M']: p for p in sj['points']}; ev = sj['evaluation']
+    fact('sweep: verdict MODEL_REFUTED on point + shape, linearity and null PASS', sj['verdict'] == 'MODEL_REFUTED' and sorted(ev['failed_rules']) == ['point', 'shape'] and ev['linearity']['PASS'] and ev['null_control']['PASS'])
+    fact('sweep: pre-registration v2 names 090314Z as superseded', sj['preregistered']['version'] == 2 and sj['preregistered']['supersedes']['artifact'].endswith('090314Z'))
+    fact('sweep: same posture (073b43d8, cpuset 0-23, NanoCpus 0, six vars =1, no work)', sj['container']['image_id'].startswith('sha256:073b43d8') and sj['container']['cpuset_readback'] == '0-23' and sj['container']['nano_cpus_readback'] == 0 and len(sj['container']['env_readback']) == 6 and sj['posture']['work_sent'] is False)
+    chk('§6.1 sweep probe sha 04be8675', None, '04be8675…'); fact('sweep artifact sha matches the landed script', sj['probe_sha256'] == __import__('hashlib').sha256((ROOT / 'working/scripts/probe_idle_spin_docs.py').read_bytes()).hexdigest())
+    chk('§6.1 sweep load1', sj['host_load1_before'], '`load1` 0.15', expect='0.15')
+    for m, lit in ((0, '| 0 | 1.015 | 1.015 | — | — | 1.022 |'), (1, '| 1 | 1.275 | 1.038 | 0.237 | 0.237 | 1.293 |'), (2, '| 2 | 1.497 | 1.035 | 0.462 | 0.230–0.232 | 1.511 |'),
+                   (4, '| 4 | 2.001 | 1.050 | 0.951 | 0.232–0.247 | 1.997 |'), (8, '| 8 | 2.988 | 1.090 | 1.898 | 0.230–0.250 | 3.026 |'), (16, '| 16 | 5.201 | 1.185 | 4.016 | 0.247–0.260 | 5.246 |')):
+        p = spts[m]; chk(f'§6.1 sweep row M={m} sum', p['sum_cores'], lit, expect=lit.split('|')[2].strip())
+        fact(f'§6.1 sweep row M={m} server/task/cgroup', agrees(p['server_cores'], lit.split('|')[3].strip()) and (m == 0 or agrees(p['task_cores'], lit.split('|')[4].strip())) and agrees(p['cgroup_cores'], lit.split('|')[6].strip()))
+        tasks = [x['cores'] for x in p['windows'][1]['per_process'] if x['role'] == 'task']
+        fact(f'§6.1 sweep row M={m} has {m} task process(es)', len(tasks) == m)
+        if m > 1:
+            lo, hi = lit.split('|')[5].strip().split('–'); fact(f'§6.1 sweep row M={m} per-task range {lo}–{hi}', agrees(min(tasks), lo) and agrees(max(tasks), hi))
+    chk('§6.1 M=16 measured 5.201', spts[16]['sum_cores'], '**5.201**'); chk('§6.1 server at 16 = 1.185', spts[16]['server_cores'], '**1.185**'); chk('§6.1 shape band upper 1.122', ev['shape']['band'][1], '1.122')
+    chk('§6.1 fit A', ev['fit']['A'], '**A = 0.982, B = 0.261**', expect='0.982'); fact('§6.1 fit B 0.261', ev['fit']['B'] == 0.261); chk('§6.1 max residual 0.081', max(abs(v) for v in ev['fit']['residuals'].values()), '≤ 0.081', expect='0.081')
+    pw = ev['linearity']['pairwise_B']; chk('§6.1 pairwise B list', None, '0.260, 0.222, 0.252, 0.247, 0.277'); fact('§6.1 pairwise B values', [pw[k] for k in ('0->1', '1->2', '2->4', '4->8', '8->16')] == [0.26, 0.222, 0.252, 0.247, 0.277])
+    fact('§6.1 films not reproduced', ev['out_of_sample']['reproduced'] is False); chk('§6.1 cost 22% of 24 cores', spts[16]['sum_cores'] / 24 * 100, 'about 22% of the arm', tol=0.6)
+    t16 = [x for x in spts[16]['windows'][1]['per_process'] if x['role'] == 'task']
+    fact('§6.1 idle task RSS 1.05–1.08 GiB each (from the artifact)', agrees(min(x['rss_kb'] for x in t16) / 1024 / 1024, '1.05') and agrees(max(x['rss_kb'] for x in t16) / 1024 / 1024, '1.08')); chk('§6.1 RSS range literal', None, '~1.05–1.08 GiB resident apiece')
+    chk('§6.1 ~17 GiB at 16', sum(x['rss_kb'] for x in t16) / 1024 / 1024, '~17 GiB', tol=0.6)
+    fact('§6.1 task threads 200–227', 199 <= min(x['threads'] for x in t16) <= 200 and 226 <= max(x['threads'] for x in t16) <= 227)
+    chk('§6.1 server creep per pipeline ~0.011', (spts[16]['server_cores'] - spts[0]['server_cores']) / 16, 'roughly 0.011 core per loaded pipeline', expect='0.011')
+    fact('§6.1 preflight table matches the artifact (rounded to 2 dp)', all(abs(spts[m]['sum_cores'] - v) < 0.006 for m, v in ((0, 1.02), (1, 1.28), (2, 1.50), (4, 2.00), (8, 2.99), (16, 5.20))))
+    chk('§6.1 preflight table literal', None, 'M=0 1.02, M=1 1.28, M=2 1.50, M=4 2.00, M=8 2.99, M=16 5.20 cores')
     print('=== §5 / §8: branch facts and the register, from git and the tree ===')
     # §5.1 describes the fork state the handoff was written against: video-bench at 87b957d,
     # main at c06673a. Later landings move origin/video-bench (the correction artifact alone

@@ -1,0 +1,1089 @@
+{
+ "probe": "probe_idle_spin_docs.py",
+ "probe_sha256": "04be86755f636a756e036d9f713b1ebe65dccbc6e1361e9d172d946068dad21f",
+ "utc": "2026-09-08T10:42:11Z",
+ "preregistered": {
+  "version": 2,
+  "supersedes": {
+   "artifact": "working/results/probe_idle_spin_docs__20260908T090314Z",
+   "probe_sha256": "4d5721a94740eaf5d0f5db77f0c64ca0f446b26724200e516b5fe3d12c760fd5",
+   "why": "v1 asked M=1 to reproduce the ~1.0 one-token figure within [0.85, 1.20] and refused 1.253. The control worked; the hypothesis was malformed: ~1.0 is the M=0 server floor (v1 read 1.013 at M=0), and neither v1 hypothesis (flat ~1.0, or ~M cores) matches v1's own two points. Superseded on the record, never amended."
+  },
+  "model": "idle_cores = A + B*M; A ~ 1.02 (serving process, fixed); B ~ 0.23 (per task subprocess)",
+  "A_expected": 1.02,
+  "B_expected": 0.23,
+  "point": {
+   "M": 16,
+   "predicted_cores": 4.7,
+   "accept_band": [
+    4.2,
+    5.2
+   ],
+   "outside": "REFUTED \u2014 do not fit to it"
+  },
+  "shape": {
+   "rule": "server_cores within +-10% of 1.02 at every M",
+   "band": [
+    0.918,
+    1.122
+   ],
+   "outside": "two-term model wrong even if the sum fits"
+  },
+  "linearity": {
+   "rule": "pairwise B = (sum[M2]-sum[M1])/(M2-M1) between adjacent M within [0.115, 0.345] (0.23 +-50%)",
+   "band": [
+    0.115,
+    0.345
+   ],
+   "outside": "model wrong even if the endpoints fit"
+  },
+  "null_control": {
+   "M": 0,
+   "expect_cores": 1.013,
+   "band": [
+    0.85,
+    1.2
+   ],
+   "rule": "outside the band: the probe measures something else; stop after M=0, never widen a band"
+  },
+  "out_of_sample": {
+   "films_16_tokens_idle_cores": [
+    4.65,
+    4.66
+   ],
+   "model_predicts": 4.7,
+   "note": "films campaign, different corpus/campaign/instrumentation; fixed here before the sweep"
+  }
+ },
+ "posture": {
+  "image": "rr:patched",
+  "cpuset": "0-23",
+  "thread_env": {
+   "OMP_NUM_THREADS": "1",
+   "MKL_NUM_THREADS": "1",
+   "OPENBLAS_NUM_THREADS": "1",
+   "VECLIB_MAXIMUM_THREADS": "1",
+   "NUMEXPR_NUM_THREADS": "1",
+   "TORCH_NUM_THREADS": "1"
+  },
+  "pipe": "working/pipes/product_pdf.pipe",
+  "work_sent": false,
+  "settle_s": 25.0,
+  "window_s": 6.0,
+  "sweep": [
+   1,
+   2,
+   4,
+   8,
+   16
+  ]
+ },
+ "clk_tck": 100,
+ "host_load1_before": 0.15,
+ "container": {
+  "container_id": "38a8322a02385819b1c402ab1fa484a148348cfa6c28fff350cfc8b6bdea82b1",
+  "image_id": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "cpuset_readback": "0-23",
+  "nano_cpus_readback": 0,
+  "memory_readback": 62277025792,
+  "env_readback": [
+   "OMP_NUM_THREADS=1",
+   "MKL_NUM_THREADS=1",
+   "OPENBLAS_NUM_THREADS=1",
+   "VECLIB_MAXIMUM_THREADS=1",
+   "NUMEXPR_NUM_THREADS=1",
+   "TORCH_NUM_THREADS=1"
+  ],
+  "image_labels": {
+   "benchmark.rocketride.constraints_cache_prewarmed": "1",
+   "benchmark.rocketride.duplication_patch_applied": "1",
+   "benchmark.rocketride.duplication_patch_id": "preventDefault-after-embedding-flush",
+   "benchmark.rocketride.engine_version": "3.3.1",
+   "org.opencontainers.image.version": "22.04"
+  }
+ },
+ "ready": {
+  "ready": true,
+  "arm": "rr",
+  "port": 5565,
+  "wall_s": 15.0,
+  "attempts": 4
+ },
+ "null_control": {
+  "M0_sum_cores": 1.015,
+  "band": [
+   0.85,
+   1.2
+  ],
+  "expect": 1.013,
+  "PASS": true,
+  "note": "reproduces the M=0 reading"
+ },
+ "points": [
+  {
+   "M": 0,
+   "tokens_open": 0,
+   "use_wall_s": 0.0,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 1,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 30,
+       "rss_kb": 106020,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.015
+      }
+     ],
+     "sum_cores": 1.015,
+     "by_role": {
+      "server": 1.015
+     },
+     "cgroup_cores": 1.022
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 1,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 30,
+       "rss_kb": 106020,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.015
+      }
+     ],
+     "sum_cores": 1.015,
+     "by_role": {
+      "server": 1.015
+     },
+     "cgroup_cores": 1.022
+    }
+   ],
+   "sum_cores": 1.015,
+   "cgroup_cores": 1.022,
+   "server_cores": 1.015,
+   "task_cores": 0.0,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  },
+  {
+   "M": 1,
+   "tokens_open": 1,
+   "use_wall_s": 28.7,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 2,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112984,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.025
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 227,
+       "rss_kb": 1137404,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.232
+      }
+     ],
+     "sum_cores": 1.257,
+     "by_role": {
+      "server": 1.025,
+      "task": 0.232
+     },
+     "cgroup_cores": 1.274
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 2,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112984,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.038
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 227,
+       "rss_kb": 1137404,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.237
+      }
+     ],
+     "sum_cores": 1.275,
+     "by_role": {
+      "server": 1.038,
+      "task": 0.237
+     },
+     "cgroup_cores": 1.293
+    }
+   ],
+   "sum_cores": 1.275,
+   "cgroup_cores": 1.293,
+   "server_cores": 1.038,
+   "task_cores": 0.237,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  },
+  {
+   "M": 2,
+   "tokens_open": 2,
+   "use_wall_s": 6.5,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 3,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112984,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.035
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1137336,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.237
+      },
+      {
+       "pid": 1322,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1107392,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-0b232fdd.webhook_1-xkp6la8q.json --autoterm --monitor=app --debug_port=20002 --debug_h",
+       "role": "task",
+       "cores": 0.228
+      }
+     ],
+     "sum_cores": 1.5,
+     "by_role": {
+      "server": 1.035,
+      "task": 0.465
+     },
+     "cgroup_cores": 1.512
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 3,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112984,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.035
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1137336,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.232
+      },
+      {
+       "pid": 1322,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1107392,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-0b232fdd.webhook_1-xkp6la8q.json --autoterm --monitor=app --debug_port=20002 --debug_h",
+       "role": "task",
+       "cores": 0.23
+      }
+     ],
+     "sum_cores": 1.497,
+     "by_role": {
+      "server": 1.035,
+      "task": 0.462
+     },
+     "cgroup_cores": 1.511
+    }
+   ],
+   "sum_cores": 1.497,
+   "cgroup_cores": 1.511,
+   "server_cores": 1.035,
+   "task_cores": 0.462,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  },
+  {
+   "M": 4,
+   "tokens_open": 4,
+   "use_wall_s": 12.3,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 5,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112988,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.05
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1137336,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.233
+      },
+      {
+       "pid": 1322,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1107332,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-0b232fdd.webhook_1-xkp6la8q.json --autoterm --monitor=app --debug_port=20002 --debug_h",
+       "role": "task",
+       "cores": 0.233
+      },
+      {
+       "pid": 1678,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1106316,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-b00507ae.webhook_1-e5v29ap1.json --autoterm --monitor=app --debug_port=20004 --debug_h",
+       "role": "task",
+       "cores": 0.233
+      },
+      {
+       "pid": 1931,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1102136,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-a76a0918.webhook_1-_a0rv1uz.json --autoterm --monitor=app --debug_port=20006 --debug_h",
+       "role": "task",
+       "cores": 0.233
+      }
+     ],
+     "sum_cores": 1.982,
+     "by_role": {
+      "server": 1.05,
+      "task": 0.932
+     },
+     "cgroup_cores": 2.007
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 5,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112988,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.05
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1137336,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 1322,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1107332,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-0b232fdd.webhook_1-xkp6la8q.json --autoterm --monitor=app --debug_port=20002 --debug_h",
+       "role": "task",
+       "cores": 0.24
+      },
+      {
+       "pid": 1678,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1106316,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-b00507ae.webhook_1-e5v29ap1.json --autoterm --monitor=app --debug_port=20004 --debug_h",
+       "role": "task",
+       "cores": 0.232
+      },
+      {
+       "pid": 1931,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1102136,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-a76a0918.webhook_1-_a0rv1uz.json --autoterm --monitor=app --debug_port=20006 --debug_h",
+       "role": "task",
+       "cores": 0.232
+      }
+     ],
+     "sum_cores": 2.001,
+     "by_role": {
+      "server": 1.05,
+      "task": 0.951
+     },
+     "cgroup_cores": 1.997
+    }
+   ],
+   "sum_cores": 2.001,
+   "cgroup_cores": 1.997,
+   "server_cores": 1.05,
+   "task_cores": 0.951,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  },
+  {
+   "M": 8,
+   "tokens_open": 8,
+   "use_wall_s": 24.7,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 9,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112992,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.092
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1137336,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 1322,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1107332,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-0b232fdd.webhook_1-xkp6la8q.json --autoterm --monitor=app --debug_port=20002 --debug_h",
+       "role": "task",
+       "cores": 0.233
+      },
+      {
+       "pid": 1678,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1106256,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-b00507ae.webhook_1-e5v29ap1.json --autoterm --monitor=app --debug_port=20004 --debug_h",
+       "role": "task",
+       "cores": 0.232
+      },
+      {
+       "pid": 1931,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1102076,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-a76a0918.webhook_1-_a0rv1uz.json --autoterm --monitor=app --debug_port=20006 --debug_h",
+       "role": "task",
+       "cores": 0.238
+      },
+      {
+       "pid": 2334,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1103396,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-3ceda081.webhook_1-8aejvri9.json --autoterm --monitor=app --debug_port=20008 --debug_h",
+       "role": "task",
+       "cores": 0.238
+      },
+      {
+       "pid": 2588,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1102584,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-11e7c054.webhook_1-2wu0fpzn.json --autoterm --monitor=app --debug_port=20010 --debug_h",
+       "role": "task",
+       "cores": 0.25
+      },
+      {
+       "pid": 2842,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1100928,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-48f643a5.webhook_1-lt9dc4y0.json --autoterm --monitor=app --debug_port=20012 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 3096,
+       "ppid": 1,
+       "threads": 201,
+       "rss_kb": 1102236,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-9bfbb72a.webhook_1-c3csznq0.json --autoterm --monitor=app --debug_port=20014 --debug_h",
+       "role": "task",
+       "cores": 0.25
+      }
+     ],
+     "sum_cores": 3.028,
+     "by_role": {
+      "server": 1.092,
+      "task": 1.936
+     },
+     "cgroup_cores": 3.074
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 9,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112992,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.09
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1137336,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.232
+      },
+      {
+       "pid": 1322,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1107332,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-0b232fdd.webhook_1-xkp6la8q.json --autoterm --monitor=app --debug_port=20002 --debug_h",
+       "role": "task",
+       "cores": 0.237
+      },
+      {
+       "pid": 1678,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1106256,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-b00507ae.webhook_1-e5v29ap1.json --autoterm --monitor=app --debug_port=20004 --debug_h",
+       "role": "task",
+       "cores": 0.25
+      },
+      {
+       "pid": 1931,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1102076,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-a76a0918.webhook_1-_a0rv1uz.json --autoterm --monitor=app --debug_port=20006 --debug_h",
+       "role": "task",
+       "cores": 0.25
+      },
+      {
+       "pid": 2334,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1103396,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-3ceda081.webhook_1-8aejvri9.json --autoterm --monitor=app --debug_port=20008 --debug_h",
+       "role": "task",
+       "cores": 0.232
+      },
+      {
+       "pid": 2588,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1102584,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-11e7c054.webhook_1-2wu0fpzn.json --autoterm --monitor=app --debug_port=20010 --debug_h",
+       "role": "task",
+       "cores": 0.23
+      },
+      {
+       "pid": 2842,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1100928,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-48f643a5.webhook_1-lt9dc4y0.json --autoterm --monitor=app --debug_port=20012 --debug_h",
+       "role": "task",
+       "cores": 0.23
+      },
+      {
+       "pid": 3096,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1102232,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-9bfbb72a.webhook_1-c3csznq0.json --autoterm --monitor=app --debug_port=20014 --debug_h",
+       "role": "task",
+       "cores": 0.237
+      }
+     ],
+     "sum_cores": 2.988,
+     "by_role": {
+      "server": 1.09,
+      "task": 1.898
+     },
+     "cgroup_cores": 3.026
+    }
+   ],
+   "sum_cores": 2.988,
+   "cgroup_cores": 3.026,
+   "server_cores": 1.09,
+   "task_cores": 1.898,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  },
+  {
+   "M": 16,
+   "tokens_open": 16,
+   "use_wall_s": 49.6,
+   "windows": [
+    {
+     "window_s": 6.0,
+     "n_processes": 17,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112992,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.185
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1137336,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.25
+      },
+      {
+       "pid": 1322,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1107332,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-0b232fdd.webhook_1-xkp6la8q.json --autoterm --monitor=app --debug_port=20002 --debug_h",
+       "role": "task",
+       "cores": 0.257
+      },
+      {
+       "pid": 1678,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1106256,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-b00507ae.webhook_1-e5v29ap1.json --autoterm --monitor=app --debug_port=20004 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 1931,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1102076,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-a76a0918.webhook_1-_a0rv1uz.json --autoterm --monitor=app --debug_port=20006 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 2334,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1103344,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-3ceda081.webhook_1-8aejvri9.json --autoterm --monitor=app --debug_port=20008 --debug_h",
+       "role": "task",
+       "cores": 0.255
+      },
+      {
+       "pid": 2588,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1102524,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-11e7c054.webhook_1-2wu0fpzn.json --autoterm --monitor=app --debug_port=20010 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 2842,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1100872,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-48f643a5.webhook_1-lt9dc4y0.json --autoterm --monitor=app --debug_port=20012 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 3096,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1102172,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-9bfbb72a.webhook_1-c3csznq0.json --autoterm --monitor=app --debug_port=20014 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 3595,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1110204,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-cce5b7d0.webhook_1-1s556u6p.json --autoterm --monitor=app --debug_port=20016 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 3849,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1107052,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-7b9336c5.webhook_1-gxgkfa1w.json --autoterm --monitor=app --debug_port=20018 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 4104,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1099768,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-740c1c06.webhook_1-13q8wlk0.json --autoterm --monitor=app --debug_port=20020 --debug_h",
+       "role": "task",
+       "cores": 0.25
+      },
+      {
+       "pid": 4357,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1104636,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-83147839.webhook_1-86gkwrds.json --autoterm --monitor=app --debug_port=20022 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 4612,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1110268,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-a04b9752.webhook_1-awyk38hz.json --autoterm --monitor=app --debug_port=20024 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 4866,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1100344,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-bb66ceeb.webhook_1-us1sbeoi.json --autoterm --monitor=app --debug_port=20026 --debug_h",
+       "role": "task",
+       "cores": 0.25
+      },
+      {
+       "pid": 5121,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1103040,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-55901214.webhook_1-pjvs3gga.json --autoterm --monitor=app --debug_port=20028 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 5376,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1096356,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-950496f5.webhook_1-9p0wncty.json --autoterm --monitor=app --debug_port=20030 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      }
+     ],
+     "sum_cores": 5.171,
+     "by_role": {
+      "server": 1.185,
+      "task": 3.986
+     },
+     "cgroup_cores": 5.258
+    },
+    {
+     "window_s": 6.0,
+     "n_processes": 17,
+     "per_process": [
+      {
+       "pid": 1,
+       "ppid": 0,
+       "threads": 31,
+       "rss_kb": 112992,
+       "args": "./engine ai/eaas.py --host=0.0.0.0 --port=5565",
+       "role": "server",
+       "cores": 1.185
+      },
+      {
+       "pid": 718,
+       "ppid": 1,
+       "threads": 226,
+       "rss_kb": 1137344,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-5bd09bbb.webhook_1-n0k0ysu8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 1322,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1107332,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-0b232fdd.webhook_1-xkp6la8q.json --autoterm --monitor=app --debug_port=20002 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 1678,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1106256,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-b00507ae.webhook_1-e5v29ap1.json --autoterm --monitor=app --debug_port=20004 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 1931,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1102076,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-a76a0918.webhook_1-_a0rv1uz.json --autoterm --monitor=app --debug_port=20006 --debug_h",
+       "role": "task",
+       "cores": 0.25
+      },
+      {
+       "pid": 2334,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1103344,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-3ceda081.webhook_1-8aejvri9.json --autoterm --monitor=app --debug_port=20008 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 2588,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1102524,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-11e7c054.webhook_1-2wu0fpzn.json --autoterm --monitor=app --debug_port=20010 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 2842,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1100872,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-48f643a5.webhook_1-lt9dc4y0.json --autoterm --monitor=app --debug_port=20012 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 3096,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1102172,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-9bfbb72a.webhook_1-c3csznq0.json --autoterm --monitor=app --debug_port=20014 --debug_h",
+       "role": "task",
+       "cores": 0.253
+      },
+      {
+       "pid": 3595,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1110204,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-cce5b7d0.webhook_1-1s556u6p.json --autoterm --monitor=app --debug_port=20016 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 3849,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1107052,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-7b9336c5.webhook_1-gxgkfa1w.json --autoterm --monitor=app --debug_port=20018 --debug_h",
+       "role": "task",
+       "cores": 0.26
+      },
+      {
+       "pid": 4104,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1099768,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-740c1c06.webhook_1-13q8wlk0.json --autoterm --monitor=app --debug_port=20020 --debug_h",
+       "role": "task",
+       "cores": 0.258
+      },
+      {
+       "pid": 4357,
+       "ppid": 1,
+       "threads": 199,
+       "rss_kb": 1104576,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-83147839.webhook_1-86gkwrds.json --autoterm --monitor=app --debug_port=20022 --debug_h",
+       "role": "task",
+       "cores": 0.252
+      },
+      {
+       "pid": 4612,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1110268,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-a04b9752.webhook_1-awyk38hz.json --autoterm --monitor=app --debug_port=20024 --debug_h",
+       "role": "task",
+       "cores": 0.248
+      },
+      {
+       "pid": 4866,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1100344,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-bb66ceeb.webhook_1-us1sbeoi.json --autoterm --monitor=app --debug_port=20026 --debug_h",
+       "role": "task",
+       "cores": 0.247
+      },
+      {
+       "pid": 5121,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1103040,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-55901214.webhook_1-pjvs3gga.json --autoterm --monitor=app --debug_port=20028 --debug_h",
+       "role": "task",
+       "cores": 0.258
+      },
+      {
+       "pid": 5376,
+       "ppid": 1,
+       "threads": 200,
+       "rss_kb": 1096356,
+       "args": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-950496f5.webhook_1-9p0wncty.json --autoterm --monitor=app --debug_port=20030 --debug_h",
+       "role": "task",
+       "cores": 0.257
+      }
+     ],
+     "sum_cores": 5.201,
+     "by_role": {
+      "server": 1.185,
+      "task": 4.016
+     },
+     "cgroup_cores": 5.246
+    }
+   ],
+   "sum_cores": 5.201,
+   "cgroup_cores": 5.246,
+   "server_cores": 1.185,
+   "task_cores": 4.016,
+   "java_cores": 0.0,
+   "other_cores": 0.0
+  }
+ ],
+ "evaluation": {
+  "preregistration_version": 2,
+  "null_control": {
+   "M0_sum_cores": 1.015,
+   "band": [
+    0.85,
+    1.2
+   ],
+   "expect": 1.013,
+   "PASS": true,
+   "note": "reproduces the M=0 reading"
+  },
+  "shape": {
+   "server_cores_by_M": {
+    "0": 1.015,
+    "1": 1.038,
+    "2": 1.035,
+    "4": 1.05,
+    "8": 1.09,
+    "16": 1.185
+   },
+   "band": [
+    0.918,
+    1.122
+   ],
+   "PASS": false
+  },
+  "linearity": {
+   "pairwise_B": {
+    "0->1": 0.26,
+    "1->2": 0.222,
+    "2->4": 0.252,
+    "4->8": 0.247,
+    "8->16": 0.277
+   },
+   "band": [
+    0.115,
+    0.345
+   ],
+   "PASS": true
+  },
+  "point": {
+   "M": 16,
+   "predicted": 4.7,
+   "measured": 5.201,
+   "band": [
+    4.2,
+    5.2
+   ],
+   "PASS": false
+  },
+  "fit": {
+   "A": 0.982,
+   "B": 0.261,
+   "residuals": {
+    "0": 0.033,
+    "1": 0.033,
+    "2": -0.006,
+    "4": -0.024,
+    "8": -0.081,
+    "16": 0.045
+   }
+  },
+  "out_of_sample": {
+   "films_16_tokens": [
+    4.65,
+    4.66
+   ],
+   "measured_M16": 5.201,
+   "reproduced": false,
+   "note": "reproduced = M=16 within 0.25 core of the films reading; a statement, not a rule"
+  },
+  "verdict": "MODEL_REFUTED",
+  "failed_rules": [
+   "point",
+   "shape"
+  ]
+ },
+ "verdict": "MODEL_REFUTED"
+}
