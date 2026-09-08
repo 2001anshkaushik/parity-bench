@@ -450,46 +450,34 @@ values that were never in effect.
 
 ---
 
-# TICKET 4 — Idle engine burns ~1 core continuously, plus ~0.26 cores per loaded-but-idle pipeline
+# TICKET 4 — Idle engine: ~1 core in the serving process plus ~0.25 cores and ~1.1 GiB in every loaded-but-idle pipeline's task subprocess
 
-**Title:** The engine busy-waits at ~1.0 core with zero pipelines loaded and zero work submitted (measured 1.002 cores by cgroup `cpu.stat` delta on an otherwise idle host) — and every additional loaded, idle pipeline adds ~0.26 cores: measured 1.28 → 5.25 idle cores across 1 → 16 tokens
+**Title:** With zero work submitted, the engine's serving process busy-waits at ~1.0 core, and every pipeline loaded by `use()` adds a task subprocess that busy-waits at ~0.25 cores and holds ~1.1 GiB resident — measured per process: 16 idle pipelines cost 5.2 cores (22% of a 24-core cpuset, 16% of a 32-core host) and ~17 GiB before a single document is read
 
-**Type:** Performance · **Severity:** Medium, rising with multiplexing (the idle cost scales with the number of loaded pipelines; measurement bias in any CPU-accounted deployment) · **Component:** engine core + task subprocess (the split between eaas server and task processes is in the sweep's per-process deltas — see Open questions)
+**Type:** Performance · **Severity:** Medium, rising with multiplexing (the idle cost is linear in the number of loaded pipelines; measurement bias in any CPU-accounted deployment) · **Component:** engine core (serving process) **and** the task subprocess — the two terms are attributed separately below
 
-**Affects:** engine 3.3.1 (release binary, Linux x64). *Re-checked 2026-09-08: behavioural, not source-diffable; no statement about `develop` HEAD is possible from source.* Measured 2026-08-21 twice: single-engine idle (1.002 cores) and the Phase 2 concurrency sweep (M = 1/2/4/8/16 loaded pipelines, the six BLAS/OMP variables at 8). Not source-diffed across versions (the spin is in compiled code or the served python's event loop; the reproduction is behavioural).
+**Affects:** engine 3.3.1 (release binary = `server-v3.3.1`, Linux x64). *Behavioural, not source-diffable; no statement about `develop` HEAD is possible from source.* Measured 2026-08-21 (video pipeline, six BLAS/OMP variables at 8 and at 2) and **2026-09-08 (document pipeline, the six variables at 1, per-process attribution, pre-registered)** — `working/results/probe_idle_spin_docs__20260908T104211Z/idlespin_result.json`, probe `working/scripts/probe_idle_spin_docs.py`.
 
 ## Summary
 
-A freshly started engine container (`engine ai/eaas.py --host --port`, no `use()` issued, no
-data submitted) consumes a steady **1.002 cores**. Measurement: host `/proc` stat delta over an
-idle window on a box whose only other activity floors load1 at ~0; box load1 with the idle
-engine present reads 1.00 flat. The container cgroup's `cpu.stat usage_usec` delta over the
-same window attributes the burn to the engine's cgroup, not to any host process.
+Two terms, at different rates, in different processes. `rr:patched` (3.3.1 + the Ticket 1 patch, which does not touch this path), `--cpuset-cpus 0-23 --memory 58g`, the six thread variables at 1, `product_pdf.pipe` (parse → LangChain splitter → MiniLM embed), M pipelines loaded with `use()` — one fresh `project_id` per token, so M task subprocesses — **nothing submitted**, 25 s settle, then `/proc/<pid>/stat` deltas for every process in the container over 6 s, cgroup `cpu.stat` beside them:
 
-**Second measurement, same day — the spin scales with loaded pipelines.** With M pipelines
-loaded via `use()` (one fresh project_id per token, so M distinct task processes — census-verified)
-and NO work submitted, the container cgroup's idle burn over a 6 s quiet window after the last
-`use()` and before any send:
+| M loaded, idle | sum (cores) | serving process, pid 1 | task subprocesses | cgroup cross-check | per task |
+|---:|---:|---:|---:|---:|---|
+| 0 | 1.015 | 1.015 | — | 1.022 | — |
+| 1 | 1.275 | 1.038 | 0.237 | 1.293 | 0.237 |
+| 2 | 1.497 | 1.035 | 0.462 | 1.511 | 0.230–0.232 |
+| 4 | 2.001 | 1.050 | 0.951 | 1.997 | 0.232–0.247 |
+| 8 | 2.988 | 1.090 | 1.898 | 3.026 | 0.230–0.250 |
+| 16 | 5.201 | 1.185 | 4.016 | 5.246 | 0.247–0.260 |
 
-| M (loaded, idle pipelines) | idle cores | marginal cores per added pipeline |
-|---:|---:|---:|
-| 1 | 1.28 | — |
-| 2 | 1.54 | 0.26 |
-| 4 | 2.02 | 0.24 |
-| 8 | 3.04 | 0.26 |
-| 16 | 5.25 | 0.28 |
-| 32 (six variables at 1) | 10.04 | 0.30 |
+Least squares over the six points: **0.98 + 0.261 × M** cores, residual ≤ 0.08 at every point. Each idle task subprocess runs ~200–227 threads and holds ~1.08–1.11 GiB resident; the serving process holds 30–31 threads throughout.
 
-Least-squares over the five points at 8 threads: **slope 0.26 cores per pipeline, intercept 0.99 cores** — the
-fit's intercept recovers the single-engine measurement. The spin is **partial**: neither a
-server constant (would be flat ~1.0) nor one full core per pipeline (would be ~M). At M=4 the
-engine burns 2.02 cores — **6.3% of a 32-core host — before any work is submitted**; at M=16,
-16.4%. (Values as relayed from the sweep's stdout; the sweep JSON's `ticket4_idle_answer` key
-carries the fitted verdict and `idle_cores_per_process` carries the per-process attribution.)
+**Where the burn is — answered by the per-process attribution** (the ticket's open questions 1 and 3): the ~1.0-core term is in the **serving process** (pid 1, `engine ai/eaas.py`) with nothing loaded; the per-pipeline term is **inside each task subprocess** (`engine ai/node.py`), not in the server's bookkeeping — the task subprocesses account for 4.02 of the 5.20 cores at M=16. The serving term is not perfectly flat: it rose from 1.015 to 1.185 across 0 → 16 loaded pipelines (~0.011 core per pipeline of server-side cost on top of the task's own 0.25).
 
-**Independent of the intra-op thread count:** the M × T refine re-measured M=16 with the six
-variables at 2 and read 5.24 idle cores, against 5.25 at 8 — the per-pipeline spin is not a
-BLAS/OMP thread-pool effect. (Relayed, same day.)
+**Cross-checks.** (a) The video campaign's sweep (2026-08-21, `rr:patched-video`, six variables at 8) read 0.99 + 0.26·M from the cgroup alone — the same slope, now attributed to the task process. (b) The films campaign held 16 tokens (video pipeline, six variables at 2) and read ~4.65–4.66 idle cores; the document pipeline at 16 read 5.20 — same order, **not** the same number: the per-task term depends on the pipeline loaded (≈0.23 there, ≈0.25 here), so an idle floor measured on one posture does not transfer to another. (c) A pre-registered two-term model with a *flat* server term (A + B·M, A≈1.02, B≈0.23, predicting 4.70 at M=16 and accepting [4.2, 5.2]) was **refuted on its own rules** by this sweep — M=16 read 5.201 and the server term grew by 17% — while the linear per-token term held (pairwise slope 0.22–0.28 between every adjacent pair). The numbers above are the measurement; the fit is descriptive.
+
+**Cost, in cores, at the postures that matter.** Sixteen loaded, idle pipelines on a 24-core cpuset: **5.2 cores ≈ 22% of the arm** consumed before any document is read (16% of a 32-core host); 8 pipelines: 3.0 cores, 12%; 4: 2.0 cores, 8%. Resident memory at 16: ~17 GiB of idle task processes. By linear extrapolation (not measured past 16) ~88 loaded pipelines would idle a full 24-core cpuset.
 
 ## Reproduction
 
@@ -515,7 +503,8 @@ working/video/probe/probe_concurrency.py --video <avi> --sweep 1 2 4 8 16 \
 * **Deployment:** one core of every host running an idle or lightly-loaded engine is spent on
   nothing. On small instances this is a material fraction of capacity.
 * **Multiplexed deployments:** an engine holding M loaded pipelines idles at ≈ 1.0 + 0.26·M
-  cores. Sixteen loaded pipelines idle at 5.25 cores; by extrapolation ~120 would idle a full
+  cores (video 2026-08-21: 5.25 at 16; documents 2026-09-08: 5.20 at 16, attributed per process
+  above), plus ~1.1 GiB resident per idle pipeline. By extrapolation ~120 would idle a full
   32-core host with nothing submitted. (Extrapolation labeled as such; measured to M=16.)
 * **Benchmark bias, Phase 1 (PDF campaign):** the engine ran under `--cpuset-cpus 0-23`; the
   spin means RocketRide had **23 effective working cores against LlamaIndex's 24**, and every
@@ -530,14 +519,16 @@ working/video/probe/probe_concurrency.py --video <avi> --sweep 1 2 4 8 16 \
 
 ## Open questions (deliberately left to the engine team rather than answered wrongly)
 
-1. **Where is the spin?** Candidates: a polling loop in the C++ core, the embedded python
-   server's event loop, or a timer with a zero/short period. Not attributed here. The sweep's
-   per-process CPU deltas (`idle_cores_per_process`) split the idle burn between the eaas server
-   and each task subprocess; that split has not yet been read into this ticket.
-2. **Does it scale with task subprocesses?** — **ANSWERED 2026-08-21: partially.** ~0.26 cores
-   per loaded, idle pipeline on top of the ~1.0-core server spin (table above), linear to M=16.
-3. **Is the per-pipeline ~0.26 inside the task subprocess (a spin per task) or in the server's
-   per-token bookkeeping?** Same data as (1) decides it.
+1. **Where is the spin?** **Attributed 2026-09-08 (per process, table above):** ~1.0 core in
+   the serving process with nothing loaded — a polling loop, the embedded python server's event
+   loop, or a short-period timer in that process; which one is still the engine team's to name.
+2. **Does it scale with task subprocesses?** — **ANSWERED 2026-08-21, confirmed 2026-09-08:**
+   ~0.25–0.26 cores per loaded, idle pipeline on top of the ~1.0-core server spin, linear to M=16
+   on both the video and the document pipeline.
+3. **Is the per-pipeline term inside the task subprocess or in the server's bookkeeping?** —
+   **ANSWERED 2026-09-08: inside the task subprocess** (each `node.py` process reads 0.23–0.26
+   cores on its own `/proc/<pid>/stat`), with a smaller server-side creep of ~0.011 core per
+   loaded pipeline on top. Open: what each idle task process is doing with ~200 threads.
 
 ## Acceptance criteria
 
