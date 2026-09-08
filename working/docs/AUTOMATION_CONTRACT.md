@@ -50,29 +50,47 @@ One command that commits, gates, pushes and **proves the landing**. Seven gates,
 
 | # | Gate | Refuses when |
 |---|---|---|
-| 0 | branch shape | detached HEAD |
-| 1 | **append-only** | any `M`/`D`/`R` staged under `working/results/` |
-| 2 | static names | `static_names.py` flags an undefined name in changed python |
-| 3 | suite | `regression_selftest.py` fails — or is **absent** (a missing gate is not a passing gate) |
-| 4 | figure guard | its own null control does not fire, or a never-quote figure is uncaveated |
-| 5 | commit | — |
-| 6 | push | never `--force` |
+| 0 | branch shape | detached HEAD; origin unreachable; the index already dirty (never folded in, never discarded); no explicit paths; `origin/<branch>` not an ancestor of HEAD (a **claimed base**, entry 26) |
+| 0b | **single-source files** | a file in the single-source list diverges between this branch and the other campaign branch in the wrong direction (§2a below) |
+| 1 | **append-only** | anything but `A` staged under `working/results/` (`M`, `D`, `R`, `T`, `C`) |
+| 2 | static names | `static_names.py` (imported, never run as a script) flags an undefined name in changed python; staged deletions are skipped, not crashed on |
+| 3 | suite | a failure **not in** `suite_baseline.json`; a baselined failure that now **passes** (update the baseline deliberately); a runner that did not print its summary; **more skips than `max_skipped`** — a skipped test is a path the suite did not run (entry 27); or the runner/baseline **absent** (a missing gate is not a passing gate) |
+| 4 | figure guard | its own null control does not fire, or a never-quote figure is uncaveated in any prose the push makes public (index vs. `origin/<branch>`, else the merge-base with `origin/video-bench`, else `origin/main`, else HEAD — printed) |
+| 5 | **commit message**, then commit | the message carries an uncaveated never-quote figure — refused **before** the commit exists, because a message is public, permanent and never rewritten |
+| 6 | push | never `--force`; the first push of a branch sets its upstream |
 | 7 | **ls-remote read-back** | `origin` does not report the sha we just built |
+
+Every gate has a null control in `working/harness/autoland_selftest.sh` (`autoland.sh --self-test`): a throwaway repo with a local bare origin, each gate driven to refuse its seeded case and to pass its clean twin. The interpreter is **proven** by importing psutil (`$PYBIN`, then `<repo>/../.venv/bin/python` — the laptop — then `~/.venv/bin/python` — the box); a path that exists is not evidence.
+
+### §2a. Branches and single-source files
+
+**Two campaign branches, one direction.** `video-bench` is the films/harness branch; `docs-bench` is the document re-run. **Merges go `video-bench` → `docs-bench` only, as an as-is merge after a mechanical path-overlap check — never the reverse.** Docs work must not reach the films branch. A harness change is made on `video-bench` and merged forward; a docs change stays on `docs-bench`. Neither branch is rebased.
+
+**Single-source files** (the list is `SINGLE_SOURCE_*` in `autoland.sh`; gate 0b enforces it):
+
+* `working/docs/AUTOMATION_CONTRACT.md` — **must be byte-identical** on both branches. On `video-bench` (the source) the other branch may only be *behind* (its copy is a version already in `video-bench`'s history — merge forward to converge); on `docs-bench` or any other branch the copy must equal `origin/video-bench`'s exactly. Edit it on `video-bench`; never on `docs-bench`.
+* `working/docs/DOCS_HANDOFF.md` — **canonical on `docs-bench` only.** Every other branch carries a marked stub whose first line is `<!-- DOCS_HANDOFF_STUB: the document lives on docs-bench -->`, so no prose on the wrong branch can be mistaken for the briefing. Gate 0b refuses a stub on `docs-bench` and refuses non-stub prose anywhere else. (Ruled 2026-09-08 after a fresh session cloning `video-bench` read the stale 7-Sep text; the earlier "land the handoff on video-bench" instruction was transitional and outlived its transition.)
+
+Adding a file to the list is a `video-bench` edit of `autoland.sh` plus a null control in the self-test, then a merge forward.
 
 Gate 7 is register entry 26 made mechanical. Previously the read-back was a separate command a human remembered to run; now "pushed" and "landed" cannot diverge, because the script exits non-zero unless origin agrees.
 
 ```bash
-working/harness/autoland.sh "commit message" [path ...]
-working/harness/autoland.sh --dry-run "msg"      # all gates, no commit/push
+working/harness/autoland.sh "commit message" path [path ...]   # explicit paths, always
+working/harness/autoland.sh --dry-run "msg" path [path ...]     # every gate, no commit/push
+working/harness/autoland.sh --verify                            # is HEAD landed on origin?
+working/harness/autoland.sh --self-test                         # the null controls
 ```
 
-With nothing staged it does not no-op — it verifies HEAD is on origin and reports `LANDED` or refuses. So it doubles as "am I actually landed?"
+There is no all-files mode: a `git add -A` once swept ~170 local run records into this public repo. `--verify` answers "am I actually landed?" by the same ls-remote read-back.
 
 ### `working/harness/figure_guard.py`
 
 Scans changed prose for the never-quote figures enumerated in `DOCS_HANDOFF.md` §3.6. A pattern firing is **not** a failure; firing **without a caveat marker within 6 lines** is. The handoff itself therefore passes — it caveats all of them, which is why they appear in it — while a fresh report writing "RocketRide is 6.9x lighter" is refused.
 
-Nine patterns. `--null-control` seeds a file with every banned figure uncaveated and asserts the gate refuses it, exiting 3 if the gate fails to fire. `autoland.sh` runs the null control **before** the real scan every time, so a broken checker can never sit green.
+Nine patterns. `--null-control` seeds a file with every banned figure uncaveated and asserts the gate refuses it, exiting 3 if the gate fails to fire; it also seeds a **commit message** and asserts the message path refuses it and passes a caveated one. `autoland.sh` runs the null control **before** the real scan every time, so a broken checker can never sit green. `--message-file FILE` is the commit-message mode gate 5 uses.
+
+The `dup-patch-false` pattern bans the *assertion* that `duplication_patch_applied` is False, not the field name: the field is trustworthy from `provenance_leela.py`'s label-reading fix forward (d98aa7c) and is legitimately quotable; only the two 18-Aug `smoke50_parser_in` exports carry a false `False`.
 
 **Scope, stated honestly:** it catches the bare quote. It does not judge whether a caveat is *good*. Do not claim more coverage than that.
 

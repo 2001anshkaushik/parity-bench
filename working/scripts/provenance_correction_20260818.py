@@ -71,19 +71,29 @@ def digest_label_evidence(exports: List[Tuple[Path, Dict[str, Any]]]) -> Dict[st
     return ev
 
 
-def corrected_block(block: Dict[str, Any], evidence: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+def corrected_block(block: Dict[str, Any], evidence: Dict[str, Dict[str, Any]],
+                    arm: Optional[str] = None) -> Dict[str, Any]:
     """A copy of one `provenance_leela` arm block with the two patch fields re-derived from
     the digest -> label table and a `duplication_patch_source` saying how. Same value rule as
-    `provenance_leela._patch_state`; an unevidenced digest is None on both fields."""
+    `provenance_leela._patch_state`; an unevidenced digest is None on both fields.
+
+    Post-R2 (2026-09-08, 4029eab): an arm with no RocketRide image is marked
+    `not_applicable_no_engine` — the same marker build() now writes — so `check()` scopes
+    the two patch fields out for it and lists the exemption; the reason the label could not
+    be read is kept beside it in `duplication_patch_note`."""
     out = dict(block)
     digest = block.get("image_digest")
     e = evidence.get(digest) if digest else None
     if e is None:
         out["duplication_patch_applied"] = None
         out["duplication_patch_id"] = None
-        out["duplication_patch_source"] = (
-            f"no label reading of image {digest or '(no digest)'} exists in any {DAY} artifact "
-            "(the LlamaIndex image carries no RocketRide patch label) — UNKNOWN, not asserted")
+        why = (f"no label reading of image {digest or '(no digest)'} exists in any {DAY} artifact "
+               "(the LlamaIndex image carries no RocketRide patch label) — UNKNOWN, not asserted")
+        if arm is not None and not pvl.is_rocketride_arm(arm):
+            out["duplication_patch_source"] = pvl.NOT_APPLICABLE
+            out["duplication_patch_note"] = why
+        else:
+            out["duplication_patch_source"] = why
         return out
     raw = e["label_raw"]
     if raw == "1":
@@ -142,22 +152,42 @@ def build_correction(results: Path) -> Dict[str, Any]:
         per_arm = {}
         any_change = False
         for arm, block in arms.items():
-            new = corrected_block(block, evidence)
+            arm_name = None if arm == "(single)" else arm
+            new = corrected_block(block, evidence, arm=arm_name)
             before = {k: block.get(k) for k in FIELDS}
             after = {k: new.get(k) for k in FIELDS}
             arm_changed = before != after
             any_change |= arm_changed
             per_arm[arm] = {"image_digest": block.get("image_digest"),
                             "before": before, "after": after, "changed": arm_changed,
-                            "check_before": pvl.check(block), "check_after": pvl.check(new),
+                            "check_before": pvl.check(block),
+                            "check_after": pvl.check(new, arm=arm_name),
                             "corrected_provenance_leela": new}
         entry["status"] = "corrected" if any_change else "unchanged"
         entry["arms"] = per_arm
         (changed if any_change else unchanged).append(p.name)
         entries.append(entry)
+    from harness.resultio import latest
+    prev = latest(f"provenance_correction_{DAY}")
+    supersedes = None
+    if prev is not None:
+        supersedes = {
+            "artifact": prev.name,
+            "why": ("its check_after for the LlamaIndex arm was computed with the pre-R2 check() "
+                    "(no arm scoping) and reads PASS=False, which contradicts provenance_leela.check() "
+                    "from 4029eab onward (Advisor R2: the two patch fields are exempted by scope for an "
+                    "arm with no RocketRide image, and the exemption is listed). Recomputed here with "
+                    "check(block, arm=<arm>); the earlier file is untouched — artifacts are append-only."),
+        }
     return {
         "correction_of": ("duplication_patch_applied / duplication_patch_id inside every "
                           f"provenance_leela arm block of the {DAY} exports"),
+        "check_semantics": {
+            "check_before": "provenance_leela.check(block) — Leela's port, no arm scoping (as it read at the time)",
+            "check_after": ("provenance_leela.check(block, arm=<arm>) — post-R2 (4029eab): patch fields exempted "
+                            "by scope for a non-RocketRide arm, exemption listed under `exempted` / `exemption_reasons`"),
+        },
+        "supersedes": supersedes,
         "defect": ("working/harness/provenance_leela.py build() hardcoded "
                    "\"duplication_patch_applied\": False from 17 Aug to 7 Sep 2026 "
                    "(main:140, video-bench:140, unconditional); the 18-Aug measured docs runs "
