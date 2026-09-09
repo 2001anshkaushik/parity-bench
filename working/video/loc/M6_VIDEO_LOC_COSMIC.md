@@ -204,3 +204,63 @@ collector or probes), and the same layer names (COUNTING_RULE §2). Whether the
 `instrumentation` and `ambiguous` classes are in or out has to match too: this
 arm's service-only bar is 243 and its as-built bar is 348, and the choice moves
 it by 105 lines.
+
+---
+
+## The AMI-era figure under a rule that excludes Dockerfiles and requirements (2026-09-09)
+
+**The one adjusted number: LI service-only is 198**, not 283. The 85-line
+difference is exactly the Dockerfile, which every total in the tables above
+includes; the requirements file was never counted on either side. Per layer, on
+that rule: `compute_transforms` **111**, `serving_integration` **87**,
+`pipeline_definition` 0, `client_harness` 0 — and note the banked
+`layers.serving_integration` of 172 in `loc_report_video.json` is 87 plus the
+Dockerfile's 85, so it cannot be quoted under this rule either.
+
+**Files counted, all four, at the tree the AMI headline legs ran:**
+
+| file | layer | service | instrumentation | ambiguous |
+|---|---|---|---|---|
+| `working/video/li_video/pipeline.py` | `compute_transforms` | 111 | 27 | 7 |
+| `working/video/li_video/service.py` | `serving_integration` | 73 | 35 | 5 |
+| `working/video/li_video/schema.py` | `serving_integration` | 14 | 25 | 5 |
+| `working/video/li_video/__init__.py` | `serving_integration` | 0 | 0 | 0 |
+| **total** | | **198** | **87** | **17** |
+
+**Files present and excluded by the rule**, so the delta is visible:
+`docker/Dockerfile.llamaindex-video` 93 raw lines, **85** by METHOD A;
+`working/video/li_video/li_image_freeze.txt` **149** lines, which existed from
+`5c029b3` (2026-08-21) and so was present for the whole AMI campaign;
+`working/video/li_video/extract_engine_pins.sh` 52 lines, already outside the
+scope ruling.
+
+**Consequence for the published range.** The 1.8x–35x range is computed from
+283, which carries the Dockerfile. On 198 the same two cuts give **1.25x**
+(198 vs the pipe's 158 as-stored) and **25x** (198 vs 8 nodes-per-line). Quote
+the range with the rule that produced it.
+
+### Timing: the AMI figure is final, and only a films-era count needs re-running
+
+| event | when | effect on this figure |
+|---|---|---|
+| AMI default cells ran | 2026-08-24T02:55:50Z | tree `62d9243`; counted files unchanged since `2b1e969` |
+| AMI balanced headline legs ran | 2026-08-26T07:42:03Z | tree `e1584796`, committed 07:29:33Z, 12 minutes earlier |
+| M6 counted | `6ce2f9c`, 2026-08-26T19:58:35Z | counted files **byte-identical** to the headline tree |
+| LI streaming refactor | `b295dea`, 2026-08-28T00:08:56Z | **after every AMI leg** |
+
+So M6 measures the service as the AMI headline cells actually ran it, and the
+refactor cannot reach back into that figure: **the AMI LOC number is final at
+198 under this rule.** Only a films-era count needed re-running, and it is
+`loc_report_video_HEAD.json` — 243 service, +45.
+
+**One correction the era check surfaces**: the 24-Aug default cells ran a
+slightly earlier service than M6 counted — **199 service / 84 instrumentation**,
+layers 111 / 88 (`service.py` 74/33/5, `pipeline.py` 111/28/7, `schema.py`
+14/23/5). The balanced-posture, hashing-locus and schema commits landed between
+those cells and the headline pair. A LOC figure attached specifically to the
+default cells is 199, not 198.
+
+Artifacts, both from the same committed counter via `recount_loc_head.py --rev`:
+`loc_report_video_AMI.json` (headline tree) and
+`loc_report_video_AMI_default_cells.json`, each carrying its commit, its date
+and every counted file's sha256.

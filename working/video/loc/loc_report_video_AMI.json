@@ -1,0 +1,158 @@
+{
+ "measured_at_commit": "e15847968fda6fe604d1d1b706c2bd4c43b18c65",
+ "commit_date": "2026-08-26T00:29:33-07:00",
+ "tree": "historical tree at e1584796",
+ "files_absent_at_this_rev": [],
+ "rule": "non-blank, non-comment code lines (docstrings excluded); Dockerfiles and requirements EXCLUDED; four COUNTING_RULE layers",
+ "counter": "count_loc_video.classify (committed, unmodified); METHOD A for reference: imported from /Users/ansh/RocketRide/Benchmarking/reference-now/leela/aws_bench/metrics/m6_loc.py",
+ "scope_ruling": "developer-written service only; harness/driver/gates/collector/probes excluded (operator 2026-08-26)",
+ "supersedes_for_this_rule": "loc_report_video.json (M6, commit 6ce2f9c, 2026-08-26) \u2014 same counter, different file set (Dockerfile included there) and an older tree (pre b295dea streaming refactor, pre 6143aab Ruling L)",
+ "llamaindex": {
+  "per_file": {
+   "working/video/li_video/service.py": {
+    "service": 73,
+    "instrumentation": 35,
+    "ambiguous": 5,
+    "all_classes": 113,
+    "raw_lines": 163,
+    "layer": "serving_integration",
+    "sha256": "30b89f3ab91e9d88e0e59a77117c381e593adb0a570689b5775a3cd56d97469a",
+    "banked_m6": {
+     "service": 73,
+     "instrumentation": 35,
+     "ambiguous": 5,
+     "all_classes": 113
+    },
+    "delta_service": 0,
+    "delta_all_classes": 0
+   },
+   "working/video/li_video/pipeline.py": {
+    "service": 111,
+    "instrumentation": 27,
+    "ambiguous": 7,
+    "all_classes": 145,
+    "raw_lines": 227,
+    "layer": "compute_transforms",
+    "sha256": "ee701e5df583469c80a1bb7cf8acdf2767f86326a216363b5fadc73f4ec5ba91",
+    "banked_m6": {
+     "service": 111,
+     "instrumentation": 27,
+     "ambiguous": 7,
+     "all_classes": 145
+    },
+    "delta_service": 0,
+    "delta_all_classes": 0
+   },
+   "working/video/li_video/schema.py": {
+    "service": 14,
+    "instrumentation": 25,
+    "ambiguous": 5,
+    "all_classes": 44,
+    "raw_lines": 71,
+    "layer": "serving_integration",
+    "sha256": "584aed1d7604cd03e18dabf33f47303feb33fb74be7376caffb56dc890365e3d",
+    "banked_m6": {
+     "service": 14,
+     "instrumentation": 25,
+     "ambiguous": 5,
+     "all_classes": 44
+    },
+    "delta_service": 0,
+    "delta_all_classes": 0
+   },
+   "working/video/li_video/__init__.py": {
+    "service": 0,
+    "instrumentation": 0,
+    "ambiguous": 0,
+    "all_classes": 0,
+    "raw_lines": 4,
+    "layer": "serving_integration",
+    "sha256": "191033fd6652d588ca7b3567bea40732122be15e70c85a18c211c3dc922fca87",
+    "banked_m6": {
+     "service": 0,
+     "instrumentation": 0,
+     "ambiguous": 0,
+     "all_classes": 0
+    },
+    "delta_service": 0,
+    "delta_all_classes": 0
+   }
+  },
+  "totals": {
+   "service": 198,
+   "instrumentation": 87,
+   "ambiguous": 17,
+   "all_classes": 302
+  },
+  "banked_m6_totals": {
+   "service": 198,
+   "instrumentation": 87,
+   "ambiguous": 17,
+   "all_classes": 302
+  },
+  "delta_vs_m6": {
+   "service": 0,
+   "instrumentation": 0,
+   "ambiguous": 0,
+   "all_classes": 0
+  },
+  "layers": {
+   "service_only": {
+    "pipeline_definition": 0,
+    "client_harness": 0,
+    "compute_transforms": 111,
+    "serving_integration": 87
+   },
+   "all_classes": {
+    "pipeline_definition": 0,
+    "client_harness": 0,
+    "compute_transforms": 145,
+    "serving_integration": 157
+   }
+  }
+ },
+ "excluded_files": {
+  "docker/Dockerfile.llamaindex-video": {
+   "reason": "Dockerfile \u2014 excluded by the chart rule",
+   "lines": 93,
+   "loc_method_a": 85,
+   "sha256": "3e50b24a856f990cb435c81dfc839d880fdf2bb6758520082e3533a20e15d9a8"
+  },
+  "working/video/li_video/li_image_freeze.txt": {
+   "reason": "requirements (149 pins) \u2014 excluded by the chart rule",
+   "lines": 149,
+   "loc_method_a": null,
+   "sha256": "f4e620fd7a408211232e43c9f7d65d5b9d9fbd15f9c2f038dbeb1daf035274db"
+  },
+  "working/video/li_video/extract_engine_pins.sh": {
+   "reason": "build-time provenance tooling \u2014 outside the M6 scope ruling (harness/driver/gates/collector/probes excluded)",
+   "lines": 52,
+   "loc_method_a": null,
+   "sha256": "f00ae5bffb9c72f5ae5f338a9b66df263976ce520a17065f1676ba0ea6b13c7b"
+  }
+ },
+ "rocketride": {
+  "pipeline_definition_formatting_spread": {
+   "as_stored": 158,
+   "indent_2": 158,
+   "compact": 1,
+   "one_node_per_line": 8
+  },
+  "compute_transforms": 0,
+  "serving_integration": 0,
+  "client_harness": 0,
+  "note": "engine-internal stages are product code, not user code (COUNTING_RULE \u00a72); no developer-written service and no authored Dockerfile for this pipeline"
+ },
+ "semantic_units": {
+  "llamaindex": {
+   "authored_python_units": 21,
+   "declared_nodes": 0,
+   "total": 21
+  },
+  "rocketride": {
+   "authored_python_units": 0,
+   "declared_nodes": 6,
+   "total": 6
+  }
+ }
+}
