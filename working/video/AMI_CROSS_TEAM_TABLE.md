@@ -50,7 +50,11 @@ three bases per cell, GiB. **cgroup-cache** = `peak_cgroup_current_mb`
 `peak_rss_mb`, the SUM of per-process RSS across the engine's task
 processes — it double-counts pages shared between the 16/8/1 processes
 (it exceeds cgroup-cache at 16 tokens for exactly that reason) and is
-NOT the same animal as a single-process or container RSS. Their row
+NOT the same animal as a single-process or container RSS. **The two cgroup
+bases are per-container**: the collector resolves one cgroup per role, so they
+are whole-service here only because this arm is ONE container — a cell from a
+multi-instance arm is quotable on the RSS-sum basis alone (`results/AMI_LANDING.md`,
+2026-09-09 section; register entry 36). Their row
 already mixes bases (Leela cgroup-incl-cache vs Shashi RSS in one row);
 no memory figure in this table is comparable across bases, and each of
 Ansh's cells carries all three labels rather than one number.

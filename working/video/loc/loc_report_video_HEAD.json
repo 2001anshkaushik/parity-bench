@@ -1,0 +1,152 @@
+{
+ "measured_at_commit": "e0f75a67f665d95421b1e8bd7e1b87f538e26a03",
+ "rule": "non-blank, non-comment code lines (docstrings excluded); Dockerfiles and requirements EXCLUDED; four COUNTING_RULE layers",
+ "counter": "count_loc_video.classify (committed, unmodified); METHOD A for reference: imported from /Users/ansh/RocketRide/Benchmarking/reference-now/leela/aws_bench/metrics/m6_loc.py",
+ "scope_ruling": "developer-written service only; harness/driver/gates/collector/probes excluded (operator 2026-08-26)",
+ "supersedes_for_this_rule": "loc_report_video.json (M6, commit 6ce2f9c, 2026-08-26) \u2014 same counter, different file set (Dockerfile included there) and an older tree (pre b295dea streaming refactor, pre 6143aab Ruling L)",
+ "llamaindex": {
+  "per_file": {
+   "working/video/li_video/service.py": {
+    "service": 100,
+    "instrumentation": 36,
+    "ambiguous": 5,
+    "all_classes": 141,
+    "raw_lines": 209,
+    "layer": "serving_integration",
+    "sha256": "d6edcb1de9daa81a7e439508e953d819df30416aea52cf4327e77d996f0e291f",
+    "banked_m6": {
+     "service": 73,
+     "instrumentation": 35,
+     "ambiguous": 5,
+     "all_classes": 113
+    },
+    "delta_service": 27,
+    "delta_all_classes": 28
+   },
+   "working/video/li_video/pipeline.py": {
+    "service": 123,
+    "instrumentation": 27,
+    "ambiguous": 7,
+    "all_classes": 157,
+    "raw_lines": 282,
+    "layer": "compute_transforms",
+    "sha256": "ea4edb58bcfe87750517f309435bc3d9cf12a6daf9a7272d806c824fe113e2f0",
+    "banked_m6": {
+     "service": 111,
+     "instrumentation": 27,
+     "ambiguous": 7,
+     "all_classes": 145
+    },
+    "delta_service": 12,
+    "delta_all_classes": 12
+   },
+   "working/video/li_video/schema.py": {
+    "service": 20,
+    "instrumentation": 25,
+    "ambiguous": 5,
+    "all_classes": 50,
+    "raw_lines": 81,
+    "layer": "serving_integration",
+    "sha256": "2f3127a9ae2f6d3261158efc30c6b84a7d30ba9228e19a34aadebd7c4452e4e7",
+    "banked_m6": {
+     "service": 14,
+     "instrumentation": 25,
+     "ambiguous": 5,
+     "all_classes": 44
+    },
+    "delta_service": 6,
+    "delta_all_classes": 6
+   },
+   "working/video/li_video/__init__.py": {
+    "service": 0,
+    "instrumentation": 0,
+    "ambiguous": 0,
+    "all_classes": 0,
+    "raw_lines": 4,
+    "layer": "serving_integration",
+    "sha256": "191033fd6652d588ca7b3567bea40732122be15e70c85a18c211c3dc922fca87",
+    "banked_m6": {
+     "service": 0,
+     "instrumentation": 0,
+     "ambiguous": 0,
+     "all_classes": 0
+    },
+    "delta_service": 0,
+    "delta_all_classes": 0
+   }
+  },
+  "totals": {
+   "service": 243,
+   "instrumentation": 88,
+   "ambiguous": 17,
+   "all_classes": 348
+  },
+  "banked_m6_totals": {
+   "service": 198,
+   "instrumentation": 87,
+   "ambiguous": 17,
+   "all_classes": 302
+  },
+  "delta_vs_m6": {
+   "service": 45,
+   "instrumentation": 1,
+   "ambiguous": 0,
+   "all_classes": 46
+  },
+  "layers": {
+   "service_only": {
+    "pipeline_definition": 0,
+    "client_harness": 0,
+    "compute_transforms": 123,
+    "serving_integration": 120
+   },
+   "all_classes": {
+    "pipeline_definition": 0,
+    "client_harness": 0,
+    "compute_transforms": 157,
+    "serving_integration": 191
+   }
+  }
+ },
+ "excluded_files": {
+  "docker/Dockerfile.llamaindex-video": {
+   "reason": "Dockerfile \u2014 excluded by the chart rule",
+   "lines": 122,
+   "loc_method_a": 114
+  },
+  "working/video/li_video/li_image_freeze.txt": {
+   "reason": "requirements (149 pins) \u2014 excluded by the chart rule",
+   "lines": 149,
+   "loc_method_a": null
+  },
+  "working/video/li_video/extract_engine_pins.sh": {
+   "reason": "build-time provenance tooling \u2014 outside the M6 scope ruling (harness/driver/gates/collector/probes excluded)",
+   "lines": 52,
+   "loc_method_a": null
+  }
+ },
+ "rocketride": {
+  "pipeline_definition_formatting_spread": {
+   "as_stored": 158,
+   "indent_2": 158,
+   "compact": 1,
+   "one_node_per_line": 8
+  },
+  "compute_transforms": 0,
+  "serving_integration": 0,
+  "client_harness": 0,
+  "note": "engine-internal stages are product code, not user code (COUNTING_RULE \u00a72); no developer-written service and no authored Dockerfile for this pipeline"
+ },
+ "semantic_units": {
+  "llamaindex": {
+   "authored_python_units": 22,
+   "declared_nodes": 0,
+   "total": 22
+  },
+  "rocketride": {
+   "authored_python_units": 0,
+   "declared_nodes": 6,
+   "total": 6
+  }
+ }
+}

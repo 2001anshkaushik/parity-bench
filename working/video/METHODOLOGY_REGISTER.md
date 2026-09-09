@@ -1322,3 +1322,32 @@ than rewritten from memory, which is entry 2's point in miniature.
 > against the document it certifies — never in the same command that
 > produces it.** Corrected in the next commit with the run that actually
 > completed and the comparison recorded.
+
+## 36. A field that names a role and measures a container — the per-cgroup basis quoted as an arm total (added 2026-09-09)
+
+> The collector's `service` role carries every instance's root pid since
+> `7c1cd81` — the RSS row sums all sixteen LlamaIndex process trees, which is
+> what that fix was for. Its cgroup rows did not follow: `_sample_cgroup`
+> resolves ONE cgroup path from the first tracked pid and caches it, on the
+> stated assumption that "every process in the tree is in the same container
+> cgroup" — true for one container, false for an arm made of sixteen. So
+> `peak_cgroup_anon_mb` and `peak_cgroup_current_mb` are one instance's, and
+> nothing in either name says so. The end-to-end report published
+> "RR 41× higher" from that pair: RocketRide's whole service (45.5 GiB, one
+> container) against one sixteenth of LlamaIndex's (1.08 GiB). The tell was in
+> the artifact all along — the same leg's `peak_cgroup_current_mb` reads
+> **exactly 3072.0 MiB**, one instance's `--memory 3g` cap, while the summed
+> RSS reads 22.7 GiB — and the figure checker had verified the number against
+> the artifact and passed it, because it checked arithmetic, not basis.
+> The class: **a per-container field aggregated by a per-arm role name is
+> wrong by one factor of N, silently, and a checker that recomputes a figure
+> does not check what the figure is of. Any cgroup-basis figure carries its
+> instance count, from the export's own container list
+> (`preleg_container_idle_cores`, full since `7c1cd81`), and is comparable
+> across arms only when both counts are 1.** Fixed in the report (the row
+> states the basis and drops the ratio; the RSS row carries the comparison)
+> and in `probe/end_to_end_figures_check.py`, which now reads the instance
+> count per arm and fails if a cross-arm ratio appears on a per-cgroup row —
+> null-controlled by reinstating the old row, which fails it. Standing
+> consequence for the AMI cells: a LlamaIndex balanced (8-container) peak is
+> quotable on the summed-RSS basis only, and only from a post-`7c1cd81` run.

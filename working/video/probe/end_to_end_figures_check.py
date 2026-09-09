@@ -89,7 +89,23 @@ chk('util RR', R_['util'] * 100, '97.2'); chk('util LI', L_['util'] * 100, '90.7
 chk('effective cores RR', R_['eff'], '26.46'); chk('effective cores LI', L_['eff'], '28.96'); chk('eff delta', pct(L_['eff'], R_['eff']), 'LI +9.4%')
 chk('CPU-s/foot-min RR', R_['cpm'], '10.74'); chk('CPU-s/foot-min LI', L_['cpm'], '9.09'); chk('cpm delta', pct(R_['cpm'], L_['cpm']), 'RR +18.1%')
 chk('peak RSS RR p3', r3['rss'], '53.2'); chk('peak RSS RR p4', r4['rss'], '50.8'); chk('peak RSS LI p3', l3['rss'], '22.7'); chk('peak RSS LI p4', l4['rss'], '22.6'); chk('RSS ratio', m(r3, r4, 'rss') / m(l3, l4, 'rss'), 'RR 2.3× higher')
-chk('anon RR p3', r3['anon'], '45.5'); chk('anon RR p4', r4['anon'], '43.1'); chk('anon LI', l3['anon'], '1.08'); chk('anon ratio', m(r3, r4, 'anon') / m(l3, l4, 'anon'), 'RR 41× higher')
+chk('anon RR p3', r3['anon'], '45.5'); chk('anon RR p4', r4['anon'], '43.1')
+# BASIS GUARD (2026-09-09, register entry 36): the cgroup fields are per-CGROUP —
+# collector.py resolves one cgroup per role and caches it — so on a multi-container
+# arm they read ONE instance. The instance count comes from the export itself
+# (preleg_container_idle_cores carries every resolved container since 7c1cd81), and a
+# cgroup figure may be compared across arms only when both counts are 1.
+insts = lambda d, arm, name: len(ex(d, arm, name).get('preleg_container_idle_cores') or {})
+n_rr, n_li = insts(L, RR, 'blast_p3'), insts(L, LI, 'blast_p3')
+chk('RR instances sampled = 1 (cgroup basis is whole service)', n_rr, '1', expect=1)
+chk('LI instances sampled = 16, so anon is one of them', n_li, 'one instance of 16 reads 1.08', expect=16)
+_anon_row = next((ln for ln in TEXT.splitlines() if ln.startswith('| Peak cgroup anon')), '')
+chk('anon row states the basis, not a ratio', None, 'bases differ — not compared')
+if not _anon_row or '×' in _anon_row or 'higher' in _anon_row:
+    fails.append(f'anon row basis guard: cross-arm comparison present on a per-cgroup field: {_anon_row[:120]!r}')
+    print(f'  FAIL  anon row basis guard: {_anon_row[:100]}')
+else:
+    n_ok += 1; print('  PASS  anon row basis guard: no cross-arm ratio on a per-cgroup field')
 chk('growth RR p3', r3['first'], '26.7 → 52.5'); chk('growth RR p3 end', r3['last'], '52.5 GiB'); chk('growth RR p4', r4['first'], '26.5 → 49.2'); chk('growth LI p3', l3['first'], '22.1 → 21.6'); chk('growth LI p4', l4['first'], '21.8 → 21.6')
 chk('retention RR p3', (r3['last'] - r3['first']) * 1024 / 498, '52.9'); chk('retention RR p4', (r4['last'] - r4['first']) * 1024 / 498, '46.6'); chk('retention LI p3', (l3['last'] - l3['first']) * 1024 / 498, '−1.1'); chk('retention LI p4', (l4['last'] - l4['first']) * 1024 / 498, '−0.4')
 chk('spool hw RR', r3['fs'], '12.0 / 12.0'); chk('spool hw LI p3', l3['fs'], '13.9 / 13.8'); chk('spool hw delta', pct(m(l3, l4, 'fs'), m(r3, r4, 'fs')), 'LI +15.6%')

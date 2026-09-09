@@ -133,3 +133,74 @@ the service, so we wrote the bugs. RocketRide's are *discovery* defects — the 
 its semantics (idle-ttl, token concurrency, payload limits) were not discoverable from its
 surface, and each cost a measured leg. **Fewer lines to write also means fewer lines to get
 wrong, and more product behaviour to discover the hard way.** Both belong in the report.
+
+---
+
+## Re-count at the current tree, under the chart rule (2026-09-09)
+
+Two reasons the figures above cannot be lifted onto a chart whose stated rule
+is *non-blank, non-comment code lines, excluding Dockerfiles and requirements,
+broken down by layer*:
+
+| | the M6 figures above | what the chart rule needs |
+|---|---|---|
+| file set | all three totals (387 / 300 / 283) include the Dockerfile; `layers.serving_integration` 172 carries its 85 inside | Dockerfile and requirements excluded |
+| tree | measured 2026-08-26 at `6ce2f9c` | measured at the current tree — the LI streaming refactor (`b295dea`, 08-27) rewrote `pipeline.py` and `service.py`, and Ruling L (`6143aab`, 08-29) changed the splitter defaults |
+
+Re-counted with the **same counter, unmodified** — `count_loc_video.classify`,
+the same line rules and the same service / instrumentation / ambiguous knife —
+only the file set and the output path differ. Reproducer:
+`recount_loc_head.py`; artifact: `loc_report_video_HEAD.json` (carries each
+file's sha256 and the measuring commit).
+
+**Comparison arm, per file, at the current tree** (Python only, Dockerfile and
+requirements excluded):
+
+| file | layer | (a) service | (b) instrumentation | (c) ambiguous | all classes | Δ service vs M6 |
+|---|---|---|---|---|---|---|
+| `working/video/li_video/pipeline.py` | `compute_transforms` | 123 | 27 | 7 | 157 | +12 |
+| `working/video/li_video/service.py` | `serving_integration` | 100 | 36 | 5 | 141 | +27 |
+| `working/video/li_video/schema.py` | `serving_integration` | 20 | 25 | 5 | 50 | +6 |
+| `working/video/li_video/__init__.py` | `serving_integration` | 0 | 0 | 0 | 0 | 0 |
+| **total** | | **243** | **88** | **17** | **348** | **+45** |
+
+**By layer** — `pipeline_definition` 0 and `client_harness` 0 on this arm (the
+service is the pipeline; the harness is excluded by the scope ruling):
+
+| layer | service only | all classes |
+|---|---|---|
+| `compute_transforms` | 123 | 157 |
+| `serving_integration` | 120 | 191 |
+| **total** | **243** | **348** |
+
+**Delta against M6, like for like** (both sides Python-only, Dockerfile
+excluded from both): service 198 → **243** (+45), instrumentation 87 → **88**
+(+1), ambiguous 17 → **17** (0), all classes 302 → **348** (+46). The growth is
+the streaming refactor and its read-backs: `service.py` +27 service lines (the
+spool-file request path, the `/health` surface), `pipeline.py` +12 (frames to
+disk, one frame resident at a time), `schema.py` +6 (additive response fields).
+
+**Files present in the arm's tree and deliberately not counted**:
+
+| file | lines | why not counted |
+|---|---|---|
+| `docker/Dockerfile.llamaindex-video` | 122 raw, 114 by METHOD A | Dockerfile — excluded by the chart rule (it was 85 at M6; the 149-pin freeze install is what grew it) |
+| `working/video/li_video/li_image_freeze.txt` | 149 | requirements — excluded by the chart rule |
+| `working/video/li_video/extract_engine_pins.sh` | 52 | build-time provenance tooling — outside the M6 scope ruling |
+
+**RocketRide side unchanged**: `benchmark_video_detect.pipe` reports the
+formatting spread, not one number — 158 as stored, 158 at `indent=2`, 8 one
+node per line, 1 compact — with `compute_transforms` 0 and
+`serving_integration` 0 (engine-internal stages are product code, and no
+Dockerfile is authored for this pipeline). Formatting-immune cross-check at the
+current tree: **22** authored Python units (was 21) against **6** declared
+nodes.
+
+**If these go on a chart beside another framework's bar**, the bar's rule must
+match on all four points: the same counter class (non-blank, non-comment,
+docstrings excluded), the same exclusions (Dockerfile, requirements), the same
+scope ruling (developer-written service only — no harness, driver, gates,
+collector or probes), and the same layer names (COUNTING_RULE §2). Whether the
+`instrumentation` and `ambiguous` classes are in or out has to match too: this
+arm's service-only bar is 243 and its as-built bar is 348, and the choice moves
+it by 105 lines.

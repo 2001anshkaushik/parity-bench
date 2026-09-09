@@ -152,3 +152,60 @@ corpse-row classification requires. Left on the box.
    `task_census` (declared 8 → census_after 8), image digest
    `sha256:b7f51acc…` (same `rr:patched-video` as the mainrun), and
    `provenance_leela` (engine 3.3.1, duplication_patch_applied: False).
+   **Do not quote that last field as evidence about the image — it is a
+   label-reading artifact, not the record**: the same export's
+   `provenance_video.image.labels` reads
+   `benchmark.rocketride.duplication_patch_applied":"1"` on image digest
+   `sha256:b7f51acc…`, and the label-reading defect behind the False was only
+   fixed at `d98aa7c` (2026-09-07), after every AMI run. The image digest and
+   its labels are the record; cite those.
+
+## The comparison arm's AMI cells are NOT landed — and what a memory figure from them would require (2026-09-09)
+
+**Verdict first: this repository holds no LlamaIndex AMI export, collector
+summary or records file, so there is no LlamaIndex AMI peak-memory figure to
+quote on any basis** — not for the balanced cell, not for the default cell, and
+not even a pre-fix one. Basis for that statement:
+
+| check | result |
+|---|---|
+| files landed by this note | 14, every one RocketRide (list above) |
+| repo-wide inventory of `export_*.json` | 25 files; the earliest LlamaIndex video export is `films_mainrun_20260901T204015Z/` — the 35-film campaign, six days after AMI |
+| repo-wide inventory of `collector_*.summary.json` | same shape: RocketRide only for AMI |
+| the banked LlamaIndex AMI cells (DEFINITIVE §3.2; reconciliation §8) | span / window f/s, cores, util, n — **no memory column exists** to quote from either |
+| the archive's own census, from this note | 43 exports on S3, 25 RocketRide scanned → the LlamaIndex exports are there, unlanded |
+
+Landing them needs one read-only fetch from
+`s3://rocketride-benchmark-data/ansh/video-ami-20260826/` with the `rocketride`
+SSO profile (the token in this environment is expired, so the fetch is Ansh's
+to run), identified by contents the way the six above were.
+
+**When they are landed, only some of them carry a quotable arm-level memory
+figure.** The collector defect is `7c1cd81`, committed **2026-08-25 20:33:44
+-0700 = 2026-08-26 03:33:44Z**: before it, the collector's `service` role
+carried ONE container's root pid and the CPU bracket read ONE cgroup, so a
+multi-instance posture reported one-Nth of the service as the service (H10:
+~3 cores for an arm using ~30). What that means per cell:
+
+| cell | containers | run | vs the fix | what a memory figure means |
+|---|---|---|---|---|
+| LI balanced 8×4, 25-Aug pair | 8 | 2026-08-25, pre-fix | **before** | one container of eight. **Not the arm's peak — do not report it as one.** The DEFINITIVE already strikes this pair for CPU (§3.2, H10); the same wiring makes its memory one-eighth-scoped |
+| LI balanced 8×4, 26-Aug pair (headline) | 8 | `apples_*` sessions, 04:15:10Z and 05:29:15Z | **after**, by 42 and 116 minutes | summed RSS across all eight process trees is the arm's peak; the two cgroup fields are NOT (next paragraph) |
+| LI default W=8 / W=16 | 1 (one port, kernel accept) | 23–24 Aug | before | unaffected: with one container, the single sample IS the whole service on all three bases |
+| RR 16×2, RR default, RR 8×4 | 1 | 24-Aug and 26-Aug | both sides | unaffected for the same reason; the three landed bases reproduce this note's table exactly (verified 2026-09-09) |
+
+**The per-export witness, since no field name says it**: `7c1cd81` also made
+`preleg_container_idle_cores` carry every resolved container, so the number of
+keys in that object is the number of instances the leg sampled — 1 on every
+landed RocketRide AMI leg, 16 on a landed films LlamaIndex leg. Read it before
+quoting any efficiency or memory figure from a multi-instance leg.
+
+**One limitation survives the fix, and it decides the basis** (register entry
+36): the collector resolves ONE cgroup per role and caches it, so
+`peak_cgroup_anon_mb` and `peak_cgroup_current_mb` are one instance's on a
+multi-container arm even after `7c1cd81`, while `peak_rss_mb` sums every
+instance. The landed films LlamaIndex leg shows it plainly — summed RSS 22.7
+GiB against `peak_cgroup_current_mb` of exactly 3072.0 MiB, which is one
+instance's `--memory 3g` cap. **So the balanced AMI cell is quotable on the
+summed-RSS basis only, and the RocketRide cells' cgroup figures are
+whole-service only because that arm is one container.**

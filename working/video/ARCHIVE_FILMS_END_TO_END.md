@@ -73,7 +73,7 @@ source column, last, names the export field or reproducer behind it.
 | Cost per 1,000 footage-hours ($, at $1.428/h) | 8.22 | 7.46 | RR +10.2% | `efficiency.usd_per_1k_footage_hours` |
 | **Memory** | | | | |
 | Peak service RSS, process tree (GiB; p3 / p4) | 53.2 / 50.8 | 22.7 / 22.6 | RR 2.3× higher | `collector_summary.roles.service.peak_rss_bytes` |
-| Peak cgroup anon (GiB; p3 / p4) | 45.5 / 43.1 | 1.08 / 1.08 | RR 41× higher | `collector_summary.roles.service.peak_cgroup_anon_mb` |
+| Peak cgroup anon (GiB; p3 / p4) | 45.5 / 43.1 | one instance of 16 reads 1.08; the arm's own total is not measured | **bases differ — not compared** (see the note below) | `collector_summary.roles.service.peak_cgroup_anon_mb` |
 | Growth across a leg (GiB, first → last 5 min; p3; p4) | 26.7 → 52.5; 26.5 → 49.2 | 22.1 → 21.6; 21.8 → 21.6 | RR grows +25.7 / +22.7 GiB; LI flat | `lifetime_state.service_memory_trajectory.rss` |
 | Per-film retention (MiB per film served; p3; p4) | 52.9; 46.6 | −1.1; −0.4 | RR retains; LI flat | growth ÷ 498; resets when the tokens end |
 | Spool high-water on the host fs (GiB above leg start; p3 / p4) | 12.0 / 12.0 | 13.9 / 13.8 | LI +15.6% | `lifetime_state.fs_stream.paths.docker_root.max_used_minus_start` |
@@ -97,7 +97,14 @@ maximum over 0.5 s samples of the whole leg; **growth across a leg** is the
 same stream's first- and last-five-minute means — which is why the peak
 (53.2 GiB) sits above the end-of-leg mean (52.5 GiB). Both are
 given because the peak sizes the container and the growth names the
-mechanism.
+mechanism. The **cgroup** rows are not cross-arm quantities: the collector
+resolves ONE cgroup per role and caches it, so on an arm made of 16
+containers the anon and cache figures are one instance's, while the RSS row
+sums every instance's process tree. RocketRide is one container, so its
+cgroup figures are the whole service; LlamaIndex's arm-level anon total was
+never sampled, and the ratio that an earlier revision of this row printed
+(RR "41× higher") compared one arm's whole service against one sixteenth of
+the other's. The RSS row carries the memory comparison.
 
 Per-leg detail (the settled campaign pass 2 shown for reference; the
 campaign's pass 1 is excluded, §9):
