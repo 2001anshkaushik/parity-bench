@@ -200,6 +200,42 @@ keys in that object is the number of instances the leg sampled — 1 on every
 landed RocketRide AMI leg, 16 on a landed films LlamaIndex leg. Read it before
 quoting any efficiency or memory figure from a multi-instance leg.
 
+### The recomputation is built, proven on landed data, and waiting on one login (2026-09-09)
+
+The peak can be recomputed from the raw tick stream rather than read from the
+stored summary, which is the stronger reading: a stored `peak_rss_mb` cannot say
+how many containers it covered. Two committed tools do it:
+`probe/fetch_ami_li_memory.py` fetches only what is needed and identifies each
+cell **by contents** — every comparison-arm export in the archive is read and
+matched on its own `total_frames_per_s` against the banked values (balanced
+12.745 / 12.733, default W=8 9.267 / 8.714, default W=16 8.793), reporting
+unmatched and ambiguous cells rather than trusting a directory name — and
+`probe/ami_li_memory_recompute.py` recomputes the three bases tick by tick.
+
+**What the stream does and does not carry, checked against the landed films
+streams.** A row is `{"kind":"role_tick","role":"service","n_procs":N,"rss":…,
+"cg_anon":…,"cg_current":…,"cg_pids_tasks":…}`. There are **no container names in
+the stream** — a role tick is already aggregated over whatever trees the role
+resolved — so "distinct containers per tick" is measured as: `n_procs`, the
+processes tracked per tick, which reads ~1 for one single-worker instance and N
+for N of them; the export's own container-name census; and `cg_pids_tasks`, the
+task count of the ONE cgroup the collector resolved, which is what makes the two
+cgroup bases one instance's on a multi-container arm.
+
+**Method validated where the answer is known** (`--selftest`, no network): on the
+landed films legs the recomputed peaks equal the stored ones to 0.02 MiB on all
+three bases, both arms; the comparison arm is classified from 16 named
+containers and 16 tracked processes per tick; its cgroup-cache peak recomputes
+to exactly one instance's 3.0 GiB cap; RocketRide is classified as the
+single-container posture it is, from the arm and not from its 16 tokens. A
+synthetic one-of-eight stream is the null control: it must classify DEFECTIVE
+and label its RSS a lower bound on one container, and it does.
+
+**Blocker, stated plainly**: the laptop's SSO token expired 2026-09-08T11:42:04Z
+and a refresh needs a browser on this machine, so nothing was fetched and no AMI
+comparison-arm figure is recomputed yet. `aws sso login --profile rocketride`,
+then the two commands above, produce every cell in one pass.
+
 **One limitation survives the fix, and it decides the basis** (register entry
 36): the collector resolves ONE cgroup per role and caches it, so
 `peak_cgroup_anon_mb` and `peak_cgroup_current_mb` are one instance's on a
