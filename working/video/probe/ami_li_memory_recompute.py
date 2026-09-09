@@ -182,6 +182,19 @@ def classify(stats: dict, decl: dict) -> dict:
     elif exp is None and n_names == 1 and procs == 1 and (workers or 0) > 1:
         verdict = (f'DEFECTIVE SAMPLER (inferred) — one name and one tracked process for '
                    f'{workers} declared workers')
+    elif n_names == 0 and workers and procs is not None:
+        # An export era with NO container census at all. The stream still separates the
+        # two shapes: W workers inside one container track ~W processes, whereas one of N
+        # single-worker instances tracks ~1. Anything between is not decided here.
+        if procs >= max(2, workers - 1):
+            verdict = ('SINGLE-CONTAINER POSTURE (inferred, no container census in this export era) — '
+                       f'the stream tracks {procs} processes for {workers} declared workers')
+        elif procs <= 1 and workers > 1:
+            verdict = ('DEFECTIVE SAMPLER (inferred, no container census in this export era) — '
+                       f'one tracked process for {workers} declared workers')
+        else:
+            verdict = (f'INDETERMINATE — no container census, and {procs} tracked process(es) '
+                       f'decides neither shape against {workers} declared workers')
     else:
         verdict = 'INDETERMINATE — refusing to guess'
     whole = verdict.startswith(('FIXED', 'SINGLE'))
@@ -303,6 +316,33 @@ def selftest() -> int:
        n['sampler_verdict'])
     ck('null control: RSS labelled a lower bound, not the arm peak',
        'lower bound' in n['rss_basis_scope'].lower(), n['rss_basis_scope'])
+
+    # NULL CONTROLS for the OLDER export era, which may carry no container census at all:
+    # the same two streams must still separate the shapes, and an ambiguous one must refuse.
+    def era0(workers, procs, rss=1_500_000_000):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            j = Path(d) / 'c.jsonl'
+            j.write_text('\n'.join(json.dumps(
+                {'kind': 'role_tick', 't': i * 0.5, 'role': 'service', 'n_procs': procs, 'rss': rss,
+                 'cg_anon': 900_000_000, 'cg_current': 3_221_225_472, 'cg_pids_tasks': 13})
+                for i in range(20)) + '\n')
+            ex = Path(d) / 'export_e.json'
+            ex.write_text(json.dumps({
+                'arm': 'llamaindex_video', 'leg': 'era0', 'throughput': {'total_frames_per_s': 1.0},
+                'efficiency': {'idle_burden': {'instances': workers, 'instance_kind': 'li_workers'}},
+                'provenance_video': {'posture': {'declared_workers': workers}},
+                'collector_summary': {'roles': {'service': {'peak_rss_mb': rss / 2 ** 20}}}}))
+            return do_leg(ex, j)
+    one_of_eight, w8_in_one, murky = era0(8, 1), era0(8, 9), era0(8, 4)
+    ck('no-census era: one tracked process for 8 workers reads DEFECTIVE',
+       one_of_eight['sampler_verdict'].startswith('DEFECTIVE'), one_of_eight['sampler_verdict'])
+    ck('no-census era: nine tracked processes for 8 workers reads SINGLE-CONTAINER',
+       w8_in_one['sampler_verdict'].startswith('SINGLE'), w8_in_one['sampler_verdict'])
+    ck('no-census era: an in-between count REFUSES rather than guessing',
+       murky['sampler_verdict'].startswith('INDETERMINATE'), murky['sampler_verdict'])
+    ck('no-census era: the defective one still labels RSS a lower bound',
+       'lower bound' in one_of_eight['rss_basis_scope'].lower(), one_of_eight['rss_basis_scope'])
     print(f'\nselftest: {"PASS" if not fails else "FAIL " + str(fails)}')
     return 1 if fails else 0
 
