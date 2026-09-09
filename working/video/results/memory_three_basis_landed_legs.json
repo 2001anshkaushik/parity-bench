@@ -1,0 +1,1716 @@
+{
+ "legs": [
+  {
+   "export": "working/video/results/apples_20260826T041510Z/export_rocketride_video_parity_blast.json",
+   "export_sha256": "889e0f5adb6c7912b6eb1a73b84ea7d7e27fd4e198b3424feccf3bae6df14e01",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 1,
+   "span_frames_per_s": 11.694,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 8,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 8,
+    "census_after": 8,
+    "posture": "parity[tokens=8,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 29562.25,
+    "peak_cgroup_anon_mb": 25502.39,
+    "peak_cgroup_current_mb": 28215.19,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-327f1664ae92eddd518568d890eca78225e18b38fde07a2c597fab36b7b47980.scope",
+    "peak_cgroup_tasks": 3017
+   },
+   "recomputed": null,
+   "note": "no raw tick stream beside this export \u2014 nothing recomputed"
+  },
+  {
+   "export": "working/video/results/apples_20260826T052915Z/export_rocketride_video_parity_blast_p2.json",
+   "export_sha256": "a34457c066e4868ecc7a196f91d5b17de1517eb0f415163e2f76005a128778eb",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 2,
+   "span_frames_per_s": 11.571,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 8,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 8,
+    "census_after": 8,
+    "posture": "parity[tokens=8,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 27541.06,
+    "peak_cgroup_anon_mb": 23468.12,
+    "peak_cgroup_current_mb": 25768.73,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-856af0a8f731908eb585944d30931cc65ee93db240d43249200853398d98af59.scope",
+    "peak_cgroup_tasks": 3012
+   },
+   "recomputed": null,
+   "note": "no raw tick stream beside this export \u2014 nothing recomputed"
+  },
+  {
+   "export": "working/video/results/films500_lifetimes_20260906T090339Z/export_llamaindex_video_workers_blast_p3.json",
+   "export_sha256": "c4db8aa5a097836db179e7c1cccdaa0ea815f51a9bd843d364094f2453b462dc",
+   "arm": "llamaindex_video",
+   "leg": "blast",
+   "pass": 3,
+   "span_frames_per_s": 12.791,
+   "declared": {
+    "container_names_in_export": [
+     "li_bal_0",
+     "li_bal_1",
+     "li_bal_10",
+     "li_bal_11",
+     "li_bal_12",
+     "li_bal_13",
+     "li_bal_14",
+     "li_bal_15",
+     "li_bal_2",
+     "li_bal_3",
+     "li_bal_4",
+     "li_bal_5",
+     "li_bal_6",
+     "li_bal_7",
+     "li_bal_8",
+     "li_bal_9"
+    ],
+    "n_container_names": 16,
+    "expected_containers": 16,
+    "expected_containers_source": "per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "instances_declared": 16,
+    "instance_kind": "li_workers",
+    "declared_workers": 16,
+    "declared_tokens": null,
+    "census_after": null,
+    "posture": "workers[declared_workers=16]"
+   },
+   "stored": {
+    "peak_rss_mb": 23255.68,
+    "peak_cgroup_anon_mb": 1105.41,
+    "peak_cgroup_current_mb": 3072.0,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-29173e0a581714dc19b7f7d8d2f7c78bafab859f7e7428d835a7c8c513501d4e.scope",
+    "peak_cgroup_tasks": 97
+   },
+   "stream": {
+    "path": "working/video/results/films500_lifetimes_20260906T090339Z/collector_llamaindex_video_workers_blast_p3.jsonl",
+    "sha256": "be6c8811e835755b27e753f551b3dc2ca478accbf4d2d37e55f519e118aa29f8",
+    "ticks": 25331,
+    "malformed_lines": 0,
+    "span_s": 12665.0,
+    "peak_rss_bytes": 24385347584,
+    "peak_cg_anon_bytes": 1159102464,
+    "peak_cg_current_bytes": 3221225472,
+    "n_procs_min": 16,
+    "n_procs_median": 19,
+    "n_procs_max": 25,
+    "cg_pids_tasks_min": 11,
+    "cg_pids_tasks_max": 97
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 3.0,
+    "anon": 1.079,
+    "rss_sum": 22.711
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 23255.68,
+     "recomputed_mb": 23255.68,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 1105.41,
+     "recomputed_mb": 1105.41,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 3072.0,
+     "recomputed_mb": 3072.0,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "FIXED SAMPLER \u2014 all 16 containers resolved",
+   "basis": [
+    "export names 16 container(s); expected 16 from per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "stream tracks 19 process(es) per service tick against 16 declared worker(s)",
+    "one cgroup sampled per role, peak 97 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "ONE CONTAINER of 16 \u2014 the collector caches one cgroup per role, so anon and cache are one instance even when the RSS sum is complete"
+  },
+  {
+   "export": "working/video/results/films500_lifetimes_20260906T090339Z/export_llamaindex_video_workers_blast_p4.json",
+   "export_sha256": "975ae5a1d4909f82f305b87e7a425511ecf9897369eebacb1a90e5c700538429",
+   "arm": "llamaindex_video",
+   "leg": "blast",
+   "pass": 4,
+   "span_frames_per_s": 12.809,
+   "declared": {
+    "container_names_in_export": [
+     "li_bal_0",
+     "li_bal_1",
+     "li_bal_10",
+     "li_bal_11",
+     "li_bal_12",
+     "li_bal_13",
+     "li_bal_14",
+     "li_bal_15",
+     "li_bal_2",
+     "li_bal_3",
+     "li_bal_4",
+     "li_bal_5",
+     "li_bal_6",
+     "li_bal_7",
+     "li_bal_8",
+     "li_bal_9"
+    ],
+    "n_container_names": 16,
+    "expected_containers": 16,
+    "expected_containers_source": "per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "instances_declared": 16,
+    "instance_kind": "li_workers",
+    "declared_workers": 16,
+    "declared_tokens": null,
+    "census_after": null,
+    "posture": "workers[declared_workers=16]"
+   },
+   "stored": {
+    "peak_rss_mb": 23173.44,
+    "peak_cgroup_anon_mb": 1107.23,
+    "peak_cgroup_current_mb": 3072.0,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-29173e0a581714dc19b7f7d8d2f7c78bafab859f7e7428d835a7c8c513501d4e.scope",
+    "peak_cgroup_tasks": 97
+   },
+   "stream": {
+    "path": "working/video/results/films500_lifetimes_20260906T090339Z/collector_llamaindex_video_workers_blast_p4.jsonl",
+    "sha256": "08bf80223b020ef7c63eea01e557c9d4d978902fdd50447218f13f8ad7f75c86",
+    "ticks": 25295,
+    "malformed_lines": 0,
+    "span_s": 12647.0,
+    "peak_rss_bytes": 24299110400,
+    "peak_cg_anon_bytes": 1161019392,
+    "peak_cg_current_bytes": 3221225472,
+    "n_procs_min": 16,
+    "n_procs_median": 19,
+    "n_procs_max": 25,
+    "cg_pids_tasks_min": 11,
+    "cg_pids_tasks_max": 97
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 3.0,
+    "anon": 1.081,
+    "rss_sum": 22.63
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 23173.44,
+     "recomputed_mb": 23173.44,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 1107.23,
+     "recomputed_mb": 1107.23,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 3072.0,
+     "recomputed_mb": 3072.0,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "FIXED SAMPLER \u2014 all 16 containers resolved",
+   "basis": [
+    "export names 16 container(s); expected 16 from per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "stream tracks 19 process(es) per service tick against 16 declared worker(s)",
+    "one cgroup sampled per role, peak 97 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "ONE CONTAINER of 16 \u2014 the collector caches one cgroup per role, so anon and cache are one instance even when the RSS sum is complete"
+  },
+  {
+   "export": "working/video/results/films500_lifetimes_20260906T090339Z/export_rocketride_video_parity_blast_p3.json",
+   "export_sha256": "89483f298aa704c96cd655002fb09cfc3e3fc7f915ff86c3aaa1b04b48525e6f",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 3,
+   "span_frames_per_s": 11.665,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 54506.42,
+    "peak_cgroup_anon_mb": 46627.52,
+    "peak_cgroup_current_mb": 54867.95,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-4a52e7b9d5e362f7e60c85a01c259d0df62b889337da959a0504b33b3f482cfc.scope",
+    "peak_cgroup_tasks": 4289
+   },
+   "stream": {
+    "path": "working/video/results/films500_lifetimes_20260906T090339Z/collector_rocketride_video_parity_blast_p3.jsonl",
+    "sha256": "dfa6331d2a828f1111036017a11233f8a96f4a8864504b1e269cbbcfafc2c07d",
+    "ticks": 27765,
+    "malformed_lines": 0,
+    "span_s": 13882.0,
+    "peak_rss_bytes": 57154125824,
+    "peak_cg_anon_bytes": 48892497920,
+    "peak_cg_current_bytes": 57533214720,
+    "n_procs_min": 17,
+    "n_procs_median": 31,
+    "n_procs_max": 33,
+    "cg_pids_tasks_min": 2736,
+    "cg_pids_tasks_max": 4289
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 53.582,
+    "anon": 45.535,
+    "rss_sum": 53.229
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 54506.42,
+     "recomputed_mb": 54506.42,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 46627.52,
+     "recomputed_mb": 46627.52,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 54867.95,
+     "recomputed_mb": 54867.95,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 31 process(es) per service tick",
+    "one cgroup sampled per role, peak 4289 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films500_lifetimes_20260906T090339Z/export_rocketride_video_parity_blast_p4.json",
+   "export_sha256": "4b2368ea2b2df3a442e9df6677a924fdf49957335ca7ab906a42c2cde4aaa9e9",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 4,
+   "span_frames_per_s": 11.56,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 52068.88,
+    "peak_cgroup_anon_mb": 44149.27,
+    "peak_cgroup_current_mb": 52844.77,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-4a52e7b9d5e362f7e60c85a01c259d0df62b889337da959a0504b33b3f482cfc.scope",
+    "peak_cgroup_tasks": 4282
+   },
+   "stream": {
+    "path": "working/video/results/films500_lifetimes_20260906T090339Z/collector_rocketride_video_parity_blast_p4.jsonl",
+    "sha256": "c61f37ce9e742003894a34e055a349dc0b5594bd34bca7cae9162088022c8571",
+    "ticks": 28017,
+    "malformed_lines": 0,
+    "span_s": 14008.0,
+    "peak_rss_bytes": 54598180864,
+    "peak_cg_anon_bytes": 46293864448,
+    "peak_cg_current_bytes": 55411752960,
+    "n_procs_min": 17,
+    "n_procs_median": 31,
+    "n_procs_max": 33,
+    "cg_pids_tasks_min": 2736,
+    "cg_pids_tasks_max": 4282
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 51.606,
+    "anon": 43.115,
+    "rss_sum": 50.849
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 52068.88,
+     "recomputed_mb": 52068.88,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 44149.27,
+     "recomputed_mb": 44149.27,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 52844.77,
+     "recomputed_mb": 52844.77,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 31 process(es) per service tick",
+    "one cgroup sampled per role, peak 4282 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films500_mainrun_20260904T204852Z/export_llamaindex_video_workers_blast.json",
+   "export_sha256": "bc873db88d7ecf0308fcf97938bd8a16befa035975c12cc545ab48c9c9ae5918",
+   "arm": "llamaindex_video",
+   "leg": "blast",
+   "pass": 1,
+   "span_frames_per_s": 12.249,
+   "declared": {
+    "container_names_in_export": [
+     "li_bal_0",
+     "li_bal_1",
+     "li_bal_10",
+     "li_bal_11",
+     "li_bal_12",
+     "li_bal_13",
+     "li_bal_14",
+     "li_bal_15",
+     "li_bal_2",
+     "li_bal_3",
+     "li_bal_4",
+     "li_bal_5",
+     "li_bal_6",
+     "li_bal_7",
+     "li_bal_8",
+     "li_bal_9"
+    ],
+    "n_container_names": 16,
+    "expected_containers": 16,
+    "expected_containers_source": "per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "instances_declared": 16,
+    "instance_kind": "li_workers",
+    "declared_workers": 16,
+    "declared_tokens": null,
+    "census_after": null,
+    "posture": "workers[declared_workers=16]"
+   },
+   "stored": {
+    "peak_rss_mb": 23260.03,
+    "peak_cgroup_anon_mb": 1053.06,
+    "peak_cgroup_current_mb": 3072.0,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-577723c8d9a498a2b4dae52c2b2cfc638844338fa49d3d65dc564b86e07f138a.scope",
+    "peak_cgroup_tasks": 98
+   },
+   "stream": {
+    "path": "working/video/results/films500_mainrun_20260904T204852Z/collector_llamaindex_video_workers_blast.jsonl",
+    "sha256": "788b496243f8cd5545a9da59725ebc3673e00d0b00a532af2d99b307d5ecf40e",
+    "ticks": 26444,
+    "malformed_lines": 0,
+    "span_s": 13221.5,
+    "peak_rss_bytes": 24389906432,
+    "peak_cg_anon_bytes": 1104211968,
+    "peak_cg_current_bytes": 3221225472,
+    "n_procs_min": 16,
+    "n_procs_median": 19,
+    "n_procs_max": 25,
+    "cg_pids_tasks_min": 11,
+    "cg_pids_tasks_max": 98
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 3.0,
+    "anon": 1.028,
+    "rss_sum": 22.715
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 23260.03,
+     "recomputed_mb": 23260.03,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 1053.06,
+     "recomputed_mb": 1053.06,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 3072.0,
+     "recomputed_mb": 3072.0,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "FIXED SAMPLER \u2014 all 16 containers resolved",
+   "basis": [
+    "export names 16 container(s); expected 16 from per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "stream tracks 19 process(es) per service tick against 16 declared worker(s)",
+    "one cgroup sampled per role, peak 98 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "ONE CONTAINER of 16 \u2014 the collector caches one cgroup per role, so anon and cache are one instance even when the RSS sum is complete"
+  },
+  {
+   "export": "working/video/results/films500_mainrun_20260904T204852Z/export_llamaindex_video_workers_blast_p2.json",
+   "export_sha256": "a47c9a56894f5eab647b2804e780c25e7635f29bf52bb6d99a47ab2af9adebc9",
+   "arm": "llamaindex_video",
+   "leg": "blast",
+   "pass": 2,
+   "span_frames_per_s": 12.953,
+   "declared": {
+    "container_names_in_export": [
+     "li_bal_0",
+     "li_bal_1",
+     "li_bal_10",
+     "li_bal_11",
+     "li_bal_12",
+     "li_bal_13",
+     "li_bal_14",
+     "li_bal_15",
+     "li_bal_2",
+     "li_bal_3",
+     "li_bal_4",
+     "li_bal_5",
+     "li_bal_6",
+     "li_bal_7",
+     "li_bal_8",
+     "li_bal_9"
+    ],
+    "n_container_names": 16,
+    "expected_containers": 16,
+    "expected_containers_source": "per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "instances_declared": 16,
+    "instance_kind": "li_workers",
+    "declared_workers": 16,
+    "declared_tokens": null,
+    "census_after": null,
+    "posture": "workers[declared_workers=16]"
+   },
+   "stored": {
+    "peak_rss_mb": 23334.37,
+    "peak_cgroup_anon_mb": 1047.77,
+    "peak_cgroup_current_mb": 3072.0,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-577723c8d9a498a2b4dae52c2b2cfc638844338fa49d3d65dc564b86e07f138a.scope",
+    "peak_cgroup_tasks": 97
+   },
+   "stream": {
+    "path": "working/video/results/films500_mainrun_20260904T204852Z/collector_llamaindex_video_workers_blast_p2.jsonl",
+    "sha256": "ef3e7d258f4542334bac5da0480add11cd249807e1fd0ff485e2454b139db956",
+    "ticks": 25005,
+    "malformed_lines": 0,
+    "span_s": 12502.0,
+    "peak_rss_bytes": 24467857408,
+    "peak_cg_anon_bytes": 1098670080,
+    "peak_cg_current_bytes": 3221225472,
+    "n_procs_min": 16,
+    "n_procs_median": 19,
+    "n_procs_max": 25,
+    "cg_pids_tasks_min": 11,
+    "cg_pids_tasks_max": 97
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 3.0,
+    "anon": 1.023,
+    "rss_sum": 22.787
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 23334.37,
+     "recomputed_mb": 23334.37,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 1047.77,
+     "recomputed_mb": 1047.77,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 3072.0,
+     "recomputed_mb": 3072.0,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "FIXED SAMPLER \u2014 all 16 containers resolved",
+   "basis": [
+    "export names 16 container(s); expected 16 from per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "stream tracks 19 process(es) per service tick against 16 declared worker(s)",
+    "one cgroup sampled per role, peak 97 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "ONE CONTAINER of 16 \u2014 the collector caches one cgroup per role, so anon and cache are one instance even when the RSS sum is complete"
+  },
+  {
+   "export": "working/video/results/films500_mainrun_20260904T204852Z/export_llamaindex_video_workers_sequential.json",
+   "export_sha256": "afc617581e2289349b6b02769ff2800fb322aa8792d356655d0f2675ea93d83f",
+   "arm": "llamaindex_video",
+   "leg": "sequential",
+   "pass": 1,
+   "span_frames_per_s": 1.834,
+   "declared": {
+    "container_names_in_export": [
+     "li_bal_0",
+     "li_bal_1",
+     "li_bal_10",
+     "li_bal_11",
+     "li_bal_12",
+     "li_bal_13",
+     "li_bal_14",
+     "li_bal_15",
+     "li_bal_2",
+     "li_bal_3",
+     "li_bal_4",
+     "li_bal_5",
+     "li_bal_6",
+     "li_bal_7",
+     "li_bal_8",
+     "li_bal_9"
+    ],
+    "n_container_names": 16,
+    "expected_containers": 16,
+    "expected_containers_source": "per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "instances_declared": 16,
+    "instance_kind": "li_workers",
+    "declared_workers": 16,
+    "declared_tokens": null,
+    "census_after": null,
+    "posture": "workers[declared_workers=16]"
+   },
+   "stored": {
+    "peak_rss_mb": 22547.35,
+    "peak_cgroup_anon_mb": 921.4,
+    "peak_cgroup_current_mb": 948.29,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-577723c8d9a498a2b4dae52c2b2cfc638844338fa49d3d65dc564b86e07f138a.scope",
+    "peak_cgroup_tasks": 13
+   },
+   "stream": {
+    "path": "working/video/results/films500_mainrun_20260904T204852Z/collector_llamaindex_video_workers_sequential.jsonl",
+    "sha256": "b55ba56f8b60d8ea27f91ac726875afa055b7a884349eaa6717edf2d27584e67",
+    "ticks": 2093,
+    "malformed_lines": 0,
+    "span_s": 1046.0,
+    "peak_rss_bytes": 23642607616,
+    "peak_cg_anon_bytes": 966160384,
+    "peak_cg_current_bytes": 994349056,
+    "n_procs_min": 16,
+    "n_procs_median": 16,
+    "n_procs_max": 17,
+    "cg_pids_tasks_min": 13,
+    "cg_pids_tasks_max": 13
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 0.926,
+    "anon": 0.9,
+    "rss_sum": 22.019
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 22547.35,
+     "recomputed_mb": 22547.35,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 921.4,
+     "recomputed_mb": 921.4,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 948.29,
+     "recomputed_mb": 948.29,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "FIXED SAMPLER \u2014 all 16 containers resolved",
+   "basis": [
+    "export names 16 container(s); expected 16 from per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "stream tracks 16 process(es) per service tick against 16 declared worker(s)",
+    "one cgroup sampled per role, peak 13 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "ONE CONTAINER of 16 \u2014 the collector caches one cgroup per role, so anon and cache are one instance even when the RSS sum is complete"
+  },
+  {
+   "export": "working/video/results/films500_mainrun_20260904T204852Z/export_rocketride_video_parity_blast.json",
+   "export_sha256": "b6ae09d1be972f86bf9103991226264d477d7d623e1f07d5b490654636d9ef62",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 1,
+   "span_frames_per_s": 12.198,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 56421.23,
+    "peak_cgroup_anon_mb": 48529.34,
+    "peak_cgroup_current_mb": 54884.25,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-01dc0fdb5d078bcd13d25b3617165f377ba9551ecdd034734028eba148ba26e6.scope",
+    "peak_cgroup_tasks": 4307
+   },
+   "stream": {
+    "path": "working/video/results/films500_mainrun_20260904T204852Z/collector_rocketride_video_parity_blast.jsonl",
+    "sha256": "5a3669c364667f5e623c55f27e70298adb9997cdbd14b431ac5cec603c6d6ea0",
+    "ticks": 26552,
+    "malformed_lines": 0,
+    "span_s": 13275.5,
+    "peak_rss_bytes": 59161944064,
+    "peak_cg_anon_bytes": 50886696960,
+    "peak_cg_current_bytes": 57550303232,
+    "n_procs_min": 17,
+    "n_procs_median": 31,
+    "n_procs_max": 33,
+    "cg_pids_tasks_min": 2736,
+    "cg_pids_tasks_max": 4307
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 53.598,
+    "anon": 47.392,
+    "rss_sum": 55.099
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 56421.23,
+     "recomputed_mb": 56421.23,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 48529.34,
+     "recomputed_mb": 48529.34,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 54884.25,
+     "recomputed_mb": 54884.25,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 31 process(es) per service tick",
+    "one cgroup sampled per role, peak 4307 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films500_mainrun_20260904T204852Z/export_rocketride_video_parity_blast_p2.json",
+   "export_sha256": "f5c04e50606fa30c28d5c73e31af92956c6a9aed8544e7a317b4943ef16a67ea",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 2,
+   "span_frames_per_s": 11.609,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 55640.56,
+    "peak_cgroup_anon_mb": 47724.7,
+    "peak_cgroup_current_mb": 54602.64,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-01dc0fdb5d078bcd13d25b3617165f377ba9551ecdd034734028eba148ba26e6.scope",
+    "peak_cgroup_tasks": 4313
+   },
+   "stream": {
+    "path": "working/video/results/films500_mainrun_20260904T204852Z/collector_rocketride_video_parity_blast_p2.jsonl",
+    "sha256": "46d40663e5b2bd33d8469e38c3f8ce1e724382893896e398993245dd75a56c43",
+    "ticks": 27899,
+    "malformed_lines": 0,
+    "span_s": 13949.0,
+    "peak_rss_bytes": 58343358464,
+    "peak_cg_anon_bytes": 50042978304,
+    "peak_cg_current_bytes": 57255014400,
+    "n_procs_min": 17,
+    "n_procs_median": 31,
+    "n_procs_max": 33,
+    "cg_pids_tasks_min": 2736,
+    "cg_pids_tasks_max": 4313
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 53.323,
+    "anon": 46.606,
+    "rss_sum": 54.336
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 55640.56,
+     "recomputed_mb": 55640.56,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 47724.7,
+     "recomputed_mb": 47724.7,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 54602.64,
+     "recomputed_mb": 54602.64,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 31 process(es) per service tick",
+    "one cgroup sampled per role, peak 4313 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films500_mainrun_20260904T204852Z/export_rocketride_video_parity_sequential.json",
+   "export_sha256": "052a17bbd5cc70b43ea84a2647e5c6022c1cd99bcd390f5481f37bf27ced908a",
+   "arm": "rocketride_video",
+   "leg": "sequential",
+   "pass": 1,
+   "span_frames_per_s": 2.081,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 26624.45,
+    "peak_cgroup_anon_mb": 19012.34,
+    "peak_cgroup_current_mb": 20326.2,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-01dc0fdb5d078bcd13d25b3617165f377ba9551ecdd034734028eba148ba26e6.scope",
+    "peak_cgroup_tasks": 2824
+   },
+   "stream": {
+    "path": "working/video/results/films500_mainrun_20260904T204852Z/collector_rocketride_video_parity_sequential.jsonl",
+    "sha256": "d45505c08e4cef9b9ee1b7fe3360254f85a49c52666ed64dbcb75a15e4d97f8c",
+    "ticks": 1842,
+    "malformed_lines": 0,
+    "span_s": 920.5,
+    "peak_rss_bytes": 27917754368,
+    "peak_cg_anon_bytes": 19935887360,
+    "peak_cg_current_bytes": 21313568768,
+    "n_procs_min": 17,
+    "n_procs_median": 18,
+    "n_procs_max": 18,
+    "cg_pids_tasks_min": 2736,
+    "cg_pids_tasks_max": 2824
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 19.85,
+    "anon": 18.567,
+    "rss_sum": 26.0
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 26624.45,
+     "recomputed_mb": 26624.45,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 19012.34,
+     "recomputed_mb": 19012.34,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 20326.2,
+     "recomputed_mb": 20326.2,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 18 process(es) per service tick",
+    "one cgroup sampled per role, peak 2824 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films_mainrun_20260901T204015Z/export_llamaindex_video_workers_blast.json",
+   "export_sha256": "87c41fe66a2fe4c9b6ca990ef3b336937321601315ed245be5d9c1a950504784",
+   "arm": "llamaindex_video",
+   "leg": "blast",
+   "pass": 1,
+   "span_frames_per_s": 10.145,
+   "declared": {
+    "container_names_in_export": [
+     "li_bal_0",
+     "li_bal_1",
+     "li_bal_10",
+     "li_bal_11",
+     "li_bal_12",
+     "li_bal_13",
+     "li_bal_14",
+     "li_bal_15",
+     "li_bal_2",
+     "li_bal_3",
+     "li_bal_4",
+     "li_bal_5",
+     "li_bal_6",
+     "li_bal_7",
+     "li_bal_8",
+     "li_bal_9"
+    ],
+    "n_container_names": 16,
+    "expected_containers": 16,
+    "expected_containers_source": "per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "instances_declared": 16,
+    "instance_kind": "li_workers",
+    "declared_workers": 16,
+    "declared_tokens": null,
+    "census_after": null,
+    "posture": "workers[declared_workers=16]"
+   },
+   "stored": {
+    "peak_rss_mb": 23144.78,
+    "peak_cgroup_anon_mb": 1048.66,
+    "peak_cgroup_current_mb": 2856.48,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-87e6fe4e2f49ff14b2a3741c4e88724c7253a958d8ed3db47990d44458587437.scope",
+    "peak_cgroup_tasks": 95
+   },
+   "stream": {
+    "path": "working/video/results/films_mainrun_20260901T204015Z/collector_llamaindex_video_workers_blast.jsonl",
+    "sha256": "4c79f2366bb2fd85e83b48e1846f321c98406ef0458b32840497e32ee0c3fac9",
+    "ticks": 2338,
+    "malformed_lines": 0,
+    "span_s": 1168.5,
+    "peak_rss_bytes": 24269062144,
+    "peak_cg_anon_bytes": 1099603968,
+    "peak_cg_current_bytes": 2995240960,
+    "n_procs_min": 16,
+    "n_procs_median": 18,
+    "n_procs_max": 23,
+    "cg_pids_tasks_min": 11,
+    "cg_pids_tasks_max": 95
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 2.79,
+    "anon": 1.024,
+    "rss_sum": 22.602
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 23144.78,
+     "recomputed_mb": 23144.78,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 1048.66,
+     "recomputed_mb": 1048.66,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 2856.48,
+     "recomputed_mb": 2856.48,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "FIXED SAMPLER \u2014 all 16 containers resolved",
+   "basis": [
+    "export names 16 container(s); expected 16 from per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "stream tracks 18 process(es) per service tick against 16 declared worker(s)",
+    "one cgroup sampled per role, peak 95 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "ONE CONTAINER of 16 \u2014 the collector caches one cgroup per role, so anon and cache are one instance even when the RSS sum is complete"
+  },
+  {
+   "export": "working/video/results/films_mainrun_20260901T204015Z/export_llamaindex_video_workers_blast_p2.json",
+   "export_sha256": "4062c3cedbe6f8f5f28087c3973c2eae670820960c89d1b1ba2062b1553f9de6",
+   "arm": "llamaindex_video",
+   "leg": "blast",
+   "pass": 2,
+   "span_frames_per_s": 10.123,
+   "declared": {
+    "container_names_in_export": [
+     "li_bal_0",
+     "li_bal_1",
+     "li_bal_10",
+     "li_bal_11",
+     "li_bal_12",
+     "li_bal_13",
+     "li_bal_14",
+     "li_bal_15",
+     "li_bal_2",
+     "li_bal_3",
+     "li_bal_4",
+     "li_bal_5",
+     "li_bal_6",
+     "li_bal_7",
+     "li_bal_8",
+     "li_bal_9"
+    ],
+    "n_container_names": 16,
+    "expected_containers": 16,
+    "expected_containers_source": "per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "instances_declared": 16,
+    "instance_kind": "li_workers",
+    "declared_workers": 16,
+    "declared_tokens": null,
+    "census_after": null,
+    "posture": "workers[declared_workers=16]"
+   },
+   "stored": {
+    "peak_rss_mb": 23061.38,
+    "peak_cgroup_anon_mb": 1078.3,
+    "peak_cgroup_current_mb": 2857.71,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-87e6fe4e2f49ff14b2a3741c4e88724c7253a958d8ed3db47990d44458587437.scope",
+    "peak_cgroup_tasks": 95
+   },
+   "stream": {
+    "path": "working/video/results/films_mainrun_20260901T204015Z/collector_llamaindex_video_workers_blast_p2.jsonl",
+    "sha256": "b373bb834e3d05da5334617991fb792aea7512298391edcc094b1065753d2aa8",
+    "ticks": 2343,
+    "malformed_lines": 0,
+    "span_s": 1171.0,
+    "peak_rss_bytes": 24181608448,
+    "peak_cg_anon_bytes": 1130684416,
+    "peak_cg_current_bytes": 2996531200,
+    "n_procs_min": 16,
+    "n_procs_median": 18,
+    "n_procs_max": 23,
+    "cg_pids_tasks_min": 11,
+    "cg_pids_tasks_max": 95
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 2.791,
+    "anon": 1.053,
+    "rss_sum": 22.521
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 23061.38,
+     "recomputed_mb": 23061.38,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 1078.3,
+     "recomputed_mb": 1078.3,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 2857.71,
+     "recomputed_mb": 2857.71,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "FIXED SAMPLER \u2014 all 16 containers resolved",
+   "basis": [
+    "export names 16 container(s); expected 16 from per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "stream tracks 18 process(es) per service tick against 16 declared worker(s)",
+    "one cgroup sampled per role, peak 95 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "ONE CONTAINER of 16 \u2014 the collector caches one cgroup per role, so anon and cache are one instance even when the RSS sum is complete"
+  },
+  {
+   "export": "working/video/results/films_mainrun_20260901T204015Z/export_llamaindex_video_workers_sequential.json",
+   "export_sha256": "53231d32da972aa34e23f7a65aad8ad174b7340eafbed484e2e002de06dc7b64",
+   "arm": "llamaindex_video",
+   "leg": "sequential",
+   "pass": 1,
+   "span_frames_per_s": 1.939,
+   "declared": {
+    "container_names_in_export": [
+     "li_bal_0",
+     "li_bal_1",
+     "li_bal_10",
+     "li_bal_11",
+     "li_bal_12",
+     "li_bal_13",
+     "li_bal_14",
+     "li_bal_15",
+     "li_bal_2",
+     "li_bal_3",
+     "li_bal_4",
+     "li_bal_5",
+     "li_bal_6",
+     "li_bal_7",
+     "li_bal_8",
+     "li_bal_9"
+    ],
+    "n_container_names": 16,
+    "expected_containers": 16,
+    "expected_containers_source": "per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "instances_declared": 16,
+    "instance_kind": "li_workers",
+    "declared_workers": 16,
+    "declared_tokens": null,
+    "census_after": null,
+    "posture": "workers[declared_workers=16]"
+   },
+   "stored": {
+    "peak_rss_mb": 22809.73,
+    "peak_cgroup_anon_mb": 954.14,
+    "peak_cgroup_current_mb": 1000.84,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-87e6fe4e2f49ff14b2a3741c4e88724c7253a958d8ed3db47990d44458587437.scope",
+    "peak_cgroup_tasks": 13
+   },
+   "stream": {
+    "path": "working/video/results/films_mainrun_20260901T204015Z/collector_llamaindex_video_workers_sequential.jsonl",
+    "sha256": "7e330c8dd9040e33cba36b8d5d3f15680c2506feb002eedf66cfa07d9e384b7d",
+    "ticks": 2052,
+    "malformed_lines": 0,
+    "span_s": 1025.5,
+    "peak_rss_bytes": 23917731840,
+    "peak_cg_anon_bytes": 1000484864,
+    "peak_cg_current_bytes": 1049456640,
+    "n_procs_min": 16,
+    "n_procs_median": 16,
+    "n_procs_max": 17,
+    "cg_pids_tasks_min": 13,
+    "cg_pids_tasks_max": 13
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 0.977,
+    "anon": 0.932,
+    "rss_sum": 22.275
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 22809.73,
+     "recomputed_mb": 22809.73,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 954.14,
+     "recomputed_mb": 954.14,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 1000.84,
+     "recomputed_mb": 1000.84,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "FIXED SAMPLER \u2014 all 16 containers resolved",
+   "basis": [
+    "export names 16 container(s); expected 16 from per-container checkpoint read-back (`rfdetr_checkpoint_md5_by_container`)",
+    "stream tracks 16 process(es) per service tick against 16 declared worker(s)",
+    "one cgroup sampled per role, peak 13 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "ONE CONTAINER of 16 \u2014 the collector caches one cgroup per role, so anon and cache are one instance even when the RSS sum is complete"
+  },
+  {
+   "export": "working/video/results/films_mainrun_20260901T204015Z/export_rocketride_video_default_blast.json",
+   "export_sha256": "e5e5bd6022adba4ba4618a880d1c96bc1cd1f18765e2ecc5050446b37a591d23",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 1,
+   "span_frames_per_s": 2.36,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 1,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 1,
+    "census_after": 1,
+    "posture": "default[tokens=1,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 10648.39,
+    "peak_cgroup_anon_mb": 9921.36,
+    "peak_cgroup_current_mb": 23151.54,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-c5f65f243135f1157e25a018b24379a6bd674b97ebd785a16144ac656cefb07f.scope",
+    "peak_cgroup_tasks": 2236
+   },
+   "stream": {
+    "path": "working/video/results/films_mainrun_20260901T204015Z/collector_rocketride_video_default_blast.jsonl",
+    "sha256": "eeace485ed74fd0534888a9c0e310c4dc82c5a1d483f6e820e69cb7377b51c94",
+    "ticks": 10035,
+    "malformed_lines": 0,
+    "span_s": 5017.0,
+    "peak_rss_bytes": 11165646848,
+    "peak_cg_anon_bytes": 10403295232,
+    "peak_cg_current_bytes": 24276148224,
+    "n_procs_min": 2,
+    "n_procs_median": 18,
+    "n_procs_max": 18,
+    "cg_pids_tasks_min": 318,
+    "cg_pids_tasks_max": 2236
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 22.609,
+    "anon": 9.689,
+    "rss_sum": 10.399
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 10648.39,
+     "recomputed_mb": 10648.39,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 9921.36,
+     "recomputed_mb": 9921.36,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 23151.54,
+     "recomputed_mb": 23151.54,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 18 process(es) per service tick",
+    "one cgroup sampled per role, peak 2236 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films_mainrun_20260901T204015Z/export_rocketride_video_default_blast_p2.json",
+   "export_sha256": "1a2d0a1eb606afe87a72b309abeed0216ddc1dcf33bb7034a0d46eb1972f7bfc",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 2,
+   "span_frames_per_s": 2.342,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 1,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 1,
+    "census_after": 1,
+    "posture": "default[tokens=1,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 10821.34,
+    "peak_cgroup_anon_mb": 10080.32,
+    "peak_cgroup_current_mb": 23373.09,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-c5f65f243135f1157e25a018b24379a6bd674b97ebd785a16144ac656cefb07f.scope",
+    "peak_cgroup_tasks": 2236
+   },
+   "stream": {
+    "path": "working/video/results/films_mainrun_20260901T204015Z/collector_rocketride_video_default_blast_p2.jsonl",
+    "sha256": "4202fbc1ecef5482b8ee380671cfee2431d99bcb29b12e461caf42184d816980",
+    "ticks": 10111,
+    "malformed_lines": 0,
+    "span_s": 5055.0,
+    "peak_rss_bytes": 11347001344,
+    "peak_cg_anon_bytes": 10569977856,
+    "peak_cg_current_bytes": 24508456960,
+    "n_procs_min": 2,
+    "n_procs_median": 18,
+    "n_procs_max": 18,
+    "cg_pids_tasks_min": 318,
+    "cg_pids_tasks_max": 2236
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 22.825,
+    "anon": 9.844,
+    "rss_sum": 10.568
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 10821.34,
+     "recomputed_mb": 10821.34,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 10080.32,
+     "recomputed_mb": 10080.32,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 23373.09,
+     "recomputed_mb": 23373.09,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 18 process(es) per service tick",
+    "one cgroup sampled per role, peak 2236 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films_mainrun_20260901T204015Z/export_rocketride_video_default_sequential.json",
+   "export_sha256": "e7b992f519a277cf5bf3877523e2ec9d7f1c7b925337abc8fece4fe6f7b6e79c",
+   "arm": "rocketride_video",
+   "leg": "sequential",
+   "pass": 1,
+   "span_frames_per_s": 2.129,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 1,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 1,
+    "census_after": 1,
+    "posture": "default[tokens=1,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 2595.94,
+    "peak_cgroup_anon_mb": 2063.43,
+    "peak_cgroup_current_mb": 4846.61,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-c5f65f243135f1157e25a018b24379a6bd674b97ebd785a16144ac656cefb07f.scope",
+    "peak_cgroup_tasks": 420
+   },
+   "stream": {
+    "path": "working/video/results/films_mainrun_20260901T204015Z/collector_rocketride_video_default_sequential.jsonl",
+    "sha256": "a0182ae47c1cdb1eda13287bc2c2d50583bab9df26ae56dfef6ef5d3f9773162",
+    "ticks": 1866,
+    "malformed_lines": 0,
+    "span_s": 932.5,
+    "peak_rss_bytes": 2722037760,
+    "peak_cg_anon_bytes": 2163666944,
+    "peak_cg_current_bytes": 5082034176,
+    "n_procs_min": 2,
+    "n_procs_median": 3,
+    "n_procs_max": 3,
+    "cg_pids_tasks_min": 318,
+    "cg_pids_tasks_max": 420
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 4.733,
+    "anon": 2.015,
+    "rss_sum": 2.535
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 2595.94,
+     "recomputed_mb": 2595.94,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 2063.43,
+     "recomputed_mb": 2063.43,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 4846.61,
+     "recomputed_mb": 4846.61,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 3 process(es) per service tick",
+    "one cgroup sampled per role, peak 420 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films_mainrun_20260901T204015Z/export_rocketride_video_parity_blast.json",
+   "export_sha256": "90e235987e27cb11195db9e5a487f21bf4ee42bf781cc4be026adf5b80027ce3",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 1,
+   "span_frames_per_s": 9.413,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 30772.05,
+    "peak_cgroup_anon_mb": 23032.17,
+    "peak_cgroup_current_mb": 37094.95,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-f166ceef2804dfe7069ae58f6f8307c3c0e69d679ebc63697ac762ca0fd92668.scope",
+    "peak_cgroup_tasks": 4154
+   },
+   "stream": {
+    "path": "working/video/results/films_mainrun_20260901T204015Z/collector_rocketride_video_parity_blast.jsonl",
+    "sha256": "f8d148069d9f00a7c5326788de3892862efea01934c859c5af9643502a5b3488",
+    "ticks": 2517,
+    "malformed_lines": 0,
+    "span_s": 1258.0,
+    "peak_rss_bytes": 32266838016,
+    "peak_cg_anon_bytes": 24150982656,
+    "peak_cg_current_bytes": 38896877568,
+    "n_procs_min": 17,
+    "n_procs_median": 27,
+    "n_procs_max": 33,
+    "cg_pids_tasks_min": 2736,
+    "cg_pids_tasks_max": 4154
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 36.226,
+    "anon": 22.492,
+    "rss_sum": 30.051
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 30772.05,
+     "recomputed_mb": 30772.05,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 23032.17,
+     "recomputed_mb": 23032.17,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 37094.95,
+     "recomputed_mb": 37094.95,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 27 process(es) per service tick",
+    "one cgroup sampled per role, peak 4154 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films_mainrun_20260901T204015Z/export_rocketride_video_parity_blast_p2.json",
+   "export_sha256": "30e490ba92d72f022c4a64b7b313ff28888f1f675236d143dddd138d5fb1ba44",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 2,
+   "span_frames_per_s": 9.611,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 31736.88,
+    "peak_cgroup_anon_mb": 23991.89,
+    "peak_cgroup_current_mb": 37566.35,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-f166ceef2804dfe7069ae58f6f8307c3c0e69d679ebc63697ac762ca0fd92668.scope",
+    "peak_cgroup_tasks": 4152
+   },
+   "stream": {
+    "path": "working/video/results/films_mainrun_20260901T204015Z/collector_rocketride_video_parity_blast_p2.jsonl",
+    "sha256": "fe657c0761aa6e4a1411a4202730c74c1523038a27d256cb7fead2f8066c1c30",
+    "ticks": 2465,
+    "malformed_lines": 0,
+    "span_s": 1232.0,
+    "peak_rss_bytes": 33278525440,
+    "peak_cg_anon_bytes": 25157324800,
+    "peak_cg_current_bytes": 39391170560,
+    "n_procs_min": 17,
+    "n_procs_median": 27,
+    "n_procs_max": 33,
+    "cg_pids_tasks_min": 2736,
+    "cg_pids_tasks_max": 4152
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 36.686,
+    "anon": 23.43,
+    "rss_sum": 30.993
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 31736.88,
+     "recomputed_mb": 31736.88,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 23991.89,
+     "recomputed_mb": 23991.89,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 37566.35,
+     "recomputed_mb": 37566.35,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 27 process(es) per service tick",
+    "one cgroup sampled per role, peak 4152 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/films_mainrun_20260901T204015Z/export_rocketride_video_parity_sequential.json",
+   "export_sha256": "70b019233eadb6c128c74923496b2b12e3ba3d5fd053fe78bfa703ac8ab7a190",
+   "arm": "rocketride_video",
+   "leg": "sequential",
+   "pass": 1,
+   "span_frames_per_s": 1.953,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 26364.66,
+    "peak_cgroup_anon_mb": 18752.4,
+    "peak_cgroup_current_mb": 20142.88,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-f166ceef2804dfe7069ae58f6f8307c3c0e69d679ebc63697ac762ca0fd92668.scope",
+    "peak_cgroup_tasks": 2825
+   },
+   "stream": {
+    "path": "working/video/results/films_mainrun_20260901T204015Z/collector_rocketride_video_parity_sequential.jsonl",
+    "sha256": "545473946cb1f8e07d29482f0c5b94646477951ed49dddc4a468b7844e749699",
+    "ticks": 2035,
+    "malformed_lines": 0,
+    "span_s": 1017.0,
+    "peak_rss_bytes": 27645345792,
+    "peak_cg_anon_bytes": 19663314944,
+    "peak_cg_current_bytes": 21121339392,
+    "n_procs_min": 17,
+    "n_procs_median": 18,
+    "n_procs_max": 18,
+    "cg_pids_tasks_min": 2736,
+    "cg_pids_tasks_max": 2825
+   },
+   "recomputed_GiB": {
+    "cgroup_cache": 19.671,
+    "anon": 18.313,
+    "rss_sum": 25.747
+   },
+   "stored_vs_recomputed": {
+    "rss_sum": {
+     "stored_mb": 26364.66,
+     "recomputed_mb": 26364.66,
+     "agrees": true
+    },
+    "anon": {
+     "stored_mb": 18752.4,
+     "recomputed_mb": 18752.4,
+     "agrees": true
+    },
+    "cgroup_cache": {
+     "stored_mb": 20142.88,
+     "recomputed_mb": 20142.88,
+     "agrees": true
+    }
+   },
+   "sampler_verdict": "SINGLE-CONTAINER POSTURE \u2014 one sample IS the whole service",
+   "basis": [
+    "export names 1 container(s); expected 1 from the RocketRide arm is one engine container (tokens are in-container)",
+    "stream tracks 18 process(es) per service tick",
+    "one cgroup sampled per role, peak 2825 tasks in it"
+   ],
+   "rss_basis_scope": "whole service \u2014 summed per-process RSS across every tracked tree",
+   "cgroup_basis_scope": "whole service"
+  },
+  {
+   "export": "working/video/results/mainrun_20260824T025550Z/export_rocketride_video_default_blast.json",
+   "export_sha256": "050f0e9069428977b745e62754ec0f1acf9e929ca18616e69a38f0c5eb2c3054",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 1,
+   "span_frames_per_s": 2.443,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 1,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 1,
+    "census_after": 1,
+    "posture": "default[tokens=1,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 17277.25,
+    "peak_cgroup_anon_mb": 16582.71,
+    "peak_cgroup_current_mb": 18820.96,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-f055ad173325fe247bfd6bce13bab7e6e42d261a9b9aa0b13a4b79c4b95745fb.scope",
+    "peak_cgroup_tasks": 2255
+   },
+   "recomputed": null,
+   "note": "no raw tick stream beside this export \u2014 nothing recomputed"
+  },
+  {
+   "export": "working/video/results/mainrun_20260824T025550Z/export_rocketride_video_default_blast_p2.json",
+   "export_sha256": "d0586714ed2e72e333d245f003da63c8abd35794746d812497ab6cc183915c0b",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 2,
+   "span_frames_per_s": 2.446,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 1,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 1,
+    "census_after": 1,
+    "posture": "default[tokens=1,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 17419.27,
+    "peak_cgroup_anon_mb": 16677.27,
+    "peak_cgroup_current_mb": 19449.67,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-f85222023bcb162009cec565c4caa1c91b898c35e0748a63a4d01d412ce21900.scope",
+    "peak_cgroup_tasks": 2223
+   },
+   "recomputed": null,
+   "note": "no raw tick stream beside this export \u2014 nothing recomputed"
+  },
+  {
+   "export": "working/video/results/mainrun_20260824T025550Z/export_rocketride_video_parity_blast.json",
+   "export_sha256": "003b38b860343f914edb04f025fb21c36a306c3833211b57cf8f3cf3bb7a19f4",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 1,
+   "span_frames_per_s": 12.729,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 40338.55,
+    "peak_cgroup_anon_mb": 32511.05,
+    "peak_cgroup_current_mb": 35027.12,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-771c136a26e584a9cfe58ba11693571445da58e61c63c2fd83c54965d8a21853.scope",
+    "peak_cgroup_tasks": 4222
+   },
+   "recomputed": null,
+   "note": "no raw tick stream beside this export \u2014 nothing recomputed"
+  },
+  {
+   "export": "working/video/results/mainrun_20260824T025550Z/export_rocketride_video_parity_blast_p2.json",
+   "export_sha256": "a28645a5583418c1039d5f11f2d9582612de162803ecb98624112f49f804cc2b",
+   "arm": "rocketride_video",
+   "leg": "blast",
+   "pass": 2,
+   "span_frames_per_s": 12.753,
+   "declared": {
+    "container_names_in_export": [
+     "rr"
+    ],
+    "n_container_names": 1,
+    "expected_containers": 1,
+    "expected_containers_source": "the RocketRide arm is one engine container (tokens are in-container)",
+    "instances_declared": 16,
+    "instance_kind": "rr_tokens",
+    "declared_workers": null,
+    "declared_tokens": 16,
+    "census_after": 16,
+    "posture": "parity[tokens=16,threads=unset(engine-default-64)]"
+   },
+   "stored": {
+    "peak_rss_mb": 41505.09,
+    "peak_cgroup_anon_mb": 33678.61,
+    "peak_cgroup_current_mb": 36280.13,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-37449fef981c32b630fa49a397c6e8f34732a73ca5162392556ced73bb15436b.scope",
+    "peak_cgroup_tasks": 4216
+   },
+   "recomputed": null,
+   "note": "no raw tick stream beside this export \u2014 nothing recomputed"
+  }
+ ]
+}
