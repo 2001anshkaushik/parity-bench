@@ -98,6 +98,7 @@ DOC_TIMEOUT_S = int(os.environ.get("BSZ_DOC_TIMEOUT_S", "1800"))
 BREAKER_K = 3
 STRAY_CORE_LIMIT = float(os.environ.get("BSZ_STRAY_CORE_LIMIT", "0.5"))   # Ruling C
 IDLE_SPIN_WINDOW_S = float(os.environ.get("BSZ_IDLE_SPIN_WINDOW_S", "6.0"))
+DROP_CACHES = os.environ.get("BSZ_DROP_CACHES", "") not in ("", "0")   # G5(a)
 ENVPROBE_SCHEMA_MIN = 2                      # driver_video.py:679, same contract
 ENVPROBE_REQUIRED = ("env_probe_schema", "env", "torch_num_threads", "python_version")
 DOCUMENT_OUTCOMES = ("no_documents", "empty_extraction", "parse_failed")
@@ -248,6 +249,20 @@ def stray_processes(cg: Path, window_s: float = 4.0) -> Dict[str, Any]:
             "clean": not found,
             "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's "
                      "cgroup.procs and the driver itself"}
+
+
+def drop_caches() -> Dict[str, Any]:
+    """G5(a): the 384-document slice is ~267 MB and the box has 61 GiB, so an ascending K grid
+    re-reads a corpus the page cache already holds. Dropping the caches makes ONE leg pay the
+    cold read the first leg of a fresh campaign would. Reported as an attempted action with its
+    return code: a silent no-op here would look exactly like 'caching does not matter'."""
+    r = subprocess.run(["sudo", "sh", "-c", "sync; echo 3 > /proc/sys/vm/drop_caches"],
+                       capture_output=True, text=True)
+    free = subprocess.run(["free", "-m"], capture_output=True, text=True).stdout.splitlines()
+    return {"attempted": True, "rc": r.returncode, "stderr": r.stderr.strip()[:200] or None,
+            "free_after": free[1] if len(free) > 1 else None,
+            "note": "dropped before the warm-up, so the measured slice is read cold; the "
+                    "warm-up's own 25 disjoint documents re-warm only themselves"}
 
 
 def measure_idle_spin(cg: Path, window_s: float = IDLE_SPIN_WINDOW_S) -> Dict[str, Any]:
@@ -640,6 +655,9 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
         state["d1"] = driver_cpu_s()
         state["percore"] = state["sampler"].stop()
 
+    state["caches"] = drop_caches() if DROP_CACHES else {"attempted": False}
+    if DROP_CACHES:
+        say(f"  caches dropped: rc={state['caches']['rc']}  {state['caches']['free_after']}")
     tw = time.perf_counter()
     if arm == "rr":
         async def go():
@@ -753,6 +771,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                          "net_of_spin_basis": "raw idle + measured idle spin: the spin is busy "
                                               "CPU doing no work, so it is unused capacity"},
         "box_hygiene": hygiene,
+        "page_cache": state["caches"],
         "warm_up": {"docs": len(warm), "seconds": state.get("warm_s"),
                     "disjoint_from_measured": True, "same_shape_as_leg": True},
         "quiet_box_before": pre,

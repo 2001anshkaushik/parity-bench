@@ -62,7 +62,9 @@ refuse_existing() { for c in "$@"; do docker inspect "$c" >/dev/null 2>&1 && { e
 
 envargs() { echo "-e OMP_NUM_THREADS=$1 -e MKL_NUM_THREADS=$1 -e OPENBLAS_NUM_THREADS=$1 -e VECLIB_MAXIMUM_THREADS=$1 -e NUMEXPR_NUM_THREADS=$1 -e TORCH_NUM_THREADS=$1"; }
 
-LI_N=8; LI_T=4
+# The service arm's shape is a swept knob, not a constant: G4 needs ONE instance against one
+# RocketRide token, and the banked headline cell is eight at four threads.
+LI_N="${BSZ_LI_INSTANCES:-8}"; LI_T="${BSZ_LI_T:-4}"
 PORTS=""; NAMES=""
 for i in $(seq 0 $((LI_N-1))); do PORTS="$PORTS,$((8802+i))"; NAMES="$NAMES,li_bal_$i"; done
 PORTS="${PORTS#,}"; NAMES="${NAMES#,}"
@@ -77,7 +79,7 @@ start_arm() {
     for i in $(seq 0 $((LI_N-1))); do refuse_existing "li_bal_$i"; done
     for i in $(seq 0 $((LI_N-1))); do
       # shellcheck disable=SC2046
-      ours+=("$(docker run -d --name "li_bal_$i" --memory 7g $(envargs "$LI_T") -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c "rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port $((8802+i)) --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30")") || return 1
+      ours+=("$(docker run -d --name "li_bal_$i" --memory "${BSZ_LI_MEM:-7g}" $(envargs "$LI_T") -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c "rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port $((8802+i)) --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30")") || return 1
     done
     for i in $(seq 0 $((LI_N-1))); do
       "$PY" working/video/probe/wait_ready.py --arm li --port $((8802+i)) --workers 1 --container "li_bal_$i" --deadline 1200 || return 1
@@ -87,10 +89,10 @@ start_arm() {
 
 RCS=()
 for K in ${KLIST//,/ }; do
-  LEG="$OUT/${ARM}_k$K"
+  LEG="$OUT/${ARM}_k$K${BSZ_LEG_SUFFIX:-}"
   [ -e "$LEG" ] && { echo "REFUSED: $LEG exists — append-only"; RCS+=("k$K:exists"); continue; }
   mkdir -p "$LEG"
-  echo "=== $ARM K=$K n=$N — fresh lifetime ==="
+  echo "=== $ARM K=$K n=$N instances=${LI_N} T=${LI_T} — fresh lifetime ==="
   start_arm || { echo "NOT READY"; RCS+=("k$K:not_ready"); cleanup; ours=(); continue; }
   PYTHONPATH="$BATCH_TREE/working" "$PY" -m harness.percore_sampler --cpus 0-31 --out "$LEG/percore.jsonl" --duration 21600 --until "$LEG/.leg_done" > "$LEG/percore_summary.txt" 2>&1 &
   SPID=$!
@@ -109,8 +111,8 @@ echo "LEGS: ${RCS[*]}"
 
 STAMP="$(basename "$(dirname "$OUT")")/$(basename "$OUT")"
 for K in ${KLIST//,/ }; do
-  LEG="$OUT/${ARM}_k$K"; [ -d "$LEG" ] || continue
-  DEST="s3://rocketride-benchmark-data/ansh/batch-size-optimization/$STAMP/${ARM}_k$K/"
+  LEG="$OUT/${ARM}_k$K${BSZ_LEG_SUFFIX:-}"; [ -d "$LEG" ] || continue
+  DEST="s3://rocketride-benchmark-data/ansh/batch-size-optimization/$STAMP/${ARM}_k$K${BSZ_LEG_SUFFIX:-}/"
   if aws s3 ls "$DEST" >/dev/null 2>&1; then echo "!! $DEST exists — not uploading over it"; continue; fi
   aws s3 cp "$LEG" "$DEST" --recursive --only-show-errors && echo "uploaded $DEST"
 done
