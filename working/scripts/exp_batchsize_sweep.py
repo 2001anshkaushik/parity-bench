@@ -299,8 +299,8 @@ def _assert_envprobe_complete(info: Any) -> None:
     older field set; `.get()` would collapse 'the instrument did not report' into 'the value is
     None', and None reads as unpinned exactly where unpinned is the thing being tested."""
     if not isinstance(info, dict) or not info:
-        raise SystemExit("REFUSED: env_probe returned no data — the node did not run, or the "
-                         "response lane is wrong.")
+        raise SystemExit("REFUSED: env_probe parsed to no data — the payload under the lane key "
+                         "was not a JSON object.")
     missing = [k for k in ENVPROBE_REQUIRED if k not in info]
     ver = info.get("env_probe_schema")
     if missing or not (isinstance(ver, int) and ver >= ENVPROBE_SCHEMA_MIN):
@@ -341,7 +341,13 @@ async def rr_inprocess_readback(threads: Optional[int]) -> Dict[str, Any]:
         # found nothing and reported it as "the node did not run" — the instrument was fine and
         # the reader was wrong, which is why the md5 fix changed nothing.
         texts = (out or {}).get("envprobe") or []
-        info = json.loads(texts[0]) if texts else None
+        if not texts:
+            raise SystemExit(
+                "REFUSED: env_probe returned nothing under the lane key 'envprobe'. Keys the "
+                f"engine actually returned: {sorted((out or {}).keys())}. The response is keyed "
+                "by response_text's config.laneName — check the READER first (register entry "
+                "37), then whether the node ran at all.")
+        info = json.loads(texts[0])
         _assert_envprobe_complete(info)
         return {"source": "env_probe node appended to product_pdf.pipe (same task process as "
                           "the measured nodes)", **info}

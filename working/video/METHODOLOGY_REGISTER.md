@@ -1351,3 +1351,35 @@ than rewritten from memory, which is entry 2's point in miniature.
 > null-controlled by reinstating the old row, which fails it. Standing
 > consequence for the AMI cells: a LlamaIndex balanced (8-container) peak is
 > quotable on the summed-RSS basis only, and only from a post-`7c1cd81` run.
+
+## 37. The fix that changed nothing, and the error message that pointed away from the cause (added 2026-09-20)
+
+> Stage 3b needed the docs arms' thread state read from INSIDE the task
+> process, so `env_probe` was appended to `product_pdf.pipe` — the
+> a3_env_torch pattern the video driver already uses, chosen precisely so
+> the read would not be the one-armed check of entry 33. It returned an
+> empty response. The refusal said *"the node did not run, or the response
+> lane is wrong"*, and a real defect was standing right there to explain
+> it: the node baked into `rr:patched` is an OLDER copy than the repo's
+> (md5 `cba71b35…` against `0a2850a0…`). The runner was taught to compare
+> md5 and replace a stale node rather than only an absent one; the copy
+> landed, the md5 matched — **and the probe still returned nothing.**
+>
+> The cause was the second clause of the message, not the first. The probe
+> appends `response_text` with `config.laneName = 'envprobe'`, and the
+> engine keys the response BY THE LANE NAME; the reader asked for
+> `out['text']`. `driver_video.py:723` reads `result.get('envprobe')` and
+> has always been right. The instrument was healthy and the reader was
+> wrong the whole time.
+>
+> Two rules. **A plausible defect found while diagnosing is not thereby the
+> cause** — the md5 mismatch was real, was worth fixing, and was not it;
+> entry 10's shape with the layers swapped, since here the loud finding was
+> the *innocent* one. The discipline that resolves it is the same one that
+> resolves entry 10: change one thing and require the outcome to move, and
+> when it does not, say so and keep the fix rather than quietly assuming it
+> worked. **An error message that enumerates causes must not bury the one
+> the author controls** — "the node did not run" names the remote, exotic
+> failure; "the response lane is wrong" names the local, likely one, and it
+> was second. The message now names the lane it looked under and the key it
+> got back, so the next reader is told which clause fired.
