@@ -334,9 +334,14 @@ async def rr_inprocess_readback(threads: Optional[int]) -> Dict[str, Any]:
         kw["threads"] = threads
     tok = (await c.use(**kw))["token"]
     try:
-        out = await asyncio.wait_for(c.send(tok, "probe", mimetype="text/plain"), timeout=300)
-        txt = "".join(out.get("text", []) if isinstance(out.get("text"), list) else [])
-        info = json.loads(txt.strip()) if txt.strip() else None
+        out = await asyncio.wait_for(c.send(tok, "readback probe", mimetype="text/plain"),
+                                     timeout=300)
+        # THE RESPONSE KEY IS THE LANE NAME, not "text" (driver_video.py:723). response_text
+        # with config laneName='envprobe' returns {'envprobe': [...]}; reading out['text']
+        # found nothing and reported it as "the node did not run" — the instrument was fine and
+        # the reader was wrong, which is why the md5 fix changed nothing.
+        texts = (out or {}).get("envprobe") or []
+        info = json.loads(texts[0]) if texts else None
         _assert_envprobe_complete(info)
         return {"source": "env_probe node appended to product_pdf.pipe (same task process as "
                           "the measured nodes)", **info}
