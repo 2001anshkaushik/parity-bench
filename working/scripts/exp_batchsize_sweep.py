@@ -78,6 +78,7 @@ QUIET_MAX_FOREIGN = float(os.environ.get("BSZ_QUIET_MAX_FOREIGN", "2.0"))   # co
 BATCH_TIMEOUT_S = int(os.environ.get("BSZ_BATCH_TIMEOUT_S", "1800"))
 DOC_TIMEOUT_S = int(os.environ.get("BSZ_DOC_TIMEOUT_S", "1800"))
 BREAKER_K = 3
+DOCUMENT_OUTCOMES = ("no_documents", "empty_extraction", "parse_failed")
 PIPE = ROOT / "working" / "pipes" / "product_pdf.pipe"
 
 
@@ -469,8 +470,11 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
     cpu_s = (state["u1"] - state["u0"]) / 1e6
     ok = [r for r in recs if r.get("ok")]
     empties = [r["doc"] for r in recs if r.get("reason") == "no_documents"]
-    hard = [r for r in recs if not r.get("ok") and r.get("reason") not in ("no_documents",
-                                                                           "empty_extraction")]
+    # A document the arm's own parser cannot read is a CONTENT outcome — deterministic, the same
+    # at every K, already in the corpus manifest (parse_error) — not a degraded leg. Hard means
+    # the work was LOST: transport errors, timeouts, a file with no response. (First pass labelled
+    # every LlamaIndex leg DEGRADED over one PdfReadError document that pypdf never could read.)
+    hard = [r for r in recs if not r.get("ok") and r.get("reason") not in DOCUMENT_OUTCOMES]
     chunks = sum(r["n_chunks"] for r in ok)
     ncpu = len(cpus)
     eff = cpu_s / span if span > 0 else None

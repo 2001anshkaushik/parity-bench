@@ -32,6 +32,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 
+DOCUMENT_OUTCOMES = {"no_documents", "empty_extraction", "parse_failed"}
+
+
 def load_campaign(d: Path) -> List[Dict[str, Any]]:
     """Shakedown launches (shake_*) are wiring checks on a DIFFERENT, 16-document slice. Pooling
     them with the measured slice once read a corpus difference as run-to-run noise (a 30% 'noise
@@ -43,6 +46,14 @@ def load_campaign(d: Path) -> List[Dict[str, Any]]:
             continue
         leg = json.loads(lj.read_text())
         leg["_launch"] = lj.parent.name
+        # The verdict is DERIVED here from the recorded reasons, never edited in the artifact:
+        # parser-level document outcomes are content, not lost work (see exp_batchsize_sweep.py).
+        reasons = set((leg.get("documents") or {}).get("hard_failure_reasons") or [])
+        leg["verdict_export"] = leg.get("verdict")
+        if leg.get("verdict") == "DEGRADED" and reasons and reasons <= DOCUMENT_OUTCOMES \
+                and leg["documents"]["recorded"] == leg["documents"]["submitted"]:
+            leg["verdict"] = "OK"
+            leg["verdict_note"] = f"export said DEGRADED over document outcomes only: {sorted(reasons)}"
         pd = lj.parent / lj.name.replace("leg_", "perdoc_").replace(".json", ".jsonl")
         leg["_perdoc"] = ([json.loads(x) for x in pd.read_text().splitlines() if x.strip()]
                           if pd.exists() else None)
