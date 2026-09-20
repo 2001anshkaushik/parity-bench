@@ -125,7 +125,9 @@ class PerCoreSampler(threading.Thread):
                     continue
                 self.intervals.append(fr)
                 if fh:
-                    fh.write(json.dumps({"t": time.time(),
+                    # mono_ns is CLOCK_MONOTONIC, system-wide on Linux: the clock driver_video.py
+                    # stamps its records with, so a sidecar stream can be windowed to a leg exactly.
+                    fh.write(json.dumps({"t": time.time(), "mono_ns": time.monotonic_ns(),
                                          "busy": {str(c): round(v, 4) for c, v in fr.items()}})
                              + "\n")
         finally:
