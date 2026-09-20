@@ -8,9 +8,12 @@
 # WHAT IT DOES, in order, refusing at the first thing that is not as declared:
 #   1. refuses if a container named rr or li already exists — it will not remove one it did not
 #      create (arms run ONE AT A TIME: PHASE1_CARRYOVER "never concurrently");
-#   2. starts the arm in the canonical docs posture (PHASE1_CARRYOVER.md:261-279; the form
-#      probe_idle_spin_docs.py:247 executes): --cpuset-cpus 0-23, --memory 58g, the six thread
-#      variables, -p, and NO --cpus. thread_env=unset omits the six variables (engine default);
+#   2. starts the arm UNCONSTRAINED (Ruling A, 2026-09-20): --memory 58g, the six thread
+#      variables, -p, and NO --cpuset-cpus and NO --cpus. This deliberately departs from the
+#      canonical docs posture (PHASE1_CARRYOVER.md:261-279 pins 0-23), because that cpuset is
+#      exactly what made the Stage 3 docs table incomparable with the video and cross-team
+#      numbers; the driver REFUSES if any cpuset or quota still binds.
+#      thread_env=unset omits the six variables (engine default);
 #   3. waits for a real answer from the service, not a TCP accept (register entry 3);
 #   4. runs the sweep with the driver on the complementary cores (taskset -c 24-31). The driver
 #      reads the posture back from the running container and refuses on any mismatch;
@@ -23,6 +26,8 @@ set -uo pipefail
 echo "batchsize_docs_run.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
 [ "$#" -ge 4 ] || { echo "usage: $0 <rr|li> <slice.json> <run_dir> <k-list> [ref_c] [label] [thread_env]" >&2; exit 2; }
 ARM="$1"; SLICE="$2"; RUN_DIR="$3"; KLIST="$4"; REFC="${5:-}"; LABEL="${6:-}"; TENV="${7:-1}"
+CONT="${BSZ_CONTINUOUS:-}"          # G3a: continuous-submission C sweep, comma list
+LI_WORKERS="${BSZ_LI_WORKERS:-24}"  # G3b/G4: the service arm's worker count is a swept knob
 PY="$HOME/.venv/bin/python"
 CORPUS="${BSZ_CORPUS_DIR:-$HOME/parity-bench/corpus/govdocs1/pdfs}"
 cd "$(dirname "$0")/../.." || exit 2
@@ -44,10 +49,10 @@ if [ "$TENV" != "unset" ]; then
 fi
 
 if [ "$ARM" = "rr" ]; then
-  CID=$(docker run -d --name rr --cpuset-cpus 0-23 --memory 58g "${TARGS[@]}" -p 5565:5565 rr:patched) || exit 4
+  CID=$(docker run -d --name rr --memory 58g "${TARGS[@]}" -p 5565:5565 rr:patched) || exit 4
   READY='curl -sf http://127.0.0.1:5565/version'
 elif [ "$ARM" = "li" ]; then
-  CID=$(docker run -d --name li --cpuset-cpus 0-23 --memory 58g -e WS1_WORKERS=24 "${TARGS[@]}" -p 8801:8801 ws1-llamaindex:x86_64) || exit 4
+  CID=$(docker run -d --name li --memory 58g -e WS1_WORKERS="$LI_WORKERS" "${TARGS[@]}" -p 8801:8801 ws1-llamaindex:x86_64) || exit 4
   READY='curl -sf http://127.0.0.1:8801/health'
 else
   echo "arm must be rr or li" >&2; exit 2
@@ -63,17 +68,34 @@ for i in $(seq 1 180); do
 done
 [ "$ok" = 1 ] || { echo "REFUSED: $ARM service did not answer in 900s"; docker logs --tail 40 "$CID"; exit 5; }
 if [ "$ARM" = "li" ]; then
-  # 24 workers warm one by one; a leg against a half-warm pool measures the warm-up.
-  for i in $(seq 1 120); do
+  # Workers warm one by one; a leg against a half-warm pool measures the warm-up, not the arm.
+  for i in $(seq 1 180); do
     w=$(curl -sf http://127.0.0.1:8801/health | "$PY" -c 'import json,sys; print(json.load(sys.stdin).get("warm_workers"))' 2>/dev/null)
-    echo "warm_workers=$w"; [ "$w" = "24" ] && break; sleep 5
+    echo "warm_workers=$w/$LI_WORKERS"; [ "$w" = "$LI_WORKERS" ] && break; sleep 5
   done
+  [ "$w" = "$LI_WORKERS" ] || { echo "REFUSED: only $w of $LI_WORKERS workers warm after 900s"; exit 6; }
+else
+  # G2 needs env_probe INSIDE the task process. The image should carry it (Dockerfile.rocketride
+  # COPYs it); if it does not, copy it into the writable layer and restart — docker cp is undone
+  # by docker rm, so this is per-container, every time (DOCS_HANDOFF §8.4).
+  if ! docker exec "$CID" test -f /opt/rocketride/engine/nodes/env_probe/IInstance.py 2>/dev/null; then
+    echo "env_probe absent in the image — copying the repo node in and restarting"
+    docker cp working/nodes/env_probe "$CID":/opt/rocketride/engine/nodes/ || exit 6
+    docker restart "$CID" >/dev/null || exit 6
+    for i in $(seq 1 180); do curl -sf http://127.0.0.1:5565/version >/dev/null 2>&1 && break; sleep 5; done
+  fi
+  echo "env_probe md5 in container: $(docker exec "$CID" md5sum /opt/rocketride/engine/nodes/env_probe/IInstance.py 2>/dev/null | cut -d" " -f1)  repo: $(md5sum working/nodes/env_probe/IInstance.py | cut -d" " -f1)"
 fi
 
 ARGS=(--arm "$ARM" --slice "$SLICE" --run-dir "$RUN_DIR" --k "$KLIST" --corpus-dir "$CORPUS" --thread-env "$TENV")
 [ -n "$REFC" ] && [ "$REFC" != "0" ] && ARGS+=(--reference-c "$REFC")
+[ -n "$CONT" ] && ARGS+=(--continuous "$CONT")
 [ -n "$LABEL" ] && [ "$LABEL" != "-" ] && ARGS+=(--label "$LABEL")
-SMOKE_PORT=8801 taskset -c 24-31 "$PY" working/scripts/exp_batchsize_sweep.py "${ARGS[@]}"
+# NO taskset on the driver either (Ruling A). Pinning it to 24-31 was the complement of the
+# arm's 0-23 cpuset; with the arm unconstrained across every vCPU, a pinned driver would both
+# contradict the ruling and hide its own cost in 8 cores it does not own. The driver's CPU is
+# now a reported number (cost.driver_cores), not a hidden one.
+SMOKE_PORT=8801 "$PY" working/scripts/exp_batchsize_sweep.py "${ARGS[@]}"
 RC=$?
 echo "sweep rc=$RC"
 

@@ -210,8 +210,22 @@ if git rev-parse -q --verify "refs/remotes/origin/$OTHER" >/dev/null; then
     if [[ -z "$mine" && -n "$head_" ]]; then git reset -q; die "$sp is being DELETED on $BRANCH"; fi
     if [[ -z "$mine" ]]; then echo "  $sp: absent on $BRANCH"; continue; fi
     if [[ "$BRANCH" == "$CAMPAIGN_DST" ]]; then
+      # THE MERGE SHAPE IS CHECKED FIRST (2026-09-20), because the stub-content check below
+      # would otherwise fire on the same tree with a message that names the symptom and not the
+      # cause. The stub is a DELETION relative to the merge base, so a plain
+      # `git merge <feature>` into docs-bench resolves to "content removed" with no conflict to
+      # stop it; the operator needs to be told a merge did it and what to do instead.
+      if [[ -n "$(git rev-parse -q --verify HEAD^2 2>/dev/null)" ]]; then
+        for par in $(git rev-list --parents -n 1 HEAD | cut -d" " -f3-); do
+          pb="$(blob_at "$par" "$sp")"
+          if [[ -n "$pb" ]] && blob_is_stub "$pb"; then
+            git reset -q
+            die "HEAD is a MERGE into $CAMPAIGN_DST whose parent $(git rev-parse --short "$par") carries the $sp STUB. A plain merge from a stub-carrying branch deletes the canonical document without a conflict. Bring that branch's files across by explicit path instead: git checkout <branch> -- <paths>."
+          fi
+        done
+      fi
       if blob_is_stub "$mine"; then git reset -q; die "$sp on $CAMPAIGN_DST is a STUB — $CAMPAIGN_DST is the canonical home; a stub here leaves no document anywhere"; fi
-      echo "  $sp: canonical on $CAMPAIGN_DST"
+      echo "  $sp: canonical on $CAMPAIGN_DST (no stub-carrying merge parent)"
     else
       if ! blob_is_stub "$mine"; then git reset -q; die "$sp on $BRANCH is not the stub — only $CAMPAIGN_DST carries the document; every other branch carries a stub whose first line is: $STUB_MARKER"; fi
       echo "  $sp: stub on $BRANCH (canonical copy is on $CAMPAIGN_DST)"

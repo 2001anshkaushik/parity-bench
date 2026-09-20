@@ -226,6 +226,33 @@ printf '%s\n# stub\n' "$STUB" > "$REPO/working/docs/DOCS_HANDOFF.md"
 run_al "$BASE_OK" --dry-run "m" working/docs/DOCS_HANDOFF.md
 chk "0b REFUSES a stub DOCS_HANDOFF on docs-bench (no document anywhere)" $([[ $RC -ne 0 ]] && has 'is a STUB'; echo $?) "rc=$RC $OUT"
 clean_tree
+
+# The stub-carrying MERGE (2026-09-20). A feature branch cut from docs-bench that replaced the
+# handoff with the stub carries a DELETION relative to the merge base, so `git merge` into
+# docs-bench removes the canonical document with no conflict. Seeded here as the real shape:
+# branch, stub it, merge it back, and assert the gate refuses the merge commit by name.
+G checkout -q -b feat-stubbed docs-bench
+printf '%s\n# stub\n' "$STUB" > "$REPO/working/docs/DOCS_HANDOFF.md"
+G add working/docs/DOCS_HANDOFF.md; G commit -q -m "feature branch carries the stub"
+G checkout -q docs-bench
+G merge -q --no-ff feat-stubbed -m "merge the feature branch" >/dev/null 2>&1 || true
+echo "z" > "$REPO/ss3.txt"
+run_al "$BASE_OK" --dry-run "m" ss3.txt
+chk "0b REFUSES a stub-carrying MERGE into docs-bench" $([[ $RC -ne 0 ]] && has 'is a MERGE into docs-bench' && has 'carries the' ; echo $?) "rc=$RC $OUT"
+chk "0b merge refusal restores a clean index" $([[ -z "$(G diff --cached --name-only)" ]]; echo $?)
+G reset -q --hard "docs-bench@{1}" 2>/dev/null || G reset -q --hard HEAD~1
+clean_tree
+# Null control's twin: the SAME merge shape from a branch that did NOT stub the document must
+# pass, so the gate is refusing the stub and not merges as such.
+G checkout -q -b feat-clean docs-bench
+echo "harmless" > "$REPO/feat_clean.txt"; G add feat_clean.txt; G commit -q -m "no handoff change"
+G checkout -q docs-bench
+G merge -q --no-ff feat-clean -m "merge a clean feature branch" >/dev/null 2>&1 || true
+echo "z2" > "$REPO/ss4.txt"
+run_al "$BASE_OK" --dry-run "m" ss4.txt
+chk "0b clean twin: a merge with no stub parent PASSES" $([[ $RC -eq 0 ]] && has 'no stub-carrying merge parent'; echo $?) "rc=$RC $OUT"
+G reset -q --hard "docs-bench@{1}" 2>/dev/null || G reset -q --hard HEAD~1
+clean_tree
 G checkout -q video-bench
 
 echo "=== gate 3: skip budget (entry 27)"

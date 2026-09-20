@@ -28,6 +28,23 @@ is least bad"; with it, "is batching the optimum at all" is answerable. DOCS_HAN
 per-document ~45% faster than one atomic batch — under load contamination, so it is re-asked
 here rather than assumed.
 
+CPU ALLOCATION (Ruling A, 2026-09-20). Every arm runs UNCONSTRAINED across all host vCPUs: no
+cpuset, no --cpus. A cgroup that BINDS is refused, not recorded — the Stage 3 docs legs ran on a
+real `--cpuset-cpus 0-23` (their exports carry cpuset_effective 24), so their utilisation cannot
+be restated against 32 by division; it has to be re-measured, which is what this posture is for.
+The denominator for every utilisation and idle-core figure is the host's own cpu count.
+
+THREE CPU NUMBERS, never one (Ruling A). engine-container (its cgroup cpu.stat), harness/driver
+(getrusage self+children), host total (per-core /proc/stat over every cpu). They answer different
+questions and their gaps are the finding: host minus container minus driver is work neither owns.
+The engine's IDLE SPIN is measured in this posture per leg — token open, pipeline loaded, nothing
+submitted — and reported beside every idle-core figure rather than taken from a table measured on
+another posture (AUTOMATION_CONTRACT §4: a posture not in the table measures its own).
+
+BOX HYGIENE (Ruling C). Before every measured leg: no container but this arm's, no process
+outside the arm and the driver above 0.5 cores, and the host idle baseline recorded INTO the leg.
+A prior campaign lost a pass pair to an environmental anomaly nothing was instrumented to see.
+
 BOTH ARMS, ONE METHOD (register entry 12): same documents in the same order, same K grid, same
 warm-up rule, same preflight, same cost source (the arm container's cgroup cpu.stat, read at the
 leg's own t0/t1), same per-core sampler. One arm per invocation; the other arm's container is
@@ -45,6 +62,7 @@ import concurrent.futures as cf
 import hashlib
 import json
 import os
+import resource
 import subprocess
 import sys
 import time
@@ -78,6 +96,10 @@ QUIET_MAX_FOREIGN = float(os.environ.get("BSZ_QUIET_MAX_FOREIGN", "2.0"))   # co
 BATCH_TIMEOUT_S = int(os.environ.get("BSZ_BATCH_TIMEOUT_S", "1800"))
 DOC_TIMEOUT_S = int(os.environ.get("BSZ_DOC_TIMEOUT_S", "1800"))
 BREAKER_K = 3
+STRAY_CORE_LIMIT = float(os.environ.get("BSZ_STRAY_CORE_LIMIT", "0.5"))   # Ruling C
+IDLE_SPIN_WINDOW_S = float(os.environ.get("BSZ_IDLE_SPIN_WINDOW_S", "6.0"))
+ENVPROBE_SCHEMA_MIN = 2                      # driver_video.py:679, same contract
+ENVPROBE_REQUIRED = ("env_probe_schema", "env", "torch_num_threads", "python_version")
 DOCUMENT_OUTCOMES = ("no_documents", "empty_extraction", "parse_failed")
 PIPE = ROOT / "working" / "pipes" / "product_pdf.pipe"
 
@@ -134,8 +156,23 @@ def container_facts(arm: str, expect_thread_env: Optional[str] = "1") -> Dict[st
     facts["cgroup"] = str(cg) if cg else None
     cs = msrc.cgroup_cpuset_count(cg) if cg else {"cpus": None, "raw": None, "source": "no cgroup"}
     facts["cpuset_effective"] = cs
+    facts["host_nproc"] = host_nproc()
+    # Ruling A: the arm may not be confined. A cgroup that binds is refused rather than recorded,
+    # because a figure divided by a denominator the leg did not have is defect #34 either way up.
+    if cg is not None:
+        try:
+            facts["cpu_max"] = (cg / "cpu.max").read_text().strip()
+        except OSError:
+            facts["cpu_max"] = None
+        if facts["cpu_max"] and not facts["cpu_max"].startswith("max"):
+            problems.append(f"cpu.max={facts['cpu_max']} — a CFS quota binds this arm (Ruling A: "
+                            "unconstrained across every vCPU)")
     if not cs.get("cpus"):
         problems.append(f"no effective cpuset readable: {cs.get('source')}")
+    elif cs["cpus"] < facts["host_nproc"]:
+        problems.append(f"cpuset {cs['raw']} gives {cs['cpus']} of {facts['host_nproc']} cpus — "
+                        "a cpuset binds this arm (Ruling A). Start it with no --cpuset-cpus; the "
+                        "Stage 3 docs legs ran at 0-23 and CANNOT be restated against 32.")
     if problems:
         raise SystemExit("REFUSED (posture read-back):\n  - " + "\n  - ".join(problems))
     return facts
@@ -164,6 +201,66 @@ def _host_ticks() -> Tuple[int, int]:
     return sum(v[:8]), v[3] + v[4]
 
 
+def host_nproc() -> int:
+    """The kernel's cpu count — the Ruling A denominator. os.cpu_count() would answer the
+    driver's affinity if the driver were ever pinned; /proc/stat lines are the machine."""
+    return sum(1 for line in Path("/proc/stat").read_text().splitlines()
+               if line.startswith("cpu") and not line.startswith("cpu "))
+
+
+def _proc_cpu_snapshot() -> Dict[int, Tuple[float, str]]:
+    out: Dict[int, Tuple[float, str]] = {}
+    hz = os.sysconf("SC_CLK_TCK")
+    for d in Path("/proc").iterdir():
+        if not d.name.isdigit():
+            continue
+        try:
+            st = (d / "stat").read_text()
+            comm_end = st.rindex(")")
+            f = st[comm_end + 2:].split()
+            out[int(d.name)] = ((int(f[11]) + int(f[12])) / hz, st[st.index("(") + 1:comm_end])
+        except (OSError, ValueError, IndexError):
+            continue
+    return out
+
+
+def stray_processes(cg: Path, window_s: float = 4.0) -> Dict[str, Any]:
+    """Ruling C: anything outside the arm's cgroup and our own process tree burning more than
+    STRAY_CORE_LIMIT cores. Named, not merely counted — 'the box was busy' is not a diagnosis."""
+    try:
+        ours = {int(x) for x in (cg / "cgroup.procs").read_text().split()}
+    except (OSError, ValueError):
+        ours = set()
+    mine = {os.getpid(), os.getppid()}
+    a = _proc_cpu_snapshot()
+    time.sleep(window_s)
+    b = _proc_cpu_snapshot()
+    found = []
+    for pid, (cpu_b, comm) in b.items():
+        if pid in ours or pid in mine:
+            continue
+        cpu_a = a.get(pid, (cpu_b, comm))[0]
+        cores = (cpu_b - cpu_a) / window_s
+        if cores > STRAY_CORE_LIMIT:
+            found.append({"pid": pid, "comm": comm, "cores": round(cores, 3)})
+    found.sort(key=lambda x: -x["cores"])
+    return {"limit_cores": STRAY_CORE_LIMIT, "window_s": window_s, "strays": found[:10],
+            "clean": not found,
+            "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's "
+                     "cgroup.procs and the driver itself"}
+
+
+def measure_idle_spin(cg: Path, window_s: float = IDLE_SPIN_WINDOW_S) -> Dict[str, Any]:
+    """The arm's CPU with everything loaded and NOTHING submitted, in THIS posture. Never read
+    from the contract's table: that table was measured on cpuset 0-23 with the six thread
+    variables at 1, and a posture not in the table has no expected_idle (AUTOMATION_CONTRACT §4)."""
+    t0, u0 = time.perf_counter(), cgroup_usage_usec(cg)
+    time.sleep(window_s)
+    t1, u1 = time.perf_counter(), cgroup_usage_usec(cg)
+    return {"cores": round((u1 - u0) / 1e6 / (t1 - t0), 3), "window_s": round(t1 - t0, 2),
+            "basis": "arm cgroup cpu.stat with the pipeline loaded and nothing submitted"}
+
+
 def quiet_box(cg: Path, window_s: float = 4.0) -> Dict[str, Any]:
     """Foreign busy cores = host busy (/proc/stat) − the arm container's own cgroup rate, over
     one window. The arm's idle spin is excluded by MEASUREMENT, in the same window, rather than
@@ -180,6 +277,88 @@ def quiet_box(cg: Path, window_s: float = 4.0) -> Dict[str, Any]:
             "quiet": foreign <= QUIET_MAX_FOREIGN, "load1": os.getloadavg()[0],
             "window_s": window_s,
             "basis": "/proc/stat aggregate busy − arm cgroup usage_usec rate, one window"}
+
+
+def _assert_envprobe_complete(info: Any) -> None:
+    """Absence fails before any value is read (driver_video.py:683). A stale baked node emits an
+    older field set; `.get()` would collapse 'the instrument did not report' into 'the value is
+    None', and None reads as unpinned exactly where unpinned is the thing being tested."""
+    if not isinstance(info, dict) or not info:
+        raise SystemExit("REFUSED: env_probe returned no data — the node did not run, or the "
+                         "response lane is wrong.")
+    missing = [k for k in ENVPROBE_REQUIRED if k not in info]
+    ver = info.get("env_probe_schema")
+    if missing or not (isinstance(ver, int) and ver >= ENVPROBE_SCHEMA_MIN):
+        raise SystemExit(f"REFUSED: env_probe is a STALE INSTRUMENT, not a negative read-back — "
+                         f"missing {missing or 'no keys'}, schema {ver!r} (need >= "
+                         f"{ENVPROBE_SCHEMA_MIN}). The node inside the image predates these "
+                         "fields: docker cp working/nodes/env_probe <container>:"
+                         "/opt/rocketride/engine/nodes/ and restart, then re-run.")
+
+
+async def rr_inprocess_readback(threads: Optional[int]) -> Dict[str, Any]:
+    """G2: the six variables and torch's EFFECTIVE intra-op count, read from inside a task
+    process running THE MEASURED PIPELINE — env_probe appended to product_pdf.pipe, the
+    a3_env_torch pattern (driver_video.py:654). Probing a different pipe would be a different
+    task process: the one-armed check, register entry 33."""
+    from rocketride import RocketRideClient
+    pipe = json.loads(PIPE.read_text())
+    pipe["project_id"] = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"bszenv-{os.getpid()}-{time.time()}"))
+    pipe["components"].append({"id": "envprobe_1", "provider": "env_probe", "config": {},
+                               "input": [{"lane": "text", "from": "webhook_1"}]})
+    pipe["components"].append({"id": "resp_env", "provider": "response_text",
+                               "config": {"laneName": "envprobe"},
+                               "input": [{"lane": "text", "from": "envprobe_1"}]})
+    pp = ROOT / "working" / "pipes" / "generated" / f"bszenv_{os.getpid()}.pipe"
+    pp.parent.mkdir(parents=True, exist_ok=True)
+    pp.write_text(json.dumps(pipe))
+    c = RocketRideClient()
+    await c.connect(timeout=60000)
+    kw: Dict[str, Any] = dict(filepath=str(pp.relative_to(ROOT)), ttl=RR_TTL_S)
+    if threads is not None:
+        kw["threads"] = threads
+    tok = (await c.use(**kw))["token"]
+    try:
+        out = await asyncio.wait_for(c.send(tok, "probe", mimetype="text/plain"), timeout=300)
+        txt = "".join(out.get("text", []) if isinstance(out.get("text"), list) else [])
+        info = json.loads(txt.strip()) if txt.strip() else None
+        _assert_envprobe_complete(info)
+        return {"source": "env_probe node appended to product_pdf.pipe (same task process as "
+                          "the measured nodes)", **info}
+    finally:
+        try:
+            await asyncio.wait_for(c.terminate(tok), timeout=120)
+        except Exception:
+            pass
+        await c.disconnect()
+
+
+def li_inprocess_readback() -> Dict[str, Any]:
+    """G2 for the service arm: /health answers from INSIDE a uvicorn worker (its own torch and
+    its own environ), and /proc/<pid>/environ is read inside the container for every worker
+    process, so the declared container env is never the evidence."""
+    with urllib.request.urlopen(f"http://127.0.0.1:{LI_PORT}/health", timeout=30) as r:
+        h = json.loads(r.read().decode())
+    out: Dict[str, Any] = {"source": "GET /health answered inside a uvicorn worker, plus "
+                                     "/proc/<pid>/environ per worker read in the container",
+                           "health_torch_threads": h.get("torch_threads"),
+                           "health_thread_env": h.get("thread_env"),
+                           "warm_workers": h.get("warm_workers")}
+    ps = subprocess.run(["docker", "exec", CONTAINER["li"], "sh", "-c",
+                         "for p in /proc/[0-9]*; do [ -r $p/environ ] && "
+                         "echo \"$(basename $p) $(tr '\\0' '\\n' < $p/environ | "
+                         "grep -E '^(OMP|MKL|OPENBLAS|VECLIB|NUMEXPR|TORCH)_' | tr '\\n' ' ')\"; "
+                         "done"], capture_output=True, text=True)
+    per_proc = {}
+    for line in ps.stdout.splitlines():
+        parts = line.split()
+        if len(parts) > 1:
+            per_proc[parts[0]] = dict(x.split("=", 1) for x in parts[1:] if "=" in x)
+    out["worker_environ"] = per_proc
+    vals = {tuple(sorted(v.items())) for v in per_proc.values()}
+    out["all_workers_agree"] = len(vals) <= 1
+    out["n_worker_processes_read"] = len(per_proc)
+    return out
 
 
 def service_ready(arm: str) -> Dict[str, Any]:
@@ -405,16 +584,35 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
             warm: List[Path], run_dir: Path, facts: Dict[str, Any], threads: Optional[int],
             allow_noisy: bool) -> Dict[str, Any]:
     cg = Path(facts["cgroup"])
-    cpus = cpus_from_spec(facts["cpuset_effective"]["raw"])
+    ncpu_host = facts["host_nproc"]
+    cpus = cpus_from_spec(facts["cpuset_effective"]["raw"]) or list(range(ncpu_host))
     say(f"\n=== {arm} {leg} — {len(measured)} documents, warm {len(warm)} ===")
     shape = (lambda docs: batches(docs, k)) if k else None
 
+    # Ruling C, in this order: the box carries this leg and nothing else, and the baseline the
+    # claim rests on is recorded INTO the leg rather than remembered.
+    others = [c for c in subprocess.run(["docker", "ps", "--format", "{{.Names}}"],
+                                        capture_output=True, text=True).stdout.split()
+              if c != CONTAINER[arm]]
+    strays = stray_processes(cg)
     pre = quiet_box(cg)
     say(f"  quiet box: host busy {pre['host_busy_cores']}  arm idle {pre['arm_idle_cores']}  "
-        f"foreign {pre['foreign_busy_cores']} (max {QUIET_MAX_FOREIGN})  load1 {pre['load1']:.2f}")
-    if not pre["quiet"] and not allow_noisy:
+        f"foreign {pre['foreign_busy_cores']} (max {QUIET_MAX_FOREIGN})  load1 {pre['load1']:.2f}"
+        f"  other containers {others or 'none'}  strays {strays['strays'] or 'none'}")
+    hygiene = {"other_containers": others, "stray_processes": strays,
+               "host_idle_baseline_cores": round(ncpu_host - pre["host_busy_cores"], 3),
+               "ruling": "C — one workload on the box; the leg records the baseline it assumed"}
+    blockers = []
+    if others:
+        blockers.append(f"containers other than this arm are running: {others}")
+    if not strays["clean"]:
+        blockers.append(f"processes above {STRAY_CORE_LIMIT} cores outside the arm: "
+                        f"{strays['strays']}")
+    if not pre["quiet"]:
+        blockers.append(f"foreign busy {pre['foreign_busy_cores']} > {QUIET_MAX_FOREIGN} cores")
+    if blockers and not allow_noisy:
         return {"arm": arm, "leg": leg, "k": k, "reference_c": conc, "verdict": "REFUSED",
-                "reason": "box not quiet", "quiet_box": pre}
+                "reason": "; ".join(blockers), "quiet_box": pre, "box_hygiene": hygiene}
 
     perdoc = run_dir / f"perdoc_{arm}_{leg}.jsonl"
     percore = run_dir / f"percore_{arm}_{leg}.jsonl"
@@ -424,15 +622,22 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
     leaked = None
     state: Dict[str, Any] = {}
 
+    def driver_cpu_s() -> float:
+        r = resource.getrusage(resource.RUSAGE_SELF)
+        ch = resource.getrusage(resource.RUSAGE_CHILDREN)
+        return r.ru_utime + r.ru_stime + ch.ru_utime + ch.ru_stime
+
     def open_window() -> None:
         state["sampler"] = PerCoreSampler(cpus, interval_s=1.0, out_path=percore)
         state["sampler"].start()
+        state["d0"] = driver_cpu_s()
         state["u0"], state["t0_ns"], state["p0"] = (cgroup_usage_usec(cg), time.time_ns(),
                                                     time.perf_counter())
 
     def close_window() -> None:
         state["p1"], state["t1_ns"], state["u1"] = (time.perf_counter(), time.time_ns(),
                                                     cgroup_usage_usec(cg))
+        state["d1"] = driver_cpu_s()
         state["percore"] = state["sampler"].stop()
 
     tw = time.perf_counter()
@@ -447,6 +652,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                     else:
                         await rr_send_continuous(c, tok, warm, conc, None)
                 state["warm_s"] = round(time.perf_counter() - tw, 2)
+                state["idle_spin"] = measure_idle_spin(cg)   # loaded, nothing submitted
                 with JsonlWriter(perdoc) as w:
                     open_window()
                     recs = (await rr_send_batches(c, tok, shape(measured), w) if k
@@ -460,6 +666,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
         if warm:
             li_send_batches(shape(warm), k, None) if k else li_send_continuous(warm, conc, None)
         state["warm_s"] = round(time.perf_counter() - tw, 2)
+        state["idle_spin"] = measure_idle_spin(cg)
         with JsonlWriter(perdoc) as w:
             open_window()
             recs = (li_send_batches(shape(measured), k, w) if k
@@ -468,6 +675,10 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
 
     span = state["p1"] - state["p0"]
     cpu_s = (state["u1"] - state["u0"]) / 1e6
+    driver_s = state["d1"] - state["d0"]
+    pc = state["percore"]
+    host_s = (pc["mean_busy_cores"] * span) if pc.get("mean_busy_cores") is not None else None
+    spin = (state.get("idle_spin") or {}).get("cores")
     ok = [r for r in recs if r.get("ok")]
     empties = [r["doc"] for r in recs if r.get("reason") == "no_documents"]
     # A document the arm's own parser cannot read is a CONTENT outcome — deterministic, the same
@@ -476,7 +687,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
     # every LlamaIndex leg DEGRADED over one PdfReadError document that pypdf never could read.)
     hard = [r for r in recs if not r.get("ok") and r.get("reason") not in DOCUMENT_OUTCOMES]
     chunks = sum(r["n_chunks"] for r in ok)
-    ncpu = len(cpus)
+    ncpu = ncpu_host                      # Ruling A: the denominator is the host's cpu count
     eff = cpu_s / span if span > 0 else None
     util = eff / ncpu if eff is not None else None
     bwalls: List[float] = []
@@ -504,14 +715,44 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
         "batches": ({"n": len(bwalls), "wall_s_min": round(bwalls[0], 3),
                      "wall_s_p50": round(bwalls[len(bwalls) // 2], 3),
                      "wall_s_max": round(bwalls[-1], 3)} if bwalls else None),
+        # THREE SOURCES, never merged (Ruling A). Their gaps are the finding: host minus engine
+        # minus driver is work neither owns — docker-proxy, kernel threads, the sampler itself.
         "cost": {"cpu_s": round(cpu_s, 3), "effective_cores": round(eff, 3) if eff else None,
                  "cpu_utilization": round(util, 4) if util is not None else None,
                  "cpu_utilization_valid": (util is not None and util <= 1.0),
                  "cpu_s_per_doc": round(cpu_s / len(ok), 4) if ok else None,
-                 "available_cpus": ncpu, "available_cpus_source": facts["cpuset_effective"]["source"],
+                 "available_cpus": ncpu,
+                 "available_cpus_source": f"host nproc (Ruling A); arm cgroup reports "
+                                          f"{facts['cpuset_effective']['raw']!r} via "
+                                          f"{facts['cpuset_effective']['source']}",
+                 "engine_container_cpu_s": round(cpu_s, 3),
+                 "engine_container_cores": round(eff, 3) if eff else None,
+                 "driver_cpu_s": round(driver_s, 3),
+                 "driver_cores": round(driver_s / span, 3) if span > 0 else None,
+                 "host_total_cpu_s": round(host_s, 3) if host_s is not None else None,
+                 "host_total_cores": pc.get("mean_busy_cores"),
+                 "unattributed_cores": (round(pc["mean_busy_cores"] - eff - driver_s / span, 3)
+                                        if host_s is not None and eff is not None and span > 0
+                                        else None),
+                 "idle_spin_measured": state.get("idle_spin"),
+                 "engine_cores_net_of_idle_spin": (round(eff - spin, 3)
+                                                   if eff is not None and spin is not None
+                                                   else None),
                  "idle_core_equivalents_arm": round(ncpu - eff, 3) if eff is not None else None,
-                 "basis": "arm container cgroup cpu.stat usage_usec, read at the leg's t0 and t1"},
-        "percore_host": state["percore"],
+                 "basis": "engine: arm cgroup cpu.stat at the leg's t0/t1; driver: getrusage "
+                          "self+children over the same window; host: per-core /proc/stat"},
+        # Idle capacity two ways. RAW is what the cores did. NET-OF-SPIN adds back the engine's
+        # measured do-nothing burn, because a core spinning on an idle pipeline is not capacity
+        # the workload used — it is capacity the posture consumed before a document arrived.
+        "percore_host": {**pc,
+                         "idle_core_equivalents_net_of_spin": (
+                             round(pc["idle_core_equivalents"] + spin, 3)
+                             if pc.get("idle_core_equivalents") is not None and spin is not None
+                             else None),
+                         "idle_spin_cores_subtracted": spin,
+                         "net_of_spin_basis": "raw idle + measured idle spin: the spin is busy "
+                                              "CPU doing no work, so it is unused capacity"},
+        "box_hygiene": hygiene,
         "warm_up": {"docs": len(warm), "seconds": state.get("warm_s"),
                     "disjoint_from_measured": True, "same_shape_as_leg": True},
         "quiet_box_before": pre,
@@ -521,9 +762,11 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
     t = out["throughput"]
     say(f"  docs/s={t['docs_per_s']}  ok={len(ok)}/{len(measured)} (empty {len(empties)}, hard "
         f"{len(hard)})  span={t['span_s']}s  eff_cores={out['cost']['effective_cores']}  "
-        f"util={out['cost']['cpu_utilization']}  idle cores: mean count "
-        f"{state['percore'].get('idle_core_count_mean')} / equivalents "
-        f"{state['percore'].get('idle_core_equivalents')} of {ncpu}")
+        f"util={out['cost']['cpu_utilization']} of {ncpu}  engine/driver/host cores="
+        f"{out['cost']['engine_container_cores']}/{out['cost']['driver_cores']}/"
+        f"{out['cost']['host_total_cores']}  spin={spin}  idle: count "
+        f"{pc.get('idle_core_count_mean')} / equiv {pc.get('idle_core_equivalents')} "
+        f"(net of spin {out['percore_host']['idle_core_equivalents_net_of_spin']})")
     (run_dir / f"leg_{arm}_{leg}.json").write_text(json.dumps(out, indent=1))
     return out
 
@@ -535,7 +778,10 @@ def main() -> int:
     ap.add_argument("--arm", required=True, choices=("rr", "li"))
     ap.add_argument("--slice", required=True, type=Path)
     ap.add_argument("--k", required=True, help="comma list, e.g. 1,8,16,32,64,128; '' for none")
-    ap.add_argument("--reference-c", type=int, default=None)
+    ap.add_argument("--reference-c", type=int, default=None,
+                    help="one continuous-submission reference leg at this C")
+    ap.add_argument("--continuous", default="",
+                    help="comma list of C for a continuous-submission sweep (G3a), e.g. 4,8,16,32,64")
     ap.add_argument("--run-dir", required=True, type=Path)
     ap.add_argument("--corpus-dir", type=Path,
                     default=Path(os.environ.get("BSZ_CORPUS_DIR",
@@ -551,6 +797,7 @@ def main() -> int:
     say(f"exp_batchsize_sweep.py sha256: {self_sha()}")
     threads = None if a.rr_threads == "unset" else int(a.rr_threads)
     ks = [int(x) for x in a.k.split(",") if x.strip()]
+    cs = [int(x) for x in a.continuous.split(",") if x.strip()]
     a.run_dir.mkdir(parents=True, exist_ok=True)
 
     facts = container_facts(a.arm, None if a.thread_env == "unset" else a.thread_env)
@@ -563,8 +810,19 @@ def main() -> int:
         raise SystemExit(f"REFUSED: the other arm's container '{CONTAINER[other]}' is running — "
                          "its idle spin would be charged to this arm's cores")
     say(f"  posture read-back: image {facts['image_id'][:19]}…  cpuset "
-        f"{facts['cpuset_effective']['raw']}  thread env {facts['thread_env_expected']}  "
-        f"threads_requested={'NOT PASSED' if threads is None else threads}")
+        f"{facts['cpuset_effective']['raw']} of {facts['host_nproc']} host cpus (Ruling A: "
+        f"unconstrained)  cpu.max={facts.get('cpu_max')}  declared thread env "
+        f"{facts['thread_env_expected']}  threads_requested="
+        f"{'NOT PASSED' if threads is None else threads}")
+    # G2: the DECLARED posture above is the container's; this is the one the work actually ran in.
+    facts["in_process_readback"] = (asyncio.run(rr_inprocess_readback(threads)) if a.arm == "rr"
+                                    else li_inprocess_readback())
+    ipr = facts["in_process_readback"]
+    say(f"  in-process read-back: torch intra-op="
+        f"{ipr.get('torch_num_threads', ipr.get('health_torch_threads'))}  six vars="
+        f"{ipr.get('env', ipr.get('health_thread_env'))}"
+        + (f"  workers read={ipr.get('n_worker_processes_read')} agree="
+           f"{ipr.get('all_workers_agree')}" if a.arm == "li" else ""))
 
     sl, measured, warm = load_slice(a.slice, a.corpus_dir)
     say(f"  slice {sl['slice_sha256'][:16]}  n={len(measured)}  warm={len(warm)}  manifest-verified")
@@ -572,8 +830,8 @@ def main() -> int:
     sfx = f"_{a.label}" if a.label else ""
     legs = [run_leg(a.arm, f"k{k}{sfx}", k, None, measured, warm, a.run_dir, facts, threads,
                     a.allow_noisy_box) for k in ks]
-    if a.reference_c:
-        legs.append(run_leg(a.arm, f"refc{a.reference_c}{sfx}", None, a.reference_c, measured,
+    for c in ([a.reference_c] if a.reference_c else []) + cs:
+        legs.append(run_leg(a.arm, f"refc{c}{sfx}", None, c, measured,
                             warm, a.run_dir, facts, threads, a.allow_noisy_box))
 
     ranked = sorted((g for g in legs if g.get("verdict") == "OK" and g.get("k")),
@@ -587,7 +845,11 @@ def main() -> int:
                                              else threads) if a.arm == "rr" else None,
                     "rr_threads_observed": None},
         "slice": {k: sl[k] for k in sl if k not in ("measured", "warm_docs")},
-        "k_grid": ks, "reference_c": a.reference_c,
+        "k_grid": ks, "reference_c": a.reference_c, "continuous_grid": cs,
+        "rulings": {"A": "unconstrained on every vCPU; denominator = host nproc; engine, driver "
+                         "and host CPU reported separately; idle spin measured in this posture",
+                    "C": "one workload on the box; each leg records containers, strays and the "
+                         "host idle baseline it assumed"},
         "legs": legs,
         "best_k_by_docs_per_s": ranked[0]["k"] if ranked else None,
         "ranking": [{"k": g["k"], "docs_per_s": g["throughput"]["docs_per_s"]} for g in ranked],
