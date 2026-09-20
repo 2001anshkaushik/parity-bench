@@ -86,16 +86,26 @@ if [ "$ARM" = "li" ]; then
   done
   [ "$w" = "$LI_WORKERS" ] || { echo "REFUSED: only $w of $LI_WORKERS workers warm after 900s"; exit 6; }
 else
-  # G2 needs env_probe INSIDE the task process. The image should carry it (Dockerfile.rocketride
-  # COPYs it); if it does not, copy it into the writable layer and restart — docker cp is undone
-  # by docker rm, so this is per-container, every time (DOCS_HANDOFF §8.4).
-  if ! docker exec "$CID" test -f /opt/rocketride/engine/nodes/env_probe/IInstance.py 2>/dev/null; then
-    echo "env_probe absent in the image — copying the repo node in and restarting"
+  # G2 needs env_probe INSIDE the task process. ABSENT IS NOT THE ONLY FAILURE: rr:patched bakes
+  # an OLDER copy of the node (md5 cba71b35 against the repo's, 2026-09-20) which returns an
+  # empty response, and an instrument that answers nothing is worse than one that is missing —
+  # it reads as "no pins declared". So the container's copy is compared with the repo's and
+  # REPLACED when it differs, not merely when it is absent. docker cp writes to the writable
+  # layer and is undone by docker rm, so this runs per container, every time (DOCS_HANDOFF §8.4).
+  # The image itself is never rebuilt or retagged; product_pdf.pipe does not load this node, so
+  # the measured legs are unaffected by its presence.
+  REPO_MD5="$(md5sum working/nodes/env_probe/IInstance.py | cut -d" " -f1)"
+  CON_MD5="$(docker exec "$CID" md5sum /opt/rocketride/engine/nodes/env_probe/IInstance.py 2>/dev/null | cut -d" " -f1)"
+  echo "env_probe md5 container=${CON_MD5:-ABSENT} repo=$REPO_MD5"
+  if [ "$CON_MD5" != "$REPO_MD5" ]; then
+    echo "env_probe in the container is ${CON_MD5:+STALE}${CON_MD5:-ABSENT} — copying the repo node in and restarting"
     docker cp working/nodes/env_probe "$CID":/opt/rocketride/engine/nodes/ || exit 6
     docker restart "$CID" >/dev/null || exit 6
     for i in $(seq 1 180); do curl -sf http://127.0.0.1:5565/version >/dev/null 2>&1 && break; sleep 5; done
+    CON_MD5="$(docker exec "$CID" md5sum /opt/rocketride/engine/nodes/env_probe/IInstance.py 2>/dev/null | cut -d" " -f1)"
+    echo "env_probe md5 after copy: ${CON_MD5:-ABSENT} (repo $REPO_MD5)"
+    [ "$CON_MD5" = "$REPO_MD5" ] || { echo "REFUSED: env_probe still does not match the repo after the copy" >&2; exit 6; }
   fi
-  echo "env_probe md5 in container: $(docker exec "$CID" md5sum /opt/rocketride/engine/nodes/env_probe/IInstance.py 2>/dev/null | cut -d" " -f1)  repo: $(md5sum working/nodes/env_probe/IInstance.py | cut -d" " -f1)"
 fi
 
 ARGS=(--arm "$ARM" --slice "$SLICE" --run-dir "$RUN_DIR" --k "$KLIST" --corpus-dir "$CORPUS" --thread-env "$TENV")
