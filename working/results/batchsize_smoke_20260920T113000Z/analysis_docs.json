@@ -1,0 +1,1291 @@
+{
+ "campaign_dir": "working/results/batchsize_smoke_20260920T113000Z",
+ "legs_seen": [
+  "li_pass1/li/k128_pass1:OK",
+  "li_pass1/li/k16_pass1:OK",
+  "li_pass1/li/k1_pass1:OK",
+  "li_pass1/li/k32_pass1:OK",
+  "li_pass1/li/k64_pass1:OK",
+  "li_pass1/li/k8_pass1:OK",
+  "li_pass1/li/refc32_pass1:OK",
+  "li_rep3/li/k128_rep3:OK",
+  "li_rep3/li/k384_rep3:OK",
+  "li_rep3/li/k64_rep3:OK",
+  "li_rep3/li/refc32_rep3:OK",
+  "li_rev/li/k128_rev:OK",
+  "li_rev/li/k256_rev:OK",
+  "li_rev/li/k384_rev:OK",
+  "li_rev/li/k64_rev:OK",
+  "li_rev/li/refc32_rev:OK",
+  "rr_pass1/rr/k128_pass1:OK",
+  "rr_pass1/rr/k16_pass1:OK",
+  "rr_pass1/rr/k1_pass1:OK",
+  "rr_pass1/rr/k32_pass1:OK",
+  "rr_pass1/rr/k64_pass1:OK",
+  "rr_pass1/rr/k8_pass1:OK",
+  "rr_pass1/rr/refc32_pass1:OK",
+  "rr_rev/rr/k128_rev:OK",
+  "rr_rev/rr/k256_rev:OK",
+  "rr_rev/rr/k384_rev:OK",
+  "rr_rev/rr/k64_rev:OK",
+  "rr_rev/rr/refc32_rev:OK"
+ ],
+ "ranking": {
+  "li": {
+   "by_k": [
+    {
+     "k": 1,
+     "runs": 1,
+     "docs_per_s_mean": 0.4583,
+     "docs_per_s_all": [
+      0.4583
+     ],
+     "effective_cores": 1.03,
+     "cpu_utilization": 0.0429,
+     "idle_core_count_mean": 22.91,
+     "idle_core_equivalents": 22.973,
+     "cpu_s_per_doc": 2.247,
+     "batch_wall_s_max": 64.728
+    },
+    {
+     "k": 8,
+     "runs": 1,
+     "docs_per_s_mean": 0.8833,
+     "docs_per_s_all": [
+      0.8833
+     ],
+     "effective_cores": 2.074,
+     "cpu_utilization": 0.0864,
+     "idle_core_count_mean": 21.37,
+     "idle_core_equivalents": 21.93,
+     "cpu_s_per_doc": 2.3483,
+     "batch_wall_s_max": 67.501
+    },
+    {
+     "k": 16,
+     "runs": 1,
+     "docs_per_s_mean": 1.0843,
+     "docs_per_s_all": [
+      1.0843
+     ],
+     "effective_cores": 2.577,
+     "cpu_utilization": 0.1074,
+     "idle_core_count_mean": 20.76,
+     "idle_core_equivalents": 21.427,
+     "cpu_s_per_doc": 2.3763,
+     "batch_wall_s_max": 66.407
+    },
+    {
+     "k": 32,
+     "runs": 1,
+     "docs_per_s_mean": 1.4826,
+     "docs_per_s_all": [
+      1.4826
+     ],
+     "effective_cores": 3.838,
+     "cpu_utilization": 0.1599,
+     "idle_core_count_mean": 19.35,
+     "idle_core_equivalents": 20.157,
+     "cpu_s_per_doc": 2.5884,
+     "batch_wall_s_max": 65.45
+    },
+    {
+     "k": 64,
+     "runs": 3,
+     "docs_per_s_mean": 2.1284,
+     "docs_per_s_all": [
+      2.0897,
+      2.1604,
+      2.1351
+     ],
+     "effective_cores": 5.642,
+     "cpu_utilization": 0.2351,
+     "idle_core_count_mean": 17.74,
+     "idle_core_equivalents": 18.355,
+     "cpu_s_per_doc": 2.6512,
+     "batch_wall_s_max": 71.352
+    },
+    {
+     "k": 128,
+     "runs": 3,
+     "docs_per_s_mean": 2.6148,
+     "docs_per_s_all": [
+      2.8979,
+      2.5087,
+      2.4378
+     ],
+     "effective_cores": 7.506,
+     "cpu_utilization": 0.3127,
+     "idle_core_count_mean": 16.04,
+     "idle_core_equivalents": 16.477,
+     "cpu_s_per_doc": 2.8717,
+     "batch_wall_s_max": 96.411
+    },
+    {
+     "k": 256,
+     "runs": 1,
+     "docs_per_s_mean": 2.4099,
+     "docs_per_s_all": [
+      2.4099
+     ],
+     "effective_cores": 7.202,
+     "cpu_utilization": 0.3001,
+     "idle_core_count_mean": 16.51,
+     "idle_core_equivalents": 16.802,
+     "cpu_s_per_doc": 2.9885,
+     "batch_wall_s_max": 115.586
+    },
+    {
+     "k": 384,
+     "runs": 2,
+     "docs_per_s_mean": 3.3018,
+     "docs_per_s_all": [
+      3.5041,
+      3.0995
+     ],
+     "effective_cores": 10.411,
+     "cpu_utilization": 0.4337,
+     "idle_core_count_mean": 13.36,
+     "idle_core_equivalents": 13.532,
+     "cpu_s_per_doc": 3.1537,
+     "batch_wall_s_max": 122.9
+    }
+   ],
+   "call": {
+    "best_k": 384,
+    "runner_up_k": 128,
+    "lead_over_runner_up": 0.2627,
+    "noise_floor": 0.1921,
+    "verdict": "RESOLVED \u2014 lead exceeds the noise floor",
+    "in_requested_grid": {
+     "grid": [
+      1,
+      8,
+      16,
+      32,
+      64,
+      128
+     ],
+     "best_k": 128,
+     "runner_up_k": 64,
+     "lead_over_runner_up": 0.2285,
+     "best_worst_run": 2.4378,
+     "runner_up_best_run": 2.1604,
+     "ranges_non_overlapping": true,
+     "monotonic_in_k": true,
+     "best_is_grid_edge": true
+    },
+    "batching_vs_continuous": {
+     "best_batched_docs_per_s": 3.3018,
+     "continuous_docs_per_s": 4.1505,
+     "batched_over_continuous": 0.7955
+    }
+   },
+   "continuous_reference": [
+    {
+     "reference_c": 32,
+     "docs_per_s": 4.1505,
+     "effective_cores": 13.902,
+     "cpu_utilization": 0.5793,
+     "idle_core_count_mean": 9.89,
+     "launch": "li_pass1"
+    },
+    {
+     "reference_c": 32,
+     "docs_per_s": 3.7441,
+     "effective_cores": 12.499,
+     "cpu_utilization": 0.5208,
+     "idle_core_count_mean": 11.32,
+     "launch": "li_rep3"
+    },
+    {
+     "reference_c": 32,
+     "docs_per_s": 3.4255,
+     "effective_cores": 11.514,
+     "cpu_utilization": 0.4798,
+     "idle_core_count_mean": 12.38,
+     "launch": "li_rev"
+    }
+   ]
+  },
+  "rr": {
+   "by_k": [
+    {
+     "k": 1,
+     "runs": 1,
+     "docs_per_s_mean": 0.3215,
+     "docs_per_s_all": [
+      0.3215
+     ],
+     "effective_cores": 2.286,
+     "cpu_utilization": 0.0953,
+     "idle_core_count_mean": 20.41,
+     "idle_core_equivalents": 21.728,
+     "cpu_s_per_doc": 7.1121,
+     "batch_wall_s_max": 86.415
+    },
+    {
+     "k": 8,
+     "runs": 1,
+     "docs_per_s_mean": 0.5719,
+     "docs_per_s_all": [
+      0.5719
+     ],
+     "effective_cores": 3.197,
+     "cpu_utilization": 0.1332,
+     "idle_core_count_mean": 18.5,
+     "idle_core_equivalents": 20.822,
+     "cpu_s_per_doc": 5.5906,
+     "batch_wall_s_max": 85.762
+    },
+    {
+     "k": 16,
+     "runs": 1,
+     "docs_per_s_mean": 0.7064,
+     "docs_per_s_all": [
+      0.7064
+     ],
+     "effective_cores": 3.828,
+     "cpu_utilization": 0.1595,
+     "idle_core_count_mean": 17.65,
+     "idle_core_equivalents": 20.188,
+     "cpu_s_per_doc": 5.4189,
+     "batch_wall_s_max": 85.911
+    },
+    {
+     "k": 32,
+     "runs": 1,
+     "docs_per_s_mean": 0.8823,
+     "docs_per_s_all": [
+      0.8823
+     ],
+     "effective_cores": 4.935,
+     "cpu_utilization": 0.2056,
+     "idle_core_count_mean": 16.46,
+     "idle_core_equivalents": 19.072,
+     "cpu_s_per_doc": 5.5941,
+     "batch_wall_s_max": 88.067
+    },
+    {
+     "k": 64,
+     "runs": 2,
+     "docs_per_s_mean": 1.2302,
+     "docs_per_s_all": [
+      1.2261,
+      1.2342
+     ],
+     "effective_cores": 6.482,
+     "cpu_utilization": 0.2701,
+     "idle_core_count_mean": 14.85,
+     "idle_core_equivalents": 17.521,
+     "cpu_s_per_doc": 5.2693,
+     "batch_wall_s_max": 92.987
+    },
+    {
+     "k": 128,
+     "runs": 2,
+     "docs_per_s_mean": 2.0013,
+     "docs_per_s_all": [
+      1.9722,
+      2.0304
+     ],
+     "effective_cores": 10.026,
+     "cpu_utilization": 0.4178,
+     "idle_core_count_mean": 10.74,
+     "idle_core_equivalents": 13.932,
+     "cpu_s_per_doc": 5.0106,
+     "batch_wall_s_max": 105.341
+    },
+    {
+     "k": 256,
+     "runs": 1,
+     "docs_per_s_mean": 2.2542,
+     "docs_per_s_all": [
+      2.2542
+     ],
+     "effective_cores": 11.322,
+     "cpu_utilization": 0.4718,
+     "idle_core_count_mean": 9.45,
+     "idle_core_equivalents": 12.63,
+     "cpu_s_per_doc": 5.0227,
+     "batch_wall_s_max": 128.849
+    },
+    {
+     "k": 384,
+     "runs": 1,
+     "docs_per_s_mean": 2.6931,
+     "docs_per_s_all": [
+      2.6931
+     ],
+     "effective_cores": 13.512,
+     "cpu_utilization": 0.563,
+     "idle_core_count_mean": 7.53,
+     "idle_core_equivalents": 10.367,
+     "cpu_s_per_doc": 5.0173,
+     "batch_wall_s_max": 141.777
+    }
+   ],
+   "call": {
+    "best_k": 384,
+    "runner_up_k": 256,
+    "lead_over_runner_up": 0.1947,
+    "noise_floor": 0.0291,
+    "verdict": "RESOLVED \u2014 lead exceeds the noise floor",
+    "in_requested_grid": {
+     "grid": [
+      1,
+      8,
+      16,
+      32,
+      64,
+      128
+     ],
+     "best_k": 128,
+     "runner_up_k": 64,
+     "lead_over_runner_up": 0.6268,
+     "best_worst_run": 1.9722,
+     "runner_up_best_run": 1.2342,
+     "ranges_non_overlapping": true,
+     "monotonic_in_k": true,
+     "best_is_grid_edge": true
+    },
+    "batching_vs_continuous": {
+     "best_batched_docs_per_s": 2.6931,
+     "continuous_docs_per_s": 2.6797,
+     "batched_over_continuous": 1.005
+    }
+   },
+   "continuous_reference": [
+    {
+     "reference_c": 32,
+     "docs_per_s": 2.6769,
+     "effective_cores": 13.512,
+     "cpu_utilization": 0.563,
+     "idle_core_count_mean": 7.66,
+     "launch": "rr_pass1"
+    },
+    {
+     "reference_c": 32,
+     "docs_per_s": 2.6797,
+     "effective_cores": 13.42,
+     "cpu_utilization": 0.5591,
+     "idle_core_count_mean": 7.79,
+     "launch": "rr_rev"
+    }
+   ]
+  }
+ },
+ "noise_floor": {
+  "li": {
+   "replicated": {
+    "128": [
+     2.8979,
+     2.5087,
+     2.4378
+    ],
+    "64": [
+     2.0897,
+     2.1604,
+     2.1351
+    ],
+    "refc32": [
+     4.1505,
+     3.7441,
+     3.4255
+    ],
+    "384": [
+     3.5041,
+     3.0995
+    ]
+   },
+   "relative_spread": {
+    "128": 0.176,
+    "64": 0.0332,
+    "refc32": 0.1921,
+    "384": 0.1225
+   },
+   "floor": 0.1921
+  },
+  "rr": {
+   "replicated": {
+    "128": [
+     1.9722,
+     2.0304
+    ],
+    "64": [
+     1.2261,
+     1.2342
+    ],
+    "refc32": [
+     2.6769,
+     2.6797
+    ]
+   },
+   "relative_spread": {
+    "128": 0.0291,
+    "64": 0.0066,
+    "refc32": 0.001
+   },
+   "floor": 0.0291
+  }
+ },
+ "check_A_clock": {
+  "li_pass1/k128_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.8981,
+   "docs_per_s_export": 2.8979,
+   "relative_gap": 6e-05,
+   "tolerance": 0.02
+  },
+  "li_pass1/k16_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.0843,
+   "docs_per_s_export": 1.0843,
+   "relative_gap": 1e-05,
+   "tolerance": 0.02
+  },
+  "li_pass1/k1_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.4583,
+   "docs_per_s_export": 0.4583,
+   "relative_gap": 6e-05,
+   "tolerance": 0.02
+  },
+  "li_pass1/k32_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.4827,
+   "docs_per_s_export": 1.4826,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "li_pass1/k64_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.0898,
+   "docs_per_s_export": 2.0897,
+   "relative_gap": 4e-05,
+   "tolerance": 0.02
+  },
+  "li_pass1/k8_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.8833,
+   "docs_per_s_export": 0.8833,
+   "relative_gap": 3e-05,
+   "tolerance": 0.02
+  },
+  "li_pass1/refc32_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 4.1509,
+   "docs_per_s_export": 4.1505,
+   "relative_gap": 0.0001,
+   "tolerance": 0.02
+  },
+  "li_rep3/k128_rep3": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.5088,
+   "docs_per_s_export": 2.5087,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "li_rep3/k384_rep3": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.5048,
+   "docs_per_s_export": 3.5041,
+   "relative_gap": 0.00021,
+   "tolerance": 0.02
+  },
+  "li_rep3/k64_rep3": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.1604,
+   "docs_per_s_export": 2.1604,
+   "relative_gap": 1e-05,
+   "tolerance": 0.02
+  },
+  "li_rep3/refc32_rep3": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.7445,
+   "docs_per_s_export": 3.7441,
+   "relative_gap": 0.0001,
+   "tolerance": 0.02
+  },
+  "li_rev/k128_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.4379,
+   "docs_per_s_export": 2.4378,
+   "relative_gap": 4e-05,
+   "tolerance": 0.02
+  },
+  "li_rev/k256_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.4101,
+   "docs_per_s_export": 2.4099,
+   "relative_gap": 7e-05,
+   "tolerance": 0.02
+  },
+  "li_rev/k384_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.1001,
+   "docs_per_s_export": 3.0995,
+   "relative_gap": 0.00019,
+   "tolerance": 0.02
+  },
+  "li_rev/k64_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.1351,
+   "docs_per_s_export": 2.1351,
+   "relative_gap": 2e-05,
+   "tolerance": 0.02
+  },
+  "li_rev/refc32_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.4257,
+   "docs_per_s_export": 3.4255,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "rr_pass1/k128_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.9724,
+   "docs_per_s_export": 1.9722,
+   "relative_gap": 0.0001,
+   "tolerance": 0.02
+  },
+  "rr_pass1/k16_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.7064,
+   "docs_per_s_export": 0.7064,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "rr_pass1/k1_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.3215,
+   "docs_per_s_export": 0.3215,
+   "relative_gap": 0.00015,
+   "tolerance": 0.02
+  },
+  "rr_pass1/k32_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.8823,
+   "docs_per_s_export": 0.8823,
+   "relative_gap": 4e-05,
+   "tolerance": 0.02
+  },
+  "rr_pass1/k64_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.2262,
+   "docs_per_s_export": 1.2261,
+   "relative_gap": 7e-05,
+   "tolerance": 0.02
+  },
+  "rr_pass1/k8_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.5719,
+   "docs_per_s_export": 0.5719,
+   "relative_gap": 6e-05,
+   "tolerance": 0.02
+  },
+  "rr_pass1/refc32_pass1": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.6769,
+   "docs_per_s_export": 2.6769,
+   "relative_gap": 0.0,
+   "tolerance": 0.02
+  },
+  "rr_rev/k128_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.0306,
+   "docs_per_s_export": 2.0304,
+   "relative_gap": 9e-05,
+   "tolerance": 0.02
+  },
+  "rr_rev/k256_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.2544,
+   "docs_per_s_export": 2.2542,
+   "relative_gap": 0.0001,
+   "tolerance": 0.02
+  },
+  "rr_rev/k384_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.6944,
+   "docs_per_s_export": 2.6931,
+   "relative_gap": 0.00047,
+   "tolerance": 0.02
+  },
+  "rr_rev/k64_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.2342,
+   "docs_per_s_export": 1.2342,
+   "relative_gap": 4e-05,
+   "tolerance": 0.02
+  },
+  "rr_rev/refc32_rev": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.6797,
+   "docs_per_s_export": 2.6797,
+   "relative_gap": 1e-05,
+   "tolerance": 0.02
+  }
+ },
+ "check_B_cpu_source": {
+  "li_pass1/k128_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 8.266,
+   "host_busy_cores_on_cpuset": 8.285,
+   "host_minus_cgroup": 0.019,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_pass1/k16_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 2.577,
+   "host_busy_cores_on_cpuset": 2.573,
+   "host_minus_cgroup": -0.004,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_pass1/k1_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 1.03,
+   "host_busy_cores_on_cpuset": 1.027,
+   "host_minus_cgroup": -0.003,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_pass1/k32_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 3.838,
+   "host_busy_cores_on_cpuset": 3.843,
+   "host_minus_cgroup": 0.005,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_pass1/k64_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 5.57,
+   "host_busy_cores_on_cpuset": 5.572,
+   "host_minus_cgroup": 0.002,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_pass1/k8_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 2.074,
+   "host_busy_cores_on_cpuset": 2.07,
+   "host_minus_cgroup": -0.004,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_pass1/refc32_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 13.902,
+   "host_busy_cores_on_cpuset": 14.007,
+   "host_minus_cgroup": 0.105,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_rep3/k128_rep3": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 7.199,
+   "host_busy_cores_on_cpuset": 7.227,
+   "host_minus_cgroup": 0.028,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_rep3/k384_rep3": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 11.005,
+   "host_busy_cores_on_cpuset": 11.063,
+   "host_minus_cgroup": 0.058,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_rep3/k64_rep3": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 5.675,
+   "host_busy_cores_on_cpuset": 5.676,
+   "host_minus_cgroup": 0.001,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_rep3/refc32_rep3": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 12.499,
+   "host_busy_cores_on_cpuset": 12.575,
+   "host_minus_cgroup": 0.076,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_rev/k128_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 7.053,
+   "host_busy_cores_on_cpuset": 7.058,
+   "host_minus_cgroup": 0.005,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_rev/k256_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 7.202,
+   "host_busy_cores_on_cpuset": 7.198,
+   "host_minus_cgroup": -0.004,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_rev/k384_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 9.816,
+   "host_busy_cores_on_cpuset": 9.873,
+   "host_minus_cgroup": 0.057,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_rev/k64_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 5.682,
+   "host_busy_cores_on_cpuset": 5.687,
+   "host_minus_cgroup": 0.005,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_rev/refc32_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 11.514,
+   "host_busy_cores_on_cpuset": 11.528,
+   "host_minus_cgroup": 0.014,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_pass1/k128_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 9.98,
+   "host_busy_cores_on_cpuset": 10.012,
+   "host_minus_cgroup": 0.032,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_pass1/k16_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 3.828,
+   "host_busy_cores_on_cpuset": 3.812,
+   "host_minus_cgroup": -0.016,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_pass1/k1_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 2.286,
+   "host_busy_cores_on_cpuset": 2.272,
+   "host_minus_cgroup": -0.014,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_pass1/k32_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 4.935,
+   "host_busy_cores_on_cpuset": 4.928,
+   "host_minus_cgroup": -0.007,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_pass1/k64_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 6.548,
+   "host_busy_cores_on_cpuset": 6.546,
+   "host_minus_cgroup": -0.002,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_pass1/k8_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 3.197,
+   "host_busy_cores_on_cpuset": 3.178,
+   "host_minus_cgroup": -0.019,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_pass1/refc32_pass1": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 13.512,
+   "host_busy_cores_on_cpuset": 13.608,
+   "host_minus_cgroup": 0.096,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_rev/k128_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 10.072,
+   "host_busy_cores_on_cpuset": 10.124,
+   "host_minus_cgroup": 0.052,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_rev/k256_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 11.322,
+   "host_busy_cores_on_cpuset": 11.37,
+   "host_minus_cgroup": 0.048,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_rev/k384_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 13.512,
+   "host_busy_cores_on_cpuset": 13.633,
+   "host_minus_cgroup": 0.121,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_rev/k64_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 6.416,
+   "host_busy_cores_on_cpuset": 6.412,
+   "host_minus_cgroup": -0.004,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_rev/refc32_rev": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 13.42,
+   "host_busy_cores_on_cpuset": 13.504,
+   "host_minus_cgroup": 0.084,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  }
+ },
+ "check_C_content": {
+  "li": {
+   "reference": "li_pass1/k128_pass1",
+   "comparisons": [
+    {
+     "leg": "li_pass1/k16_pass1",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_pass1/k1_pass1",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_pass1/k32_pass1",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_pass1/k64_pass1",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_pass1/k8_pass1",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_pass1/refc32_pass1",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_rep3/k128_rep3",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_rep3/k384_rep3",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_rep3/k64_rep3",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_rep3/refc32_rep3",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_rev/k128_rev",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_rev/k256_rev",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_rev/k384_rev",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_rev/k64_rev",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_rev/refc32_rev",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    }
+   ],
+   "verdict": "PASS"
+  },
+  "rr": {
+   "reference": "rr_pass1/k128_pass1",
+   "comparisons": [
+    {
+     "leg": "rr_pass1/k16_pass1",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_pass1/k1_pass1",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_pass1/k32_pass1",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_pass1/k64_pass1",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_pass1/k8_pass1",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_pass1/refc32_pass1",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_rev/k128_rev",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_rev/k256_rev",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_rev/k384_rev",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_rev/k64_rev",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_rev/refc32_rev",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    }
+   ],
+   "verdict": "PASS"
+  },
+  "null_control_cross_arm": {
+   "common": 381,
+   "differing": 379,
+   "verdict": "FIRED",
+   "meaning": "the comparator sees differences where they must exist (different parsers)"
+  }
+ },
+ "check_E_tail": {
+  "per_leg": {
+   "li_pass1/k128_pass1": {
+    "docs_per_s_span": 2.8981,
+    "docs_per_s_to_p90": 3.0494,
+    "p90_over_span": 1.052,
+    "t90_s": 112.2,
+    "span_s": 131.5
+   },
+   "li_pass1/k16_pass1": {
+    "docs_per_s_span": 1.0843,
+    "docs_per_s_to_p90": 1.0869,
+    "p90_over_span": 1.002,
+    "t90_s": 314.7,
+    "span_s": 351.4
+   },
+   "li_pass1/k1_pass1": {
+    "docs_per_s_span": 0.4583,
+    "docs_per_s_to_p90": 0.4509,
+    "p90_over_span": 0.984,
+    "t90_s": 758.5,
+    "span_s": 831.4
+   },
+   "li_pass1/k32_pass1": {
+    "docs_per_s_span": 1.4827,
+    "docs_per_s_to_p90": 1.5375,
+    "p90_over_span": 1.037,
+    "t90_s": 222.4,
+    "span_s": 257.0
+   },
+   "li_pass1/k64_pass1": {
+    "docs_per_s_span": 2.0898,
+    "docs_per_s_to_p90": 2.081,
+    "p90_over_span": 0.996,
+    "t90_s": 164.3,
+    "span_s": 182.3
+   },
+   "li_pass1/k8_pass1": {
+    "docs_per_s_span": 0.8833,
+    "docs_per_s_to_p90": 0.8667,
+    "p90_over_span": 0.981,
+    "t90_s": 394.6,
+    "span_s": 431.3
+   },
+   "li_pass1/refc32_pass1": {
+    "docs_per_s_span": 4.1509,
+    "docs_per_s_to_p90": 7.5188,
+    "p90_over_span": 1.811,
+    "t90_s": 45.5,
+    "span_s": 91.8
+   },
+   "li_rep3/k128_rep3": {
+    "docs_per_s_span": 2.5088,
+    "docs_per_s_to_p90": 2.6765,
+    "p90_over_span": 1.067,
+    "t90_s": 127.8,
+    "span_s": 151.9
+   },
+   "li_rep3/k384_rep3": {
+    "docs_per_s_span": 3.5048,
+    "docs_per_s_to_p90": 7.7841,
+    "p90_over_span": 2.221,
+    "t90_s": 43.9,
+    "span_s": 108.7
+   },
+   "li_rep3/k64_rep3": {
+    "docs_per_s_span": 2.1604,
+    "docs_per_s_to_p90": 2.2202,
+    "p90_over_span": 1.028,
+    "t90_s": 154.0,
+    "span_s": 176.4
+   },
+   "li_rep3/refc32_rep3": {
+    "docs_per_s_span": 3.7445,
+    "docs_per_s_to_p90": 7.696,
+    "p90_over_span": 2.055,
+    "t90_s": 44.4,
+    "span_s": 101.8
+   },
+   "li_rev/k128_rev": {
+    "docs_per_s_span": 2.4379,
+    "docs_per_s_to_p90": 2.5551,
+    "p90_over_span": 1.048,
+    "t90_s": 133.9,
+    "span_s": 156.3
+   },
+   "li_rev/k256_rev": {
+    "docs_per_s_span": 2.4101,
+    "docs_per_s_to_p90": 2.7657,
+    "p90_over_span": 1.148,
+    "t90_s": 123.7,
+    "span_s": 158.1
+   },
+   "li_rev/k384_rev": {
+    "docs_per_s_span": 3.1001,
+    "docs_per_s_to_p90": 7.8755,
+    "p90_over_span": 2.54,
+    "t90_s": 43.4,
+    "span_s": 122.9
+   },
+   "li_rev/k64_rev": {
+    "docs_per_s_span": 2.1351,
+    "docs_per_s_to_p90": 2.1598,
+    "p90_over_span": 1.012,
+    "t90_s": 158.3,
+    "span_s": 178.4
+   },
+   "li_rev/refc32_rev": {
+    "docs_per_s_span": 3.4257,
+    "docs_per_s_to_p90": 7.596,
+    "p90_over_span": 2.217,
+    "t90_s": 45.0,
+    "span_s": 111.2
+   },
+   "rr_pass1/k128_pass1": {
+    "docs_per_s_span": 1.9724,
+    "docs_per_s_to_p90": 1.771,
+    "p90_over_span": 0.898,
+    "t90_s": 193.7,
+    "span_s": 193.7
+   },
+   "rr_pass1/k16_pass1": {
+    "docs_per_s_span": 0.7064,
+    "docs_per_s_to_p90": 0.6635,
+    "p90_over_span": 0.939,
+    "t90_s": 516.9,
+    "span_s": 540.7
+   },
+   "rr_pass1/k1_pass1": {
+    "docs_per_s_span": 0.3215,
+    "docs_per_s_to_p90": 0.3113,
+    "p90_over_span": 0.968,
+    "t90_s": 1102.0,
+    "span_s": 1188.4
+   },
+   "rr_pass1/k32_pass1": {
+    "docs_per_s_span": 0.8823,
+    "docs_per_s_to_p90": 0.8271,
+    "p90_over_span": 0.937,
+    "t90_s": 414.7,
+    "span_s": 433.0
+   },
+   "rr_pass1/k64_pass1": {
+    "docs_per_s_span": 1.2262,
+    "docs_per_s_to_p90": 1.101,
+    "p90_over_span": 0.898,
+    "t90_s": 311.5,
+    "span_s": 311.5
+   },
+   "rr_pass1/k8_pass1": {
+    "docs_per_s_span": 0.5719,
+    "docs_per_s_to_p90": 0.5349,
+    "p90_over_span": 0.935,
+    "t90_s": 641.2,
+    "span_s": 668.0
+   },
+   "rr_pass1/refc32_pass1": {
+    "docs_per_s_span": 2.6769,
+    "docs_per_s_to_p90": 5.4549,
+    "p90_over_span": 2.038,
+    "t90_s": 62.9,
+    "span_s": 142.7
+   },
+   "rr_rev/k128_rev": {
+    "docs_per_s_span": 2.0306,
+    "docs_per_s_to_p90": 1.8233,
+    "p90_over_span": 0.898,
+    "t90_s": 188.1,
+    "span_s": 188.1
+   },
+   "rr_rev/k256_rev": {
+    "docs_per_s_span": 2.2544,
+    "docs_per_s_to_p90": 2.0243,
+    "p90_over_span": 0.898,
+    "t90_s": 169.4,
+    "span_s": 169.4
+   },
+   "rr_rev/k384_rev": {
+    "docs_per_s_span": 2.6944,
+    "docs_per_s_to_p90": 2.4193,
+    "p90_over_span": 0.898,
+    "t90_s": 141.8,
+    "span_s": 141.8
+   },
+   "rr_rev/k64_rev": {
+    "docs_per_s_span": 1.2342,
+    "docs_per_s_to_p90": 1.1082,
+    "p90_over_span": 0.898,
+    "t90_s": 309.5,
+    "span_s": 309.5
+   },
+   "rr_rev/refc32_rev": {
+    "docs_per_s_span": 2.6797,
+    "docs_per_s_to_p90": 5.4884,
+    "p90_over_span": 2.048,
+    "t90_s": 62.5,
+    "span_s": 142.6
+   }
+  },
+  "by_arm": {
+   "li": {
+    "rank_by_span": [
+     "k384",
+     "k128",
+     "k256",
+     "k64",
+     "k32",
+     "k16",
+     "k8",
+     "k1"
+    ],
+    "rank_by_to_p90": [
+     "k384",
+     "k256",
+     "k128",
+     "k64",
+     "k32",
+     "k16",
+     "k8",
+     "k1"
+    ],
+    "verdict": "DIFFERS \u2014 read both rankings",
+    "to_p90_replicate_spread": {
+     "k128": 0.1791,
+     "k64": 0.0646,
+     "refc32": 0.0233,
+     "k384": 0.0117
+    }
+   },
+   "rr": {
+    "rank_by_span": [
+     "k384",
+     "k256",
+     "k128",
+     "k64",
+     "k32",
+     "k16",
+     "k8",
+     "k1"
+    ],
+    "rank_by_to_p90": [
+     "k384",
+     "k256",
+     "k128",
+     "k64",
+     "k32",
+     "k16",
+     "k8",
+     "k1"
+    ],
+    "verdict": "PASS \u2014 K ranking identical under both metrics",
+    "to_p90_replicate_spread": {
+     "k128": 0.0291,
+     "k64": 0.0066,
+     "refc32": 0.0061
+    }
+   }
+  }
+ }
+}

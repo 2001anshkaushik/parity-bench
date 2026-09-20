@@ -39,6 +39,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 
+GRID = {1, 8, 16, 32, 64, 128}          # the batch sizes the campaign was asked to test
 DOCUMENT_OUTCOMES = {"no_documents", "empty_extraction", "parse_failed"}
 
 
@@ -220,6 +221,23 @@ def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
                         verdict=("UNRESOLVED — no replicate, noise floor unknown" if floor is None
                                  else "TIE — lead is inside the noise floor" if lead <= floor
                                  else "RESOLVED — lead exceeds the noise floor"))
+        # THE REQUESTED GRID, called separately: edge probes beyond it (K=256, K=384) describe
+        # the trend and must not decide the answer to "which of the requested sizes is best".
+        # Non-overlap is the sturdier test on a noisy arm: the best K's WORST run against the
+        # runner-up's BEST run. It needs replicates on both; without them it says so.
+        in_grid = [r for r in ordered if r["k"] in GRID]
+        if len(in_grid) > 1:
+            b, u = in_grid[0], in_grid[1]
+            call["in_requested_grid"] = {
+                "grid": sorted(GRID), "best_k": b["k"], "runner_up_k": u["k"],
+                "lead_over_runner_up": round(b["docs_per_s_mean"] / u["docs_per_s_mean"] - 1, 4),
+                "best_worst_run": min(b["docs_per_s_all"]), "runner_up_best_run": max(u["docs_per_s_all"]),
+                "ranges_non_overlapping": (min(b["docs_per_s_all"]) > max(u["docs_per_s_all"])
+                                           if b["runs"] > 1 and u["runs"] > 1 else None),
+                "monotonic_in_k": all(x["docs_per_s_mean"] < y["docs_per_s_mean"] for x, y in
+                                      zip(sorted(in_grid, key=lambda r: r["k"]),
+                                          sorted(in_grid, key=lambda r: r["k"])[1:])),
+                "best_is_grid_edge": b["k"] == max(GRID)}
         refs = [{"reference_c": g["reference_c"], "docs_per_s": g["throughput"]["docs_per_s"],
                  "effective_cores": g["cost"]["effective_cores"],
                  "cpu_utilization": g["cost"]["cpu_utilization"],

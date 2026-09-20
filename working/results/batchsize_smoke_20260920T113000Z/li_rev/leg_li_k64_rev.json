@@ -1,0 +1,104 @@
+{
+ "arm": "li",
+ "leg": "k64_rev",
+ "k": 64,
+ "reference_c": null,
+ "verdict": "OK",
+ "submission_shape": "K concurrent POST /process_pdf, K=64, one batch in flight, barrier between batches",
+ "documents": {
+  "submitted": 384,
+  "recorded": 384,
+  "ok": 381,
+  "empty": 0,
+  "hard_failures": 0,
+  "hard_failure_reasons": []
+ },
+ "throughput": {
+  "span_s": 178.448,
+  "docs_per_s": 2.1351,
+  "chunks": 6785,
+  "chunks_per_s": 38.0222,
+  "basis": "MEASURED \u2014 first submit to last return, one clock"
+ },
+ "batches": {
+  "n": 6,
+  "wall_s_min": 16.958,
+  "wall_s_p50": 23.809,
+  "wall_s_max": 68.302
+ },
+ "cost": {
+  "cpu_s": 1013.908,
+  "effective_cores": 5.682,
+  "cpu_utilization": 0.2367,
+  "cpu_utilization_valid": true,
+  "cpu_s_per_doc": 2.6612,
+  "available_cpus": 24,
+  "available_cpus_source": "cgroup cpuset.cpus.effective",
+  "idle_core_equivalents_arm": 18.318,
+  "basis": "arm container cgroup cpu.stat usage_usec, read at the leg's t0 and t1"
+ },
+ "percore_host": {
+  "n_intervals": 178,
+  "ncpus": 24,
+  "idle_threshold": 0.1,
+  "mean_busy_cores": 5.687,
+  "idle_core_equivalents": 18.313,
+  "host_util_of_cpuset": 0.237,
+  "idle_core_count_mean": 17.75,
+  "idle_core_count_min": 0,
+  "idle_core_count_p50": 21,
+  "idle_core_count_max": 23,
+  "cores_idle_whole_leg": 1,
+  "per_core_mean_busy": {
+   "0": 0.22,
+   "1": 0.21,
+   "2": 0.181,
+   "3": 0.102,
+   "4": 0.084,
+   "5": 0.168,
+   "6": 0.477,
+   "7": 0.12,
+   "8": 0.18,
+   "9": 0.353,
+   "10": 0.297,
+   "11": 0.28,
+   "12": 0.35,
+   "13": 0.214,
+   "14": 0.385,
+   "15": 0.367,
+   "16": 0.232,
+   "17": 0.341,
+   "18": 0.143,
+   "19": 0.147,
+   "20": 0.212,
+   "21": 0.231,
+   "22": 0.174,
+   "23": 0.218
+  },
+  "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+  "interval_s": 1.0,
+  "intervals_dropped": 0,
+  "sampler_read_s_total": 0.0516
+ },
+ "warm_up": {
+  "docs": 25,
+  "seconds": 13.93,
+  "disjoint_from_measured": true,
+  "same_shape_as_leg": true
+ },
+ "quiet_box_before": {
+  "host_busy_cores": 0.025,
+  "arm_idle_cores": 0.027,
+  "foreign_busy_cores": -0.002,
+  "max_foreign": 2.0,
+  "quiet": true,
+  "load1": 6.24267578125,
+  "window_s": 4.0,
+  "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+ },
+ "window": {
+  "t0_ns": 1789912371804551404,
+  "t1_ns": 1789912550252810298
+ },
+ "leaked_task": null
+}

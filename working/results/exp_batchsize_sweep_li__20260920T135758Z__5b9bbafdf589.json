@@ -1,0 +1,648 @@
+{
+ "_meta": {
+  "name": "exp_batchsize_sweep_li",
+  "written_utc": "20260920T135758Z",
+  "payload_sha256_12": "5b9bbafdf589",
+  "host": "ip-172-31-13-86",
+  "user": "ssm-user",
+  "pid": 2837006,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "experiment": "batchsize_sweep_docs",
+  "arm": "li",
+  "label": "rev",
+  "script_sha256": "88bbda6b0131696f6508ebd24641ef664db554aa891921ec54462566e1a9008a",
+  "posture": {
+   "container": "li",
+   "running": true,
+   "pid": 2836663,
+   "image_id": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",
+   "image_expected": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",
+   "cpuset_declared": "0-23",
+   "nano_cpus": 0,
+   "memory_limit": 62277025792,
+   "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "TORCH_NUM_THREADS": "1"
+   },
+   "ws1_workers": "24",
+   "started_at": "2026-09-20T13:44:17.098459255Z",
+   "thread_env_expected": "1",
+   "cgroup": "/sys/fs/cgroup/system.slice/docker-6ef42261fe8264c58095283d2476e87d5a785a742143b8144512b2dd6067fd4b.scope",
+   "cpuset_effective": {
+    "cpus": 24,
+    "raw": "0-23",
+    "source": "cgroup cpuset.cpus.effective"
+   },
+   "ready": {
+    "health": {
+     "ok": null,
+     "warm_workers": 24,
+     "torch_threads": 1
+    }
+   },
+   "other_arm_running": false,
+   "rr_tokens": null,
+   "rr_threads_requested": null,
+   "rr_threads_observed": null
+  },
+  "slice": {
+   "kind": "batchsize_slice",
+   "manifest_sha256": "309749a593dd44675bbcf622465b672ca40faac16db90dbdebc7005cf08f3ecf",
+   "n": 384,
+   "warm": 25,
+   "page_edges": [
+    7,
+    22
+   ],
+   "chars_per_page_edges": [
+    1849.5,
+    2885.75
+   ],
+   "cell_sizes_corpus": {
+    "pages0_cpp2": 1505,
+    "pages0_cpp0": 930,
+    "pages0_cpp1": 859,
+    "pages1_cpp1": 1096,
+    "pages1_cpp2": 1132,
+    "pages2_cpp0": 1353,
+    "pages2_cpp1": 1375,
+    "pages1_cpp0": 1047,
+    "pages2_cpp2": 695,
+    "uncharacterised": 8
+   },
+   "cell_take": {
+    "pages0_cpp2": 58,
+    "pages0_cpp0": 36,
+    "pages0_cpp1": 33,
+    "pages1_cpp1": 42,
+    "pages1_cpp2": 43,
+    "pages2_cpp0": 52,
+    "pages2_cpp1": 53,
+    "pages1_cpp0": 40,
+    "pages2_cpp2": 26,
+    "uncharacterised": 1
+   },
+   "pages_min_median_max": [
+    1,
+    12,
+    791
+   ],
+   "bytes_total": 266751254,
+   "slice_sha256": "411f96f117512f9cdf6d833796a532c0cae8ca42cefdc3c3077671c882a3fb24"
+  },
+  "k_grid": [
+   384,
+   256,
+   128,
+   64
+  ],
+  "reference_c": 32,
+  "legs": [
+   {
+    "arm": "li",
+    "leg": "k384_rev",
+    "k": 384,
+    "reference_c": null,
+    "verdict": "OK",
+    "submission_shape": "K concurrent POST /process_pdf, K=384, one batch in flight, barrier between batches",
+    "documents": {
+     "submitted": 384,
+     "recorded": 384,
+     "ok": 381,
+     "empty": 0,
+     "hard_failures": 0,
+     "hard_failure_reasons": []
+    },
+    "throughput": {
+     "span_s": 122.923,
+     "docs_per_s": 3.0995,
+     "chunks": 6785,
+     "chunks_per_s": 55.1973,
+     "basis": "MEASURED \u2014 first submit to last return, one clock"
+    },
+    "batches": {
+     "n": 1,
+     "wall_s_min": 122.9,
+     "wall_s_p50": 122.9,
+     "wall_s_max": 122.9
+    },
+    "cost": {
+     "cpu_s": 1206.625,
+     "effective_cores": 9.816,
+     "cpu_utilization": 0.409,
+     "cpu_utilization_valid": true,
+     "cpu_s_per_doc": 3.167,
+     "available_cpus": 24,
+     "available_cpus_source": "cgroup cpuset.cpus.effective",
+     "idle_core_equivalents_arm": 14.184,
+     "basis": "arm container cgroup cpu.stat usage_usec, read at the leg's t0 and t1"
+    },
+    "percore_host": {
+     "n_intervals": 122,
+     "ncpus": 24,
+     "idle_threshold": 0.1,
+     "mean_busy_cores": 9.873,
+     "idle_core_equivalents": 14.127,
+     "host_util_of_cpuset": 0.4114,
+     "idle_core_count_mean": 14.0,
+     "idle_core_count_min": 0,
+     "idle_core_count_p50": 21,
+     "idle_core_count_max": 23,
+     "cores_idle_whole_leg": 0,
+     "per_core_mean_busy": {
+      "0": 0.32,
+      "1": 0.317,
+      "2": 0.351,
+      "3": 0.617,
+      "4": 0.37,
+      "5": 0.322,
+      "6": 0.384,
+      "7": 0.365,
+      "8": 0.394,
+      "9": 0.367,
+      "10": 0.565,
+      "11": 0.451,
+      "12": 0.413,
+      "13": 0.449,
+      "14": 0.406,
+      "15": 0.408,
+      "16": 0.345,
+      "17": 0.329,
+      "18": 0.418,
+      "19": 0.608,
+      "20": 0.47,
+      "21": 0.406,
+      "22": 0.341,
+      "23": 0.458
+     },
+     "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+     "interval_s": 1.0,
+     "intervals_dropped": 0,
+     "sampler_read_s_total": 0.0513
+    },
+    "warm_up": {
+     "docs": 25,
+     "seconds": 12.53,
+     "disjoint_from_measured": true,
+     "same_shape_as_leg": true
+    },
+    "quiet_box_before": {
+     "host_busy_cores": 0.02,
+     "arm_idle_cores": 0.025,
+     "foreign_busy_cores": -0.005,
+     "max_foreign": 2.0,
+     "quiet": true,
+     "load1": 10.40625,
+     "window_s": 4.0,
+     "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+    },
+    "window": {
+     "t0_ns": 1789911884305875946,
+     "t1_ns": 1789912007228658510
+    },
+    "leaked_task": null
+   },
+   {
+    "arm": "li",
+    "leg": "k256_rev",
+    "k": 256,
+    "reference_c": null,
+    "verdict": "OK",
+    "submission_shape": "K concurrent POST /process_pdf, K=256, one batch in flight, barrier between batches",
+    "documents": {
+     "submitted": 384,
+     "recorded": 384,
+     "ok": 381,
+     "empty": 0,
+     "hard_failures": 0,
+     "hard_failure_reasons": []
+    },
+    "throughput": {
+     "span_s": 158.1,
+     "docs_per_s": 2.4099,
+     "chunks": 6785,
+     "chunks_per_s": 42.9157,
+     "basis": "MEASURED \u2014 first submit to last return, one clock"
+    },
+    "batches": {
+     "n": 2,
+     "wall_s_min": 42.497,
+     "wall_s_p50": 115.586,
+     "wall_s_max": 115.586
+    },
+    "cost": {
+     "cpu_s": 1138.614,
+     "effective_cores": 7.202,
+     "cpu_utilization": 0.3001,
+     "cpu_utilization_valid": true,
+     "cpu_s_per_doc": 2.9885,
+     "available_cpus": 24,
+     "available_cpus_source": "cgroup cpuset.cpus.effective",
+     "idle_core_equivalents_arm": 16.798,
+     "basis": "arm container cgroup cpu.stat usage_usec, read at the leg's t0 and t1"
+    },
+    "percore_host": {
+     "n_intervals": 158,
+     "ncpus": 24,
+     "idle_threshold": 0.1,
+     "mean_busy_cores": 7.198,
+     "idle_core_equivalents": 16.802,
+     "host_util_of_cpuset": 0.2999,
+     "idle_core_count_mean": 16.51,
+     "idle_core_count_min": 0,
+     "idle_core_count_p50": 22,
+     "idle_core_count_max": 23,
+     "cores_idle_whole_leg": 0,
+     "per_core_mean_busy": {
+      "0": 0.282,
+      "1": 0.344,
+      "2": 0.241,
+      "3": 0.195,
+      "4": 0.357,
+      "5": 0.268,
+      "6": 0.182,
+      "7": 0.226,
+      "8": 0.224,
+      "9": 0.29,
+      "10": 0.31,
+      "11": 0.37,
+      "12": 0.506,
+      "13": 0.262,
+      "14": 0.457,
+      "15": 0.323,
+      "16": 0.258,
+      "17": 0.239,
+      "18": 0.186,
+      "19": 0.296,
+      "20": 0.633,
+      "21": 0.207,
+      "22": 0.282,
+      "23": 0.261
+     },
+     "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+     "interval_s": 1.0,
+     "intervals_dropped": 0,
+     "sampler_read_s_total": 0.0475
+    },
+    "warm_up": {
+     "docs": 25,
+     "seconds": 12.53,
+     "disjoint_from_measured": true,
+     "same_shape_as_leg": true
+    },
+    "quiet_box_before": {
+     "host_busy_cores": 0.023,
+     "arm_idle_cores": 0.026,
+     "foreign_busy_cores": -0.004,
+     "max_foreign": 2.0,
+     "quiet": true,
+     "load1": 5.4560546875,
+     "window_s": 4.0,
+     "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+    },
+    "window": {
+     "t0_ns": 1789912023760457779,
+     "t1_ns": 1789912181860954357
+    },
+    "leaked_task": null
+   },
+   {
+    "arm": "li",
+    "leg": "k128_rev",
+    "k": 128,
+    "reference_c": null,
+    "verdict": "OK",
+    "submission_shape": "K concurrent POST /process_pdf, K=128, one batch in flight, barrier between batches",
+    "documents": {
+     "submitted": 384,
+     "recorded": 384,
+     "ok": 381,
+     "empty": 0,
+     "hard_failures": 0,
+     "hard_failure_reasons": []
+    },
+    "throughput": {
+     "span_s": 156.291,
+     "docs_per_s": 2.4378,
+     "chunks": 6785,
+     "chunks_per_s": 43.4126,
+     "basis": "MEASURED \u2014 first submit to last return, one clock"
+    },
+    "batches": {
+     "n": 3,
+     "wall_s_min": 29.07,
+     "wall_s_p50": 30.795,
+     "wall_s_max": 96.411
+    },
+    "cost": {
+     "cpu_s": 1102.313,
+     "effective_cores": 7.053,
+     "cpu_utilization": 0.2939,
+     "cpu_utilization_valid": true,
+     "cpu_s_per_doc": 2.8932,
+     "available_cpus": 24,
+     "available_cpus_source": "cgroup cpuset.cpus.effective",
+     "idle_core_equivalents_arm": 16.947,
+     "basis": "arm container cgroup cpu.stat usage_usec, read at the leg's t0 and t1"
+    },
+    "percore_host": {
+     "n_intervals": 156,
+     "ncpus": 24,
+     "idle_threshold": 0.1,
+     "mean_busy_cores": 7.058,
+     "idle_core_equivalents": 16.942,
+     "host_util_of_cpuset": 0.2941,
+     "idle_core_count_mean": 16.6,
+     "idle_core_count_min": 0,
+     "idle_core_count_p50": 22,
+     "idle_core_count_max": 23,
+     "cores_idle_whole_leg": 0,
+     "per_core_mean_busy": {
+      "0": 0.295,
+      "1": 0.267,
+      "2": 0.208,
+      "3": 0.184,
+      "4": 0.17,
+      "5": 0.255,
+      "6": 0.203,
+      "7": 0.251,
+      "8": 0.282,
+      "9": 0.251,
+      "10": 0.847,
+      "11": 0.336,
+      "12": 0.401,
+      "13": 0.431,
+      "14": 0.302,
+      "15": 0.268,
+      "16": 0.167,
+      "17": 0.17,
+      "18": 0.302,
+      "19": 0.325,
+      "20": 0.419,
+      "21": 0.268,
+      "22": 0.254,
+      "23": 0.202
+     },
+     "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+     "interval_s": 1.0,
+     "intervals_dropped": 0,
+     "sampler_read_s_total": 0.0464
+    },
+    "warm_up": {
+     "docs": 25,
+     "seconds": 11.71,
+     "disjoint_from_measured": true,
+     "same_shape_as_leg": true
+    },
+    "quiet_box_before": {
+     "host_busy_cores": 0.028,
+     "arm_idle_cores": 0.027,
+     "foreign_busy_cores": 0.0,
+     "max_foreign": 2.0,
+     "quiet": true,
+     "load1": 4.33447265625,
+     "window_s": 4.0,
+     "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+    },
+    "window": {
+     "t0_ns": 1789912197578717578,
+     "t1_ns": 1789912353869924221
+    },
+    "leaked_task": null
+   },
+   {
+    "arm": "li",
+    "leg": "k64_rev",
+    "k": 64,
+    "reference_c": null,
+    "verdict": "OK",
+    "submission_shape": "K concurrent POST /process_pdf, K=64, one batch in flight, barrier between batches",
+    "documents": {
+     "submitted": 384,
+     "recorded": 384,
+     "ok": 381,
+     "empty": 0,
+     "hard_failures": 0,
+     "hard_failure_reasons": []
+    },
+    "throughput": {
+     "span_s": 178.448,
+     "docs_per_s": 2.1351,
+     "chunks": 6785,
+     "chunks_per_s": 38.0222,
+     "basis": "MEASURED \u2014 first submit to last return, one clock"
+    },
+    "batches": {
+     "n": 6,
+     "wall_s_min": 16.958,
+     "wall_s_p50": 23.809,
+     "wall_s_max": 68.302
+    },
+    "cost": {
+     "cpu_s": 1013.908,
+     "effective_cores": 5.682,
+     "cpu_utilization": 0.2367,
+     "cpu_utilization_valid": true,
+     "cpu_s_per_doc": 2.6612,
+     "available_cpus": 24,
+     "available_cpus_source": "cgroup cpuset.cpus.effective",
+     "idle_core_equivalents_arm": 18.318,
+     "basis": "arm container cgroup cpu.stat usage_usec, read at the leg's t0 and t1"
+    },
+    "percore_host": {
+     "n_intervals": 178,
+     "ncpus": 24,
+     "idle_threshold": 0.1,
+     "mean_busy_cores": 5.687,
+     "idle_core_equivalents": 18.313,
+     "host_util_of_cpuset": 0.237,
+     "idle_core_count_mean": 17.75,
+     "idle_core_count_min": 0,
+     "idle_core_count_p50": 21,
+     "idle_core_count_max": 23,
+     "cores_idle_whole_leg": 1,
+     "per_core_mean_busy": {
+      "0": 0.22,
+      "1": 0.21,
+      "2": 0.181,
+      "3": 0.102,
+      "4": 0.084,
+      "5": 0.168,
+      "6": 0.477,
+      "7": 0.12,
+      "8": 0.18,
+      "9": 0.353,
+      "10": 0.297,
+      "11": 0.28,
+      "12": 0.35,
+      "13": 0.214,
+      "14": 0.385,
+      "15": 0.367,
+      "16": 0.232,
+      "17": 0.341,
+      "18": 0.143,
+      "19": 0.147,
+      "20": 0.212,
+      "21": 0.231,
+      "22": 0.174,
+      "23": 0.218
+     },
+     "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+     "interval_s": 1.0,
+     "intervals_dropped": 0,
+     "sampler_read_s_total": 0.0516
+    },
+    "warm_up": {
+     "docs": 25,
+     "seconds": 13.93,
+     "disjoint_from_measured": true,
+     "same_shape_as_leg": true
+    },
+    "quiet_box_before": {
+     "host_busy_cores": 0.025,
+     "arm_idle_cores": 0.027,
+     "foreign_busy_cores": -0.002,
+     "max_foreign": 2.0,
+     "quiet": true,
+     "load1": 6.24267578125,
+     "window_s": 4.0,
+     "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+    },
+    "window": {
+     "t0_ns": 1789912371804551404,
+     "t1_ns": 1789912550252810298
+    },
+    "leaked_task": null
+   },
+   {
+    "arm": "li",
+    "leg": "refc32_rev",
+    "k": null,
+    "reference_c": 32,
+    "verdict": "OK",
+    "submission_shape": "POST /process_pdf per document, C=32 in flight, no barrier (the banked blast shape)",
+    "documents": {
+     "submitted": 384,
+     "recorded": 384,
+     "ok": 381,
+     "empty": 0,
+     "hard_failures": 0,
+     "hard_failure_reasons": []
+    },
+    "throughput": {
+     "span_s": 111.224,
+     "docs_per_s": 3.4255,
+     "chunks": 6785,
+     "chunks_per_s": 61.003,
+     "basis": "MEASURED \u2014 first submit to last return, one clock"
+    },
+    "batches": null,
+    "cost": {
+     "cpu_s": 1280.652,
+     "effective_cores": 11.514,
+     "cpu_utilization": 0.4798,
+     "cpu_utilization_valid": true,
+     "cpu_s_per_doc": 3.3613,
+     "available_cpus": 24,
+     "available_cpus_source": "cgroup cpuset.cpus.effective",
+     "idle_core_equivalents_arm": 12.486,
+     "basis": "arm container cgroup cpu.stat usage_usec, read at the leg's t0 and t1"
+    },
+    "percore_host": {
+     "n_intervals": 111,
+     "ncpus": 24,
+     "idle_threshold": 0.1,
+     "mean_busy_cores": 11.528,
+     "idle_core_equivalents": 12.472,
+     "host_util_of_cpuset": 0.4803,
+     "idle_core_count_mean": 12.38,
+     "idle_core_count_min": 0,
+     "idle_core_count_p50": 19,
+     "idle_core_count_max": 23,
+     "cores_idle_whole_leg": 0,
+     "per_core_mean_busy": {
+      "0": 0.417,
+      "1": 0.426,
+      "2": 0.458,
+      "3": 0.425,
+      "4": 0.429,
+      "5": 0.482,
+      "6": 0.526,
+      "7": 0.441,
+      "8": 0.572,
+      "9": 0.443,
+      "10": 0.503,
+      "11": 0.573,
+      "12": 0.995,
+      "13": 0.446,
+      "14": 0.437,
+      "15": 0.451,
+      "16": 0.445,
+      "17": 0.431,
+      "18": 0.44,
+      "19": 0.435,
+      "20": 0.467,
+      "21": 0.426,
+      "22": 0.425,
+      "23": 0.432
+     },
+     "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+     "interval_s": 1.0,
+     "intervals_dropped": 0,
+     "sampler_read_s_total": 0.0363
+    },
+    "warm_up": {
+     "docs": 25,
+     "seconds": 13.14,
+     "disjoint_from_measured": true,
+     "same_shape_as_leg": true
+    },
+    "quiet_box_before": {
+     "host_busy_cores": 0.025,
+     "arm_idle_cores": 0.024,
+     "foreign_busy_cores": 0.001,
+     "max_foreign": 2.0,
+     "quiet": true,
+     "load1": 4.63671875,
+     "window_s": 4.0,
+     "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+    },
+    "window": {
+     "t0_ns": 1789912567403702867,
+     "t1_ns": 1789912678627661592
+    },
+    "leaked_task": null
+   }
+  ],
+  "best_k_by_docs_per_s": 384,
+  "ranking": [
+   {
+    "k": 384,
+    "docs_per_s": 3.0995
+   },
+   {
+    "k": 128,
+    "docs_per_s": 2.4378
+   },
+   {
+    "k": 256,
+    "docs_per_s": 2.4099
+   },
+   {
+    "k": 64,
+    "docs_per_s": 2.1351
+   }
+  ],
+  "not_swept": {
+   "embedding_batch": "SOURCE READING, not measured: engine embedding_transformer buffers maxDocuments=64 and calls encode() at the sentence-transformers default; the LlamaIndex service never sets embed_batch_size (LlamaIndex default 10). Neither is reachable without changing an arm, so neither was swept."
+  },
+  "scope_note": "A smoke-sized slice ranks K; its absolute docs/s must not sit in a table beside a 10k figure (DOCS_HANDOFF \u00a73.4: wave count biases short runs).",
+  "run_dir": "working/results/batchsize_smoke_20260920T113000Z/li_rev"
+ }
+}
