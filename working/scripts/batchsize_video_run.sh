@@ -41,6 +41,17 @@ cd "$VIDEO_TREE" || { echo "REFUSED: no video worktree at $VIDEO_TREE" >&2; exit
 echo "video tree: $(pwd) head $(git rev-parse --short HEAD) ; batch tree: $BATCH_TREE head $(git -C "$BATCH_TREE" rev-parse --short HEAD)"
 MAN="working/video/ami_video_manifest.jsonl"
 [ -f "$MAN" ] || { echo "REFUSED: $MAN is not on this box" >&2; exit 2; }
+
+# FAIL CLOSED ON A STALE WORKTREE (2026-09-20). A `git pull --ff-only` that aborts leaves the
+# box on an OLDER commit, and the chain then runs an older script under a posture nobody
+# declared — which is how a Stage 3b launch briefly ran the Stage 3 cpuset. The caller states
+# the commit it means to measure; anything else refuses here rather than producing data.
+if [ -n "${BSZ_EXPECT_HEAD:-}" ]; then
+  HAVE="$(git rev-parse HEAD 2>/dev/null | cut -c1-12)"
+  WANT="$(echo "$BSZ_EXPECT_HEAD" | cut -c1-12)"
+  [ "$HAVE" = "$WANT" ] || { echo "REFUSED: worktree is at $HAVE, caller expects $WANT — the pull did not land; refusing to measure with an undeclared tree" >&2; exit 2; }
+  echo "worktree head matches the declared commit: $HAVE"
+fi
 mkdir -p "$OUT"
 
 ours=()

@@ -35,6 +35,17 @@ echo "worktree: $(pwd)  branch: $(git branch --show-current)  head: $(git rev-pa
 "$PY" -c 'import psutil' || { echo "REFUSED: $PY cannot import psutil — wrong interpreter" >&2; exit 2; }
 [ -d "$CORPUS" ] || { echo "REFUSED: corpus dir $CORPUS missing" >&2; exit 2; }
 
+# FAIL CLOSED ON A STALE WORKTREE (2026-09-20). A `git pull --ff-only` that aborts leaves the
+# box on an OLDER commit, and the chain then runs an older script under a posture nobody
+# declared — which is how a Stage 3b launch briefly ran the Stage 3 cpuset. The caller states
+# the commit it means to measure; anything else refuses here rather than producing data.
+if [ -n "${BSZ_EXPECT_HEAD:-}" ]; then
+  HAVE="$(git rev-parse HEAD 2>/dev/null | cut -c1-12)"
+  WANT="$(echo "$BSZ_EXPECT_HEAD" | cut -c1-12)"
+  [ "$HAVE" = "$WANT" ] || { echo "REFUSED: worktree is at $HAVE, caller expects $WANT — the pull did not land; refusing to measure with an undeclared tree" >&2; exit 2; }
+  echo "worktree head matches the declared commit: $HAVE"
+fi
+
 for c in rr li; do
   if docker inspect "$c" >/dev/null 2>&1; then
     echo "REFUSED: a container named '$c' already exists — not ours to remove" >&2; exit 3
