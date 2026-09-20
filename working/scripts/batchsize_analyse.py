@@ -33,14 +33,24 @@ from typing import Any, Dict, List, Optional, Tuple
 
 
 def load_campaign(d: Path) -> List[Dict[str, Any]]:
+    """Shakedown launches (shake_*) are wiring checks on a DIFFERENT, 16-document slice. Pooling
+    them with the measured slice once read a corpus difference as run-to-run noise (a 30% 'noise
+    floor' from two legs that never shared a document), so they are excluded, and so is any leg
+    whose document count differs from the campaign's — a replicate is the same work twice."""
     legs = []
     for lj in sorted(d.glob("*/leg_*.json")):
+        if lj.parent.name.startswith("shake"):
+            continue
         leg = json.loads(lj.read_text())
         leg["_launch"] = lj.parent.name
         pd = lj.parent / lj.name.replace("leg_", "perdoc_").replace(".json", ".jsonl")
         leg["_perdoc"] = ([json.loads(x) for x in pd.read_text().splitlines() if x.strip()]
                           if pd.exists() else None)
         legs.append(leg)
+    sizes = {g["documents"]["submitted"] for g in legs if g.get("documents")}
+    if len(sizes) > 1:
+        raise SystemExit(f"REFUSED: legs with different document counts {sorted(sizes)} in one "
+                         "campaign — they are not comparable and are not replicates")
     return legs
 
 
