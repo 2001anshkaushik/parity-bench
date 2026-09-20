@@ -19,6 +19,13 @@ self-consistency is not evidence — a check must cross an independence boundary
                   arm — batch size may change when work happens, never what comes out. NULL
                   CONTROL: the same comparator run ACROSS arms must report differences (Tika vs
                   pypdf extract different text); if it reports none, it cannot see anything.
+  E. TAIL         docs/s up to the 90th-percentile completion, beside the span figure. On a
+                  short slice ONE slow document sets the span of every fast leg (first read:
+                  two LlamaIndex continuous passes 19% apart on span, 1% apart to 90% — the whole
+                  gap was when a 791-page PDF finished). A K ranking that changes between the
+                  two metrics is a ranking of where the slow document landed, not of K. On the
+                  engine's batched legs completion stamps are per BATCH, so this figure is
+                  coarse at large K and mechanical (0.9x span) when one batch holds everything.
   D. NOISE FLOOR  legs that ran twice (a replicate launch) give the spread of the instrument.
                   A best K whose lead over the runner-up is inside that spread is a TIE, and
                   is reported as one. No replicate -> the floor is UNKNOWN and says so.
@@ -132,6 +139,39 @@ def check_content(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
     return out
 
 
+def check_tail(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
+    per_leg: Dict[str, Any] = {}
+    by_arm: Dict[str, Dict[str, List[Tuple[float, float]]]] = {}
+    for g in legs:
+        rows = g.get("_perdoc")
+        if g.get("verdict") != "OK" or not rows:
+            continue
+        ok = sorted((r for r in rows if r.get("ok")), key=lambda r: r["completion_ns"])
+        t0 = min(r["submit_ns"] for r in rows)
+        k90 = int(0.9 * len(ok))
+        t90 = (ok[k90 - 1]["completion_ns"] - t0) / 1e9
+        span = (max(r["completion_ns"] for r in rows) - t0) / 1e9
+        a, b = len(ok) / span, k90 / t90
+        per_leg[f"{g['_launch']}/{g['leg']}"] = {
+            "docs_per_s_span": round(a, 4), "docs_per_s_to_p90": round(b, 4),
+            "p90_over_span": round(b / a, 3), "t90_s": round(t90, 1), "span_s": round(span, 1)}
+        key = f"k{g['k']}" if g.get("k") else f"refc{g['reference_c']}"
+        by_arm.setdefault(g["arm"], {}).setdefault(key, []).append((a, b))
+    ranks: Dict[str, Any] = {}
+    for arm, m in by_arm.items():
+        mean = lambda v, i: sum(x[i] for x in v) / len(v)      # noqa: E731
+        grid = [k for k in m if k.startswith("k")]
+        r_span = sorted(grid, key=lambda k: -mean(m[k], 0))
+        r_p90 = sorted(grid, key=lambda k: -mean(m[k], 1))
+        ranks[arm] = {"rank_by_span": r_span, "rank_by_to_p90": r_p90,
+                      "verdict": "PASS — K ranking identical under both metrics"
+                      if r_span == r_p90 else "DIFFERS — read both rankings",
+                      "to_p90_replicate_spread": {
+                          k: round((max(x[1] for x in v) - min(x[1] for x in v)) / mean(v, 1), 4)
+                          for k, v in m.items() if len(v) > 1}}
+    return {"per_leg": per_leg, "by_arm": ranks}
+
+
 def noise_floor(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
     for arm in sorted({g["arm"] for g in legs}):
@@ -215,6 +255,7 @@ def main() -> int:
         "check_B_cpu_source": {f"{g['_launch']}/{g['leg']}": check_cpu(g) for g in legs
                                if g.get("verdict") == "OK"},
         "check_C_content": check_content(legs),
+        "check_E_tail": check_tail(legs),
     }
     for g in legs:
         g.pop("_perdoc", None)
