@@ -188,6 +188,11 @@ def noise_floor(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
     return out
 
 
+def _mean(gs: List[Dict[str, Any]], f) -> Optional[float]:
+    v = [f(g) for g in gs if f(g) is not None]
+    return round(sum(v) / len(v), 3) if v else None
+
+
 def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
     for arm in sorted({g["arm"] for g in legs}):
@@ -210,7 +215,16 @@ def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
                 "idle_core_equivalents": round(sum(g["percore_host"]["idle_core_equivalents"]
                                                    for g in gs) / len(gs), 3),
                 "cpu_s_per_doc": round(sum(g["cost"]["cpu_s_per_doc"] for g in gs) / len(gs), 4),
-                "batch_wall_s_max": max((g["batches"] or {}).get("wall_s_max", 0) for g in gs)})
+                "batch_wall_s_max": max((g["batches"] or {}).get("wall_s_max", 0) for g in gs),
+                # Ruling A's three sources, carried into the table rather than left in the legs.
+                "engine_cores": _mean(gs, lambda g: g["cost"].get("engine_container_cores")),
+                "driver_cores": _mean(gs, lambda g: g["cost"].get("driver_cores")),
+                "host_cores": _mean(gs, lambda g: g["cost"].get("host_total_cores")),
+                "unattributed_cores": _mean(gs, lambda g: g["cost"].get("unattributed_cores")),
+                "idle_spin_cores": _mean(gs, lambda g: (g["cost"].get("idle_spin_measured") or {}).get("cores")),
+                "idle_core_equivalents_net_of_spin":
+                    _mean(gs, lambda g: g["percore_host"].get("idle_core_equivalents_net_of_spin")),
+                "available_cpus": gs[0]["cost"].get("available_cpus")})
         ordered = sorted(table, key=lambda r: r["docs_per_s_mean"], reverse=True)
         floor = floors.get(arm, {}).get("floor")
         call: Dict[str, Any] = {"best_k": ordered[0]["k"] if ordered else None}
@@ -242,7 +256,37 @@ def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
                  "effective_cores": g["cost"]["effective_cores"],
                  "cpu_utilization": g["cost"]["cpu_utilization"],
                  "idle_core_count_mean": g["percore_host"]["idle_core_count_mean"],
+                 "idle_core_equivalents_net_of_spin":
+                     g["percore_host"].get("idle_core_equivalents_net_of_spin"),
+                 "idle_spin_cores": (g["cost"].get("idle_spin_measured") or {}).get("cores"),
+                 "engine_cores": g["cost"].get("engine_container_cores"),
+                 "driver_cores": g["cost"].get("driver_cores"),
+                 "host_cores": g["cost"].get("host_total_cores"),
+                 "unattributed_cores": g["cost"].get("unattributed_cores"),
+                 "available_cpus": g["cost"].get("available_cpus"),
                  "launch": g["_launch"]} for g in ref]
+        # THE KNEE (G3a), by a rule fixed before the curve was seen: the SMALLEST C whose mean
+        # throughput is within the arm's own replicate noise of the best C. "Within noise of the
+        # best" is the only definition that does not reward buying concurrency that bought
+        # nothing; where there is no replicate the noise is unknown and the knee says so.
+        by_c: Dict[int, List[float]] = {}
+        for r in refs:
+            by_c.setdefault(r["reference_c"], []).append(r["docs_per_s"])
+        if by_c:
+            means = {c: sum(v) / len(v) for c, v in by_c.items()}
+            best_c = max(means, key=lambda c: means[c])
+            tol = floors.get(arm, {}).get("floor")
+            within = ([c for c in sorted(means) if means[c] >= means[best_c] * (1 - tol)]
+                      if tol is not None else [])
+            call["continuous_knee"] = {
+                "curve": {str(c): round(means[c], 4) for c in sorted(means)},
+                "best_c": best_c, "best_docs_per_s": round(means[best_c], 4),
+                "noise_floor_used": tol,
+                "knee_c": (within[0] if within else None),
+                "rule": "smallest C within the arm's replicate noise floor of the best C",
+                "verdict": ("UNRESOLVED — no replicate on this arm, so 'within noise' has no "
+                            "value" if tol is None else
+                            f"knee at C={within[0]}" if within else "no C qualifies")}
         if refs and ordered:
             best_ref = max(r["docs_per_s"] for r in refs)
             call["batching_vs_continuous"] = {
@@ -274,6 +318,11 @@ def main() -> int:
                                if g.get("verdict") == "OK"},
         "check_C_content": check_content(legs),
         "check_E_tail": check_tail(legs),
+        "box_hygiene_per_leg": {f"{g['_launch']}/{g['leg']}": {
+            k: v for k, v in (g.get("box_hygiene") or {}).items() if k != "ruling"}
+            for g in legs if g.get("box_hygiene")},
+        "page_cache_per_leg": {f"{g['_launch']}/{g['leg']}": g.get("page_cache")
+                               for g in legs if (g.get("page_cache") or {}).get("attempted")},
     }
     for g in legs:
         g.pop("_perdoc", None)
