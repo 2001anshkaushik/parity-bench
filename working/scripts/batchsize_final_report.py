@@ -33,6 +33,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 RES = Path("working/results")
 STRAGGLER = "039_039660.pdf"
 DAG = "†"
+DDAG = "‡"
 CAVEAT = ("32 vCPU unconstrained per Ruling A; measured posture cost vs 24-core cpuset -7.1% "
           "throughput, +28% CPU-s/doc.")
 LEG6_SPREAD_RULE = 0.02
@@ -111,6 +112,59 @@ def outcome_counts(perdoc: Path, name: str) -> Dict[str, int]:
     return c
 
 
+def find_export(camp: Path, launch: str) -> Optional[Path]:
+    """A launch's export sits beside it (S3 layout) or one level up (committed layout), named by run_dir."""
+    base = camp if camp.is_absolute() else ROOT / camp
+    for d, one_up in ((base, False), (base.parent, True)):
+        for f in sorted(d.glob("exp_batchsize_sweep_*.json")):
+            try:
+                parts = (json.loads(f.read_text()).get("data", {}).get("run_dir") or "").rstrip("/").split("/")
+            except (OSError, json.JSONDecodeError):
+                continue
+            if parts[-1] == launch and (not one_up or (len(parts) > 1 and parts[-2] == camp.name)):
+                return f
+    return None
+
+
+def docs_posture(camp: Path, launch: str, name: str) -> Dict[str, Any]:
+    f = find_export(camp, launch)
+    if f is None:
+        raise SystemExit(f"REFUSED: no export for {camp}/{launch} — the posture cannot be read back, and is never assumed")
+    INPUTS[name] = f"{f.relative_to(ROOT) if f.is_relative_to(ROOT) else f}  sha256:{hashlib.sha256(f.read_bytes()).hexdigest()[:16]}"
+    p = json.loads(f.read_text())["data"]["posture"]
+    rb = p.get("in_process_readback") or {}
+    env = set((p.get("thread_env") or {}).values())
+    torch = rb.get("torch_num_threads", rb.get("health_torch_threads"))
+    return {"thread_env": sorted(env), "in_process_torch_threads": torch, "ws1_workers": p.get("ws1_workers"),
+            "rr_tokens": p.get("rr_tokens"), "rr_threads_requested": p.get("rr_threads_requested"),
+            "cpuset_effective": (p.get("cpuset_effective") or {}).get("raw"), "host_nproc": p.get("host_nproc"),
+            "image_id": (p.get("image_id") or "")[:19]}
+
+
+def docs_posture_text(pp: Dict[str, Any], arm: str) -> str:
+    env = pp["thread_env"]
+    envs = ("six thread variables at " + env[0]) if len(env) == 1 else f"thread variables {env}"
+    unit = (f"{pp['rr_tokens']} token, threads= {pp['rr_threads_requested']}" if arm == "rr"
+            else f"{pp['ws1_workers']} workers")
+    who = "task process" if arm == "rr" else "each worker"
+    return (f"{unit}; {envs}; torch threads read in {who}: {pp['in_process_torch_threads']}; "
+            f"cpuset {pp['cpuset_effective']} of {pp['host_nproc']}")
+
+
+def video_posture_text(leg_dir: Path, name: str) -> Dict[str, Any]:
+    base = leg_dir if leg_dir.is_absolute() else ROOT / leg_dir
+    fs = sorted(base.glob("preflight_*.json"))
+    if not fs:
+        raise SystemExit(f"REFUSED: no preflight in {leg_dir} — the video posture cannot be read back")
+    INPUTS[name] = f"{leg_dir}/{fs[0].name}  sha256:{hashlib.sha256(fs[0].read_bytes()).hexdigest()[:16]}"
+    rb = json.loads(fs[0].read_text()).get("readbacks") or {}
+    envs = {v for r in rb.values() for v in (r.get("env") or {}).values()}
+    torch = sorted({r.get("torch_num_threads") for r in rb.values()})
+    env_txt = ("six thread variables unset" if envs == {None} else
+               "six thread variables at " + ", ".join(sorted(str(e) for e in envs)))
+    return {"processes_read": len(rb), "text": f"{len(rb)} process(es) read back: {env_txt}; torch threads {torch}"}
+
+
 def video_leg(p: Path, name: str) -> Dict[str, Any]:
     d = load(p, name)
     if not d or not d.get("legs"):
@@ -144,6 +198,10 @@ def headline_docs(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
                                      "peak_anon_mb": v["mem"].get("anon_mb"), "peak_mb": v["mem"].get("peak_mb"),
                                      "documents": v["docs"]} for k, v in arms.items()}
     R, L = arms["rr"], arms["li"]
+    R["posture"] = docs_posture(s4, rr_launch, "s4_export_rr_p1")
+    L["posture"] = docs_posture(s4, li_launch, "s4_export_li_p2")
+    F["stage4_docs_headline"]["rr"]["posture"] = R["posture"]
+    F["stage4_docs_headline"]["li"]["posture"] = L["posture"]
 
     def r(x: str) -> str:
         return f"{x} {DAG}"
@@ -152,6 +210,7 @@ def headline_docs(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
                  f"{pct(lk['noise_floor_used'])} floor; C=32 kept per register 12, not as a winner"
                  if lk.get("tie") else "continuous, C=32")
     rows_out = [
+        ["Posture, read back from the running arm", r(docs_posture_text(R["posture"], "rr")), docs_posture_text(L["posture"], "li")],
         ["Submission at the arm's own optimum", r(f"continuous, C={R['knee']['knee_c']} (the knee)"), li_choice],
         ["**Span throughput, docs/s — PRIMARY**", r(f"**{n(R['tail']['PRIMARY_docs_per_s_span'])}**"),
          f"**{n(L['tail']['PRIMARY_docs_per_s_span'])}**"],
@@ -178,12 +237,13 @@ def headline_docs(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
          " / ".join(n(L["docs"][k]) for k in ("completed", "content_outcome", "deadline_loss", "other_failure"))],
     ]
     out = ["## 1. Headline — each arm at its own measured optimum, 9,975 GovDocs PDFs (Stage 4)", "",
-           "RocketRide runs **one token, out of the box** (`use()` with no `threads=`, the six thread variables "
-           "unset); LlamaIndex runs **24 service workers**, its own measured optimum. This row pair answers "
-           "\"how fast does each stack go at its best on this box\"; it is **not** a per-unit comparison — "
-           "one token against 24 workers — and carries no parity claim. The per-unit comparison is the G4 "
-           "anchor, §4. Both arms unconstrained across all 32 vCPUs (Ruling A); one leg on the box at a time "
-           "(Ruling C); caches prewarmed.", ""]
+           "RocketRide runs **one token** — `use()` with no `threads=`, the engine's out-of-the-box token count; "
+           "LlamaIndex runs **24 service workers**, its own measured optimum. Both run the docs thread posture "
+           "shown in the first row, read back from inside the running processes, not from the container "
+           "environment. This row pair answers \"how fast does each stack go at its best on this box\"; it is "
+           "**not** a per-unit comparison — one token against 24 workers — and carries no parity claim. The "
+           "per-unit comparison is the G4 anchor, §4. Both arms unconstrained across all 32 vCPUs (Ruling A); one "
+           "leg on the box at a time (Ruling C); caches prewarmed.", ""]
     out += table(["Stage 4 docs, 9,975 PDFs + 25 warm-up", "RocketRide — 1 token", "LlamaIndex — 24 workers"], rows_out)
     lost = R["lost"]
     out += ["", f"{DAG} {CAVEAT}", "",
@@ -224,7 +284,9 @@ def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
             "li": [(128, "p4_li_k128/k128_main"), (256, "e8_li_k256/k256_env"), (512, "e10_li_k512/k512_env"),
                    (1024, "e12_li_k1024/k1024_env")]}
     F["stage4_envelope"] = {}
-    for arm, label in (("rr", "RocketRide — 1 token"), ("li", "LlamaIndex — 24 workers")):
+    for arm in ("rr", "li"):
+        u = a["ranking"][arm].get("arm_units_ranked")
+        label = "RocketRide — 1 token" if arm == "rr" else f"LlamaIndex — {u} workers"
         byk = {r["k"]: r for r in a["ranking"][arm]["by_k"]}
         rows, per_batch = [], []
         for k, key in keys[arm]:
@@ -291,7 +353,10 @@ def video_stage4(s4: Path, smoke: Path, s3b: Path, F: Dict[str, Any]) -> List[st
                                        "branch": "RANKING ONLY" if fired else "absolute quotable"},
                          "g5b_li_spread": round(s_li, 4)}
     rank = "LlamaIndex ahead of RocketRide" if li["frames_per_s"] > rr["frames_per_s"] else "RocketRide ahead of LlamaIndex"
-    rows = [["Posture", "8 single-worker instances, thread variables at 4 (banked 8x4)", "1 token, default posture (threads unset, torch reads 16)"],
+    lp = video_posture_text(s4 / "p5_li_video" / "li_k16", "s4_video_li_preflight")
+    rp = video_posture_text(s4 / "p6_rr_video" / "rr_k16", "s4_video_rr_preflight")
+    F["stage4_video"]["posture"] = {"li": lp, "rr": rp}
+    rows = [["Posture, read back in-process", f"{li.get('posture')}: {lp['text']}", f"{rr.get('posture')}: {rp['text']}"],
             ["Videos in flight, K", "16", "16"],
             ["Throughput, frames/s", n(li["frames_per_s"], 3), "**RANKING ONLY** — see rule below" if fired else n(rr["frames_per_s"], 3)],
             ["Engine CPU, cores (cgroup)", n(li["effective_cores"], 3), n(rr["effective_cores"], 3)],
@@ -355,7 +420,9 @@ def smoke_scale(s3b: Path, F: Dict[str, Any]) -> List[str]:
            "is stratified by page count × characters per page; one long PDF can set a short leg's span.", ""]
     rows = []
     F["s3b"] = {"noise_floor": {arm: a["noise_floor"][arm].get("floor") for arm in ("rr", "li")}}
-    for arm, label in (("rr", "RocketRide — 1 token"), ("li", "LlamaIndex — 24 workers")):
+    for arm in ("rr", "li"):
+        u = a["ranking"][arm].get("arm_units_ranked")
+        label = "RocketRide — 1 token" if arm == "rr" else f"LlamaIndex — {u} workers"
         knee = a["ranking"][arm]["call"]["continuous_knee"]
         curve = ", ".join(f"C={c}: {n(v)}" for c, v in sorted(knee["curve"].items(), key=lambda kv: int(kv[0])))
         byk = a["ranking"][arm]["by_k"]
@@ -453,7 +520,8 @@ def answers(F: Dict[str, Any]) -> List[str]:
             + (f"; RocketRide at one token moved {pct(sv['range'])} from K=1 to K=16, inside its own K=16 replicate "
                f"spread of {pct(sv['replicate_spread'])}." if sv else "."), "",
             "**Best to best, full scale, each arm at its own optimum** (§1, §3). Not a per-unit comparison — one "
-            "RocketRide token against 24 LlamaIndex workers (docs) or 8 instances (video):", ""]
+            f"RocketRide token against {L['posture']['ws1_workers']} LlamaIndex workers (docs) or "
+            f"{v['posture']['li']['processes_read']} LlamaIndex instances (video):", ""]
     out += table(["Full scale", "RocketRide — 1 token", "LlamaIndex"],
                  [["Docs: span docs/s (PRIMARY)", f"{n(R['docs_per_s_span'])} {DAG}", n(L["docs_per_s_span"])],
                   ["Docs: CPU utilisation, engine / 32", f"{pct(R['cpu_utilization'])} {DAG}", pct(L["cpu_utilization"])],
@@ -519,7 +587,9 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
                 f"Excluded legs: {json.dumps(t.get('excluded'))}.",
                 f"T=16 against the out-of-the-box default cell: {eq.get('verdict')} (relative {eq.get('relative')}, "
                 f"chunk-identical videos {eq.get('chunk_hash_identical_videos')}).",
-                f"Comparator, G4 anchor: {json.dumps(t.get('comparator_G4_anchor'))}.", "",
+                "Comparator, the G4 anchor (one LlamaIndex instance, K=16, same videos): "
+                f"{n((t.get('comparator_G4_anchor') or {}).get('frames_per_s'), 3)} frames/s at "
+                f"{n((t.get('comparator_G4_anchor') or {}).get('effective_cores'), 3)} cores.", "",
                 f"Source: `{s5}/analysis_s5a_threads.json`.", ""]
     # S5-B
     pre = load(s5 / "s5b_precheck" / "s5b_precheck.json", "s5b_precheck", required=False)
@@ -536,10 +606,12 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
         out += [f"Null control (patched B=1 vs stock, chunk hashes): {json.dumps(b.get('null_control_patched_B1_vs_stock'))}.",
                 f"Correctness by B: {json.dumps(b.get('correctness_by_b'))[:900]}.", ""]
         rows = [[f"B={B}", "PATCHED-ENGINE", n(r["frames_per_s"], 3), n(r["effective_cores"], 3), pct(r["cpu_util_of_box"]),
-                 n(r["idle_core_equivalents"], 3), json.dumps(r.get("engine_memory_mb"))]
+                 n(r["idle_core_equivalents"], 3),
+                 ", ".join(f"{k.replace('_bytes', '')} {v / 1024:.1f} GiB" for k, v in (r.get("engine_memory_mb") or {}).items()
+                           if isinstance(v, (int, float)))]
                 for B, r in sorted((b.get("timing_only_for_passing_b") or {}).items(), key=lambda kv: int(kv[0]))]
         if rows:
-            out += table(["B", "Label", "frames/s", "engine cores", "util / 32", "idle core-equiv.", "engine memory, MB"], rows)
+            out += table(["B", "Label", "frames/s", "engine cores", "util / 32", "idle core-equiv.", "engine memory (cgroup)"], rows)
         out += ["", f"Verdict: {b.get('verdict')}. Source: `{s5}/analysis_s5b.json`.", ""]
     elif pre:
         out += ["S5-B proper: not run or not analysed (the chain refuses unless the pre-check passed).", ""]
@@ -557,13 +629,17 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
         for name, cell in (c.get("cells") or {}).items():
             if not cell:
                 continue
-            d = (lambda x: f"{x} {DAG}") if name.startswith("rr") else (lambda x: x)
+            # C4's caveat describes the UNCONSTRAINED posture; a cell bound to a cpuset on purpose
+            # would be mislabelled by it, so those RocketRide rows carry their own mark.
+            mark = (DAG if not cell.get("declared_cpuset") else DDAG) if name.startswith("rr") else ""
+            d = (lambda x, m=mark: f"{x} {m}".rstrip())
             rows.append([name, str(cell.get("declared_cpuset") or "none (32 vCPU)"), d(n(cell.get("docs_per_s"))),
                          d(n(cell.get("cpu_s_per_doc"), 3)), d(n(cell.get("engine_cores"), 3)),
                          n(cell.get("threads_task_node_py")), n(cell.get("threads_java"))])
         out += table(["Cell (384 slice, continuous C=32)", "cpuset", "docs/s", "CPU-s/doc", "engine cores",
                       "task-process threads", "JVM threads"], rows)
-        out += ["", f"{DAG} {CAVEAT}", "",
+        out += ["", f"{DAG} {CAVEAT}", f"{DDAG} RocketRide under a declared cpuset — an S5-C diagnostic outside Ruling A, "
+                "never a baseline figure.", "",
                 f"Hypothesis test: {json.dumps(c.get('hypothesis_test'))}.", f"Verdict: **{c.get('verdict')}**.", "",
                 f"Source: `{s5}/analysis_s5c_smt.json`.", ""]
     # S5-D
