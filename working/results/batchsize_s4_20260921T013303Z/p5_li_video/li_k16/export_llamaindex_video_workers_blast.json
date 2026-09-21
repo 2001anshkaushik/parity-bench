@@ -1,0 +1,2692 @@
+{
+ "at_a_glance": "llamaindex_video workers[declared_workers=8] blast pass 1 records 168 (errors 0) / offered 168 | THROUGHPUT 13.524 frames/s (202.9x realtime), steady window 13.192 frames/s (n=152) | SERVICE CPU 28.566 cores = 89.3% of 32 | IDLE BURDEN 0.034 cores with 8 li_workers live = 0.1% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 \u00b7 NOT RUN 2 \u00b7 FAIL 0 | efficiency valid=True | COLLECTOR ok",
+ "arm": "llamaindex_video",
+ "posture": "workers[declared_workers=8]",
+ "leg": "blast",
+ "pass": 1,
+ "submission_order": "manifest-seq: deterministic by meeting id, identical both arms; NOT longest-first \u2014 sorting to shorten the drain tail would benchmark our scheduler, not the frameworks (ruling 2026-08-20)",
+ "throughput": {
+  "total_span_s": 1704.3,
+  "total_frames": 23049,
+  "total_frames_per_s": 13.524,
+  "total_realtime_factor": 202.9,
+  "steady_window": {
+   "defined": true,
+   "window_start_ns": 42714919933244,
+   "window_end_ns": 44267786794701,
+   "window_wall_s": 1552.9,
+   "window_n": 152,
+   "window_frames": 20485,
+   "window_frames_per_s": 13.192,
+   "window_realtime_factor": 197.92,
+   "note": "window = [first in-flight==C, last in-flight>=C]; completions inside"
+  }
+ },
+ "efficiency": {
+  "valid": true,
+  "source": "container cgroup cpu.stat usage_usec bracketed around the leg \u2014 the same reader as the probes (#34: denominators from the container, never the driver)",
+  "service_cpu_s": 48685.9,
+  "effective_cores": 28.566,
+  "cpu_util_of_box": 0.8927,
+  "box_cpus": 32,
+  "cpu_s_per_footage_min": 8.447,
+  "cpu_s_per_frame": 2.112,
+  "cpu_s_per_video": 289.8,
+  "cpu_s_per_detection": 0.2484,
+  "cpu_s_per_chunk": 4.435,
+  "n_detections": 195999,
+  "n_chunks": 10977,
+  "usd_per_1k_footage_hours": 7.04,
+  "usd_per_hour_basis": "1.428 (instance on-demand $/h; cost = $/h / x_realtime * 1000, her V5 definition)",
+  "idle_burden": {
+   "instances": 8,
+   "instance_kind": "li_workers",
+   "idle_cores_before_instances": 0.047,
+   "idle_cores_with_instances_live": 0.034,
+   "sample_s": 6.0,
+   "idle_share_of_box": 0.0011,
+   "box_cpus": 32,
+   "marginal_cores_per_instance": null,
+   "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+   "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve",
+   "idle_cpu_s_over_leg_if_additive": 57.9,
+   "idle_share_of_service_cpu_if_additive": 0.0012
+  },
+  "policy": "idle_burden is reported beside every figure above and never subtracted \u2014 additivity under load is unmeasured (Ticket 4)"
+ },
+ "driver_memory": {
+  "ru_maxrss_kb": 133612,
+  "basis": "getrusage(RUSAGE_SELF).ru_maxrss at export time \u2014 the driver process peak over the whole leg (KiB on Linux)"
+ },
+ "collector_status": "ok",
+ "collector_summary": {
+  "roles": {
+   "driver": {
+    "peak_rss_bytes": 185790464,
+    "peak_rss_mb": 177.18,
+    "peak_vms_bytes": 3931213824,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 4,
+    "peak_thread_count": 35,
+    "peak_cgroup_anon_mb": 184.96,
+    "peak_cgroup_current_mb": 29820.87,
+    "peak_cgroup_tasks": 76,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/snap.amazon-ssm-agent.amazon-ssm-agent.service",
+    "cgroup_samples": 3415,
+    "peak_fd_count": 48,
+    "distinct_pids_seen": 5,
+    "total_cpu_seconds": 119.5,
+    "ctx_switches_voluntary": 36429,
+    "ctx_switches_involuntary": 335,
+    "samples": 3415,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": 7908.32,
+    "rss_final_over_initial": 1.308
+   },
+   "service": {
+    "peak_rss_bytes": 12188323840,
+    "peak_rss_mb": 11623.69,
+    "peak_vms_bytes": 63007395840,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 18,
+    "peak_thread_count": 1000,
+    "peak_cgroup_anon_mb": 1049.96,
+    "peak_cgroup_current_mb": 1717.5,
+    "peak_cgroup_tasks": 188,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-f3acecdbe8e37a161332f303866e85648ba12719265ba7e7e8de7e2a7ca46a1b.scope",
+    "cgroup_samples": 3415,
+    "peak_fd_count": 0,
+    "distinct_pids_seen": 176,
+    "total_cpu_seconds": 53871.63,
+    "ctx_switches_voluntary": 414463,
+    "ctx_switches_involuntary": 43454,
+    "samples": 3415,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": 61766.56,
+    "rss_final_over_initial": 1.0208
+   }
+  },
+  "system": {
+   "compressor_delta_bytes": 0,
+   "swapouts_delta": 0,
+   "compressions_delta": 0,
+   "peak_system_mem_percent": 16.3
+  }
+ },
+ "lifetime_state": {
+  "basis": {
+   "spool_df": "df -kP of the spool path INSIDE the container (the overlay the engine writes to; size/used/avail in KiB as the engine sees them)",
+   "spool_du": "du -sk + `find -type f | wc -l` of the spool path inside the container \u2014 spool in flight at the instant of the read; at leg END (before the tokens are terminated) a non-zero count is a spool LEAK",
+   "mounts": "/proc/mounts lines for / and the spool path inside the container \u2014 a spool path with no mount of its own lives on the writable layer (host fs under the docker root)",
+   "cgroup": "cgroup v2 memory.current (incl. page cache) / memory.stat anon (OOM-relevant) / file (reclaimable), read inside the container",
+   "procs": "sum over every /proc/[0-9]*/status in the container of VmRSS, RssAnon, VmData, VmSize (KiB) + n processes; top_by_rss lists the largest with cmdline so the persistent engine server and the per-token processes are separable",
+   "layer": "docker ps -s SIZE: the writable layer (spool + container logs + anything written), first token; virtual size second",
+   "host_df": "os.statvfs of each host path: total/free/avail/used bytes; device and fstype from df -P",
+   "frag_ext4": "/proc/fs/ext4/<dev>/mb_groups summed over block groups: free blocks, free fragments, avg free extent KiB, per-order histogram (count of free extents of 2^k blocks), share of free blocks in extents >= 2^10 blocks (4 MiB; lower bound from the histogram) \u2014 e2freefrag's data source",
+   "frag_tool": "e2freefrag / xfs_spaceman text, best-effort via sudo -n; state recorded",
+   "diskstats": "/proc/diskstats row for the device: reads, sectors_read, writes, sectors_written, io_ms (cumulative; leg delta = churn volume)",
+   "fs_stream": "statvfs of the host paths every period_s under the leg: used/avail bytes; summary = start/end/max used, min avail per path",
+   "service_memory_trajectory": "collector role_tick rows for role=service: first 5 min mean -> last 5 min mean, max, time-quartile means, for rss / vms / cg_anon / cg_current / n_procs"
+  },
+  "spool_paths": [
+   "/tmp"
+  ],
+  "leg_start": {
+   "phase": "leg_start",
+   "taken_utc": "2026-09-21T08:19:45Z",
+   "containers": {
+    "li_bal_0": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384608944,
+       "avail_kb": 631431920,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1731/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1732/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1732/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 991920128,
+      "anon": 968482816,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1406168,
+      "rssanon_kb": 945508,
+      "vmdata_kb": 1963160,
+      "vmsize_kb": 6576472,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6576472,
+        "vmrss": 1406168,
+        "rssanon": 945508,
+        "vmdata": 1963160,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_1": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384608944,
+       "avail_kb": 631431920,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1733/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1734/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1734/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 992022528,
+      "anon": 968900608,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1406888,
+      "rssanon_kb": 945920,
+      "vmdata_kb": 1963184,
+      "vmsize_kb": 6576472,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6576472,
+        "vmrss": 1406888,
+        "rssanon": 945920,
+        "vmdata": 1963184,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8803 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_2": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384608944,
+       "avail_kb": 631431920,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1735/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1736/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1736/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 995614720,
+      "anon": 971763712,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1409744,
+      "rssanon_kb": 948716,
+      "vmdata_kb": 1974208,
+      "vmsize_kb": 6587128,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6587128,
+        "vmrss": 1409744,
+        "rssanon": 948716,
+        "vmdata": 1974208,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8804 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_3": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384608944,
+       "avail_kb": 631431920,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1737/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1738/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1738/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 959787008,
+      "anon": 936292352,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1375240,
+      "rssanon_kb": 914072,
+      "vmdata_kb": 1937800,
+      "vmsize_kb": 6550128,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6550128,
+        "vmrss": 1375240,
+        "rssanon": 914072,
+        "vmdata": 1937800,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8805 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_4": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384608944,
+       "avail_kb": 631431920,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1739/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1740/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1740/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1053446144,
+      "anon": 1029718016,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1465636,
+      "rssanon_kb": 1005312,
+      "vmdata_kb": 2030904,
+      "vmsize_kb": 6652524,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6652524,
+        "vmrss": 1465636,
+        "rssanon": 1005312,
+        "vmdata": 2030904,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8806 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_5": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384608944,
+       "avail_kb": 631431920,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1741/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1742/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1742/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1026912256,
+      "anon": 1003626496,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1440568,
+      "rssanon_kb": 979832,
+      "vmdata_kb": 2001392,
+      "vmsize_kb": 6616548,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6616548,
+        "vmrss": 1440568,
+        "rssanon": 979832,
+        "vmdata": 2001392,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8807 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_6": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384608944,
+       "avail_kb": 631431920,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1743/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1744/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1744/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 992559104,
+      "anon": 968687616,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1406328,
+      "rssanon_kb": 945716,
+      "vmdata_kb": 1963296,
+      "vmsize_kb": 6576608,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6576608,
+        "vmrss": 1406328,
+        "rssanon": 945716,
+        "vmdata": 1963296,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8808 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_7": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384608944,
+       "avail_kb": 631431920,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1745/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1746/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1746/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1026932736,
+      "anon": 1003786240,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1440800,
+      "rssanon_kb": 979988,
+      "vmdata_kb": 2001520,
+      "vmsize_kb": 6616676,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6616676,
+        "vmrss": 1440800,
+        "rssanon": 979988,
+        "vmdata": 2001520,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8809 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    }
+   },
+   "host": {
+    "df": {
+     "corpus": {
+      "path": "/home/ssm-user/parity-bench-video/corpus/ami/full",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 646603063296,
+      "avail_bytes": 646586286080,
+      "used_bytes": 393839558656,
+      "inodes_free": 128495344,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "host_tmp": {
+      "path": "/tmp",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 646603063296,
+      "avail_bytes": 646586286080,
+      "used_bytes": 393839558656,
+      "inodes_free": 128495344,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "out_dir": {
+      "path": "/home/ssm-user/parity-bench-batch/working/results/batchsize_s4_20260921T013303Z/p5_li_video/li_k16",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 646603063296,
+      "avail_bytes": 646586286080,
+      "used_bytes": 393839558656,
+      "inodes_free": 128495344,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "docker_root": {
+      "path": "/var/lib/docker",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 646603063296,
+      "avail_bytes": 646586286080,
+      "used_bytes": 393839558656,
+      "inodes_free": 128495344,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     }
+    },
+    "docker_root": "/var/lib/docker",
+    "frag": {
+     "device": "/dev/root",
+     "fstype": "ext4",
+     "mount": "/",
+     "proc_fs_ext4_entries": [
+      "nvme0n1p1"
+     ],
+     "mb_groups": {
+      "source": "/proc/fs/ext4/nvme0n1p1/mb_groups",
+      "state": "measured",
+      "groups": 8000,
+      "free_blocks": 157682355,
+      "free_fragments": 15600,
+      "avg_free_extent_kb": 40431.4,
+      "hist_by_order": [
+       7605,
+       6291,
+       5476,
+       4751,
+       3151,
+       2569,
+       2369,
+       2043,
+       1338,
+       358,
+       376,
+       157,
+       143,
+       18950
+      ],
+      "free_share_in_extents_ge_4mib_lower_bound": 0.9927
+     },
+     "e2freefrag": {
+      "state": "measured (sudo -n)",
+      "text": "Device: /dev/root\nBlocksize: 4096 bytes\nTotal blocks: 262115579\nFree blocks: 157852943 (60.2%)\n\nMin. free extent: 4 KB \nMax. free extent: 2032512 KB\nAvg. free extent: 57332 KB\nNum. free extent: 11013\n\nHISTOGRAM OF FREE EXTENT SIZES:\nExtent Size Range :  Free extents   Free Blocks  Percent\n    4K...    8K-  :          1449          1449    0.00%\n    8K...   16K-  :          1124          2698    0.00%\n   16K...   32K-  :          1303          6941    0.00%\n   32K...   64K-  :          2045         22949    0.01%\n   64K...  128K-  :          1373         30267    0.02%\n  128K...  256K-  :           516         22630    0.01%\n  256K...  512K-  :           509         46230    0.03%\n  512K... 1024K-  :           563        102475    0.06%\n    1M...    2M-  :           907        348418    0.22%\n    2M...    4M-  :           314        217376    0.14%\n    4M...    8M-  :           325        467988    0.30%\n    8M...   16M-  :            11         30157    0.02%\n   16M...   32M-  :             9         57035    0.04%\n   32M...   64M-  :            13        144000    0.09%\n   64M...  128M-  :           180       3119094    1.98%\n  128M...  256M-  :            26       1242326    0.79%\n  256M...  512M-  :            26       2427353    1.54%\n  512M... 1024M-  :            27       5719547    3.62%\n    1G...    2G-  :           293     143844010   91.13%\n"
+     }
+    },
+    "diskstats": {
+     "state": "unavailable: root not in /proc/diskstats"
+    },
+    "psi_io": {
+     "state": "measured",
+     "text": "some avg10=0.00 avg60=0.43 avg300=1.02 total=323941650\nfull avg10=0.00 avg60=0.31 avg300=0.75 total=318596209"
+    }
+   },
+   "read_cost_s": 1.04
+  },
+  "leg_end": {
+   "phase": "leg_end",
+   "taken_utc": "2026-09-21T08:48:11Z",
+   "containers": {
+    "li_bal_0": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384617512,
+       "avail_kb": 631423352,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1731/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1732/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1732/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1011515392,
+      "anon": 988045312,
+      "file": 102400
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1433056,
+      "rssanon_kb": 964616,
+      "vmdata_kb": 2016516,
+      "vmsize_kb": 6629980,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6629980,
+        "vmrss": 1433056,
+        "rssanon": 964616,
+        "vmdata": 2016516,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_1": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384617512,
+       "avail_kb": 631423352,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1733/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1734/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1734/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1025712128,
+      "anon": 1002082304,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1447272,
+      "rssanon_kb": 978320,
+      "vmdata_kb": 2051572,
+      "vmsize_kb": 6665084,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6665084,
+        "vmrss": 1447272,
+        "rssanon": 978320,
+        "vmdata": 2051572,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8803 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_2": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384617512,
+       "avail_kb": 631423352,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1735/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1736/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1736/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1023959040,
+      "anon": 1000706048,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1445612,
+      "rssanon_kb": 976976,
+      "vmdata_kb": 1984384,
+      "vmsize_kb": 6599348,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6599348,
+        "vmrss": 1445612,
+        "rssanon": 976976,
+        "vmdata": 1984384,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8804 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_3": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384617512,
+       "avail_kb": 631423352,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1737/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1738/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1738/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 972394496,
+      "anon": 949051392,
+      "file": 20480
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1394856,
+      "rssanon_kb": 926532,
+      "vmdata_kb": 1934816,
+      "vmsize_kb": 6547144,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6547144,
+        "vmrss": 1394856,
+        "rssanon": 926532,
+        "vmdata": 1934816,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8805 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_4": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384617512,
+       "avail_kb": 631423352,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1739/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1740/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1740/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1053384704,
+      "anon": 1029713920,
+      "file": 176128
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1473260,
+      "rssanon_kb": 1005308,
+      "vmdata_kb": 2046380,
+      "vmsize_kb": 6661192,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6661192,
+        "vmrss": 1473260,
+        "rssanon": 1005308,
+        "vmdata": 2046380,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8806 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_5": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384617512,
+       "avail_kb": 631423352,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1741/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1742/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1742/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1068896256,
+      "anon": 1044615168,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1488276,
+      "rssanon_kb": 1019860,
+      "vmdata_kb": 2125464,
+      "vmsize_kb": 6739612,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6739612,
+        "vmrss": 1488276,
+        "rssanon": 1019860,
+        "vmdata": 2125464,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8807 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_6": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384617512,
+       "avail_kb": 631423352,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1743/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1744/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1744/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1050447872,
+      "anon": 1026441216,
+      "file": 217088
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1470052,
+      "rssanon_kb": 1002108,
+      "vmdata_kb": 2013308,
+      "vmsize_kb": 6626484,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6626484,
+        "vmrss": 1470052,
+        "rssanon": 1002108,
+        "vmdata": 2013308,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8808 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    },
+    "li_bal_7": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 384617512,
+       "avail_kb": 631423352,
+       "mounted_on": "/",
+       "du_kb": 32,
+       "n_files": 3,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1745/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1746/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/1746/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1024122880,
+      "anon": 1000935424,
+      "file": 8192
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1445996,
+      "rssanon_kb": 977200,
+      "vmdata_kb": 2018172,
+      "vmsize_kb": 6631900,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6631900,
+        "vmrss": 1445996,
+        "rssanon": 977200,
+        "vmdata": 2018172,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8809 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "20.5kB (virtual 9.08GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    }
+   },
+   "host": {
+    "df": {
+     "corpus": {
+      "path": "/home/ssm-user/parity-bench-video/corpus/ami/full",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 646594289664,
+      "avail_bytes": 646577512448,
+      "used_bytes": 393848332288,
+      "inodes_free": 128495342,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "host_tmp": {
+      "path": "/tmp",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 646594289664,
+      "avail_bytes": 646577512448,
+      "used_bytes": 393848332288,
+      "inodes_free": 128495342,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "out_dir": {
+      "path": "/home/ssm-user/parity-bench-batch/working/results/batchsize_s4_20260921T013303Z/p5_li_video/li_k16",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 646594289664,
+      "avail_bytes": 646577512448,
+      "used_bytes": 393848332288,
+      "inodes_free": 128495342,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "docker_root": {
+      "path": "/var/lib/docker",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 646594289664,
+      "avail_bytes": 646577512448,
+      "used_bytes": 393848332288,
+      "inodes_free": 128495342,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     }
+    },
+    "docker_root": "/var/lib/docker",
+    "frag": {
+     "device": "/dev/root",
+     "fstype": "ext4",
+     "mount": "/",
+     "proc_fs_ext4_entries": [
+      "nvme0n1p1"
+     ],
+     "mb_groups": {
+      "source": "/proc/fs/ext4/nvme0n1p1/mb_groups",
+      "state": "measured",
+      "groups": 8000,
+      "free_blocks": 157850653,
+      "free_fragments": 15551,
+      "avg_free_extent_kb": 40602.1,
+      "hist_by_order": [
+       7607,
+       6291,
+       5476,
+       4754,
+       3150,
+       2570,
+       2372,
+       2050,
+       1343,
+       362,
+       380,
+       103,
+       101,
+       19004
+      ],
+      "free_share_in_extents_ge_4mib_lower_bound": 0.9927
+     },
+     "e2freefrag": {
+      "state": "measured (sudo -n)",
+      "text": "Device: /dev/root\nBlocksize: 4096 bytes\nTotal blocks: 262115579\nFree blocks: 157850653 (60.2%)\n\nMin. free extent: 4 KB \nMax. free extent: 2032512 KB\nAvg. free extent: 57296 KB\nNum. free extent: 11020\n\nHISTOGRAM OF FREE EXTENT SIZES:\nExtent Size Range :  Free extents   Free Blocks  Percent\n    4K...    8K-  :          1449          1449    0.00%\n    8K...   16K-  :          1122          2692    0.00%\n   16K...   32K-  :          1302          6934    0.00%\n   32K...   64K-  :          2047         22969    0.01%\n   64K...  128K-  :          1373         30262    0.02%\n  128K...  256K-  :           517         22663    0.01%\n  256K...  512K-  :           509         46230    0.03%\n  512K... 1024K-  :           563        102475    0.06%\n    1M...    2M-  :           907        348418    0.22%\n    2M...    4M-  :           316        218596    0.14%\n    4M...    8M-  :           325        467988    0.30%\n    8M...   16M-  :            11         30157    0.02%\n   16M...   32M-  :             9         57035    0.04%\n   32M...   64M-  :            13        144000    0.09%\n   64M...  128M-  :           181       3144950    1.99%\n  128M...  256M-  :            30       1452188    0.92%\n  256M...  512M-  :            26       2427353    1.54%\n  512M... 1024M-  :            27       5578588    3.53%\n    1G...    2G-  :           293     143745706   91.06%\n"
+     }
+    },
+    "diskstats": {
+     "state": "unavailable: root not in /proc/diskstats"
+    },
+    "psi_io": {
+     "state": "measured",
+     "text": "some avg10=0.00 avg60=0.00 avg300=0.01 total=346719894\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=336747716"
+    }
+   },
+   "read_cost_s": 1.01
+  },
+  "fs_stream": {
+   "basis": "statvfs of the host paths every period_s under the leg: used/avail bytes; summary = start/end/max used, min avail per path",
+   "period_s": 5.0,
+   "n": 341,
+   "path": "/home/ssm-user/parity-bench-batch/working/results/batchsize_s4_20260921T013303Z/p5_li_video/li_k16/fsstream_llamaindex_video_workers_blast.jsonl",
+   "paths": {
+    "corpus": {
+     "state": "measured",
+     "start_used": 393839566848,
+     "end_used": 394117419008,
+     "max_used": 397507203072,
+     "min_avail": 642918641664,
+     "max_used_minus_start": 3667636224
+    },
+    "host_tmp": {
+     "state": "measured",
+     "start_used": 393839566848,
+     "end_used": 394117419008,
+     "max_used": 397507203072,
+     "min_avail": 642918641664,
+     "max_used_minus_start": 3667636224
+    },
+    "out_dir": {
+     "state": "measured",
+     "start_used": 393839566848,
+     "end_used": 394117419008,
+     "max_used": 397507203072,
+     "min_avail": 642918641664,
+     "max_used_minus_start": 3667636224
+    },
+    "docker_root": {
+     "state": "measured",
+     "start_used": 393839566848,
+     "end_used": 394117419008,
+     "max_used": 397507203072,
+     "min_avail": 642918641664,
+     "max_used_minus_start": 3667636224
+    }
+   }
+  },
+  "service_memory_trajectory": {
+   "state": "measured",
+   "basis": "collector role_tick rows for role=service: first 5 min mean -> last 5 min mean, max, time-quartile means, for rss / vms / cg_anon / cg_current / n_procs",
+   "n_ticks": 3415,
+   "span_s": 1707.0,
+   "edge_s": 300.0,
+   "rss": {
+    "first_mean": 11783810901.3,
+    "last_mean": 11934220431.1,
+    "max": 12188323840,
+    "quartile_means": [
+     11805306630.3,
+     11830990282.0,
+     11904401806.1,
+     11944019334.9
+    ]
+   },
+   "vms": {
+    "first_mean": 55651430045.0,
+    "last_mean": 55081701137.5,
+    "max": 63007395840,
+    "quartile_means": [
+     55615253433.2,
+     55358379039.2,
+     55359358323.7,
+     55304002572.0
+    ]
+   },
+   "cg_anon": {
+    "first_mean": 1011349463.0,
+    "last_mean": 1029040990.1,
+    "max": 1100963840,
+    "quartile_means": [
+     1017380355.0,
+     1039972726.1,
+     1034642012.3,
+     1030758093.0
+    ]
+   },
+   "cg_current": {
+    "first_mean": 1562736326.0,
+    "last_mean": 1267892687.4,
+    "max": 1800925184,
+    "quartile_means": [
+     1506128222.5,
+     1341521071.1,
+     1290192737.7,
+     1261948189.4
+    ]
+   },
+   "n_procs": {
+    "first_mean": 9.8,
+    "last_mean": 8.8,
+    "max": 18,
+    "quartile_means": [
+     9.7,
+     9.2,
+     9.1,
+     9.1
+    ]
+   },
+   "cg_pids_tasks": {
+    "first_mean": 42.0,
+    "last_mean": 36.4,
+    "max": 188,
+    "quartile_means": [
+     40.9,
+     37.2,
+     30.5,
+     33.6
+    ]
+   }
+  }
+ },
+ "n_offered": 168,
+ "n_records": 168,
+ "n_errors": 0,
+ "leg_wall_s": 1704.3,
+ "aborted_by_breaker": false,
+ "wall_s_order_stats": [
+  23.3,
+  28.4,
+  32.9,
+  33.1,
+  34.7,
+  34.9,
+  37.7,
+  38.2,
+  38.7,
+  39.6,
+  39.6,
+  39.8,
+  40.4,
+  42.2,
+  43.1,
+  43.5,
+  46.4,
+  47.9,
+  48.0,
+  49.4,
+  52.1,
+  52.8,
+  53.3,
+  54.5,
+  54.9,
+  57.2,
+  57.8,
+  59.7,
+  65.6,
+  66.2,
+  71.5,
+  72.1,
+  72.7,
+  75.1,
+  75.2,
+  75.7,
+  76.5,
+  76.7,
+  78.1,
+  78.4,
+  78.8,
+  81.1,
+  81.4,
+  82.0,
+  82.1,
+  83.5,
+  83.5,
+  83.5,
+  84.5,
+  85.8,
+  88.9,
+  90.5,
+  90.7,
+  92.8,
+  92.9,
+  93.2,
+  94.6,
+  97.9,
+  99.3,
+  100.4,
+  100.8,
+  101.8,
+  106.1,
+  106.4,
+  107.5,
+  108.6,
+  109.8,
+  112.9,
+  115.6,
+  117.6,
+  126.3,
+  131.4,
+  132.0,
+  137.1,
+  138.9,
+  141.0,
+  142.3,
+  143.0,
+  144.7,
+  146.7,
+  150.7,
+  157.0,
+  158.9,
+  159.2,
+  160.1,
+  162.9,
+  163.0,
+  165.5,
+  166.0,
+  166.9,
+  169.3,
+  169.8,
+  170.3,
+  171.5,
+  171.6,
+  178.8,
+  182.0,
+  182.8,
+  184.9,
+  185.3,
+  186.6,
+  193.7,
+  195.5,
+  196.9,
+  199.2,
+  199.4,
+  199.5,
+  199.6,
+  200.3,
+  200.6,
+  201.1,
+  201.7,
+  201.9,
+  202.0,
+  203.8,
+  203.8,
+  203.9,
+  204.5,
+  205.1,
+  206.8,
+  209.4,
+  211.1,
+  211.7,
+  213.8,
+  214.4,
+  215.0,
+  218.5,
+  218.6,
+  218.7,
+  220.0,
+  221.0,
+  225.6,
+  228.5,
+  228.7,
+  231.7,
+  232.2,
+  232.5,
+  234.2,
+  234.5,
+  236.6,
+  237.0,
+  237.8,
+  239.0,
+  241.9,
+  244.4,
+  249.2,
+  254.1,
+  254.3,
+  256.3,
+  256.8,
+  257.4,
+  263.1,
+  264.5,
+  265.9,
+  267.1,
+  269.3,
+  272.1,
+  274.1,
+  292.5,
+  295.2,
+  298.9,
+  299.3,
+  310.3,
+  320.8,
+  322.0,
+  323.9,
+  362.2,
+  386.2
+ ],
+ "latency_normalized": {
+  "wall_s_per_video_minute": [
+   1.92,
+   2.03,
+   2.06,
+   2.06,
+   2.06,
+   2.08,
+   2.08,
+   2.08,
+   2.1,
+   2.12,
+   2.18,
+   2.2,
+   2.21,
+   2.24,
+   2.24,
+   2.26,
+   2.27,
+   2.3,
+   2.3,
+   2.3,
+   2.3,
+   2.31,
+   2.33,
+   2.33,
+   2.34,
+   2.35,
+   2.36,
+   2.37,
+   2.37,
+   2.38,
+   2.38,
+   2.4,
+   2.4,
+   2.42,
+   2.43,
+   2.44,
+   2.44,
+   2.45,
+   2.45,
+   2.46,
+   2.46,
+   2.47,
+   2.49,
+   2.51,
+   2.52,
+   2.57,
+   2.59,
+   2.62,
+   2.63,
+   2.63,
+   2.66,
+   2.67,
+   2.68,
+   2.74,
+   2.76,
+   2.89,
+   3.06,
+   3.11,
+   3.13,
+   3.15,
+   3.16,
+   3.17,
+   3.2,
+   3.3,
+   3.33,
+   3.38,
+   3.4,
+   3.63,
+   3.64,
+   3.67,
+   3.69,
+   3.69,
+   3.78,
+   4.0,
+   4.04,
+   4.1,
+   4.14,
+   4.17,
+   4.18,
+   4.22,
+   4.27,
+   4.29,
+   4.3,
+   4.32,
+   4.34,
+   4.36,
+   4.42,
+   4.45,
+   4.47,
+   4.53,
+   4.54,
+   4.63,
+   4.72,
+   4.74,
+   4.82,
+   4.83,
+   4.84,
+   4.87,
+   4.89,
+   4.9,
+   4.92,
+   4.94,
+   5.0,
+   5.01,
+   5.02,
+   5.06,
+   5.1,
+   5.14,
+   5.18,
+   5.19,
+   5.21,
+   5.23,
+   5.28,
+   5.34,
+   5.35,
+   5.41,
+   5.45,
+   5.47,
+   5.53,
+   5.57,
+   5.57,
+   5.61,
+   5.62,
+   5.67,
+   5.76,
+   5.77,
+   5.78,
+   5.8,
+   5.85,
+   5.86,
+   5.96,
+   5.99,
+   6.06,
+   6.15,
+   6.19,
+   6.23,
+   6.29,
+   6.29,
+   6.29,
+   6.36,
+   6.37,
+   6.45,
+   6.45,
+   6.5,
+   6.5,
+   6.52,
+   6.52,
+   6.53,
+   6.65,
+   6.7,
+   6.82,
+   6.86,
+   6.86,
+   6.91,
+   7.02,
+   7.09,
+   7.38,
+   7.71,
+   7.74,
+   7.92,
+   8.18,
+   8.2,
+   9.44,
+   9.46,
+   9.7,
+   10.12,
+   10.39,
+   14.37
+  ],
+  "note": "raw per-video wall_s and video_s_manifest are in every record; this normalization keeps the 6x duration confound visible",
+  "p50": 4.34,
+  "max": 14.37,
+  "n": 168,
+  "percentile_policy": "p50/max/n only below n=50 (no dressed percentiles)"
+ },
+ "preleg_load1": 5.13,
+ "preleg_container_idle_cores": {
+  "li_bal_0": 0.006,
+  "li_bal_1": 0.006,
+  "li_bal_2": 0.006,
+  "li_bal_3": 0.006,
+  "li_bal_4": 0.005,
+  "li_bal_5": 0.006,
+  "li_bal_6": 0.006,
+  "li_bal_7": 0.006
+ },
+ "preleg_foreign_excess": 0.04,
+ "quiet_box_override": null,
+ "driver_cpu": {
+  "cpu_s": 67.5,
+  "share_of_box": 0.0012,
+  "over_1pct": false
+ },
+ "gates": {
+  "frames_census": {
+   "PASS": true,
+   "arm": "llamaindex_video",
+   "n_records": 168,
+   "missing_videos": null,
+   "rows": [
+    {
+     "video": "EN2002b.avi",
+     "PASS": true,
+     "frames": 119
+    },
+    {
+     "video": "EN2004a.avi",
+     "PASS": true,
+     "frames": 230
+    },
+    {
+     "video": "EN2003a.avi",
+     "PASS": true,
+     "frames": 149
+    },
+    {
+     "video": "EN2009b.avi",
+     "PASS": true,
+     "frames": 164
+    },
+    {
+     "video": "EN2002d.avi",
+     "PASS": true,
+     "frames": 147
+    },
+    {
+     "video": "EN2002a.avi",
+     "PASS": true,
+     "frames": 143
+    },
+    {
+     "video": "EN2001e.avi",
+     "PASS": true,
+     "frames": 239
+    },
+    {
+     "video": "EN2006a.avi",
+     "PASS": true,
+     "frames": 235
+    },
+    {
+     "video": "EN2001a.avi",
+     "PASS": true,
+     "frames": 239
+    },
+    {
+     "video": "EN2009c.avi",
+     "PASS": true,
+     "frames": 206
+    },
+    {
+     "video": "EN2002c.avi",
+     "PASS": true,
+     "frames": 194
+    },
+    {
+     "video": "EN2001d.avi",
+     "PASS": true,
+     "frames": 226
+    },
+    {
+     "video": "ES2003a.avi",
+     "PASS": true,
+     "frames": 75
+    },
+    {
+     "video": "EN2001b.avi",
+     "PASS": true,
+     "frames": 230
+    },
+    {
+     "video": "ES2002a.avi",
+     "PASS": true,
+     "frames": 82
+    },
+    {
+     "video": "ES2004a.avi",
+     "PASS": true,
+     "frames": 77
+    },
+    {
+     "video": "EN2006b.avi",
+     "PASS": true,
+     "frames": 203
+    },
+    {
+     "video": "EN2005a.avi",
+     "PASS": true,
+     "frames": 239
+    },
+    {
+     "video": "ES2002d.avi",
+     "PASS": true,
+     "frames": 179
+    },
+    {
+     "video": "ES2005a.avi",
+     "PASS": true,
+     "frames": 31
+    },
+    {
+     "video": "EN2009d.avi",
+     "PASS": true,
+     "frames": 240
+    },
+    {
+     "video": "ES2004d.avi",
+     "PASS": true,
+     "frames": 147
+    },
+    {
+     "video": "ES2006a.avi",
+     "PASS": true,
+     "frames": 85
+    },
+    {
+     "video": "ES2003b.avi",
+     "PASS": true,
+     "frames": 140
+    },
+    {
+     "video": "ES2002c.avi",
+     "PASS": true,
+     "frames": 159
+    },
+    {
+     "video": "ES2002b.avi",
+     "PASS": true,
+     "frames": 151
+    },
+    {
+     "video": "ES2003d.avi",
+     "PASS": true,
+     "frames": 155
+    },
+    {
+     "video": "ES2005d.avi",
+     "PASS": true,
+     "frames": 115
+    },
+    {
+     "video": "ES2007a.avi",
+     "PASS": true,
+     "frames": 80
+    },
+    {
+     "video": "ES2006d.avi",
+     "PASS": true,
+     "frames": 132
+    },
+    {
+     "video": "ES2008a.avi",
+     "PASS": true,
+     "frames": 69
+    },
+    {
+     "video": "ES2003c.avi",
+     "PASS": true,
+     "frames": 149
+    },
+    {
+     "video": "ES2007d.avi",
+     "PASS": true,
+     "frames": 83
+    },
+    {
+     "video": "ES2005b.avi",
+     "PASS": true,
+     "frames": 153
+    },
+    {
+     "video": "ES2009a.avi",
+     "PASS": true,
+     "frames": 93
+    },
+    {
+     "video": "ES2004c.avi",
+     "PASS": true,
+     "frames": 150
+    },
+    {
+     "video": "ES2010a.avi",
+     "PASS": true,
+     "frames": 42
+    },
+    {
+     "video": "ES2004b.avi",
+     "PASS": true,
+     "frames": 155
+    },
+    {
+     "video": "ES2007b.avi",
+     "PASS": true,
+     "frames": 112
+    },
+    {
+     "video": "ES2011a.avi",
+     "PASS": true,
+     "frames": 74
+    },
+    {
+     "video": "ES2005c.avi",
+     "PASS": true,
+     "frames": 153
+    },
+    {
+     "video": "ES2009d.avi",
+     "PASS": true,
+     "frames": 141
+    },
+    {
+     "video": "ES2006c.avi",
+     "PASS": true,
+     "frames": 145
+    },
+    {
+     "video": "ES2009b.avi",
+     "PASS": true,
+     "frames": 96
+    },
+    {
+     "video": "ES2008d.avi",
+     "PASS": true,
+     "frames": 175
+    },
+    {
+     "video": "ES2011b.avi",
+     "PASS": true,
+     "frames": 106
+    },
+    {
+     "video": "ES2010d.avi",
+     "PASS": true,
+     "frames": 65
+    },
+    {
+     "video": "ES2012a.avi",
+     "PASS": true,
+     "frames": 74
+    },
+    {
+     "video": "ES2013a.avi",
+     "PASS": true,
+     "frames": 55
+    },
+    {
+     "video": "ES2012d.avi",
+     "PASS": true,
+     "frames": 63
+    },
+    {
+     "video": "ES2008c.avi",
+     "PASS": true,
+     "frames": 139
+    },
+    {
+     "video": "ES2006b.avi",
+     "PASS": true,
+     "frames": 145
+    },
+    {
+     "video": "ES2014a.avi",
+     "PASS": true,
+     "frames": 76
+    },
+    {
+     "video": "ES2013b.avi",
+     "PASS": true,
+     "frames": 142
+    },
+    {
+     "video": "ES2007c.avi",
+     "PASS": true,
+     "frames": 158
+    },
+    {
+     "video": "ES2011d.avi",
+     "PASS": true,
+     "frames": 132
+    },
+    {
+     "video": "ES2013c.avi",
+     "PASS": true,
+     "frames": 157
+    },
+    {
+     "video": "ES2015a.avi",
+     "PASS": true,
+     "frames": 76
+    },
+    {
+     "video": "ES2010c.avi",
+     "PASS": true,
+     "frames": 123
+    },
+    {
+     "video": "ES2008b.avi",
+     "PASS": true,
+     "frames": 139
+    },
+    {
+     "video": "ES2009c.avi",
+     "PASS": true,
+     "frames": 130
+    },
+    {
+     "video": "ES2011c.avi",
+     "PASS": true,
+     "frames": 114
+    },
+    {
+     "video": "ES2016a.avi",
+     "PASS": true,
+     "frames": 92
+    },
+    {
+     "video": "ES2015d.avi",
+     "PASS": true,
+     "frames": 129
+    },
+    {
+     "video": "ES2012c.avi",
+     "PASS": true,
+     "frames": 147
+    },
+    {
+     "video": "ES2010b.avi",
+     "PASS": true,
+     "frames": 117
+    },
+    {
+     "video": "ES2012b.avi",
+     "PASS": true,
+     "frames": 149
+    },
+    {
+     "video": "ES2014d.avi",
+     "PASS": true,
+     "frames": 194
+    },
+    {
+     "video": "ES2016d.avi",
+     "PASS": true,
+     "frames": 102
+    },
+    {
+     "video": "IB4001.avi",
+     "PASS": true,
+     "frames": 118
+    },
+    {
+     "video": "ES2013d.avi",
+     "PASS": true,
+     "frames": 126
+    },
+    {
+     "video": "ES2015b.avi",
+     "PASS": true,
+     "frames": 153
+    },
+    {
+     "video": "IB4002.avi",
+     "PASS": true,
+     "frames": 125
+    },
+    {
+     "video": "ES2014c.avi",
+     "PASS": true,
+     "frames": 151
+    },
+    {
+     "video": "ES2015c.avi",
+     "PASS": true,
+     "frames": 142
+    },
+    {
+     "video": "ES2014b.avi",
+     "PASS": true,
+     "frames": 154
+    },
+    {
+     "video": "IN1002.avi",
+     "PASS": true,
+     "frames": 165
+    },
+    {
+     "video": "IB4005.avi",
+     "PASS": true,
+     "frames": 134
+    },
+    {
+     "video": "IN1009.avi",
+     "PASS": true,
+     "frames": 84
+    },
+    {
+     "video": "ES2016c.avi",
+     "PASS": true,
+     "frames": 154
+    },
+    {
+     "video": "IB4003.avi",
+     "PASS": true,
+     "frames": 135
+    },
+    {
+     "video": "IB4004.avi",
+     "PASS": true,
+     "frames": 158
+    },
+    {
+     "video": "ES2016b.avi",
+     "PASS": true,
+     "frames": 161
+    },
+    {
+     "video": "IN1005.avi",
+     "PASS": true,
+     "frames": 186
+    },
+    {
+     "video": "IS1000a.avi",
+     "PASS": true,
+     "frames": 100
+    },
+    {
+     "video": "IN1007.avi",
+     "PASS": true,
+     "frames": 160
+    },
+    {
+     "video": "IN1008.avi",
+     "PASS": true,
+     "frames": 227
+    },
+    {
+     "video": "IB4011.avi",
+     "PASS": true,
+     "frames": 161
+    },
+    {
+     "video": "IS1000b.avi",
+     "PASS": true,
+     "frames": 156
+    },
+    {
+     "video": "IS1000c.avi",
+     "PASS": true,
+     "frames": 143
+    },
+    {
+     "video": "IN1001.avi",
+     "PASS": true,
+     "frames": 231
+    },
+    {
+     "video": "IS1000d.avi",
+     "PASS": true,
+     "frames": 174
+    },
+    {
+     "video": "IN1016.avi",
+     "PASS": true,
+     "frames": 240
+    },
+    {
+     "video": "IS1001d.avi",
+     "PASS": true,
+     "frames": 51
+    },
+    {
+     "video": "IB4010.avi",
+     "PASS": true,
+     "frames": 197
+    },
+    {
+     "video": "IS1003a.avi",
+     "PASS": true,
+     "frames": 60
+    },
+    {
+     "video": "IS1004a.avi",
+     "PASS": true,
+     "frames": 53
+    },
+    {
+     "video": "IS1002d.avi",
+     "PASS": true,
+     "frames": 83
+    },
+    {
+     "video": "IN1014.avi",
+     "PASS": true,
+     "frames": 246
+    },
+    {
+     "video": "IN1013.avi",
+     "PASS": true,
+     "frames": 209
+    },
+    {
+     "video": "IS1005a.avi",
+     "PASS": true,
+     "frames": 68
+    },
+    {
+     "video": "IS1004d.avi",
+     "PASS": true,
+     "frames": 130
+    },
+    {
+     "video": "IN1012.avi",
+     "PASS": true,
+     "frames": 207
+    },
+    {
+     "video": "IS1001a.avi",
+     "PASS": true,
+     "frames": 59
+    },
+    {
+     "video": "IS1001c.avi",
+     "PASS": true,
+     "frames": 95
+    },
+    {
+     "video": "IS1001b.avi",
+     "PASS": true,
+     "frames": 140
+    },
+    {
+     "video": "IS1002c.avi",
+     "PASS": true,
+     "frames": 138
+    },
+    {
+     "video": "IS1002b.avi",
+     "PASS": true,
+     "frames": 158
+    },
+    {
+     "video": "IS1007a.avi",
+     "PASS": true,
+     "frames": 64
+    },
+    {
+     "video": "IS1006b.avi",
+     "PASS": true,
+     "frames": 143
+    },
+    {
+     "video": "IS1003d.avi",
+     "PASS": true,
+     "frames": 139
+    },
+    {
+     "video": "IS1007b.avi",
+     "PASS": true,
+     "frames": 86
+    },
+    {
+     "video": "IS1003b.avi",
+     "PASS": true,
+     "frames": 109
+    },
+    {
+     "video": "IS1004c.avi",
+     "PASS": true,
+     "frames": 150
+    },
+    {
+     "video": "IS1006a.avi",
+     "PASS": true,
+     "frames": 56
+    },
+    {
+     "video": "IS1008a.avi",
+     "PASS": true,
+     "frames": 63
+    },
+    {
+     "video": "IS1003c.avi",
+     "PASS": true,
+     "frames": 124
+    },
+    {
+     "video": "IS1004b.avi",
+     "PASS": true,
+     "frames": 144
+    },
+    {
+     "video": "IS1009a.avi",
+     "PASS": true,
+     "frames": 55
+    },
+    {
+     "video": "IS1008b.avi",
+     "PASS": true,
+     "frames": 117
+    },
+    {
+     "video": "IS1006d.avi",
+     "PASS": true,
+     "frames": 122
+    },
+    {
+     "video": "IS1005b.avi",
+     "PASS": true,
+     "frames": 145
+    },
+    {
+     "video": "TS3003a.avi",
+     "PASS": true,
+     "frames": 100
+    },
+    {
+     "video": "IS1009b.avi",
+     "PASS": true,
+     "frames": 137
+    },
+    {
+     "video": "IS1006c.avi",
+     "PASS": true,
+     "frames": 129
+    },
+    {
+     "video": "IS1005c.avi",
+     "PASS": true,
+     "frames": 137
+    },
+    {
+     "video": "IS1008d.avi",
+     "PASS": true,
+     "frames": 98
+    },
+    {
+     "video": "TS3004a.avi",
+     "PASS": true,
+     "frames": 89
+    },
+    {
+     "video": "TS3004b.avi",
+     "PASS": true,
+     "frames": 149
+    },
+    {
+     "video": "IS1007c.avi",
+     "PASS": true,
+     "frames": 140
+    },
+    {
+     "video": "IS1007d.avi",
+     "PASS": true,
+     "frames": 134
+    },
+    {
+     "video": "TS3006a.avi",
+     "PASS": true,
+     "frames": 83
+    },
+    {
+     "video": "TS3005b.avi",
+     "PASS": true,
+     "frames": 162
+    },
+    {
+     "video": "TS3003b.avi",
+     "PASS": true,
+     "frames": 147
+    },
+    {
+     "video": "TS3005c.avi",
+     "PASS": true,
+     "frames": 160
+    },
+    {
+     "video": "TS3006b.avi",
+     "PASS": true,
+     "frames": 157
+    },
+    {
+     "video": "IS1009d.avi",
+     "PASS": true,
+     "frames": 128
+    },
+    {
+     "video": "IS1008c.avi",
+     "PASS": true,
+     "frames": 102
+    },
+    {
+     "video": "IS1009c.avi",
+     "PASS": true,
+     "frames": 120
+    },
+    {
+     "video": "TS3008a.avi",
+     "PASS": true,
+     "frames": 90
+    },
+    {
+     "video": "TS3005a.avi",
+     "PASS": true,
+     "frames": 87
+    },
+    {
+     "video": "TS3007a.avi",
+     "PASS": true,
+     "frames": 79
+    },
+    {
+     "video": "TS3007b.avi",
+     "PASS": true,
+     "frames": 167
+    },
+    {
+     "video": "TS3004c.avi",
+     "PASS": true,
+     "frames": 198
+    },
+    {
+     "video": "TS3007c.avi",
+     "PASS": true,
+     "frames": 161
+    },
+    {
+     "video": "TS3010a.avi",
+     "PASS": true,
+     "frames": 69
+    },
+    {
+     "video": "TS3009a.avi",
+     "PASS": true,
+     "frames": 100
+    },
+    {
+     "video": "TS3004d.avi",
+     "PASS": true,
+     "frames": 183
+    },
+    {
+     "video": "TS3009b.avi",
+     "PASS": true,
+     "frames": 164
+    },
+    {
+     "video": "TS3006c.avi",
+     "PASS": true,
+     "frames": 169
+    },
+    {
+     "video": "TS3009c.avi",
+     "PASS": true,
+     "frames": 171
+    },
+    {
+     "video": "TS3011a.avi",
+     "PASS": true,
+     "frames": 101
+    },
+    {
+     "video": "TS3008b.avi",
+     "PASS": true,
+     "frames": 154
+    },
+    {
+     "video": "TS3010b.avi",
+     "PASS": true,
+     "frames": 139
+    },
+    {
+     "video": "TS3012a.avi",
+     "PASS": true,
+     "frames": 57
+    },
+    {
+     "video": "TS3003c.avi",
+     "PASS": true,
+     "frames": 277
+    },
+    {
+     "video": "TS3011b.avi",
+     "PASS": true,
+     "frames": 148
+    },
+    {
+     "video": "TS3011c.avi",
+     "PASS": true,
+     "frames": 159
+    },
+    {
+     "video": "TS3008c.avi",
+     "PASS": true,
+     "frames": 167
+    },
+    {
+     "video": "TS3010c.avi",
+     "PASS": true,
+     "frames": 142
+    },
+    {
+     "video": "TS3012b.avi",
+     "PASS": true,
+     "frames": 163
+    },
+    {
+     "video": "TS3005d.avi",
+     "PASS": true,
+     "frames": 177
+    },
+    {
+     "video": "TS3006d.avi",
+     "PASS": true,
+     "frames": 198
+    },
+    {
+     "video": "TS3008d.avi",
+     "PASS": true,
+     "frames": 186
+    },
+    {
+     "video": "TS3010d.avi",
+     "PASS": true,
+     "frames": 128
+    },
+    {
+     "video": "TS3007d.avi",
+     "PASS": true,
+     "frames": 188
+    },
+    {
+     "video": "TS3009d.avi",
+     "PASS": true,
+     "frames": 137
+    },
+    {
+     "video": "TS3011d.avi",
+     "PASS": true,
+     "frames": 144
+    }
+   ]
+  },
+  "errors": {
+   "PASS": true,
+   "n_errors": 0
+  },
+  "self_duplication_any": {
+   "PASS": true,
+   "doubled_videos": null,
+   "indeterminate_videos": null,
+   "detector_rows": 168
+  },
+  "duplication_trigger": {
+   "PASS": true,
+   "n_trigger_eligible": 65,
+   "n_indeterminate": 0
+  },
+  "chunkid_monotone": {
+   "PASS": true,
+   "violations": null
+  },
+  "detection_liveness": {
+   "verdict": "NOT RUN",
+   "PASS": null,
+   "records": 0,
+   "offered": 168,
+   "reason": "--liveness-min-fraction not provided; value comes from probe data"
+  },
+  "embed_integrity": {
+   "PASS": true,
+   "n": 10977,
+   "expected_dim": 384,
+   "tol": 0.001,
+   "bad_dim_idx": null,
+   "bad_norm_idx": null
+  },
+  "determinism_repeat": {
+   "verdict": "NOT RUN",
+   "PASS": null,
+   "records": 0,
+   "offered": null,
+   "reason": "no ::repeat record in this leg (sequential legs produce one; blast legs report NOT RUN)"
+  }
+ },
+ "provenance_leela": {
+  "run_id": "20260921T084812Z-3219666",
+  "timestamp_utc": "2026-09-21T08:48:12Z",
+  "git_commit": "cde988fb139f68bd16587a0464ecfe3040f5595e-dirty",
+  "image_digest": null,
+  "framework_version": "0.14.23",
+  "instance_type": "c7i.8xlarge",
+  "architecture": "Linux/x86_64",
+  "cpu_count": 32,
+  "ram_gb": 61.8,
+  "corpus_manifest_sha256": "f5a2255cc5c9ad8744c096c7267f7c8845182aec902213329eea4e3669e65c19",
+  "corpus_n_docs": 168,
+  "parser": "ffmpeg fps=1/15 + rfdetr(RF-DETR base, thr 0.3)",
+  "parser_config_hash": "f16cb645f66726de",
+  "chunk_config": {
+   "chunk_size": 4000,
+   "chunk_overlap": 0,
+   "splitter": "SentenceSplitter(native, char length function supplied)",
+   "input_transform": "text + '\\n'"
+  },
+  "rocketride_engine_version": "3.3.1",
+  "duplication_patch_applied": null,
+  "duplication_patch_id": null,
+  "duplication_patch_source": "not_applicable_no_engine",
+  "rocketride_sdk_version": "1.3.0",
+  "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+  "offered_concurrency": 16,
+  "configured_concurrency": 8,
+  "warmup_policy": "driver-side, 2 disjoint manifest warm rows, coverage proven per instance; LI sends concurrent in waves of max(2 x workers, leg concurrency) (Crossroad 40), RR tokens round-robin; per-send ledger in warmup_<stem>.json",
+  "timeout_s": 43200,
+  "mode": "blast"
+ },
+ "provenance_video": {
+  "pipe_sha256": "6330773fb63bf7f286563cc37b39a671e3b25c1874ae9bcfc4b936c9c2e5b911",
+  "manifest_sha256": "f5a2255cc5c9ad8744c096c7267f7c8845182aec902213329eea4e3669e65c19",
+  "posture": {
+   "name": "workers",
+   "declared_workers": 8,
+   "threads_env_in_process_torch": 4,
+   "note": "LlamaIndex arm: uvicorn worker PROCESSES. No use(threads=) and no engine thread default exist here \u2014 the thread configuration is the six BLAS/OMP variables, read back in-process from every worker; threads_config/threads_note are RocketRide fields and are deliberately absent."
+  },
+  "identity_readback": {
+   "sdk": {
+    "skipped": "LI leg \u2014 the rocketride SDK is not on this path"
+   },
+   "li": {
+    "detect_impl": [
+     "rfdetr"
+    ],
+    "python_version": "3.12.13",
+    "versions": {
+     "rfdetr": "1.5.2",
+     "torch": "2.10.0+cu128",
+     "torchvision": "0.25.0+cu128",
+     "transformers": "4.53.3",
+     "supervision": "0.30.0",
+     "llama-index-core": "0.14.24",
+     "llama-index-embeddings-huggingface": "0.7.0",
+     "sentence-transformers": "5.7.0",
+     "imageio-ffmpeg": "0.6.0",
+     "fastapi": "0.141.1",
+     "uvicorn": "0.52.4"
+    },
+    "chunk_config_readback": {
+     "expected": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "per_worker": {
+      "li_worker_8802_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8803_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8804_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8805_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8806_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8807_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8808_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      },
+      "li_worker_8809_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      }
+     }
+    },
+    "rfdetr_checkpoint_md5_by_container": {
+     "li_bal_0": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_1": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_2": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_3": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_4": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_5": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_6": "b4d3ce46099eaed50626ede388caf979",
+     "li_bal_7": "b4d3ce46099eaed50626ede388caf979"
+    },
+    "rfdetr_checkpoint_md5_ok": true
+   }
+  },
+  "thread_pins_by_arm": {
+   "PASS": true,
+   "arms": {
+    "li": {
+     "within_arm": {
+      "PASS": true,
+      "readers": [
+       "li_worker_8802_1",
+       "li_worker_8803_1",
+       "li_worker_8804_1",
+       "li_worker_8805_1",
+       "li_worker_8806_1",
+       "li_worker_8807_1",
+       "li_worker_8808_1",
+       "li_worker_8809_1"
+      ],
+      "disagreements": null,
+      "values_agreed": {
+       "OMP_NUM_THREADS": "4",
+       "MKL_NUM_THREADS": "4",
+       "OPENBLAS_NUM_THREADS": "4",
+       "VECLIB_MAXIMUM_THREADS": "4",
+       "NUMEXPR_NUM_THREADS": "4",
+       "TORCH_NUM_THREADS": "4",
+       "torch_num_threads": 4
+      }
+     },
+     "declared": {
+      "NUMEXPR_NUM_THREADS": "4",
+      "TORCH_NUM_THREADS": "4",
+      "OMP_NUM_THREADS": "4",
+      "MKL_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "4",
+      "VECLIB_MAXIMUM_THREADS": "4"
+     },
+     "declared_vs_measured_mismatch": null
+    }
+   },
+   "cross_arm_values": {
+    "li": 4
+   },
+   "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm optima, difference recorded never failed (Crossroad 17)"
+  },
+  "task_census": null,
+  "network_mode": {
+   "li_bal_0": "host",
+   "li_bal_1": "host",
+   "li_bal_2": "host",
+   "li_bal_3": "host",
+   "li_bal_4": "host",
+   "li_bal_5": "host",
+   "li_bal_6": "host",
+   "li_bal_7": "host"
+  },
+  "image": {
+   "container": "li_bal_0",
+   "requested_tag": "li:video",
+   "image_id": "sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95",
+   "rootfs_layer_count": 14,
+   "labels": "{}",
+   "lineage_declared": "li:video sha256:0a52afcb (batch-size sweep, LI-balanced 8x4)",
+   "lineage_is_declared": true,
+   "lineage_note": "a declared string, not a measurement \u2014 it states how this image was produced; the image_id and layer count are the measured facts it must be read against"
+  },
+  "container_lifetime": null,
+  "interval_s": 15,
+  "rr_write_path": null,
+  "frames_observed_method": "extractor-count",
+  "chunk_config_source": "measured from records (config literal never exported)"
+ }
+}
