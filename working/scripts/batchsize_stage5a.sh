@@ -28,7 +28,7 @@ OUT="$1"; H="$2"
 cd "$(dirname "$0")/../.." || exit 2
 S4="${BSZ_STAGE4_DIR:-}"
 [ -n "$S4" ] && [ -d "$S4" ] || { echo "REFUSED: set BSZ_STAGE4_DIR to the Stage 4 campaign dir — Stage 5 runs strictly after Stage 4 is banked" >&2; exit 5; }
-for need in p1_rr_cont32 p2_li_cont p3_rr_k128 p4_li_k128 p5_li_video p6_rr_video envelope_k512_decision.json; do
+for need in p1_rr_cont32 p2_li_cont p3_rr_k128 p4_li_k128 p5_li_video p6_rr_video envelope_done.json; do
   [ -e "$S4/$need" ] || { echo "REFUSED: Stage 4 not banked — $S4/$need is absent" >&2; exit 5; }
 done
 export BSZ_EXPECT_HEAD="$H"

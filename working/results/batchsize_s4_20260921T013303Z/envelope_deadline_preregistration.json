@@ -1,0 +1,18 @@
+{
+ "written_utc": "2026-09-21T07:42:49Z",
+ "ruling": "Ansh, Stage 4 envelope ruling, 2026-09-21 \u2014 written and landed on origin BEFORE leg 7",
+ "batch_deadline_s": 1800,
+ "doc_deadline_s": 1800,
+ "applies_to": "every envelope K (256, 512, 1024) on BOTH arms; the chain refuses a different value",
+ "on_deadline_loss": "a batch lost to the deadline is BLAST RADIUS \u2014 recorded, NEVER re-run",
+ "blast_radius_dominated": "a leg in which MORE THAN ONE batch dies is reported BLAST-RADIUS-DOMINATED, not failed",
+ "report_every_leg": [
+  "per-batch wall times",
+  "which batch held 039_039660.pdf, and its wall",
+  "peak anon RSS (container cgroup)",
+  "documents lost per failed batch"
+ ],
+ "k512": "runs UNCONDITIONALLY on both arms; the rule pre-registered in envelope_floors.json is evaluated after the K=256 legs FOR AUDIT ONLY and gates nothing",
+ "hypothesis": "batch wall equals the slowest document's service time, so throughput approaches the continuous value as barrier count falls; the finding is the memory and blast-radius cost, not a throughput win",
+ "known_risk_stated_before_the_data": "at K=128 (leg 3) the batch holding 039_039660.pdf took 1707 s \u2014 93 s under the deadline; a larger batch holding it may die"
+}

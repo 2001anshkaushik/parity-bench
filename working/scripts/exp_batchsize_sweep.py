@@ -831,6 +831,10 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
         # BLAST RADIUS (envelope). One failed send_files costs the WHOLE batch, so the price of
         # a large K is not only memory: it is how many documents a single failure takes with it.
         # Reported as the worst batch actually lost, and as the exposure K implies.
+        # The deadlines this leg actually ran under, so a pre-registration can be checked
+        # against the leg rather than against a default someone remembers.
+        "deadlines": {"batch_timeout_s": BATCH_TIMEOUT_S, "doc_timeout_s": DOC_TIMEOUT_S,
+                      "breaker_consecutive": BREAKER_K},
         "failure_blast_radius": {
             "documents_per_batch": k,
             "batches_with_a_hard_failure": (len({r["batch"] for r in recs

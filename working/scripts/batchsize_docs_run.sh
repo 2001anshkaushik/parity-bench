@@ -126,8 +126,10 @@ STAMP="$(basename "$(dirname "$RUN_DIR")")"
 if aws s3 ls "s3://rocketride-benchmark-data/ansh/batch-size-optimization/$STAMP/$(basename "$RUN_DIR")/" >/dev/null 2>&1; then
   echo "!! S3 prefix for this launch already exists — NOT uploading over it; results remain in $RUN_DIR"; exit "$RC"
 fi
+EXPORTS=(working/results/exp_batchsize_sweep_"$ARM"__*.json)   # names carry a UTC stamp: glob order is time order
+LATEST_EXPORT=""; [ -e "${EXPORTS[0]}" ] && LATEST_EXPORT="${EXPORTS[${#EXPORTS[@]}-1]}"
 BENCH_S3="s3://rocketride-benchmark-data/ansh/batch-size-optimization" RUN_STAMP="$STAMP" \
-  bash working/scripts/exfil_s3.sh "$RUN_DIR" $(ls -t working/results/exp_batchsize_sweep_"$ARM"__*.json 2>/dev/null | head -1) \
+  bash working/scripts/exfil_s3.sh "$RUN_DIR" "${LATEST_EXPORT:-}" \
   || echo "!! exfil failed — results remain in $RUN_DIR on the box"
 echo "DONE arm=$ARM rc=$RC"
 exit "$RC"

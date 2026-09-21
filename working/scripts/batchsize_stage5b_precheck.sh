@@ -25,7 +25,7 @@ cd "$(dirname "$0")/../.." || exit 2
 [ "$(git rev-parse HEAD | cut -c1-12)" = "$(echo "$H" | cut -c1-12)" ] || { echo "REFUSED: worktree is not at the declared commit $H" >&2; exit 2; }
 S4="${BSZ_STAGE4_DIR:-}"
 [ -n "$S4" ] && [ -d "$S4" ] || { echo "REFUSED: set BSZ_STAGE4_DIR — Stage 5 runs strictly after Stage 4 is banked" >&2; exit 5; }
-for need in p1_rr_cont32 p2_li_cont p3_rr_k128 p4_li_k128 p5_li_video p6_rr_video envelope_k512_decision.json; do
+for need in p1_rr_cont32 p2_li_cont p3_rr_k128 p4_li_k128 p5_li_video p6_rr_video envelope_done.json; do
   [ -e "$S4/$need" ] || { echo "REFUSED: Stage 4 not banked — $S4/$need is absent" >&2; exit 5; }
 done
 RUNNING="$(docker ps --format '{{.Names}}')"          # captured: no pipe into grep -q (register 38)
