@@ -1550,3 +1550,49 @@ than rewritten from memory, which is entry 2's point in miniature.
 > When the two differ, report the gap as a bound. Same class as entry 36 (a per-cgroup basis quoted
 > as an arm total).
 
+## 44. The leg that measured nothing, and the upload that sent an older launch's file (added 2026-09-21)
+
+> The envelope's last leg, LlamaIndex K=1024, died about twenty minutes in with
+> `OSError: [Errno 24] Too many open files`. The failure was in OUR driver, not in the arm. Batch
+> mode holds K requests open at once, and the box's default soft limit is 1,024 descriptors. K=512
+> had run cleanly under the same limit. No leg file and no export were written; the leg measured
+> nothing.
+>
+> It is a harness loss, not blast radius. The deadline pre-registration's "never a re-run" covers
+> a batch the ENGINE lost to the 1,800 s deadline. A driver crash is not that. The leg is therefore
+> run once more as a new launch, `e12b_li_k1024`, after the fix below. Whatever e12b shows,
+> including any batch lost to the deadline, is reported as it falls. It is re-run again only if the
+> harness itself fails. The crashed launch's partial records stay, unused by any analysis.
+>
+> The same crash exposed a second defect, in the runner. After a sweep it uploaded "the newest
+> export on disk". A driver that wrote no export therefore had an OLDER launch's export sent under
+> that export's own name. Twice so far:
+>
+> - **2026-09-20, ~21:38Z.** A Stage 3b launch that failed early filed a copy of the smoke
+>   campaign's `shake_rr` export under the Stage 3b prefix. That was a new key; no leg objects came
+>   with it.
+> - **2026-09-21, 20:01:51Z.** e12 re-put e10's export under its EXISTING key. The bytes are
+>   identical: the sha256 matches a copy pulled before the re-put. But an object under `ansh/` was
+>   written twice, and the append-only rule forbids that in form, whatever the content.
+>
+> Found by comparing each export's creation stamp with its upload time. Every other export was
+> uploaded within seconds of being written.
+>
+> Fixes:
+>
+> - The driver names its export inside its own run directory, and the runner uploads that file or
+>   nothing.
+> - The runner refuses a non-empty run directory.
+> - `exfil_s3.sh` refuses any key or prefix that already exists, whatever its caller believes.
+> - The runner raises the driver's open-file limit.
+> - The driver records the limit in its export, and refuses at the start a leg whose concurrency
+>   the limit cannot hold. The estimate is one descriptor per request in flight, plus overhead,
+>   which fits both observations: K=512 ran at 1,024, and K=1024 did not.
+>
+> Rules:
+>
+> - **A resource limit of the harness is a condition of the leg.** Check it before the first
+>   request, not twenty minutes in.
+> - **An uploader enforces append-only itself**, rather than trusting its caller to have chosen the
+>   right file.
+

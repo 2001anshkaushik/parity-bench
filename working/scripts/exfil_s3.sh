@@ -31,9 +31,18 @@ aws sts get-caller-identity >/dev/null || {
 n=0
 for src in "$@"; do
   [ -e "$src" ] || { echo "!! skipping missing $src" >&2; continue; }
+  # APPEND-ONLY AT THE UPLOADER (2026-09-21): an existing key or prefix is never written again,
+  # whatever the caller believed. Before this, a caller that picked the wrong file re-put an
+  # existing object (register 44).
   if [ -d "$src" ]; then
+    if [ -n "$(aws s3 ls "$DEST$(basename "$src")/" 2>/dev/null)" ]; then
+      echo "!! $DEST$(basename "$src")/ already holds objects — not uploading over it" >&2; continue
+    fi
     aws s3 cp "$src" "$DEST$(basename "$src")/" --recursive --only-show-errors
   else
+    if [ -n "$(aws s3 ls "$DEST$(basename "$src")" 2>/dev/null)" ]; then
+      echo "!! $DEST$(basename "$src") already exists — not uploading over it" >&2; continue
+    fi
     aws s3 cp "$src" "$DEST" --only-show-errors
   fi
   n=$((n + 1))

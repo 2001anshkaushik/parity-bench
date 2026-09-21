@@ -191,6 +191,22 @@ def container_facts(arm: str, expect_thread_env: Optional[str] = "1",
     return facts
 
 
+def open_files_check(max_in_flight: int, soft: int, hard: int) -> Dict[str, Any]:
+    """OPEN FILES ARE A CONDITION OF THE LEG (2026-09-21). The service arm's batch mode holds up to
+    K requests open at once: K sockets, plus each request's source file while it is read. At the
+    box's default soft limit of 1,024, the first LlamaIndex K=1024 leg died of EMFILE twenty minutes
+    in and measured nothing, while K=512 had run cleanly at the same limit. One descriptor per
+    request in flight (its socket; each source file is read and closed) plus a fixed allowance for
+    the interpreter, the sampler and the Docker client fits both observations. Applied to both arms,
+    conservatively: RocketRide's K=1024 ran at 1,024 and would be refused there, which the runner's
+    raised limit makes moot. Checked BEFORE the first request, so a limit that cannot hold the leg
+    refuses instead of crashing mid-leg."""
+    need = max_in_flight + 256
+    unlimited = soft == resource.RLIM_INFINITY
+    return {"soft": "unlimited" if unlimited else soft, "hard": "unlimited" if hard == resource.RLIM_INFINITY else hard,
+            "max_in_flight": max_in_flight, "needed_estimate": need, "ok": unlimited or need <= soft}
+
+
 def cpus_from_spec(spec: str) -> List[int]:
     out: List[int] = []
     for part in spec.split(","):
@@ -982,11 +998,17 @@ def main() -> int:
     threads = None if a.rr_threads == "unset" else int(a.rr_threads)
     ks = [int(x) for x in a.k.split(",") if x.strip()]
     cs = [int(x) for x in a.continuous.split(",") if x.strip()]
+    ofc = open_files_check(max(ks + cs + [a.reference_c or 0, 1]), *resource.getrlimit(resource.RLIMIT_NOFILE))
+    if not ofc["ok"]:
+        raise SystemExit(f"REFUSED: up to {ofc['max_in_flight']} requests in flight need about "
+                         f"{ofc['needed_estimate']} open files; the driver's soft limit is {ofc['soft']} "
+                         f"(hard {ofc['hard']}). Raise it before the leg — the runner does, with ulimit -n.")
     a.run_dir.mkdir(parents=True, exist_ok=True)
 
     facts = container_facts(a.arm, None if a.thread_env == "unset" else a.thread_env,
                             declared_cpuset=a.declared_cpuset)
     facts["ready"] = service_ready(a.arm)
+    facts["driver_open_files"] = ofc
     other = "li" if a.arm == "rr" else "rr"
     o = subprocess.run(["docker", "inspect", "-f", "{{.State.Running}}", CONTAINER[other]],
                        capture_output=True, text=True)
@@ -1051,6 +1073,9 @@ def main() -> int:
         "run_dir": str(a.run_dir),
     }
     p = write_result(f"exp_batchsize_sweep_{a.arm}", out)
+    # The runner uploads the export named HERE, never "the newest export on disk": a driver that
+    # crashed before writing one used to have an OLDER launch's export re-sent under its key.
+    (a.run_dir / "export_path.txt").write_text(str(p) + "\n")
     say(f"\nRANKING ({a.arm}): " + "  ".join(f"K={r['k']}:{r['docs_per_s']}" for r in out["ranking"]))
     say(f"export: {p}")
     bad = [g for g in legs if g.get("verdict") != "OK"]

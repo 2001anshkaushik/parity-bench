@@ -43,6 +43,19 @@ echo "worktree: $(pwd)  branch: $(git branch --show-current)  head: $(git rev-pa
 # Stage 5 leg is <campaign>/s5c/rr_b). Decided HERE, before a container starts, so a run_dir
 # that cannot be uploaded refuses instead of measuring and then stranding its results.
 STAMP="$(results_parent_rel "$RUN_DIR")" || { echo "REFUSED: run_dir $RUN_DIR is not <campaign under working/results/>/<leg>" >&2; exit 2; }
+# A launch never writes into another launch's directory (working/results/ is append-only), which
+# also guarantees that the export_path.txt read after the sweep was written by THIS launch.
+if [ -d "$RUN_DIR" ] && [ -n "$(ls -A "$RUN_DIR" 2>/dev/null)" ]; then
+  echo "REFUSED: run_dir $RUN_DIR exists and is not empty — choose a new launch directory" >&2; exit 2
+fi
+# Open files (2026-09-21): the service arm's batch mode holds K requests open at once, and the box's
+# default soft limit of 1,024 killed the first LlamaIndex K=1024 leg with EMFILE. Raised for this
+# runner and the driver only (never the arm's container); the driver records the limit in its export
+# and refuses a leg the limit cannot hold.
+NOFILE_WANT=65536; NOFILE_HARD="$(ulimit -Hn)"
+if [ "$NOFILE_HARD" != "unlimited" ] && [ "$NOFILE_HARD" -lt "$NOFILE_WANT" ]; then NOFILE_WANT="$NOFILE_HARD"; fi
+ulimit -n "$NOFILE_WANT" || echo "!! could not raise the open-file limit"
+echo "driver open-file limit: soft $(ulimit -Sn) hard $(ulimit -Hn)"
 "$PY" -c 'import psutil' || { echo "REFUSED: $PY cannot import psutil — wrong interpreter" >&2; exit 2; }
 [ -d "$CORPUS" ] || { echo "REFUSED: corpus dir $CORPUS missing" >&2; exit 2; }
 
@@ -148,8 +161,15 @@ echo "sweep rc=$RC"
 if aws s3 ls "s3://rocketride-benchmark-data/ansh/batch-size-optimization/$STAMP/$(basename "$RUN_DIR")/" >/dev/null 2>&1; then
   echo "!! S3 prefix for this launch already exists — NOT uploading over it; results remain in $RUN_DIR"; exit "$RC"
 fi
-EXPORTS=(working/results/exp_batchsize_sweep_"$ARM"__*.json)   # names carry a UTC stamp: glob order is time order
-LATEST_EXPORT=""; [ -e "${EXPORTS[0]}" ] && LATEST_EXPORT="${EXPORTS[${#EXPORTS[@]}-1]}"
+# THIS launch's export, as its driver named it — never "the newest export on disk". A driver that
+# crashed before writing one had the previous launch's export re-sent under that export's own key
+# (e12, 2026-09-21: identical bytes, but a re-put of an existing object; register 44).
+LATEST_EXPORT="$(cat "$RUN_DIR/export_path.txt" 2>/dev/null)"
+if [ -n "$LATEST_EXPORT" ] && [ -f "$LATEST_EXPORT" ]; then
+  echo "export written by this launch: $LATEST_EXPORT"
+else
+  LATEST_EXPORT=""; echo "!! the driver wrote no export (rc=$RC) — only the run dir is uploaded; no older export is re-sent"
+fi
 BENCH_S3="s3://rocketride-benchmark-data/ansh/batch-size-optimization" RUN_STAMP="$STAMP" \
   bash working/scripts/exfil_s3.sh "$RUN_DIR" "${LATEST_EXPORT:-}" \
   || echo "!! exfil failed — results remain in $RUN_DIR on the box"

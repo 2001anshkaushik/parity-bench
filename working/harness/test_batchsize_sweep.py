@@ -76,5 +76,25 @@ class Slice(unittest.TestCase):
         self.assertEqual(sum(s["cell_take"].values()), 384)
 
 
+class OpenFiles(unittest.TestCase):
+    """The leg that measured nothing (LlamaIndex K=1024 at a soft limit of 1,024) must refuse at the
+    start; the legs that ran must still pass (the null control: the check is not a blanket refusal)."""
+    import resource as _r
+
+    def test_the_failed_configuration_refuses(self):
+        self.assertFalse(bsz.open_files_check(1024, 1024, 524288)["ok"])
+
+    def test_the_raised_limit_holds_it(self):
+        self.assertTrue(bsz.open_files_check(1024, 65536, 524288)["ok"])
+
+    def test_null_control_the_legs_that_ran_still_pass_at_the_old_limit(self):
+        for k in (1, 8, 16, 32, 64, 128, 256, 512):          # every service-arm leg that ran at 1,024
+            self.assertTrue(bsz.open_files_check(k, 1024, 524288)["ok"], k)
+
+    def test_unlimited_is_ok_and_reported_as_such(self):
+        r = bsz.open_files_check(4096, self._r.RLIM_INFINITY, self._r.RLIM_INFINITY)
+        self.assertEqual((r["ok"], r["soft"], r["hard"]), (True, "unlimited", "unlimited"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)
