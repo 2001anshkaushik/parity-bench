@@ -1,0 +1,19 @@
+{
+ "rr": 0.0082,
+ "li": 0.0987,
+ "written_utc": "2026-09-21T07:01:36Z",
+ "source": "warm replicate spreads from the Stage 3b smoke (384 stratified documents), partitioned by cache condition and arm shape; the largest relative spread per arm",
+ "per_cell_spreads": {
+  "rr": {
+   "128@units=1": 0.0062,
+   "256@units=1": 0.0082,
+   "refc32@units=1": 0.0027
+  },
+  "li": {
+   "128@units=24": 0.0987,
+   "256@units=24": 0.0403,
+   "refc32@units=24": 0.0702
+  }
+ },
+ "pre_registration": "written and landed BEFORE any full-scale K=256 leg exists, so the K=512 threshold cannot be chosen after the delta is seen"
+}
