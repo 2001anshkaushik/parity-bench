@@ -23,6 +23,8 @@ echo "batchsize_stage5b_precheck.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
 OUT="$1"; H="$2"
 cd "$(dirname "$0")/../.." || exit 2
 [ "$(git rev-parse HEAD | cut -c1-12)" = "$(echo "$H" | cut -c1-12)" ] || { echo "REFUSED: worktree is not at the declared commit $H" >&2; exit 2; }
+. working/harness/results_prefix.sh || { echo "REFUSED: working/harness/results_prefix.sh is absent from this tree" >&2; exit 2; }
+REL="$(results_rel "$OUT")" || { echo "REFUSED: out_dir $OUT is not under working/results/ — its S3 prefix mirrors that path" >&2; exit 2; }
 S4="${BSZ_STAGE4_DIR:-}"
 [ -n "$S4" ] && [ -d "$S4" ] || { echo "REFUSED: set BSZ_STAGE4_DIR — Stage 5 runs strictly after Stage 4 is banked" >&2; exit 5; }
 for need in p1_rr_cont32 p2_li_cont p3_rr_k128 p4_li_k128 p5_li_video p6_rr_video envelope_done.json; do
@@ -46,6 +48,6 @@ docker run --rm --network none \
   > "$OUT/s5b_precheck.json" 2> "$OUT/s5b_precheck.stderr"
 RC=$?
 echo "probe rc=$RC"; cat "$OUT/s5b_precheck.json"
-aws s3 cp "$OUT" "s3://rocketride-benchmark-data/ansh/batch-size-optimization/${OUT##*/working/results/}/" --recursive --only-show-errors || echo "!! upload failed — results remain in $OUT"
+aws s3 cp "$OUT" "s3://rocketride-benchmark-data/ansh/batch-size-optimization/$REL/" --recursive --only-show-errors || echo "!! upload failed — results remain in $OUT"
 echo "DONE rc=$RC"
 exit "$RC"

@@ -32,6 +32,12 @@ echo "batchsize_stage4_envelope.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
 D="$1"; SLICE="$2"; H="$3"
 cd "$(dirname "$0")/../.." || exit 2
 PY="$HOME/.venv/bin/python"
+. working/harness/results_prefix.sh || { echo "REFUSED: working/harness/results_prefix.sh is absent from this tree" >&2; exit 2; }
+# The end-of-chain files' S3 prefix. The first run of this chain (from d57a378) derived it as
+# ${D##*/working/results/}, which never matches a RELATIVE D, so its decision and completion
+# files landed under batch-size-optimization/working/results/<campaign>/ instead of the
+# campaign's own prefix (register 41).
+REL="$(results_rel "$D")" || { echo "REFUSED: campaign dir $D is not under working/results/" >&2; exit 2; }
 
 missing=()
 for pat in "p1_rr_cont32/leg_rr_refc32_*" "p2_li_cont/leg_li_refc32_*" "p3_rr_k128/leg_rr_k128_*" "p4_li_k128/leg_li_k128_*"; do
@@ -65,7 +71,7 @@ step e10_li_k512  BSZ_LI_WORKERS=24 bash working/scripts/batchsize_docs_run.sh l
 step e11_rr_k1024 bash working/scripts/batchsize_docs_run.sh rr "$SLICE" "$D/e11_rr_k1024" 1024 0 env
 step e12_li_k1024 BSZ_LI_WORKERS=24 bash working/scripts/batchsize_docs_run.sh li "$SLICE" "$D/e12_li_k1024" 1024 0 env
 
-DEST="s3://rocketride-benchmark-data/ansh/batch-size-optimization/${D##*/working/results/}"
+DEST="s3://rocketride-benchmark-data/ansh/batch-size-optimization/$REL"
 for f in envelope_k512_decision.json envelope_k512_decision.txt; do
   aws s3 cp "$D/$f" "$DEST/$f" --only-show-errors || echo "!! upload of $f failed — it remains in $D"
 done

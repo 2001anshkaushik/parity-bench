@@ -34,6 +34,8 @@ echo "batchsize_stage5c_smt.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
 [ "$#" -eq 3 ] || { echo "usage: $0 <campaign_dir> <slice_384.json> <expect_head>" >&2; exit 2; }
 D="$1"; SLICE="$2"; H="$3"
 cd "$(dirname "$0")/../.." || exit 2
+. working/harness/results_prefix.sh || { echo "REFUSED: working/harness/results_prefix.sh is absent from this tree" >&2; exit 2; }
+REL="$(results_rel "$D")" || { echo "REFUSED: campaign dir $D is not under working/results/ — its S3 prefix mirrors that path" >&2; exit 2; }
 S4="${BSZ_STAGE4_DIR:-}"
 [ -n "$S4" ] && [ -f "$S4/envelope_done.json" ] || { echo "REFUSED: Stage 5 runs strictly after the envelope — set BSZ_STAGE4_DIR to a campaign dir holding envelope_done.json" >&2; exit 5; }
 command -v lscpu >/dev/null 2>&1 || { echo "REFUSED: lscpu is not installed — the sibling map must be READ, never assumed" >&2; exit 5; }
@@ -61,7 +63,7 @@ step li_a  BSZ_CONTINUOUS=32 BSZ_LI_WORKERS=24 bash working/scripts/batchsize_do
 step li_b  BSZ_CONTINUOUS=32 BSZ_LI_WORKERS=24 BSZ_CPUSET=0-23 bash working/scripts/batchsize_docs_run.sh li "$SLICE" "$D/li_b" "" 0 smt_b
 step li_c  BSZ_CONTINUOUS=32 BSZ_LI_WORKERS=24 BSZ_CPUSET="$ONE_PER_CORE" bash working/scripts/batchsize_docs_run.sh li "$SLICE" "$D/li_c" "" 0 smt_c
 
-DEST="s3://rocketride-benchmark-data/ansh/batch-size-optimization/${D##*/working/results/}"
+DEST="s3://rocketride-benchmark-data/ansh/batch-size-optimization/$REL"
 for f in lscpu_siblings.txt lscpu_full.txt cells.json; do aws s3 cp "$D/$f" "$DEST/$f" --only-show-errors || true; done
 echo "CHAIN RESULTS: ${R[*]}"
 echo "CHAIN_DONE"

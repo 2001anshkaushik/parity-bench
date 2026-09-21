@@ -36,6 +36,12 @@ PY="$HOME/.venv/bin/python"
 BATCH_TREE="$(cd "$(dirname "$0")/../.." && pwd)"
 VIDEO_TREE="${BSZ_VIDEO_TREE:-$HOME/parity-bench-video}"
 case "$OUT" in /*) ;; *) echo "out_dir must be absolute" >&2; exit 2;; esac
+# Sourced from the BATCH tree, before the cd into the video tree, which is a different checkout.
+. "$BATCH_TREE/working/harness/results_prefix.sh" || { echo "REFUSED: results_prefix.sh is absent from $BATCH_TREE" >&2; exit 2; }
+# The S3 prefix mirrors the path UNDER working/results/, however deep it is. Taking only the last
+# two components put a run meant for <campaign>/video/rep under a top-level "video/" prefix
+# (2026-09-20). Decided before any leg runs, so an un-uploadable out_dir refuses up front.
+STAMP="$(results_rel "$OUT")" || { echo "REFUSED: out_dir $OUT is not under working/results/" >&2; exit 2; }
 "$PY" -c 'import psutil' || { echo "REFUSED: $PY cannot import psutil" >&2; exit 2; }
 cd "$VIDEO_TREE" || { echo "REFUSED: no video worktree at $VIDEO_TREE" >&2; exit 2; }
 echo "video tree: $(pwd) head $(git rev-parse --short HEAD) ; batch tree: $BATCH_TREE head $(git -C "$BATCH_TREE" rev-parse --short HEAD)"
@@ -133,10 +139,7 @@ for K in ${KLIST//,/ }; do
 done
 echo "LEGS: ${RCS[*]}"
 
-# The S3 prefix mirrors the path UNDER working/results/, however deep it is. Taking only the
-# last two components put a run meant for <campaign>/video/rep under a top-level "video/"
-# prefix, outside its own campaign (2026-09-20).
-STAMP="${OUT##*/working/results/}"
+# STAMP, the campaign's S3 prefix, was fixed at the top from results_rel.
 for K in ${KLIST//,/ }; do
   LEG="$OUT/${ARM}_k$K${BSZ_LEG_SUFFIX:-}"; [ -d "$LEG" ] || continue
   DEST="s3://rocketride-benchmark-data/ansh/batch-size-optimization/$STAMP/${ARM}_k$K${BSZ_LEG_SUFFIX:-}/"

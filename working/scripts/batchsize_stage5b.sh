@@ -23,6 +23,8 @@ echo "batchsize_stage5b.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
 [ "$#" -eq 3 ] || { echo "usage: $0 <out_dir_abs> <precheck.json> <expect_head>" >&2; exit 2; }
 OUT="$1"; PRE="$2"; H="$3"
 cd "$(dirname "$0")/../.." || exit 2
+. working/harness/results_prefix.sh || { echo "REFUSED: working/harness/results_prefix.sh is absent from this tree" >&2; exit 2; }
+REL="$(results_rel "$OUT")" || { echo "REFUSED: out_dir $OUT is not under working/results/ — its S3 prefix mirrors that path" >&2; exit 2; }
 S4="${BSZ_STAGE4_DIR:-}"
 [ -n "$S4" ] && [ -f "$S4/envelope_done.json" ] || { echo "REFUSED: Stage 5 runs strictly after the envelope" >&2; exit 5; }
 [ -f "$PRE" ] || { echo "REFUSED: no pre-check result at $PRE" >&2; exit 5; }
@@ -64,6 +66,6 @@ step() { local l="$1"; shift; echo "===== STEP $l $(date -u +%H:%M:%SZ) ====="; 
 for B in 1 2 4 8; do
   step "s5b_B$B" BSZ_RR_IMAGE=rr:s5b-microbatch BSZ_S5B_BATCH="$B" BSZ_S5B_TAP=1 BSZ_LEG_SUFFIX="_B$B" bash working/scripts/batchsize_video_run.sh rr 16 16 "$OUT"
 done
-aws s3 cp "$OUT/s5b_image.json" "s3://rocketride-benchmark-data/ansh/batch-size-optimization/${OUT##*/working/results/}/s5b_image.json" --only-show-errors || true
+aws s3 cp "$OUT/s5b_image.json" "s3://rocketride-benchmark-data/ansh/batch-size-optimization/$REL/s5b_image.json" --only-show-errors || true
 echo "CHAIN RESULTS: ${R[*]}"
 echo "CHAIN_DONE"

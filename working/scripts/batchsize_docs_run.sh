@@ -15,8 +15,9 @@
 #      numbers; the driver REFUSES if any cpuset or quota still binds.
 #      thread_env=unset omits the six variables (engine default);
 #   3. waits for a real answer from the service, not a TCP accept (register entry 3);
-#   4. runs the sweep with the driver on the complementary cores (taskset -c 24-31). The driver
-#      reads the posture back from the running container and refuses on any mismatch;
+#   4. runs the sweep with the driver unpinned (no taskset, Ruling A; its CPU is a reported
+#      number). The driver reads the posture back from the running container and refuses on any
+#      mismatch;
 #   5. removes ONLY the container it created, by id;
 #   6. ships the run dir and the export to S3 as NEW objects (exfil_s3.sh, instance role).
 #
@@ -37,6 +38,11 @@ PY="$HOME/.venv/bin/python"
 CORPUS="${BSZ_CORPUS_DIR:-$HOME/parity-bench/corpus/govdocs1/pdfs}"
 cd "$(dirname "$0")/../.." || exit 2
 echo "worktree: $(pwd)  branch: $(git branch --show-current)  head: $(git rev-parse --short HEAD)  dirty: $(git status --porcelain | wc -l)"
+. working/harness/results_prefix.sh || { echo "REFUSED: working/harness/results_prefix.sh is absent from this tree" >&2; exit 2; }
+# The launch's S3 prefix mirrors its campaign's path under working/results/, however deep (a
+# Stage 5 leg is <campaign>/s5c/rr_b). Decided HERE, before a container starts, so a run_dir
+# that cannot be uploaded refuses instead of measuring and then stranding its results.
+STAMP="$(results_parent_rel "$RUN_DIR")" || { echo "REFUSED: run_dir $RUN_DIR is not <campaign under working/results/>/<leg>" >&2; exit 2; }
 "$PY" -c 'import psutil' || { echo "REFUSED: $PY cannot import psutil — wrong interpreter" >&2; exit 2; }
 [ -d "$CORPUS" ] || { echo "REFUSED: corpus dir $CORPUS missing" >&2; exit 2; }
 
@@ -136,8 +142,9 @@ fi
 echo "sweep rc=$RC"
 
 # RUN_DIR is <campaign dir>/<arm>_<label>: one S3 prefix per launch, so a later launch can never
-# re-upload (overwrite) an earlier launch's objects — S3 under ansh/ is append-only too.
-STAMP="$(basename "$(dirname "$RUN_DIR")")"
+# re-upload (overwrite) an earlier launch's objects — S3 under ansh/ is append-only too. STAMP was
+# fixed at the top; for a leg one level under its campaign it equals the old
+# basename(dirname(RUN_DIR)), so every banked launch's key is unchanged.
 if aws s3 ls "s3://rocketride-benchmark-data/ansh/batch-size-optimization/$STAMP/$(basename "$RUN_DIR")/" >/dev/null 2>&1; then
   echo "!! S3 prefix for this launch already exists — NOT uploading over it; results remain in $RUN_DIR"; exit "$RC"
 fi

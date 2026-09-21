@@ -1459,3 +1459,40 @@ than rewritten from memory, which is entry 2's point in miniature.
 > dropped from both arms beside the primary span. The percentile throughput was defined after the
 > leg was seen (entry 34) and is labelled a post-hoc diagnostic, never the headline.
 
+## 41. The fix that held for the path it was tested on, and the watcher that would have read "hung" (added 2026-09-21)
+
+> On 2026-09-20 a video run meant for `<campaign>/video/rep` landed under a top-level `video/` S3
+> prefix, because its key kept only the last two path components. The fix mirrored the whole path
+> under `working/results/` as `${OUT##*/working/results/}`, and it was verified on the input it
+> was written for: the video runner, which insists on an ABSOLUTE out_dir. The same expression
+> was then copied into five more scripts, whose callers pass RELATIVE paths. The pattern needs a
+> "/" before `working`, so a relative path never matches and the whole path, `working/results/`
+> included, becomes the key. The Stage 4 envelope chain was launched with a relative campaign
+> dir, so its audit and completion files go under `batch-size-optimization/working/results/<campaign>/`,
+> not the campaign's prefix. A seventh derivation, the docs runner's `basename(dirname(run_dir))`,
+> would have put every Stage 5 docs leg, which sits two levels deep (`<campaign>/s5c/rr_b`), under
+> a top-level `s5c/` prefix. Found while writing the Stage 5 umbrella, before any Stage 5 leg ran.
+>
+> The consequence that mattered was the WAIT, not the data. The laptop was polling the campaign's
+> own prefix for `envelope_done.json`. The file would never have appeared there, and after 300
+> minutes `s3_wait.sh` would have exited 4, "genuine timeout with working credentials", which reads
+> as a hung envelope. It was the same failure shape as entry 38's helper that could never say
+> "found": absence at the place we look was being read as absence of the event. The wait was
+> stopped and re-armed on the prefix the RUNNING code would use. That prefix was read from the
+> script revision the box was executing, not from the revision in the repo.
+>
+> Handling: the running chain was not touched. Bash reads a script as it executes, so editing one
+> mid-run is its own hazard. Once the chain ends, its misplaced files are to be copied to the
+> campaign prefix as NEW objects, and the misplaced copies stay, because S3 under `ansh/` is
+> append-only. Rules:
+>
+> - **A derived key has one definition**, tested on every input shape its callers use
+>   (`working/harness/results_prefix.sh`, `test_results_prefix.py`). The test's null control runs
+>   the same cases through the old expression and must see it fail. A static guard refuses any
+>   script that uploads without the helper.
+> - **Derive and validate the key before measuring**, not at upload time. An upload that refuses
+>   at the end strands a run that has already been paid for.
+> - **Watch where the running code will write**, never where it should write.
+>
+> Kin to entry 27 (a green run is a claim about the paths it ran) and entry 38.
+
