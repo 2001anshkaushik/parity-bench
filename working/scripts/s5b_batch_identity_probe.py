@@ -147,6 +147,13 @@ def main() -> int:
             return 2
     else:
         frames_dir = src
+    # The engine's own packages (ai/) live at the engine ROOT; a script run from /probe gets /probe
+    # at sys.path[0], not the root, so the root is put on the path explicitly — the binary's own
+    # directory, the image's WORKDIR, and the literal path — before any engine import.
+    import os
+    for root in (str(Path(sys.executable).resolve().parent), os.getcwd(), "/opt/rocketride/engine"):
+        if root not in sys.path:
+            sys.path.insert(0, root)
     sys.modules.setdefault("matplotlib.pyplot", types.ModuleType("matplotlib.pyplot"))
     import torch
     from PIL import Image

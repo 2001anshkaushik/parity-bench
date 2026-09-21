@@ -1,0 +1,12 @@
+# S5-B — PATCHED-ENGINE, NOT OUT-OF-THE-BOX. A NEW tagged image built FROM rr:patched-video, which
+# is never modified, retagged or removed (it is not bit-reproducible and every banked RocketRide
+# number in both campaigns rides it). The ONLY change is the detect node: frames are micro-batched
+# into one rfdetr predict() of S5B_BATCH frames (env, default 1). Build context is a directory
+# holding just the patched IInstance.py (never the repo — it carries the corpus):
+#   docker build -f docker/Dockerfile.s5b -t rr:s5b-microbatch <ctx_dir>
+FROM rr:patched-video
+COPY IInstance.py /opt/rocketride/engine/nodes/detect/IInstance.py
+LABEL benchmark.s5b.patched="1" \
+      benchmark.s5b.what="detect node micro-batches S5B_BATCH frames into one rfdetr predict(); default 1" \
+      benchmark.s5b.base="rr:patched-video" \
+      benchmark.s5b.label="PATCHED-ENGINE, NOT OUT-OF-THE-BOX"

@@ -80,7 +80,9 @@ start_arm() {
     # the one knob that can widen a single instance without adding tokens. It is NOT the SDK's
     # threads= (item concurrency, measured to queue at the device lock); that stays unset.
     # Unset BSZ_RR_T = the out-of-the-box default posture, exactly as before.
-    ours+=("$(docker run -d --name rr --memory 58g ${BSZ_RR_T:+$(envargs "$BSZ_RR_T")} --log-opt max-size=200m --network host rr:patched-video)") || return 1
+    # S5-B: BSZ_RR_IMAGE selects the patched image; BSZ_S5B_BATCH / BSZ_S5B_TAP reach the patched
+    # detect node as container env. Unset = rr:patched-video exactly as before.
+    ours+=("$(docker run -d --name rr --memory 58g ${BSZ_RR_T:+$(envargs "$BSZ_RR_T")} ${BSZ_S5B_BATCH:+-e S5B_BATCH=$BSZ_S5B_BATCH} ${BSZ_S5B_TAP:+-e S5B_TAP=1} --log-opt max-size=200m --network host "${BSZ_RR_IMAGE:-rr:patched-video}")") || return 1
     "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
   else
     local i
@@ -118,6 +120,13 @@ for K in ${KLIST//,/ }; do
   fi
   RC=${PIPESTATUS[0]}
   touch "$LEG/.leg_done"; wait "$SPID" 2>/dev/null
+  if [ "$ARM" = "rr" ]; then
+    # Peak and anon memory of the engine container over its lifetime (one leg per lifetime):
+    # memory.peak is a kernel high-water mark, so it cannot miss a spike between samples.
+    docker exec rr sh -c 'echo "{\"peak_bytes\": $(cat /sys/fs/cgroup/memory.peak 2>/dev/null || echo null), \"anon_bytes\": $(awk "/^anon /{print \$2}" /sys/fs/cgroup/memory.stat 2>/dev/null || echo null)}"' > "$LEG/engine_memory.json" 2>/dev/null || echo "!! engine memory not readable"
+    [ -n "${BSZ_S5B_TAP:-}" ] && { docker cp rr:/tmp/s5b_tap.jsonl "$LEG/s5b_tap.jsonl" && echo "s5b tap copied out: $(wc -l < "$LEG/s5b_tap.jsonl") frames" || echo "!! no s5b tap came out"; }
+    docker image inspect -f '{{.Id}}' "${BSZ_RR_IMAGE:-rr:patched-video}" > "$LEG/engine_image_id.txt" 2>/dev/null || true
+  fi
   RCS+=("k$K:rc=$RC")
   for c in "${ours[@]:-}"; do [ -n "$c" ] && docker logs "$c" > "$LEG/dockerlog_${c:0:12}.txt" 2>&1; done
   cleanup; ours=()
