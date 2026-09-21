@@ -47,7 +47,11 @@ MAN="working/video/ami_video_manifest.jsonl"
 # declared — which is how a Stage 3b launch briefly ran the Stage 3 cpuset. The caller states
 # the commit it means to measure; anything else refuses here rather than producing data.
 if [ -n "${BSZ_EXPECT_HEAD:-}" ]; then
-  HAVE="$(git rev-parse HEAD 2>/dev/null | cut -c1-12)"
+  # THE TREE THE SCRIPTS COME FROM, not the one we cd'd into. This runner deliberately works
+  # from the video worktree (it owns the AMI manifest) while its own code lives in the batch
+  # worktree, so a bare `git rev-parse HEAD` here answered for the wrong repository and the
+  # guard refused a correct tree. Caught by the guard itself, 2026-09-20.
+  HAVE="$(git -C "$BATCH_TREE" rev-parse HEAD 2>/dev/null | cut -c1-12)"
   WANT="$(echo "$BSZ_EXPECT_HEAD" | cut -c1-12)"
   [ "$HAVE" = "$WANT" ] || { echo "REFUSED: worktree is at $HAVE, caller expects $WANT — the pull did not land; refusing to measure with an undeclared tree" >&2; exit 2; }
   echo "worktree head matches the declared commit: $HAVE"
