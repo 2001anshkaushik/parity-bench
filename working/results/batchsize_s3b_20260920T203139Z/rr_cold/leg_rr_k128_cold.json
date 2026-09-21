@@ -1,0 +1,147 @@
+{
+ "arm": "rr",
+ "leg": "k128_cold",
+ "k": 128,
+ "reference_c": null,
+ "verdict": "OK",
+ "submission_shape": "send_files, K=128, one batch in flight, barrier between batches",
+ "documents": {
+  "submitted": 384,
+  "recorded": 384,
+  "ok": 382,
+  "empty": 2,
+  "hard_failures": 0,
+  "hard_failure_reasons": []
+ },
+ "throughput": {
+  "span_s": 207.075,
+  "docs_per_s": 1.8447,
+  "chunks": 7457,
+  "chunks_per_s": 36.011,
+  "basis": "MEASURED \u2014 first submit to last return, one clock"
+ },
+ "batches": {
+  "n": 3,
+  "wall_s_min": 41.363,
+  "wall_s_p50": 48.313,
+  "wall_s_max": 117.353
+ },
+ "cost": {
+  "cpu_s": 2382.278,
+  "effective_cores": 11.504,
+  "cpu_utilization": 0.3595,
+  "cpu_utilization_valid": true,
+  "cpu_s_per_doc": 6.2363,
+  "available_cpus": 32,
+  "available_cpus_source": "host nproc (Ruling A); arm cgroup reports '0-31' via cgroup cpuset.cpus.effective",
+  "engine_container_cpu_s": 2382.278,
+  "engine_container_cores": 11.504,
+  "driver_cpu_s": 4.516,
+  "driver_cores": 0.022,
+  "host_total_cpu_s": 2400.003,
+  "host_total_cores": 11.59,
+  "unattributed_cores": 0.064,
+  "idle_spin_measured": {
+   "cores": 1.235,
+   "window_s": 6.0,
+   "basis": "arm cgroup cpu.stat with the pipeline loaded and nothing submitted"
+  },
+  "engine_cores_net_of_idle_spin": 10.269,
+  "idle_core_equivalents_arm": 20.496,
+  "basis": "engine: arm cgroup cpu.stat at the leg's t0/t1; driver: getrusage self+children over the same window; host: per-core /proc/stat"
+ },
+ "percore_host": {
+  "n_intervals": 206,
+  "ncpus": 32,
+  "idle_threshold": 0.1,
+  "mean_busy_cores": 11.59,
+  "idle_core_equivalents": 20.41,
+  "host_util_of_cpuset": 0.3622,
+  "idle_core_count_mean": 16.34,
+  "idle_core_count_min": 0,
+  "idle_core_count_p50": 24,
+  "idle_core_count_max": 29,
+  "cores_idle_whole_leg": 0,
+  "per_core_mean_busy": {
+   "0": 0.323,
+   "1": 0.412,
+   "2": 0.309,
+   "3": 0.34,
+   "4": 0.309,
+   "5": 0.397,
+   "6": 0.365,
+   "7": 0.362,
+   "8": 0.301,
+   "9": 0.312,
+   "10": 0.313,
+   "11": 0.366,
+   "12": 0.608,
+   "13": 0.331,
+   "14": 0.79,
+   "15": 0.33,
+   "16": 0.293,
+   "17": 0.339,
+   "18": 0.352,
+   "19": 0.334,
+   "20": 0.33,
+   "21": 0.333,
+   "22": 0.364,
+   "23": 0.305,
+   "24": 0.319,
+   "25": 0.332,
+   "26": 0.336,
+   "27": 0.333,
+   "28": 0.437,
+   "29": 0.349,
+   "30": 0.304,
+   "31": 0.362
+  },
+  "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+  "interval_s": 1.0,
+  "intervals_dropped": 0,
+  "sampler_read_s_total": 0.0677,
+  "idle_core_equivalents_net_of_spin": 21.645,
+  "idle_spin_cores_subtracted": 1.235,
+  "net_of_spin_basis": "raw idle + measured idle spin: the spin is busy CPU doing no work, so it is unused capacity"
+ },
+ "box_hygiene": {
+  "other_containers": [],
+  "stray_processes": {
+   "limit_cores": 0.5,
+   "window_s": 4.0,
+   "strays": [],
+   "clean": true,
+   "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+  },
+  "host_idle_baseline_cores": 30.977,
+  "ruling": "C \u2014 one workload on the box; the leg records the baseline it assumed"
+ },
+ "page_cache": {
+  "attempted": true,
+  "rc": 0,
+  "stderr": null,
+  "free_after": "Mem:           63252         723       62176           3         352       61910",
+  "note": "dropped before the warm-up, so the measured slice is read cold; the warm-up's own 25 disjoint documents re-warm only themselves"
+ },
+ "warm_up": {
+  "docs": 25,
+  "seconds": 31.57,
+  "disjoint_from_measured": true,
+  "same_shape_as_leg": true
+ },
+ "quiet_box_before": {
+  "host_busy_cores": 1.023,
+  "arm_idle_cores": 1.002,
+  "foreign_busy_cores": 0.021,
+  "max_foreign": 2.0,
+  "quiet": true,
+  "load1": 3.845703125,
+  "window_s": 4.0,
+  "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+ },
+ "window": {
+  "t0_ns": 1789948210840703238,
+  "t1_ns": 1789948417916048879
+ },
+ "leaked_task": null
+}

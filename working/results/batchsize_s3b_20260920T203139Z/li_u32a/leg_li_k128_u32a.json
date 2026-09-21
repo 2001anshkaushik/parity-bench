@@ -1,0 +1,140 @@
+{
+ "arm": "li",
+ "leg": "k128_u32a",
+ "k": 128,
+ "reference_c": null,
+ "verdict": "OK",
+ "submission_shape": "K concurrent POST /process_pdf, K=128, one batch in flight, barrier between batches",
+ "documents": {
+  "submitted": 384,
+  "recorded": 384,
+  "ok": 381,
+  "empty": 0,
+  "hard_failures": 0,
+  "hard_failure_reasons": []
+ },
+ "throughput": {
+  "span_s": 167.675,
+  "docs_per_s": 2.2723,
+  "chunks": 6785,
+  "chunks_per_s": 40.4652,
+  "basis": "MEASURED \u2014 first submit to last return, one clock"
+ },
+ "batches": {
+  "n": 3,
+  "wall_s_min": 37.977,
+  "wall_s_p50": 42.016,
+  "wall_s_max": 87.664
+ },
+ "cost": {
+  "cpu_s": 1247.585,
+  "effective_cores": 7.44,
+  "cpu_utilization": 0.2325,
+  "cpu_utilization_valid": true,
+  "cpu_s_per_doc": 3.2745,
+  "available_cpus": 32,
+  "available_cpus_source": "host nproc (Ruling A); arm cgroup reports '0-31' via cgroup cpuset.cpus.effective",
+  "engine_container_cpu_s": 1247.585,
+  "engine_container_cores": 7.44,
+  "driver_cpu_s": 2.205,
+  "driver_cores": 0.013,
+  "host_total_cpu_s": 1253.706,
+  "host_total_cores": 7.477,
+  "unattributed_cores": 0.023,
+  "idle_spin_measured": {
+   "cores": 0.035,
+   "window_s": 6.0,
+   "basis": "arm cgroup cpu.stat with the pipeline loaded and nothing submitted"
+  },
+  "engine_cores_net_of_idle_spin": 7.405,
+  "idle_core_equivalents_arm": 24.56,
+  "basis": "engine: arm cgroup cpu.stat at the leg's t0/t1; driver: getrusage self+children over the same window; host: per-core /proc/stat"
+ },
+ "percore_host": {
+  "n_intervals": 167,
+  "ncpus": 32,
+  "idle_threshold": 0.1,
+  "mean_busy_cores": 7.477,
+  "idle_core_equivalents": 24.523,
+  "host_util_of_cpuset": 0.2337,
+  "idle_core_count_mean": 23.95,
+  "idle_core_count_min": 6,
+  "idle_core_count_p50": 29,
+  "idle_core_count_max": 31,
+  "cores_idle_whole_leg": 4,
+  "per_core_mean_busy": {
+   "0": 0.156,
+   "1": 0.196,
+   "2": 0.369,
+   "3": 0.22,
+   "4": 0.503,
+   "5": 0.188,
+   "6": 0.182,
+   "7": 0.204,
+   "8": 0.675,
+   "9": 0.258,
+   "10": 0.245,
+   "11": 0.272,
+   "12": 0.272,
+   "13": 0.323,
+   "14": 0.239,
+   "15": 0.218,
+   "16": 0.328,
+   "17": 0.17,
+   "18": 0.097,
+   "19": 0.073,
+   "20": 0.184,
+   "21": 0.258,
+   "22": 0.099,
+   "23": 0.241,
+   "24": 0.118,
+   "25": 0.071,
+   "26": 0.29,
+   "27": 0.129,
+   "28": 0.135,
+   "29": 0.197,
+   "30": 0.431,
+   "31": 0.137
+  },
+  "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+  "interval_s": 1.0,
+  "intervals_dropped": 0,
+  "sampler_read_s_total": 0.0519,
+  "idle_core_equivalents_net_of_spin": 24.558,
+  "idle_spin_cores_subtracted": 0.035,
+  "net_of_spin_basis": "raw idle + measured idle spin: the spin is busy CPU doing no work, so it is unused capacity"
+ },
+ "box_hygiene": {
+  "other_containers": [],
+  "stray_processes": {
+   "limit_cores": 0.5,
+   "window_s": 4.0,
+   "strays": [],
+   "clean": true,
+   "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+  },
+  "host_idle_baseline_cores": 31.95,
+  "ruling": "C \u2014 one workload on the box; the leg records the baseline it assumed"
+ },
+ "warm_up": {
+  "docs": 25,
+  "seconds": 13.41,
+  "disjoint_from_measured": true,
+  "same_shape_as_leg": true
+ },
+ "quiet_box_before": {
+  "host_busy_cores": 0.05,
+  "arm_idle_cores": 0.035,
+  "foreign_busy_cores": 0.015,
+  "max_foreign": 2.0,
+  "quiet": true,
+  "load1": 4.11962890625,
+  "window_s": 4.0,
+  "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+ },
+ "window": {
+  "t0_ns": 1789938853947262767,
+  "t1_ns": 1789939021622233502
+ },
+ "leaked_task": null
+}
