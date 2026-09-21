@@ -1421,3 +1421,41 @@ than rewritten from memory, which is entry 2's point in miniature.
 > `head`) — capture first. Kin to entry 27 (a green run is a claim about the paths it ran) and
 > entry 4 (an unexecuted string).
 
+## 39. Two conditions pooled as one noise floor — twice in one afternoon (added 2026-09-21)
+
+> Stage 3b needed each arm's run-to-run spread to judge its concurrency knee and its best batch
+> size. The analyser computed the spread over "every leg at the same K". The first read put the
+> service arm's floor at 27.7% — which made every "within noise" verdict mean nothing — because
+> one of the three K=128 legs was the COLD-CACHE leg, run on purpose under a different condition
+> and the slowest of the three. Partitioned by cache condition, the warm spread was ~10%. The
+> fix landed, and the very next read did it again one level up: continuous C=32 legs at 16, 24
+> and 32 service workers — a worker-count SWEEP — were pooled as repeats of one cell, putting a
+> configuration effect into the floor. Partitioned by arm shape as well, the floor fell to 9.87%.
+>
+> Rule: **a replicate is the same work under the same conditions — partition by every condition
+> the experiment varies (cache state, arm shape, slice, posture) before a spread is computed,**
+> and let the partitioning be driven by recorded fields (the leg's own page_cache block, the
+> launch export's worker count), never by directory names. Kin to entry 2 (a check must cross an
+> independence boundary; here the boundary was drawn in the wrong place) and to the Stage 3 slip
+> that pooled the 16-document shakedown with the 384-document slice — the same class a third
+> time, which is why the analyser now refuses mixed document counts outright.
+
+## 40. The deadline shaped the headline (added 2026-09-21)
+
+> The first full-corpus continuous leg of the batch-size campaign spent its last 28 minutes with
+> ONE document in flight — 039_039660.pdf, 39 pages, 3.3 MB, clean in the manifest — while the
+> host idled at 2.3 cores; it completed at 1,722 s and set the span, so span throughput read 2.34
+> docs/s where throughput to the 99th-percentile completion read 3.93. The document was not new.
+> Both banked RocketRide 10k runs had carried it as their FINAL event, each marked a failure after
+> exactly 300 s — the blast leg's send timeout. Their spans ended when the HARNESS gave up on it,
+> not when the engine finished it; the service arm had parsed it in 67 s. A deadline nobody
+> reported as part of the measurement had been quietly deciding how long the banked leg lasted.
+>
+> Two rules. **A deadline is a measurement condition** (entry 3): a change in the client deadline
+> changes what span throughput measures, and spans taken under different deadlines are not
+> comparable until it is stated. And **every span names the document that set it** — the
+> analyser now records, per leg, which document finished last, how long it was held and how far
+> past the 99th-percentile completion it ran, and reports a symmetric view with that document
+> dropped from both arms beside the primary span. The percentile throughput was defined after the
+> leg was seen (entry 34) and is labelled a post-hoc diagnostic, never the headline.
+
