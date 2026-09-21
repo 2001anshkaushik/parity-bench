@@ -86,5 +86,31 @@ class Tier2(unittest.TestCase):
         self.assertTrue(p.tier2_frame(single, batched, 1, 1)["ok"])
 
 
+import extract_probe_json as ex  # noqa: E402
+
+
+class Extract(unittest.TestCase):
+    """The pre-check keeps the probe's stdout whole and extracts the verdict from it."""
+    V = '{\n "criterion": {"band": 0.001},\n "verdict": "PASS (TIER 1)",\n "tiers_by_b": {"2": "TIER 1"}\n}'
+
+    def test_clean_stdout(self):
+        self.assertEqual(ex.extract(self.V)["verdict"], "PASS (TIER 1)")
+
+    def test_log_noise_before_and_after(self):
+        noisy = "INFO engine: loading detector\n[warn] {not json at line start\n" + self.V + "\nINFO: shutdown\n"
+        self.assertEqual(ex.extract(noisy)["verdict"], "PASS (TIER 1)")
+
+    def test_single_line_early_exit_json(self):
+        self.assertEqual(ex.extract('noise\n{"verdict": "NOT RUN", "reason": "ffmpeg rc=1"}\ntrailing\n')["verdict"], "NOT RUN")
+
+    def test_the_last_verdict_wins(self):
+        two = '{"verdict": "first"}\n' + self.V + "\n"
+        self.assertEqual(ex.extract(two)["verdict"], "PASS (TIER 1)")
+
+    def test_null_control_garbage_yields_nothing(self):
+        self.assertIsNone(ex.extract("Traceback (most recent call last):\n  File x\nKeyError: 'y'\n"))
+        self.assertIsNone(ex.extract('{"no_verdict_here": 1}\n'))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

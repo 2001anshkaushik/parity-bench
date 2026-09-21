@@ -41,13 +41,17 @@ VID="$(basename "${VIDS[0]}")"
 mkdir -p "$OUT"
 [ -e "$OUT/s5b_precheck.json" ] && { echo "REFUSED: $OUT/s5b_precheck.json exists — append-only" >&2; exit 3; }
 echo "video: $VID  image: $(docker image inspect -f '{{.Id}}' rr:patched-video)"
+# stdout is kept WHOLE and the verdict extracted from it: the engine's imports may log to stdout,
+# and one such line in a file read as JSON would refuse S5-B for a reason unrelated to the verdict.
 docker run --rm --network none \
   -v "$VDIR:/v:ro" -v "$(pwd)/working/scripts:/probe:ro" \
   -w /opt/rocketride/engine rr:patched-video \
   /opt/rocketride/engine/engine /probe/s5b_batch_identity_probe.py "/v/$VID" 24 \
-  > "$OUT/s5b_precheck.json" 2> "$OUT/s5b_precheck.stderr"
+  > "$OUT/s5b_precheck.stdout" 2> "$OUT/s5b_precheck.stderr"
 RC=$?
-echo "probe rc=$RC"; cat "$OUT/s5b_precheck.json"
+echo "probe rc=$RC"
+"$HOME/.venv/bin/python" working/scripts/extract_probe_json.py "$OUT/s5b_precheck.stdout" "$OUT/s5b_precheck.json"
+[ -f "$OUT/s5b_precheck.json" ] && cat "$OUT/s5b_precheck.json" || { echo "!! no verdict — stdout tail:"; tail -n 20 "$OUT/s5b_precheck.stdout"; echo "!! stderr tail:"; tail -n 20 "$OUT/s5b_precheck.stderr"; }
 aws s3 cp "$OUT" "s3://rocketride-benchmark-data/ansh/batch-size-optimization/$REL/" --recursive --only-show-errors || echo "!! upload failed — results remain in $OUT"
 echo "DONE rc=$RC"
 exit "$RC"
