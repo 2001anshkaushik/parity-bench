@@ -1,0 +1,2 @@
+RUN_512 rr yes delta=+0.2394 floor=0.0082
+RUN_512 li yes delta=+0.2955 floor=0.0987

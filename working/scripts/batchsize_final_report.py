@@ -284,7 +284,7 @@ def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
     keys = {"rr": [(128, "p3_rr_k128/k128_main"), (256, "e7_rr_k256/k256_env"), (512, "e9_rr_k512/k512_env"),
                    (1024, "e11_rr_k1024/k1024_env")],
             "li": [(128, "p4_li_k128/k128_main"), (256, "e8_li_k256/k256_env"), (512, "e10_li_k512/k512_env"),
-                   (1024, "e12_li_k1024/k1024_env")]}
+                   (1024, "e12b_li_k1024/k1024_env")]}   # e12 crashed in OUR driver (EMFILE) and measured nothing; e12b is its re-run (register 44)
     F["stage4_envelope"] = {}
     for arm in ("rr", "li"):
         u = a["ranking"][arm].get("arm_units_ranked")
@@ -299,10 +299,14 @@ def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
                 continue
             d = (lambda x: f"{x} {DAG}") if arm == "rr" else (lambda x: x)
             died = br.get("batches_died") or []
-            rows.append([f"K={k}", d(n(row["docs_per_s_mean"])), n(br["batches"]),
-                         f"{n(br['wall_s_median'], 1)} / {n(br['wall_s_max'], 1)}",
-                         f"#{br['straggler_batch']}: {n(br['straggler_batch_wall_s'], 1)} s ({n(br['straggler_margin_s'], 1)} s spare)",
-                         n(len(died)) + (" — **BLAST-RADIUS-DOMINATED**" if len(died) > 1 else ""),
+            held = (f"#{br['straggler_batch']}: DIED at the deadline ({n(br['straggler_batch_wall_s'], 1)} s)"
+                    if br.get("straggler_batch") in died else
+                    f"#{br['straggler_batch']}: {n(br['straggler_batch_wall_s'], 1)} s ({n(br['straggler_margin_s'], 1)} s spare)")
+            rows.append([f"K={k}" + (" (re-run, register 44)" if key.startswith("e12b") else ""),
+                         d(n(row["docs_per_s_mean"])), n(br["batches"]),
+                         f"{n(br['wall_s_median'], 1)} / {n(br['wall_s_max'], 1)}", held,
+                         (n(len(died)) + (" — **BLAST-RADIUS-DOMINATED**" if len(died) > 1 else
+                                            f" — batch {died[0]}, blast radius" if died else "")),
                          n(br.get("documents_lost_total")),
                          f"{gb(br.get('anon_mb_at_window_close'))} – {gb(br.get('memory_peak_mb_total'))}",
                          d(n(row.get("idle_core_equivalents"), 3))])
@@ -498,25 +502,34 @@ def answers(F: Dict[str, Any]) -> List[str]:
         return ", ".join(f"K={k}: {d(n(e['docs_per_s']))}" for k, e in ks(arm))
     best_b = {arm: max(ks(arm), key=lambda ke: ke[1]["docs_per_s"]) for arm in ("rr", "li") if ks(arm)}
     out = ["## 0. Answers", "",
-           "**Optimal batch size, GovDocs PDFs.** No batch size is optimal on either arm: per-document continuous "
-           "submission beats every batch size at full scale. Within batch mode, throughput rises with K at full "
-           f"scale on both arms (RocketRide {curve('rr')}; LlamaIndex {curve('li')}), because fewer barriers "
-           "mean less time waiting on each batch's slowest document."]
+           "**Optimal batch size, GovDocs PDFs.** No batch size beats continuous submission on either arm: sending "
+           "each document as a slot frees was faster than every batch size at full scale. Within batch mode, "
+           f"throughput rises with K on both arms (RocketRide {curve('rr')}; LlamaIndex {curve('li')}) — "
+           "consistent with the pre-registered hypothesis that each batch barrier costs a wait for that batch's "
+           "slowest document, so fewer barriers approach the continuous rate."]
     if best_b:
         out[-1] += (f" Even the best batch reaches only {n(best_b['rr'][1]['docs_per_s'] / R['docs_per_s_span'], 3)}"
                     f" of RocketRide's continuous rate {DAG} and {n(best_b['li'][1]['docs_per_s'] / L['docs_per_s_span'], 3)}"
                     " of LlamaIndex's.")
-    margins = {arm: [(k, e["batch_report"]["straggler_margin_s"]) for k, e in ks(arm)] for arm in ("rr", "li")}
-    died = sum(len(e["batch_report"].get("batches_died") or []) for e in env.values())
+    def spare(e: Dict[str, Any]) -> str:
+        br = e["batch_report"]
+        return ("died at the deadline" if br.get("straggler_batch") in (br.get("batches_died") or [])
+                else n(br["straggler_margin_s"], 1))
+    margins = {arm: [(k, spare(e)) for k, e in ks(arm)] for arm in ("rr", "li")}
+    deaths = [(arm, k, e["batch_report"]) for arm in ("rr", "li") for k, e in ks(arm) if e["batch_report"].get("batches_died")]
+    died = sum(len(br["batches_died"]) for _, _, br in deaths)
     anon = {arm: [e["batch_report"].get("anon_mb_at_window_close") for _, e in ks(arm)
                   if e["batch_report"].get("anon_mb_at_window_close")] for arm in ("rr", "li")}
     tot = {arm: [e["batch_report"].get("memory_peak_mb_total") for _, e in ks(arm)
                  if e["batch_report"].get("memory_peak_mb_total")] for arm in ("rr", "li")}
     out += ["", f"**The cost of large batches.** The batch holding `{STRAGGLER}` had this many seconds to spare "
             "against the 1,800 s batch deadline, by K — RocketRide: "
-            + ", ".join(f"K={k}: {n(m, 1)}" for k, m in margins["rr"]) + f" {DAG}; LlamaIndex: "
-            + ", ".join(f"K={k}: {n(m, 1)}" for k, m in margins["li"]) + ". "
-            + ("No batch died on either arm. " if died == 0 else f"**{died} batch(es) died** (§2). ")
+            + ", ".join(f"K={k}: {m}" for k, m in margins["rr"]) + f" {DAG}; LlamaIndex: "
+            + ", ".join(f"K={k}: {m}" for k, m in margins["li"]) + ". "
+            + ("No batch died on either arm. " if died == 0 else
+               " ".join(f"**{ {'rr': 'RocketRide', 'li': 'LlamaIndex'}[arm]} K={k} lost {len(br['batches_died'])} batch(es) to the "
+                        f"deadline — {n(br['documents_lost_total'])} documents — reported as blast radius, never re-run.**"
+                        for arm, k, br in deaths) + " ")
             + "Engine anon memory at each leg's close, across K: "
             + "; ".join(f"{ {'rr': 'RocketRide', 'li': 'LlamaIndex'}[arm]} {gb(min(v))} to {gb(max(v))}" for arm, v in anon.items() if v)
             + "; total high-water `memory.peak`: "

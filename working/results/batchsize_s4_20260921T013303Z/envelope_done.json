@@ -1,0 +1,11 @@
+{
+ "envelope_complete_utc": "2026-09-21T20:01:53Z",
+ "steps": [
+  "e7_rr_k256:rc=0",
+  "e8_li_k256:rc=0",
+  "e9_rr_k512:rc=0",
+  "e10_li_k512:rc=0",
+  "e11_rr_k1024:rc=1",
+  "e12_li_k1024:rc=1"
+ ]
+}

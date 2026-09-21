@@ -1,0 +1,34 @@
+{
+ "rule": "run K=512 on an arm iff |K256/K128 - 1| on p99 throughput exceeds that arm's warm replicate floor",
+ "floors_source": "working/results/batchsize_s4_20260921T013303Z/envelope_floors.json",
+ "arms": {
+  "rr": {
+   "k128": {
+    "to_p99": 0.9547,
+    "span": 0.9643
+   },
+   "k256": {
+    "to_p99": 1.1833,
+    "span": 1.1952
+   },
+   "delta_p99": 0.2394,
+   "floor": 0.0082,
+   "run_512": true,
+   "verdict": "RUN K=512 \u2014 the K=128->256 change exceeds the arm's noise"
+  },
+  "li": {
+   "k128": {
+    "to_p99": 1.9211,
+    "span": 1.9264
+   },
+   "k256": {
+    "to_p99": 2.4887,
+    "span": 2.4591
+   },
+   "delta_p99": 0.2955,
+   "floor": 0.0987,
+   "run_512": true,
+   "verdict": "RUN K=512 \u2014 the K=128->256 change exceeds the arm's noise"
+  }
+ }
+}
