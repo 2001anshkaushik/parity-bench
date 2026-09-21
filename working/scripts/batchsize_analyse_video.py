@@ -18,6 +18,7 @@ angle: the host's per-core busy sum against the arm's cgroup-derived effective c
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
@@ -26,9 +27,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from harness.percore_sampler import summarise          # noqa: E402
 
 
+LEG_DIR = re.compile(r"^(?P<arm>rr|li)_k(?P<k>\d+)(?P<variant>.*)$")
+
+
 def leg_row(d: Path) -> Dict[str, Any]:
-    arm, k = d.name.split("_k")
-    row: Dict[str, Any] = {"arm": arm, "k": int(k), "dir": d.name}
+    # A leg directory may carry a variant suffix (_rep for a replicate, _1inst for the
+    # matched-unit anchor). Parsed, not assumed: `split("_k")` read li_k8_rep as k="8_rep".
+    m = LEG_DIR.match(d.name)
+    if not m:
+        return {"dir": d.name, "verdict": "UNPARSED DIRECTORY NAME"}
+    arm, k = m.group("arm"), m.group("k")
+    row: Dict[str, Any] = {"arm": arm, "k": int(k), "variant": m.group("variant") or None,
+                           "dir": d.name}
     exports = sorted(d.glob("export_*.json"))
     if not exports:
         return {**row, "verdict": "NO EXPORT", "driver_log_tail":
@@ -82,8 +92,8 @@ def main() -> int:
         print(f"REFUSED: no <arm>_k<K> directories under {out_dir}")
         return 3
     rep: Dict[str, Any] = {"out_dir": str(out_dir), "legs": rows, "by_arm": {}}
-    for arm in sorted({r["arm"] for r in rows}):
-        ok = sorted((r for r in rows if r["arm"] == arm and r.get("frames_per_s")),
+    for arm in sorted({r["arm"] for r in rows if r.get("arm")}):
+        ok = sorted((r for r in rows if r.get("arm") == arm and r.get("frames_per_s")),
                     key=lambda r: r["frames_per_s"], reverse=True)
         call: Dict[str, Any] = {"best_k": ok[0]["k"] if ok else None}
         if len(ok) > 1:

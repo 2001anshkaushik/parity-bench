@@ -288,6 +288,26 @@ def prewarm_corpus(paths: List[Path]) -> Dict[str, Any]:
             "basis": "every measured and warm-up file read once; the leg then starts warm"}
 
 
+def cgroup_mem(cg: Path) -> Dict[str, Any]:
+    """The arm container's own memory, from its cgroup. `memory.peak` is a kernel high-water
+    mark, so unlike a 0.5 s sampler it cannot miss a spike between ticks; it is cumulative for
+    the container's lifetime, which is why a Stage 4 leg gets a container of its own."""
+    m = msrc.cgroup_memory(cg)
+    anon = None
+    try:
+        for line in (cg / "memory.stat").read_text().splitlines():
+            if line.startswith("anon "):
+                anon = int(line.split()[1])
+                break
+    except OSError:
+        pass
+    mb = lambda v: round(v / 1048576, 1) if isinstance(v, int) else None   # noqa: E731
+    return {"current_mb": mb(m.get("current_bytes")), "peak_mb": mb(m.get("peak_bytes")),
+            "anon_mb": mb(anon), "limit_mb": mb(m.get("max_bytes")),
+            "basis": "container cgroup memory.current / memory.peak / memory.stat anon; peak is "
+                     "a kernel high-water mark over the container's lifetime"}
+
+
 def measure_idle_spin(cg: Path, window_s: float = IDLE_SPIN_WINDOW_S) -> Dict[str, Any]:
     """The arm's CPU with everything loaded and NOTHING submitted, in THIS posture. Never read
     from the contract's table: that table was measured on cpuset 0-23 with the six thread
@@ -677,6 +697,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
         return r.ru_utime + r.ru_stime + ch.ru_utime + ch.ru_stime
 
     def open_window() -> None:
+        state["mem_start"] = cgroup_mem(cg)
         state["sampler"] = PerCoreSampler(cpus, interval_s=1.0, out_path=percore)
         state["sampler"].start()
         state["d0"] = driver_cpu_s()
@@ -684,6 +705,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                                                     time.perf_counter())
 
     def close_window() -> None:
+        state["mem_end"] = cgroup_mem(cg)
         state["p1"], state["t1_ns"], state["u1"] = (time.perf_counter(), time.time_ns(),
                                                     cgroup_usage_usec(cg))
         state["d1"] = driver_cpu_s()
@@ -804,6 +826,24 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
         # Idle capacity two ways. RAW is what the cores did. NET-OF-SPIN adds back the engine's
         # measured do-nothing burn, because a core spinning on an idle pipeline is not capacity
         # the workload used — it is capacity the posture consumed before a document arrived.
+        "memory": {"at_window_open": state.get("mem_start"),
+                   "at_window_close": state.get("mem_end")},
+        # BLAST RADIUS (envelope). One failed send_files costs the WHOLE batch, so the price of
+        # a large K is not only memory: it is how many documents a single failure takes with it.
+        # Reported as the worst batch actually lost, and as the exposure K implies.
+        "failure_blast_radius": {
+            "documents_per_batch": k,
+            "batches_with_a_hard_failure": (len({r["batch"] for r in recs
+                                                 if not r.get("ok")
+                                                 and str(r.get("reason", "")).startswith(
+                                                     ("batch_error", "no_response"))})
+                                            if k else None),
+            "documents_lost_to_batch_failures": (sum(1 for r in recs if not r.get("ok")
+                                                     and str(r.get("reason", "")).startswith(
+                                                         ("batch_error", "no_response")))
+                                                 if k else None),
+            "exposure_note": ("a single failed batch loses K documents; at K=1 the blast radius "
+                              "is one document and the continuous shape has no batch to lose")},
         "percore_host": {**pc,
                          "idle_core_equivalents_net_of_spin": (
                              round(pc["idle_core_equivalents"] + spin, 3)

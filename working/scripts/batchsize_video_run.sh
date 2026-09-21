@@ -113,7 +113,10 @@ for K in ${KLIST//,/ }; do
 done
 echo "LEGS: ${RCS[*]}"
 
-STAMP="$(basename "$(dirname "$OUT")")/$(basename "$OUT")"
+# The S3 prefix mirrors the path UNDER working/results/, however deep it is. Taking only the
+# last two components put a run meant for <campaign>/video/rep under a top-level "video/"
+# prefix, outside its own campaign (2026-09-20).
+STAMP="${OUT##*/working/results/}"
 for K in ${KLIST//,/ }; do
   LEG="$OUT/${ARM}_k$K${BSZ_LEG_SUFFIX:-}"; [ -d "$LEG" ] || continue
   DEST="s3://rocketride-benchmark-data/ansh/batch-size-optimization/$STAMP/${ARM}_k$K${BSZ_LEG_SUFFIX:-}/"
