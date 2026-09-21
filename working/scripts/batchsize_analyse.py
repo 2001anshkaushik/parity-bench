@@ -43,12 +43,31 @@ GRID = {1, 8, 16, 32, 64, 128}          # the batch sizes the campaign was asked
 DOCUMENT_OUTCOMES = {"no_documents", "empty_extraction", "parse_failed"}
 
 
+def _units_by_run_dir(d: Path) -> Dict[str, Any]:
+    """Each launch's per-arm export records the shape the arm was started with. Read it rather
+    than parsing launch directory names: the name is a label, the export is the read-back."""
+    out: Dict[str, Any] = {}
+    for f in sorted(d.glob("exp_batchsize_sweep_*.json")):
+        try:
+            data = json.loads(f.read_text()).get("data", {})
+        except (OSError, json.JSONDecodeError):
+            continue
+        rd = (data.get("run_dir") or "").rstrip("/").split("/")[-1]
+        p_ = data.get("posture") or {}
+        if rd:
+            out[rd] = {"ws1_workers": p_.get("ws1_workers"),
+                       "thread_env": p_.get("thread_env_expected"),
+                       "rr_threads": data.get("posture", {}).get("rr_threads_requested")}
+    return out
+
+
 def load_campaign(d: Path) -> List[Dict[str, Any]]:
     """Shakedown launches (shake_*) are wiring checks on a DIFFERENT, 16-document slice. Pooling
     them with the measured slice once read a corpus difference as run-to-run noise (a 30% 'noise
     floor' from two legs that never shared a document), so they are excluded, and so is any leg
     whose document count differs from the campaign's — a replicate is the same work twice."""
     legs = []
+    units = _units_by_run_dir(d)
     for lj in sorted(d.glob("*/leg_*.json")):
         if lj.parent.name.startswith("shake"):
             continue
@@ -57,6 +76,18 @@ def load_campaign(d: Path) -> List[Dict[str, Any]]:
         # The verdict is DERIVED here from the recorded reasons, never edited in the artifact:
         # parser-level document outcomes are content, not lost work (see exp_batchsize_sweep.py).
         reasons = set((leg.get("documents") or {}).get("hard_failure_reasons") or [])
+        # A COLD-CACHE LEG IS A CONDITION, NOT A REPLICATE (2026-09-20). Pooling one with the
+        # warm legs at the same K reported the cache effect as instrument noise and tripled the
+        # service arm's floor (27.7% against a true warm spread of ~10%), which then made every
+        # "within noise" verdict meaningless. Same class as pooling the shakedown slice.
+        leg["condition"] = "cold" if (leg.get("page_cache") or {}).get("attempted") else "warm"
+        # THE ARM'S SHAPE IS PART OF THE CONDITION TOO (2026-09-20). Continuous C=32 legs at 16,
+        # 24 and 32 service workers are three configurations, and pooling them as repeats put a
+        # worker-count effect into the noise floor — the same error as pooling a cold leg with
+        # warm ones, one level up. A replicate is the same work under the same conditions.
+        u = units.get(lj.parent.name) or {}
+        leg["arm_units"] = u.get("ws1_workers") if leg["arm"] == "li" else 1
+        leg["cell"] = f"{leg['condition']}/units={leg['arm_units']}"
         leg["verdict_export"] = leg.get("verdict")
         if leg.get("verdict") == "DEGRADED" and reasons and reasons <= DOCUMENT_OUTCOMES \
                 and leg["documents"]["recorded"] == leg["documents"]["submitted"]:
@@ -178,12 +209,15 @@ def noise_floor(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
     for arm in sorted({g["arm"] for g in legs}):
         seen: Dict[Any, List[float]] = {}
         for g in legs:
-            if g["arm"] == arm and g.get("verdict") == "OK" and g["throughput"]["docs_per_s"]:
-                seen.setdefault(g["k"] or f"refc{g['reference_c']}", []).append(
-                    g["throughput"]["docs_per_s"])
+            if (g["arm"] == arm and g.get("verdict") == "OK" and g.get("condition") == "warm"
+                    and g["throughput"]["docs_per_s"]):
+                seen.setdefault((g["k"] or f"refc{g['reference_c']}", g.get("arm_units")),
+                                []).append(g["throughput"]["docs_per_s"])
         reps = {k: v for k, v in seen.items() if len(v) > 1}
-        spreads = {str(k): round((max(v) - min(v)) / (sum(v) / len(v)), 4) for k, v in reps.items()}
-        out[arm] = {"replicated": {str(k): v for k, v in reps.items()}, "relative_spread": spreads,
+        spreads = {f"{k[0]}@units={k[1]}": round((max(v) - min(v)) / (sum(v) / len(v)), 4)
+                   for k, v in reps.items()}
+        out[arm] = {"replicated": {f"{k[0]}@units={k[1]}": v for k, v in reps.items()},
+                    "relative_spread": spreads,
                     "floor": max(spreads.values()) if spreads else None}
     return out
 
@@ -193,13 +227,71 @@ def _mean(gs: List[Dict[str, Any]], f) -> Optional[float]:
     return round(sum(v) / len(v), 3) if v else None
 
 
+def unit_sweep(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """G3(b): the service arm's worker count, swept at one C, against its own replicate noise.
+    24 was inherited from a 24-core cpuset that Ruling A removed, so it has to be re-earned."""
+    out: Dict[str, Any] = {}
+    for arm in sorted({g["arm"] for g in legs}):
+        cells: Dict[Any, Dict[Any, List[float]]] = {}
+        for g in legs:
+            if g["arm"] != arm or g.get("verdict") != "OK" or g.get("condition") != "warm":
+                continue
+            key = f"K={g['k']}" if g.get("k") else f"C={g['reference_c']}"
+            cells.setdefault(key, {}).setdefault(g.get("arm_units"), []).append(
+                g["throughput"]["docs_per_s"])
+        rows = {k: {str(u): [round(x, 4) for x in v] for u, v in byu.items()}
+                for k, byu in cells.items() if len(byu) > 1}
+        if rows:
+            out[arm] = rows
+    return out
+
+
+def cache_effect(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """G5(a): cold against warm at the SAME configuration, so the ordering hypothesis is tested
+    rather than absorbed. A cold leg's own cost numbers travel with it: a cold arm that also
+    burns fewer cores was waiting on disk, which is the mechanism, not just the magnitude."""
+    out: Dict[str, Any] = {}
+    for arm in sorted({g["arm"] for g in legs}):
+        cells: Dict[str, Dict[str, List[Dict[str, Any]]]] = {}
+        for g in legs:
+            if g["arm"] != arm or g.get("verdict") != "OK":
+                continue
+            key = f"K={g['k']}" if g.get("k") else f"C={g['reference_c']}"
+            cells.setdefault(key, {}).setdefault(g["condition"], []).append(g)
+        rows = {}
+        for key, byc in cells.items():
+            if "cold" not in byc or "warm" not in byc:
+                continue
+            w = [x["throughput"]["docs_per_s"] for x in byc["warm"]]
+            c = [x["throughput"]["docs_per_s"] for x in byc["cold"]]
+            wm, cm = sum(w) / len(w), sum(c) / len(c)
+            rows[key] = {
+                "warm_runs": w, "cold_runs": c, "warm_mean": round(wm, 4), "cold_mean": round(cm, 4),
+                "cold_over_warm": round(cm / wm, 4), "delta_pct": round((cm / wm - 1) * 100, 1),
+                "warm_engine_cores": round(sum(x["cost"]["engine_container_cores"] for x in byc["warm"]) / len(w), 3),
+                "cold_engine_cores": round(sum(x["cost"]["engine_container_cores"] for x in byc["cold"]) / len(c), 3)}
+        out[arm] = rows
+    return out
+
+
 def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
+    # The K grid and the continuous curve are read at ONE arm shape — the one most of the
+    # campaign ran — so a worker-count sweep cannot leak into a batch-size ranking.
+    ref_units: Dict[str, Any] = {}
+    for arm in sorted({g["arm"] for g in legs}):
+        counts: Dict[Any, int] = {}
+        for g in legs:
+            if g["arm"] == arm and g.get("condition") == "warm":
+                counts[g.get("arm_units")] = counts.get(g.get("arm_units"), 0) + 1
+        ref_units[arm] = max(counts, key=lambda u: counts[u]) if counts else None
     for arm in sorted({g["arm"] for g in legs}):
         per_k: Dict[int, List[Dict[str, Any]]] = {}
         ref = []
         for g in legs:
-            if g["arm"] != arm or g.get("verdict") != "OK":
+            if g["arm"] != arm or g.get("verdict") != "OK" or g.get("condition") != "warm":
+                continue
+            if g.get("arm_units") != ref_units.get(arm):
                 continue
             (per_k.setdefault(g["k"], []) if g["k"] else ref).append(g)
         table = []
@@ -293,7 +385,10 @@ def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
                 "best_batched_docs_per_s": ordered[0]["docs_per_s_mean"],
                 "continuous_docs_per_s": best_ref,
                 "batched_over_continuous": round(ordered[0]["docs_per_s_mean"] / best_ref, 4)}
-        out[arm] = {"by_k": table, "call": call, "continuous_reference": refs}
+        out[arm] = {"by_k": table, "call": call, "continuous_reference": refs,
+                    "arm_units_ranked": ref_units[arm],
+                    "arm_units_note": "the K grid and continuous curve are read at this arm "
+                                      "shape only; other shapes are in unit_sweep"}
     return out
 
 
@@ -318,6 +413,8 @@ def main() -> int:
                                if g.get("verdict") == "OK"},
         "check_C_content": check_content(legs),
         "check_E_tail": check_tail(legs),
+        "check_G5a_cache_effect": cache_effect(legs),
+        "check_G3b_unit_sweep": unit_sweep(legs),
         "box_hygiene_per_leg": {f"{g['_launch']}/{g['leg']}": {
             k: v for k, v in (g.get("box_hygiene") or {}).items() if k != "ruling"}
             for g in legs if g.get("box_hygiene")},

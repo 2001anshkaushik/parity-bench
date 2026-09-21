@@ -99,6 +99,7 @@ BREAKER_K = 3
 STRAY_CORE_LIMIT = float(os.environ.get("BSZ_STRAY_CORE_LIMIT", "0.5"))   # Ruling C
 IDLE_SPIN_WINDOW_S = float(os.environ.get("BSZ_IDLE_SPIN_WINDOW_S", "6.0"))
 DROP_CACHES = os.environ.get("BSZ_DROP_CACHES", "") not in ("", "0")   # G5(a)
+PREWARM = os.environ.get("BSZ_PREWARM", "") not in ("", "0")
 ENVPROBE_SCHEMA_MIN = 2                      # driver_video.py:679, same contract
 ENVPROBE_REQUIRED = ("env_probe_schema", "env", "torch_num_threads", "python_version")
 DOCUMENT_OUTCOMES = ("no_documents", "empty_extraction", "parse_failed")
@@ -263,6 +264,28 @@ def drop_caches() -> Dict[str, Any]:
             "free_after": free[1] if len(free) > 1 else None,
             "note": "dropped before the warm-up, so the measured slice is read cold; the "
                     "warm-up's own 25 disjoint documents re-warm only themselves"}
+
+
+def prewarm_corpus(paths: List[Path]) -> Dict[str, Any]:
+    """Read every file the leg will send into the page cache BEFORE the measured window.
+
+    WHY, measured not assumed (G5a): a cold cache cost the service arm 20.9% at K=128 and 3.5%
+    at C=32 — the penalty tracks how many files the driver reads AT ONCE, because the service
+    arm reads K files in K threads while the engine arm hands paths to the SDK. Without this,
+    the first leg of a 10k campaign pays a 6.3 GB cold read and every later leg does not, so the
+    LEG ORDER would decide part of the answer. Warming every leg identically removes the
+    ordering effect and states the basis: these are steady-state, warm-cache figures.
+    """
+    t0, n = time.perf_counter(), 0
+    for p_ in paths:
+        try:
+            with open(p_, "rb") as fh:
+                while fh.read(1 << 20):
+                    n += 1
+        except OSError:
+            continue
+    return {"attempted": True, "files": len(paths), "seconds": round(time.perf_counter() - t0, 2),
+            "basis": "every measured and warm-up file read once; the leg then starts warm"}
 
 
 def measure_idle_spin(cg: Path, window_s: float = IDLE_SPIN_WINDOW_S) -> Dict[str, Any]:
@@ -669,6 +692,14 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
     state["caches"] = drop_caches() if DROP_CACHES else {"attempted": False}
     if DROP_CACHES:
         say(f"  caches dropped: rc={state['caches']['rc']}  {state['caches']['free_after']}")
+    # Prewarm AFTER any drop: the two are opposites and a leg that asked for both would be
+    # measuring neither. Refused rather than silently ordered.
+    if PREWARM and DROP_CACHES:
+        raise SystemExit("REFUSED: BSZ_PREWARM and BSZ_DROP_CACHES are contradictory")
+    state["prewarm"] = prewarm_corpus(measured + warm) if PREWARM else {"attempted": False}
+    if PREWARM:
+        say(f"  corpus prewarmed: {state['prewarm']['files']} files in "
+            f"{state['prewarm']['seconds']}s")
     tw = time.perf_counter()
     if arm == "rr":
         async def go():
@@ -783,6 +814,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                                               "CPU doing no work, so it is unused capacity"},
         "box_hygiene": hygiene,
         "page_cache": state["caches"],
+        "prewarm": state["prewarm"],
         "warm_up": {"docs": len(warm), "seconds": state.get("warm_s"),
                     "disjoint_from_measured": True, "same_shape_as_leg": True},
         "quiet_box_before": pre,
