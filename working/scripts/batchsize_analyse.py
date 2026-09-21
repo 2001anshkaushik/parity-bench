@@ -211,8 +211,27 @@ def check_tail(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
         span = (max(r["completion_ns"] for r in rows) - t0) / 1e9
         last = max(rows, key=lambda r: r["completion_ns"])
         a, b, c99 = len(ok) / span, k90 / t90, k99 / t99
+        # C2, SYMMETRIC SECOND VIEW (ruling 2026-09-21): drop the straggler from BOTH arms and
+        # recompute span. In a BATCHED leg the straggler's batch-mates share its completion stamp,
+        # so dropping its row cannot shorten the span — that is reported as a no-op, not hidden.
+        keep = [r for r in rows if r["doc"] != STRAGGLER]
+        ok_x = [r for r in keep if r.get("ok")]
+        span_x = ((max(r["completion_ns"] for r in keep) - min(r["submit_ns"] for r in keep)) / 1e9
+                  if keep else None)
         per_leg[f"{g['_launch']}/{g['leg']}"] = {
-            "docs_per_s_span": round(a, 4), "docs_per_s_to_p90": round(b, 4),
+            "PRIMARY_docs_per_s_span": round(a, 4),
+            "docs_per_s_span": round(a, 4),
+            "span_excluding_straggler": {
+                "doc_dropped": STRAGGLER, "was_present": len(keep) < len(rows),
+                "docs_per_s": round(len(ok_x) / span_x, 4) if span_x else None,
+                "span_s": round(span_x, 1) if span_x else None,
+                "noop": (span_x is not None and abs(span_x - span) < 1.0),
+                "noop_reason": ("the straggler's batch-mates return with it, so its wall is carried "
+                                "by their shared completion stamp" if g.get("k") and span_x is not None
+                                and abs(span_x - span) < 1.0 else None)},
+            "POST_HOC_DIAGNOSTIC": ("docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was "
+                                    "seen (register 34); they are diagnostics, never the headline"),
+            "docs_per_s_to_p90": round(b, 4),
             "docs_per_s_to_p99": round(c99, 4), "p99_over_span": round(c99 / a, 3),
             "p90_over_span": round(b / a, 3), "t90_s": round(t90, 1), "t99_s": round(t99, 1),
             "span_s": round(span, 1),
@@ -254,9 +273,76 @@ def noise_floor(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
     return out
 
 
+EXTERNAL_FLOORS: Dict[str, float] = {}
+EXTERNAL_FLOORS_SRC = ""
+STRAGGLER = "039_039660.pdf"
+# C4 (ruling 2026-09-21): every RocketRide docs figure carries this, verbatim.
+RR_DOCS_CAVEAT = ("32 vCPU unconstrained per Ruling A; measured posture cost vs 24-core cpuset "
+                  "-7.1% throughput, +28% CPU-s/doc.")
+
+
 def _mean(gs: List[Dict[str, Any]], f) -> Optional[float]:
     v = [f(g) for g in gs if f(g) is not None]
     return round(sum(v) / len(v), 3) if v else None
+
+
+def empty_content(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """C5: documents each arm returned as content outcomes (no text extracted, parse failed),
+    per arm, and the documents on which the arms DISAGREE — named, since the arms use different
+    parsers (Tika vs pypdf) and a count alone hides which side a document defeated."""
+    by_arm: Dict[str, set] = {}
+    for g in legs:
+        for r in g.get("_perdoc") or []:
+            if not r.get("ok") and r.get("reason") in DOCUMENT_OUTCOMES:
+                by_arm.setdefault(g["arm"], set()).add(r["doc"])
+    out: Dict[str, Any] = {a: {"n": len(v), "documents": sorted(v)[:200]} for a, v in by_arm.items()}
+    if len(by_arm) == 2:
+        (a1, s1), (a2, s2) = sorted(by_arm.items())
+        out["only_" + a1] = sorted(s1 - s2)
+        out["only_" + a2] = sorted(s2 - s1)
+        out["both"] = len(s1 & s2)
+        out["arms_agree"] = s1 == s2
+    return out
+
+
+def batch_report(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """The envelope's pre-registered reporting, per batched leg: every batch's wall, the batch
+    that held the straggler and its wall against the deadline, batches that died, documents lost
+    per failed batch, peak anon RSS — and BLAST-RADIUS-DOMINATED when more than one batch died."""
+    out: Dict[str, Any] = {}
+    for g in legs:
+        rows = g.get("_perdoc") or []
+        if not g.get("k") or not rows:
+            continue
+        by: Dict[int, List[Dict[str, Any]]] = {}
+        for r in rows:
+            by.setdefault(r["batch"], []).append(r)
+        walls = {b: round((max(x["completion_ns"] for x in v) - min(x["submit_ns"] for x in v)) / 1e9, 1)
+                 for b, v in sorted(by.items())}
+        died = {b: len(v) for b, v in by.items()
+                if any(str(x.get("reason", "")).startswith(("batch_error", "no_response")) for x in v)}
+        holder = next((b for b, v in by.items() if any(x["doc"] == STRAGGLER for x in v)), None)
+        deadline = (g.get("deadlines") or {}).get("batch_timeout_s")
+        deadline_basis = "recorded in the leg"
+        if deadline is None:
+            # Legs written before the deadlines field existed ran at the driver's default: no
+            # override was set by any chain that produced them. Stated, not silently assumed.
+            deadline, deadline_basis = 1800, ("NOT recorded in this leg (it predates the field); "
+                                              "the driver default 1800 s — no chain overrode it")
+        mem = ((g.get("memory") or {}).get("at_window_close") or {})
+        out[f"{g['_launch']}/{g['leg']}"] = {
+            "k": g["k"], "batches": len(walls), "per_batch_wall_s": walls,
+            "wall_s_max": max(walls.values()), "wall_s_median": sorted(walls.values())[len(walls) // 2],
+            "straggler_batch": holder, "straggler_batch_wall_s": walls.get(holder),
+            "batch_deadline_s": deadline, "batch_deadline_basis": deadline_basis,
+            "straggler_margin_s": (round(deadline - walls[holder], 1)
+                                   if holder is not None and deadline else None),
+            "batches_died": sorted(died), "documents_lost_per_failed_batch": died,
+            "documents_lost_total": sum(died.values()),
+            "peak_anon_mb": mem.get("anon_mb"), "peak_mb": mem.get("peak_mb"),
+            "label": ("BLAST-RADIUS-DOMINATED" if len(died) > 1 else
+                      "ONE BATCH LOST (blast radius)" if died else "no batch lost")}
+    return out
 
 
 def unit_sweep(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -346,8 +432,9 @@ def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
                 "host_cores": _mean(gs, lambda g: g["cost"].get("host_total_cores")),
                 "unattributed_cores": _mean(gs, lambda g: g["cost"].get("unattributed_cores")),
                 "idle_spin_cores": _mean(gs, lambda g: (g["cost"].get("idle_spin_measured") or {}).get("cores")),
-                "idle_core_equivalents_net_of_spin":
-                    _mean(gs, lambda g: g["percore_host"].get("idle_core_equivalents_net_of_spin")),
+                # C3 (ruling 2026-09-21): idle = cpus - host busy cores. The engine's idle spin is
+                # BURNED CPU and is reported beside it, never added back into idle.
+                "idle_spin_burned_cores": _mean(gs, lambda g: (g["cost"].get("idle_spin_measured") or {}).get("cores")),
                 "available_cpus": gs[0]["cost"].get("available_cpus")})
         ordered = sorted(table, key=lambda r: r["docs_per_s_mean"], reverse=True)
         floor = floors.get(arm, {}).get("floor")
@@ -380,8 +467,8 @@ def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
                  "effective_cores": g["cost"]["effective_cores"],
                  "cpu_utilization": g["cost"]["cpu_utilization"],
                  "idle_core_count_mean": g["percore_host"]["idle_core_count_mean"],
-                 "idle_core_equivalents_net_of_spin":
-                     g["percore_host"].get("idle_core_equivalents_net_of_spin"),
+                 "idle_core_equivalents": g["percore_host"].get("idle_core_equivalents"),
+                 "idle_spin_burned_cores": (g["cost"].get("idle_spin_measured") or {}).get("cores"),
                  "idle_spin_cores": (g["cost"].get("idle_spin_measured") or {}).get("cores"),
                  "engine_cores": g["cost"].get("engine_container_cores"),
                  "driver_cores": g["cost"].get("driver_cores"),
@@ -400,12 +487,25 @@ def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
             means = {c: sum(v) / len(v) for c, v in by_c.items()}
             best_c = max(means, key=lambda c: means[c])
             tol = floors.get(arm, {}).get("floor")
+            tol_src = "this campaign's own replicates"
+            if tol is None and EXTERNAL_FLOORS.get(arm) is not None:
+                tol, tol_src = EXTERNAL_FLOORS[arm], f"pre-registered floors ({EXTERNAL_FLOORS_SRC})"
             within = ([c for c in sorted(means) if means[c] >= means[best_c] * (1 - tol)]
                       if tol is not None else [])
             call["continuous_knee"] = {
                 "curve": {str(c): round(means[c], 4) for c in sorted(means)},
                 "best_c": best_c, "best_docs_per_s": round(means[best_c], 4),
-                "noise_floor_used": tol,
+                "noise_floor_used": tol, "noise_floor_source": tol_src if tol is not None else None,
+                # C1: several C inside the floor of the best is a TIE by the rule. The chosen cell is
+                # then the best mean only because register entry 12 forbids running the competitor
+                # below a CANDIDATE optimum — never "because it won".
+                "tie": (len(within) > 1) if tol is not None else None,
+                "tie_between": within if tol is not None and len(within) > 1 else None,
+                "chosen_cell_basis": ("TIE by the rule — the best mean is chosen per register entry 12 "
+                                      "(never run the competitor below a candidate optimum), NOT as a "
+                                      "validated winner" if tol is not None and len(within) > 1 else
+                                      "resolved: no other C inside the floor" if tol is not None else
+                                      "no floor available"),
                 "knee_c": (within[0] if within else None),
                 "rule": "smallest C within the arm's replicate noise floor of the best C",
                 "verdict": ("UNRESOLVED — no replicate on this arm, so 'within noise' has no "
@@ -429,6 +529,12 @@ def main() -> int:
         print(__doc__)
         return 2
     d = Path(sys.argv[1])
+    if "--floors" in sys.argv:
+        global EXTERNAL_FLOORS_SRC
+        fp = Path(sys.argv[sys.argv.index("--floors") + 1])
+        fl = json.loads(fp.read_text())
+        EXTERNAL_FLOORS.update({a: fl[a] for a in ("rr", "li") if isinstance(fl.get(a), (int, float))})
+        EXTERNAL_FLOORS_SRC = fp.name
     legs = load_campaign(d)
     if not legs:
         print(f"REFUSED: no leg_*.json under {d}/*/")
@@ -446,6 +552,9 @@ def main() -> int:
         "check_C_content": check_content(legs),
         "check_E_tail": check_tail(legs),
         "check_G5a_cache_effect": cache_effect(legs),
+        "check_C5_empty_content": empty_content(legs),
+        "envelope_batch_report": batch_report(legs),
+        "rr_docs_caveat": RR_DOCS_CAVEAT,
         "check_G3b_unit_sweep": unit_sweep(legs),
         "deadline_losses_per_leg": {f"{g['_launch']}/{g['leg']}": g["deadline_losses"]
                                     for g in legs if g.get("deadline_losses")},
