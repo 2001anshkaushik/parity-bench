@@ -182,11 +182,24 @@ def check_tail(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
         t0 = min(r["submit_ns"] for r in rows)
         k90 = int(0.9 * len(ok))
         t90 = (ok[k90 - 1]["completion_ns"] - t0) / 1e9
+        # p99 too (2026-09-21): at full scale p90 discards a thousand documents; p99 discards the
+        # stragglers. The first 10k leg spent its last 28 minutes on ONE document
+        # (039_039660.pdf — 39 pages, 1722 s on the engine arm, 67 s on the service arm in the
+        # banked run) while the host idled at 2.3 cores, so span throughput there measures that
+        # document's parse, not the pipeline. The straggler that set the span is NAMED, below.
+        k99 = int(0.99 * len(ok))
+        t99 = (ok[k99 - 1]["completion_ns"] - t0) / 1e9
         span = (max(r["completion_ns"] for r in rows) - t0) / 1e9
-        a, b = len(ok) / span, k90 / t90
+        last = max(rows, key=lambda r: r["completion_ns"])
+        a, b, c99 = len(ok) / span, k90 / t90, k99 / t99
         per_leg[f"{g['_launch']}/{g['leg']}"] = {
             "docs_per_s_span": round(a, 4), "docs_per_s_to_p90": round(b, 4),
-            "p90_over_span": round(b / a, 3), "t90_s": round(t90, 1), "span_s": round(span, 1)}
+            "docs_per_s_to_p99": round(c99, 4), "p99_over_span": round(c99 / a, 3),
+            "p90_over_span": round(b / a, 3), "t90_s": round(t90, 1), "t99_s": round(t99, 1),
+            "span_s": round(span, 1),
+            "span_set_by": {"doc": last["doc"], "held_s": round((last["completion_ns"]
+                                                                  - last["submit_ns"]) / 1e9, 1),
+                            "seconds_after_p99": round(span - t99, 1)}}
         key = f"k{g['k']}" if g.get("k") else f"refc{g['reference_c']}"
         by_arm.setdefault(g["arm"], {}).setdefault(key, []).append((a, b))
     ranks: Dict[str, Any] = {}
