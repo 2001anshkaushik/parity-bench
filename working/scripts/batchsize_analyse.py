@@ -338,10 +338,16 @@ def batch_report(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
             "straggler_margin_s": (round(deadline - walls[holder], 1)
                                    if holder is not None and deadline else None),
             "batches_died": sorted(died), "documents_lost_per_failed_batch": died,
-            "documents_lost_total": sum(died.values()),
+            # Documents the breaker never SENT (three consecutive dead batches stop the leg) leave
+            # no rows at all, so they are counted from submitted - recorded, never assumed zero.
+            "documents_never_submitted": (g["documents"]["submitted"] - g["documents"]["recorded"]),
+            "documents_lost_total": sum(died.values()) + (g["documents"]["submitted"]
+                                                          - g["documents"]["recorded"]),
             "peak_anon_mb": mem.get("anon_mb"), "peak_mb": mem.get("peak_mb"),
             "label": ("BLAST-RADIUS-DOMINATED" if len(died) > 1 else
-                      "ONE BATCH LOST (blast radius)" if died else "no batch lost")}
+                      "ONE BATCH LOST (blast radius)" if died else "no batch lost")
+                     + (" — BREAKER STOPPED THE LEG" if g["documents"]["submitted"]
+                        > g["documents"]["recorded"] else "")}
     return out
 
 
