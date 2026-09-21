@@ -84,6 +84,13 @@ def load_campaign(d: Path) -> List[Dict[str, Any]]:
         # service arm's floor (27.7% against a true warm spread of ~10%), which then made every
         # "within noise" verdict meaningless. Same class as pooling the shakedown slice.
         leg["condition"] = "cold" if (leg.get("page_cache") or {}).get("attempted") else "warm"
+        # Entry 39, applied BEFORE it recurs: an S5-C leg under a DECLARED cpuset is a different
+        # condition from an unconstrained one, never its replicate. Folded into the condition so
+        # every partition below (noise floor, ranking, cache effect) keeps them apart.
+        if leg.get("cpuset_declared_for_s5c"):
+            leg["condition"] += f"/cpuset={leg['cpuset_declared_for_s5c']}"
+        if leg.get("instrumented_s5d_stamps"):
+            leg["condition"] += "/instrumented"
         # THE ARM'S SHAPE IS PART OF THE CONDITION TOO (2026-09-20). Continuous C=32 legs at 16,
         # 24 and 32 service workers are three configurations, and pooling them as repeats put a
         # worker-count effect into the noise floor — the same error as pooling a cold leg with
@@ -381,6 +388,8 @@ def cache_effect(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
             if g["arm"] != arm or g.get("verdict") != "OK":
                 continue
             key = f"K={g['k']}" if g.get("k") else f"C={g['reference_c']}"
+            if g["condition"] not in ("cold", "warm"):
+                continue                      # S5-C / S5-D legs are not part of the cache comparison
             cells.setdefault(key, {}).setdefault(g["condition"], []).append(g)
         rows = {}
         for key, byc in cells.items():
