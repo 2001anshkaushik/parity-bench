@@ -1,0 +1,1992 @@
+{
+ "campaign_dir": "working/results/batchsize_s4_20260921T013303Z",
+ "command": "batchsize_analyse.py working/results/batchsize_s4_20260921T013303Z --floors working/results/batchsize_s4_20260921T013303Z/envelope_floors.json --out working/results/batchsize_s4_20260921T013303Z/analysis_docs.json",
+ "launches_selected": "all",
+ "legs_seen": [
+  "e10_li_k512/li/k512_env:OK",
+  "e11_rr_k1024/rr/k1024_env:OK",
+  "e12b_li_k1024/li/k1024_env:OK",
+  "e7_rr_k256/rr/k256_env:OK",
+  "e8_li_k256/li/k256_env:OK",
+  "e9_rr_k512/rr/k512_env:OK",
+  "p1_rr_cont32/rr/refc32_main:OK",
+  "p2_li_cont/li/refc16_main:OK",
+  "p2_li_cont/li/refc32_main:OK",
+  "p3_rr_k128/rr/k128_main:OK",
+  "p4_li_k128/li/k128_main:OK"
+ ],
+ "ranking": {
+  "li": {
+   "by_k": [
+    {
+     "k": 128,
+     "runs": 1,
+     "docs_per_s_mean": 1.9264,
+     "docs_per_s_all": [
+      1.9264
+     ],
+     "effective_cores": 6.797,
+     "cpu_utilization": 0.2124,
+     "idle_core_count_mean": 24.66,
+     "idle_core_equivalents": 25.181,
+     "cpu_s_per_doc": 3.5285,
+     "batch_wall_s_max": 235.976,
+     "engine_cores": 6.797,
+     "driver_cores": 0.011,
+     "host_cores": 6.819,
+     "unattributed_cores": 0.01,
+     "idle_spin_cores": 0.03,
+     "idle_spin_burned_cores": 0.03,
+     "available_cpus": 32
+    },
+    {
+     "k": 256,
+     "runs": 1,
+     "docs_per_s_mean": 2.4591,
+     "docs_per_s_all": [
+      2.4591
+     ],
+     "effective_cores": 9.51,
+     "cpu_utilization": 0.2972,
+     "idle_core_count_mean": 21.97,
+     "idle_core_equivalents": 22.47,
+     "cpu_s_per_doc": 3.8675,
+     "batch_wall_s_max": 251.251,
+     "engine_cores": 9.51,
+     "driver_cores": 0.016,
+     "host_cores": 9.53,
+     "unattributed_cores": 0.003,
+     "idle_spin_cores": 0.034,
+     "idle_spin_burned_cores": 0.034,
+     "available_cpus": 32
+    },
+    {
+     "k": 512,
+     "runs": 1,
+     "docs_per_s_mean": 3.0462,
+     "docs_per_s_all": [
+      3.0462
+     ],
+     "effective_cores": 12.552,
+     "cpu_utilization": 0.3923,
+     "idle_core_count_mean": 18.96,
+     "idle_core_equivalents": 19.422,
+     "cpu_s_per_doc": 4.1205,
+     "batch_wall_s_max": 308.175,
+     "engine_cores": 12.552,
+     "driver_cores": 0.021,
+     "host_cores": 12.578,
+     "unattributed_cores": 0.005,
+     "idle_spin_cores": 0.035,
+     "idle_spin_burned_cores": 0.035,
+     "available_cpus": 32
+    },
+    {
+     "k": 1024,
+     "runs": 1,
+     "docs_per_s_mean": 3.8638,
+     "docs_per_s_all": [
+      3.8638
+     ],
+     "effective_cores": 16.967,
+     "cpu_utilization": 0.5302,
+     "idle_core_count_mean": 14.33,
+     "idle_core_equivalents": 14.995,
+     "cpu_s_per_doc": 4.3914,
+     "batch_wall_s_max": 380.783,
+     "engine_cores": 16.967,
+     "driver_cores": 0.029,
+     "host_cores": 17.005,
+     "unattributed_cores": 0.009,
+     "idle_spin_cores": 0.032,
+     "idle_spin_burned_cores": 0.032,
+     "available_cpus": 32
+    }
+   ],
+   "call": {
+    "best_k": 1024,
+    "runner_up_k": 512,
+    "lead_over_runner_up": 0.2684,
+    "noise_floor": null,
+    "verdict": "UNRESOLVED \u2014 no replicate, noise floor unknown",
+    "continuous_knee": {
+     "curve": {
+      "16": 4.6511,
+      "32": 5.096
+     },
+     "best_c": 32,
+     "best_docs_per_s": 5.096,
+     "noise_floor_used": 0.0987,
+     "noise_floor_source": "pre-registered floors (envelope_floors.json)",
+     "tie": true,
+     "tie_between": [
+      16,
+      32
+     ],
+     "chosen_cell_basis": "TIE by the rule \u2014 the best mean is chosen per register entry 12 (never run the competitor below a candidate optimum), NOT as a validated winner",
+     "knee_c": 16,
+     "rule": "smallest C within the arm's replicate noise floor of the best C",
+     "verdict": "knee at C=16"
+    },
+    "batching_vs_continuous": {
+     "best_batched_docs_per_s": 3.8638,
+     "continuous_docs_per_s": 5.096,
+     "batched_over_continuous": 0.7582
+    }
+   },
+   "continuous_reference": [
+    {
+     "reference_c": 16,
+     "docs_per_s": 4.6511,
+     "effective_cores": 15.567,
+     "cpu_utilization": 0.4865,
+     "idle_core_count_mean": 12.57,
+     "idle_core_equivalents": 16.389,
+     "idle_spin_burned_cores": 0.034,
+     "idle_spin_cores": 0.034,
+     "engine_cores": 15.567,
+     "driver_cores": 0.033,
+     "host_cores": 15.611,
+     "unattributed_cores": 0.011,
+     "available_cpus": 32,
+     "launch": "p2_li_cont"
+    },
+    {
+     "reference_c": 32,
+     "docs_per_s": 5.096,
+     "effective_cores": 23.228,
+     "cpu_utilization": 0.7259,
+     "idle_core_count_mean": 7.96,
+     "idle_core_equivalents": 8.714,
+     "idle_spin_burned_cores": 0.034,
+     "idle_spin_cores": 0.034,
+     "engine_cores": 23.228,
+     "driver_cores": 0.039,
+     "host_cores": 23.286,
+     "unattributed_cores": 0.019,
+     "available_cpus": 32,
+     "launch": "p2_li_cont"
+    }
+   ],
+   "arm_units_ranked": "24",
+   "arm_units_note": "the K grid and continuous curve are read at this arm shape only; other shapes are in unit_sweep"
+  },
+  "rr": {
+   "by_k": [
+    {
+     "k": 128,
+     "runs": 1,
+     "docs_per_s_mean": 0.9643,
+     "docs_per_s_all": [
+      0.9643
+     ],
+     "effective_cores": 7.229,
+     "cpu_utilization": 0.2259,
+     "idle_core_count_mean": 21.72,
+     "idle_core_equivalents": 24.771,
+     "cpu_s_per_doc": 7.4968,
+     "batch_wall_s_max": 1706.822,
+     "engine_cores": 7.229,
+     "driver_cores": 0.012,
+     "host_cores": 7.229,
+     "unattributed_cores": -0.012,
+     "idle_spin_cores": 1.219,
+     "idle_spin_burned_cores": 1.219,
+     "available_cpus": 32
+    },
+    {
+     "k": 256,
+     "runs": 1,
+     "docs_per_s_mean": 1.1952,
+     "docs_per_s_all": [
+      1.1952
+     ],
+     "effective_cores": 9.127,
+     "cpu_utilization": 0.2852,
+     "idle_core_count_mean": 19.51,
+     "idle_core_equivalents": 22.848,
+     "cpu_s_per_doc": 7.636,
+     "batch_wall_s_max": 1748.149,
+     "engine_cores": 9.127,
+     "driver_cores": 0.015,
+     "host_cores": 9.152,
+     "unattributed_cores": 0.01,
+     "idle_spin_cores": 1.236,
+     "idle_spin_burned_cores": 1.236,
+     "available_cpus": 32
+    },
+    {
+     "k": 512,
+     "runs": 1,
+     "docs_per_s_mean": 1.392,
+     "docs_per_s_all": [
+      1.392
+     ],
+     "effective_cores": 10.849,
+     "cpu_utilization": 0.339,
+     "idle_core_count_mean": 17.79,
+     "idle_core_equivalents": 21.099,
+     "cpu_s_per_doc": 7.7939,
+     "batch_wall_s_max": 1754.448,
+     "engine_cores": 10.849,
+     "driver_cores": 0.019,
+     "host_cores": 10.901,
+     "unattributed_cores": 0.033,
+     "idle_spin_cores": 1.235,
+     "idle_spin_burned_cores": 1.235,
+     "available_cpus": 32
+    },
+    {
+     "k": 1024,
+     "runs": 1,
+     "docs_per_s_mean": 1.5142,
+     "docs_per_s_all": [
+      1.5142
+     ],
+     "effective_cores": 12.823,
+     "cpu_utilization": 0.4007,
+     "idle_core_count_mean": 15.68,
+     "idle_core_equivalents": 19.084,
+     "cpu_s_per_doc": 8.4682,
+     "batch_wall_s_max": 1800.085,
+     "engine_cores": 12.823,
+     "driver_cores": 0.023,
+     "host_cores": 12.916,
+     "unattributed_cores": 0.071,
+     "idle_spin_cores": 1.236,
+     "idle_spin_burned_cores": 1.236,
+     "available_cpus": 32
+    }
+   ],
+   "call": {
+    "best_k": 1024,
+    "runner_up_k": 512,
+    "lead_over_runner_up": 0.0878,
+    "noise_floor": null,
+    "verdict": "UNRESOLVED \u2014 no replicate, noise floor unknown",
+    "continuous_knee": {
+     "curve": {
+      "32": 2.3395
+     },
+     "best_c": 32,
+     "best_docs_per_s": 2.3395,
+     "noise_floor_used": 0.0082,
+     "noise_floor_source": "pre-registered floors (envelope_floors.json)",
+     "tie": false,
+     "tie_between": null,
+     "chosen_cell_basis": "resolved: no other C inside the floor",
+     "knee_c": 32,
+     "rule": "smallest C within the arm's replicate noise floor of the best C",
+     "verdict": "knee at C=32"
+    },
+    "batching_vs_continuous": {
+     "best_batched_docs_per_s": 1.5142,
+     "continuous_docs_per_s": 2.3395,
+     "batched_over_continuous": 0.6472
+    }
+   },
+   "continuous_reference": [
+    {
+     "reference_c": 32,
+     "docs_per_s": 2.3395,
+     "effective_cores": 17.97,
+     "cpu_utilization": 0.5616,
+     "idle_core_count_mean": 10.59,
+     "idle_core_equivalents": 13.802,
+     "idle_spin_burned_cores": 1.224,
+     "idle_spin_cores": 1.224,
+     "engine_cores": 17.97,
+     "driver_cores": 0.036,
+     "host_cores": 18.198,
+     "unattributed_cores": 0.192,
+     "available_cpus": 32,
+     "launch": "p1_rr_cont32"
+    }
+   ],
+   "arm_units_ranked": 1,
+   "arm_units_note": "the K grid and continuous curve are read at this arm shape only; other shapes are in unit_sweep"
+  }
+ },
+ "noise_floor": {
+  "li": {
+   "replicated": {},
+   "relative_spread": {},
+   "floor": null
+  },
+  "rr": {
+   "replicated": {},
+   "relative_spread": {},
+   "floor": null
+  }
+ },
+ "check_A_clock": {
+  "e10_li_k512/k512_env": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.0463,
+   "docs_per_s_export": 3.0462,
+   "relative_gap": 2e-05,
+   "tolerance": 0.02
+  },
+  "e11_rr_k1024/k1024_env": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.5142,
+   "docs_per_s_export": 1.5142,
+   "relative_gap": 1e-05,
+   "tolerance": 0.02
+  },
+  "e12b_li_k1024/k1024_env": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.8639,
+   "docs_per_s_export": 3.8638,
+   "relative_gap": 1e-05,
+   "tolerance": 0.02
+  },
+  "e7_rr_k256/k256_env": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.1952,
+   "docs_per_s_export": 1.1952,
+   "relative_gap": 3e-05,
+   "tolerance": 0.02
+  },
+  "e8_li_k256/k256_env": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.4591,
+   "docs_per_s_export": 2.4591,
+   "relative_gap": 1e-05,
+   "tolerance": 0.02
+  },
+  "e9_rr_k512/k512_env": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.392,
+   "docs_per_s_export": 1.392,
+   "relative_gap": 3e-05,
+   "tolerance": 0.02
+  },
+  "p1_rr_cont32/refc32_main": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.3395,
+   "docs_per_s_export": 2.3395,
+   "relative_gap": 0.0,
+   "tolerance": 0.02
+  },
+  "p2_li_cont/refc16_main": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 4.6512,
+   "docs_per_s_export": 4.6511,
+   "relative_gap": 2e-05,
+   "tolerance": 0.02
+  },
+  "p2_li_cont/refc32_main": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 5.096,
+   "docs_per_s_export": 5.096,
+   "relative_gap": 1e-05,
+   "tolerance": 0.02
+  },
+  "p3_rr_k128/k128_main": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.9643,
+   "docs_per_s_export": 0.9643,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "p4_li_k128/k128_main": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.9264,
+   "docs_per_s_export": 1.9264,
+   "relative_gap": 0.0,
+   "tolerance": 0.02
+  }
+ },
+ "check_B_cpu_source": {
+  "e10_li_k512/k512_env": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 12.552,
+   "host_busy_cores_on_cpuset": 12.578,
+   "host_minus_cgroup": 0.026,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "e11_rr_k1024/k1024_env": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 12.823,
+   "host_busy_cores_on_cpuset": 12.916,
+   "host_minus_cgroup": 0.093,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "e12b_li_k1024/k1024_env": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 16.967,
+   "host_busy_cores_on_cpuset": 17.005,
+   "host_minus_cgroup": 0.038,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "e7_rr_k256/k256_env": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 9.127,
+   "host_busy_cores_on_cpuset": 9.152,
+   "host_minus_cgroup": 0.025,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "e8_li_k256/k256_env": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 9.51,
+   "host_busy_cores_on_cpuset": 9.53,
+   "host_minus_cgroup": 0.02,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "e9_rr_k512/k512_env": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 10.849,
+   "host_busy_cores_on_cpuset": 10.901,
+   "host_minus_cgroup": 0.052,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "p1_rr_cont32/refc32_main": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 17.97,
+   "host_busy_cores_on_cpuset": 18.198,
+   "host_minus_cgroup": 0.228,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "p2_li_cont/refc16_main": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 15.567,
+   "host_busy_cores_on_cpuset": 15.611,
+   "host_minus_cgroup": 0.044,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "p2_li_cont/refc32_main": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 23.228,
+   "host_busy_cores_on_cpuset": 23.286,
+   "host_minus_cgroup": 0.058,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "p3_rr_k128/k128_main": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 7.229,
+   "host_busy_cores_on_cpuset": 7.229,
+   "host_minus_cgroup": 0.0,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "p4_li_k128/k128_main": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 6.797,
+   "host_busy_cores_on_cpuset": 6.819,
+   "host_minus_cgroup": 0.022,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  }
+ },
+ "check_C_content": {
+  "li": {
+   "reference": "e10_li_k512/k512_env",
+   "comparisons": [
+    {
+     "leg": "e12b_li_k1024/k1024_env",
+     "common": 9873,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "e8_li_k256/k256_env",
+     "common": 9873,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "p2_li_cont/refc16_main",
+     "common": 9873,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "p2_li_cont/refc32_main",
+     "common": 9873,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "p4_li_k128/k128_main",
+     "common": 9873,
+     "differing": 0,
+     "examples": []
+    }
+   ],
+   "verdict": "PASS"
+  },
+  "rr": {
+   "reference": "e11_rr_k1024/k1024_env",
+   "comparisons": [
+    {
+     "leg": "e7_rr_k256/k256_env",
+     "common": 9129,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "e9_rr_k512/k512_env",
+     "common": 9129,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "p1_rr_cont32/refc32_main",
+     "common": 9128,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "p3_rr_k128/k128_main",
+     "common": 9129,
+     "differing": 0,
+     "examples": []
+    }
+   ],
+   "verdict": "PASS"
+  },
+  "null_control_cross_arm": {
+   "common": 9116,
+   "differing": 9081,
+   "verdict": "FIRED",
+   "meaning": "the comparator sees differences where they must exist (different parsers)"
+  }
+ },
+ "check_E_tail": {
+  "per_leg": {
+   "e10_li_k512/k512_env": {
+    "PRIMARY_docs_per_s_span": 3.0463,
+    "docs_per_s_span": 3.0463,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 3.046,
+     "span_s": 3241.0,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 3.2213,
+    "docs_per_s_to_p99": 3.0946,
+    "p99_over_span": 1.016,
+    "p90_over_span": 1.057,
+    "t90_s": 2758.2,
+    "t99_s": 3158.4,
+    "span_s": 3241.0,
+    "span_set_by": {
+     "doc": "009_009076.pdf",
+     "held_s": 101.2,
+     "seconds_after_p99": 82.6
+    }
+   },
+   "e11_rr_k1024/k1024_env": {
+    "PRIMARY_docs_per_s_span": 1.5142,
+    "docs_per_s_span": 1.5142,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 1.5142,
+     "span_s": 6028.9,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.9429,
+    "docs_per_s_to_p99": 2.1371,
+    "p99_over_span": 1.411,
+    "p90_over_span": 1.283,
+    "t90_s": 4228.7,
+    "t99_s": 4228.7,
+    "span_s": 6028.9,
+    "span_set_by": {
+     "doc": "019_019047.pdf",
+     "held_s": 1800.1,
+     "seconds_after_p99": 1800.2
+    }
+   },
+   "e12b_li_k1024/k1024_env": {
+    "PRIMARY_docs_per_s_span": 3.8639,
+    "docs_per_s_span": 3.8639,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 3.8635,
+     "span_s": 2555.2,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 4.028,
+    "docs_per_s_to_p99": 4.032,
+    "p99_over_span": 1.044,
+    "p90_over_span": 1.042,
+    "t90_s": 2205.8,
+    "t99_s": 2424.1,
+    "span_s": 2555.2,
+    "span_set_by": {
+     "doc": "018_018497.pdf",
+     "held_s": 241.1,
+     "seconds_after_p99": 131.1
+    }
+   },
+   "e7_rr_k256/k256_env": {
+    "PRIMARY_docs_per_s_span": 1.1952,
+    "docs_per_s_span": 1.1952,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 1.1951,
+     "span_s": 8271.2,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.4064,
+    "docs_per_s_to_p99": 1.1833,
+    "p99_over_span": 0.99,
+    "p90_over_span": 1.177,
+    "t90_s": 6326.1,
+    "t99_s": 8271.2,
+    "span_s": 8271.2,
+    "span_set_by": {
+     "doc": "018_018488.pdf",
+     "held_s": 1748.1,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "e8_li_k256/k256_env": {
+    "PRIMARY_docs_per_s_span": 2.4591,
+    "docs_per_s_span": 2.4591,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 2.4588,
+     "span_s": 4014.9,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 2.4652,
+    "docs_per_s_to_p99": 2.4887,
+    "p99_over_span": 1.012,
+    "p90_over_span": 1.002,
+    "t90_s": 3604.2,
+    "t99_s": 3927.4,
+    "span_s": 4014.9,
+    "span_set_by": {
+     "doc": "033_033175.pdf",
+     "held_s": 105.3,
+     "seconds_after_p99": 87.5
+    }
+   },
+   "e9_rr_k512/k512_env": {
+    "PRIMARY_docs_per_s_span": 1.392,
+    "docs_per_s_span": 1.392,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 1.3918,
+     "span_s": 7102.2,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.7216,
+    "docs_per_s_to_p99": 1.378,
+    "p99_over_span": 0.99,
+    "p90_over_span": 1.237,
+    "t90_s": 5167.8,
+    "t99_s": 7102.2,
+    "span_s": 7102.2,
+    "span_set_by": {
+     "doc": "018_018488.pdf",
+     "held_s": 1754.4,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "p1_rr_cont32/refc32_main": {
+    "PRIMARY_docs_per_s_span": 2.3395,
+    "docs_per_s_span": 2.3395,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 3.6956,
+     "span_s": 2674.6,
+     "noop": false,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 3.9644,
+    "docs_per_s_to_p99": 3.9344,
+    "p99_over_span": 1.682,
+    "p90_over_span": 1.695,
+    "t90_s": 2244.0,
+    "t99_s": 2487.3,
+    "span_s": 4225.2,
+    "span_set_by": {
+     "doc": "039_039660.pdf",
+     "held_s": 1722.0,
+     "seconds_after_p99": 1738.0
+    }
+   },
+   "p2_li_cont/refc16_main": {
+    "PRIMARY_docs_per_s_span": 4.6512,
+    "docs_per_s_span": 4.6512,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 4.6507,
+     "span_s": 2122.7,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 4.8178,
+    "docs_per_s_to_p99": 4.7987,
+    "p99_over_span": 1.032,
+    "p90_over_span": 1.036,
+    "t90_s": 1844.2,
+    "t99_s": 2036.8,
+    "span_s": 2122.7,
+    "span_set_by": {
+     "doc": "011_011575.pdf",
+     "held_s": 151.0,
+     "seconds_after_p99": 85.9
+    }
+   },
+   "p2_li_cont/refc32_main": {
+    "PRIMARY_docs_per_s_span": 5.096,
+    "docs_per_s_span": 5.096,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 5.0955,
+     "span_s": 1937.4,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 5.3114,
+    "docs_per_s_to_p99": 5.2865,
+    "p99_over_span": 1.037,
+    "p90_over_span": 1.042,
+    "t90_s": 1672.8,
+    "t99_s": 1848.9,
+    "span_s": 1937.4,
+    "span_set_by": {
+     "doc": "011_011575.pdf",
+     "held_s": 149.8,
+     "seconds_after_p99": 88.5
+    }
+   },
+   "p3_rr_k128/k128_main": {
+    "PRIMARY_docs_per_s_span": 0.9643,
+    "docs_per_s_span": 0.9643,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 0.9642,
+     "span_s": 10251.5,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.1098,
+    "docs_per_s_to_p99": 0.9547,
+    "p99_over_span": 0.99,
+    "p90_over_span": 1.151,
+    "t90_s": 8016.7,
+    "t99_s": 10251.5,
+    "span_s": 10251.5,
+    "span_set_by": {
+     "doc": "027_027335.pdf",
+     "held_s": 1706.8,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "p4_li_k128/k128_main": {
+    "PRIMARY_docs_per_s_span": 1.9264,
+    "docs_per_s_span": 1.9264,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": true,
+     "docs_per_s": 1.9282,
+     "span_s": 5119.8,
+     "noop": false,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.9462,
+    "docs_per_s_to_p99": 1.9211,
+    "p99_over_span": 0.997,
+    "p90_over_span": 1.01,
+    "t90_s": 4565.3,
+    "t99_s": 5087.8,
+    "span_s": 5125.1,
+    "span_set_by": {
+     "doc": "039_039660.pdf",
+     "held_s": 38.8,
+     "seconds_after_p99": 37.3
+    }
+   }
+  },
+  "by_arm": {
+   "li": {
+    "rank_by_span": [
+     "k1024",
+     "k512",
+     "k256",
+     "k128"
+    ],
+    "rank_by_to_p90": [
+     "k1024",
+     "k512",
+     "k256",
+     "k128"
+    ],
+    "verdict": "PASS \u2014 K ranking identical under both metrics",
+    "to_p90_replicate_spread": {}
+   },
+   "rr": {
+    "rank_by_span": [
+     "k1024",
+     "k512",
+     "k256",
+     "k128"
+    ],
+    "rank_by_to_p90": [
+     "k1024",
+     "k512",
+     "k256",
+     "k128"
+    ],
+    "verdict": "PASS \u2014 K ranking identical under both metrics",
+    "to_p90_replicate_spread": {}
+   }
+  }
+ },
+ "check_G5a_cache_effect": {
+  "li": {},
+  "rr": {}
+ },
+ "check_C5_empty_content": {
+  "li": {
+   "n": 102,
+   "documents": [
+    "000_000164.pdf",
+    "000_000357.pdf",
+    "001_001657.pdf",
+    "002_002014.pdf",
+    "002_002103.pdf",
+    "002_002189.pdf",
+    "002_002400.pdf",
+    "002_002472.pdf",
+    "002_002477.pdf",
+    "002_002978.pdf",
+    "003_003010.pdf",
+    "003_003113.pdf",
+    "003_003358.pdf",
+    "003_003988.pdf",
+    "004_004306.pdf",
+    "004_004749.pdf",
+    "004_004859.pdf",
+    "005_005393.pdf",
+    "005_005697.pdf",
+    "006_006192.pdf",
+    "006_006368.pdf",
+    "006_006487.pdf",
+    "006_006582.pdf",
+    "006_006736.pdf",
+    "007_007030.pdf",
+    "007_007136.pdf",
+    "007_007201.pdf",
+    "007_007224.pdf",
+    "008_008575.pdf",
+    "008_008724.pdf",
+    "008_008766.pdf",
+    "009_009305.pdf",
+    "009_009469.pdf",
+    "009_009535.pdf",
+    "009_009802.pdf",
+    "010_010242.pdf",
+    "010_010257.pdf",
+    "010_010312.pdf",
+    "010_010584.pdf",
+    "010_010609.pdf",
+    "010_010956.pdf",
+    "011_011390.pdf",
+    "012_012802.pdf",
+    "013_013108.pdf",
+    "014_014222.pdf",
+    "014_014939.pdf",
+    "014_014961.pdf",
+    "015_015512.pdf",
+    "016_016288.pdf",
+    "016_016387.pdf",
+    "016_016503.pdf",
+    "016_016914.pdf",
+    "017_017017.pdf",
+    "017_017865.pdf",
+    "017_017872.pdf",
+    "018_018542.pdf",
+    "018_018765.pdf",
+    "018_018778.pdf",
+    "018_018831.pdf",
+    "018_018868.pdf",
+    "019_019031.pdf",
+    "019_019054.pdf",
+    "019_019208.pdf",
+    "020_020747.pdf",
+    "020_020806.pdf",
+    "020_020821.pdf",
+    "020_020913.pdf",
+    "021_021709.pdf",
+    "022_022778.pdf",
+    "022_022819.pdf",
+    "023_023515.pdf",
+    "023_023712.pdf",
+    "023_023767.pdf",
+    "024_024301.pdf",
+    "025_025004.pdf",
+    "025_025297.pdf",
+    "025_025385.pdf",
+    "025_025749.pdf",
+    "025_025754.pdf",
+    "026_026202.pdf",
+    "026_026303.pdf",
+    "027_027613.pdf",
+    "030_030226.pdf",
+    "030_030475.pdf",
+    "030_030814.pdf",
+    "031_031229.pdf",
+    "031_031374.pdf",
+    "031_031947.pdf",
+    "032_032208.pdf",
+    "032_032423.pdf",
+    "032_032565.pdf",
+    "033_033689.pdf",
+    "034_034153.pdf",
+    "034_034685.pdf",
+    "037_037393.pdf",
+    "037_037919.pdf",
+    "037_037957.pdf",
+    "039_039045.pdf",
+    "039_039399.pdf",
+    "039_039457.pdf",
+    "040_040669.pdf",
+    "040_040760.pdf"
+   ]
+  },
+  "rr": {
+   "n": 89,
+   "documents": [
+    "000_000164.pdf",
+    "000_000357.pdf",
+    "001_001657.pdf",
+    "002_002014.pdf",
+    "002_002103.pdf",
+    "002_002189.pdf",
+    "002_002472.pdf",
+    "002_002477.pdf",
+    "002_002978.pdf",
+    "003_003010.pdf",
+    "003_003113.pdf",
+    "003_003358.pdf",
+    "003_003988.pdf",
+    "004_004749.pdf",
+    "004_004859.pdf",
+    "005_005393.pdf",
+    "005_005697.pdf",
+    "006_006192.pdf",
+    "006_006368.pdf",
+    "006_006487.pdf",
+    "006_006582.pdf",
+    "006_006736.pdf",
+    "007_007030.pdf",
+    "007_007136.pdf",
+    "007_007201.pdf",
+    "007_007224.pdf",
+    "008_008575.pdf",
+    "008_008766.pdf",
+    "009_009305.pdf",
+    "009_009469.pdf",
+    "009_009535.pdf",
+    "010_010242.pdf",
+    "010_010257.pdf",
+    "010_010312.pdf",
+    "010_010584.pdf",
+    "010_010609.pdf",
+    "010_010956.pdf",
+    "011_011390.pdf",
+    "012_012802.pdf",
+    "013_013108.pdf",
+    "014_014939.pdf",
+    "014_014961.pdf",
+    "015_015512.pdf",
+    "016_016288.pdf",
+    "016_016387.pdf",
+    "016_016503.pdf",
+    "016_016914.pdf",
+    "017_017017.pdf",
+    "017_017865.pdf",
+    "017_017872.pdf",
+    "018_018765.pdf",
+    "018_018778.pdf",
+    "018_018831.pdf",
+    "018_018868.pdf",
+    "019_019031.pdf",
+    "019_019054.pdf",
+    "019_019208.pdf",
+    "020_020821.pdf",
+    "020_020913.pdf",
+    "021_021709.pdf",
+    "022_022778.pdf",
+    "023_023515.pdf",
+    "023_023712.pdf",
+    "023_023767.pdf",
+    "024_024301.pdf",
+    "025_025004.pdf",
+    "025_025297.pdf",
+    "025_025385.pdf",
+    "025_025749.pdf",
+    "025_025754.pdf",
+    "026_026202.pdf",
+    "026_026303.pdf",
+    "030_030226.pdf",
+    "030_030475.pdf",
+    "030_030814.pdf",
+    "031_031229.pdf",
+    "031_031374.pdf",
+    "031_031947.pdf",
+    "032_032208.pdf",
+    "032_032423.pdf",
+    "032_032565.pdf",
+    "034_034153.pdf",
+    "034_034685.pdf",
+    "037_037393.pdf",
+    "037_037957.pdf",
+    "039_039045.pdf",
+    "039_039399.pdf",
+    "039_039457.pdf",
+    "040_040760.pdf"
+   ]
+  },
+  "only_li": [
+   "002_002400.pdf",
+   "004_004306.pdf",
+   "008_008724.pdf",
+   "009_009802.pdf",
+   "014_014222.pdf",
+   "018_018542.pdf",
+   "020_020747.pdf",
+   "020_020806.pdf",
+   "022_022819.pdf",
+   "027_027613.pdf",
+   "033_033689.pdf",
+   "037_037919.pdf",
+   "040_040669.pdf"
+  ],
+  "only_rr": [],
+  "both": 89,
+  "arms_agree": false
+ },
+ "envelope_batch_report": {
+  "e10_li_k512/k512_env": {
+   "k": 512,
+   "batches": 20,
+   "per_batch_wall_s": {
+    "0": 141.2,
+    "1": 147.7,
+    "2": 164.6,
+    "3": 112.6,
+    "4": 129.9,
+    "5": 114.7,
+    "6": 170.2,
+    "7": 145.4,
+    "8": 296.6,
+    "9": 308.2,
+    "10": 147.9,
+    "11": 116.0,
+    "12": 112.6,
+    "13": 180.9,
+    "14": 132.5,
+    "15": 136.9,
+    "16": 164.4,
+    "17": 121.9,
+    "18": 295.2,
+    "19": 101.2
+   },
+   "wall_s_max": 308.2,
+   "wall_s_median": 145.4,
+   "straggler_batch": 19,
+   "straggler_batch_wall_s": 101.2,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "recorded in the leg",
+   "straggler_margin_s": 1698.8,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "anon_mb_at_window_close": 16364.3,
+   "memory_peak_mb_total": 17595.5,
+   "peak_anon_bounds_mb": [
+    16364.3,
+    17595.5
+   ],
+   "label": "no batch lost"
+  },
+  "e11_rr_k1024/k1024_env": {
+   "k": 1024,
+   "batches": 10,
+   "per_batch_wall_s": {
+    "0": 262.9,
+    "1": 325.5,
+    "2": 249.7,
+    "3": 972.3,
+    "4": 574.4,
+    "5": 448.7,
+    "6": 617.4,
+    "7": 309.6,
+    "8": 467.2,
+    "9": 1800.1
+   },
+   "wall_s_max": 1800.1,
+   "wall_s_median": 467.2,
+   "straggler_batch": 9,
+   "straggler_batch_wall_s": 1800.1,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "recorded in the leg",
+   "straggler_margin_s": -0.1,
+   "batches_died": [
+    9
+   ],
+   "documents_lost_per_failed_batch": {
+    "9": 759
+   },
+   "documents_never_submitted": 0,
+   "documents_lost_total": 759,
+   "anon_mb_at_window_close": 11811.9,
+   "memory_peak_mb_total": 23548.7,
+   "peak_anon_bounds_mb": [
+    11811.9,
+    23548.7
+   ],
+   "label": "ONE BATCH LOST (blast radius)"
+  },
+  "e12b_li_k1024/k1024_env": {
+   "k": 1024,
+   "batches": 10,
+   "per_batch_wall_s": {
+    "0": 227.2,
+    "1": 241.7,
+    "2": 232.1,
+    "3": 271.6,
+    "4": 380.8,
+    "5": 212.0,
+    "6": 273.5,
+    "7": 235.6,
+    "8": 239.4,
+    "9": 241.3
+   },
+   "wall_s_max": 380.8,
+   "wall_s_median": 241.3,
+   "straggler_batch": 9,
+   "straggler_batch_wall_s": 241.3,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "recorded in the leg",
+   "straggler_margin_s": 1558.7,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "anon_mb_at_window_close": 16305.1,
+   "memory_peak_mb_total": 17555.4,
+   "peak_anon_bounds_mb": [
+    16305.1,
+    17555.4
+   ],
+   "label": "no batch lost"
+  },
+  "e7_rr_k256/k256_env": {
+   "k": 256,
+   "batches": 39,
+   "per_batch_wall_s": {
+    "0": 140.5,
+    "1": 103.4,
+    "2": 93.6,
+    "3": 85.5,
+    "4": 205.9,
+    "5": 89.2,
+    "6": 94.4,
+    "7": 86.2,
+    "8": 89.2,
+    "9": 126.1,
+    "10": 88.1,
+    "11": 70.9,
+    "12": 198.3,
+    "13": 274.6,
+    "14": 779.5,
+    "15": 109.8,
+    "16": 282.3,
+    "17": 83.2,
+    "18": 168.0,
+    "19": 390.4,
+    "20": 165.0,
+    "21": 92.4,
+    "22": 293.5,
+    "23": 129.1,
+    "24": 244.7,
+    "25": 55.8,
+    "26": 478.7,
+    "27": 145.6,
+    "28": 147.3,
+    "29": 184.3,
+    "30": 121.5,
+    "31": 90.1,
+    "32": 172.2,
+    "33": 71.5,
+    "34": 95.2,
+    "35": 279.2,
+    "36": 68.2,
+    "37": 128.6,
+    "38": 1748.1
+   },
+   "wall_s_max": 1748.1,
+   "wall_s_median": 128.6,
+   "straggler_batch": 38,
+   "straggler_batch_wall_s": 1748.1,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "recorded in the leg",
+   "straggler_margin_s": 51.9,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "anon_mb_at_window_close": 11960.9,
+   "memory_peak_mb_total": 23306.1,
+   "peak_anon_bounds_mb": [
+    11960.9,
+    23306.1
+   ],
+   "label": "no batch lost"
+  },
+  "e8_li_k256/k256_env": {
+   "k": 256,
+   "batches": 39,
+   "per_batch_wall_s": {
+    "0": 108.7,
+    "1": 100.3,
+    "2": 99.3,
+    "3": 76.7,
+    "4": 118.2,
+    "5": 100.3,
+    "6": 64.7,
+    "7": 81.3,
+    "8": 76.9,
+    "9": 84.7,
+    "10": 65.3,
+    "11": 65.5,
+    "12": 113.8,
+    "13": 105.1,
+    "14": 88.8,
+    "15": 112.7,
+    "16": 251.3,
+    "17": 85.9,
+    "18": 125.1,
+    "19": 212.0,
+    "20": 122.1,
+    "21": 94.6,
+    "22": 81.9,
+    "23": 94.3,
+    "24": 66.1,
+    "25": 61.2,
+    "26": 126.2,
+    "27": 124.1,
+    "28": 98.2,
+    "29": 102.7,
+    "30": 127.8,
+    "31": 62.0,
+    "32": 165.2,
+    "33": 70.2,
+    "34": 68.6,
+    "35": 85.9,
+    "36": 54.0,
+    "37": 167.7,
+    "38": 105.3
+   },
+   "wall_s_max": 251.3,
+   "wall_s_median": 98.2,
+   "straggler_batch": 38,
+   "straggler_batch_wall_s": 105.3,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "recorded in the leg",
+   "straggler_margin_s": 1694.7,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "anon_mb_at_window_close": 16241.8,
+   "memory_peak_mb_total": 17451.1,
+   "peak_anon_bounds_mb": [
+    16241.8,
+    17451.1
+   ],
+   "label": "no batch lost"
+  },
+  "e9_rr_k512/k512_env": {
+   "k": 512,
+   "batches": 20,
+   "per_batch_wall_s": {
+    "0": 169.8,
+    "1": 144.9,
+    "2": 253.3,
+    "3": 139.3,
+    "4": 174.6,
+    "5": 126.1,
+    "6": 351.9,
+    "7": 815.1,
+    "8": 322.1,
+    "9": 439.8,
+    "10": 190.0,
+    "11": 330.9,
+    "12": 273.3,
+    "13": 514.8,
+    "14": 236.0,
+    "15": 150.6,
+    "16": 200.2,
+    "17": 334.1,
+    "18": 179.8,
+    "19": 1754.4
+   },
+   "wall_s_max": 1754.4,
+   "wall_s_median": 253.3,
+   "straggler_batch": 19,
+   "straggler_batch_wall_s": 1754.4,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "recorded in the leg",
+   "straggler_margin_s": 45.6,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "anon_mb_at_window_close": 11986.8,
+   "memory_peak_mb_total": 23099.6,
+   "peak_anon_bounds_mb": [
+    11986.8,
+    23099.6
+   ],
+   "label": "no batch lost"
+  },
+  "p3_rr_k128/k128_main": {
+   "k": 128,
+   "batches": 78,
+   "per_batch_wall_s": {
+    "0": 47.1,
+    "1": 115.9,
+    "2": 41.4,
+    "3": 85.7,
+    "4": 78.4,
+    "5": 55.7,
+    "6": 71.5,
+    "7": 61.3,
+    "8": 105.5,
+    "9": 174.1,
+    "10": 46.2,
+    "11": 64.0,
+    "12": 49.7,
+    "13": 72.2,
+    "14": 38.3,
+    "15": 60.9,
+    "16": 43.5,
+    "17": 64.9,
+    "18": 106.9,
+    "19": 84.4,
+    "20": 67.5,
+    "21": 58.7,
+    "22": 48.2,
+    "23": 48.2,
+    "24": 173.8,
+    "25": 72.9,
+    "26": 104.3,
+    "27": 242.2,
+    "28": 98.3,
+    "29": 753.2,
+    "30": 94.6,
+    "31": 75.7,
+    "32": 60.8,
+    "33": 255.2,
+    "34": 65.9,
+    "35": 46.9,
+    "36": 51.0,
+    "37": 142.8,
+    "38": 359.0,
+    "39": 192.9,
+    "40": 107.3,
+    "41": 133.2,
+    "42": 79.4,
+    "43": 41.9,
+    "44": 274.5,
+    "45": 41.3,
+    "46": 39.4,
+    "47": 108.4,
+    "48": 171.5,
+    "49": 211.2,
+    "50": 45.7,
+    "51": 22.0,
+    "52": 442.6,
+    "53": 288.1,
+    "54": 27.0,
+    "55": 124.6,
+    "56": 27.3,
+    "57": 125.2,
+    "58": 156.4,
+    "59": 81.7,
+    "60": 103.2,
+    "61": 51.8,
+    "62": 74.4,
+    "63": 64.3,
+    "64": 152.9,
+    "65": 69.3,
+    "66": 52.6,
+    "67": 48.0,
+    "68": 56.6,
+    "69": 68.5,
+    "70": 245.8,
+    "71": 151.6,
+    "72": 50.1,
+    "73": 43.7,
+    "74": 102.8,
+    "75": 99.7,
+    "76": 80.0,
+    "77": 1706.8
+   },
+   "wall_s_max": 1706.8,
+   "wall_s_median": 75.7,
+   "straggler_batch": 77,
+   "straggler_batch_wall_s": 1706.8,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": 93.2,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "anon_mb_at_window_close": 10454.8,
+   "memory_peak_mb_total": 22119.0,
+   "peak_anon_bounds_mb": [
+    10454.8,
+    22119.0
+   ],
+   "label": "no batch lost"
+  },
+  "p4_li_k128/k128_main": {
+   "k": 128,
+   "batches": 78,
+   "per_batch_wall_s": {
+    "0": 34.7,
+    "1": 94.1,
+    "2": 39.8,
+    "3": 90.5,
+    "4": 93.6,
+    "5": 47.7,
+    "6": 54.0,
+    "7": 55.6,
+    "8": 98.7,
+    "9": 73.5,
+    "10": 64.4,
+    "11": 46.3,
+    "12": 34.9,
+    "13": 42.9,
+    "14": 46.7,
+    "15": 55.1,
+    "16": 47.8,
+    "17": 52.3,
+    "18": 67.8,
+    "19": 69.1,
+    "20": 40.1,
+    "21": 55.4,
+    "22": 37.8,
+    "23": 42.8,
+    "24": 96.6,
+    "25": 38.9,
+    "26": 89.8,
+    "27": 32.1,
+    "28": 79.9,
+    "29": 87.7,
+    "30": 87.5,
+    "31": 34.6,
+    "32": 73.5,
+    "33": 236.0,
+    "34": 57.8,
+    "35": 57.5,
+    "36": 49.9,
+    "37": 134.6,
+    "38": 79.6,
+    "39": 178.7,
+    "40": 68.2,
+    "41": 106.5,
+    "42": 80.9,
+    "43": 47.6,
+    "44": 74.1,
+    "45": 41.2,
+    "46": 36.8,
+    "47": 49.7,
+    "48": 42.2,
+    "49": 31.4,
+    "50": 51.2,
+    "51": 25.1,
+    "52": 99.1,
+    "53": 36.8,
+    "54": 31.3,
+    "55": 91.6,
+    "56": 32.2,
+    "57": 78.0,
+    "58": 59.1,
+    "59": 54.9,
+    "60": 106.5,
+    "61": 44.4,
+    "62": 44.6,
+    "63": 47.2,
+    "64": 134.3,
+    "65": 62.0,
+    "66": 48.1,
+    "67": 49.8,
+    "68": 41.6,
+    "69": 45.9,
+    "70": 62.9,
+    "71": 46.0,
+    "72": 31.8,
+    "73": 40.8,
+    "74": 101.2,
+    "75": 171.6,
+    "76": 68.9,
+    "77": 38.8
+   },
+   "wall_s_max": 236.0,
+   "wall_s_median": 54.9,
+   "straggler_batch": 77,
+   "straggler_batch_wall_s": 38.8,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": 1761.2,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "anon_mb_at_window_close": 16176.7,
+   "memory_peak_mb_total": 17351.3,
+   "peak_anon_bounds_mb": [
+    16176.7,
+    17351.3
+   ],
+   "label": "no batch lost"
+  }
+ },
+ "rr_docs_caveat": "32 vCPU unconstrained per Ruling A; measured posture cost vs 24-core cpuset -7.1% throughput, +28% CPU-s/doc.",
+ "check_G3b_unit_sweep": {},
+ "deadline_losses_per_leg": {
+  "e11_rr_k1024/k1024_env": {
+   "n": 759,
+   "documents": [
+    {
+     "doc": "019_019047.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "023_023531.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "029_029948.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "037_037354.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "001_001720.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "026_026297.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "009_009137.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "032_032305.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "006_006408.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "000_000015.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "004_004907.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "011_011081.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "015_015758.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "001_001359.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "026_026828.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "007_007493.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "026_026626.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "012_012169.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "002_002910.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "019_019063.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "028_028052.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "025_025992.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "016_016850.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "033_033543.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "029_029459.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "016_016763.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "029_029449.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "007_007938.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "004_004891.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "023_023101.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "040_040162.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "013_013889.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "018_018744.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "027_027580.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "023_023926.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "001_001386.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "025_025968.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "009_009274.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "014_014834.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "013_013551.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "019_019932.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "021_021506.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "019_019576.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "014_014889.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "017_017156.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "000_000018.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "013_013340.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "005_005497.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "016_016676.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    },
+    {
+     "doc": "023_023528.pdf",
+     "reason": "batch_error:TimeoutError",
+     "held_s": 1800.1
+    }
+   ],
+   "fraction_of_submitted": 0.07609,
+   "attribution": "the driver's own deadline firing \u2014 not an engine error"
+  },
+  "p1_rr_cont32/refc32_main": {
+   "n": 1,
+   "documents": [
+    {
+     "doc": "011_011464.pdf",
+     "reason": "error:TimeoutError",
+     "held_s": 1800.0
+    }
+   ],
+   "fraction_of_submitted": 0.0001,
+   "attribution": "the driver's own deadline firing \u2014 not an engine error"
+  }
+ },
+ "box_hygiene_per_leg": {
+  "e10_li_k512/k512_env": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.967
+  },
+  "e11_rr_k1024/k1024_env": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.977
+  },
+  "e12b_li_k1024/k1024_env": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.955
+  },
+  "e7_rr_k256/k256_env": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.972
+  },
+  "e8_li_k256/k256_env": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.97
+  },
+  "e9_rr_k512/k512_env": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.975
+  },
+  "p1_rr_cont32/refc32_main": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.995
+  },
+  "p2_li_cont/refc16_main": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.965
+  },
+  "p2_li_cont/refc32_main": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.97
+  },
+  "p3_rr_k128/k128_main": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.957
+  },
+  "p4_li_k128/k128_main": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.953
+  }
+ },
+ "page_cache_per_leg": {}
+}
