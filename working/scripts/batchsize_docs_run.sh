@@ -99,10 +99,16 @@ else
   # layer and is undone by docker rm, so this runs per container, every time (DOCS_HANDOFF §8.4).
   # The image itself is never rebuilt or retagged; product_pdf.pipe does not load this node, so
   # the measured legs are unaffected by its presence.
+  # S5-D: the stamp node is not in any image; copy it in the same way, per container.
+  if [ "${BSZ_STAMP:-}" = "1" ]; then
+    docker cp working/nodes/stamp_probe "$CID":/opt/rocketride/engine/nodes/ || exit 6
+    echo "stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's"
+    NEED_RESTART=1
+  fi
   REPO_MD5="$(md5sum working/nodes/env_probe/IInstance.py | cut -d" " -f1)"
   CON_MD5="$(docker exec "$CID" md5sum /opt/rocketride/engine/nodes/env_probe/IInstance.py 2>/dev/null | cut -d" " -f1)"
   echo "env_probe md5 container=${CON_MD5:-ABSENT} repo=$REPO_MD5"
-  if [ "$CON_MD5" != "$REPO_MD5" ]; then
+  if [ "$CON_MD5" != "$REPO_MD5" ] || [ "${NEED_RESTART:-0}" = "1" ]; then
     echo "env_probe in the container is ${CON_MD5:+STALE}${CON_MD5:-ABSENT} — copying the repo node in and restarting"
     docker cp working/nodes/env_probe "$CID":/opt/rocketride/engine/nodes/ || exit 6
     docker restart "$CID" >/dev/null || exit 6
@@ -124,6 +130,9 @@ ARGS=(--arm "$ARM" --slice "$SLICE" --run-dir "$RUN_DIR" --k "$KLIST" --corpus-d
 # now a reported number (cost.driver_cores), not a hidden one.
 SMOKE_PORT=8801 "$PY" working/scripts/exp_batchsize_sweep.py "${ARGS[@]}"
 RC=$?
+if [ "${BSZ_STAMP:-}" = "1" ] && [ "$ARM" = "rr" ]; then
+  docker cp "$CID":/tmp/stamp_probe.jsonl "$RUN_DIR/stamp_probe.jsonl" && echo "stamps copied out: $(wc -l < "$RUN_DIR/stamp_probe.jsonl") records" || echo "!! no stamp file came out of the container"
+fi
 echo "sweep rc=$RC"
 
 # RUN_DIR is <campaign dir>/<arm>_<label>: one S3 prefix per launch, so a later launch can never

@@ -1,0 +1,13 @@
+{
+	"title": "Stamp Probe",
+	"protocol": "stamp_probe://",
+	"classType": ["preprocessor"],
+	"capabilities": [],
+	"register": "filter",
+	"node": "python",
+	"path": "nodes.stamp_probe",
+	"prefix": "StampProbe",
+	"description": ["Benchmark-only node (NOT part of RocketRide; safe to delete). A PASS-THROUGH placed at a stage boundary: it forwards every text or documents event unchanged (it never calls preventDefault) and records, per document, when its pipeline instance opened and when the first and last event crossed this boundary. S5-D uses it to separate admission queueing from service time inside one token."],
+	"lanes": { "text": ["text"], "documents": ["documents"] },
+	"shape": [ { "section": "Pipe", "title": "Stamp Probe", "properties": [] } ]
+}

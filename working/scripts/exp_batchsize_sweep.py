@@ -100,6 +100,10 @@ STRAY_CORE_LIMIT = float(os.environ.get("BSZ_STRAY_CORE_LIMIT", "0.5"))   # Ruli
 IDLE_SPIN_WINDOW_S = float(os.environ.get("BSZ_IDLE_SPIN_WINDOW_S", "6.0"))
 DROP_CACHES = os.environ.get("BSZ_DROP_CACHES", "") not in ("", "0")   # G5(a)
 PREWARM = os.environ.get("BSZ_PREWARM", "") not in ("", "0")
+# S5-D: stage stamps. Adds three PASS-THROUGH stamp_probe nodes at the parse, split and embed
+# boundaries (proven on the laptop engine: chunk hashes identical with and without them) and names
+# every send so engine-side stamps join client-side records. An INSTRUMENTED leg, labelled so.
+STAMP = os.environ.get("BSZ_STAMP", "") not in ("", "0")
 ENVPROBE_SCHEMA_MIN = 2                      # driver_video.py:679, same contract
 ENVPROBE_REQUIRED = ("env_probe_schema", "env", "torch_num_threads", "python_version")
 DOCUMENT_OUTCOMES = ("no_documents", "empty_extraction", "parse_failed")
@@ -552,9 +556,31 @@ def rr_batch_records(files: List[Path], out: Any, bi: int, t0_ns: int, t1_ns: in
     return recs
 
 
+def stamp_pipeline(pipe: Dict[str, Any]) -> Dict[str, Any]:
+    """product_pdf.pipe with a pass-through stamp at each stage boundary. Same wiring the laptop
+    test proved: every node keeps its inputs except that each stage now reads from the stamp
+    that follows the stage before it."""
+    comp = {c["id"]: c for c in pipe["components"]}
+    pipe["components"] += [
+        {"id": "stamp_parse", "provider": "stamp_probe", "config": {},
+         "input": [{"lane": "text", "from": "parse_1"}]},
+        {"id": "stamp_split", "provider": "stamp_probe", "config": {},
+         "input": [{"lane": "documents", "from": "preprocessor_1"}]},
+        {"id": "stamp_embed", "provider": "stamp_probe", "config": {},
+         "input": [{"lane": "documents", "from": "embedding_1"}]}]
+    comp["preprocessor_1"]["input"] = [{"lane": "text", "from": "stamp_parse"}
+                                       if i["from"] == "parse_1" else i
+                                       for i in comp["preprocessor_1"]["input"]]
+    comp["embedding_1"]["input"] = [{"lane": "documents", "from": "stamp_split"}]
+    comp["response_1"]["input"] = [{"lane": "documents", "from": "stamp_embed"}]
+    return pipe
+
+
 async def rr_open(threads: Optional[int]):
     from rocketride import RocketRideClient
     pipe = json.loads(PIPE.read_text())
+    if STAMP:
+        pipe = stamp_pipeline(pipe)
     pipe["project_id"] = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"bsz-{os.getpid()}-{time.time()}"))
     pp = ROOT / "working" / "pipes" / "generated" / f"bsz_{os.getpid()}.pipe"
     pp.parent.mkdir(parents=True, exist_ok=True)
@@ -615,7 +641,8 @@ async def rr_send_continuous(c, tok, files: List[Path], conc: int, w: Optional[J
             row: Dict[str, Any] = {"doc": p.name, "batch": None, "submit_ns": time.time_ns(),
                                    "timing_source": "per-document submit/return (MEASURED)"}
             try:
-                o = await asyncio.wait_for(c.send(tok, b, mimetype="application/pdf"),
+                kw = {"objinfo": {"name": p.name}} if STAMP else {}
+                o = await asyncio.wait_for(c.send(tok, b, mimetype="application/pdf", **kw),
                                            timeout=DOC_TIMEOUT_S)
                 texts = [d.get("page_content", "") for d in documents_from(o)]
                 row.update(completion_ns=time.time_ns(), ok=bool(texts), n_chunks=len(texts),
@@ -873,6 +900,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
         "process_readback": {"thirty_s_into_window": state.get("proc_mid"),
                              "at_window_close": state.get("proc_end")},
         "cpuset_declared_for_s5c": facts.get("declared_cpuset"),
+        "instrumented_s5d_stamps": STAMP,
         "memory": {"at_window_open": state.get("mem_start"),
                    "at_window_close": state.get("mem_end")},
         # BLAST RADIUS (envelope). One failed send_files costs the WHOLE batch, so the price of
