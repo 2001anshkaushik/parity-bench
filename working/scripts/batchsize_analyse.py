@@ -46,18 +46,30 @@ DOCUMENT_OUTCOMES = {"no_documents", "empty_extraction", "parse_failed"}
 def _units_by_run_dir(d: Path) -> Dict[str, Any]:
     """Each launch's per-arm export records the shape the arm was started with. Read it rather
     than parsing launch directory names: the name is a label, the export is the read-back."""
+    # TWO LAYOUTS (2026-09-21). A campaign pulled from S3 holds its exports beside its launches;
+    # the COMMITTED tree keeps them one level up, at the working/results/ root. Reading only the
+    # first layout, an analysis of the committed Stage 3b directory found no export, lost every
+    # service-arm worker count, and pooled the 16/24/32-worker legs into one noise floor (13.15%
+    # against 9.87%) — entry 39's error returning through a file layout. Exports one level up are
+    # accepted only when their run_dir names THIS campaign, so launch names cannot collide.
+    cands = [(f, False) for f in sorted(d.glob("exp_batchsize_sweep_*.json"))]
+    cands += [(f, True) for f in sorted(d.parent.glob("exp_batchsize_sweep_*.json"))]
     out: Dict[str, Any] = {}
-    for f in sorted(d.glob("exp_batchsize_sweep_*.json")):
+    for f, one_up in cands:
         try:
             data = json.loads(f.read_text()).get("data", {})
         except (OSError, json.JSONDecodeError):
             continue
-        rd = (data.get("run_dir") or "").rstrip("/").split("/")[-1]
+        parts = (data.get("run_dir") or "").rstrip("/").split("/")
+        rd = parts[-1]
+        if one_up and (len(parts) < 2 or parts[-2] != d.name):
+            continue
         p_ = data.get("posture") or {}
-        if rd:
+        if rd and rd not in out:
             out[rd] = {"ws1_workers": p_.get("ws1_workers"),
                        "thread_env": p_.get("thread_env_expected"),
-                       "rr_threads": data.get("posture", {}).get("rr_threads_requested")}
+                       "rr_threads": data.get("posture", {}).get("rr_threads_requested"),
+                       "export": f.name}
     return out
 
 
@@ -70,6 +82,8 @@ def load_campaign(d: Path) -> List[Dict[str, Any]]:
     units = _units_by_run_dir(d)
     for lj in sorted(d.glob("*/leg_*.json")):
         if lj.parent.name.startswith("shake"):
+            continue
+        if LAUNCHES is not None and lj.parent.name not in LAUNCHES:
             continue
         leg = json.loads(lj.read_text())
         leg["_launch"] = lj.parent.name
@@ -97,6 +111,10 @@ def load_campaign(d: Path) -> List[Dict[str, Any]]:
         # warm ones, one level up. A replicate is the same work under the same conditions.
         u = units.get(lj.parent.name) or {}
         leg["arm_units"] = u.get("ws1_workers") if leg["arm"] == "li" else 1
+        if leg["arm_units"] is None:
+            # Fail closed: an unknown worker count cannot be partitioned, and pooling it is entry 39.
+            raise SystemExit(f"REFUSED: launch {lj.parent.name}'s service worker count is unknown — no "
+                             f"export names it in {d} or {d.parent}; pooling it would mix configurations")
         leg["cell"] = f"{leg['condition']}/units={leg['arm_units']}"
         leg["verdict_export"] = leg.get("verdict")
         # A TimeoutError is OUR client deadline firing — the engine did not error, the driver
@@ -200,6 +218,7 @@ def check_content(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
 def check_tail(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
     per_leg: Dict[str, Any] = {}
     by_arm: Dict[str, Dict[str, List[Tuple[float, float]]]] = {}
+    ref_units = reference_units(legs)
     for g in legs:
         rows = g.get("_perdoc")
         if g.get("verdict") != "OK" or not rows:
@@ -246,7 +265,8 @@ def check_tail(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
                                                                   - last["submit_ns"]) / 1e9, 1),
                             "seconds_after_p99": round(span - t99, 1)}}
         key = f"k{g['k']}" if g.get("k") else f"refc{g['reference_c']}"
-        by_arm.setdefault(g["arm"], {}).setdefault(key, []).append((a, b))
+        if g.get("condition") == "warm" and g.get("arm_units") == ref_units.get(g["arm"]):
+            by_arm.setdefault(g["arm"], {}).setdefault(key, []).append((a, b))
     ranks: Dict[str, Any] = {}
     for arm, m in by_arm.items():
         mean = lambda v, i: sum(x[i] for x in v) / len(v)      # noqa: E731
@@ -282,6 +302,11 @@ def noise_floor(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 EXTERNAL_FLOORS: Dict[str, float] = {}
 EXTERNAL_FLOORS_SRC = ""
+# --launches a,b,c: analyse only these launch directories of a campaign. A campaign can hold
+# slices of different sizes (Stage 3b: the 384-document legs and the 96-document G4 anchors),
+# which the document-count refusal rightly will not pool. Selecting launches in the COMMITTED
+# directory keeps the analysis reproducible from the repo; a scratch directory of symlinks did not.
+LAUNCHES: Optional[set] = None
 STRAGGLER = "039_039660.pdf"
 # C4 (ruling 2026-09-21): every RocketRide docs figure carries this, verbatim.
 RR_DOCS_CAVEAT = ("32 vCPU unconstrained per Ruling A; measured posture cost vs 24-core cpuset "
@@ -387,7 +412,9 @@ def cache_effect(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
         for g in legs:
             if g["arm"] != arm or g.get("verdict") != "OK":
                 continue
-            key = f"K={g['k']}" if g.get("k") else f"C={g['reference_c']}"
+            # The SAME configuration means the same arm shape too: the cold C=32 leg ran at 24
+            # workers, and the 16- and 32-worker C=32 legs are not its warm twins (register 39).
+            key = (f"K={g['k']}" if g.get("k") else f"C={g['reference_c']}") + f"@units={g.get('arm_units')}"
             if g["condition"] not in ("cold", "warm"):
                 continue                      # S5-C / S5-D legs are not part of the cache comparison
             cells.setdefault(key, {}).setdefault(g["condition"], []).append(g)
@@ -407,10 +434,11 @@ def cache_effect(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
     return out
 
 
-def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
-    out: Dict[str, Any] = {}
-    # The K grid and the continuous curve are read at ONE arm shape — the one most of the
-    # campaign ran — so a worker-count sweep cannot leak into a batch-size ranking.
+def reference_units(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """The K grid and the continuous curve are read at ONE arm shape — the one most of the
+    campaign ran, warm — so a worker-count sweep or a cold leg cannot leak into a ranking. Every
+    function that groups legs as replicates uses this, not only rank() (register 39: check_tail and
+    cache_effect grouped by K alone, pooling the cold leg and three worker counts, until 2026-09-21)."""
     ref_units: Dict[str, Any] = {}
     for arm in sorted({g["arm"] for g in legs}):
         counts: Dict[Any, int] = {}
@@ -418,6 +446,12 @@ def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
             if g["arm"] == arm and g.get("condition") == "warm":
                 counts[g.get("arm_units")] = counts.get(g.get("arm_units"), 0) + 1
         ref_units[arm] = max(counts, key=lambda u: counts[u]) if counts else None
+    return ref_units
+
+
+def rank(legs: List[Dict[str, Any]], floors: Dict[str, Any]) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    ref_units = reference_units(legs)
     for arm in sorted({g["arm"] for g in legs}):
         per_k: Dict[int, List[Dict[str, Any]]] = {}
         ref = []
@@ -550,6 +584,13 @@ def main() -> int:
         fl = json.loads(fp.read_text())
         EXTERNAL_FLOORS.update({a: fl[a] for a in ("rr", "li") if isinstance(fl.get(a), (int, float))})
         EXTERNAL_FLOORS_SRC = fp.name
+    if "--launches" in sys.argv:
+        global LAUNCHES
+        LAUNCHES = {x for x in sys.argv[sys.argv.index("--launches") + 1].split(",") if x}
+        absent = sorted(x for x in LAUNCHES if not (d / x).is_dir())
+        if absent:
+            print(f"REFUSED: selected launches absent from {d}: {absent}")
+            return 3
     legs = load_campaign(d)
     if not legs:
         print(f"REFUSED: no leg_*.json under {d}/*/")
@@ -557,6 +598,8 @@ def main() -> int:
     floors = noise_floor(legs)
     rep = {
         "campaign_dir": str(d),
+        "command": " ".join(["batchsize_analyse.py"] + sys.argv[1:]),
+        "launches_selected": sorted(LAUNCHES) if LAUNCHES is not None else "all",
         "legs_seen": [f"{g['_launch']}/{g['arm']}/{g['leg']}:{g.get('verdict')}" for g in legs],
         "ranking": rank(legs, floors),
         "noise_floor": floors,

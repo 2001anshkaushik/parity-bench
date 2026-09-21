@@ -1,0 +1,103 @@
+{
+ "out_dir": "working/results/batchsize_s3b_20260920T203139Z/video/rep",
+ "legs": [
+  {
+   "arm": "li",
+   "k": 8,
+   "variant": "_rep",
+   "dir": "li_k8_rep",
+   "verdict": "OK",
+   "posture": "workers[declared_workers=8]",
+   "n_offered": 16,
+   "n_errors": 0,
+   "span_s": 261.0,
+   "frames": 3203,
+   "frames_per_s": 12.274,
+   "videos_per_s": 0.0613,
+   "effective_cores": 24.182,
+   "cpu_util_of_box": 0.7557,
+   "box_cpus": 32,
+   "efficiency_valid": true,
+   "idle_burden": 0.036,
+   "driver_share_of_box": 0.0013,
+   "preleg_foreign_excess": 0.03,
+   "percore_host": {
+    "n_intervals": 254,
+    "ncpus": 32,
+    "idle_threshold": 0.1,
+    "mean_busy_cores": 24.945,
+    "idle_core_equivalents": 7.055,
+    "host_util_of_cpuset": 0.7795,
+    "idle_core_count_mean": 4.36,
+    "idle_core_count_min": 0,
+    "idle_core_count_p50": 1,
+    "idle_core_count_max": 30,
+    "cores_idle_whole_leg": 0,
+    "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm"
+   },
+   "percore_window_s": 254.3,
+   "check_B_host_minus_cgroup_cores": 0.763
+  },
+  {
+   "arm": "rr",
+   "k": 16,
+   "variant": "_rep",
+   "dir": "rr_k16_rep",
+   "verdict": "OK",
+   "posture": "default[tokens=1,threads=unset(engine-default-64)]",
+   "n_offered": 16,
+   "n_errors": 0,
+   "span_s": 1346.3,
+   "frames": 3203,
+   "frames_per_s": 2.379,
+   "videos_per_s": 0.01188,
+   "effective_cores": 5.507,
+   "cpu_util_of_box": 0.1721,
+   "box_cpus": 32,
+   "efficiency_valid": true,
+   "idle_burden": 1.226,
+   "driver_share_of_box": 0.0002,
+   "preleg_foreign_excess": 0.01,
+   "percore_host": {
+    "n_intervals": 1333,
+    "ncpus": 32,
+    "idle_threshold": 0.1,
+    "mean_busy_cores": 5.671,
+    "idle_core_equivalents": 26.329,
+    "host_util_of_cpuset": 0.1772,
+    "idle_core_count_mean": 7.64,
+    "idle_core_count_min": 0,
+    "idle_core_count_p50": 8,
+    "idle_core_count_max": 28,
+    "cores_idle_whole_leg": 0,
+    "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm"
+   },
+   "percore_window_s": 1334.3,
+   "check_B_host_minus_cgroup_cores": 0.164
+  }
+ ],
+ "by_arm": {
+  "li": {
+   "ranking": [
+    [
+     8,
+     12.274
+    ]
+   ],
+   "call": {
+    "best_k": 8
+   }
+  },
+  "rr": {
+   "ranking": [
+    [
+     16,
+     2.379
+    ]
+   ],
+   "call": {
+    "best_k": 16
+   }
+  }
+ }
+}

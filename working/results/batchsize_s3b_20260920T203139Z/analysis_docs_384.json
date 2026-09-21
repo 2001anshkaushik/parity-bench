@@ -1,0 +1,4552 @@
+{
+ "campaign_dir": "working/results/batchsize_s3b_20260920T203139Z",
+ "command": "batchsize_analyse.py working/results/batchsize_s3b_20260920T203139Z --launches li_cold,li_u32a,li_u32b,li_w16,li_w32,rr_cold,rr_u32a,rr_u32b --out working/results/batchsize_s3b_20260920T203139Z/analysis_docs_384.json",
+ "launches_selected": [
+  "li_cold",
+  "li_u32a",
+  "li_u32b",
+  "li_w16",
+  "li_w32",
+  "rr_cold",
+  "rr_u32a",
+  "rr_u32b"
+ ],
+ "legs_seen": [
+  "li_cold/li/k128_cold:OK",
+  "li_cold/li/refc32_cold:OK",
+  "li_u32a/li/k128_u32a:OK",
+  "li_u32a/li/k16_u32a:OK",
+  "li_u32a/li/k1_u32a:OK",
+  "li_u32a/li/k256_u32a:OK",
+  "li_u32a/li/k32_u32a:OK",
+  "li_u32a/li/k384_u32a:OK",
+  "li_u32a/li/k64_u32a:OK",
+  "li_u32a/li/k8_u32a:OK",
+  "li_u32a/li/refc16_u32a:OK",
+  "li_u32a/li/refc32_u32a:OK",
+  "li_u32a/li/refc4_u32a:OK",
+  "li_u32a/li/refc64_u32a:OK",
+  "li_u32a/li/refc8_u32a:OK",
+  "li_u32b/li/k128_u32b:OK",
+  "li_u32b/li/k256_u32b:OK",
+  "li_u32b/li/refc32_u32b:OK",
+  "li_w16/li/refc32_w16:OK",
+  "li_w32/li/refc32_w32:OK",
+  "rr_cold/rr/k128_cold:OK",
+  "rr_cold/rr/refc32_cold:OK",
+  "rr_u32a/rr/k128_u32a:OK",
+  "rr_u32a/rr/k16_u32a:OK",
+  "rr_u32a/rr/k1_u32a:OK",
+  "rr_u32a/rr/k256_u32a:OK",
+  "rr_u32a/rr/k32_u32a:OK",
+  "rr_u32a/rr/k384_u32a:OK",
+  "rr_u32a/rr/k64_u32a:OK",
+  "rr_u32a/rr/k8_u32a:OK",
+  "rr_u32a/rr/refc16_u32a:OK",
+  "rr_u32a/rr/refc32_u32a:OK",
+  "rr_u32a/rr/refc4_u32a:OK",
+  "rr_u32a/rr/refc64_u32a:OK",
+  "rr_u32a/rr/refc8_u32a:OK",
+  "rr_u32b/rr/k128_u32b:OK",
+  "rr_u32b/rr/k256_u32b:OK",
+  "rr_u32b/rr/refc32_u32b:OK"
+ ],
+ "ranking": {
+  "li": {
+   "by_k": [
+    {
+     "k": 1,
+     "runs": 1,
+     "docs_per_s_mean": 0.4138,
+     "docs_per_s_all": [
+      0.4138
+     ],
+     "effective_cores": 1.033,
+     "cpu_utilization": 0.0323,
+     "idle_core_count_mean": 30.88,
+     "idle_core_equivalents": 30.967,
+     "cpu_s_per_doc": 2.4959,
+     "batch_wall_s_max": 74.045,
+     "engine_cores": 1.033,
+     "driver_cores": 0.002,
+     "host_cores": 1.033,
+     "unattributed_cores": -0.002,
+     "idle_spin_cores": 0.034,
+     "idle_spin_burned_cores": 0.034,
+     "available_cpus": 32
+    },
+    {
+     "k": 8,
+     "runs": 1,
+     "docs_per_s_mean": 0.8101,
+     "docs_per_s_all": [
+      0.8101
+     ],
+     "effective_cores": 2.077,
+     "cpu_utilization": 0.0649,
+     "idle_core_count_mean": 29.36,
+     "idle_core_equivalents": 29.921,
+     "cpu_s_per_doc": 2.5641,
+     "batch_wall_s_max": 75.375,
+     "engine_cores": 2.077,
+     "driver_cores": 0.004,
+     "host_cores": 2.079,
+     "unattributed_cores": -0.002,
+     "idle_spin_cores": 0.034,
+     "idle_spin_burned_cores": 0.034,
+     "available_cpus": 32
+    },
+    {
+     "k": 16,
+     "runs": 1,
+     "docs_per_s_mean": 1.0593,
+     "docs_per_s_all": [
+      1.0593
+     ],
+     "effective_cores": 2.817,
+     "cpu_utilization": 0.088,
+     "idle_core_count_mean": 28.33,
+     "idle_core_equivalents": 29.176,
+     "cpu_s_per_doc": 2.6596,
+     "batch_wall_s_max": 72.008,
+     "engine_cores": 2.817,
+     "driver_cores": 0.005,
+     "host_cores": 2.824,
+     "unattributed_cores": 0.002,
+     "idle_spin_cores": 0.035,
+     "idle_spin_burned_cores": 0.035,
+     "available_cpus": 32
+    },
+    {
+     "k": 32,
+     "runs": 1,
+     "docs_per_s_mean": 1.3889,
+     "docs_per_s_all": [
+      1.3889
+     ],
+     "effective_cores": 4.018,
+     "cpu_utilization": 0.1256,
+     "idle_core_count_mean": 27.05,
+     "idle_core_equivalents": 27.973,
+     "cpu_s_per_doc": 2.893,
+     "batch_wall_s_max": 74.43,
+     "engine_cores": 4.018,
+     "driver_cores": 0.007,
+     "host_cores": 4.027,
+     "unattributed_cores": 0.002,
+     "idle_spin_cores": 0.035,
+     "idle_spin_burned_cores": 0.035,
+     "available_cpus": 32
+    },
+    {
+     "k": 64,
+     "runs": 1,
+     "docs_per_s_mean": 1.9108,
+     "docs_per_s_all": [
+      1.9108
+     ],
+     "effective_cores": 5.955,
+     "cpu_utilization": 0.1861,
+     "idle_core_count_mean": 25.52,
+     "idle_core_equivalents": 26.028,
+     "cpu_s_per_doc": 3.1165,
+     "batch_wall_s_max": 78.212,
+     "engine_cores": 5.955,
+     "driver_cores": 0.01,
+     "host_cores": 5.972,
+     "unattributed_cores": 0.007,
+     "idle_spin_cores": 0.035,
+     "idle_spin_burned_cores": 0.035,
+     "available_cpus": 32
+    },
+    {
+     "k": 128,
+     "runs": 2,
+     "docs_per_s_mean": 2.1654,
+     "docs_per_s_all": [
+      2.2723,
+      2.0586
+     ],
+     "effective_cores": 7.117,
+     "cpu_utilization": 0.2224,
+     "idle_core_count_mean": 24.3,
+     "idle_core_equivalents": 24.843,
+     "cpu_s_per_doc": 3.2873,
+     "batch_wall_s_max": 92.944,
+     "engine_cores": 7.117,
+     "driver_cores": 0.013,
+     "host_cores": 7.157,
+     "unattributed_cores": 0.026,
+     "idle_spin_cores": 0.035,
+     "idle_spin_burned_cores": 0.035,
+     "available_cpus": 32
+    },
+    {
+     "k": 256,
+     "runs": 2,
+     "docs_per_s_mean": 2.217,
+     "docs_per_s_all": [
+      2.1723,
+      2.2617
+     ],
+     "effective_cores": 7.75,
+     "cpu_utilization": 0.2422,
+     "idle_core_count_mean": 23.77,
+     "idle_core_equivalents": 24.223,
+     "cpu_s_per_doc": 3.4954,
+     "batch_wall_s_max": 125.483,
+     "engine_cores": 7.75,
+     "driver_cores": 0.014,
+     "host_cores": 7.777,
+     "unattributed_cores": 0.013,
+     "idle_spin_cores": 0.035,
+     "idle_spin_burned_cores": 0.035,
+     "available_cpus": 32
+    },
+    {
+     "k": 384,
+     "runs": 1,
+     "docs_per_s_mean": 3.307,
+     "docs_per_s_all": [
+      3.307
+     ],
+     "effective_cores": 12.398,
+     "cpu_utilization": 0.3874,
+     "idle_core_count_mean": 18.87,
+     "idle_core_equivalents": 19.562,
+     "cpu_s_per_doc": 3.749,
+     "batch_wall_s_max": 115.184,
+     "engine_cores": 12.398,
+     "driver_cores": 0.022,
+     "host_cores": 12.438,
+     "unattributed_cores": 0.018,
+     "idle_spin_cores": 0.035,
+     "idle_spin_burned_cores": 0.035,
+     "available_cpus": 32
+    }
+   ],
+   "call": {
+    "best_k": 384,
+    "runner_up_k": 256,
+    "lead_over_runner_up": 0.4917,
+    "noise_floor": 0.0987,
+    "verdict": "RESOLVED \u2014 lead exceeds the noise floor",
+    "in_requested_grid": {
+     "grid": [
+      1,
+      8,
+      16,
+      32,
+      64,
+      128
+     ],
+     "best_k": 128,
+     "runner_up_k": 64,
+     "lead_over_runner_up": 0.1332,
+     "best_worst_run": 2.0586,
+     "runner_up_best_run": 1.9108,
+     "ranges_non_overlapping": null,
+     "monotonic_in_k": true,
+     "best_is_grid_edge": true
+    },
+    "continuous_knee": {
+     "curve": {
+      "4": 1.5444,
+      "8": 2.7016,
+      "16": 3.3481,
+      "32": 3.5358,
+      "64": 3.3858
+     },
+     "best_c": 32,
+     "best_docs_per_s": 3.5358,
+     "noise_floor_used": 0.0987,
+     "noise_floor_source": "this campaign's own replicates",
+     "tie": true,
+     "tie_between": [
+      16,
+      32,
+      64
+     ],
+     "chosen_cell_basis": "TIE by the rule \u2014 the best mean is chosen per register entry 12 (never run the competitor below a candidate optimum), NOT as a validated winner",
+     "knee_c": 16,
+     "rule": "smallest C within the arm's replicate noise floor of the best C",
+     "verdict": "knee at C=16"
+    },
+    "batching_vs_continuous": {
+     "best_batched_docs_per_s": 3.307,
+     "continuous_docs_per_s": 3.66,
+     "batched_over_continuous": 0.9036
+    }
+   },
+   "continuous_reference": [
+    {
+     "reference_c": 16,
+     "docs_per_s": 3.3481,
+     "effective_cores": 10.115,
+     "cpu_utilization": 0.3161,
+     "idle_core_count_mean": 19.18,
+     "idle_core_equivalents": 21.798,
+     "idle_spin_burned_cores": 0.035,
+     "idle_spin_cores": 0.035,
+     "engine_cores": 10.115,
+     "driver_cores": 0.021,
+     "host_cores": 10.202,
+     "unattributed_cores": 0.067,
+     "available_cpus": 32,
+     "launch": "li_u32a"
+    },
+    {
+     "reference_c": 32,
+     "docs_per_s": 3.66,
+     "effective_cores": 14.395,
+     "cpu_utilization": 0.4498,
+     "idle_core_count_mean": 16.96,
+     "idle_core_equivalents": 17.573,
+     "idle_spin_burned_cores": 0.034,
+     "idle_spin_cores": 0.034,
+     "engine_cores": 14.395,
+     "driver_cores": 0.024,
+     "host_cores": 14.427,
+     "unattributed_cores": 0.008,
+     "available_cpus": 32,
+     "launch": "li_u32a"
+    },
+    {
+     "reference_c": 4,
+     "docs_per_s": 1.5444,
+     "effective_cores": 3.961,
+     "cpu_utilization": 0.1238,
+     "idle_core_count_mean": 27.25,
+     "idle_core_equivalents": 28.024,
+     "idle_spin_burned_cores": 0.034,
+     "idle_spin_cores": 0.034,
+     "engine_cores": 3.961,
+     "driver_cores": 0.007,
+     "host_cores": 3.976,
+     "unattributed_cores": 0.008,
+     "available_cpus": 32,
+     "launch": "li_u32a"
+    },
+    {
+     "reference_c": 64,
+     "docs_per_s": 3.3858,
+     "effective_cores": 12.815,
+     "cpu_utilization": 0.4005,
+     "idle_core_count_mean": 18.57,
+     "idle_core_equivalents": 19.111,
+     "idle_spin_burned_cores": 0.036,
+     "idle_spin_cores": 0.036,
+     "engine_cores": 12.815,
+     "driver_cores": 0.022,
+     "host_cores": 12.889,
+     "unattributed_cores": 0.051,
+     "available_cpus": 32,
+     "launch": "li_u32a"
+    },
+    {
+     "reference_c": 8,
+     "docs_per_s": 2.7016,
+     "effective_cores": 7.446,
+     "cpu_utilization": 0.2327,
+     "idle_core_count_mean": 22.83,
+     "idle_core_equivalents": 24.496,
+     "idle_spin_burned_cores": 0.035,
+     "idle_spin_cores": 0.035,
+     "engine_cores": 7.446,
+     "driver_cores": 0.012,
+     "host_cores": 7.504,
+     "unattributed_cores": 0.047,
+     "available_cpus": 32,
+     "launch": "li_u32a"
+    },
+    {
+     "reference_c": 32,
+     "docs_per_s": 3.4117,
+     "effective_cores": 13.446,
+     "cpu_utilization": 0.4202,
+     "idle_core_count_mean": 18.25,
+     "idle_core_equivalents": 18.462,
+     "idle_spin_burned_cores": 0.034,
+     "idle_spin_cores": 0.034,
+     "engine_cores": 13.446,
+     "driver_cores": 0.022,
+     "host_cores": 13.538,
+     "unattributed_cores": 0.071,
+     "available_cpus": 32,
+     "launch": "li_u32b"
+    }
+   ],
+   "arm_units_ranked": "24",
+   "arm_units_note": "the K grid and continuous curve are read at this arm shape only; other shapes are in unit_sweep"
+  },
+  "rr": {
+   "by_k": [
+    {
+     "k": 1,
+     "runs": 1,
+     "docs_per_s_mean": 0.2942,
+     "docs_per_s_all": [
+      0.2942
+     ],
+     "effective_cores": 2.285,
+     "cpu_utilization": 0.0714,
+     "idle_core_count_mean": 28.38,
+     "idle_core_equivalents": 29.725,
+     "cpu_s_per_doc": 7.7678,
+     "batch_wall_s_max": 94.928,
+     "engine_cores": 2.285,
+     "driver_cores": 0.003,
+     "host_cores": 2.275,
+     "unattributed_cores": -0.013,
+     "idle_spin_cores": 1.236,
+     "idle_spin_burned_cores": 1.236,
+     "available_cpus": 32
+    },
+    {
+     "k": 8,
+     "runs": 1,
+     "docs_per_s_mean": 0.5254,
+     "docs_per_s_all": [
+      0.5254
+     ],
+     "effective_cores": 3.25,
+     "cpu_utilization": 0.1016,
+     "idle_core_count_mean": 26.38,
+     "idle_core_equivalents": 28.762,
+     "cpu_s_per_doc": 6.1857,
+     "batch_wall_s_max": 94.057,
+     "engine_cores": 3.25,
+     "driver_cores": 0.004,
+     "host_cores": 3.238,
+     "unattributed_cores": -0.017,
+     "idle_spin_cores": 1.236,
+     "idle_spin_burned_cores": 1.236,
+     "available_cpus": 32
+    },
+    {
+     "k": 16,
+     "runs": 1,
+     "docs_per_s_mean": 0.6461,
+     "docs_per_s_all": [
+      0.6461
+     ],
+     "effective_cores": 3.934,
+     "cpu_utilization": 0.123,
+     "idle_core_count_mean": 25.12,
+     "idle_core_equivalents": 28.072,
+     "cpu_s_per_doc": 6.0897,
+     "batch_wall_s_max": 95.204,
+     "engine_cores": 3.934,
+     "driver_cores": 0.006,
+     "host_cores": 3.928,
+     "unattributed_cores": -0.012,
+     "idle_spin_cores": 1.236,
+     "idle_spin_burned_cores": 1.236,
+     "available_cpus": 32
+    },
+    {
+     "k": 32,
+     "runs": 1,
+     "docs_per_s_mean": 0.8448,
+     "docs_per_s_all": [
+      0.8448
+     ],
+     "effective_cores": 5.059,
+     "cpu_utilization": 0.1581,
+     "idle_core_count_mean": 23.98,
+     "idle_core_equivalents": 26.936,
+     "cpu_s_per_doc": 5.9882,
+     "batch_wall_s_max": 95.761,
+     "engine_cores": 5.059,
+     "driver_cores": 0.008,
+     "host_cores": 5.064,
+     "unattributed_cores": -0.003,
+     "idle_spin_cores": 1.237,
+     "idle_spin_burned_cores": 1.237,
+     "available_cpus": 32
+    },
+    {
+     "k": 64,
+     "runs": 1,
+     "docs_per_s_mean": 1.1371,
+     "docs_per_s_all": [
+      1.1371
+     ],
+     "effective_cores": 7.08,
+     "cpu_utilization": 0.2212,
+     "idle_core_count_mean": 21.85,
+     "idle_core_equivalents": 24.899,
+     "cpu_s_per_doc": 6.2264,
+     "batch_wall_s_max": 101.005,
+     "engine_cores": 7.08,
+     "driver_cores": 0.012,
+     "host_cores": 7.101,
+     "unattributed_cores": 0.009,
+     "idle_spin_cores": 1.237,
+     "idle_spin_burned_cores": 1.237,
+     "available_cpus": 32
+    },
+    {
+     "k": 128,
+     "runs": 2,
+     "docs_per_s_mean": 1.833,
+     "docs_per_s_all": [
+      1.8273,
+      1.8387
+     ],
+     "effective_cores": 11.441,
+     "cpu_utilization": 0.3575,
+     "idle_core_count_mean": 16.59,
+     "idle_core_equivalents": 20.482,
+     "cpu_s_per_doc": 6.2416,
+     "batch_wall_s_max": 118.149,
+     "engine_cores": 11.441,
+     "driver_cores": 0.021,
+     "host_cores": 11.518,
+     "unattributed_cores": 0.057,
+     "idle_spin_cores": 1.236,
+     "idle_spin_burned_cores": 1.236,
+     "available_cpus": 32
+    },
+    {
+     "k": 256,
+     "runs": 2,
+     "docs_per_s_mean": 2.0593,
+     "docs_per_s_all": [
+      2.0509,
+      2.0677
+     ],
+     "effective_cores": 13.127,
+     "cpu_utilization": 0.4102,
+     "idle_core_count_mean": 14.86,
+     "idle_core_equivalents": 18.778,
+     "cpu_s_per_doc": 6.3744,
+     "batch_wall_s_max": 143.77,
+     "engine_cores": 13.127,
+     "driver_cores": 0.025,
+     "host_cores": 13.222,
+     "unattributed_cores": 0.071,
+     "idle_spin_cores": 1.232,
+     "idle_spin_burned_cores": 1.232,
+     "available_cpus": 32
+    },
+    {
+     "k": 384,
+     "runs": 1,
+     "docs_per_s_mean": 2.4798,
+     "docs_per_s_all": [
+      2.4798
+     ],
+     "effective_cores": 16.194,
+     "cpu_utilization": 0.5061,
+     "idle_core_count_mean": 12.22,
+     "idle_core_equivalents": 15.621,
+     "cpu_s_per_doc": 6.5304,
+     "batch_wall_s_max": 153.976,
+     "engine_cores": 16.194,
+     "driver_cores": 0.029,
+     "host_cores": 16.379,
+     "unattributed_cores": 0.155,
+     "idle_spin_cores": 1.237,
+     "idle_spin_burned_cores": 1.237,
+     "available_cpus": 32
+    }
+   ],
+   "call": {
+    "best_k": 384,
+    "runner_up_k": 256,
+    "lead_over_runner_up": 0.2042,
+    "noise_floor": 0.0082,
+    "verdict": "RESOLVED \u2014 lead exceeds the noise floor",
+    "in_requested_grid": {
+     "grid": [
+      1,
+      8,
+      16,
+      32,
+      64,
+      128
+     ],
+     "best_k": 128,
+     "runner_up_k": 64,
+     "lead_over_runner_up": 0.612,
+     "best_worst_run": 1.8273,
+     "runner_up_best_run": 1.1371,
+     "ranges_non_overlapping": null,
+     "monotonic_in_k": true,
+     "best_is_grid_edge": true
+    },
+    "continuous_knee": {
+     "curve": {
+      "4": 1.0764,
+      "8": 1.8886,
+      "16": 2.3417,
+      "32": 2.4836,
+      "64": 2.4744
+     },
+     "best_c": 32,
+     "best_docs_per_s": 2.4836,
+     "noise_floor_used": 0.0082,
+     "noise_floor_source": "this campaign's own replicates",
+     "tie": true,
+     "tie_between": [
+      32,
+      64
+     ],
+     "chosen_cell_basis": "TIE by the rule \u2014 the best mean is chosen per register entry 12 (never run the competitor below a candidate optimum), NOT as a validated winner",
+     "knee_c": 32,
+     "rule": "smallest C within the arm's replicate noise floor of the best C",
+     "verdict": "knee at C=32"
+    },
+    "batching_vs_continuous": {
+     "best_batched_docs_per_s": 2.4798,
+     "continuous_docs_per_s": 2.487,
+     "batched_over_continuous": 0.9971
+    }
+   },
+   "continuous_reference": [
+    {
+     "reference_c": 16,
+     "docs_per_s": 2.3417,
+     "effective_cores": 12.471,
+     "cpu_utilization": 0.3897,
+     "idle_core_count_mean": 10.07,
+     "idle_core_equivalents": 19.445,
+     "idle_spin_burned_cores": 1.237,
+     "idle_spin_cores": 1.237,
+     "engine_cores": 12.471,
+     "driver_cores": 0.027,
+     "host_cores": 12.555,
+     "unattributed_cores": 0.057,
+     "available_cpus": 32,
+     "launch": "rr_u32a"
+    },
+    {
+     "reference_c": 32,
+     "docs_per_s": 2.487,
+     "effective_cores": 16.08,
+     "cpu_utilization": 0.5025,
+     "idle_core_count_mean": 12.35,
+     "idle_core_equivalents": 15.767,
+     "idle_spin_burned_cores": 1.219,
+     "idle_spin_cores": 1.219,
+     "engine_cores": 16.08,
+     "driver_cores": 0.034,
+     "host_cores": 16.233,
+     "unattributed_cores": 0.119,
+     "available_cpus": 32,
+     "launch": "rr_u32a"
+    },
+    {
+     "reference_c": 4,
+     "docs_per_s": 1.0764,
+     "effective_cores": 5.388,
+     "cpu_utilization": 0.1684,
+     "idle_core_count_mean": 22.55,
+     "idle_core_equivalents": 26.62,
+     "idle_spin_burned_cores": 1.23,
+     "idle_spin_cores": 1.23,
+     "engine_cores": 5.388,
+     "driver_cores": 0.009,
+     "host_cores": 5.38,
+     "unattributed_cores": -0.018,
+     "available_cpus": 32,
+     "launch": "rr_u32a"
+    },
+    {
+     "reference_c": 64,
+     "docs_per_s": 2.4744,
+     "effective_cores": 16.121,
+     "cpu_utilization": 0.5038,
+     "idle_core_count_mean": 12.21,
+     "idle_core_equivalents": 15.735,
+     "idle_spin_burned_cores": 1.235,
+     "idle_spin_cores": 1.235,
+     "engine_cores": 16.121,
+     "driver_cores": 0.032,
+     "host_cores": 16.265,
+     "unattributed_cores": 0.112,
+     "available_cpus": 32,
+     "launch": "rr_u32a"
+    },
+    {
+     "reference_c": 8,
+     "docs_per_s": 1.8886,
+     "effective_cores": 9.102,
+     "cpu_utilization": 0.2844,
+     "idle_core_count_mean": 13.86,
+     "idle_core_equivalents": 22.881,
+     "idle_spin_burned_cores": 1.236,
+     "idle_spin_cores": 1.236,
+     "engine_cores": 9.102,
+     "driver_cores": 0.018,
+     "host_cores": 9.119,
+     "unattributed_cores": -0.001,
+     "available_cpus": 32,
+     "launch": "rr_u32a"
+    },
+    {
+     "reference_c": 32,
+     "docs_per_s": 2.4802,
+     "effective_cores": 15.993,
+     "cpu_utilization": 0.4998,
+     "idle_core_count_mean": 12.33,
+     "idle_core_equivalents": 15.816,
+     "idle_spin_burned_cores": 1.237,
+     "idle_spin_cores": 1.237,
+     "engine_cores": 15.993,
+     "driver_cores": 0.032,
+     "host_cores": 16.184,
+     "unattributed_cores": 0.159,
+     "available_cpus": 32,
+     "launch": "rr_u32b"
+    }
+   ],
+   "arm_units_ranked": 1,
+   "arm_units_note": "the K grid and continuous curve are read at this arm shape only; other shapes are in unit_sweep"
+  }
+ },
+ "noise_floor": {
+  "li": {
+   "replicated": {
+    "128@units=24": [
+     2.2723,
+     2.0586
+    ],
+    "256@units=24": [
+     2.1723,
+     2.2617
+    ],
+    "refc32@units=24": [
+     3.66,
+     3.4117
+    ]
+   },
+   "relative_spread": {
+    "128@units=24": 0.0987,
+    "256@units=24": 0.0403,
+    "refc32@units=24": 0.0702
+   },
+   "floor": 0.0987
+  },
+  "rr": {
+   "replicated": {
+    "128@units=1": [
+     1.8273,
+     1.8387
+    ],
+    "256@units=1": [
+     2.0509,
+     2.0677
+    ],
+    "refc32@units=1": [
+     2.487,
+     2.4802
+    ]
+   },
+   "relative_spread": {
+    "128@units=1": 0.0062,
+    "256@units=1": 0.0082,
+    "refc32@units=1": 0.0027
+   },
+   "floor": 0.0082
+  }
+ },
+ "check_A_clock": {
+  "li_cold/k128_cold": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.7136,
+   "docs_per_s_export": 1.7135,
+   "relative_gap": 6e-05,
+   "tolerance": 0.02
+  },
+  "li_cold/refc32_cold": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.2839,
+   "docs_per_s_export": 3.2835,
+   "relative_gap": 0.00011,
+   "tolerance": 0.02
+  },
+  "li_u32a/k128_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.2724,
+   "docs_per_s_export": 2.2723,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/k16_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.0593,
+   "docs_per_s_export": 1.0593,
+   "relative_gap": 4e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/k1_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.4138,
+   "docs_per_s_export": 0.4138,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/k256_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.1726,
+   "docs_per_s_export": 2.1723,
+   "relative_gap": 0.00012,
+   "tolerance": 0.02
+  },
+  "li_u32a/k32_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.3889,
+   "docs_per_s_export": 1.3889,
+   "relative_gap": 1e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/k384_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.3078,
+   "docs_per_s_export": 3.307,
+   "relative_gap": 0.00023,
+   "tolerance": 0.02
+  },
+  "li_u32a/k64_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.9109,
+   "docs_per_s_export": 1.9108,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/k8_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.8101,
+   "docs_per_s_export": 0.8101,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/refc16_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.3484,
+   "docs_per_s_export": 3.3481,
+   "relative_gap": 8e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/refc32_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.6603,
+   "docs_per_s_export": 3.66,
+   "relative_gap": 8e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/refc4_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.5444,
+   "docs_per_s_export": 1.5444,
+   "relative_gap": 2e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/refc64_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.386,
+   "docs_per_s_export": 3.3858,
+   "relative_gap": 7e-05,
+   "tolerance": 0.02
+  },
+  "li_u32a/refc8_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.7018,
+   "docs_per_s_export": 2.7016,
+   "relative_gap": 7e-05,
+   "tolerance": 0.02
+  },
+  "li_u32b/k128_u32b": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.0587,
+   "docs_per_s_export": 2.0586,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "li_u32b/k256_u32b": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.2619,
+   "docs_per_s_export": 2.2617,
+   "relative_gap": 8e-05,
+   "tolerance": 0.02
+  },
+  "li_u32b/refc32_u32b": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.412,
+   "docs_per_s_export": 3.4117,
+   "relative_gap": 8e-05,
+   "tolerance": 0.02
+  },
+  "li_w16/refc32_w16": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.2125,
+   "docs_per_s_export": 3.2123,
+   "relative_gap": 7e-05,
+   "tolerance": 0.02
+  },
+  "li_w32/refc32_w32": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 3.3313,
+   "docs_per_s_export": 3.331,
+   "relative_gap": 9e-05,
+   "tolerance": 0.02
+  },
+  "rr_cold/k128_cold": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.8449,
+   "docs_per_s_export": 1.8447,
+   "relative_gap": 0.00011,
+   "tolerance": 0.02
+  },
+  "rr_cold/refc32_cold": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.4577,
+   "docs_per_s_export": 2.4575,
+   "relative_gap": 0.0001,
+   "tolerance": 0.02
+  },
+  "rr_u32a/k128_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.8275,
+   "docs_per_s_export": 1.8273,
+   "relative_gap": 9e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32a/k16_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.6461,
+   "docs_per_s_export": 0.6461,
+   "relative_gap": 2e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32a/k1_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.2942,
+   "docs_per_s_export": 0.2942,
+   "relative_gap": 0.00016,
+   "tolerance": 0.02
+  },
+  "rr_u32a/k256_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.0511,
+   "docs_per_s_export": 2.0509,
+   "relative_gap": 0.00011,
+   "tolerance": 0.02
+  },
+  "rr_u32a/k32_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.8448,
+   "docs_per_s_export": 0.8448,
+   "relative_gap": 3e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32a/k384_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.4809,
+   "docs_per_s_export": 2.4798,
+   "relative_gap": 0.00045,
+   "tolerance": 0.02
+  },
+  "rr_u32a/k64_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.1371,
+   "docs_per_s_export": 1.1371,
+   "relative_gap": 1e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32a/k8_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 0.5254,
+   "docs_per_s_export": 0.5254,
+   "relative_gap": 4e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32a/refc16_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.3418,
+   "docs_per_s_export": 2.3417,
+   "relative_gap": 4e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32a/refc32_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.4871,
+   "docs_per_s_export": 2.487,
+   "relative_gap": 4e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32a/refc4_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.0765,
+   "docs_per_s_export": 1.0764,
+   "relative_gap": 6e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32a/refc64_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.4745,
+   "docs_per_s_export": 2.4744,
+   "relative_gap": 5e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32a/refc8_u32a": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.8887,
+   "docs_per_s_export": 1.8886,
+   "relative_gap": 4e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32b/k128_u32b": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 1.8389,
+   "docs_per_s_export": 1.8387,
+   "relative_gap": 9e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32b/k256_u32b": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.0679,
+   "docs_per_s_export": 2.0677,
+   "relative_gap": 9e-05,
+   "tolerance": 0.02
+  },
+  "rr_u32b/refc32_u32b": {
+   "verdict": "PASS",
+   "docs_per_s_from_records": 2.4804,
+   "docs_per_s_export": 2.4802,
+   "relative_gap": 7e-05,
+   "tolerance": 0.02
+  }
+ },
+ "check_B_cpu_source": {
+  "li_cold/k128_cold": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 5.56,
+   "host_busy_cores_on_cpuset": 5.576,
+   "host_minus_cgroup": 0.016,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_cold/refc32_cold": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 12.81,
+   "host_busy_cores_on_cpuset": 13.117,
+   "host_minus_cgroup": 0.307,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/k128_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 7.44,
+   "host_busy_cores_on_cpuset": 7.477,
+   "host_minus_cgroup": 0.037,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/k16_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 2.817,
+   "host_busy_cores_on_cpuset": 2.824,
+   "host_minus_cgroup": 0.007,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/k1_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 1.033,
+   "host_busy_cores_on_cpuset": 1.033,
+   "host_minus_cgroup": 0.0,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/k256_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 7.58,
+   "host_busy_cores_on_cpuset": 7.605,
+   "host_minus_cgroup": 0.025,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/k32_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 4.018,
+   "host_busy_cores_on_cpuset": 4.027,
+   "host_minus_cgroup": 0.009,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/k384_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 12.398,
+   "host_busy_cores_on_cpuset": 12.438,
+   "host_minus_cgroup": 0.04,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/k64_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 5.955,
+   "host_busy_cores_on_cpuset": 5.972,
+   "host_minus_cgroup": 0.017,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/k8_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 2.077,
+   "host_busy_cores_on_cpuset": 2.079,
+   "host_minus_cgroup": 0.002,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/refc16_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 10.115,
+   "host_busy_cores_on_cpuset": 10.202,
+   "host_minus_cgroup": 0.087,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/refc32_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 14.395,
+   "host_busy_cores_on_cpuset": 14.427,
+   "host_minus_cgroup": 0.032,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/refc4_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 3.961,
+   "host_busy_cores_on_cpuset": 3.976,
+   "host_minus_cgroup": 0.015,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/refc64_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 12.815,
+   "host_busy_cores_on_cpuset": 12.889,
+   "host_minus_cgroup": 0.074,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32a/refc8_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 7.446,
+   "host_busy_cores_on_cpuset": 7.504,
+   "host_minus_cgroup": 0.058,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32b/k128_u32b": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 6.793,
+   "host_busy_cores_on_cpuset": 6.836,
+   "host_minus_cgroup": 0.043,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32b/k256_u32b": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 7.92,
+   "host_busy_cores_on_cpuset": 7.949,
+   "host_minus_cgroup": 0.029,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_u32b/refc32_u32b": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 13.446,
+   "host_busy_cores_on_cpuset": 13.538,
+   "host_minus_cgroup": 0.092,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_w16/refc32_w16": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 9.388,
+   "host_busy_cores_on_cpuset": 9.449,
+   "host_minus_cgroup": 0.061,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "li_w32/refc32_w32": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 15.695,
+   "host_busy_cores_on_cpuset": 15.756,
+   "host_minus_cgroup": 0.061,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_cold/k128_cold": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 11.504,
+   "host_busy_cores_on_cpuset": 11.59,
+   "host_minus_cgroup": 0.086,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_cold/refc32_cold": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 15.874,
+   "host_busy_cores_on_cpuset": 15.999,
+   "host_minus_cgroup": 0.125,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/k128_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 11.447,
+   "host_busy_cores_on_cpuset": 11.531,
+   "host_minus_cgroup": 0.084,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/k16_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 3.934,
+   "host_busy_cores_on_cpuset": 3.928,
+   "host_minus_cgroup": -0.006,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/k1_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 2.285,
+   "host_busy_cores_on_cpuset": 2.275,
+   "host_minus_cgroup": -0.01,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/k256_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 13.091,
+   "host_busy_cores_on_cpuset": 13.171,
+   "host_minus_cgroup": 0.08,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/k32_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 5.059,
+   "host_busy_cores_on_cpuset": 5.064,
+   "host_minus_cgroup": 0.005,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/k384_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 16.194,
+   "host_busy_cores_on_cpuset": 16.379,
+   "host_minus_cgroup": 0.185,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/k64_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 7.08,
+   "host_busy_cores_on_cpuset": 7.101,
+   "host_minus_cgroup": 0.021,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/k8_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 3.25,
+   "host_busy_cores_on_cpuset": 3.238,
+   "host_minus_cgroup": -0.012,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/refc16_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 12.471,
+   "host_busy_cores_on_cpuset": 12.555,
+   "host_minus_cgroup": 0.084,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/refc32_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 16.08,
+   "host_busy_cores_on_cpuset": 16.233,
+   "host_minus_cgroup": 0.153,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/refc4_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 5.388,
+   "host_busy_cores_on_cpuset": 5.38,
+   "host_minus_cgroup": -0.008,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/refc64_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 16.121,
+   "host_busy_cores_on_cpuset": 16.265,
+   "host_minus_cgroup": 0.144,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32a/refc8_u32a": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 9.102,
+   "host_busy_cores_on_cpuset": 9.119,
+   "host_minus_cgroup": 0.017,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32b/k128_u32b": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 11.435,
+   "host_busy_cores_on_cpuset": 11.505,
+   "host_minus_cgroup": 0.07,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32b/k256_u32b": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 13.162,
+   "host_busy_cores_on_cpuset": 13.273,
+   "host_minus_cgroup": 0.111,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  },
+  "rr_u32b/refc32_u32b": {
+   "verdict": "PASS",
+   "cgroup_effective_cores": 15.993,
+   "host_busy_cores_on_cpuset": 16.184,
+   "host_minus_cgroup": 0.191,
+   "tolerance_cores": 1.5,
+   "reading": "host > cgroup is work on the arm's cores the arm's cgroup does not own"
+  }
+ },
+ "check_C_content": {
+  "li": {
+   "reference": "li_cold/k128_cold",
+   "comparisons": [
+    {
+     "leg": "li_cold/refc32_cold",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/k128_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/k16_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/k1_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/k256_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/k32_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/k384_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/k64_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/k8_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/refc16_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/refc32_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/refc4_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/refc64_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32a/refc8_u32a",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32b/k128_u32b",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32b/k256_u32b",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_u32b/refc32_u32b",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_w16/refc32_w16",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "li_w32/refc32_w32",
+     "common": 381,
+     "differing": 0,
+     "examples": []
+    }
+   ],
+   "verdict": "PASS"
+  },
+  "rr": {
+   "reference": "rr_cold/k128_cold",
+   "comparisons": [
+    {
+     "leg": "rr_cold/refc32_cold",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/k128_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/k16_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/k1_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/k256_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/k32_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/k384_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/k64_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/k8_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/refc16_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/refc32_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/refc4_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/refc64_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32a/refc8_u32a",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32b/k128_u32b",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32b/k256_u32b",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    },
+    {
+     "leg": "rr_u32b/refc32_u32b",
+     "common": 382,
+     "differing": 0,
+     "examples": []
+    }
+   ],
+   "verdict": "PASS"
+  },
+  "null_control_cross_arm": {
+   "common": 381,
+   "differing": 379,
+   "verdict": "FIRED",
+   "meaning": "the comparator sees differences where they must exist (different parsers)"
+  }
+ },
+ "check_E_tail": {
+  "per_leg": {
+   "li_cold/k128_cold": {
+    "PRIMARY_docs_per_s_span": 1.7136,
+    "docs_per_s_span": 1.7136,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.7136,
+     "span_s": 222.3,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.8222,
+    "docs_per_s_to_p99": 1.7353,
+    "p99_over_span": 1.013,
+    "p90_over_span": 1.063,
+    "t90_s": 187.7,
+    "t99_s": 217.3,
+    "span_s": 222.3,
+    "span_set_by": {
+     "doc": "024_024887.pdf",
+     "held_s": 44.8,
+     "seconds_after_p99": 5.1
+    }
+   },
+   "li_cold/refc32_cold": {
+    "PRIMARY_docs_per_s_span": 3.2839,
+    "docs_per_s_span": 3.2839,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 3.2839,
+     "span_s": 116.0,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 6.4849,
+    "docs_per_s_to_p99": 5.7542,
+    "p99_over_span": 1.752,
+    "p90_over_span": 1.975,
+    "t90_s": 52.7,
+    "t99_s": 65.5,
+    "span_s": 116.0,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 90.7,
+     "seconds_after_p99": 50.5
+    }
+   },
+   "li_u32a/k128_u32a": {
+    "PRIMARY_docs_per_s_span": 2.2724,
+    "docs_per_s_span": 2.2724,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.2724,
+     "span_s": 167.7,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 2.4505,
+    "docs_per_s_to_p99": 2.3635,
+    "p99_over_span": 1.04,
+    "p90_over_span": 1.078,
+    "t90_s": 139.6,
+    "t99_s": 159.5,
+    "span_s": 167.7,
+    "span_set_by": {
+     "doc": "029_029641.pdf",
+     "held_s": 37.9,
+     "seconds_after_p99": 8.2
+    }
+   },
+   "li_u32a/k16_u32a": {
+    "PRIMARY_docs_per_s_span": 1.0593,
+    "docs_per_s_span": 1.0593,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.0593,
+     "span_s": 359.7,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.0523,
+    "docs_per_s_to_p99": 1.0673,
+    "p99_over_span": 1.007,
+    "p90_over_span": 0.993,
+    "t90_s": 325.0,
+    "t99_s": 353.2,
+    "span_s": 359.7,
+    "span_set_by": {
+     "doc": "017_017818.pdf",
+     "held_s": 8.2,
+     "seconds_after_p99": 6.4
+    }
+   },
+   "li_u32a/k1_u32a": {
+    "PRIMARY_docs_per_s_span": 0.4138,
+    "docs_per_s_span": 0.4138,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 0.4138,
+     "span_s": 920.8,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 0.4073,
+    "docs_per_s_to_p99": 0.4111,
+    "p99_over_span": 0.994,
+    "p90_over_span": 0.984,
+    "t90_s": 839.6,
+    "t99_s": 917.0,
+    "span_s": 920.8,
+    "span_set_by": {
+     "doc": "020_020602.pdf",
+     "held_s": 1.2,
+     "seconds_after_p99": 3.7
+    }
+   },
+   "li_u32a/k256_u32a": {
+    "PRIMARY_docs_per_s_span": 2.1726,
+    "docs_per_s_span": 2.1726,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.1726,
+     "span_s": 175.4,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 2.5287,
+    "docs_per_s_to_p99": 2.4238,
+    "p99_over_span": 1.116,
+    "p90_over_span": 1.164,
+    "t90_s": 135.2,
+    "t99_s": 155.5,
+    "span_s": 175.4,
+    "span_set_by": {
+     "doc": "031_031985.pdf",
+     "held_s": 49.9,
+     "seconds_after_p99": 19.8
+    }
+   },
+   "li_u32a/k32_u32a": {
+    "PRIMARY_docs_per_s_span": 1.3889,
+    "docs_per_s_span": 1.3889,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.3889,
+     "span_s": 274.3,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.4411,
+    "docs_per_s_to_p99": 1.4789,
+    "p99_over_span": 1.065,
+    "p90_over_span": 1.038,
+    "t90_s": 237.3,
+    "t99_s": 254.9,
+    "span_s": 274.3,
+    "span_set_by": {
+     "doc": "023_023913.pdf",
+     "held_s": 24.5,
+     "seconds_after_p99": 19.4
+    }
+   },
+   "li_u32a/k384_u32a": {
+    "PRIMARY_docs_per_s_span": 3.3078,
+    "docs_per_s_span": 3.3078,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 3.3078,
+     "span_s": 115.2,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 6.29,
+    "docs_per_s_to_p99": 3.766,
+    "p99_over_span": 1.139,
+    "p90_over_span": 1.902,
+    "t90_s": 54.4,
+    "t99_s": 100.1,
+    "span_s": 115.2,
+    "span_set_by": {
+     "doc": "015_015773.pdf",
+     "held_s": 115.1,
+     "seconds_after_p99": 15.1
+    }
+   },
+   "li_u32a/k64_u32a": {
+    "PRIMARY_docs_per_s_span": 1.9109,
+    "docs_per_s_span": 1.9109,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.9109,
+     "span_s": 199.4,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.9173,
+    "docs_per_s_to_p99": 2.0133,
+    "p99_over_span": 1.054,
+    "p90_over_span": 1.003,
+    "t90_s": 178.4,
+    "t99_s": 187.3,
+    "span_s": 199.4,
+    "span_set_by": {
+     "doc": "023_023913.pdf",
+     "held_s": 23.2,
+     "seconds_after_p99": 12.1
+    }
+   },
+   "li_u32a/k8_u32a": {
+    "PRIMARY_docs_per_s_span": 0.8101,
+    "docs_per_s_span": 0.8101,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 0.8101,
+     "span_s": 470.3,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 0.7902,
+    "docs_per_s_to_p99": 0.811,
+    "p99_over_span": 1.001,
+    "p90_over_span": 0.975,
+    "t90_s": 432.8,
+    "t99_s": 464.9,
+    "span_s": 470.3,
+    "span_set_by": {
+     "doc": "017_017818.pdf",
+     "held_s": 7.2,
+     "seconds_after_p99": 5.5
+    }
+   },
+   "li_u32a/refc16_u32a": {
+    "PRIMARY_docs_per_s_span": 3.3484,
+    "docs_per_s_span": 3.3484,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 3.3484,
+     "span_s": 113.8,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 5.5462,
+    "docs_per_s_to_p99": 5.2821,
+    "p99_over_span": 1.578,
+    "p90_over_span": 1.656,
+    "t90_s": 61.7,
+    "t99_s": 71.4,
+    "span_s": 113.8,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 81.3,
+     "seconds_after_p99": 42.4
+    }
+   },
+   "li_u32a/refc32_u32a": {
+    "PRIMARY_docs_per_s_span": 3.6603,
+    "docs_per_s_span": 3.6603,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 3.6603,
+     "span_s": 104.1,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 6.4848,
+    "docs_per_s_to_p99": 5.6223,
+    "p99_over_span": 1.536,
+    "p90_over_span": 1.772,
+    "t90_s": 52.7,
+    "t99_s": 67.1,
+    "span_s": 104.1,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 79.7,
+     "seconds_after_p99": 37.0
+    }
+   },
+   "li_u32a/refc4_u32a": {
+    "PRIMARY_docs_per_s_span": 1.5444,
+    "docs_per_s_span": 1.5444,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.5444,
+     "span_s": 246.7,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.5461,
+    "docs_per_s_to_p99": 1.5717,
+    "p99_over_span": 1.018,
+    "p90_over_span": 1.001,
+    "t90_s": 221.2,
+    "t99_s": 239.9,
+    "span_s": 246.7,
+    "span_set_by": {
+     "doc": "023_023913.pdf",
+     "held_s": 19.6,
+     "seconds_after_p99": 6.8
+    }
+   },
+   "li_u32a/refc64_u32a": {
+    "PRIMARY_docs_per_s_span": 3.386,
+    "docs_per_s_span": 3.386,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 3.386,
+     "span_s": 112.5,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 6.5689,
+    "docs_per_s_to_p99": 4.8357,
+    "p99_over_span": 1.428,
+    "p90_over_span": 1.94,
+    "t90_s": 52.1,
+    "t99_s": 78.0,
+    "span_s": 112.5,
+    "span_set_by": {
+     "doc": "004_004648.pdf",
+     "held_s": 92.2,
+     "seconds_after_p99": 34.6
+    }
+   },
+   "li_u32a/refc8_u32a": {
+    "PRIMARY_docs_per_s_span": 2.7018,
+    "docs_per_s_span": 2.7018,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.7018,
+     "span_s": 141.0,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 2.9776,
+    "docs_per_s_to_p99": 2.9503,
+    "p99_over_span": 1.092,
+    "p90_over_span": 1.102,
+    "t90_s": 114.9,
+    "t99_s": 127.8,
+    "span_s": 141.0,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 80.7,
+     "seconds_after_p99": 13.2
+    }
+   },
+   "li_u32b/k128_u32b": {
+    "PRIMARY_docs_per_s_span": 2.0587,
+    "docs_per_s_span": 2.0587,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.0587,
+     "span_s": 185.1,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 2.4988,
+    "docs_per_s_to_p99": 2.4339,
+    "p99_over_span": 1.182,
+    "p90_over_span": 1.214,
+    "t90_s": 136.9,
+    "t99_s": 154.9,
+    "span_s": 185.1,
+    "span_set_by": {
+     "doc": "031_031985.pdf",
+     "held_s": 58.6,
+     "seconds_after_p99": 30.2
+    }
+   },
+   "li_u32b/k256_u32b": {
+    "PRIMARY_docs_per_s_span": 2.2619,
+    "docs_per_s_span": 2.2619,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.2619,
+     "span_s": 168.4,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 2.7803,
+    "docs_per_s_to_p99": 2.6825,
+    "p99_over_span": 1.186,
+    "p90_over_span": 1.229,
+    "t90_s": 123.0,
+    "t99_s": 140.5,
+    "span_s": 168.4,
+    "span_set_by": {
+     "doc": "015_015789.pdf",
+     "held_s": 55.9,
+     "seconds_after_p99": 27.9
+    }
+   },
+   "li_u32b/refc32_u32b": {
+    "PRIMARY_docs_per_s_span": 3.412,
+    "docs_per_s_span": 3.412,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 3.412,
+     "span_s": 111.7,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 6.4532,
+    "docs_per_s_to_p99": 5.3896,
+    "p99_over_span": 1.58,
+    "p90_over_span": 1.891,
+    "t90_s": 53.0,
+    "t99_s": 69.9,
+    "span_s": 111.7,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 87.7,
+     "seconds_after_p99": 41.7
+    }
+   },
+   "li_w16/refc32_w16": {
+    "PRIMARY_docs_per_s_span": 3.2125,
+    "docs_per_s_span": 3.2125,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 3.2125,
+     "span_s": 118.6,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 6.0909,
+    "docs_per_s_to_p99": 4.6744,
+    "p99_over_span": 1.455,
+    "p90_over_span": 1.896,
+    "t90_s": 56.1,
+    "t99_s": 80.7,
+    "span_s": 118.6,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 91.1,
+     "seconds_after_p99": 37.9
+    }
+   },
+   "li_w32/refc32_w32": {
+    "PRIMARY_docs_per_s_span": 3.3313,
+    "docs_per_s_span": 3.3313,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 3.3313,
+     "span_s": 114.4,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 6.8929,
+    "docs_per_s_to_p99": 6.1368,
+    "p99_over_span": 1.842,
+    "p90_over_span": 2.069,
+    "t90_s": 49.6,
+    "t99_s": 61.4,
+    "span_s": 114.4,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 90.1,
+     "seconds_after_p99": 52.9
+    }
+   },
+   "rr_cold/k128_cold": {
+    "PRIMARY_docs_per_s_span": 1.8449,
+    "docs_per_s_span": 1.8449,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.8449,
+     "span_s": 207.1,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.6566,
+    "docs_per_s_to_p99": 1.8256,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.898,
+    "t90_s": 207.1,
+    "t99_s": 207.1,
+    "span_s": 207.1,
+    "span_set_by": {
+     "doc": "013_013422.pdf",
+     "held_s": 41.4,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_cold/refc32_cold": {
+    "PRIMARY_docs_per_s_span": 2.4577,
+    "docs_per_s_span": 2.4577,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.4577,
+     "span_s": 155.4,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 5.1056,
+    "docs_per_s_to_p99": 4.0979,
+    "p99_over_span": 1.667,
+    "p90_over_span": 2.077,
+    "t90_s": 67.2,
+    "t99_s": 92.2,
+    "span_s": 155.4,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 122.1,
+     "seconds_after_p99": 63.2
+    }
+   },
+   "rr_u32a/k128_u32a": {
+    "PRIMARY_docs_per_s_span": 1.8275,
+    "docs_per_s_span": 1.8275,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.8275,
+     "span_s": 209.0,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.6409,
+    "docs_per_s_to_p99": 1.8083,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.898,
+    "t90_s": 209.0,
+    "t99_s": 209.0,
+    "span_s": 209.0,
+    "span_set_by": {
+     "doc": "013_013422.pdf",
+     "held_s": 43.2,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_u32a/k16_u32a": {
+    "PRIMARY_docs_per_s_span": 0.6461,
+    "docs_per_s_span": 0.6461,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 0.6461,
+     "span_s": 591.3,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 0.6073,
+    "docs_per_s_to_p99": 0.6393,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.94,
+    "t90_s": 564.8,
+    "t99_s": 591.3,
+    "span_s": 591.3,
+    "span_set_by": {
+     "doc": "018_018160.pdf",
+     "held_s": 7.8,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_u32a/k1_u32a": {
+    "PRIMARY_docs_per_s_span": 0.2942,
+    "docs_per_s_span": 0.2942,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 0.2942,
+     "span_s": 1298.7,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 0.285,
+    "docs_per_s_to_p99": 0.292,
+    "p99_over_span": 0.993,
+    "p90_over_span": 0.969,
+    "t90_s": 1203.3,
+    "t99_s": 1294.7,
+    "span_s": 1298.7,
+    "span_set_by": {
+     "doc": "020_020602.pdf",
+     "held_s": 1.3,
+     "seconds_after_p99": 4.0
+    }
+   },
+   "rr_u32a/k256_u32a": {
+    "PRIMARY_docs_per_s_span": 2.0511,
+    "docs_per_s_span": 2.0511,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.0511,
+     "span_s": 186.2,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.8417,
+    "docs_per_s_to_p99": 2.0296,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.898,
+    "t90_s": 186.2,
+    "t99_s": 186.2,
+    "span_s": 186.2,
+    "span_set_by": {
+     "doc": "013_013422.pdf",
+     "held_s": 42.4,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_u32a/k32_u32a": {
+    "PRIMARY_docs_per_s_span": 0.8448,
+    "docs_per_s_span": 0.8448,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 0.8448,
+     "span_s": 452.2,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 0.7926,
+    "docs_per_s_to_p99": 0.836,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.938,
+    "t90_s": 432.7,
+    "t99_s": 452.2,
+    "span_s": 452.2,
+    "span_set_by": {
+     "doc": "020_020086.pdf",
+     "held_s": 19.4,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_u32a/k384_u32a": {
+    "PRIMARY_docs_per_s_span": 2.4809,
+    "docs_per_s_span": 2.4809,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.4809,
+     "span_s": 154.0,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 2.2276,
+    "docs_per_s_to_p99": 2.4549,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.898,
+    "t90_s": 154.0,
+    "t99_s": 154.0,
+    "span_s": 154.0,
+    "span_set_by": {
+     "doc": "003_003668.pdf",
+     "held_s": 154.0,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_u32a/k64_u32a": {
+    "PRIMARY_docs_per_s_span": 1.1371,
+    "docs_per_s_span": 1.1371,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.1371,
+     "span_s": 335.9,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.021,
+    "docs_per_s_to_p99": 1.1252,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.898,
+    "t90_s": 335.9,
+    "t99_s": 335.9,
+    "span_s": 335.9,
+    "span_set_by": {
+     "doc": "004_004383.pdf",
+     "held_s": 24.0,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_u32a/k8_u32a": {
+    "PRIMARY_docs_per_s_span": 0.5254,
+    "docs_per_s_span": 0.5254,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 0.5254,
+     "span_s": 727.0,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 0.4916,
+    "docs_per_s_to_p99": 0.5199,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.936,
+    "t90_s": 697.7,
+    "t99_s": 727.0,
+    "span_s": 727.0,
+    "span_set_by": {
+     "doc": "029_029924.pdf",
+     "held_s": 7.5,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_u32a/refc16_u32a": {
+    "PRIMARY_docs_per_s_span": 2.3418,
+    "docs_per_s_span": 2.3418,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.3418,
+     "span_s": 163.1,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 3.6127,
+    "docs_per_s_to_p99": 3.2673,
+    "p99_over_span": 1.395,
+    "p90_over_span": 1.543,
+    "t90_s": 94.9,
+    "t99_s": 115.7,
+    "span_s": 163.1,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 113.6,
+     "seconds_after_p99": 47.4
+    }
+   },
+   "rr_u32a/refc32_u32a": {
+    "PRIMARY_docs_per_s_span": 2.4871,
+    "docs_per_s_span": 2.4871,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.4871,
+     "span_s": 153.6,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 5.2193,
+    "docs_per_s_to_p99": 4.1471,
+    "p99_over_span": 1.667,
+    "p90_over_span": 2.099,
+    "t90_s": 65.7,
+    "t99_s": 91.1,
+    "span_s": 153.6,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 121.7,
+     "seconds_after_p99": 62.4
+    }
+   },
+   "rr_u32a/refc4_u32a": {
+    "PRIMARY_docs_per_s_span": 1.0765,
+    "docs_per_s_span": 1.0765,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.0765,
+     "span_s": 354.9,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.053,
+    "docs_per_s_to_p99": 1.0825,
+    "p99_over_span": 1.006,
+    "p90_over_span": 0.978,
+    "t90_s": 325.7,
+    "t99_s": 349.2,
+    "span_s": 354.9,
+    "span_set_by": {
+     "doc": "023_023913.pdf",
+     "held_s": 19.1,
+     "seconds_after_p99": 5.7
+    }
+   },
+   "rr_u32a/refc64_u32a": {
+    "PRIMARY_docs_per_s_span": 2.4745,
+    "docs_per_s_span": 2.4745,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.4745,
+     "span_s": 154.4,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 5.2081,
+    "docs_per_s_to_p99": 4.1107,
+    "p99_over_span": 1.661,
+    "p90_over_span": 2.105,
+    "t90_s": 65.9,
+    "t99_s": 92.0,
+    "span_s": 154.4,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 126.4,
+     "seconds_after_p99": 62.4
+    }
+   },
+   "rr_u32a/refc8_u32a": {
+    "PRIMARY_docs_per_s_span": 1.8887,
+    "docs_per_s_span": 1.8887,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.8887,
+     "span_s": 202.3,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.9768,
+    "docs_per_s_to_p99": 2.0073,
+    "p99_over_span": 1.063,
+    "p90_over_span": 1.047,
+    "t90_s": 173.5,
+    "t99_s": 188.3,
+    "span_s": 202.3,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 110.0,
+     "seconds_after_p99": 13.9
+    }
+   },
+   "rr_u32b/k128_u32b": {
+    "PRIMARY_docs_per_s_span": 1.8389,
+    "docs_per_s_span": 1.8389,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 1.8389,
+     "span_s": 207.7,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.6511,
+    "docs_per_s_to_p99": 1.8196,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.898,
+    "t90_s": 207.7,
+    "t99_s": 207.7,
+    "span_s": 207.7,
+    "span_set_by": {
+     "doc": "013_013422.pdf",
+     "held_s": 41.9,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_u32b/k256_u32b": {
+    "PRIMARY_docs_per_s_span": 2.0679,
+    "docs_per_s_span": 2.0679,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.0679,
+     "span_s": 184.7,
+     "noop": true,
+     "noop_reason": "the straggler's batch-mates return with it, so its wall is carried by their shared completion stamp"
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 1.8568,
+    "docs_per_s_to_p99": 2.0462,
+    "p99_over_span": 0.99,
+    "p90_over_span": 0.898,
+    "t90_s": 184.7,
+    "t99_s": 184.7,
+    "span_s": 184.7,
+    "span_set_by": {
+     "doc": "013_013422.pdf",
+     "held_s": 41.2,
+     "seconds_after_p99": 0.0
+    }
+   },
+   "rr_u32b/refc32_u32b": {
+    "PRIMARY_docs_per_s_span": 2.4804,
+    "docs_per_s_span": 2.4804,
+    "span_excluding_straggler": {
+     "doc_dropped": "039_039660.pdf",
+     "was_present": false,
+     "docs_per_s": 2.4804,
+     "span_s": 154.0,
+     "noop": true,
+     "noop_reason": null
+    },
+    "POST_HOC_DIAGNOSTIC": "docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was seen (register 34); they are diagnostics, never the headline",
+    "docs_per_s_to_p90": 5.2576,
+    "docs_per_s_to_p99": 4.1739,
+    "p99_over_span": 1.683,
+    "p90_over_span": 2.12,
+    "t90_s": 65.2,
+    "t99_s": 90.6,
+    "span_s": 154.0,
+    "span_set_by": {
+     "doc": "029_029958.pdf",
+     "held_s": 121.9,
+     "seconds_after_p99": 63.4
+    }
+   }
+  },
+  "by_arm": {
+   "li": {
+    "rank_by_span": [
+     "k384",
+     "k256",
+     "k128",
+     "k64",
+     "k32",
+     "k16",
+     "k8",
+     "k1"
+    ],
+    "rank_by_to_p90": [
+     "k384",
+     "k256",
+     "k128",
+     "k64",
+     "k32",
+     "k16",
+     "k8",
+     "k1"
+    ],
+    "verdict": "PASS \u2014 K ranking identical under both metrics",
+    "to_p90_replicate_spread": {
+     "k128": 0.0195,
+     "k256": 0.0948,
+     "refc32": 0.0049
+    }
+   },
+   "rr": {
+    "rank_by_span": [
+     "k384",
+     "k256",
+     "k128",
+     "k64",
+     "k32",
+     "k16",
+     "k8",
+     "k1"
+    ],
+    "rank_by_to_p90": [
+     "k384",
+     "k256",
+     "k128",
+     "k64",
+     "k32",
+     "k16",
+     "k8",
+     "k1"
+    ],
+    "verdict": "PASS \u2014 K ranking identical under both metrics",
+    "to_p90_replicate_spread": {
+     "k128": 0.0062,
+     "k256": 0.0081,
+     "refc32": 0.0073
+    }
+   }
+  }
+ },
+ "check_G5a_cache_effect": {
+  "li": {
+   "K=128@units=24": {
+    "warm_runs": [
+     2.2723,
+     2.0586
+    ],
+    "cold_runs": [
+     1.7135
+    ],
+    "warm_mean": 2.1654,
+    "cold_mean": 1.7135,
+    "cold_over_warm": 0.7913,
+    "delta_pct": -20.9,
+    "warm_engine_cores": 7.117,
+    "cold_engine_cores": 5.56
+   },
+   "C=32@units=24": {
+    "warm_runs": [
+     3.66,
+     3.4117
+    ],
+    "cold_runs": [
+     3.2835
+    ],
+    "warm_mean": 3.5358,
+    "cold_mean": 3.2835,
+    "cold_over_warm": 0.9286,
+    "delta_pct": -7.1,
+    "warm_engine_cores": 13.921,
+    "cold_engine_cores": 12.81
+   }
+  },
+  "rr": {
+   "K=128@units=1": {
+    "warm_runs": [
+     1.8273,
+     1.8387
+    ],
+    "cold_runs": [
+     1.8447
+    ],
+    "warm_mean": 1.833,
+    "cold_mean": 1.8447,
+    "cold_over_warm": 1.0064,
+    "delta_pct": 0.6,
+    "warm_engine_cores": 11.441,
+    "cold_engine_cores": 11.504
+   },
+   "C=32@units=1": {
+    "warm_runs": [
+     2.487,
+     2.4802
+    ],
+    "cold_runs": [
+     2.4575
+    ],
+    "warm_mean": 2.4836,
+    "cold_mean": 2.4575,
+    "cold_over_warm": 0.9895,
+    "delta_pct": -1.1,
+    "warm_engine_cores": 16.037,
+    "cold_engine_cores": 15.874
+   }
+  }
+ },
+ "check_C5_empty_content": {
+  "li": {
+   "n": 3,
+   "documents": [
+    "014_014961.pdf",
+    "039_039457.pdf",
+    "040_040669.pdf"
+   ]
+  },
+  "rr": {
+   "n": 2,
+   "documents": [
+    "014_014961.pdf",
+    "039_039457.pdf"
+   ]
+  },
+  "only_li": [
+   "040_040669.pdf"
+  ],
+  "only_rr": [],
+  "both": 2,
+  "arms_agree": false
+ },
+ "envelope_batch_report": {
+  "li_cold/k128_cold": {
+   "k": 128,
+   "batches": 3,
+   "per_batch_wall_s": {
+    "0": 51.3,
+    "1": 126.2,
+    "2": 44.9
+   },
+   "wall_s_max": 126.2,
+   "wall_s_median": 51.3,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32a/k128_u32a": {
+   "k": 128,
+   "batches": 3,
+   "per_batch_wall_s": {
+    "0": 42.0,
+    "1": 87.7,
+    "2": 38.0
+   },
+   "wall_s_max": 87.7,
+   "wall_s_median": 42.0,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32a/k16_u32a": {
+   "k": 16,
+   "batches": 24,
+   "per_batch_wall_s": {
+    "0": 6.0,
+    "1": 10.4,
+    "2": 15.2,
+    "3": 5.6,
+    "4": 18.2,
+    "5": 15.8,
+    "6": 9.1,
+    "7": 10.5,
+    "8": 7.5,
+    "9": 21.6,
+    "10": 8.4,
+    "11": 12.3,
+    "12": 72.0,
+    "13": 10.3,
+    "14": 10.9,
+    "15": 20.6,
+    "16": 12.8,
+    "17": 7.8,
+    "18": 9.4,
+    "19": 22.5,
+    "20": 16.7,
+    "21": 8.7,
+    "22": 19.2,
+    "23": 8.2
+   },
+   "wall_s_max": 72.0,
+   "wall_s_median": 10.9,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32a/k1_u32a": {
+   "k": 1,
+   "batches": 384,
+   "per_batch_wall_s": {
+    "0": 1.9,
+    "1": 0.8,
+    "2": 2.8,
+    "3": 0.6,
+    "4": 0.7,
+    "5": 1.8,
+    "6": 5.7,
+    "7": 0.2,
+    "8": 0.5,
+    "9": 0.5,
+    "10": 1.9,
+    "11": 5.6,
+    "12": 1.2,
+    "13": 0.4,
+    "14": 0.2,
+    "15": 1.3,
+    "16": 2.3,
+    "17": 0.4,
+    "18": 0.2,
+    "19": 0.2,
+    "20": 4.3,
+    "21": 4.0,
+    "22": 5.5,
+    "23": 0.2,
+    "24": 3.8,
+    "25": 1.2,
+    "26": 0.2,
+    "27": 9.2,
+    "28": 1.1,
+    "29": 3.8,
+    "30": 1.2,
+    "31": 2.6,
+    "32": 2.1,
+    "33": 1.5,
+    "34": 1.3,
+    "35": 0.7,
+    "36": 0.3,
+    "37": 0.9,
+    "38": 2.0,
+    "39": 0.2,
+    "40": 1.2,
+    "41": 2.6,
+    "42": 1.1,
+    "43": 1.4,
+    "44": 0.4,
+    "45": 0.7,
+    "46": 14.6,
+    "47": 1.4,
+    "48": 2.5,
+    "49": 1.8,
+    "50": 0.8,
+    "51": 0.6,
+    "52": 0.4,
+    "53": 1.1,
+    "54": 1.1,
+    "55": 3.3,
+    "56": 1.0,
+    "57": 2.4,
+    "58": 5.1,
+    "59": 3.8,
+    "60": 2.1,
+    "61": 2.4,
+    "62": 5.0,
+    "63": 0.1,
+    "64": 9.9,
+    "65": 1.5,
+    "66": 1.0,
+    "67": 1.5,
+    "68": 17.7,
+    "69": 2.6,
+    "70": 0.4,
+    "71": 4.5,
+    "72": 1.1,
+    "73": 0.2,
+    "74": 0.2,
+    "75": 0.4,
+    "76": 0.4,
+    "77": 1.6,
+    "78": 1.8,
+    "79": 1.0,
+    "80": 1.0,
+    "81": 0.1,
+    "82": 3.0,
+    "83": 1.0,
+    "84": 15.3,
+    "85": 0.2,
+    "86": 0.4,
+    "87": 0.3,
+    "88": 1.2,
+    "89": 4.5,
+    "90": 1.0,
+    "91": 0.1,
+    "92": 1.0,
+    "93": 0.3,
+    "94": 0.6,
+    "95": 0.2,
+    "96": 1.5,
+    "97": 0.2,
+    "98": 2.3,
+    "99": 8.7,
+    "100": 5.5,
+    "101": 0.1,
+    "102": 0.9,
+    "103": 1.4,
+    "104": 1.0,
+    "105": 1.7,
+    "106": 0.9,
+    "107": 0.6,
+    "108": 0.0,
+    "109": 2.3,
+    "110": 0.7,
+    "111": 4.0,
+    "112": 0.7,
+    "113": 0.8,
+    "114": 1.5,
+    "115": 6.1,
+    "116": 4.6,
+    "117": 0.4,
+    "118": 0.6,
+    "119": 0.2,
+    "120": 1.0,
+    "121": 3.1,
+    "122": 1.1,
+    "123": 1.3,
+    "124": 9.9,
+    "125": 1.1,
+    "126": 3.1,
+    "127": 1.2,
+    "128": 0.4,
+    "129": 1.2,
+    "130": 0.4,
+    "131": 0.4,
+    "132": 0.1,
+    "133": 5.7,
+    "134": 6.5,
+    "135": 3.1,
+    "136": 0.4,
+    "137": 0.1,
+    "138": 3.8,
+    "139": 2.6,
+    "140": 1.1,
+    "141": 0.8,
+    "142": 2.5,
+    "143": 0.7,
+    "144": 10.5,
+    "145": 1.2,
+    "146": 0.1,
+    "147": 0.7,
+    "148": 1.3,
+    "149": 0.2,
+    "150": 10.4,
+    "151": 0.0,
+    "152": 7.1,
+    "153": 5.0,
+    "154": 2.8,
+    "155": 0.5,
+    "156": 0.2,
+    "157": 1.0,
+    "158": 8.7,
+    "159": 2.1,
+    "160": 3.2,
+    "161": 2.7,
+    "162": 2.4,
+    "163": 3.2,
+    "164": 2.6,
+    "165": 0.1,
+    "166": 1.5,
+    "167": 3.4,
+    "168": 4.4,
+    "169": 0.5,
+    "170": 0.6,
+    "171": 0.7,
+    "172": 0.2,
+    "173": 1.4,
+    "174": 1.7,
+    "175": 0.6,
+    "176": 2.7,
+    "177": 2.5,
+    "178": 0.9,
+    "179": 0.1,
+    "180": 1.7,
+    "181": 8.2,
+    "182": 0.6,
+    "183": 3.0,
+    "184": 1.3,
+    "185": 0.1,
+    "186": 0.5,
+    "187": 0.2,
+    "188": 11.9,
+    "189": 6.4,
+    "190": 0.5,
+    "191": 1.1,
+    "192": 0.4,
+    "193": 0.4,
+    "194": 0.2,
+    "195": 0.2,
+    "196": 0.7,
+    "197": 4.7,
+    "198": 0.2,
+    "199": 0.5,
+    "200": 0.5,
+    "201": 1.4,
+    "202": 4.8,
+    "203": 2.1,
+    "204": 0.6,
+    "205": 74.0,
+    "206": 1.7,
+    "207": 0.5,
+    "208": 1.3,
+    "209": 0.1,
+    "210": 0.1,
+    "211": 1.1,
+    "212": 9.4,
+    "213": 0.2,
+    "214": 2.4,
+    "215": 9.8,
+    "216": 0.0,
+    "217": 1.7,
+    "218": 0.1,
+    "219": 0.7,
+    "220": 1.5,
+    "221": 2.1,
+    "222": 1.1,
+    "223": 4.3,
+    "224": 8.6,
+    "225": 0.7,
+    "226": 2.1,
+    "227": 5.2,
+    "228": 0.6,
+    "229": 0.7,
+    "230": 1.3,
+    "231": 0.6,
+    "232": 0.3,
+    "233": 6.3,
+    "234": 1.4,
+    "235": 4.0,
+    "236": 0.2,
+    "237": 0.3,
+    "238": 7.3,
+    "239": 0.4,
+    "240": 1.9,
+    "241": 0.0,
+    "242": 0.3,
+    "243": 0.4,
+    "244": 0.5,
+    "245": 0.5,
+    "246": 9.5,
+    "247": 1.2,
+    "248": 2.7,
+    "249": 19.9,
+    "250": 4.1,
+    "251": 1.6,
+    "252": 0.4,
+    "253": 0.8,
+    "254": 2.3,
+    "255": 10.6,
+    "256": 0.8,
+    "257": 11.1,
+    "258": 0.3,
+    "259": 1.1,
+    "260": 0.2,
+    "261": 0.4,
+    "262": 0.3,
+    "263": 1.4,
+    "264": 0.2,
+    "265": 1.9,
+    "266": 5.2,
+    "267": 0.8,
+    "268": 0.4,
+    "269": 3.3,
+    "270": 3.4,
+    "271": 1.0,
+    "272": 1.6,
+    "273": 4.5,
+    "274": 1.6,
+    "275": 0.5,
+    "276": 0.4,
+    "277": 6.5,
+    "278": 2.9,
+    "279": 7.0,
+    "280": 3.4,
+    "281": 1.2,
+    "282": 0.2,
+    "283": 0.7,
+    "284": 3.0,
+    "285": 1.5,
+    "286": 1.0,
+    "287": 0.3,
+    "288": 0.4,
+    "289": 0.2,
+    "290": 9.3,
+    "291": 0.3,
+    "292": 0.4,
+    "293": 0.4,
+    "294": 1.6,
+    "295": 0.7,
+    "296": 0.1,
+    "297": 0.1,
+    "298": 0.6,
+    "299": 0.4,
+    "300": 3.0,
+    "301": 0.6,
+    "302": 0.4,
+    "303": 1.9,
+    "304": 0.7,
+    "305": 4.2,
+    "306": 0.3,
+    "307": 0.1,
+    "308": 1.1,
+    "309": 0.3,
+    "310": 0.3,
+    "311": 0.4,
+    "312": 1.7,
+    "313": 0.4,
+    "314": 0.2,
+    "315": 22.8,
+    "316": 0.3,
+    "317": 5.5,
+    "318": 3.2,
+    "319": 0.5,
+    "320": 0.4,
+    "321": 1.3,
+    "322": 4.1,
+    "323": 0.7,
+    "324": 0.1,
+    "325": 1.3,
+    "326": 0.2,
+    "327": 2.4,
+    "328": 0.1,
+    "329": 0.1,
+    "330": 5.4,
+    "331": 1.4,
+    "332": 0.3,
+    "333": 5.6,
+    "334": 2.8,
+    "335": 16.6,
+    "336": 0.2,
+    "337": 0.4,
+    "338": 0.5,
+    "339": 0.5,
+    "340": 2.9,
+    "341": 0.0,
+    "342": 4.7,
+    "343": 0.9,
+    "344": 0.3,
+    "345": 1.3,
+    "346": 3.7,
+    "347": 2.5,
+    "348": 2.7,
+    "349": 0.5,
+    "350": 8.4,
+    "351": 1.2,
+    "352": 0.6,
+    "353": 1.2,
+    "354": 1.3,
+    "355": 0.7,
+    "356": 0.6,
+    "357": 0.7,
+    "358": 0.4,
+    "359": 0.5,
+    "360": 19.5,
+    "361": 0.9,
+    "362": 0.8,
+    "363": 0.9,
+    "364": 4.6,
+    "365": 0.1,
+    "366": 0.6,
+    "367": 2.5,
+    "368": 1.2,
+    "369": 0.5,
+    "370": 0.9,
+    "371": 0.5,
+    "372": 0.1,
+    "373": 1.0,
+    "374": 1.8,
+    "375": 0.7,
+    "376": 2.4,
+    "377": 1.2,
+    "378": 7.2,
+    "379": 3.7,
+    "380": 0.5,
+    "381": 0.9,
+    "382": 1.1,
+    "383": 1.2
+   },
+   "wall_s_max": 74.0,
+   "wall_s_median": 1.1,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32a/k256_u32a": {
+   "k": 256,
+   "batches": 2,
+   "per_batch_wall_s": {
+    "0": 125.5,
+    "1": 49.9
+   },
+   "wall_s_max": 125.5,
+   "wall_s_median": 125.5,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32a/k32_u32a": {
+   "k": 32,
+   "batches": 12,
+   "per_batch_wall_s": {
+    "0": 15.1,
+    "1": 15.9,
+    "2": 19.0,
+    "3": 11.5,
+    "4": 16.2,
+    "5": 14.3,
+    "6": 74.4,
+    "7": 22.3,
+    "8": 15.1,
+    "9": 28.8,
+    "10": 17.1,
+    "11": 24.5
+   },
+   "wall_s_max": 74.4,
+   "wall_s_median": 17.1,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32a/k384_u32a": {
+   "k": 384,
+   "batches": 1,
+   "per_batch_wall_s": {
+    "0": 115.2
+   },
+   "wall_s_max": 115.2,
+   "wall_s_median": 115.2,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32a/k64_u32a": {
+   "k": 64,
+   "batches": 6,
+   "per_batch_wall_s": {
+    "0": 23.7,
+    "1": 23.3,
+    "2": 21.7,
+    "3": 78.2,
+    "4": 29.2,
+    "5": 23.2
+   },
+   "wall_s_max": 78.2,
+   "wall_s_median": 23.7,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32a/k8_u32a": {
+   "k": 8,
+   "batches": 48,
+   "per_batch_wall_s": {
+    "0": 5.6,
+    "1": 5.7,
+    "2": 8.4,
+    "3": 10.4,
+    "4": 2.4,
+    "5": 15.0,
+    "6": 3.4,
+    "7": 9.0,
+    "8": 18.1,
+    "9": 2.0,
+    "10": 15.3,
+    "11": 4.6,
+    "12": 8.9,
+    "13": 4.2,
+    "14": 6.4,
+    "15": 10.2,
+    "16": 7.2,
+    "17": 4.0,
+    "18": 11.2,
+    "19": 11.4,
+    "20": 3.8,
+    "21": 4.2,
+    "22": 8.5,
+    "23": 12.1,
+    "24": 4.7,
+    "25": 75.4,
+    "26": 10.3,
+    "27": 4.6,
+    "28": 8.9,
+    "29": 7.4,
+    "30": 9.9,
+    "31": 20.2,
+    "32": 11.0,
+    "33": 6.2,
+    "34": 7.5,
+    "35": 7.7,
+    "36": 8.9,
+    "37": 3.0,
+    "38": 4.2,
+    "39": 22.8,
+    "40": 4.1,
+    "41": 16.2,
+    "42": 7.4,
+    "43": 8.1,
+    "44": 1.4,
+    "45": 19.0,
+    "46": 2.2,
+    "47": 7.2
+   },
+   "wall_s_max": 75.4,
+   "wall_s_median": 7.7,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32b/k128_u32b": {
+   "k": 128,
+   "batches": 3,
+   "per_batch_wall_s": {
+    "0": 33.5,
+    "1": 92.9,
+    "2": 58.6
+   },
+   "wall_s_max": 92.9,
+   "wall_s_median": 58.6,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "li_u32b/k256_u32b": {
+   "k": 256,
+   "batches": 2,
+   "per_batch_wall_s": {
+    "0": 112.5,
+    "1": 55.9
+   },
+   "wall_s_max": 112.5,
+   "wall_s_median": 112.5,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_cold/k128_cold": {
+   "k": 128,
+   "batches": 3,
+   "per_batch_wall_s": {
+    "0": 48.3,
+    "1": 117.4,
+    "2": 41.4
+   },
+   "wall_s_max": 117.4,
+   "wall_s_median": 48.3,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32a/k128_u32a": {
+   "k": 128,
+   "batches": 3,
+   "per_batch_wall_s": {
+    "0": 48.8,
+    "1": 117.0,
+    "2": 43.2
+   },
+   "wall_s_max": 117.0,
+   "wall_s_median": 48.8,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32a/k16_u32a": {
+   "k": 16,
+   "batches": 24,
+   "per_batch_wall_s": {
+    "0": 7.1,
+    "1": 35.1,
+    "2": 16.7,
+    "3": 7.8,
+    "4": 32.0,
+    "5": 18.3,
+    "6": 9.2,
+    "7": 12.5,
+    "8": 28.8,
+    "9": 89.4,
+    "10": 6.9,
+    "11": 25.0,
+    "12": 95.2,
+    "13": 11.0,
+    "14": 38.7,
+    "15": 23.1,
+    "16": 5.0,
+    "17": 35.2,
+    "18": 10.2,
+    "19": 27.0,
+    "20": 20.2,
+    "21": 10.6,
+    "22": 18.7,
+    "23": 7.8
+   },
+   "wall_s_max": 95.2,
+   "wall_s_median": 18.7,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32a/k1_u32a": {
+   "k": 1,
+   "batches": 384,
+   "per_batch_wall_s": {
+    "0": 2.5,
+    "1": 1.5,
+    "2": 2.7,
+    "3": 0.3,
+    "4": 0.8,
+    "5": 1.9,
+    "6": 5.8,
+    "7": 0.2,
+    "8": 0.5,
+    "9": 0.5,
+    "10": 2.3,
+    "11": 6.4,
+    "12": 2.0,
+    "13": 0.4,
+    "14": 0.7,
+    "15": 1.4,
+    "16": 2.6,
+    "17": 0.4,
+    "18": 0.2,
+    "19": 0.2,
+    "20": 5.5,
+    "21": 3.6,
+    "22": 6.2,
+    "23": 0.3,
+    "24": 4.3,
+    "25": 4.6,
+    "26": 0.2,
+    "27": 13.3,
+    "28": 33.7,
+    "29": 4.5,
+    "30": 1.2,
+    "31": 2.7,
+    "32": 2.3,
+    "33": 2.4,
+    "34": 1.3,
+    "35": 1.0,
+    "36": 0.1,
+    "37": 1.0,
+    "38": 3.0,
+    "39": 0.9,
+    "40": 1.8,
+    "41": 1.6,
+    "42": 2.6,
+    "43": 1.7,
+    "44": 0.4,
+    "45": 0.7,
+    "46": 16.1,
+    "47": 1.6,
+    "48": 2.3,
+    "49": 2.1,
+    "50": 1.0,
+    "51": 0.6,
+    "52": 0.4,
+    "53": 1.3,
+    "54": 0.7,
+    "55": 7.0,
+    "56": 1.0,
+    "57": 4.2,
+    "58": 5.6,
+    "59": 4.0,
+    "60": 4.3,
+    "61": 2.7,
+    "62": 5.3,
+    "63": 0.1,
+    "64": 1.3,
+    "65": 1.9,
+    "66": 1.3,
+    "67": 1.7,
+    "68": 32.0,
+    "69": 2.8,
+    "70": 0.4,
+    "71": 5.4,
+    "72": 0.8,
+    "73": 0.4,
+    "74": 0.7,
+    "75": 4.6,
+    "76": 1.2,
+    "77": 1.4,
+    "78": 2.9,
+    "79": 1.7,
+    "80": 1.0,
+    "81": 0.2,
+    "82": 3.7,
+    "83": 0.9,
+    "84": 17.9,
+    "85": 0.2,
+    "86": 0.3,
+    "87": 1.7,
+    "88": 1.5,
+    "89": 5.9,
+    "90": 0.9,
+    "91": 0.1,
+    "92": 1.0,
+    "93": 0.3,
+    "94": 0.6,
+    "95": 0.2,
+    "96": 6.6,
+    "97": 0.5,
+    "98": 2.2,
+    "99": 7.8,
+    "100": 4.2,
+    "101": 0.6,
+    "102": 1.3,
+    "103": 2.3,
+    "104": 0.9,
+    "105": 2.9,
+    "106": 1.8,
+    "107": 0.6,
+    "108": 0.1,
+    "109": 3.2,
+    "110": 0.6,
+    "111": 5.7,
+    "112": 0.5,
+    "113": 0.9,
+    "114": 0.7,
+    "115": 10.3,
+    "116": 11.6,
+    "117": 0.4,
+    "118": 0.6,
+    "119": 0.2,
+    "120": 1.1,
+    "121": 3.5,
+    "122": 1.0,
+    "123": 2.2,
+    "124": 10.9,
+    "125": 1.1,
+    "126": 4.6,
+    "127": 1.6,
+    "128": 0.4,
+    "129": 1.3,
+    "130": 0.4,
+    "131": 0.4,
+    "132": 0.1,
+    "133": 6.0,
+    "134": 6.0,
+    "135": 3.1,
+    "136": 0.4,
+    "137": 0.1,
+    "138": 6.3,
+    "139": 26.8,
+    "140": 1.2,
+    "141": 0.8,
+    "142": 2.2,
+    "143": 0.7,
+    "144": 6.6,
+    "145": 1.0,
+    "146": 5.8,
+    "147": 0.7,
+    "148": 1.6,
+    "149": 0.3,
+    "150": 10.9,
+    "151": 0.1,
+    "152": 88.2,
+    "153": 4.6,
+    "154": 2.7,
+    "155": 0.4,
+    "156": 0.2,
+    "157": 1.0,
+    "158": 6.5,
+    "159": 2.3,
+    "160": 3.5,
+    "161": 6.2,
+    "162": 3.2,
+    "163": 4.4,
+    "164": 2.2,
+    "165": 0.1,
+    "166": 1.6,
+    "167": 3.9,
+    "168": 5.7,
+    "169": 0.6,
+    "170": 0.7,
+    "171": 0.7,
+    "172": 0.2,
+    "173": 1.5,
+    "174": 1.8,
+    "175": 0.9,
+    "176": 3.1,
+    "177": 3.0,
+    "178": 0.7,
+    "179": 0.1,
+    "180": 13.7,
+    "181": 9.0,
+    "182": 0.5,
+    "183": 3.6,
+    "184": 1.4,
+    "185": 0.2,
+    "186": 0.7,
+    "187": 0.3,
+    "188": 23.0,
+    "189": 7.0,
+    "190": 0.4,
+    "191": 1.0,
+    "192": 0.4,
+    "193": 0.5,
+    "194": 0.2,
+    "195": 0.2,
+    "196": 2.7,
+    "197": 8.1,
+    "198": 0.2,
+    "199": 0.4,
+    "200": 0.5,
+    "201": 2.6,
+    "202": 5.4,
+    "203": 2.3,
+    "204": 1.1,
+    "205": 94.9,
+    "206": 1.2,
+    "207": 0.6,
+    "208": 1.8,
+    "209": 0.2,
+    "210": 0.2,
+    "211": 1.2,
+    "212": 4.4,
+    "213": 0.4,
+    "214": 2.3,
+    "215": 10.3,
+    "216": 0.5,
+    "217": 1.8,
+    "218": 0.1,
+    "219": 0.7,
+    "220": 1.5,
+    "221": 1.7,
+    "222": 0.7,
+    "223": 5.3,
+    "224": 10.5,
+    "225": 0.8,
+    "226": 1.8,
+    "227": 35.0,
+    "228": 0.5,
+    "229": 0.7,
+    "230": 1.0,
+    "231": 0.6,
+    "232": 0.4,
+    "233": 7.0,
+    "234": 1.7,
+    "235": 4.4,
+    "236": 0.2,
+    "237": 0.2,
+    "238": 9.0,
+    "239": 0.4,
+    "240": 4.0,
+    "241": 0.2,
+    "242": 0.3,
+    "243": 0.3,
+    "244": 3.7,
+    "245": 0.6,
+    "246": 10.6,
+    "247": 1.5,
+    "248": 3.0,
+    "249": 22.3,
+    "250": 6.3,
+    "251": 1.6,
+    "252": 0.4,
+    "253": 1.4,
+    "254": 2.2,
+    "255": 7.2,
+    "256": 0.5,
+    "257": 2.0,
+    "258": 0.4,
+    "259": 1.3,
+    "260": 0.2,
+    "261": 0.5,
+    "262": 0.2,
+    "263": 1.5,
+    "264": 0.3,
+    "265": 2.2,
+    "266": 4.1,
+    "267": 0.8,
+    "268": 0.4,
+    "269": 4.5,
+    "270": 3.8,
+    "271": 1.3,
+    "272": 0.6,
+    "273": 4.8,
+    "274": 1.6,
+    "275": 0.5,
+    "276": 0.4,
+    "277": 5.9,
+    "278": 7.4,
+    "279": 7.7,
+    "280": 2.1,
+    "281": 1.2,
+    "282": 0.6,
+    "283": 0.9,
+    "284": 2.9,
+    "285": 31.5,
+    "286": 0.7,
+    "287": 0.5,
+    "288": 0.4,
+    "289": 0.2,
+    "290": 9.9,
+    "291": 0.3,
+    "292": 0.4,
+    "293": 0.6,
+    "294": 0.8,
+    "295": 1.0,
+    "296": 0.1,
+    "297": 0.2,
+    "298": 1.5,
+    "299": 0.4,
+    "300": 3.2,
+    "301": 0.6,
+    "302": 0.5,
+    "303": 1.6,
+    "304": 1.6,
+    "305": 5.1,
+    "306": 3.2,
+    "307": 0.1,
+    "308": 2.1,
+    "309": 0.4,
+    "310": 1.8,
+    "311": 0.4,
+    "312": 1.8,
+    "313": 0.1,
+    "314": 0.2,
+    "315": 26.7,
+    "316": 0.3,
+    "317": 6.0,
+    "318": 3.6,
+    "319": 1.9,
+    "320": 0.3,
+    "321": 1.3,
+    "322": 5.2,
+    "323": 0.6,
+    "324": 0.2,
+    "325": 1.2,
+    "326": 0.2,
+    "327": 2.6,
+    "328": 0.1,
+    "329": 0.2,
+    "330": 5.6,
+    "331": 1.6,
+    "332": 0.2,
+    "333": 3.9,
+    "334": 2.8,
+    "335": 19.6,
+    "336": 0.2,
+    "337": 0.8,
+    "338": 0.6,
+    "339": 0.4,
+    "340": 3.6,
+    "341": 0.1,
+    "342": 5.6,
+    "343": 2.5,
+    "344": 0.3,
+    "345": 2.2,
+    "346": 6.4,
+    "347": 2.6,
+    "348": 2.6,
+    "349": 6.2,
+    "350": 9.3,
+    "351": 1.0,
+    "352": 0.7,
+    "353": 1.2,
+    "354": 1.4,
+    "355": 0.5,
+    "356": 0.7,
+    "357": 0.6,
+    "358": 0.3,
+    "359": 0.4,
+    "360": 18.2,
+    "361": 1.0,
+    "362": 1.9,
+    "363": 1.7,
+    "364": 5.2,
+    "365": 0.3,
+    "366": 0.6,
+    "367": 2.8,
+    "368": 1.0,
+    "369": 0.4,
+    "370": 0.9,
+    "371": 0.5,
+    "372": 0.1,
+    "373": 1.2,
+    "374": 1.6,
+    "375": 0.7,
+    "376": 2.5,
+    "377": 1.3,
+    "378": 7.3,
+    "379": 6.2,
+    "380": 0.9,
+    "381": 0.8,
+    "382": 1.0,
+    "383": 1.3
+   },
+   "wall_s_max": 94.9,
+   "wall_s_median": 1.3,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32a/k256_u32a": {
+   "k": 256,
+   "batches": 2,
+   "per_batch_wall_s": {
+    "0": 143.8,
+    "1": 42.4
+   },
+   "wall_s_max": 143.8,
+   "wall_s_median": 143.8,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32a/k32_u32a": {
+   "k": 32,
+   "batches": 12,
+   "per_batch_wall_s": {
+    "0": 36.4,
+    "1": 17.9,
+    "2": 33.6,
+    "3": 13.5,
+    "4": 91.6,
+    "5": 24.8,
+    "6": 95.8,
+    "7": 37.5,
+    "8": 33.0,
+    "9": 27.2,
+    "10": 21.4,
+    "11": 19.4
+   },
+   "wall_s_max": 95.8,
+   "wall_s_median": 33.0,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32a/k384_u32a": {
+   "k": 384,
+   "batches": 1,
+   "per_batch_wall_s": {
+    "0": 154.0
+   },
+   "wall_s_max": 154.0,
+   "wall_s_median": 154.0,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32a/k64_u32a": {
+   "k": 64,
+   "batches": 6,
+   "per_batch_wall_s": {
+    "0": 40.3,
+    "1": 36.4,
+    "2": 97.2,
+    "3": 101.0,
+    "4": 37.0,
+    "5": 24.0
+   },
+   "wall_s_max": 101.0,
+   "wall_s_median": 40.3,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32a/k8_u32a": {
+   "k": 8,
+   "batches": 48,
+   "per_batch_wall_s": {
+    "0": 6.1,
+    "1": 6.6,
+    "2": 6.7,
+    "3": 34.6,
+    "4": 3.3,
+    "5": 16.1,
+    "6": 7.2,
+    "7": 6.1,
+    "8": 32.0,
+    "9": 4.9,
+    "10": 17.8,
+    "11": 6.0,
+    "12": 8.5,
+    "13": 5.9,
+    "14": 11.8,
+    "15": 11.2,
+    "16": 6.4,
+    "17": 27.2,
+    "18": 11.4,
+    "19": 88.6,
+    "20": 6.5,
+    "21": 5.8,
+    "22": 14.0,
+    "23": 23.0,
+    "24": 8.2,
+    "25": 94.1,
+    "26": 10.5,
+    "27": 5.3,
+    "28": 35.9,
+    "29": 8.9,
+    "30": 10.9,
+    "31": 22.2,
+    "32": 2.0,
+    "33": 4.7,
+    "34": 8.2,
+    "35": 32.7,
+    "36": 9.8,
+    "37": 3.3,
+    "38": 5.5,
+    "39": 26.7,
+    "40": 5.3,
+    "41": 19.7,
+    "42": 5.9,
+    "43": 10.1,
+    "44": 1.5,
+    "45": 18.6,
+    "46": 1.7,
+    "47": 7.5
+   },
+   "wall_s_max": 94.1,
+   "wall_s_median": 8.5,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32b/k128_u32b": {
+   "k": 128,
+   "batches": 3,
+   "per_batch_wall_s": {
+    "0": 47.7,
+    "1": 118.1,
+    "2": 41.9
+   },
+   "wall_s_max": 118.1,
+   "wall_s_median": 47.7,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  },
+  "rr_u32b/k256_u32b": {
+   "k": 256,
+   "batches": 2,
+   "per_batch_wall_s": {
+    "0": 143.5,
+    "1": 41.2
+   },
+   "wall_s_max": 143.5,
+   "wall_s_median": 143.5,
+   "straggler_batch": null,
+   "straggler_batch_wall_s": null,
+   "batch_deadline_s": 1800,
+   "batch_deadline_basis": "NOT recorded in this leg (it predates the field); the driver default 1800 s \u2014 no chain overrode it",
+   "straggler_margin_s": null,
+   "batches_died": [],
+   "documents_lost_per_failed_batch": {},
+   "documents_never_submitted": 0,
+   "documents_lost_total": 0,
+   "peak_anon_mb": null,
+   "peak_mb": null,
+   "label": "no batch lost"
+  }
+ },
+ "rr_docs_caveat": "32 vCPU unconstrained per Ruling A; measured posture cost vs 24-core cpuset -7.1% throughput, +28% CPU-s/doc.",
+ "check_G3b_unit_sweep": {
+  "li": {
+   "C=32": {
+    "24": [
+     3.66,
+     3.4117
+    ],
+    "16": [
+     3.2123
+    ],
+    "32": [
+     3.331
+    ]
+   }
+  }
+ },
+ "deadline_losses_per_leg": {},
+ "box_hygiene_per_leg": {
+  "li_cold/k128_cold": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.962
+  },
+  "li_cold/refc32_cold": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.965
+  },
+  "li_u32a/k128_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.95
+  },
+  "li_u32a/k16_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.965
+  },
+  "li_u32a/k1_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.972
+  },
+  "li_u32a/k256_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.97
+  },
+  "li_u32a/k32_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.965
+  },
+  "li_u32a/k384_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.97
+  },
+  "li_u32a/k64_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.965
+  },
+  "li_u32a/k8_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.953
+  },
+  "li_u32a/refc16_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.962
+  },
+  "li_u32a/refc32_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.967
+  },
+  "li_u32a/refc4_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.953
+  },
+  "li_u32a/refc64_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.955
+  },
+  "li_u32a/refc8_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.965
+  },
+  "li_u32b/k128_u32b": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.965
+  },
+  "li_u32b/k256_u32b": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.967
+  },
+  "li_u32b/refc32_u32b": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.967
+  },
+  "li_w16/refc32_w16": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.977
+  },
+  "li_w32/refc32_w32": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.962
+  },
+  "rr_cold/k128_cold": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.977
+  },
+  "rr_cold/refc32_cold": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.0
+  },
+  "rr_u32a/k128_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 31.0
+  },
+  "rr_u32a/k16_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.99
+  },
+  "rr_u32a/k1_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.975
+  },
+  "rr_u32a/k256_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.988
+  },
+  "rr_u32a/k32_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.992
+  },
+  "rr_u32a/k384_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.997
+  },
+  "rr_u32a/k64_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.992
+  },
+  "rr_u32a/k8_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.993
+  },
+  "rr_u32a/refc16_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.997
+  },
+  "rr_u32a/refc32_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.993
+  },
+  "rr_u32a/refc4_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.988
+  },
+  "rr_u32a/refc64_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.995
+  },
+  "rr_u32a/refc8_u32a": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.998
+  },
+  "rr_u32b/k128_u32b": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.995
+  },
+  "rr_u32b/k256_u32b": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.972
+  },
+  "rr_u32b/refc32_u32b": {
+   "other_containers": [],
+   "stray_processes": {
+    "limit_cores": 0.5,
+    "window_s": 4.0,
+    "strays": [],
+    "clean": true,
+    "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+   },
+   "host_idle_baseline_cores": 30.988
+  }
+ },
+ "page_cache_per_leg": {
+  "li_cold/k128_cold": {
+   "attempted": true,
+   "rc": 0,
+   "stderr": null,
+   "free_after": "Mem:           63252       13786       48777           3         688       48844",
+   "note": "dropped before the warm-up, so the measured slice is read cold; the warm-up's own 25 disjoint documents re-warm only themselves"
+  },
+  "li_cold/refc32_cold": {
+   "attempted": true,
+   "rc": 0,
+   "stderr": null,
+   "free_after": "Mem:           63252       16906       45613           3         732       45723",
+   "note": "dropped before the warm-up, so the measured slice is read cold; the warm-up's own 25 disjoint documents re-warm only themselves"
+  },
+  "rr_cold/k128_cold": {
+   "attempted": true,
+   "rc": 0,
+   "stderr": null,
+   "free_after": "Mem:           63252         723       62176           3         352       61910",
+   "note": "dropped before the warm-up, so the measured slice is read cold; the warm-up's own 25 disjoint documents re-warm only themselves"
+  },
+  "rr_cold/refc32_cold": {
+   "attempted": true,
+   "rc": 0,
+   "stderr": null,
+   "free_after": "Mem:           63252        1163       61762           3         326       61474",
+   "note": "dropped before the warm-up, so the measured slice is read cold; the warm-up's own 25 disjoint documents re-warm only themselves"
+  }
+ }
+}

@@ -1496,3 +1496,38 @@ than rewritten from memory, which is entry 2's point in miniature.
 >
 > Kin to entry 27 (a green run is a claim about the paths it ran) and entry 38.
 
+## 42. The partition rule lived in one function, and two others grouped replicates their own way (added 2026-09-21)
+
+> Entry 39's rule is that a replicate is the same work under the same conditions. It was
+> implemented inside the ranking and the noise floor. Two other functions still grouped legs by
+> K alone:
+>
+> - the tail check's replicate spread;
+> - the G5(a) cache comparison.
+>
+> The second produced a figure that was reported. LlamaIndex's cold-cache leg at C=32 ran with
+> 24 workers, but it was compared with a warm mean that pooled the 16-, 24- and 32-worker legs of
+> the worker sweep. Like-for-like, the committed analysis gives -7.1%. The delta reported
+> in-session at Stage 3b is withdrawn and not repeated here. The tail check's spreads had also
+> pooled the cold leg.
+>
+> A third route to the same error was a file layout. The committed tree keeps each launch's export
+> one level above its campaign directory. The analyser read only the campaign directory, so run on
+> the committed tree it lost every worker count and pooled the sweep into the floor again.
+>
+> All three were found the same way: by generating the final summary from COMMITTED files, not
+> from the scratch copies the interim reports used, and reading the rendered tables. One table
+> showed warm runs from three worker counts beside a cold run from one.
+>
+> Rules:
+>
+> - **A partition rule is one function** (`reference_units()`), and everything that groups legs as
+>   replicates calls it.
+> - **A missing partition key refuses; it is never guessed.** The analyser now finds exports in
+>   both layouts, and refuses when a service leg's worker count is unknown.
+> - **Final figures come from the committed tree.** An analysis of a scratch copy is a draft.
+>
+> Tested by `working/harness/test_analyse_layouts.py`. Its null controls revert each fix and must
+> see the tests fail. Kin to entries 39 and 2 (a check must cross an independence boundary; the
+> committed tree is one).
+
