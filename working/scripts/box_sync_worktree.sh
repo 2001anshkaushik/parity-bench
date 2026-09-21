@@ -19,7 +19,11 @@ set -uo pipefail
 echo "box_sync_worktree.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
 [ "$#" -eq 2 ] || { echo "usage: $0 <branch> <expect_head>" >&2; exit 2; }
 BR="$1"; WANT="$(echo "$2" | cut -c1-12)"
-cd "$(dirname "$0")/../.." || exit 2
+# BOX_SYNC_TREE: the worktree to repair, when this script is run from OUTSIDE it — which is the
+# normal case the first time: a worktree stuck behind origin does not yet contain this script, so
+# the caller extracts it from the fetched ref (git show origin/<br>:<path> > /tmp/...) and runs it.
+cd "${BOX_SYNC_TREE:-$(dirname "$0")/../..}" || exit 2
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "REFUSED: $(pwd) is not a git worktree" >&2; exit 2; }
 git fetch -q origin "$BR" || { echo "REFUSED: fetch failed" >&2; exit 2; }
 R="origin/$BR"
 UNTRACKED="$(git status --porcelain --untracked-files=all)"
