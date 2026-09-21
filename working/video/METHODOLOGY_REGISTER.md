@@ -1531,3 +1531,22 @@ than rewritten from memory, which is entry 2's point in miniature.
 > see the tests fail. Kin to entries 39 and 2 (a check must cross an independence boundary; the
 > committed tree is one).
 
+## 43. A field named for what was asked, holding what was available (added 2026-09-21)
+
+> The envelope ruling asked for peak engine anon RSS on every leg. The batch report grew a
+> `peak_anon_mb` field and filled it with the anon figure the driver had, which was anon at the
+> close of the measurement window. That is not a peak. cgroup v2 keeps a high-water mark only for
+> the container's TOTAL memory (`memory.peak`), and the driver samples anon at two instants.
+> Interim envelope reports carried the figure under the requested name. The name answered the
+> ruling; the value did not.
+>
+> The honest reading is a bracket. Peak anon is at least the anon at close, and at most the total
+> high-water mark, because anon is part of that total. The field is now
+> `anon_mb_at_window_close`, beside `memory_peak_mb_total` and `peak_anon_bounds_mb`, and every
+> summary table labels the bracket. The Stage 3b analysis committed before this change keeps the
+> old key; append-only means it is superseded, not edited.
+>
+> Rule: **name a field for what the instrument measured, never for what the ruling requested.**
+> When the two differ, report the gap as a bound. Same class as entry 36 (a per-cgroup basis quoted
+> as an arm total).
+

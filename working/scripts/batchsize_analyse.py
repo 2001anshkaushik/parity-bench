@@ -375,7 +375,12 @@ def batch_report(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
             "documents_never_submitted": (g["documents"]["submitted"] - g["documents"]["recorded"]),
             "documents_lost_total": sum(died.values()) + (g["documents"]["submitted"]
                                                           - g["documents"]["recorded"]),
-            "peak_anon_mb": mem.get("anon_mb"), "peak_mb": mem.get("peak_mb"),
+            # NOT a peak (2026-09-21; the key was "peak_anon_mb" until then): cgroup v2 keeps a
+            # high-water mark for TOTAL memory only, and the driver samples anon at window open and
+            # close. So the peak anon RSS the envelope asks for is BRACKETED, never read: at least the
+            # anon at close, at most the total high-water memory.peak (anon is part of that total).
+            "anon_mb_at_window_close": mem.get("anon_mb"), "memory_peak_mb_total": mem.get("peak_mb"),
+            "peak_anon_bounds_mb": [mem.get("anon_mb"), mem.get("peak_mb")],
             "label": ("BLAST-RADIUS-DOMINATED" if len(died) > 1 else
                       "ONE BATCH LOST (blast radius)" if died else "no batch lost")
                      + (" — BREAKER STOPPED THE LEG" if g["documents"]["submitted"]

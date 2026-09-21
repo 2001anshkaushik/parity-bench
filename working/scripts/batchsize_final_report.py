@@ -34,6 +34,7 @@ RES = Path("working/results")
 STRAGGLER = "039_039660.pdf"
 DAG = "†"
 DDAG = "‡"
+PARA = "¶"
 CAVEAT = ("32 vCPU unconstrained per Ruling A; measured posture cost vs 24-core cpuset -7.1% "
           "throughput, +28% CPU-s/doc.")
 LEG6_SPREAD_RULE = 0.02
@@ -195,7 +196,7 @@ def headline_docs(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
                                      "idle_core_equivalents": v["cr"]["idle_core_equivalents"],
                                      "idle_spin_burned_cores": v["cr"]["idle_spin_burned_cores"],
                                      "cpu_s_per_doc": (v["g"].get("cost") or {}).get("cpu_s_per_doc"),
-                                     "peak_anon_mb": v["mem"].get("anon_mb"), "peak_mb": v["mem"].get("peak_mb"),
+                                     "anon_mb_at_window_close": v["mem"].get("anon_mb"), "memory_peak_mb_total": v["mem"].get("peak_mb"),
                                      "documents": v["docs"]} for k, v in arms.items()}
     R, L = arms["rr"], arms["li"]
     R["posture"] = docs_posture(s4, rr_launch, "s4_export_rr_p1")
@@ -230,8 +231,9 @@ def headline_docs(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
          n(L["cr"]["idle_spin_burned_cores"], 3)],
         ["CPU-seconds per document (engine)", r(n((R["g"].get("cost") or {}).get("cpu_s_per_doc"), 3)),
          n((L["g"].get("cost") or {}).get("cpu_s_per_doc"), 3)],
-        ["Engine memory at window close: peak / anon (cgroup)", f"{gb(R['mem'].get('peak_mb'))} / {gb(R['mem'].get('anon_mb'))}",
-         f"{gb(L['mem'].get('peak_mb'))} / {gb(L['mem'].get('anon_mb'))}"],
+        ["Engine memory (cgroup): anon at window close / total high-water memory.peak",
+         f"{gb(R['mem'].get('anon_mb'))} / {gb(R['mem'].get('peak_mb'))}",
+         f"{gb(L['mem'].get('anon_mb'))} / {gb(L['mem'].get('peak_mb'))}"],
         ["Documents: completed / content outcome (no text, parse failed) / lost to the deadline / other failure",
          " / ".join(n(R["docs"][k]) for k in ("completed", "content_outcome", "deadline_loss", "other_failure")) + f" {DAG}",
          " / ".join(n(L["docs"][k]) for k in ("completed", "content_outcome", "deadline_loss", "other_failure"))],
@@ -302,7 +304,7 @@ def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
                          f"#{br['straggler_batch']}: {n(br['straggler_batch_wall_s'], 1)} s ({n(br['straggler_margin_s'], 1)} s spare)",
                          n(len(died)) + (" — **BLAST-RADIUS-DOMINATED**" if len(died) > 1 else ""),
                          n(br.get("documents_lost_total")),
-                         gb(br.get("peak_anon_mb")),
+                         f"{gb(br.get('anon_mb_at_window_close'))} – {gb(br.get('memory_peak_mb_total'))}",
                          d(n(row.get("idle_core_equivalents"), 3))])
             F["stage4_envelope"][f"{arm}_k{k}"] = {"docs_per_s": row["docs_per_s_mean"], "batch_report": br,
                                                   "idle_core_equivalents": row.get("idle_core_equivalents"),
@@ -315,8 +317,10 @@ def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
         out += [f"### {label}", ""]
         out += table(["K", "Span docs/s", "Batches", "Batch wall median / max, s",
                       f"Batch holding {STRAGGLER}: wall (spare to 1,800 s)", "Batches died", "Documents lost",
-                      "Peak engine anon", "Idle core-equiv."], rows)
+                      "Peak engine anon, bracketed ¶", "Idle core-equiv."], rows)
         out += [""] + ([f"{DAG} {CAVEAT}", ""] if arm == "rr" else [])
+        out += [f"{PARA} cgroup v2 keeps no anon high-water mark, so peak anon RSS is bracketed, not read: at least the "
+                "anon at the window's close, at most the container's total high-water `memory.peak`.", ""]
         out += ["<details><summary>Per-batch wall times, s (batch index: wall)</summary>", ""] + per_batch + ["", "</details>", ""]
     dec = load(s4 / "envelope_k512_decision.json", "envelope_k512_decision", required=False)
     if dec:
@@ -504,16 +508,20 @@ def answers(F: Dict[str, Any]) -> List[str]:
                     " of LlamaIndex's.")
     margins = {arm: [(k, e["batch_report"]["straggler_margin_s"]) for k, e in ks(arm)] for arm in ("rr", "li")}
     died = sum(len(e["batch_report"].get("batches_died") or []) for e in env.values())
-    anon = {arm: [e["batch_report"].get("peak_anon_mb") for _, e in ks(arm) if e["batch_report"].get("peak_anon_mb")]
-            for arm in ("rr", "li")}
+    anon = {arm: [e["batch_report"].get("anon_mb_at_window_close") for _, e in ks(arm)
+                  if e["batch_report"].get("anon_mb_at_window_close")] for arm in ("rr", "li")}
+    tot = {arm: [e["batch_report"].get("memory_peak_mb_total") for _, e in ks(arm)
+                 if e["batch_report"].get("memory_peak_mb_total")] for arm in ("rr", "li")}
     out += ["", f"**The cost of large batches.** The batch holding `{STRAGGLER}` had this many seconds to spare "
             "against the 1,800 s batch deadline, by K — RocketRide: "
             + ", ".join(f"K={k}: {n(m, 1)}" for k, m in margins["rr"]) + f" {DAG}; LlamaIndex: "
             + ", ".join(f"K={k}: {n(m, 1)}" for k, m in margins["li"]) + ". "
             + ("No batch died on either arm. " if died == 0 else f"**{died} batch(es) died** (§2). ")
-            + "Peak engine anon memory across K: "
+            + "Engine anon memory at each leg's close, across K: "
             + "; ".join(f"{ {'rr': 'RocketRide', 'li': 'LlamaIndex'}[arm]} {gb(min(v))} to {gb(max(v))}" for arm, v in anon.items() if v)
-            + " (§2).", ""]
+            + "; total high-water `memory.peak`: "
+            + "; ".join(f"{ {'rr': 'RocketRide', 'li': 'LlamaIndex'}[arm]} {gb(min(v))} to {gb(max(v))}" for arm, v in tot.items() if v)
+            + " — peak anon lies between the two (§2).", ""]
     sv = F.get("smoke_video_rr_k_range")
     out += ["**Optimal \"batch\", AMI video.** Neither arm has a frame-batch knob. The only lever, videos in flight, "
             "was set to K=16 for both arms from the 16-video smoke slice (§5)"
@@ -611,7 +619,8 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
                            if isinstance(v, (int, float)))]
                 for B, r in sorted((b.get("timing_only_for_passing_b") or {}).items(), key=lambda kv: int(kv[0]))]
         if rows:
-            out += table(["B", "Label", "frames/s", "engine cores", "util / 32", "idle core-equiv.", "engine memory (cgroup)"], rows)
+            out += table(["B", "Label", "frames/s", "engine cores", "util / 32", "idle core-equiv.",
+                          "engine memory: total high-water (peak) and anon at leg end — peak anon lies between"], rows)
         out += ["", f"Verdict: {b.get('verdict')}. Source: `{s5}/analysis_s5b.json`.", ""]
     elif pre:
         out += ["S5-B proper: not run or not analysed (the chain refuses unless the pre-check passed).", ""]
