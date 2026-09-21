@@ -43,6 +43,24 @@ import types
 from pathlib import Path
 
 
+# PRE-REGISTERED CRITERION (Ansh, 2026-09-21), fixed before the probe runs and copied into
+# every output so the verdict can be checked against the rule that produced it.
+CRITERION = {
+    "tier1": "every frame bit-identical (boxes, scores, class ids, dtype, shape) -> PASS",
+    "tier2": ("PASS labelled NUMERICALLY EQUIVALENT only if, PER FRAME: identical label sets and "
+              "detection counts OUTSIDE a +/-0.001 band around the 0.3 threshold; max |score delta| "
+              "<= 1e-5; max box delta <= 1e-3 px"),
+    "else": "STOP S5-B",
+    "band": 0.001, "threshold": 0.3, "max_score_delta": 1e-5, "max_box_delta_px": 1e-3,
+    "box_space": ("OUTPUT pixels — the detector's boxes (downscaled-image space) multiplied by the "
+                  "per-frame rescale factor the pipeline applies (_rescale_to_original), because "
+                  "that is what reaches the emitted text; the downscaled-space delta is recorded too"),
+    "hypothesis": "batched GEMM on CPU changes summation order, so Tier 1 fails and Tier 2 decides",
+    "note": ("the pipeline emits scores and boxes at full float precision (_to_detection does not "
+             "round), so even a Tier 2 pass changes the emitted text and its chunk hashes"),
+}
+
+
 def canon(det) -> list:
     """The raw rfdetr outputs, as exact bytes, per frame: boxes, scores, class ids."""
     import numpy as np
@@ -73,6 +91,43 @@ def max_abs(a, b) -> float | None:
         if x.size:
             worst = max(worst, float(np.max(np.abs(x.astype("float64") - y.astype("float64")))))
     return worst
+
+
+def tier2_frame(single, batched, fx: float, fy: float) -> dict:
+    """Tier 2 for ONE frame. Detections inside the +/-band around the threshold may legitimately
+    appear or vanish; everything outside it must match by label and count, then pair up (same
+    label, nearest box) within the score and box tolerances."""
+    import numpy as np
+    thr, band = CRITERION["threshold"], CRITERION["band"]
+
+    def rows(det):
+        xyxy, conf, cid = canon(det)
+        if conf is None or not len(conf):
+            return []
+        return [(int(cid[i]) if cid is not None else -1, float(conf[i]),
+                 [float(v) for v in xyxy[i]]) for i in range(len(conf))]
+
+    a = [r for r in rows(single) if abs(r[1] - thr) > band]
+    b = [r for r in rows(batched) if abs(r[1] - thr) > band]
+    res = {"count_single_outside_band": len(a), "count_batched_outside_band": len(b)}
+    if sorted(x[0] for x in a) != sorted(x[0] for x in b):
+        res.update(ok=False, why="label multiset or count differs outside the threshold band")
+        return res
+    worst_s = worst_small = worst_out = 0.0
+    pool = list(b)
+    for cls, sc, box in a:
+        cand = [x for x in pool if x[0] == cls]
+        best = min(cand, key=lambda x: max(abs(x[2][j] - box[j]) for j in range(4)))
+        pool.remove(best)
+        worst_s = max(worst_s, abs(best[1] - sc))
+        d_small = [abs(best[2][j] - box[j]) for j in range(4)]
+        worst_small = max(worst_small, max(d_small))
+        worst_out = max(worst_out, max(d_small[0] * fx, d_small[1] * fy, d_small[2] * fx, d_small[3] * fy))
+    ok = worst_s <= CRITERION["max_score_delta"] and worst_out <= CRITERION["max_box_delta_px"]
+    res.update(ok=ok, max_score_delta=worst_s, max_box_delta_small_px=worst_small,
+               max_box_delta_output_px=worst_out,
+               why=None if ok else "score or box delta exceeds the pre-registered tolerance")
+    return res
 
 
 def main() -> int:
@@ -106,9 +161,13 @@ def main() -> int:
     if len(paths) < 8:
         print(json.dumps({"verdict": "NOT RUN", "reason": f"only {len(paths)} frames"}))
         return 2
-    smalls = [resize_for_inference(Image.open(p).convert("RGB"), edge)[0] for p in paths]
+    smalls, factors = [], []
+    for pth in paths:
+        small, (ow, oh) = resize_for_inference(Image.open(pth).convert("RGB"), edge)
+        smalls.append(small)
+        factors.append((ow / small.size[0], oh / small.size[1]))
 
-    out = {"source": str(src), "frames": len(smalls), "infer_edge": edge, "threshold": thr,
+    out = {"criterion_preregistered": CRITERION, "source": str(src), "frames": len(smalls), "infer_edge": edge, "threshold": thr,
            "torch": torch.__version__, "torch_num_threads": torch.get_num_threads(),
            "torch_num_interop_threads": torch.get_num_interop_threads(),
            "backend_impl": backend._impl, "model_resolution": getattr(model.model, "resolution", None)}
@@ -148,15 +207,31 @@ def main() -> int:
                                           == len(canon(single_a[i])[1] if canon(single_a[i])[1] is not None else [])
                                           for i in range(len(batched))),
             "BIT_IDENTICAL": not diffs}
+        t2 = [tier2_frame(single_a[i], batched[i], *factors[i]) for i in range(len(batched))]
+        fails = [i for i, r in enumerate(t2) if not r["ok"]]
+        per_b[str(B)].update(
+            tier2_all_frames_ok=not fails, tier2_failing_frames=fails[:10],
+            tier2_first_failure=(t2[fails[0]] if fails else None),
+            tier2_max_score_delta=max((r.get("max_score_delta") or 0.0) for r in t2),
+            tier2_max_box_delta_output_px=max((r.get("max_box_delta_output_px") or 0.0) for r in t2),
+            tier=("TIER 1 — BIT-IDENTICAL" if not diffs else
+                  "TIER 2 — NUMERICALLY EQUIVALENT" if not fails else "NEITHER"))
     out["by_batch_size"] = per_b
-    all_ok = all(v["BIT_IDENTICAL"] for v in per_b.values())
-    out["verdict"] = ("PASS — every batch size bit-identical to one frame at a time; S5-B may proceed "
-                      "to the node patch and the end-to-end control" if all_ok else
-                      "FAIL — batched inference is NOT bit-identical to single-frame inference; per the "
-                      "Stage 5 ruling B>1 is a different measurement, not an optimisation, and the "
-                      "S5-B sweep stops here")
+    tiers = {b: v["tier"] for b, v in per_b.items()}
+    if all(t.startswith("TIER 1") for t in tiers.values()):
+        verdict, rc = "PASS (TIER 1 — BIT-IDENTICAL at every B)", 0
+    elif all(t != "NEITHER" for t in tiers.values()):
+        verdict, rc = ("PASS labelled NUMERICALLY EQUIVALENT (TIER 2) — within the pre-registered "
+                       "tolerances at every B, but NOT bit-identical; the emitted text and its chunk "
+                       "hashes will differ from B=1"), 0
+    else:
+        verdict, rc = ("STOP S5-B — at least one B is neither bit-identical nor within the "
+                       "pre-registered tolerances; per the ruling B>1 is a different measurement, "
+                       "not an optimisation"), 1
+    out["tiers_by_b"] = tiers
+    out["verdict"] = verdict
     print(json.dumps(out, indent=1))
-    return 0 if all_ok else 1
+    return rc
 
 
 if __name__ == "__main__":
