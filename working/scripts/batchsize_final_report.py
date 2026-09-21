@@ -548,6 +548,36 @@ def answers(F: Dict[str, Any]) -> List[str]:
     return out
 
 
+def checks(s4a: Dict[str, Any], s4: Path, F: Dict[str, Any]) -> List[str]:
+    """Every independent angle the full-scale analysis took, with its verdict — and the null
+    control that shows the comparator could have failed (register entry 2)."""
+    A, B = s4a.get("check_A_clock") or {}, s4a.get("check_B_cpu_source") or {}
+    C, T = s4a.get("check_C_content") or {}, (s4a.get("check_E_tail") or {}).get("by_arm") or {}
+    H = s4a.get("box_hygiene_per_leg") or {}
+    def tally(d: Dict[str, Any]) -> str:
+        vs: Dict[str, int] = {}
+        for v in d.values():
+            vs[v.get("verdict")] = vs.get(v.get("verdict"), 0) + 1
+        return ", ".join(f"{k} {c}" for k, c in sorted(vs.items(), key=lambda kv: str(kv[0])))
+    dirty = [k for k, v in H.items() if v.get("other_containers") or not (v.get("stray_processes") or {}).get("clean", False)]
+    nc = C.get("null_control_cross_arm") or {}
+    F["checks"] = {"A": tally(A), "B": tally(B), "C": {k: (C.get(k) or {}).get("verdict") for k in ("rr", "li")},
+                   "C_null": nc, "tail": {k: v.get("verdict") for k, v in T.items()}, "hygiene_dirty": dirty}
+    rows = [["A. Clock: docs/s from per-document wall stamps vs the export's monotonic span", f"{len(A)} legs: {tally(A)}", "—"],
+            ["B. CPU source: engine cgroup cores vs host per-core busy on the same CPUs", f"{len(B)} legs: {tally(B)}", "—"],
+            ["C. Content: chunk hashes identical across every K and C within an arm",
+             f"RocketRide {F['checks']['C']['rr']}, LlamaIndex {F['checks']['C']['li']}",
+             f"cross-arm comparison {nc.get('verdict')}: {n(nc.get('differing'))} of {n(nc.get('common'))} documents differ (different parsers)"],
+            ["E. The K ranking is the same by span and by time-to-p90", ", ".join(f"{k}: {v}" for k, v in F["checks"]["tail"].items()), "—"],
+            ["Ruling C: no other container, no stray process above 0.5 cores, before each leg",
+             f"{len(H)} legs: " + ("all clean" if not dirty else f"NOT clean: {', '.join(dirty)}"), "—"]]
+    out = ["## Checks behind the full-scale figures", ""]
+    out += table(["Check", "Verdict", "Null control"], rows)
+    out += ["", f"Source: `{s4}/analysis_docs.json` → check_A_clock, check_B_cpu_source, check_C_content, check_E_tail, "
+            "box_hygiene_per_leg.", ""]
+    return out
+
+
 def pending(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
     out = ["## Not verified / pending", ""]
     items = []
@@ -700,6 +730,7 @@ def main() -> int:
     body += anchor(a.s3b, a.smoke, F)
     body += smoke_scale(a.s3b, F)
     body += smoke_video(a.smoke, a.s3b, F)
+    body += checks(s4a, a.s4, F)
     body += stage5(a.s5, F)
     md += answers(F) + body + pending(a.s5, F)
     md += ["## Inputs", ""] + [f"- {k}: `{v}`" for k, v in sorted(INPUTS.items())] + [""]
