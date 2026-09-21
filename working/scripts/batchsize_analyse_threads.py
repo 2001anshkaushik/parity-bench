@@ -46,6 +46,32 @@ def in_process_torch(leg: Path):
     return ((d.get("readbacks") or {}).get("rr_task") or {}).get("torch_num_threads")
 
 
+def frame_compare(a: Dict[str, Dict[str, Any]], b: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """Output of two legs on the same videos, frame by frame, from the driver's own records.
+
+    OUTPUT IS NOT ASSUMED NEUTRAL TO T (2026-09-21). The first sweep leg (T=1) was chunk-identical to
+    the default cell on 0 of 16 videos: intra-op width changes the floating-point path, as batching
+    did in the S5-B pre-check. The records carry each frame's label multiset and scores (no boxes),
+    so this reports label and count identity per frame and the score change. Scores are paired in
+    sorted order within a frame, which MINIMISES the largest pairwise difference — so the figure is
+    a lower bound ("at least"), the conservative direction for a claim that outputs differ."""
+    frames = labels_same = counts_same = 0
+    max_d = 0.0
+    vids = sorted(set(a) & set(b))
+    for v in vids:
+        for la, lb, sa, sb in zip(a[v]["frame_label_multisets"], b[v]["frame_label_multisets"],
+                                  a[v]["frame_scores"], b[v]["frame_scores"]):
+            frames += 1
+            labels_same += la == lb
+            if len(sa) == len(sb):
+                counts_same += 1
+                max_d = max([max_d] + [abs(x - y) for x, y in zip(sorted(sa), sorted(sb))])
+    return {"videos": len(vids), "frames": frames, "frames_label_multiset_identical": labels_same,
+            "frames_detection_count_identical": counts_same,
+            "max_abs_score_delta_at_least": max_d,
+            "chunk_identical_videos": sum(1 for v in vids if a[v]["chunk_sha256"] == b[v]["chunk_sha256"])}
+
+
 def cpu_s_per_frame(leg: Path):
     fs = sorted(glob.glob(str(leg / "export_*.json")))
     if not fs:
@@ -100,6 +126,13 @@ def main() -> int:
     else:
         eq["verdict"] = "NOT RUN — no valid T=16 leg"
     rep["T16_vs_default"] = eq
+    base = recs(d1)
+    rep["output_vs_default"] = {
+        "what": ("DIAGNOSTIC, not a pre-registered gate for S5-A: each T's output against the out-of-the-box "
+                 "default cell, from the driver's per-frame records"),
+        "null_control_default_vs_its_replicate": frame_compare(base, recs(d2)),
+        "by_T": {T: frame_compare(base, recs(Path(r["leg"]))) for T, r in rows.items()},
+    }
     an = bav.leg_row(anchor)
     rep["comparator_G4_anchor"] = {"what": "one LlamaIndex instance, K=16, the same 16 videos",
                                    "frames_per_s": an.get("frames_per_s"), "effective_cores": an.get("effective_cores")}

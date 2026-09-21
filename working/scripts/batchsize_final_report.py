@@ -638,7 +638,21 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
                 f"Excluded legs: {json.dumps(t.get('excluded'))}.",
                 f"T=16 against the out-of-the-box default cell: {eq.get('verdict')} (relative {eq.get('relative')}, "
                 f"chunk-identical videos {eq.get('chunk_hash_identical_videos')}).",
-                "Comparator, the G4 anchor (one LlamaIndex instance, K=16, same videos): "
+                "Output against the out-of-the-box default cell — a DIAGNOSTIC, not a pre-registered gate for S5-A "
+                "(intra-op width changes the floating-point path, as batching does in S5-B):", ""]
+        ov = t.get("output_vs_default") or {}
+        orow = []
+        for name, c in ([("default vs its own replicate (null control)", ov.get("null_control_default_vs_its_replicate") or {})]
+                        + [(f"T={T}", c) for T, c in sorted((ov.get("by_T") or {}).items(), key=lambda kv: int(kv[0]))]):
+            if c:
+                orow.append([name, f"{n(c['chunk_identical_videos'])}/{n(c['videos'])}",
+                             f"{n(c['frames_label_multiset_identical'])}/{n(c['frames'])}",
+                             f"{n(c['frames_detection_count_identical'])}/{n(c['frames'])}",
+                             f"{c['max_abs_score_delta_at_least']:.2e}"])
+        if orow:
+            out += table(["Leg", "chunk-identical videos", "frames with identical labels", "frames with identical counts",
+                          "largest score change (at least)"], orow) + [""]
+        out += ["Comparator, the G4 anchor (one LlamaIndex instance, K=16, same videos): "
                 f"{n((t.get('comparator_G4_anchor') or {}).get('frames_per_s'), 3)} frames/s at "
                 f"{n((t.get('comparator_G4_anchor') or {}).get('effective_cores'), 3)} cores.", "",
                 f"Source: `{s5}/analysis_s5a_threads.json`.", ""]
@@ -647,9 +661,20 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
     b = load(s5 / "analysis_s5b.json", "s5b", required=False)
     out += ["### S5-B — detector frame micro-batching (PATCHED-ENGINE, NOT OUT-OF-THE-BOX)", ""]
     if pre:
-        F["stage5"]["s5b_precheck"] = {"verdict": pre.get("verdict"), "tiers_by_b": pre.get("tiers_by_b")}
-        out += [f"Pre-check (read-only, unmodified `rr:patched-video`, pre-registered tiers): **{pre.get('verdict')}**; "
-                f"tiers by B: {json.dumps(pre.get('tiers_by_b'))}.", ""]
+        F["stage5"]["s5b_precheck"] = {k: pre.get(k) for k in ("verdict", "tiers_by_b", "frames", "null_N1_single_is_reproducible",
+                                                               "null_N2_comparator_sees_a_different_frame", "by_batch_size")}
+        out += [f"Pre-check, read-only, in a throwaway container of the unmodified `rr:patched-video` on {n(pre.get('frames'))} "
+                f"frames, criterion pre-registered in the artifact: **{pre.get('verdict')}**", "",
+                f"Null controls: one frame at a time is bit-reproducible — {pre.get('null_N1_single_is_reproducible')}; "
+                f"the comparator sees two different frames as different — {pre.get('null_N2_comparator_sees_a_different_frame')}.", ""]
+        prow = [[f"B={b}", f"{n(r.get('bit_identical_frames'))}/{n(r.get('frames'))}",
+                 f"{r.get('tier2_max_score_delta', 0):.2e} (limit 1e-05)",
+                 f"{r.get('tier2_max_box_delta_output_px', 0):.2e} (limit 1e-03)",
+                 str(r.get("detection_counts_equal")), str(r.get("tier"))]
+                for b, r in sorted((pre.get("by_batch_size") or {}).items(), key=lambda kv: int(kv[0]))]
+        if prow:
+            out += table(["Batch", "bit-identical frames", "max score change", "max box change, output px",
+                          "detection counts equal", "Tier"], prow) + [""]
     else:
         out += ["Pre-check: PENDING / NOT RUN.", ""]
     if b:
@@ -666,7 +691,8 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
                           "engine memory: total high-water (peak) and anon at leg end — peak anon lies between"], rows)
         out += ["", f"Verdict: {b.get('verdict')}. Source: `{s5}/analysis_s5b.json`.", ""]
     elif pre:
-        out += ["S5-B proper: not run or not analysed (the chain refuses unless the pre-check passed).", ""]
+        out += [("S5-B proper: PENDING — not analysed yet." if str(pre.get("verdict", "")).startswith("PASS")
+                 else "S5-B proper: STOPPED by the pre-check, per the ruling."), ""]
     # S5-C
     c = load(s5 / "analysis_s5c_smt.json", "s5c", required=False)
     out += ["### S5-C — is RocketRide's 32-vCPU cost hyperthreading? (DIAGNOSTIC — cpusets bound on purpose)", ""]
