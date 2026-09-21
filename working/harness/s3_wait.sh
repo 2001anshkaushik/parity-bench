@@ -23,7 +23,12 @@ while :; do
     echo "AUTH EXPIRED at $(date -u +%H:%M:%SZ) — run: aws sso login --profile $PROFILE. The state of $PREFIX is UNKNOWN, not absent."
     exit 3
   fi
-  if aws --profile "$PROFILE" s3 ls "$PREFIX" 2>/dev/null | grep -q -- "$PAT"; then
+  # NO PIPE INTO `grep -q` (2026-09-21, found by exercising the found path): under pipefail,
+  # grep -q exits on its first match, aws dies writing into the closed pipe (rc 120), and the
+  # pipeline reports that SIGPIPE as failure — a MATCH read as a miss, so this helper could never
+  # report "found". The listing is captured whole, then searched with no pipe at all.
+  LISTING="$(aws --profile "$PROFILE" s3 ls "$PREFIX" 2>/dev/null)" || LISTING=""
+  if grep -q -- "$PAT" <<< "$LISTING"; then
     echo "APPEARED at $(date -u +%H:%M:%SZ): $PAT under $PREFIX"
     exit 0
   fi

@@ -28,12 +28,14 @@ S4="${BSZ_STAGE4_DIR:-}"
 for need in p1_rr_cont32 p2_li_cont p3_rr_k128 p4_li_k128 p5_li_video p6_rr_video envelope_k512_decision.json; do
   [ -e "$S4/$need" ] || { echo "REFUSED: Stage 4 not banked — $S4/$need is absent" >&2; exit 5; }
 done
-if docker ps --format '{{.Names}}' | grep -q .; then
-  echo "REFUSED (Ruling C): containers are running: $(docker ps --format '{{.Names}}' | tr '\n' ' ')" >&2; exit 3
+RUNNING="$(docker ps --format '{{.Names}}')"          # captured: no pipe into grep -q (register 38)
+if [ -n "$RUNNING" ]; then
+  echo "REFUSED (Ruling C): containers are running: $(tr '\n' ' ' <<< "$RUNNING")" >&2; exit 3
 fi
 VDIR="$HOME/parity-bench-video/corpus/ami/full"
-VID="$(ls "$VDIR" | sort | head -1)"
-[ -n "$VID" ] || { echo "REFUSED: no AMI video under $VDIR" >&2; exit 2; }
+VIDS=("$VDIR"/*)                                      # glob expansion is sorted; no pipe into head
+[ -e "${VIDS[0]}" ] || { echo "REFUSED: no AMI video under $VDIR" >&2; exit 2; }
+VID="$(basename "${VIDS[0]}")"
 mkdir -p "$OUT"
 [ -e "$OUT/s5b_precheck.json" ] && { echo "REFUSED: $OUT/s5b_precheck.json exists — append-only" >&2; exit 3; }
 echo "video: $VID  image: $(docker image inspect -f '{{.Id}}' rr:patched-video)"

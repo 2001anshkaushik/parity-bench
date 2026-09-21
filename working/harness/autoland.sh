@@ -177,7 +177,16 @@ blob_at() {  # $1 = INDEX | HEAD | any ref, $2 = path -> blob id or empty
   if [[ "$1" == "INDEX" ]]; then git rev-parse -q --verify ":$2" 2>/dev/null || true
   else git rev-parse -q --verify "$1:$2" 2>/dev/null || true; fi
 }
-blob_is_stub() { git cat-file -p "$1" | head -1 | grep -qF "$STUB_MARKER"; }
+# No pipe into `head`/`grep -q` (2026-09-21): under `set -euo pipefail` an early-exiting reader
+# SIGPIPEs the writer and pipefail reports the MATCH as a failure — the defect that made
+# s3_wait.sh unable to report "found". Harmless here only by the accident that stubs are small;
+# the first line is now read from a file with no pipe at all.
+blob_is_stub() {
+  local f first; f="$(mktemp)"
+  git cat-file -p "$1" > "$f" 2>/dev/null || { rm -f "$f"; return 1; }
+  first="$(head -n 1 "$f")"; rm -f "$f"
+  [[ "$first" == *"$STUB_MARKER"* ]]
+}
 blob_in_history() {  # $1 blob, $2 path: is this blob any committed version of $path on HEAD?
   local c
   for c in $(git log --format=%H HEAD -- "$2"); do
@@ -297,8 +306,6 @@ except Exception as e:
 for k, v in (b.get("failing") or {}).items():
     print(f"    {k}  [since {v.get('since_commit','?')}, baselined at {b.get('baselined_at_commit','?')}] {v.get('reason','')[:120]}")
 if not b.get("failing"): print("    (none)")
-for k, v in (b.get("flaky") or {}).items():
-    print(f"    FLAKY {k}  [since {v.get('since','?')}] either outcome accepted; {v.get('reason','')[:100]}")
 print(f"    max_skipped: {b.get('max_skipped', 'ABSENT')}")
 PYEOF
 then git reset -q; die "$BASELINE is not valid JSON — a gate whose baseline cannot be read cannot tell a known failure from a new one"; fi
@@ -311,30 +318,21 @@ if ! "$PY" - "$BASELINE" "$SUITE_OUT" "$SUITE_RC" <<'PYEOF'
 import json, re, sys
 bl = json.load(open(sys.argv[1]))
 base = set((bl.get("failing") or {}).keys())
-# FLAKY (2026-09-21): a test whose outcome flips with something the pushed code cannot touch —
-# here the laptop engine, which runs pipelines on some invocations and not others (observed
-# PASS, FAIL, PASS in three consecutive runs, co-flipping with nul_truncation's SKIP/XFAIL). The
-# strict baseline can only hold it as always-failing (refuses 2 pushes in 3) or always-passing
-# (refuses 1 in 3), and "re-run until it matches" is exactly what this gate forbids. So a
-# flaky entry accepts either outcome and PRINTS which occurred — and the escape hatch is itself
-# gated: an entry must carry recorded evidence of BOTH outcomes, and may not also be `failing`.
-flaky = bl.get("flaky") or {}
 out = open(sys.argv[2], errors="replace").read(); rc = int(sys.argv[3])
 summ = re.search(r"^\s*(\d+) passed, (\d+) failed, (\d+) skipped", out, re.M)
 completed = summ is not None
 skipped = int(summ.group(3)) if summ else None
 failing = set(re.findall(r"^\s*FAILED (\S+?):", out, re.M))
-new = sorted(failing - base - set(flaky)); fixed = sorted(base - failing)
-for k in sorted(flaky):
-    print(f"  flaky {k}: {'FAILED' if k in failing else 'passed'} this run (either is accepted)")
+new = sorted(failing - base); fixed = sorted(base - failing)
 print(f"  parsed: completed={completed} rc={rc} failing={sorted(failing)} baseline={sorted(base)} skipped={skipped} max_skipped={bl.get('max_skipped')!r}")
 bad = []
-for k, v in flaky.items():
-    if not (isinstance(v, dict) and v.get("observed_pass") and v.get("observed_fail")):
-        bad.append(f"flaky entry {k!r} lacks recorded evidence of BOTH outcomes (observed_pass and "
-                   "observed_fail) — without it 'flaky' is a place to hide a real failure")
-    if k in base:
-        bad.append(f"{k!r} is listed as both failing and flaky — it can only be one")
+# The FLAKY class existed for one day (2026-09-21) and was REVERTED by ruling: an outcome that
+# flips with the laptop engine is handled INSIDE the test by a deterministic precondition
+# (unreachable -> SKIP with the reason, reachable -> must pass), never by a gate that accepts
+# either result. A baseline still carrying the key is refused so the hatch cannot return quietly.
+if bl.get("flaky"):
+    bad.append(f"{sys.argv[1]} carries a 'flaky' section — that class was reverted (register 38); "
+               "make the test deterministic with a precondition instead")
 if not completed:
     bad.append("the runner did not print its summary line — it crashed or was cut off; a suite that did not complete proves nothing (entry 35)")
 if "max_skipped" not in bl:

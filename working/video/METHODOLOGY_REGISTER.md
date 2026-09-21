@@ -1383,3 +1383,41 @@ than rewritten from memory, which is entry 2's point in miniature.
 > failure; "the response lane is wrong" names the local, likely one, and it
 > was second. The message now names the lane it looked under and the key it
 > got back, so the next reader is told which clause fired.
+
+## 38. The escape hatch lasted a day, and the helper that could never say "found" (added 2026-09-21)
+
+> Two corrections from one session, both caught by exercising a path rather than trusting it.
+>
+> **The flaky class, reverted.** `thread_settings_matched` flips PASS/FAIL with the laptop
+> engine, which answers on its port but launches a task subprocess only on some `use()` calls.
+> A strict baseline can hold such a test only as always-failing or always-passing, so gate 3
+> refused most landings either way. The first fix was a `flaky` class in the gate that accepted
+> either outcome given recorded evidence of both. Ansh reverted it the same day: the cause was
+> known, and a gate that accepts either result is a gate that no longer judges that test. The
+> replacement lives INSIDE the test: a deterministic precondition probes first with a pipeline
+> that shares nothing with the test's own probe (`probe_minimal.pipe`, webhook -> response_text,
+> no custom node). Unreachable -> a SKIP that names the reason, counted against the skip budget
+> (raised 2 -> 3, the down state's named skips). Reachable -> the test must pass, and a
+> JSONDecodeError after a successful precondition is a FAILURE, never a skip. Independence is the
+> point: had the precondition reused the env-probe call, a real regression that broke only that
+> path would have read as "unreachable" and skipped forever. Null controls, stubbed engine:
+> unreachable skips and never passes; reachable-and-mismatched fails; reachable-then-garbage
+> fails. The gate now REFUSES any baseline still carrying a `flaky` section. Residual, stated:
+> the laptop engine fails per `use()`, so a passing precondition does not guarantee the test's
+> own call — a FAIL in that window is real by the ruling, and its cure is the engine, not a
+> wider gate.
+>
+> **The helper that could never say "found".** `s3_wait.sh` was written to stop an expired
+> token reading as "not landed", and its auth path was proven on the live expired token. Its
+> FOUND path was not exercised — and when it was, it reported TIMEOUT for a prefix that existed.
+> Under `set -o pipefail`, `aws s3 ls | grep -q` lets grep exit on its first match; aws then
+> dies writing into the closed pipe (rc 120) and pipefail reports the match as a miss
+> (`PIPESTATUS=120 0`, confirmed by toggling pipefail alone). The fix captures the listing and
+> searches it with no pipe. The same shape sat in `autoland.sh`'s `blob_is_stub`
+> (`git cat-file | head -1 | grep -qF`, under `set -euo pipefail`) — benign only by the accident
+> that stubs are small enough to be written before head exits — and in a Stage 5 pre-check; both
+> were rewritten without the pipe. Rule: **a helper is not verified until every exit path has
+> been driven**, and **under pipefail, never pipe into an early-exiting reader** (`grep -q`,
+> `head`) — capture first. Kin to entry 27 (a green run is a claim about the paths it ran) and
+> entry 4 (an unexecuted string).
+

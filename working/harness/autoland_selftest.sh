@@ -255,29 +255,31 @@ G reset -q --hard "docs-bench@{1}" 2>/dev/null || G reset -q --hard HEAD~1
 clean_tree
 G checkout -q video-bench
 
-echo "=== gate 3: the FLAKY class (2026-09-21) — either outcome accepted, but only with evidence"
-flaky_baseline() {  # $1 = the flaky entry JSON body
-  cat > "$REPO/working/harness/suite_baseline.json" <<JEOF
+echo "=== gate 3: the precondition ruling (2026-09-21) — no flaky class, deterministic outcomes"
+clean_tree
+echo "p1" > "$REPO/pc1.txt"
+# unreachable engine: the test SKIPS (named). With the skip inside budget the gate passes, and
+# the test is NOT reported as passed.
+cat > "$REPO/working/harness/suite_baseline.json" <<'JEOF'
 {"runner": "working/scripts/regression_selftest.py", "baselined_at_commit": "sandbox",
- "max_skipped": 0, "failing": {}, "flaky": {"laptop_engine_probe": $1}}
+ "max_skipped": 1, "failing": {}}
 JEOF
-  G add working/harness/suite_baseline.json; G commit -q -m "flaky baseline"
-}
-EVID='{"since": "sandbox", "reason": "flips with the laptop engine", "observed_pass": "run1", "observed_fail": "run2"}'
-clean_tree; flaky_baseline "$EVID"
-echo "f1" > "$REPO/fl1.txt"
-run_al "FAKE_FAILS=laptop_engine_probe" --dry-run "m" fl1.txt
-chk "flaky: a flaky test that FAILS does not refuse, and says so" $([[ $RC -eq 0 ]] && has 'flaky laptop_engine_probe: FAILED this run'; echo $?) "rc=$RC $OUT"
-run_al --dry-run "m" fl1.txt
-chk "flaky: the same test PASSING does not refuse either, and says so" $([[ $RC -eq 0 ]] && has 'flaky laptop_engine_probe: passed this run'; echo $?) "rc=$RC $OUT"
-run_al "FAKE_FAILS=laptop_engine_probe some_real_regression" --dry-run "m" fl1.txt
-chk "flaky: a NON-flaky failure beside it still REFUSES, named" $([[ $RC -ne 0 ]] && has 'NEW failure' && has 'some_real_regression'; echo $?) "rc=$RC $OUT"
-G reset -q --hard HEAD~1; clean_tree
-flaky_baseline '{"since": "sandbox", "reason": "no evidence recorded", "observed_pass": "run1"}'
-echo "f2" > "$REPO/fl2.txt"
-run_al --dry-run "m" fl2.txt
-chk "flaky: an entry WITHOUT evidence of both outcomes REFUSES (the escape hatch is gated)" $([[ $RC -ne 0 ]] && has 'lacks recorded evidence of BOTH outcomes'; echo $?) "rc=$RC $OUT"
-G reset -q --hard HEAD~1; clean_tree
+G add working/harness/suite_baseline.json; G commit -q -m "strict baseline, skip budget 1"
+run_al "FAKE_SKIPS=1" --dry-run "m" pc1.txt
+chk "precondition: UNREACHABLE engine -> test SKIPS within budget, gate passes, nothing reported passed" $([[ $RC -eq 0 ]] && has 'skipped=1' && ! has 'failing=\[.thread'; echo $?) "rc=$RC $OUT"
+# reachable engine, failing test: the gate REFUSES it as a failure not in the baseline.
+run_al "FAKE_FAILS=thread_settings_matched" --dry-run "m" pc1.txt
+chk "precondition: REACHABLE + FAILING -> gate REFUSES, naming the test" $([[ $RC -ne 0 ]] && has 'NEW failure' && has 'thread_settings_matched'; echo $?) "rc=$RC $OUT"
+# the reverted escape hatch cannot come back through the baseline file.
+cat > "$REPO/working/harness/suite_baseline.json" <<'JEOF'
+{"runner": "working/scripts/regression_selftest.py", "baselined_at_commit": "sandbox",
+ "max_skipped": 1, "failing": {},
+ "flaky": {"thread_settings_matched": {"observed_pass": "x", "observed_fail": "y"}}}
+JEOF
+G add working/harness/suite_baseline.json; G commit -q -m "a baseline that tries the reverted class"
+run_al --dry-run "m" pc1.txt
+chk "precondition: a baseline carrying the REVERTED flaky section is REFUSED" $([[ $RC -ne 0 ]] && has "carries a 'flaky' section"; echo $?) "rc=$RC $OUT"
+G reset -q --hard HEAD~2; clean_tree
 
 echo "=== gate 3: skip budget (entry 27)"
 echo "x" > "$REPO/sk.txt"
