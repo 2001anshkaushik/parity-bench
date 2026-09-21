@@ -73,6 +73,9 @@ def load_campaign(d: Path) -> List[Dict[str, Any]]:
             continue
         leg = json.loads(lj.read_text())
         leg["_launch"] = lj.parent.name
+        pd = lj.parent / lj.name.replace("leg_", "perdoc_").replace(".json", ".jsonl")
+        leg["_perdoc"] = ([json.loads(x) for x in pd.read_text().splitlines() if x.strip()]
+                          if pd.exists() else None)
         # The verdict is DERIVED here from the recorded reasons, never edited in the artifact:
         # parser-level document outcomes are content, not lost work (see exp_batchsize_sweep.py).
         reasons = set((leg.get("documents") or {}).get("hard_failure_reasons") or [])
@@ -89,13 +92,29 @@ def load_campaign(d: Path) -> List[Dict[str, Any]]:
         leg["arm_units"] = u.get("ws1_workers") if leg["arm"] == "li" else 1
         leg["cell"] = f"{leg['condition']}/units={leg['arm_units']}"
         leg["verdict_export"] = leg.get("verdict")
-        if leg.get("verdict") == "DEGRADED" and reasons and reasons <= DOCUMENT_OUTCOMES \
+        # A TimeoutError is OUR client deadline firing — the engine did not error, the driver
+        # stopped waiting. It is a HARNESS loss, never a product failure (DOCS_HANDOFF §3.6 bans
+        # quoting the 1800 s PipeExceptions as reliability), but it is still a lost document. So
+        # a leg whose only hard failures are deadline losses is ANALYSABLE and CARRIES THEM:
+        # throughput is computed on completed documents only, and every lost document is named
+        # with how long it was held. Any other hard failure keeps the leg DEGRADED.
+        deadline = {r for r in reasons if r.endswith("TimeoutError")}
+        rest = reasons - deadline - DOCUMENT_OUTCOMES
+        if leg.get("verdict") == "DEGRADED" and reasons and not rest \
                 and leg["documents"]["recorded"] == leg["documents"]["submitted"]:
             leg["verdict"] = "OK"
-            leg["verdict_note"] = f"export said DEGRADED over document outcomes only: {sorted(reasons)}"
-        pd = lj.parent / lj.name.replace("leg_", "perdoc_").replace(".json", ".jsonl")
-        leg["_perdoc"] = ([json.loads(x) for x in pd.read_text().splitlines() if x.strip()]
-                          if pd.exists() else None)
+            lost = [{"doc": r["doc"], "reason": r["reason"],
+                     "held_s": round((r["completion_ns"] - r["submit_ns"]) / 1e9, 1)}
+                    for r in (leg.get("_perdoc") or [])
+                    if str(r.get("reason", "")).endswith("TimeoutError")]
+            if lost:
+                leg["deadline_losses"] = {
+                    "n": len(lost), "documents": lost[:50],
+                    "fraction_of_submitted": round(len(lost) / leg["documents"]["submitted"], 5),
+                    "attribution": "the driver's own deadline firing — not an engine error"}
+            leg["verdict_note"] = (f"export said DEGRADED over {sorted(reasons)}: document "
+                                   f"outcomes and {len(lost)} client-deadline loss(es) only — "
+                                   "analysable, losses carried")
         legs.append(leg)
     sizes = {g["documents"]["submitted"] for g in legs if g.get("documents")}
     if len(sizes) > 1:
@@ -428,6 +447,8 @@ def main() -> int:
         "check_E_tail": check_tail(legs),
         "check_G5a_cache_effect": cache_effect(legs),
         "check_G3b_unit_sweep": unit_sweep(legs),
+        "deadline_losses_per_leg": {f"{g['_launch']}/{g['leg']}": g["deadline_losses"]
+                                    for g in legs if g.get("deadline_losses")},
         "box_hygiene_per_leg": {f"{g['_launch']}/{g['leg']}": {
             k: v for k, v in (g.get("box_hygiene") or {}).items() if k != "ruling"}
             for g in legs if g.get("box_hygiene")},
