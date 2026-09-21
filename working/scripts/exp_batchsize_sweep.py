@@ -123,7 +123,8 @@ def docker_inspect(name: str) -> Dict[str, Any]:
     return json.loads(r.stdout)[0]
 
 
-def container_facts(arm: str, expect_thread_env: Optional[str] = "1") -> Dict[str, Any]:
+def container_facts(arm: str, expect_thread_env: Optional[str] = "1",
+                    declared_cpuset: Optional[str] = None) -> Dict[str, Any]:
     """Everything the comparison depends on, read from the RUNNING container. A mismatch with
     the posture this script claims is a refusal, not a warning."""
     d = docker_inspect(CONTAINER[arm])
@@ -169,8 +170,14 @@ def container_facts(arm: str, expect_thread_env: Optional[str] = "1") -> Dict[st
         if facts["cpu_max"] and not facts["cpu_max"].startswith("max"):
             problems.append(f"cpu.max={facts['cpu_max']} — a CFS quota binds this arm (Ruling A: "
                             "unconstrained across every vCPU)")
+    facts["declared_cpuset"] = declared_cpuset
     if not cs.get("cpus"):
         problems.append(f"no effective cpuset readable: {cs.get('source')}")
+    elif declared_cpuset is not None:
+        # S5-C ONLY: the cpuset IS the experimental variable, so it must equal the declaration
+        # exactly — a cpuset that differs from what was declared is refused like any other drift.
+        if cpus_from_spec(cs["raw"]) != cpus_from_spec(declared_cpuset):
+            problems.append(f"effective cpuset {cs['raw']!r} differs from the DECLARED {declared_cpuset!r}")
     elif cs["cpus"] < facts["host_nproc"]:
         problems.append(f"cpuset {cs['raw']} gives {cs['cpus']} of {facts['host_nproc']} cpus — "
                         "a cpuset binds this arm (Ruling A). Start it with no --cpuset-cpus; the "
@@ -286,6 +293,33 @@ def prewarm_corpus(paths: List[Path]) -> Dict[str, Any]:
             continue
     return {"attempted": True, "files": len(paths), "seconds": round(time.perf_counter() - t0, 2),
             "basis": "every measured and warm-up file read once; the leg then starts warm"}
+
+
+def proc_snapshot(cg: Path) -> Dict[str, Any]:
+    """S5-C's pool read-back, taken from OUTSIDE the processes so it needs no instrument inside:
+    per process in the arm's cgroup, its name, thread count and the cpus it may run on. Python's
+    default executor is min(32, os.cpu_count() + 4), and os.cpu_count() ignores cpusets on 3.12,
+    while a JVM sizes itself from availableProcessors(), which honours them — so the thread counts
+    under each cpuset are the measurement that tells the two mechanisms apart."""
+    out = []
+    try:
+        pids = [int(x) for x in (cg / "cgroup.procs").read_text().split()]
+    except (OSError, ValueError):
+        pids = []
+    for pid in pids:
+        try:
+            st = Path(f"/proc/{pid}/status").read_text()
+            f = dict(l.split(":", 1) for l in st.splitlines() if ":" in l)
+            cmd = Path(f"/proc/{pid}/cmdline").read_bytes().replace(b"\0", b" ").decode(errors="replace")
+            out.append({"pid": pid, "name": f.get("Name", "").strip(),
+                        "threads": int(f.get("Threads", "0").strip()),
+                        "cpus_allowed": f.get("Cpus_allowed_list", "").strip(),
+                        "cmd": cmd[:120]})
+        except (OSError, ValueError):
+            continue
+    return {"processes": sorted(out, key=lambda x: -x["threads"]),
+            "total_threads": sum(x["threads"] for x in out), "n_processes": len(out),
+            "taken_utc": time.strftime("%H:%M:%SZ", time.gmtime())}
 
 
 def cgroup_mem(cg: Path) -> Dict[str, Any]:
@@ -698,6 +732,10 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
 
     def open_window() -> None:
         state["mem_start"] = cgroup_mem(cg)
+        import threading as _th
+        state["snap_timer"] = _th.Timer(30.0, lambda: state.__setitem__("proc_mid", proc_snapshot(cg)))
+        state["snap_timer"].daemon = True
+        state["snap_timer"].start()
         state["sampler"] = PerCoreSampler(cpus, interval_s=1.0, out_path=percore)
         state["sampler"].start()
         state["d0"] = driver_cpu_s()
@@ -705,6 +743,8 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                                                     time.perf_counter())
 
     def close_window() -> None:
+        state["snap_timer"].cancel()
+        state["proc_end"] = proc_snapshot(cg)
         state["mem_end"] = cgroup_mem(cg)
         state["p1"], state["t1_ns"], state["u1"] = (time.perf_counter(), time.time_ns(),
                                                     cgroup_usage_usec(cg))
@@ -770,6 +810,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
     hard = [r for r in recs if not r.get("ok") and r.get("reason") not in DOCUMENT_OUTCOMES]
     chunks = sum(r["n_chunks"] for r in ok)
     ncpu = ncpu_host                      # Ruling A: the denominator is the host's cpu count
+    ncpu_cpuset = len(cpus)               # differs from ncpu only in an S5-C declared-cpuset leg
     eff = cpu_s / span if span > 0 else None
     util = eff / ncpu if eff is not None else None
     bwalls: List[float] = []
@@ -804,6 +845,9 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                  "cpu_utilization_valid": (util is not None and util <= 1.0),
                  "cpu_s_per_doc": round(cpu_s / len(ok), 4) if ok else None,
                  "available_cpus": ncpu,
+                 "cpuset_cpus": ncpu_cpuset,
+                 "cpu_utilization_of_cpuset": (round(eff / ncpu_cpuset, 4)
+                                               if eff is not None and ncpu_cpuset else None),
                  "available_cpus_source": f"host nproc (Ruling A); arm cgroup reports "
                                           f"{facts['cpuset_effective']['raw']!r} via "
                                           f"{facts['cpuset_effective']['source']}",
@@ -826,6 +870,9 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
         # Idle capacity two ways. RAW is what the cores did. NET-OF-SPIN adds back the engine's
         # measured do-nothing burn, because a core spinning on an idle pipeline is not capacity
         # the workload used — it is capacity the posture consumed before a document arrived.
+        "process_readback": {"thirty_s_into_window": state.get("proc_mid"),
+                             "at_window_close": state.get("proc_end")},
+        "cpuset_declared_for_s5c": facts.get("declared_cpuset"),
         "memory": {"at_window_open": state.get("mem_start"),
                    "at_window_close": state.get("mem_end")},
         # BLAST RADIUS (envelope). One failed send_files costs the WHOLE batch, so the price of
@@ -894,6 +941,9 @@ def main() -> int:
                                                 ROOT / "corpus" / "govdocs1" / "pdfs")))
     ap.add_argument("--rr-threads", default="unset",
                     help="'unset' (out of the box: threads= not passed) or an int")
+    ap.add_argument("--declared-cpuset", default=None,
+                    help="S5-C ONLY: the cpuset the container was started with; asserted exactly, "
+                         "and the leg is labelled a diagnostic outside Ruling A")
     ap.add_argument("--thread-env", default="1",
                     help="declared container thread posture, read back: an int, or 'unset'")
     ap.add_argument("--label", default="", help="suffix for leg names, e.g. 'rev' for a replicate")
@@ -906,7 +956,8 @@ def main() -> int:
     cs = [int(x) for x in a.continuous.split(",") if x.strip()]
     a.run_dir.mkdir(parents=True, exist_ok=True)
 
-    facts = container_facts(a.arm, None if a.thread_env == "unset" else a.thread_env)
+    facts = container_facts(a.arm, None if a.thread_env == "unset" else a.thread_env,
+                            declared_cpuset=a.declared_cpuset)
     facts["ready"] = service_ready(a.arm)
     other = "li" if a.arm == "rr" else "rr"
     o = subprocess.run(["docker", "inspect", "-f", "{{.State.Running}}", CONTAINER[other]],

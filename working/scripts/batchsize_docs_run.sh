@@ -28,6 +28,11 @@ echo "batchsize_docs_run.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
 ARM="$1"; SLICE="$2"; RUN_DIR="$3"; KLIST="$4"; REFC="${5:-}"; LABEL="${6:-}"; TENV="${7:-1}"
 CONT="${BSZ_CONTINUOUS:-}"          # G3a: continuous-submission C sweep, comma list
 LI_WORKERS="${BSZ_LI_WORKERS:-24}"  # G3b/G4: the service arm's worker count is a swept knob
+# S5-C ONLY: a DECLARED cpuset, the experimental variable of the SMT probe. Every other leg runs
+# unconstrained (Ruling A); the driver asserts the container matches this exactly and labels the
+# leg a diagnostic outside Ruling A.
+CPUSET="${BSZ_CPUSET:-}"
+CPUSET_ARGS=(); [ -n "$CPUSET" ] && CPUSET_ARGS=(--cpuset-cpus "$CPUSET")
 PY="$HOME/.venv/bin/python"
 CORPUS="${BSZ_CORPUS_DIR:-$HOME/parity-bench/corpus/govdocs1/pdfs}"
 cd "$(dirname "$0")/../.." || exit 2
@@ -60,10 +65,10 @@ if [ "$TENV" != "unset" ]; then
 fi
 
 if [ "$ARM" = "rr" ]; then
-  CID=$(docker run -d --name rr --memory 58g "${TARGS[@]}" -p 5565:5565 rr:patched) || exit 4
+  CID=$(docker run -d --name rr --memory 58g "${CPUSET_ARGS[@]}" "${TARGS[@]}" -p 5565:5565 rr:patched) || exit 4
   READY='curl -sf http://127.0.0.1:5565/version'
 elif [ "$ARM" = "li" ]; then
-  CID=$(docker run -d --name li --memory 58g -e WS1_WORKERS="$LI_WORKERS" "${TARGS[@]}" -p 8801:8801 ws1-llamaindex:x86_64) || exit 4
+  CID=$(docker run -d --name li --memory 58g "${CPUSET_ARGS[@]}" -e WS1_WORKERS="$LI_WORKERS" "${TARGS[@]}" -p 8801:8801 ws1-llamaindex:x86_64) || exit 4
   READY='curl -sf http://127.0.0.1:8801/health'
 else
   echo "arm must be rr or li" >&2; exit 2
@@ -111,6 +116,7 @@ fi
 ARGS=(--arm "$ARM" --slice "$SLICE" --run-dir "$RUN_DIR" --k "$KLIST" --corpus-dir "$CORPUS" --thread-env "$TENV")
 [ -n "$REFC" ] && [ "$REFC" != "0" ] && ARGS+=(--reference-c "$REFC")
 [ -n "$CONT" ] && ARGS+=(--continuous "$CONT")
+[ -n "$CPUSET" ] && ARGS+=(--declared-cpuset "$CPUSET")
 [ -n "$LABEL" ] && [ "$LABEL" != "-" ] && ARGS+=(--label "$LABEL")
 # NO taskset on the driver either (Ruling A). Pinning it to 24-31 was the complement of the
 # arm's 0-23 cpuset; with the arm unconstrained across every vCPU, a pinned driver would both
