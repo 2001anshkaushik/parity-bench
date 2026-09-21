@@ -76,7 +76,11 @@ PORTS="${PORTS#,}"; NAMES="${NAMES#,}"
 start_arm() {
   if [ "$ARM" = "rr" ]; then
     refuse_existing rr
-    ours+=("$(docker run -d --name rr --memory 58g --log-opt max-size=200m --network host rr:patched-video)") || return 1
+    # S5-A: BSZ_RR_T sets the six BLAS/OMP/torch variables on the container — intra-op width,
+    # the one knob that can widen a single instance without adding tokens. It is NOT the SDK's
+    # threads= (item concurrency, measured to queue at the device lock); that stays unset.
+    # Unset BSZ_RR_T = the out-of-the-box default posture, exactly as before.
+    ours+=("$(docker run -d --name rr --memory 58g ${BSZ_RR_T:+$(envargs "$BSZ_RR_T")} --log-opt max-size=200m --network host rr:patched-video)") || return 1
     "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr
   else
     local i
@@ -101,7 +105,14 @@ for K in ${KLIST//,/ }; do
   PYTHONPATH="$BATCH_TREE/working" "$PY" -m harness.percore_sampler --cpus 0-31 --out "$LEG/percore.jsonl" --duration 21600 --until "$LEG/.leg_done" > "$LEG/percore_summary.txt" 2>&1 &
   SPID=$!
   if [ "$ARM" = "rr" ]; then
-    "$PY" working/video/driver_video.py --arm rocketride --posture default --leg blast --n "$N" --blast-concurrency "$K" --rr-threads-env unset --manifest "$MAN" --image-lineage "rr:patched-video sha256:b7f51acc (batch-size sweep, default posture)" --out-dir "$LEG" 2>&1 | tee "$LEG/driver.log"
+    if [ -n "${BSZ_RR_T:-}" ]; then
+      # One token, thread env T: the driver's parity posture at M=1 is the only form that
+      # declares a thread env and reads it back in-process. Labelled TUNED POSTURE downstream,
+      # never out-of-the-box: the image is unchanged, the configuration is not.
+      "$PY" working/video/driver_video.py --arm rocketride --posture parity --tokens 1 --leg blast --n "$N" --blast-concurrency "$K" --rr-threads-env "$BSZ_RR_T" --manifest "$MAN" --image-lineage "rr:patched-video sha256:b7f51acc (S5-A thread sweep T=$BSZ_RR_T, 1 token, TUNED POSTURE)" --out-dir "$LEG" 2>&1 | tee "$LEG/driver.log"
+    else
+      "$PY" working/video/driver_video.py --arm rocketride --posture default --leg blast --n "$N" --blast-concurrency "$K" --rr-threads-env unset --manifest "$MAN" --image-lineage "rr:patched-video sha256:b7f51acc (batch-size sweep, default posture)" --out-dir "$LEG" 2>&1 | tee "$LEG/driver.log"
+    fi
   else
     "$PY" working/video/driver_video.py --arm llamaindex --leg blast --n "$N" --blast-concurrency "$K" --li-ports "$PORTS" --li-containers "$NAMES" --manifest "$MAN" --image-lineage "li:video sha256:0a52afcb (batch-size sweep, LI-balanced 8x4)" --out-dir "$LEG" 2>&1 | tee "$LEG/driver.log"
   fi
