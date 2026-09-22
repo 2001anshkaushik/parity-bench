@@ -604,6 +604,49 @@ def jvm_note(c: Dict[str, Any]) -> List[str]:
     return [f"Processes seen in the RocketRide snapshots: {', '.join(f'`{x}`' for x in names)}."]
 
 
+def self_audit(F: Dict[str, Any]) -> List[str]:
+    """The contract's closing block, built from the verdicts the analyses recorded — each null control
+    with the way it came out, including the ones that failed."""
+    s5 = F.get("stage5") or {}
+    ch = F.get("checks") or {}
+    nulls = [f"content check across arms (Stage 4): {(ch.get('C_null') or {}).get('verdict')}"]
+    a = s5.get("s5a")
+    if a:
+        nc = (a.get("output_vs_default") or {}).get("null_control_default_vs_its_replicate") or {}
+        nulls.append(f"S5-A output comparator, default cell against its own replicate: "
+                     f"{nc.get('chunk_identical_videos')}/{nc.get('videos')} chunk-identical, score change "
+                     f"{nc.get('max_abs_score_delta_at_least')}")
+    pre = s5.get("s5b_precheck")
+    if pre:
+        nulls.append(f"S5-B pre-check N1 (single frame reproducible) {pre.get('null_N1_single_is_reproducible')}, "
+                     f"N2 (comparator sees a different frame) {pre.get('null_N2_comparator_sees_a_different_frame')}")
+    b = s5.get("s5b")
+    if b:
+        nulls.append(f"S5-B patched B=1 against stock: {json.dumps(b.get('null_control_patched_B1_vs_stock'))}")
+    c = s5.get("s5c")
+    if c:
+        nc = c.get("null_control") or {}
+        nulls.append(f"S5-C two unconstrained RocketRide runs: spread {pct(nc.get('spread'))} against "
+                     f"{pct(nc.get('floor'))} — {'PASS' if nc.get('PASS') else 'FAILED'}")
+    d = s5.get("s5d")
+    if d:
+        p = d.get("perturbation_vs_leg1") or {}
+        nulls.append(f"S5-D instrument against leg 1: {(p.get('relative') or 0) * 100:+.2f}% — {p.get('verdict')}")
+    out = ["## SELF-AUDIT", "",
+           "- **HYPOTHESIS.** Pre-registered, per stage: batch barriers cost a wait for each batch's slowest document "
+           "(§2); intra-op width can widen one token (S5-A); batched detection is not bit-identical (S5-B); "
+           "RocketRide pays an SMT tax the other arm does not (S5-C); one token queues small documents at admission "
+           "behind large ones (S5-D).",
+           "- **EVIDENCE.** Every figure above is read from the committed analysis named beside it; the inputs and "
+           "their sha256s close this document.",
+           "- **NULL CONTROLS**, each as it came out:"] + [f"  - {x}" for x in nulls] + [
+           "- **REGISTER.** Entries 37-44 were added during this campaign (working/video/METHODOLOGY_REGISTER.md).",
+           "- **NOT VERIFIED.** Listed in the section above; nothing absent from these tables is claimed.",
+           "- **GATES.** Every landing passed autoland's gates with an ls-remote read-back; the commits are on "
+           "`feat/batch-size-optimization`.", ""]
+    return out
+
+
 def pending(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
     out = ["## Not verified / pending", ""]
     items = []
@@ -612,6 +655,26 @@ def pending(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
         items.append(f"Envelope legs not in this analysis: {', '.join(missing)}.")
     if s5 is None:
         items.append("Stage 5 (S5-A, S5-B, S5-C, S5-D) has not run.")
+    st5 = F.get("stage5") or {}
+    for key, name in (("s5a", "S5-A"), ("s5b", "S5-B proper"), ("s5c", "S5-C"), ("s5d", "S5-D")):
+        if s5 is not None and key not in st5:
+            items.append(f"{name}: no analysis in this summary.")
+    a = st5.get("s5a")
+    if a:
+        changed = [T for T, c in ((a.get("output_vs_default") or {}).get("by_T") or {}).items()
+                   if c.get("chunk_identical_videos") != c.get("videos")]
+        if changed:
+            items.append(f"S5-A: T={', '.join(sorted(changed, key=int))} changed the detector's output against the default "
+                         "cell (see its table) — a tuned thread width is not output-neutral, and its throughput is not a "
+                         "like-for-like speed-up of the same computation.")
+    c = st5.get("s5c")
+    if c and not (c.get("null_control") or {}).get("PASS"):
+        items.append(f"S5-C's pre-registered null control failed (spread {pct((c.get('null_control') or {}).get('spread'))}); "
+                     "only differences beyond that spread are read, and the post-hoc view beside it is labelled as such.")
+    d = st5.get("s5d")
+    if d and "OUTSIDE" in str((d.get("perturbation_vs_leg1") or {}).get("verdict")):
+        items.append("S5-D's instrument moved the leg beyond the floor: its stage SHARES stand; its absolute stage times "
+                     "carry the offset.")
     items += ["No 10k-scale replicate exists for any K or C: the full-scale K ranking borrows the smoke-slice floors "
               "(pre-registered in `envelope_floors.json`) and is therefore an ordering, not a resolved ranking.",
               "The 168-video RocketRide leg ran once; its absolute frames/s is not quotable (leg-6 rule).",
@@ -831,7 +894,7 @@ def main() -> int:
     body += smoke_video(a.smoke, a.s3b, F)
     body += checks(s4a, a.s4, F)
     body += stage5(a.s5, F)
-    md += answers(F) + body + pending(a.s5, F)
+    md += answers(F) + body + pending(a.s5, F) + self_audit(F)
     md += ["## Inputs", ""] + [f"- {k}: `{v}`" for k, v in sorted(INPUTS.items())] + [""]
     a.out_md.write_text("\n".join(md) + "\n")
     a.out_json.write_text(json.dumps({"generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
