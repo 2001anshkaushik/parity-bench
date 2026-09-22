@@ -1,0 +1,449 @@
+{
+ "leg_dir": "working/results/batchsize_s5_20260921T205917Z/s5d/rr_stamped",
+ "joined_documents": 9885,
+ "unjoined": 90,
+ "unjoined_examples": [
+  {
+   "doc": "014_014961.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  },
+  {
+   "doc": "039_039457.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  },
+  {
+   "doc": "007_007224.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  },
+  {
+   "doc": "026_026202.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  },
+  {
+   "doc": "018_018831.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  },
+  {
+   "doc": "007_007136.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  },
+  {
+   "doc": "016_016914.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  },
+  {
+   "doc": "030_030475.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  },
+  {
+   "doc": "016_016503.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  },
+  {
+   "doc": "002_002189.pdf",
+   "ok": false,
+   "stages_seen": [
+    "after_parse",
+    "none"
+   ]
+  }
+ ],
+ "page_tercile_edges": [
+  7,
+  22
+ ],
+ "all_documents": {
+  "n": 9885,
+  "end_to_end_s_sum": 81501.0,
+  "admission_wait": {
+   "share_of_end_to_end": 0.001,
+   "p50_s": 0.003,
+   "p99_s": 0.089,
+   "max_s": 0.611
+  },
+  "parse": {
+   "share_of_end_to_end": 0.4102,
+   "p50_s": 0.267,
+   "p99_s": 51.059,
+   "max_s": 1773.097
+  },
+  "split": {
+   "share_of_end_to_end": 0.0006,
+   "p50_s": 0.002,
+   "p99_s": 0.044,
+   "max_s": 0.459
+  },
+  "embed": {
+   "share_of_end_to_end": 0.5746,
+   "p50_s": 1.833,
+   "p99_s": 45.423,
+   "max_s": 450.833
+  },
+  "return": {
+   "share_of_end_to_end": 0.0136,
+   "p50_s": 0.047,
+   "p99_s": 1.146,
+   "max_s": 5.636
+  }
+ },
+ "by_page_tercile": {
+  "tercile_0 (< 7 pages)": {
+   "n": 3250,
+   "end_to_end_s_sum": 6414.7,
+   "admission_wait": {
+    "share_of_end_to_end": 0.0045,
+    "p50_s": 0.003,
+    "p99_s": 0.092,
+    "max_s": 0.611
+   },
+   "parse": {
+    "share_of_end_to_end": 0.5795,
+    "p50_s": 0.093,
+    "p99_s": 11.774,
+    "max_s": 733.78
+   },
+   "split": {
+    "share_of_end_to_end": 0.0012,
+    "p50_s": 0.001,
+    "p99_s": 0.031,
+    "max_s": 0.269
+   },
+   "embed": {
+    "share_of_end_to_end": 0.3908,
+    "p50_s": 0.628,
+    "p99_s": 2.855,
+    "max_s": 6.866
+   },
+   "return": {
+    "share_of_end_to_end": 0.024,
+    "p50_s": 0.017,
+    "p99_s": 0.726,
+    "max_s": 3.385
+   }
+  },
+  "tercile_1 (7-21 pages)": {
+   "n": 3243,
+   "end_to_end_s_sum": 14547.0,
+   "admission_wait": {
+    "share_of_end_to_end": 0.0018,
+    "p50_s": 0.003,
+    "p99_s": 0.086,
+    "max_s": 0.497
+   },
+   "parse": {
+    "share_of_end_to_end": 0.4756,
+    "p50_s": 0.221,
+    "p99_s": 31.396,
+    "max_s": 771.17
+   },
+   "split": {
+    "share_of_end_to_end": 0.0007,
+    "p50_s": 0.002,
+    "p99_s": 0.032,
+    "max_s": 0.32
+   },
+   "embed": {
+    "share_of_end_to_end": 0.5056,
+    "p50_s": 1.869,
+    "p99_s": 7.831,
+    "max_s": 26.84
+   },
+   "return": {
+    "share_of_end_to_end": 0.0162,
+    "p50_s": 0.044,
+    "p99_s": 0.642,
+    "max_s": 3.428
+   }
+  },
+  "tercile_2 (>= 22 pages)": {
+   "n": 3392,
+   "end_to_end_s_sum": 60539.3,
+   "admission_wait": {
+    "share_of_end_to_end": 0.0005,
+    "p50_s": 0.003,
+    "p99_s": 0.088,
+    "max_s": 0.426
+   },
+   "parse": {
+    "share_of_end_to_end": 0.3765,
+    "p50_s": 0.828,
+    "p99_s": 104.814,
+    "max_s": 1773.097
+   },
+   "split": {
+    "share_of_end_to_end": 0.0005,
+    "p50_s": 0.004,
+    "p99_s": 0.065,
+    "max_s": 0.459
+   },
+   "embed": {
+    "share_of_end_to_end": 0.6107,
+    "p50_s": 6.22,
+    "p99_s": 87.502,
+    "max_s": 450.833
+   },
+   "return": {
+    "share_of_end_to_end": 0.0119,
+    "p50_s": 0.122,
+    "p99_s": 1.83,
+    "max_s": 5.636
+   }
+  }
+ },
+ "outliers_over_300s": [
+  {
+   "doc": "039_039660.pdf",
+   "pages": 39,
+   "tercile": 2,
+   "admission_wait": 0.0,
+   "parse": 1773.1,
+   "split": 0.0,
+   "embed": 0.33,
+   "return": 0.01,
+   "end_to_end": 1773.44,
+   "held_by": "parse"
+  },
+  {
+   "doc": "008_008871.pdf",
+   "pages": 238,
+   "tercile": 2,
+   "admission_wait": 0.0,
+   "parse": 1008.88,
+   "split": 0.01,
+   "embed": 24.03,
+   "return": 0.33,
+   "end_to_end": 1033.25,
+   "held_by": "parse"
+  },
+  {
+   "doc": "011_011730.pdf",
+   "pages": 24,
+   "tercile": 2,
+   "admission_wait": 0.0,
+   "parse": 971.78,
+   "split": 0.0,
+   "embed": 1.64,
+   "return": 0.03,
+   "end_to_end": 973.46,
+   "held_by": "parse"
+  },
+  {
+   "doc": "014_014261.pdf",
+   "pages": 11,
+   "tercile": 1,
+   "admission_wait": 0.0,
+   "parse": 771.17,
+   "split": 0.0,
+   "embed": 2.95,
+   "return": 0.05,
+   "end_to_end": 774.18,
+   "held_by": "parse"
+  },
+  {
+   "doc": "000_000344.pdf",
+   "pages": 1,
+   "tercile": 0,
+   "admission_wait": 0.0,
+   "parse": 733.78,
+   "split": 0.03,
+   "embed": 0.85,
+   "return": 1.13,
+   "end_to_end": 735.8,
+   "held_by": "parse"
+  },
+  {
+   "doc": "031_031239.pdf",
+   "pages": 118,
+   "tercile": 2,
+   "admission_wait": 0.0,
+   "parse": 579.31,
+   "split": 0.02,
+   "embed": 31.36,
+   "return": 0.44,
+   "end_to_end": 611.13,
+   "held_by": "parse"
+  },
+  {
+   "doc": "002_002489.pdf",
+   "pages": 1,
+   "tercile": 0,
+   "admission_wait": 0.02,
+   "parse": 557.6,
+   "split": 0.0,
+   "embed": 0.71,
+   "return": 0.01,
+   "end_to_end": 558.35,
+   "held_by": "parse"
+  },
+  {
+   "doc": "012_012852.pdf",
+   "pages": 1646,
+   "tercile": 2,
+   "admission_wait": 0.0,
+   "parse": 7.4,
+   "split": 0.1,
+   "embed": 450.83,
+   "return": 5.64,
+   "end_to_end": 463.97,
+   "held_by": "embed"
+  },
+  {
+   "doc": "034_034697.pdf",
+   "pages": 55,
+   "tercile": 2,
+   "admission_wait": 0.03,
+   "parse": 420.95,
+   "split": 0.0,
+   "embed": 10.21,
+   "return": 0.19,
+   "end_to_end": 431.39,
+   "held_by": "parse"
+  },
+  {
+   "doc": "033_033172.pdf",
+   "pages": 76,
+   "tercile": 2,
+   "admission_wait": 0.01,
+   "parse": 410.34,
+   "split": 0.0,
+   "embed": 6.49,
+   "return": 0.09,
+   "end_to_end": 416.93,
+   "held_by": "parse"
+  },
+  {
+   "doc": "014_014969.pdf",
+   "pages": 8,
+   "tercile": 1,
+   "admission_wait": 0.0,
+   "parse": 392.05,
+   "split": 0.0,
+   "embed": 1.72,
+   "return": 0.03,
+   "end_to_end": 393.8,
+   "held_by": "parse"
+  },
+  {
+   "doc": "007_007879.pdf",
+   "pages": 602,
+   "tercile": 2,
+   "admission_wait": 0.0,
+   "parse": 296.25,
+   "split": 0.03,
+   "embed": 90.66,
+   "return": 1.37,
+   "end_to_end": 388.31,
+   "held_by": "parse"
+  },
+  {
+   "doc": "003_003316.pdf",
+   "pages": 553,
+   "tercile": 2,
+   "admission_wait": 0.07,
+   "parse": 278.36,
+   "split": 0.02,
+   "embed": 95.04,
+   "return": 1.43,
+   "end_to_end": 374.93,
+   "held_by": "parse"
+  },
+  {
+   "doc": "015_015491.pdf",
+   "pages": 799,
+   "tercile": 2,
+   "admission_wait": 0.0,
+   "parse": 8.88,
+   "split": 0.07,
+   "embed": 305.68,
+   "return": 4.33,
+   "end_to_end": 318.96,
+   "held_by": "embed"
+  },
+  {
+   "doc": "032_032695.pdf",
+   "pages": 74,
+   "tercile": 2,
+   "admission_wait": 0.0,
+   "parse": 290.65,
+   "split": 0.0,
+   "embed": 12.02,
+   "return": 0.16,
+   "end_to_end": 302.84,
+   "held_by": "parse"
+  }
+ ],
+ "outliers_held_by": {
+  "admission_wait": 0,
+  "parse": 13,
+  "split": 0,
+  "embed": 2,
+  "return": 0
+ },
+ "perturbation_vs_leg1": {
+  "leg1_docs_per_s": 2.3395,
+  "instrumented_docs_per_s": 2.2912,
+  "relative": -0.0206,
+  "floor": 0.0082,
+  "verdict": "OUTSIDE the floor \u2014 the instrument perturbed the measurement; decomposition shares stand, absolute times carry the offset",
+  "POST_HOC_DIAGNOSTIC": {
+   "label": "defined after the pre-registered comparison fell outside the floor; does not change the verdict",
+   "leg1": {
+    "docs_per_s_to_p90": 3.9644,
+    "docs_per_s_to_p99": 3.9344,
+    "span_set_by": "039_039660.pdf",
+    "held_s": 1722.0,
+    "deadline_losses": [
+     "011_011464.pdf"
+    ]
+   },
+   "instrumented": {
+    "docs_per_s_to_p90": 3.9032,
+    "docs_per_s_to_p99": 3.8761,
+    "span_set_by": "039_039660.pdf",
+    "held_s": 1773.4,
+    "deadline_losses": [
+     "011_011464.pdf"
+    ]
+   },
+   "to_p90_relative": -0.0154,
+   "to_p99_relative": -0.0148
+  }
+ },
+ "cannot_separate": "a stage's own work from contention INSIDE that stage (a JVM pool, the GIL): that needs each document's solo stage time, which a C=32 run does not contain"
+}

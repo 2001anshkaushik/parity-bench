@@ -232,7 +232,7 @@ def headline_docs(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
         ["CPU-seconds per document (engine)", r(n((R["g"].get("cost") or {}).get("cpu_s_per_doc"), 3)),
          n((L["g"].get("cost") or {}).get("cpu_s_per_doc"), 3)],
         ["Engine memory (cgroup): anon at window close / total high-water memory.peak",
-         f"{gb(R['mem'].get('anon_mb'))} / {gb(R['mem'].get('peak_mb'))}",
+         f"{gb(R['mem'].get('anon_mb'))} / {gb(R['mem'].get('peak_mb'))} {DAG}",
          f"{gb(L['mem'].get('anon_mb'))} / {gb(L['mem'].get('peak_mb'))}"],
         ["Documents: completed / content outcome (no text, parse failed) / lost to the deadline / other failure",
          " / ".join(n(R["docs"][k]) for k in ("completed", "content_outcome", "deadline_loss", "other_failure")) + f" {DAG}",
@@ -503,7 +503,7 @@ def answers(F: Dict[str, Any]) -> List[str]:
     best_b = {arm: max(ks(arm), key=lambda ke: ke[1]["docs_per_s"]) for arm in ("rr", "li") if ks(arm)}
     out = ["## 0. Answers", "",
            "**Optimal batch size, GovDocs PDFs.** No batch size beats continuous submission on either arm: sending "
-           "each document as a slot frees was faster than every batch size at full scale. Within batch mode, "
+           "each document as soon as a slot frees was faster than every batch size at full scale. Within batch mode, "
            f"throughput rises with K on both arms (RocketRide {curve('rr')}; LlamaIndex {curve('li')}) — "
            "consistent with the pre-registered hypothesis that each batch barrier costs a wait for that batch's "
            "slowest document, so fewer barriers approach the continuous rate."]
@@ -558,6 +558,27 @@ def answers(F: Dict[str, Any]) -> List[str]:
         out += ["", f"{DAG} {CAVEAT}", "",
                 f"**Per unit** (§4, the only basis for a per-unit claim): from one to eight documents in flight, one "
                 f"RocketRide token's throughput grows {rr_x:.2f}x; one LlamaIndex worker's grows {li_x:.2f}x.", ""]
+    s5 = F.get("stage5") or {}
+    lines = []
+    a = s5.get("s5a")
+    if a:
+        lines.append(f"S5-A (TUNED POSTURE): intra-op width stops adding throughput at T={a.get('knee_T')}; beyond it only CPU "
+                     f"cost rises, and every T other than 16 changes the detection scores. Unset vs 16: "
+                     f"{(a.get('T16_vs_default') or {}).get('verdict', '')[:60].split(' — ')[0]}.")
+    b = s5.get("s5b")
+    if b:
+        lines.append("S5-B (PATCHED-ENGINE): " + ("STOPPED — batched detection failed the end-to-end correctness control; "
+                                                  "B>1 is a different measurement, not an optimisation."
+                                                  if b.get("not_reported") else "every B passed correctness."))
+    c = s5.get("s5c")
+    if c:
+        lines.append(f"S5-C (DIAGNOSTIC): null control {'passed' if (c.get('null_control') or {}).get('PASS') else 'FAILED'}; "
+                     f"beyond its spread, {(c.get('hypothesis_test') or {}).get('reading', '').split(' — ')[0]}.")
+    d = s5.get("s5d")
+    if d:
+        lines.append("S5-D (INSTRUMENTED): no admission queue — the time is inside the pipeline, the long holds in parse.")
+    if lines:
+        out += ["**Stage 5, segregated** (§6; no Stage 5 figure appears beside a baseline one):", ""] + [f"- {x}" for x in lines] + [""]
     return out
 
 
@@ -755,8 +776,22 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
         out += ["Pre-check: PENDING / NOT RUN.", ""]
     if b:
         F["stage5"]["s5b"] = b
-        out += [f"Null control (patched B=1 vs stock, chunk hashes): {json.dumps(b.get('null_control_patched_B1_vs_stock'))}.",
-                f"Correctness by B: {json.dumps(b.get('correctness_by_b'))[:900]}.", ""]
+        nc = b.get("null_control_patched_B1_vs_stock") or {}
+        out += [f"**Null control** (patched B=1, through the new batched code path, against stock by chunk hash): "
+                f"{n(nc.get('chunk_identical'))}/{n(nc.get('videos'))} videos identical — {'PASS' if nc.get('PASS') else 'FAILED'}.", ""]
+        crow = [[f"B={B}", str(r.get("tier1_bit_identical")), f"{n(r.get('tier2_failing_frames'))}/{n(r.get('frames_compared'))}",
+                 f"{(r.get('max_score_delta') or 0):.2e} (limit 1e-05)", f"{(r.get('max_box_delta_px') or 0):.2e} (limit 1e-03)",
+                 str(r.get("tier"))]
+                for B, r in sorted((b.get("correctness_by_b") or {}).items(), key=lambda kv: int(kv[0]))]
+        if crow:
+            out += table(["Batch", "Tier 1: every video chunk-identical", "Tier 2: frames failing", "max score change",
+                          "max box change, output px", "Result"], crow) + [""]
+        stopped = [int(x) for x in b.get("not_reported") or []]
+        if stopped and pre:
+            out += [f"**S5-B STOPPED by its end-to-end correctness control: B={stopped} is a different measurement, not an "
+                    "optimisation (the ruling), and carries no timing.** The pre-check passed Tier 2 on "
+                    f"{n(pre.get('frames'))} frames of one video; end to end, over every frame of the 16 videos, the same "
+                    "criterion failed — the pre-check licensed the build and the legs, never the claim.", ""]
         rows = [[f"B={B}", "PATCHED-ENGINE", n(r["frames_per_s"], 3), n(r["effective_cores"], 3), pct(r["cpu_util_of_box"]),
                  n(r["idle_core_equivalents"], 3),
                  ", ".join(f"{k.replace('_bytes', '')} {v / 1024:.1f} GiB" for k, v in (r.get("engine_memory_mb") or {}).items()

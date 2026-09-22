@@ -1,0 +1,82 @@
+{
+ "label": "PATCHED-ENGINE, NOT OUT-OF-THE-BOX",
+ "stock_reference": "working/results/batchsize_smoke_20260920T113000Z/video_n16/rr_k16",
+ "batch_sizes": [
+  1,
+  2,
+  4,
+  8
+ ],
+ "null_control_patched_B1_vs_stock": {
+  "videos": 16,
+  "chunk_identical": 16,
+  "PASS": true
+ },
+ "correctness_by_b": {
+  "2": {
+   "videos": 16,
+   "tier1_bit_identical": false,
+   "frames_compared": 3526,
+   "frames_missing_on_one_side": 0,
+   "tier2_failing_frames": 132,
+   "max_score_delta": 0.007490813732147217,
+   "max_box_delta_px": 0.1044769287109375,
+   "first_failure": {
+    "ok": false,
+    "max_score_delta": 0.00018158555030822754,
+    "max_box_delta_px": 0.00555419921875
+   },
+   "tier": "NEITHER \u2014 a different measurement, not an optimisation"
+  },
+  "4": {
+   "videos": 16,
+   "tier1_bit_identical": false,
+   "frames_compared": 3526,
+   "frames_missing_on_one_side": 0,
+   "tier2_failing_frames": 131,
+   "max_score_delta": 0.00195920467376709,
+   "max_box_delta_px": 0.1045074462890625,
+   "first_failure": {
+    "ok": false,
+    "max_score_delta": 5.233287811279297e-05,
+    "max_box_delta_px": 0.001251220703125
+   },
+   "tier": "NEITHER \u2014 a different measurement, not an optimisation"
+  },
+  "8": {
+   "videos": 16,
+   "tier1_bit_identical": false,
+   "frames_compared": 3526,
+   "frames_missing_on_one_side": 0,
+   "tier2_failing_frames": 131,
+   "max_score_delta": 0.00195920467376709,
+   "max_box_delta_px": 0.1045074462890625,
+   "first_failure": {
+    "ok": false,
+    "max_score_delta": 5.233287811279297e-05,
+    "max_box_delta_px": 0.001251220703125
+   },
+   "tier": "NEITHER \u2014 a different measurement, not an optimisation"
+  }
+ },
+ "timing_only_for_passing_b": {
+  "1": {
+   "LABEL": "PATCHED-ENGINE, NOT OUT-OF-THE-BOX",
+   "frames_per_s": 2.336,
+   "span_s": 1371.1,
+   "effective_cores": 5.646,
+   "cpu_util_of_box": 0.1764,
+   "idle_core_equivalents": 26.109,
+   "engine_memory_mb": {
+    "peak_bytes": 7349.3,
+    "anon_bytes": 68.1
+   }
+  }
+ },
+ "not_reported": [
+  2,
+  4,
+  8
+ ],
+ "verdict": "B=[2, 4, 8] failed correctness and carry no timing"
+}

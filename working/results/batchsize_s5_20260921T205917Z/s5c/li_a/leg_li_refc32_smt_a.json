@@ -1,0 +1,552 @@
+{
+ "arm": "li",
+ "leg": "refc32_smt_a",
+ "k": null,
+ "reference_c": 32,
+ "verdict": "OK",
+ "submission_shape": "POST /process_pdf per document, C=32 in flight, no barrier (the banked blast shape)",
+ "documents": {
+  "submitted": 384,
+  "recorded": 384,
+  "ok": 381,
+  "empty": 0,
+  "hard_failures": 0,
+  "hard_failure_reasons": []
+ },
+ "throughput": {
+  "span_s": 106.15,
+  "docs_per_s": 3.5893,
+  "chunks": 6785,
+  "chunks_per_s": 63.9192,
+  "basis": "MEASURED \u2014 first submit to last return, one clock"
+ },
+ "batches": null,
+ "cost": {
+  "cpu_s": 1528.462,
+  "effective_cores": 14.399,
+  "cpu_utilization": 0.45,
+  "cpu_utilization_valid": true,
+  "cpu_s_per_doc": 4.0117,
+  "available_cpus": 32,
+  "cpuset_cpus": 32,
+  "cpu_utilization_of_cpuset": 0.45,
+  "available_cpus_source": "host nproc (Ruling A); arm cgroup reports '0-31' via cgroup cpuset.cpus.effective",
+  "engine_container_cpu_s": 1528.462,
+  "engine_container_cores": 14.399,
+  "driver_cpu_s": 2.596,
+  "driver_cores": 0.024,
+  "host_total_cpu_s": 1532.59,
+  "host_total_cores": 14.438,
+  "unattributed_cores": 0.014,
+  "idle_spin_measured": {
+   "cores": 0.033,
+   "window_s": 6.0,
+   "basis": "arm cgroup cpu.stat with the pipeline loaded and nothing submitted"
+  },
+  "engine_cores_net_of_idle_spin": 14.366,
+  "idle_core_equivalents_arm": 17.601,
+  "basis": "engine: arm cgroup cpu.stat at the leg's t0/t1; driver: getrusage self+children over the same window; host: per-core /proc/stat"
+ },
+ "process_readback": {
+  "thirty_s_into_window": {
+   "processes": [
+    {
+     "pid": 471937,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=9) --mult"
+    },
+    {
+     "pid": 471938,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=13) --mul"
+    },
+    {
+     "pid": 471939,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=17) --mul"
+    },
+    {
+     "pid": 471940,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=21) --mul"
+    },
+    {
+     "pid": 471941,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=25) --mul"
+    },
+    {
+     "pid": 471942,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=29) --mul"
+    },
+    {
+     "pid": 471943,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=33) --mul"
+    },
+    {
+     "pid": 471944,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=37) --mul"
+    },
+    {
+     "pid": 471945,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=41) --mul"
+    },
+    {
+     "pid": 471946,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=45) --mul"
+    },
+    {
+     "pid": 471947,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=49) --mul"
+    },
+    {
+     "pid": 471948,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=53) --mul"
+    },
+    {
+     "pid": 471949,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=57) --mul"
+    },
+    {
+     "pid": 471950,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=61) --mul"
+    },
+    {
+     "pid": 471951,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=65) --mul"
+    },
+    {
+     "pid": 471952,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=69) --mul"
+    },
+    {
+     "pid": 471953,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=73) --mul"
+    },
+    {
+     "pid": 471954,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=77) --mul"
+    },
+    {
+     "pid": 471955,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=81) --mul"
+    },
+    {
+     "pid": 471956,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=85) --mul"
+    },
+    {
+     "pid": 471957,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=89) --mul"
+    },
+    {
+     "pid": 471958,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=93) --mul"
+    },
+    {
+     "pid": 471959,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=97) --mul"
+    },
+    {
+     "pid": 471960,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=101) --mu"
+    },
+    {
+     "pid": 471823,
+     "name": "python",
+     "threads": 1,
+     "cpus_allowed": "0-31",
+     "cmd": "python -m uvicorn ws1.service:app --host 0.0.0.0 --port 8801 --workers 24 --loop uvloop --http httptools --no-access-log"
+    },
+    {
+     "pid": 471936,
+     "name": "python",
+     "threads": 1,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.resource_tracker import main;main(6) "
+    }
+   ],
+   "total_threads": 98,
+   "n_processes": 26,
+   "taken_utc": "23:49:04Z"
+  },
+  "at_window_close": {
+   "processes": [
+    {
+     "pid": 471937,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=9) --mult"
+    },
+    {
+     "pid": 471938,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=13) --mul"
+    },
+    {
+     "pid": 471939,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=17) --mul"
+    },
+    {
+     "pid": 471940,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=21) --mul"
+    },
+    {
+     "pid": 471941,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=25) --mul"
+    },
+    {
+     "pid": 471942,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=29) --mul"
+    },
+    {
+     "pid": 471943,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=33) --mul"
+    },
+    {
+     "pid": 471944,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=37) --mul"
+    },
+    {
+     "pid": 471945,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=41) --mul"
+    },
+    {
+     "pid": 471946,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=45) --mul"
+    },
+    {
+     "pid": 471947,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=49) --mul"
+    },
+    {
+     "pid": 471948,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=53) --mul"
+    },
+    {
+     "pid": 471949,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=57) --mul"
+    },
+    {
+     "pid": 471950,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=61) --mul"
+    },
+    {
+     "pid": 471951,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=65) --mul"
+    },
+    {
+     "pid": 471952,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=69) --mul"
+    },
+    {
+     "pid": 471953,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=73) --mul"
+    },
+    {
+     "pid": 471954,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=77) --mul"
+    },
+    {
+     "pid": 471955,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=81) --mul"
+    },
+    {
+     "pid": 471956,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=85) --mul"
+    },
+    {
+     "pid": 471957,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=89) --mul"
+    },
+    {
+     "pid": 471958,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=93) --mul"
+    },
+    {
+     "pid": 471959,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=97) --mul"
+    },
+    {
+     "pid": 471960,
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=101) --mu"
+    },
+    {
+     "pid": 471823,
+     "name": "python",
+     "threads": 1,
+     "cpus_allowed": "0-31",
+     "cmd": "python -m uvicorn ws1.service:app --host 0.0.0.0 --port 8801 --workers 24 --loop uvloop --http httptools --no-access-log"
+    },
+    {
+     "pid": 471936,
+     "name": "python",
+     "threads": 1,
+     "cpus_allowed": "0-31",
+     "cmd": "/usr/local/bin/python -B -c from multiprocessing.resource_tracker import main;main(6) "
+    }
+   ],
+   "total_threads": 98,
+   "n_processes": 26,
+   "taken_utc": "23:50:20Z"
+  }
+ },
+ "cpuset_declared_for_s5c": null,
+ "instrumented_s5d_stamps": false,
+ "memory": {
+  "at_window_open": {
+   "current_mb": 14051.3,
+   "peak_mb": 14472.2,
+   "anon_mb": 13935.6,
+   "limit_mb": 59392.0,
+   "basis": "container cgroup memory.current / memory.peak / memory.stat anon; peak is a kernel high-water mark over the container's lifetime"
+  },
+  "at_window_close": {
+   "current_mb": 15797.1,
+   "peak_mb": 16613.6,
+   "anon_mb": 15677.6,
+   "limit_mb": 59392.0,
+   "basis": "container cgroup memory.current / memory.peak / memory.stat anon; peak is a kernel high-water mark over the container's lifetime"
+  }
+ },
+ "deadlines": {
+  "batch_timeout_s": 1800,
+  "doc_timeout_s": 1800,
+  "breaker_consecutive": 3
+ },
+ "failure_blast_radius": {
+  "documents_per_batch": null,
+  "batches_with_a_hard_failure": null,
+  "documents_lost_to_batch_failures": null,
+  "exposure_note": "a single failed batch loses K documents; at K=1 the blast radius is one document and the continuous shape has no batch to lose"
+ },
+ "percore_host": {
+  "n_intervals": 106,
+  "ncpus": 32,
+  "idle_threshold": 0.1,
+  "mean_busy_cores": 14.438,
+  "idle_core_equivalents": 17.562,
+  "host_util_of_cpuset": 0.4512,
+  "idle_core_count_mean": 17.32,
+  "idle_core_count_min": 6,
+  "idle_core_count_p50": 8,
+  "idle_core_count_max": 31,
+  "cores_idle_whole_leg": 5,
+  "per_core_mean_busy": {
+   "0": 0.727,
+   "1": 0.606,
+   "2": 0.357,
+   "3": 0.535,
+   "4": 0.605,
+   "5": 0.55,
+   "6": 0.556,
+   "7": 0.575,
+   "8": 0.562,
+   "9": 0.998,
+   "10": 0.41,
+   "11": 0.638,
+   "12": 0.568,
+   "13": 0.542,
+   "14": 0.663,
+   "15": 0.533,
+   "16": 0.008,
+   "17": 0.552,
+   "18": 0.435,
+   "19": 0.365,
+   "20": 0.369,
+   "21": 0.556,
+   "22": 0.558,
+   "23": 0.004,
+   "24": 0.543,
+   "25": 0.004,
+   "26": 0.154,
+   "27": 0.244,
+   "28": 0.006,
+   "29": 0.645,
+   "30": 0.005,
+   "31": 0.566
+  },
+  "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+  "interval_s": 1.0,
+  "intervals_dropped": 0,
+  "sampler_read_s_total": 0.0383,
+  "idle_core_equivalents_net_of_spin": 17.595,
+  "idle_spin_cores_subtracted": 0.033,
+  "net_of_spin_basis": "raw idle + measured idle spin: the spin is busy CPU doing no work, so it is unused capacity"
+ },
+ "box_hygiene": {
+  "other_containers": [],
+  "stray_processes": {
+   "limit_cores": 0.5,
+   "window_s": 4.0,
+   "strays": [],
+   "clean": true,
+   "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+  },
+  "host_idle_baseline_cores": 31.972,
+  "ruling": "C \u2014 one workload on the box; the leg records the baseline it assumed"
+ },
+ "page_cache": {
+  "attempted": false
+ },
+ "prewarm": {
+  "attempted": false
+ },
+ "warm_up": {
+  "docs": 25,
+  "seconds": 14.27,
+  "disjoint_from_measured": true,
+  "same_shape_as_leg": true
+ },
+ "quiet_box_before": {
+  "host_busy_cores": 0.028,
+  "arm_idle_cores": 0.032,
+  "foreign_busy_cores": -0.004,
+  "max_foreign": 2.0,
+  "quiet": true,
+  "load1": 8.822265625,
+  "window_s": 4.0,
+  "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+ },
+ "window": {
+  "t0_ns": 1790034514426957959,
+  "t1_ns": 1790034620576677233
+ },
+ "leaked_task": null
+}

@@ -1,0 +1,125 @@
+{
+ "label": "TUNED POSTURE \u2014 image unchanged, thread configuration set; not out-of-the-box",
+ "by_T": {
+  "1": {
+   "frames_per_s": 1.262,
+   "effective_cores": 2.39,
+   "cpu_util_of_box": 0.0747,
+   "idle_core_equivalents": 29.579,
+   "cpu_s_per_frame": 1.895,
+   "in_process_torch": 1,
+   "leg": "working/results/batchsize_s5_20260921T205917Z/s5a/rr_k16_T1"
+  },
+  "2": {
+   "frames_per_s": 2.286,
+   "effective_cores": 3.508,
+   "cpu_util_of_box": 0.1096,
+   "idle_core_equivalents": 28.436,
+   "cpu_s_per_frame": 1.534,
+   "in_process_torch": 2,
+   "leg": "working/results/batchsize_s5_20260921T205917Z/s5a/rr_k16_T2"
+  },
+  "4": {
+   "frames_per_s": 2.233,
+   "effective_cores": 3.665,
+   "cpu_util_of_box": 0.1145,
+   "idle_core_equivalents": 28.229,
+   "cpu_s_per_frame": 1.642,
+   "in_process_torch": 4,
+   "leg": "working/results/batchsize_s5_20260921T205917Z/s5a/rr_k16_T4"
+  },
+  "8": {
+   "frames_per_s": 2.462,
+   "effective_cores": 4.372,
+   "cpu_util_of_box": 0.1366,
+   "idle_core_equivalents": 27.457,
+   "cpu_s_per_frame": 1.776,
+   "in_process_torch": 8,
+   "leg": "working/results/batchsize_s5_20260921T205917Z/s5a/rr_k16_T8"
+  },
+  "16": {
+   "frames_per_s": 2.331,
+   "effective_cores": 5.637,
+   "cpu_util_of_box": 0.1761,
+   "idle_core_equivalents": 26.122,
+   "cpu_s_per_frame": 2.418,
+   "in_process_torch": 16,
+   "leg": "working/results/batchsize_s5_20260921T205917Z/s5a/rr_k16_T16"
+  }
+ },
+ "excluded": [],
+ "saturation_T": 8,
+ "knee_T": 2,
+ "knee_rule": "smallest T within G5(b)'s 9.76% spread of the best T",
+ "T16_vs_default": {
+  "default_cells_frames_per_s": [
+   2.623,
+   2.379
+  ],
+  "default_mean": 2.501,
+  "tolerance": 0.0976,
+  "T16_frames_per_s": 2.331,
+  "relative": -0.068,
+  "throughput_within_spread": true,
+  "chunk_hash_identical_videos": "16/16",
+  "verdict": "ESTABLISHED \u2014 T=16 reproduces the default cell within the spread AND produces chunk-identical output"
+ },
+ "output_vs_default": {
+  "what": "DIAGNOSTIC, not a pre-registered gate for S5-A: each T's output against the out-of-the-box default cell, from the driver's per-frame records",
+  "null_control_default_vs_its_replicate": {
+   "videos": 16,
+   "frames": 3203,
+   "frames_label_multiset_identical": 3203,
+   "frames_detection_count_identical": 3203,
+   "max_abs_score_delta_at_least": 0.0,
+   "chunk_identical_videos": 16
+  },
+  "by_T": {
+   "1": {
+    "videos": 16,
+    "frames": 3203,
+    "frames_label_multiset_identical": 3203,
+    "frames_detection_count_identical": 3203,
+    "max_abs_score_delta_at_least": 0.002175360918045044,
+    "chunk_identical_videos": 0
+   },
+   "2": {
+    "videos": 16,
+    "frames": 3203,
+    "frames_label_multiset_identical": 3203,
+    "frames_detection_count_identical": 3203,
+    "max_abs_score_delta_at_least": 0.001959085464477539,
+    "chunk_identical_videos": 0
+   },
+   "4": {
+    "videos": 16,
+    "frames": 3203,
+    "frames_label_multiset_identical": 3203,
+    "frames_detection_count_identical": 3203,
+    "max_abs_score_delta_at_least": 0.001959085464477539,
+    "chunk_identical_videos": 0
+   },
+   "8": {
+    "videos": 16,
+    "frames": 3203,
+    "frames_label_multiset_identical": 3203,
+    "frames_detection_count_identical": 3203,
+    "max_abs_score_delta_at_least": 0.0020987987518310547,
+    "chunk_identical_videos": 0
+   },
+   "16": {
+    "videos": 16,
+    "frames": 3203,
+    "frames_label_multiset_identical": 3203,
+    "frames_detection_count_identical": 3203,
+    "max_abs_score_delta_at_least": 0.0,
+    "chunk_identical_videos": 16
+   }
+  }
+ },
+ "comparator_G4_anchor": {
+  "what": "one LlamaIndex instance, K=16, the same 16 videos",
+  "frames_per_s": 3.068,
+  "effective_cores": 2.924
+ }
+}

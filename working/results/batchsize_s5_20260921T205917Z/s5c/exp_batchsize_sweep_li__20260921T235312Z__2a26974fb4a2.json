@@ -1,0 +1,905 @@
+{
+ "_meta": {
+  "name": "exp_batchsize_sweep_li",
+  "written_utc": "20260921T235312Z",
+  "payload_sha256_12": "2a26974fb4a2",
+  "host": "ip-172-31-13-86",
+  "user": "ssm-user",
+  "pid": 473074,
+  "schema": "resultio/1"
+ },
+ "data": {
+  "experiment": "batchsize_sweep_docs",
+  "arm": "li",
+  "label": "smt_b",
+  "script_sha256": "cb986eed73e0255fc5c3709878389f164c31f10b301978766a0b0f56e0bd17bd",
+  "posture": {
+   "container": "li",
+   "running": true,
+   "pid": 472729,
+   "image_id": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",
+   "image_expected": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",
+   "cpuset_declared": "0-23",
+   "nano_cpus": 0,
+   "memory_limit": 62277025792,
+   "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "TORCH_NUM_THREADS": "1"
+   },
+   "ws1_workers": "24",
+   "started_at": "2026-09-21T23:50:26.403185331Z",
+   "thread_env_expected": "1",
+   "cgroup": "/sys/fs/cgroup/system.slice/docker-f1c695b9d65f2f842041f744ff5a8ded143d85b48a6c74600be226d2ffc05913.scope",
+   "cpuset_effective": {
+    "cpus": 24,
+    "raw": "0-23",
+    "source": "cgroup cpuset.cpus.effective"
+   },
+   "host_nproc": 32,
+   "cpu_max": "max 100000",
+   "declared_cpuset": "0-23",
+   "ready": {
+    "health": {
+     "ok": null,
+     "warm_workers": 24,
+     "torch_threads": 1
+    }
+   },
+   "driver_open_files": {
+    "soft": 65536,
+    "hard": 65536,
+    "max_in_flight": 32,
+    "needed_estimate": 288,
+    "ok": true
+   },
+   "other_arm_running": false,
+   "in_process_readback": {
+    "source": "GET /health answered inside a uvicorn worker, plus /proc/<pid>/environ per worker read in the container",
+    "health_torch_threads": 1,
+    "health_thread_env": {
+     "OMP_NUM_THREADS": "1",
+     "MKL_NUM_THREADS": "1",
+     "OPENBLAS_NUM_THREADS": "1",
+     "VECLIB_MAXIMUM_THREADS": "1",
+     "NUMEXPR_NUM_THREADS": "1",
+     "TORCH_NUM_THREADS": "1"
+    },
+    "warm_workers": 24,
+    "worker_environ": {
+     "1": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "10": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "11": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "12": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "13": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "14": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "15": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "16": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "17": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "18": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "19": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "20": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "21": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "22": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "225": {
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1"
+     },
+     "23": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "24": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "25": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "26": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "27": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "28": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "29": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "30": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "31": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "32": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "8": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     },
+     "9": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "TORCH_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+     }
+    },
+    "all_workers_agree": true,
+    "n_worker_processes_read": 27
+   },
+   "rr_tokens": null,
+   "rr_threads_requested": null,
+   "rr_threads_observed": null
+  },
+  "slice": {
+   "kind": "batchsize_slice",
+   "manifest_sha256": "309749a593dd44675bbcf622465b672ca40faac16db90dbdebc7005cf08f3ecf",
+   "n": 384,
+   "warm": 25,
+   "page_edges": [
+    7,
+    22
+   ],
+   "chars_per_page_edges": [
+    1849.5,
+    2885.75
+   ],
+   "cell_sizes_corpus": {
+    "pages0_cpp2": 1505,
+    "pages0_cpp0": 930,
+    "pages0_cpp1": 859,
+    "pages1_cpp1": 1096,
+    "pages1_cpp2": 1132,
+    "pages2_cpp0": 1353,
+    "pages2_cpp1": 1375,
+    "pages1_cpp0": 1047,
+    "pages2_cpp2": 695,
+    "uncharacterised": 8
+   },
+   "cell_take": {
+    "pages0_cpp2": 58,
+    "pages0_cpp0": 36,
+    "pages0_cpp1": 33,
+    "pages1_cpp1": 42,
+    "pages1_cpp2": 43,
+    "pages2_cpp0": 52,
+    "pages2_cpp1": 53,
+    "pages1_cpp0": 40,
+    "pages2_cpp2": 26,
+    "uncharacterised": 1
+   },
+   "pages_min_median_max": [
+    1,
+    12,
+    791
+   ],
+   "bytes_total": 266751254,
+   "slice_sha256": "411f96f117512f9cdf6d833796a532c0cae8ca42cefdc3c3077671c882a3fb24"
+  },
+  "k_grid": [],
+  "reference_c": null,
+  "continuous_grid": [
+   32
+  ],
+  "rulings": {
+   "A": "unconstrained on every vCPU; denominator = host nproc; engine, driver and host CPU reported separately; idle spin measured in this posture",
+   "C": "one workload on the box; each leg records containers, strays and the host idle baseline it assumed"
+  },
+  "legs": [
+   {
+    "arm": "li",
+    "leg": "refc32_smt_b",
+    "k": null,
+    "reference_c": 32,
+    "verdict": "OK",
+    "submission_shape": "POST /process_pdf per document, C=32 in flight, no barrier (the banked blast shape)",
+    "documents": {
+     "submitted": 384,
+     "recorded": 384,
+     "ok": 381,
+     "empty": 0,
+     "hard_failures": 0,
+     "hard_failure_reasons": []
+    },
+    "throughput": {
+     "span_s": 122.958,
+     "docs_per_s": 3.0986,
+     "chunks": 6785,
+     "chunks_per_s": 55.1817,
+     "basis": "MEASURED \u2014 first submit to last return, one clock"
+    },
+    "batches": null,
+    "cost": {
+     "cpu_s": 1512.678,
+     "effective_cores": 12.302,
+     "cpu_utilization": 0.3845,
+     "cpu_utilization_valid": true,
+     "cpu_s_per_doc": 3.9703,
+     "available_cpus": 32,
+     "cpuset_cpus": 24,
+     "cpu_utilization_of_cpuset": 0.5126,
+     "available_cpus_source": "host nproc (Ruling A); arm cgroup reports '0-23' via cgroup cpuset.cpus.effective",
+     "engine_container_cpu_s": 1512.678,
+     "engine_container_cores": 12.302,
+     "driver_cpu_s": 2.612,
+     "driver_cores": 0.021,
+     "host_total_cpu_s": 1522.706,
+     "host_total_cores": 12.384,
+     "unattributed_cores": 0.06,
+     "idle_spin_measured": {
+      "cores": 0.032,
+      "window_s": 6.0,
+      "basis": "arm cgroup cpu.stat with the pipeline loaded and nothing submitted"
+     },
+     "engine_cores_net_of_idle_spin": 12.27,
+     "idle_core_equivalents_arm": 19.698,
+     "basis": "engine: arm cgroup cpu.stat at the leg's t0/t1; driver: getrusage self+children over the same window; host: per-core /proc/stat"
+    },
+    "process_readback": {
+     "thirty_s_into_window": {
+      "processes": [
+       {
+        "pid": 472845,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=9) --mult"
+       },
+       {
+        "pid": 472846,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=13) --mul"
+       },
+       {
+        "pid": 472847,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=17) --mul"
+       },
+       {
+        "pid": 472848,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=21) --mul"
+       },
+       {
+        "pid": 472849,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=25) --mul"
+       },
+       {
+        "pid": 472850,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=29) --mul"
+       },
+       {
+        "pid": 472851,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=33) --mul"
+       },
+       {
+        "pid": 472852,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=37) --mul"
+       },
+       {
+        "pid": 472853,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=41) --mul"
+       },
+       {
+        "pid": 472854,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=45) --mul"
+       },
+       {
+        "pid": 472855,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=49) --mul"
+       },
+       {
+        "pid": 472856,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=53) --mul"
+       },
+       {
+        "pid": 472857,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=57) --mul"
+       },
+       {
+        "pid": 472858,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=61) --mul"
+       },
+       {
+        "pid": 472859,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=65) --mul"
+       },
+       {
+        "pid": 472860,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=69) --mul"
+       },
+       {
+        "pid": 472861,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=73) --mul"
+       },
+       {
+        "pid": 472862,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=77) --mul"
+       },
+       {
+        "pid": 472863,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=81) --mul"
+       },
+       {
+        "pid": 472864,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=85) --mul"
+       },
+       {
+        "pid": 472865,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=89) --mul"
+       },
+       {
+        "pid": 472866,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=93) --mul"
+       },
+       {
+        "pid": 472867,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=97) --mul"
+       },
+       {
+        "pid": 472868,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=101) --mu"
+       },
+       {
+        "pid": 472729,
+        "name": "python",
+        "threads": 1,
+        "cpus_allowed": "0-23",
+        "cmd": "python -m uvicorn ws1.service:app --host 0.0.0.0 --port 8801 --workers 24 --loop uvloop --http httptools --no-access-log"
+       },
+       {
+        "pid": 472844,
+        "name": "python",
+        "threads": 1,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.resource_tracker import main;main(6) "
+       }
+      ],
+      "total_threads": 98,
+      "n_processes": 26,
+      "taken_utc": "23:51:39Z"
+     },
+     "at_window_close": {
+      "processes": [
+       {
+        "pid": 472845,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=9) --mult"
+       },
+       {
+        "pid": 472846,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=13) --mul"
+       },
+       {
+        "pid": 472847,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=17) --mul"
+       },
+       {
+        "pid": 472848,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=21) --mul"
+       },
+       {
+        "pid": 472849,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=25) --mul"
+       },
+       {
+        "pid": 472850,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=29) --mul"
+       },
+       {
+        "pid": 472851,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=33) --mul"
+       },
+       {
+        "pid": 472852,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=37) --mul"
+       },
+       {
+        "pid": 472853,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=41) --mul"
+       },
+       {
+        "pid": 472854,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=45) --mul"
+       },
+       {
+        "pid": 472855,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=49) --mul"
+       },
+       {
+        "pid": 472856,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=53) --mul"
+       },
+       {
+        "pid": 472857,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=57) --mul"
+       },
+       {
+        "pid": 472858,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=61) --mul"
+       },
+       {
+        "pid": 472859,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=65) --mul"
+       },
+       {
+        "pid": 472860,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=69) --mul"
+       },
+       {
+        "pid": 472861,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=73) --mul"
+       },
+       {
+        "pid": 472862,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=77) --mul"
+       },
+       {
+        "pid": 472863,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=81) --mul"
+       },
+       {
+        "pid": 472864,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=85) --mul"
+       },
+       {
+        "pid": 472865,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=89) --mul"
+       },
+       {
+        "pid": 472866,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=93) --mul"
+       },
+       {
+        "pid": 472867,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=97) --mul"
+       },
+       {
+        "pid": 472868,
+        "name": "python",
+        "threads": 4,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=7, pipe_handle=101) --mu"
+       },
+       {
+        "pid": 472729,
+        "name": "python",
+        "threads": 1,
+        "cpus_allowed": "0-23",
+        "cmd": "python -m uvicorn ws1.service:app --host 0.0.0.0 --port 8801 --workers 24 --loop uvloop --http httptools --no-access-log"
+       },
+       {
+        "pid": 472844,
+        "name": "python",
+        "threads": 1,
+        "cpus_allowed": "0-23",
+        "cmd": "/usr/local/bin/python -B -c from multiprocessing.resource_tracker import main;main(6) "
+       }
+      ],
+      "total_threads": 98,
+      "n_processes": 26,
+      "taken_utc": "23:53:12Z"
+     }
+    },
+    "cpuset_declared_for_s5c": "0-23",
+    "instrumented_s5d_stamps": false,
+    "memory": {
+     "at_window_open": {
+      "current_mb": 14004.6,
+      "peak_mb": 14352.1,
+      "anon_mb": 13888.3,
+      "limit_mb": 59392.0,
+      "basis": "container cgroup memory.current / memory.peak / memory.stat anon; peak is a kernel high-water mark over the container's lifetime"
+     },
+     "at_window_close": {
+      "current_mb": 15678.1,
+      "peak_mb": 16618.8,
+      "anon_mb": 15558.5,
+      "limit_mb": 59392.0,
+      "basis": "container cgroup memory.current / memory.peak / memory.stat anon; peak is a kernel high-water mark over the container's lifetime"
+     }
+    },
+    "deadlines": {
+     "batch_timeout_s": 1800,
+     "doc_timeout_s": 1800,
+     "breaker_consecutive": 3
+    },
+    "failure_blast_radius": {
+     "documents_per_batch": null,
+     "batches_with_a_hard_failure": null,
+     "documents_lost_to_batch_failures": null,
+     "exposure_note": "a single failed batch loses K documents; at K=1 the blast radius is one document and the continuous shape has no batch to lose"
+    },
+    "percore_host": {
+     "n_intervals": 122,
+     "ncpus": 24,
+     "idle_threshold": 0.1,
+     "mean_busy_cores": 12.384,
+     "idle_core_equivalents": 11.616,
+     "host_util_of_cpuset": 0.516,
+     "idle_core_count_mean": 11.51,
+     "idle_core_count_min": 0,
+     "idle_core_count_p50": 16,
+     "idle_core_count_max": 23,
+     "cores_idle_whole_leg": 0,
+     "per_core_mean_busy": {
+      "0": 0.461,
+      "1": 0.466,
+      "2": 0.482,
+      "3": 0.624,
+      "4": 0.505,
+      "5": 0.982,
+      "6": 0.534,
+      "7": 0.467,
+      "8": 0.471,
+      "9": 0.483,
+      "10": 0.486,
+      "11": 0.481,
+      "12": 0.471,
+      "13": 0.583,
+      "14": 0.481,
+      "15": 0.546,
+      "16": 0.515,
+      "17": 0.471,
+      "18": 0.508,
+      "19": 0.469,
+      "20": 0.468,
+      "21": 0.48,
+      "22": 0.458,
+      "23": 0.492
+     },
+     "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+     "interval_s": 1.0,
+     "intervals_dropped": 0,
+     "sampler_read_s_total": 0.0426,
+     "idle_core_equivalents_net_of_spin": 11.648,
+     "idle_spin_cores_subtracted": 0.032,
+     "net_of_spin_basis": "raw idle + measured idle spin: the spin is busy CPU doing no work, so it is unused capacity"
+    },
+    "box_hygiene": {
+     "other_containers": [],
+     "stray_processes": {
+      "limit_cores": 0.5,
+      "window_s": 4.0,
+      "strays": [],
+      "clean": true,
+      "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+     },
+     "host_idle_baseline_cores": 31.972,
+     "ruling": "C \u2014 one workload on the box; the leg records the baseline it assumed"
+    },
+    "page_cache": {
+     "attempted": false
+    },
+    "prewarm": {
+     "attempted": false
+    },
+    "warm_up": {
+     "docs": 25,
+     "seconds": 13.55,
+     "disjoint_from_measured": true,
+     "same_shape_as_leg": true
+    },
+    "quiet_box_before": {
+     "host_busy_cores": 0.028,
+     "arm_idle_cores": 0.031,
+     "foreign_busy_cores": -0.004,
+     "max_foreign": 2.0,
+     "quiet": true,
+     "load1": 8.34130859375,
+     "window_s": 4.0,
+     "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+    },
+    "window": {
+     "t0_ns": 1790034669880270384,
+     "t1_ns": 1790034792837773882
+    },
+    "leaked_task": null
+   }
+  ],
+  "best_k_by_docs_per_s": null,
+  "ranking": [],
+  "not_swept": {
+   "embedding_batch": "SOURCE READING, not measured: engine embedding_transformer buffers maxDocuments=64 and calls encode() at the sentence-transformers default; the LlamaIndex service never sets embed_batch_size (LlamaIndex default 10). Neither is reachable without changing an arm, so neither was swept."
+  },
+  "scope_note": "A smoke-sized slice ranks K; its absolute docs/s must not sit in a table beside a 10k figure (DOCS_HANDOFF \u00a73.4: wave count biases short runs).",
+  "run_dir": "working/results/batchsize_s5_20260921T205917Z/s5c/li_b"
+ }
+}

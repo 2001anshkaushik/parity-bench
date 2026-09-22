@@ -1,0 +1,112 @@
+{
+ "criterion_preregistered": {
+  "tier1": "every frame bit-identical (boxes, scores, class ids, dtype, shape) -> PASS",
+  "tier2": "PASS labelled NUMERICALLY EQUIVALENT only if, PER FRAME: identical label sets and detection counts OUTSIDE a +/-0.001 band around the 0.3 threshold; max |score delta| <= 1e-5; max box delta <= 1e-3 px",
+  "else": "STOP S5-B",
+  "band": 0.001,
+  "threshold": 0.3,
+  "max_score_delta": 1e-05,
+  "max_box_delta_px": 0.001,
+  "box_space": "OUTPUT pixels \u2014 the detector's boxes (downscaled-image space) multiplied by the per-frame rescale factor the pipeline applies (_rescale_to_original), because that is what reaches the emitted text; the downscaled-space delta is recorded too",
+  "hypothesis": "batched GEMM on CPU changes summation order, so Tier 1 fails and Tier 2 decides",
+  "note": "the pipeline emits scores and boxes at full float precision (_to_detection does not round), so even a Tier 2 pass changes the emitted text and its chunk hashes"
+ },
+ "source": "/v/EN2001a.avi",
+ "frames": 24,
+ "infer_edge": 560,
+ "threshold": 0.3,
+ "torch": "2.10.0+cu128",
+ "torch_num_threads": 16,
+ "torch_num_interop_threads": 16,
+ "backend_impl": "rfdetr",
+ "model_resolution": 560,
+ "single_seconds": 3.357,
+ "null_N1_single_is_reproducible": true,
+ "null_N2_comparator_sees_a_different_frame": true,
+ "by_batch_size": {
+  "2": {
+   "seconds": 3.324,
+   "frames": 24,
+   "bit_identical_frames": 0,
+   "differing_frames": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "max_abs_difference": 6.103515625e-05,
+   "detection_counts_equal": true,
+   "BIT_IDENTICAL": false,
+   "tier2_all_frames_ok": true,
+   "tier2_failing_frames": [],
+   "tier2_first_failure": null,
+   "tier2_max_score_delta": 9.5367431640625e-07,
+   "tier2_max_box_delta_output_px": 6.103515625e-05,
+   "tier": "TIER 2 \u2014 NUMERICALLY EQUIVALENT"
+  },
+  "4": {
+   "seconds": 3.493,
+   "frames": 24,
+   "bit_identical_frames": 0,
+   "differing_frames": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "max_abs_difference": 0.0001373291015625,
+   "detection_counts_equal": true,
+   "BIT_IDENTICAL": false,
+   "tier2_all_frames_ok": true,
+   "tier2_failing_frames": [],
+   "tier2_first_failure": null,
+   "tier2_max_score_delta": 1.2814998626708984e-06,
+   "tier2_max_box_delta_output_px": 0.0001373291015625,
+   "tier": "TIER 2 \u2014 NUMERICALLY EQUIVALENT"
+  },
+  "8": {
+   "seconds": 3.477,
+   "frames": 24,
+   "bit_identical_frames": 0,
+   "differing_frames": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ],
+   "max_abs_difference": 0.0001373291015625,
+   "detection_counts_equal": true,
+   "BIT_IDENTICAL": false,
+   "tier2_all_frames_ok": true,
+   "tier2_failing_frames": [],
+   "tier2_first_failure": null,
+   "tier2_max_score_delta": 1.2814998626708984e-06,
+   "tier2_max_box_delta_output_px": 0.0001373291015625,
+   "tier": "TIER 2 \u2014 NUMERICALLY EQUIVALENT"
+  }
+ },
+ "tiers_by_b": {
+  "2": "TIER 2 \u2014 NUMERICALLY EQUIVALENT",
+  "4": "TIER 2 \u2014 NUMERICALLY EQUIVALENT",
+  "8": "TIER 2 \u2014 NUMERICALLY EQUIVALENT"
+ },
+ "verdict": "PASS labelled NUMERICALLY EQUIVALENT (TIER 2) \u2014 within the pre-registered tolerances at every B, but NOT bit-identical; the emitted text and its chunk hashes will differ from B=1"
+}

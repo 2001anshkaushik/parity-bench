@@ -1,0 +1,413 @@
+{
+ "campaign_dir": "working/results/batchsize_s5_20260921T205917Z/s5c",
+ "cells": {
+  "rr_a1": {
+   "verdict": "OK",
+   "declared_cpuset": null,
+   "docs_per_s": 2.4273,
+   "span_s": 157.375,
+   "ok_documents": 382,
+   "engine_cores": 15.906,
+   "cpu_s_per_doc": 6.553,
+   "util_of_cpuset": 0.4971,
+   "util_of_32": 0.4971,
+   "cpuset_cpus": 32,
+   "host_cores": 16.036,
+   "idle_core_equivalents_of_32": 15.964,
+   "idle_spin_burned_cores": 1.237,
+   "threads_total": 315,
+   "threads_task_node_py": 283,
+   "threads_java": 0,
+   "threads_serving": 32,
+   "processes_top": [
+    {
+     "name": "engine",
+     "threads": 283,
+     "cpus_allowed": "0-31"
+    },
+    {
+     "name": "engine",
+     "threads": 32,
+     "cpus_allowed": "0-31"
+    }
+   ]
+  },
+  "rr_a2": {
+   "verdict": "OK",
+   "declared_cpuset": null,
+   "docs_per_s": 2.4673,
+   "span_s": 154.824,
+   "ok_documents": 382,
+   "engine_cores": 16.133,
+   "cpu_s_per_doc": 6.5386,
+   "util_of_cpuset": 0.5042,
+   "util_of_32": 0.5042,
+   "cpuset_cpus": 32,
+   "host_cores": 16.309,
+   "idle_core_equivalents_of_32": 15.691,
+   "idle_spin_burned_cores": 1.238,
+   "threads_total": 323,
+   "threads_task_node_py": 289,
+   "threads_java": 1,
+   "threads_serving": 32,
+   "processes_top": [
+    {
+     "name": "engine",
+     "threads": 288,
+     "cpus_allowed": "0-31"
+    },
+    {
+     "name": "engine",
+     "threads": 32,
+     "cpus_allowed": "0-31"
+    },
+    {
+     "name": "jspawnhelper",
+     "threads": 1,
+     "cpus_allowed": "0-31"
+    },
+    {
+     "name": "scanner-0",
+     "threads": 1,
+     "cpus_allowed": "0-31"
+    },
+    {
+     "name": "jspawnhelper",
+     "threads": 1,
+     "cpus_allowed": "0-31"
+    }
+   ]
+  },
+  "rr_b": {
+   "verdict": "OK",
+   "declared_cpuset": "0-23",
+   "docs_per_s": 2.3854,
+   "span_s": 160.138,
+   "ok_documents": 382,
+   "engine_cores": 13.788,
+   "cpu_s_per_doc": 5.7802,
+   "util_of_cpuset": 0.5745,
+   "util_of_32": 0.4309,
+   "cpuset_cpus": 24,
+   "host_cores": 13.91,
+   "idle_core_equivalents_of_32": 10.09,
+   "idle_spin_burned_cores": 1.231,
+   "threads_total": 312,
+   "threads_task_node_py": 280,
+   "threads_java": 0,
+   "threads_serving": 32,
+   "processes_top": [
+    {
+     "name": "engine",
+     "threads": 280,
+     "cpus_allowed": "0-23"
+    },
+    {
+     "name": "engine",
+     "threads": 32,
+     "cpus_allowed": "0-23"
+    }
+   ]
+  },
+  "rr_c": {
+   "verdict": "OK",
+   "declared_cpuset": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
+   "docs_per_s": 2.2702,
+   "span_s": 168.27,
+   "ok_documents": 382,
+   "engine_cores": 10.53,
+   "cpu_s_per_doc": 4.6386,
+   "util_of_cpuset": 0.6582,
+   "util_of_32": 0.3291,
+   "cpuset_cpus": 16,
+   "host_cores": 10.569,
+   "idle_core_equivalents_of_32": 5.431,
+   "idle_spin_burned_cores": 1.237,
+   "threads_total": 304,
+   "threads_task_node_py": 271,
+   "threads_java": 1,
+   "threads_serving": 32,
+   "processes_top": [
+    {
+     "name": "engine",
+     "threads": 269,
+     "cpus_allowed": "0-15"
+    },
+    {
+     "name": "engine",
+     "threads": 32,
+     "cpus_allowed": "0-15"
+    },
+    {
+     "name": "jspawnhelper",
+     "threads": 1,
+     "cpus_allowed": "0-15"
+    },
+    {
+     "name": "scanner-0",
+     "threads": 1,
+     "cpus_allowed": "0-15"
+    },
+    {
+     "name": "scanner-0",
+     "threads": 1,
+     "cpus_allowed": "0-15"
+    }
+   ]
+  },
+  "li_a": {
+   "verdict": "OK",
+   "declared_cpuset": null,
+   "docs_per_s": 3.5893,
+   "span_s": 106.15,
+   "ok_documents": 381,
+   "engine_cores": 14.399,
+   "cpu_s_per_doc": 4.0117,
+   "util_of_cpuset": 0.45,
+   "util_of_32": 0.45,
+   "cpuset_cpus": 32,
+   "host_cores": 14.438,
+   "idle_core_equivalents_of_32": 17.562,
+   "idle_spin_burned_cores": 0.033,
+   "threads_total": 98,
+   "threads_task_node_py": 0,
+   "threads_java": 0,
+   "threads_serving": 0,
+   "processes_top": [
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-31"
+    }
+   ]
+  },
+  "li_b": {
+   "verdict": "OK",
+   "declared_cpuset": "0-23",
+   "docs_per_s": 3.0986,
+   "span_s": 122.958,
+   "ok_documents": 381,
+   "engine_cores": 12.302,
+   "cpu_s_per_doc": 3.9703,
+   "util_of_cpuset": 0.5126,
+   "util_of_32": 0.3845,
+   "cpuset_cpus": 24,
+   "host_cores": 12.384,
+   "idle_core_equivalents_of_32": 11.616,
+   "idle_spin_burned_cores": 0.032,
+   "threads_total": 98,
+   "threads_task_node_py": 0,
+   "threads_java": 0,
+   "threads_serving": 0,
+   "processes_top": [
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-23"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-23"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-23"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-23"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-23"
+    }
+   ]
+  },
+  "li_c": {
+   "verdict": "OK",
+   "declared_cpuset": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
+   "docs_per_s": 3.1508,
+   "span_s": 120.923,
+   "ok_documents": 381,
+   "engine_cores": 9.552,
+   "cpu_s_per_doc": 3.0317,
+   "util_of_cpuset": 0.597,
+   "util_of_32": 0.2985,
+   "cpuset_cpus": 16,
+   "host_cores": 9.611,
+   "idle_core_equivalents_of_32": 6.389,
+   "idle_spin_burned_cores": 0.032,
+   "threads_total": 98,
+   "threads_task_node_py": 0,
+   "threads_java": 0,
+   "threads_serving": 0,
+   "processes_top": [
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-15"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-15"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-15"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-15"
+    },
+    {
+     "name": "python",
+     "threads": 4,
+     "cpus_allowed": "0-15"
+    }
+   ]
+  }
+ },
+ "missing_cells": [],
+ "lscpu_cells": {
+  "logical_cpus": 32,
+  "physical_cores": 16,
+  "cell_c_cpuset": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"
+ },
+ "null_control": {
+  "rr_a1": 2.4273,
+  "rr_a2": 2.4673,
+  "spread": 0.0163,
+  "floor": 0.0082,
+  "PASS": false,
+  "POST_HOC_DIAGNOSTIC": {
+   "label": "defined after the pre-registered control failed; does not change the verdict",
+   "cpu_s_per_doc_spread": 0.0022,
+   "docs_per_s_to_p90_spread": 0.0063,
+   "span_set_by": {
+    "rr_a1": {
+     "docs_per_s_to_p90": 5.2239,
+     "span_set_by": "029_029958.pdf",
+     "held_s": 124.9
+    },
+    "rr_a2": {
+     "docs_per_s_to_p90": 5.1912,
+     "span_set_by": "029_029958.pdf",
+     "held_s": 122.3
+    }
+   }
+  }
+ },
+ "verdict": "NULL CONTROL FAILED \u2014 two runs of the same unconstrained cell differ by more than the floor; no between-cell difference below that spread is interpretable",
+ "rocketride": {
+  "b_0-23": {
+   "cpu_s_per_doc_vs_a": -0.117,
+   "docs_per_s_vs_a": -0.0253,
+   "engine_cores": 13.788,
+   "cpuset_cpus": 24
+  },
+  "c_one_per_core": {
+   "cpu_s_per_doc_vs_a": -0.2914,
+   "docs_per_s_vs_a": -0.0724,
+   "engine_cores": 10.53,
+   "cpuset_cpus": 16
+  }
+ },
+ "llamaindex": {
+  "b_0-23": {
+   "cpu_s_per_doc_vs_a": -0.0103,
+   "docs_per_s_vs_a": -0.1367,
+   "engine_cores": 12.302,
+   "cpuset_cpus": 24
+  },
+  "c_one_per_core": {
+   "cpu_s_per_doc_vs_a": -0.2443,
+   "docs_per_s_vs_a": -0.1222,
+   "engine_cores": 9.552,
+   "cpuset_cpus": 16
+  }
+ },
+ "hypothesis_test": {
+  "tolerance_used": 0.0163,
+  "rr_cheaper_without_siblings": true,
+  "li_cheaper_without_siblings": true,
+  "reading": "BOX PROPERTY \u2014 both arms get cheaper without siblings; not RocketRide-specific"
+ },
+ "pool_readback": {
+  "rr_a1": {
+   "declared_cpuset": null,
+   "threads_total": 315,
+   "threads_task_node_py": 283,
+   "threads_java": 0,
+   "threads_serving": 32
+  },
+  "rr_a2": {
+   "declared_cpuset": null,
+   "threads_total": 323,
+   "threads_task_node_py": 289,
+   "threads_java": 1,
+   "threads_serving": 32
+  },
+  "rr_b": {
+   "declared_cpuset": "0-23",
+   "threads_total": 312,
+   "threads_task_node_py": 280,
+   "threads_java": 0,
+   "threads_serving": 32
+  },
+  "rr_c": {
+   "declared_cpuset": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
+   "threads_total": 304,
+   "threads_task_node_py": 271,
+   "threads_java": 1,
+   "threads_serving": 32
+  },
+  "li_a": {
+   "declared_cpuset": null,
+   "threads_total": 98,
+   "threads_task_node_py": 0,
+   "threads_java": 0,
+   "threads_serving": 0
+  },
+  "li_b": {
+   "declared_cpuset": "0-23",
+   "threads_total": 98,
+   "threads_task_node_py": 0,
+   "threads_java": 0,
+   "threads_serving": 0
+  },
+  "li_c": {
+   "declared_cpuset": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15",
+   "threads_total": 98,
+   "threads_task_node_py": 0,
+   "threads_java": 0,
+   "threads_serving": 0
+  }
+ }
+}

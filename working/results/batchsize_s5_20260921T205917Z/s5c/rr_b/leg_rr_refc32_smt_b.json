@@ -1,0 +1,208 @@
+{
+ "arm": "rr",
+ "leg": "refc32_smt_b",
+ "k": null,
+ "reference_c": 32,
+ "verdict": "OK",
+ "submission_shape": "send per document, C=32 in flight, no barrier (the banked blast shape)",
+ "documents": {
+  "submitted": 384,
+  "recorded": 384,
+  "ok": 382,
+  "empty": 2,
+  "hard_failures": 0,
+  "hard_failure_reasons": []
+ },
+ "throughput": {
+  "span_s": 160.138,
+  "docs_per_s": 2.3854,
+  "chunks": 7457,
+  "chunks_per_s": 46.5661,
+  "basis": "MEASURED \u2014 first submit to last return, one clock"
+ },
+ "batches": null,
+ "cost": {
+  "cpu_s": 2208.047,
+  "effective_cores": 13.788,
+  "cpu_utilization": 0.4309,
+  "cpu_utilization_valid": true,
+  "cpu_s_per_doc": 5.7802,
+  "available_cpus": 32,
+  "cpuset_cpus": 24,
+  "cpu_utilization_of_cpuset": 0.5745,
+  "available_cpus_source": "host nproc (Ruling A); arm cgroup reports '0-23' via cgroup cpuset.cpus.effective",
+  "engine_container_cpu_s": 2208.047,
+  "engine_container_cores": 13.788,
+  "driver_cpu_s": 5.111,
+  "driver_cores": 0.032,
+  "host_total_cpu_s": 2227.518,
+  "host_total_cores": 13.91,
+  "unattributed_cores": 0.09,
+  "idle_spin_measured": {
+   "cores": 1.231,
+   "window_s": 6.0,
+   "basis": "arm cgroup cpu.stat with the pipeline loaded and nothing submitted"
+  },
+  "engine_cores_net_of_idle_spin": 12.557,
+  "idle_core_equivalents_arm": 18.212,
+  "basis": "engine: arm cgroup cpu.stat at the leg's t0/t1; driver: getrusage self+children over the same window; host: per-core /proc/stat"
+ },
+ "process_readback": {
+  "thirty_s_into_window": {
+   "processes": [
+    {
+     "pid": 15788,
+     "name": "engine",
+     "threads": 280,
+     "cpus_allowed": "0-23",
+     "cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-8651d3f1.webhook_1-lklgzj5y.json --autoterm --"
+    },
+    {
+     "pid": 15002,
+     "name": "engine",
+     "threads": 32,
+     "cpus_allowed": "0-23",
+     "cmd": "./engine ai/eaas.py --host=0.0.0.0 --port=5565 "
+    }
+   ],
+   "total_threads": 312,
+   "n_processes": 2,
+   "taken_utc": "23:40:57Z"
+  },
+  "at_window_close": {
+   "processes": [
+    {
+     "pid": 15788,
+     "name": "engine",
+     "threads": 268,
+     "cpus_allowed": "0-23",
+     "cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-8651d3f1.webhook_1-lklgzj5y.json --autoterm --"
+    },
+    {
+     "pid": 15002,
+     "name": "engine",
+     "threads": 32,
+     "cpus_allowed": "0-23",
+     "cmd": "./engine ai/eaas.py --host=0.0.0.0 --port=5565 "
+    }
+   ],
+   "total_threads": 300,
+   "n_processes": 2,
+   "taken_utc": "23:43:07Z"
+  }
+ },
+ "cpuset_declared_for_s5c": "0-23",
+ "instrumented_s5d_stamps": false,
+ "memory": {
+  "at_window_open": {
+   "current_mb": 12035.0,
+   "peak_mb": 12916.9,
+   "anon_mb": 4348.6,
+   "limit_mb": 59392.0,
+   "basis": "container cgroup memory.current / memory.peak / memory.stat anon; peak is a kernel high-water mark over the container's lifetime"
+  },
+  "at_window_close": {
+   "current_mb": 15689.8,
+   "peak_mb": 19247.3,
+   "anon_mb": 7996.1,
+   "limit_mb": 59392.0,
+   "basis": "container cgroup memory.current / memory.peak / memory.stat anon; peak is a kernel high-water mark over the container's lifetime"
+  }
+ },
+ "deadlines": {
+  "batch_timeout_s": 1800,
+  "doc_timeout_s": 1800,
+  "breaker_consecutive": 3
+ },
+ "failure_blast_radius": {
+  "documents_per_batch": null,
+  "batches_with_a_hard_failure": null,
+  "documents_lost_to_batch_failures": null,
+  "exposure_note": "a single failed batch loses K documents; at K=1 the blast radius is one document and the continuous shape has no batch to lose"
+ },
+ "percore_host": {
+  "n_intervals": 159,
+  "ncpus": 24,
+  "idle_threshold": 0.1,
+  "mean_busy_cores": 13.91,
+  "idle_core_equivalents": 10.09,
+  "host_util_of_cpuset": 0.5796,
+  "idle_core_count_mean": 7.47,
+  "idle_core_count_min": 0,
+  "idle_core_count_p50": 0,
+  "idle_core_count_max": 20,
+  "cores_idle_whole_leg": 0,
+  "per_core_mean_busy": {
+   "0": 0.544,
+   "1": 0.517,
+   "2": 0.555,
+   "3": 0.515,
+   "4": 0.521,
+   "5": 0.542,
+   "6": 0.526,
+   "7": 0.516,
+   "8": 0.985,
+   "9": 0.556,
+   "10": 0.603,
+   "11": 0.573,
+   "12": 0.549,
+   "13": 0.97,
+   "14": 0.569,
+   "15": 0.588,
+   "16": 0.537,
+   "17": 0.564,
+   "18": 0.532,
+   "19": 0.525,
+   "20": 0.518,
+   "21": 0.527,
+   "22": 0.547,
+   "23": 0.533
+  },
+  "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+  "interval_s": 1.0,
+  "intervals_dropped": 0,
+  "sampler_read_s_total": 0.0744,
+  "idle_core_equivalents_net_of_spin": 11.321,
+  "idle_spin_cores_subtracted": 1.231,
+  "net_of_spin_basis": "raw idle + measured idle spin: the spin is busy CPU doing no work, so it is unused capacity"
+ },
+ "box_hygiene": {
+  "other_containers": [],
+  "stray_processes": {
+   "limit_cores": 0.5,
+   "window_s": 4.0,
+   "strays": [],
+   "clean": true,
+   "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+  },
+  "host_idle_baseline_cores": 30.975,
+  "ruling": "C \u2014 one workload on the box; the leg records the baseline it assumed"
+ },
+ "page_cache": {
+  "attempted": false
+ },
+ "prewarm": {
+  "attempted": false
+ },
+ "warm_up": {
+  "docs": 25,
+  "seconds": 20.2,
+  "disjoint_from_measured": true,
+  "same_shape_as_leg": true
+ },
+ "quiet_box_before": {
+  "host_busy_cores": 1.025,
+  "arm_idle_cores": 1.002,
+  "foreign_busy_cores": 0.023,
+  "max_foreign": 2.0,
+  "quiet": true,
+  "load1": 4.38720703125,
+  "window_s": 4.0,
+  "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+ },
+ "window": {
+  "t0_ns": 1790034027341663889,
+  "t1_ns": 1790034187479583177
+ },
+ "leaked_task": null
+}

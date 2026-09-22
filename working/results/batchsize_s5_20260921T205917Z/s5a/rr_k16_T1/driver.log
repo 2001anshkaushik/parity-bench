@@ -1,0 +1,25 @@
+[driver] driver lock held: /tmp/driver_video_rocketride.lock (pid 3731927)
+[driver] preflight: manifest
+[driver] preflight: corpus_dir=/home/ssm-user/parity-bench-video/corpus/ami/full [manifest meta]
+[driver] preflight: container flags
+[driver] preflight: network mode {'rr': 'host'} (Crossroad 22: host, both arms)
+[driver] preflight: quiet box PASS foreign 0.01 vs threshold 2.0 — host busy 1.02 − containers 1.01 {'rr': 1.007} − ours 0.005 [instantaneous (/proc/stat busy − containers − ours)]; load1 4.54 (lagging, by-load1 foreign 3.49); 1 reading(s) over 4.1s, trend SINGLE READING
+[driver] preflight: read-backs (absence fails before agreement)
+[driver] preflight: SDK rocketride 1.3.0 at /home/ssm-user/.venv/lib/python3.12/site-packages/rocketride/__init__.py — entry points verified, null control fired
+[driver] preflight: RR thread env expected 1 — declared {'OMP_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'VECLIB_MAXIMUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1', 'TORCH_NUM_THREADS': '1'}, in-process torch 1 (read back, fail-closed)
+[driver] RR: 1 token(s) live, posture parity[tokens=1,threads=unset(engine-default-64)], 1 distinct project_id(s)
+[driver] RR write path: chunked 1 MiB per write request (send_files shape, data.py:551; whole-frame single-message path retired 2026-08-24 — DIAG_M1_BLAST)
+[driver] census: 1 token(s) -> 1 new task process(es) [347] (declared==measured)
+[driver] idle burden: 1.23 cores with 1 instance(s) live = 3.8% of the box before any work (pre-instance baseline 1.007)
+[driver] preflight PASSED — rocketride_video parity[tokens=1,threads=unset(engine-default-64)] leg=blast n=16
+[driver] cache eviction: rc=0 }
+[driver] warm-up: 2 disjoint items
+[driver] warm-up consumed 2 send(s) over 2 warm rows (2 first batch + 0 top-up; rows re-sent when exhausted — Crossroad 32; tokens round-robin (addressed, not accepted))
+[driver] warm-up ledger: warmup_rocketride_video_parity_blast.json
+[driver] warm-up complete: tokens=[0] worker_pids=n/a
+[driver] service CPU bracket: summing 1 container cgroup(s): rr
+[driver] lifetime_state leg_start: docker_root free 601.7 GiB | frag avg-extent 40154.5 KiB, >=4MiB share 0.9925 | rr: spool du 16 KiB/3 files, layer 250kB (virtual 9.67GB), cg anon 1.27 GiB, procs 2 rss 1.77 GiB
+[driver] stream residency: max 16 concurrent in-flight (cap = 16); sha pass off-loop via to_thread; no whole blob held (streaming refactor 2026-08-27, DIAG_M1_BLAST discipline kept)
+[driver] lifetime_state leg_end: docker_root free 601.7 GiB | frag avg-extent 40143.9 KiB, >=4MiB share 0.9925 | rr: spool du 16 KiB/3 files, layer 250kB (virtual 9.67GB), cg anon 4.17 GiB, procs 2 rss 4.67 GiB
+[driver] export: /home/ssm-user/parity-bench-batch/working/results/batchsize_s5_20260921T205917Z/s5a/rr_k16_T1/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 1.262 frames/s (18.92x realtime), steady window undefined | SERVICE CPU 2.39 cores = 7.5% of 32 | IDLE BURDEN 1.228 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 1 / in-process torch 1 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
