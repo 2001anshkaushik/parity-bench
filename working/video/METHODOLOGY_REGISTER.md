@@ -1596,3 +1596,37 @@ than rewritten from memory, which is entry 2's point in miniature.
 > - **An uploader enforces append-only itself**, rather than trusting its caller to have chosen the
 >   right file.
 
+## 45. The pre-check that passed, and the control that stopped the claim (added 2026-09-22)
+
+> S5-B's read-only pre-check compared batched with single-frame detection on 24 frames of one video.
+> It passed the pre-registered Tier 2 criterion at every batch size: score changes up to 1.3e-6
+> and box changes up to 1.4e-4 output pixels.
+>
+> The end-to-end control applied the SAME criterion to every frame of the 16 videos, through the
+> patched node, and failed at every B>1. Between 131 and 132 of 3,526 frames were beyond tolerance,
+> with score changes up to 7.5e-3 and box changes up to 0.10 px, and one frame's label set changed.
+>
+> The sequence worked as designed. The pre-check licensed the build and the legs; the end-to-end
+> control decided the claim; B>1 carries no timing. What is worth writing down is why the pre-check
+> alone would have been wrong. A sample that passes shows the criterion CAN be met, not that it
+> IS met across the population. Here, frames about 4% of the population decided the claim.
+>
+> Two neighbours from the same night:
+>
+> - **S5-A.** Every intra-op width except 16 changed the detection scores: labels identical on
+>   every frame, scores moved by at least 2e-3. A tuned thread count is therefore not
+>   output-neutral, and its throughput is not a speed-up of the same computation. The first sweep
+>   leg showed it, and the analyser now reports it for every T, with the default cell's own
+>   replicate as the null control.
+> - **S5-C.** The null control failed: two unconstrained RocketRide runs on the 384 slice differed
+>   by 1.63%, against the 0.82% floor from Stage 3b. One 791-page PDF sets both spans, and it
+>   finished 2.6 s apart. The floor, taken from few replicates on a slice where one document sets
+>   the span, was an underestimate. The control is reported as failed. A post-hoc view is
+>   recorded beside it, labelled, without changing the verdict.
+>
+> Rules:
+>
+> - **A pre-check gates the build, never the claim.** An equivalence claim is decided on the
+>   population it is made about.
+> - **A replicate floor from two runs is a lower bound on the noise**, not the noise.
+
