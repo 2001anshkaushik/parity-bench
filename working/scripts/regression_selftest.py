@@ -374,6 +374,14 @@ def _load_matched_replication():
     return m
 
 
+def engine_bundle_present() -> bool:
+    """This tree can drive an engine only if the (gitignored, provisioned) engine/ bundle is here —
+    a bare clone or a fresh worktree has none (PROVISIONING §1). A named function so a stubbed test
+    can replace it: inlined, it made the stubbed precondition tests pass only on a machine whose tree
+    happened to hold the bundle (found carrying them to video-bench, 2026-09-22)."""
+    return (ROOT / "engine").is_dir()
+
+
 def t_thread_settings_matched():
     """Session 14: a full 10,000-document comparison ran with RocketRide on 1 thread and
     LlamaIndex on 10, and nothing detected it. The mismatch was invisible for the whole run."""
@@ -387,7 +395,7 @@ def t_thread_settings_matched():
     # then fails opaquely inside probe_env. Require both, or skip. And (2026-09-08) the engine must
     # be OURS — the pid start_engine.sh recorded, holding the port, running our bundle — else SKIP
     # with the reason named; a foreign instance is neither a pass nor a failure of this tree.
-    if not engine_up() or not (ROOT / "engine").is_dir():
+    if not engine_up() or not engine_bundle_present():
         print("        skip reason: no engine on :5565 or no engine/ bundle in this tree")
         return "skip"
     ours, why = our_engine_on_port()

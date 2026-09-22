@@ -28,16 +28,26 @@ class Precondition(unittest.TestCase):
         for lst in (rs.PASS, rs.FAIL, rs.SKIP, rs.XFAIL, rs.XPASS):
             lst.clear()
         self._saved = (rs.engine_up, rs.our_engine_on_port, rs.engine_runs_pipelines,
-                       rs._load_matched_replication)
+                       rs._load_matched_replication, rs.engine_bundle_present)
         rs.engine_up = lambda *a, **k: True
         rs.our_engine_on_port = lambda *a, **k: (True, "stubbed: ours")
+        # Stubbed too: without this the tests passed only where the untracked engine/ bundle exists.
+        rs.engine_bundle_present = lambda: True
 
     def tearDown(self):
         (rs.engine_up, rs.our_engine_on_port, rs.engine_runs_pipelines,
-         rs._load_matched_replication) = self._saved
+         rs._load_matched_replication, rs.engine_bundle_present) = self._saved
 
     def run_check(self):
         rs.check("thread_settings_matched", "stubbed", rs.t_thread_settings_matched)
+
+    def test_null_control_no_bundle_skips_and_never_passes(self):
+        rs.engine_bundle_present = lambda: False
+        rs.engine_runs_pipelines = lambda *a, **k: self.fail("probed an engine this tree cannot drive")
+        rs._load_matched_replication = lambda: self.fail("the test ran without a bundle")
+        self.run_check()
+        self.assertEqual([n for n, _ in rs.SKIP], ["thread_settings_matched"])
+        self.assertEqual((rs.PASS, rs.FAIL), ([], []))
 
     def test_null_control_unreachable_skips_and_never_passes(self):
         rs.engine_runs_pipelines = lambda *a, **k: (False, "stub: no echo")
