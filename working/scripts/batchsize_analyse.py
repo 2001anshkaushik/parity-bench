@@ -244,17 +244,29 @@ def check_tail(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
         ok_x = [r for r in keep if r.get("ok")]
         span_x = ((max(r["completion_ns"] for r in keep) - min(r["submit_ns"] for r in keep)) / 1e9
                   if keep else None)
+        srow = next((r for r in rows if r["doc"] == STRAGGLER), None)
+        if g.get("k"):
+            # BATCHED (R4, 2026-09-22): dropping the straggler's row cannot shorten a batched span — its
+            # batch-mates share its completion stamp — so that view is not reported at all. What a batched
+            # leg CAN say is how much of its span the straggler's batch occupied. The batch's wall is taken
+            # over ALL of its rows: on RocketRide they share one stamp pair, but each LlamaIndex POST has
+            # its own, and the straggler's own row understated the batch (caught against batch_report).
+            mates = [r for r in rows if srow is not None and r.get("batch") == srow.get("batch")]
+            bw = ((max(r["completion_ns"] for r in mates) - min(r["submit_ns"] for r in mates)) / 1e9) if mates else None
+            sx: Dict[str, Any] = {
+                "doc": STRAGGLER, "was_present": srow is not None, "straggler_batch": srow.get("batch") if srow else None,
+                "straggler_batch_wall_s": round(bw, 1) if bw is not None else None,
+                "straggler_batch_share_of_span": round(bw / span, 4) if bw is not None else None}
+            view_key = "straggler_batch"
+        else:
+            sx = {"doc_dropped": STRAGGLER, "was_present": len(keep) < len(rows),
+                  "docs_per_s": round(len(ok_x) / span_x, 4) if span_x else None,
+                  "span_s": round(span_x, 1) if span_x else None}
+            view_key = "span_excluding_straggler"
         per_leg[f"{g['_launch']}/{g['leg']}"] = {
             "PRIMARY_docs_per_s_span": round(a, 4),
             "docs_per_s_span": round(a, 4),
-            "span_excluding_straggler": {
-                "doc_dropped": STRAGGLER, "was_present": len(keep) < len(rows),
-                "docs_per_s": round(len(ok_x) / span_x, 4) if span_x else None,
-                "span_s": round(span_x, 1) if span_x else None,
-                "noop": (span_x is not None and abs(span_x - span) < 1.0),
-                "noop_reason": ("the straggler's batch-mates return with it, so its wall is carried "
-                                "by their shared completion stamp" if g.get("k") and span_x is not None
-                                and abs(span_x - span) < 1.0 else None)},
+            view_key: sx,
             "POST_HOC_DIAGNOSTIC": ("docs_per_s_to_p90 / to_p99 were defined AFTER leg 1's data was "
                                     "seen (register 34); they are diagnostics, never the headline"),
             "docs_per_s_to_p90": round(b, 4),
@@ -309,8 +321,10 @@ EXTERNAL_FLOORS_SRC = ""
 LAUNCHES: Optional[set] = None
 STRAGGLER = "039_039660.pdf"
 # C4 (ruling 2026-09-21): every RocketRide docs figure carries this, verbatim.
-RR_DOCS_CAVEAT = ("32 vCPU unconstrained per Ruling A; measured posture cost vs 24-core cpuset "
-                  "-7.1% throughput, +28% CPU-s/doc.")
+# The ruled caveat (2026-09-22): S5-C's same-harness figures. The earlier cross-session posture cost is
+# withdrawn (register 46); analyses written before this change keep the old string — append-only.
+RR_DOCS_CAVEAT = ("32 vCPU unconstrained per Ruling A; same-harness cpuset 0-23 measured -2.5% throughput, "
+                  "-11.7% CPU-s/doc (S5-C; its null control failed at 1.63%, so differences under 1.63% are unreadable)")
 
 
 def _mean(gs: List[Dict[str, Any]], f) -> Optional[float]:

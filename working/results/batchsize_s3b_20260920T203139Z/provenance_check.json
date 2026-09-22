@@ -1,0 +1,47 @@
+{
+ "campaign": "working/results/batchsize_s3b_20260920T203139Z",
+ "analyses": {
+  "analysis_docs_384.json": {
+   "launches_listed": [
+    "li_cold",
+    "li_u32a",
+    "li_u32b",
+    "li_w16",
+    "li_w32",
+    "rr_cold",
+    "rr_u32a",
+    "rr_u32b"
+   ],
+   "listed_but_not_a_stage3b_launch": [],
+   "service_arm_exports": {
+    "li_cold": "exp_batchsize_sweep_li__20260920T234754Z__2e9d14010474.json",
+    "li_u32a": "exp_batchsize_sweep_li__20260920T213705Z__127bf753bbf4.json",
+    "li_u32b": "exp_batchsize_sweep_li__20260920T232901Z__50f61658e838.json",
+    "li_w16": "exp_batchsize_sweep_li__20260920T231650Z__11482ce02fe2.json",
+    "li_w32": "exp_batchsize_sweep_li__20260920T231933Z__6b88b1e87937.json"
+   },
+   "service_arm_launch_without_matching_export": []
+  },
+  "analysis_docs_anchor96.json": {
+   "launches_listed": [
+    "anchor_li",
+    "anchor_rr"
+   ],
+   "listed_but_not_a_stage3b_launch": [],
+   "service_arm_exports": {
+    "anchor_li": "exp_batchsize_sweep_li__20260921T012837Z__46db08c769c4.json"
+   },
+   "service_arm_launch_without_matching_export": []
+  }
+ },
+ "misfiled_copy": {
+  "file": "exp_batchsize_sweep_rr__20260920T113718Z__8cd562347f86.json",
+  "run_dir_it_names": "working/results/batchsize_smoke_20260920T113000Z/shake_rr",
+  "matchable_by_stage3b": false,
+  "matched_for_any_launch": false
+ },
+ "null_control": {
+  "planted_export_for_another_campaign_rejected": true
+ },
+ "verdict": "PASS \u2014 both Stage 3b analyses contain only Stage 3b launches; the misfiled copy matches no launch"
+}

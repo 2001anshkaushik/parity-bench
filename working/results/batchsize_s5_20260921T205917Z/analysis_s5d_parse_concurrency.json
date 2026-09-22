@@ -1,0 +1,531 @@
+{
+ "label": "POST-HOC \u2014 defined 2026-09-22 after S5-D ran; occupancy and overlap from the stamps, not a parse-slot measurement",
+ "leg_dir": "working/results/batchsize_s5_20260921T205917Z/s5d/rr_stamped",
+ "measured_window_s": 4314.2,
+ "documents_with_parse_stamp": 10000,
+ "documents_with_more_than_one_parse_event": 42,
+ "in_parse_documents": {
+  "max": 32,
+  "p50": 10,
+  "p95": 17,
+  "mean": 8.36,
+  "seconds_by_level_top": {
+   "1": 1587.2,
+   "13": 337.2,
+   "14": 327.5,
+   "12": 295.1,
+   "15": 281.8,
+   "11": 243.8
+  }
+ },
+ "in_pipeline_documents": {
+  "max": 32,
+  "p50": 31,
+  "p95": 32,
+  "mean": 19.23,
+  "seconds_by_level_top": {
+   "32": 1781.2,
+   "1": 1587.1,
+   "31": 552.1,
+   "30": 122.7,
+   "4": 62.6,
+   "29": 42.1
+  }
+ },
+ "big_documents": {
+  "pages_at_least": 1000,
+  "n": 6,
+  "seconds_with_any_in_parse": 29.0,
+  "share_of_window": 0.0067
+ },
+ "small_documents": {
+  "pages_below": 7,
+  "n": 3289,
+  "n_overlapping_a_big_parse": 45,
+  "overlap_seconds_total": 47.4,
+  "share_of_small_parse_time_overlapping": 0.0125,
+  "parse_s_with_overlap": {
+   "p50": 0.1,
+   "p95": 146.93,
+   "max": 733.78
+  },
+  "parse_s_without_overlap": {
+   "p50": 0.09,
+   "p95": 2.38,
+   "max": 140.44
+  },
+  "held_over_300s": [
+   {
+    "doc": "000_000344.pdf",
+    "pages": 1,
+    "parse_s": 733.8,
+    "overlap_with_big_parse_s": 11.3
+   },
+   {
+    "doc": "002_002489.pdf",
+    "pages": 1,
+    "parse_s": 557.6,
+    "overlap_with_big_parse_s": 11.3
+   }
+  ]
+ },
+ "long_parse_holds": [
+  {
+   "doc": "011_011464.pdf",
+   "pages": 21,
+   "bytes": 1310430,
+   "parse_s": 1839.1,
+   "documents_through_parse_inside_its_interval": 6171,
+   "longest_beside_in_parse": [
+    {
+     "doc": "008_008871.pdf",
+     "pages": 238,
+     "overlap_s": 1008.9
+    },
+    {
+     "doc": "011_011730.pdf",
+     "pages": 24,
+     "overlap_s": 971.8
+    },
+    {
+     "doc": "014_014261.pdf",
+     "pages": 11,
+     "overlap_s": 771.2
+    },
+    {
+     "doc": "000_000344.pdf",
+     "pages": 1,
+     "overlap_s": 733.8
+    },
+    {
+     "doc": "002_002489.pdf",
+     "pages": 1,
+     "overlap_s": 557.6
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 1800.0,
+   "stage4_li_c32_end_to_end_s": 22.3
+  },
+  {
+   "doc": "039_039660.pdf",
+   "pages": 39,
+   "bytes": 3317480,
+   "parse_s": 1773.1,
+   "documents_through_parse_inside_its_interval": 18,
+   "longest_beside_in_parse": [
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 185.9
+    },
+    {
+     "doc": "033_033172.pdf",
+     "pages": 76,
+     "overlap_s": 162.2
+    },
+    {
+     "doc": "008_008871.pdf",
+     "pages": 238,
+     "overlap_s": 104.6
+    },
+    {
+     "doc": "014_014655.pdf",
+     "pages": 60,
+     "overlap_s": 60.3
+    },
+    {
+     "doc": "032_032695.pdf",
+     "pages": 74,
+     "overlap_s": 54.0
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 1722.0,
+   "stage4_li_c32_end_to_end_s": 31.0
+  },
+  {
+   "doc": "008_008871.pdf",
+   "pages": 238,
+   "bytes": 1063690,
+   "parse_s": 1008.9,
+   "documents_through_parse_inside_its_interval": 3245,
+   "longest_beside_in_parse": [
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 1008.9
+    },
+    {
+     "doc": "014_014261.pdf",
+     "pages": 11,
+     "overlap_s": 771.2
+    },
+    {
+     "doc": "011_011730.pdf",
+     "pages": 24,
+     "overlap_s": 488.4
+    },
+    {
+     "doc": "002_002489.pdf",
+     "pages": 1,
+     "overlap_s": 488.1
+    },
+    {
+     "doc": "000_000344.pdf",
+     "pages": 1,
+     "overlap_s": 475.3
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 1019.4,
+   "stage4_li_c32_end_to_end_s": 24.6
+  },
+  {
+   "doc": "011_011730.pdf",
+   "pages": 24,
+   "bytes": 1201063,
+   "parse_s": 971.8,
+   "documents_through_parse_inside_its_interval": 3520,
+   "longest_beside_in_parse": [
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 971.8
+    },
+    {
+     "doc": "000_000344.pdf",
+     "pages": 1,
+     "overlap_s": 733.8
+    },
+    {
+     "doc": "002_002489.pdf",
+     "pages": 1,
+     "overlap_s": 557.6
+    },
+    {
+     "doc": "008_008871.pdf",
+     "pages": 238,
+     "overlap_s": 488.4
+    },
+    {
+     "doc": "014_014261.pdf",
+     "pages": 11,
+     "overlap_s": 458.1
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 954.6,
+   "stage4_li_c32_end_to_end_s": 11.1
+  },
+  {
+   "doc": "014_014261.pdf",
+   "pages": 11,
+   "bytes": 319085,
+   "parse_s": 771.2,
+   "documents_through_parse_inside_its_interval": 2784,
+   "longest_beside_in_parse": [
+    {
+     "doc": "008_008871.pdf",
+     "pages": 238,
+     "overlap_s": 771.2
+    },
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 771.2
+    },
+    {
+     "doc": "011_011730.pdf",
+     "pages": 24,
+     "overlap_s": 458.1
+    },
+    {
+     "doc": "002_002489.pdf",
+     "pages": 1,
+     "overlap_s": 457.8
+    },
+    {
+     "doc": "000_000344.pdf",
+     "pages": 1,
+     "overlap_s": 445.0
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 768.9,
+   "stage4_li_c32_end_to_end_s": 10.7
+  },
+  {
+   "doc": "000_000344.pdf",
+   "pages": 1,
+   "bytes": 2620315,
+   "parse_s": 733.8,
+   "documents_through_parse_inside_its_interval": 2742,
+   "longest_beside_in_parse": [
+    {
+     "doc": "011_011730.pdf",
+     "pages": 24,
+     "overlap_s": 733.8
+    },
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 733.8
+    },
+    {
+     "doc": "002_002489.pdf",
+     "pages": 1,
+     "overlap_s": 544.7
+    },
+    {
+     "doc": "008_008871.pdf",
+     "pages": 238,
+     "overlap_s": 475.3
+    },
+    {
+     "doc": "014_014261.pdf",
+     "pages": 11,
+     "overlap_s": 445.0
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 719.8,
+   "stage4_li_c32_end_to_end_s": 8.5
+  },
+  {
+   "doc": "031_031239.pdf",
+   "pages": 118,
+   "bytes": 8922943,
+   "parse_s": 579.3,
+   "documents_through_parse_inside_its_interval": 2180,
+   "longest_beside_in_parse": [
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 521.0
+    },
+    {
+     "doc": "011_011730.pdf",
+     "pages": 24,
+     "overlap_s": 255.5
+    },
+    {
+     "doc": "024_024661.pdf",
+     "pages": 11,
+     "overlap_s": 222.0
+    },
+    {
+     "doc": "010_010491.pdf",
+     "pages": 170,
+     "overlap_s": 176.4
+    },
+    {
+     "doc": "003_003316.pdf",
+     "pages": 553,
+     "overlap_s": 172.1
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 608.9,
+   "stage4_li_c32_end_to_end_s": 27.8
+  },
+  {
+   "doc": "002_002489.pdf",
+   "pages": 1,
+   "bytes": 641106,
+   "parse_s": 557.6,
+   "documents_through_parse_inside_its_interval": 2037,
+   "longest_beside_in_parse": [
+    {
+     "doc": "011_011730.pdf",
+     "pages": 24,
+     "overlap_s": 557.6
+    },
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 557.6
+    },
+    {
+     "doc": "000_000344.pdf",
+     "pages": 1,
+     "overlap_s": 544.7
+    },
+    {
+     "doc": "008_008871.pdf",
+     "pages": 238,
+     "overlap_s": 488.1
+    },
+    {
+     "doc": "014_014261.pdf",
+     "pages": 11,
+     "overlap_s": 457.8
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 548.3,
+   "stage4_li_c32_end_to_end_s": 7.5
+  },
+  {
+   "doc": "034_034697.pdf",
+   "pages": 55,
+   "bytes": 512140,
+   "parse_s": 421.0,
+   "documents_through_parse_inside_its_interval": 1575,
+   "longest_beside_in_parse": [
+    {
+     "doc": "000_000344.pdf",
+     "pages": 1,
+     "overlap_s": 421.0
+    },
+    {
+     "doc": "011_011730.pdf",
+     "pages": 24,
+     "overlap_s": 421.0
+    },
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 421.0
+    },
+    {
+     "doc": "002_002489.pdf",
+     "pages": 1,
+     "overlap_s": 396.2
+    },
+    {
+     "doc": "008_008871.pdf",
+     "pages": 238,
+     "overlap_s": 326.7
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 417.9,
+   "stage4_li_c32_end_to_end_s": 10.4
+  },
+  {
+   "doc": "033_033172.pdf",
+   "pages": 76,
+   "bytes": 1523443,
+   "parse_s": 410.3,
+   "documents_through_parse_inside_its_interval": 919,
+   "longest_beside_in_parse": [
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 410.3
+    },
+    {
+     "doc": "008_008871.pdf",
+     "pages": 238,
+     "overlap_s": 352.8
+    },
+    {
+     "doc": "032_032695.pdf",
+     "pages": 74,
+     "overlap_s": 290.6
+    },
+    {
+     "doc": "004_004653.pdf",
+     "pages": 27,
+     "overlap_s": 206.1
+    },
+    {
+     "doc": "039_039660.pdf",
+     "pages": 39,
+     "overlap_s": 162.2
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 409.4,
+   "stage4_li_c32_end_to_end_s": 25.9
+  },
+  {
+   "doc": "014_014969.pdf",
+   "pages": 8,
+   "bytes": 1598094,
+   "parse_s": 392.0,
+   "documents_through_parse_inside_its_interval": 1306,
+   "longest_beside_in_parse": [
+    {
+     "doc": "014_014261.pdf",
+     "pages": 11,
+     "overlap_s": 392.0
+    },
+    {
+     "doc": "008_008871.pdf",
+     "pages": 238,
+     "overlap_s": 392.0
+    },
+    {
+     "doc": "011_011464.pdf",
+     "pages": 21,
+     "overlap_s": 392.0
+    },
+    {
+     "doc": "011_011730.pdf",
+     "pages": 24,
+     "overlap_s": 299.6
+    },
+    {
+     "doc": "002_002489.pdf",
+     "pages": 1,
+     "overlap_s": 299.3
+    }
+   ],
+   "stage4_leg1_rr_end_to_end_s": 387.7,
+   "stage4_li_c32_end_to_end_s": 27.4
+  }
+ ],
+ "big_documents_by_stage": [
+  {
+   "doc": "027_027572.pdf",
+   "pages": 1722,
+   "parse_s": 3.9,
+   "split_end_to_embed_end_s": 243.4
+  },
+  {
+   "doc": "012_012852.pdf",
+   "pages": 1646,
+   "parse_s": 7.3,
+   "split_end_to_embed_end_s": 450.8
+  },
+  {
+   "doc": "022_022440.pdf",
+   "pages": 1205,
+   "parse_s": 5.0,
+   "split_end_to_embed_end_s": 200.1
+  },
+  {
+   "doc": "010_010935.pdf",
+   "pages": 1192,
+   "parse_s": 5.7,
+   "split_end_to_embed_end_s": 113.7
+  },
+  {
+   "doc": "013_013981.pdf",
+   "pages": 1130,
+   "parse_s": 4.8,
+   "split_end_to_embed_end_s": 128.5
+  },
+  {
+   "doc": "000_000674.pdf",
+   "pages": 1000,
+   "parse_s": 2.3,
+   "split_end_to_embed_end_s": 199.1
+  }
+ ],
+ "threads_measured": {
+  "processes": [
+   641
+  ],
+  "distinct_threads_by_stage": {
+   "after_parse": 32,
+   "after_split": 32,
+   "after_embed": 32
+  },
+  "documents_whose_parse_and_embed_ran_on_one_thread": 9911,
+  "documents_with_a_parse_stamp": 10000,
+  "distinct_threads_holding_a_document_in_parse": {
+   "max": 26,
+   "p50": 14,
+   "p95": 19
+  }
+ },
+ "SOURCE_not_measurement": {
+  "per_token_processing_bound": "engine/ai/modules/data/data_conn.py:737 runs each pipe's close \u2014 where the document's pipeline executes (pipe.close(), data_conn.py:711) \u2014 via asyncio.to_thread, i.e. asyncio's DEFAULT executor; engine/ai sets no other executor, so CPython's default applies: min(32, os.cpu_count() + 4) = 32 on this 32-vCPU box. Pipes are admitted under asyncio.Semaphore(threadCount=64) (data_conn.py:138,477). So one token processes at most 32 documents at once, whatever K or C above 32.",
+  "parse_itself": "the parse provider is a native node (engine/nodes/core/services.parse.json:3, protocol parse://) running Tika 3.2.3 (engine/java/lib/tika-*-3.2.3.jar) in a JVM hosted inside the engine process (no standalone java process in S5-C's snapshots; engine/java/jre ships with the bundle). The C++ binding is compiled into the engine binary and is NOT in this bundle, so a lock inside it cannot be read here \u2014 the stamps below bound it instead.",
+  "tika_config": "engine/java/tika-config.xml:12 excludes OCR; :29 sets PDFParser sortByPosition=true and :30-32 turn on AcroForm, annotation and bookmark extraction \u2014 a candidate for the document-intrinsic slow parses (HYPOTHESIS from source, not measured)."
+ },
+ "cannot_say": "whether a document in parse was WAITING for a slot or BEING parsed: Tika emits its text as one event, so the stamp marks only when parsing ended; that split needs the engine's own parse start, which no stamp records"
+}

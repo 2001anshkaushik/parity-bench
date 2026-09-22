@@ -1,0 +1,205 @@
+{
+ "comparator": "batchsize_analyse_threads.frame_compare \u2014 label multisets and sorted-paired scores per frame (lower bound)",
+ "null_control_default_vs_its_replicate": {
+  "videos": 16,
+  "frames": 3203,
+  "frames_label_multiset_identical": 3203,
+  "frames_detection_count_identical": 3203,
+  "max_abs_score_delta_at_least": 0.0,
+  "chunk_identical_videos": 16
+ },
+ "null_control_patched_B1_vs_default": {
+  "videos": 16,
+  "frames": 3203,
+  "frames_label_multiset_identical": 3203,
+  "frames_detection_count_identical": 3203,
+  "max_abs_score_delta_at_least": 0.0,
+  "chunk_identical_videos": 16
+ },
+ "s5a_thread_width_vs_default": {
+  "1": {
+   "videos": 16,
+   "frames": 3203,
+   "frames_label_multiset_identical": 3203,
+   "frames_detection_count_identical": 3203,
+   "max_abs_score_delta_at_least": 0.002175360918045044,
+   "chunk_identical_videos": 0
+  },
+  "2": {
+   "videos": 16,
+   "frames": 3203,
+   "frames_label_multiset_identical": 3203,
+   "frames_detection_count_identical": 3203,
+   "max_abs_score_delta_at_least": 0.001959085464477539,
+   "chunk_identical_videos": 0
+  },
+  "4": {
+   "videos": 16,
+   "frames": 3203,
+   "frames_label_multiset_identical": 3203,
+   "frames_detection_count_identical": 3203,
+   "max_abs_score_delta_at_least": 0.001959085464477539,
+   "chunk_identical_videos": 0
+  },
+  "8": {
+   "videos": 16,
+   "frames": 3203,
+   "frames_label_multiset_identical": 3203,
+   "frames_detection_count_identical": 3203,
+   "max_abs_score_delta_at_least": 0.0020987987518310547,
+   "chunk_identical_videos": 0
+  },
+  "16": {
+   "videos": 16,
+   "frames": 3203,
+   "frames_label_multiset_identical": 3203,
+   "frames_detection_count_identical": 3203,
+   "max_abs_score_delta_at_least": 0.0,
+   "chunk_identical_videos": 16
+  }
+ },
+ "s5b_batch_vs_patched_B1": {
+  "2": {
+   "videos": 16,
+   "frames": 3203,
+   "frames_label_multiset_identical": 3203,
+   "frames_detection_count_identical": 3203,
+   "max_abs_score_delta_at_least": 0.007490813732147217,
+   "chunk_identical_videos": 0
+  },
+  "4": {
+   "videos": 16,
+   "frames": 3203,
+   "frames_label_multiset_identical": 3203,
+   "frames_detection_count_identical": 3203,
+   "max_abs_score_delta_at_least": 0.00195920467376709,
+   "chunk_identical_videos": 0
+  },
+  "8": {
+   "videos": 16,
+   "frames": 3203,
+   "frames_label_multiset_identical": 3203,
+   "frames_detection_count_identical": 3203,
+   "max_abs_score_delta_at_least": 0.00195920467376709,
+   "chunk_identical_videos": 0
+  }
+ },
+ "s5b_tier2_from_taps": {
+  "2": {
+   "tier2_failing_frames": 132,
+   "frames_compared": 3526,
+   "max_score_delta": 0.007490813732147217,
+   "max_box_delta_px": 0.1044769287109375,
+   "tier": "NEITHER \u2014 a different measurement, not an optimisation"
+  },
+  "4": {
+   "tier2_failing_frames": 131,
+   "frames_compared": 3526,
+   "max_score_delta": 0.00195920467376709,
+   "max_box_delta_px": 0.1045074462890625,
+   "tier": "NEITHER \u2014 a different measurement, not an optimisation"
+  },
+  "8": {
+   "tier2_failing_frames": 131,
+   "frames_compared": 3526,
+   "max_score_delta": 0.00195920467376709,
+   "max_box_delta_px": 0.1045074462890625,
+   "tier": "NEITHER \u2014 a different measurement, not an optimisation"
+  }
+ },
+ "s5b_tier2_label_set_failures_explained": {
+  "2": {
+   "tier2_failing_frames_on_measured_videos": 120,
+   "tier2_failing_frames_on_warm_up_videos": 12,
+   "label_set_failures": [
+    {
+     "video": "EN2001a.avi",
+     "frame": 97,
+     "measured_video": true,
+     "labels_B1": [
+      "microwave",
+      "person",
+      "tv",
+      "tv"
+     ],
+     "labels_B2": [
+      "microwave",
+      "person",
+      "tv",
+      "tv"
+     ],
+     "any_label_or_count_changed": false,
+     "detections_crossing_the_band_edge": [
+      {
+       "label": "tv",
+       "score_B1": 0.3011,
+       "score_B2": 0.3008
+      }
+     ]
+    }
+   ]
+  },
+  "4": {
+   "tier2_failing_frames_on_measured_videos": 120,
+   "tier2_failing_frames_on_warm_up_videos": 11,
+   "label_set_failures": [
+    {
+     "video": "EN2001a.avi",
+     "frame": 97,
+     "measured_video": true,
+     "labels_B1": [
+      "microwave",
+      "person",
+      "tv",
+      "tv"
+     ],
+     "labels_B4": [
+      "microwave",
+      "person",
+      "tv",
+      "tv"
+     ],
+     "any_label_or_count_changed": false,
+     "detections_crossing_the_band_edge": [
+      {
+       "label": "tv",
+       "score_B1": 0.3011,
+       "score_B4": 0.3008
+      }
+     ]
+    }
+   ]
+  },
+  "8": {
+   "tier2_failing_frames_on_measured_videos": 120,
+   "tier2_failing_frames_on_warm_up_videos": 11,
+   "label_set_failures": [
+    {
+     "video": "EN2001a.avi",
+     "frame": 97,
+     "measured_video": true,
+     "labels_B1": [
+      "microwave",
+      "person",
+      "tv",
+      "tv"
+     ],
+     "labels_B8": [
+      "microwave",
+      "person",
+      "tv",
+      "tv"
+     ],
+     "any_label_or_count_changed": false,
+     "detections_crossing_the_band_edge": [
+      {
+       "label": "tv",
+       "score_B1": 0.3011,
+       "score_B8": 0.3008
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

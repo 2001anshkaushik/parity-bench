@@ -1630,3 +1630,62 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   population it is made about.
 > - **A replicate floor from two runs is a lower bound on the noise**, not the noise.
 
+## 46. A posture cost measured across two harness sessions, carried as a caveat on every figure (added 2026-09-22)
+
+> Every RocketRide docs figure carried a caveat giving the 32-vCPU posture's cost against a
+> 24-core cpuset. Its figures compared two conditions that each changed more than one thing, in
+> different harness sessions:
+>
+> - **Stage 3:** 24-core cpuset, driver pinned to CPUs 24-31, an earlier session.
+> - **Stage 3b:** 32 vCPU unconstrained, driver unpinned, a later one.
+>
+> S5-C then measured the same two cpusets inside ONE session. RocketRide at 0-23 against 32 vCPU
+> ran -2.5% docs/s and -11.7% CPU-s/doc. The throughput has the opposite sign to the caveat's.
+>
+> S5-E shows how far one cell moves between sessions. RocketRide, C=32, thread variables = 1,
+> unconstrained, on the 384 slice, averaged 2.4473 docs/s in S5-C's session. The same cell ran at
+> 2.8235 after a box restart, +15.4%. Inside S5-E's own session, each pair of runs agreed within
+> 0.37%. A difference between sessions can therefore be far larger than any noise measured inside
+> one, and a posture cost read across sessions measures the sessions as much as the posture.
+>
+> The cross-session caveat is WITHDRAWN. The caveat now carries S5-C's same-harness figures,
+> together with the fact that S5-C's null control failed at 1.63%. The committed analyses and the
+> two superseded summaries written before 2026-09-22 04:00Z keep the old text: they are
+> append-only, and superseded, not edited.
+>
+> Rule: **a posture cost is measured inside one session, with both postures interleaved.** A
+> comparison across sessions is context, never a caveat.
+
+
+## 47. The label change that was a band edge, and the bound that was a thread pool (added 2026-09-22)
+
+> Three corrections from the closeout, each found by reading the data one level lower than the
+> claim had been made at.
+>
+> - **S5-B had no label change.** In-session and in entry 45, S5-B was said to fail Tier 2 with "one
+>   frame's label set changed". Frame by frame, no label and no count changed. On `EN2001a.avi`
+>   frame 97, one `tv` detection's score moved from 0.3011 to 0.3008, crossing into the ±0.001
+>   band around the 0.3 threshold. The Tier 2 rule filters each side by that side's own scores, so
+>   a detection crossing the band's edge reads as a count difference. The stop stands on its own:
+>   120 of the 3,203 measured frames fail on score and box shifts alone. The "label change" is
+>   withdrawn. By one comparator, batching moves scores by up to 7.5e-3, and a thread-width change
+>   alone (S5-A) by at least 2.0e-3, both with every label kept; the pre-registered 1e-5
+>   tolerance sits below both.
+> - **The batch-K bound is a thread pool, not the SDK.** The batch-K labels described K documents
+>   in flight. The installed SDK does open all K pipes at once, with no client-side bound. But the
+>   engine admits at most 64 pipes per token and runs each document's pipeline through
+>   `asyncio.to_thread` on the default executor, 32 threads on this box. So at K of 32 or more, at
+>   most 32 documents are processed at once per token. The S5-D stamps agree: they came from one
+>   process on exactly 32 threads, with one thread carrying each document through every stage.
+> - **Parse is not bounded per token.** The hypothesis that small documents wait behind large
+>   ones inside parse is not supported:
+>   - thousands of documents passed through parse while a slow one sat there;
+>   - documents of 1,000+ pages spend seconds in parse and minutes in embed;
+>   - every parse hold over 300 s reproduces within a few percent from Stage 4 leg 1, and takes
+>     seconds on pypdf. It is the document's own Tika cost.
+>
+> Rules:
+>
+> - **Read an equivalence failure frame by frame before describing it.**
+> - **A bound read from what the client sends is not the bound the engine applies.** Trace it to
+>   the executor that runs the work.

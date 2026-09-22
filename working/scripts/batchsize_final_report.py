@@ -35,8 +35,12 @@ STRAGGLER = "039_039660.pdf"
 DAG = "†"
 DDAG = "‡"
 PARA = "¶"
-CAVEAT = ("32 vCPU unconstrained per Ruling A; measured posture cost vs 24-core cpuset -7.1% "
-          "throughput, +28% CPU-s/doc.")
+# The ruled caveat (Ansh, 2026-09-22): S5-C's same-harness measurement, replacing a cross-session
+# figure (register 46). main() recomputes it from the S5-C analysis and REFUSES if the two differ, so the
+# text on every RocketRide docs figure cannot drift from the artifact it cites.
+CAVEAT_RULED = ("32 vCPU unconstrained per Ruling A; same-harness cpuset 0-23 measured -2.5% throughput, -11.7% "
+                "CPU-s/doc (S5-C; its null control failed at 1.63%, so differences under 1.63% are unreadable)")
+CAVEAT = CAVEAT_RULED
 LEG6_SPREAD_RULE = 0.02
 
 INPUTS: Dict[str, str] = {}
@@ -145,7 +149,8 @@ def docs_posture(camp: Path, launch: str, name: str) -> Dict[str, Any]:
 def docs_posture_text(pp: Dict[str, Any], arm: str) -> str:
     env = pp["thread_env"]
     envs = ("six thread variables at " + env[0]) if len(env) == 1 else f"thread variables {env}"
-    unit = (f"{pp['rr_tokens']} token, threads= {pp['rr_threads_requested']}" if arm == "rr"
+    req = str(pp["rr_threads_requested"])
+    unit = (f"{pp['rr_tokens']} token, threads= " + ("not passed" if req.startswith("NOT PASSED") else req) if arm == "rr"
             else f"{pp['ws1_workers']} workers")
     who = "task process" if arm == "rr" else "each worker"
     return (f"{unit}; {envs}; torch threads read in {who}: {pp['in_process_torch_threads']}; "
@@ -211,7 +216,8 @@ def headline_docs(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
                  f"{pct(lk['noise_floor_used'])} floor; C=32 kept per register 12, not as a winner"
                  if lk.get("tie") else "continuous, C=32")
     rows_out = [
-        ["Posture, read back from the running arm", r(docs_posture_text(R["posture"], "rr")), docs_posture_text(L["posture"], "li")],
+        ["Posture — banked docs posture: 1 token, six vars = 1, both arms (read back in-process)",
+         r(docs_posture_text(R["posture"], "rr")), docs_posture_text(L["posture"], "li")],
         ["Submission at the arm's own optimum", r(f"continuous, C={R['knee']['knee_c']} (the knee)"), li_choice],
         ["**Span throughput, docs/s — PRIMARY**", r(f"**{n(R['tail']['PRIMARY_docs_per_s_span'])}**"),
          f"**{n(L['tail']['PRIMARY_docs_per_s_span'])}**"],
@@ -239,10 +245,11 @@ def headline_docs(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
          " / ".join(n(L["docs"][k]) for k in ("completed", "content_outcome", "deadline_loss", "other_failure"))],
     ]
     out = ["## 1. Headline — each arm at its own measured optimum, 9,975 GovDocs PDFs (Stage 4)", "",
-           "RocketRide runs **one token** — `use()` with no `threads=`, the engine's out-of-the-box token count; "
-           "LlamaIndex runs **24 service workers**, its own measured optimum. Both run the docs thread posture "
-           "shown in the first row, read back from inside the running processes, not from the container "
-           "environment. This row pair answers \"how fast does each stack go at its best on this box\"; it is "
+           "Both arms run the **banked docs posture: 1 token, six vars = 1, both arms** — RocketRide one token "
+           "(`use()` with no `threads=`), LlamaIndex 24 service workers (its own measured optimum), and the six "
+           "BLAS/OpenMP/torch thread variables = 1 on both, read back from inside the running processes (first "
+           "row). The six variables at 1 are the campaign's banked docs posture, not RocketRide's out-of-the-box "
+           "default (which leaves them unset; S5-E measures the difference). This row pair answers \"how fast does each stack go at its best on this box\"; it is "
            "**not** a per-unit comparison — one token against 24 workers — and carries no parity claim. The "
            "per-unit comparison is the G4 anchor, §4. Both arms unconstrained across all 32 vCPUs (Ruling A); one "
            "leg on the box at a time (Ruling C); caches prewarmed.", ""]
@@ -276,11 +283,20 @@ def empty_content(a: Dict[str, Any], s4: Path, F: Dict[str, Any]) -> List[str]:
 
 def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
     out = ["## 2. Batch size at full scale — the envelope, 9,975 PDFs (Stage 4)", "",
-           "**Batch** here is the only lever that exists without modifying an arm: RocketRide "
+           "**Batch K** is the only lever that exists without modifying an arm: RocketRide "
            "`send_files(K files)` on one token; LlamaIndex K concurrent single-document POSTs behind a "
            "barrier (its service has no multi-document endpoint). The next batch starts only when every "
            "document of the current one has returned. Batch deadline pre-registered at 1,800 s for every K "
-           "and both arms before the first envelope leg; a batch lost to it is blast radius, never re-run.", ""]
+           "and both arms before the first envelope leg; a batch lost to it is blast radius, never re-run.", "",
+           "**What K means inside each arm — SOURCE, not measurement.** RocketRide: the installed SDK (rocketride "
+           "1.3.0) opens all K pipes at once, with no client-side bound (`rocketride/mixins/data.py:719-725`); the "
+           "engine admits at most 64 pipes per token (`engine/ai/modules/data/data_conn.py:138,477`; threadCount 64 "
+           "when `threads=` is not passed, `engine/ai/constants.py:48`, `task_engine.py:247,382`) and runs each "
+           "document's pipeline on asyncio's default executor (`data_conn.py:737`), which is 32 threads on this "
+           "32-vCPU box. So K is documents per barrier, and at K of 32 or more at most 32 are processed at once. "
+           "LlamaIndex: K concurrent POSTs (`working/scripts/exp_batchsize_sweep.py:702`) to 24 single-concurrency "
+           "workers, so at most 24 are processed at once. The SDK and engine files cited were hashed on the box "
+           "and match the copies read here.", ""]
     keys = {"rr": [(128, "p3_rr_k128/k128_main"), (256, "e7_rr_k256/k256_env"), (512, "e9_rr_k512/k512_env"),
                    (1024, "e11_rr_k1024/k1024_env")],
             "li": [(128, "p4_li_k128/k128_main"), (256, "e8_li_k256/k256_env"), (512, "e10_li_k512/k512_env"),
@@ -302,30 +318,55 @@ def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
             held = (f"#{br['straggler_batch']}: DIED at the deadline ({n(br['straggler_batch_wall_s'], 1)} s)"
                     if br.get("straggler_batch") in died else
                     f"#{br['straggler_batch']}: {n(br['straggler_batch_wall_s'], 1)} s ({n(br['straggler_margin_s'], 1)} s spare)")
+            launch, legname = key.split("/")
+            oc = outcome_counts(s4 / launch / f"perdoc_{arm}_{legname}.jsonl", f"s4_perdoc_{arm}_{legname}")
+            span = ((a.get("check_E_tail") or {}).get("per_leg") or {}).get(key, {}).get("span_s")
+            share = (br["straggler_batch_wall_s"] / span) if span and br.get("straggler_batch_wall_s") else None
+            returned = oc["completed"] + oc["content_outcome"]
+            lost = oc["deadline_loss"] + oc["other_failure"]
             rows.append([f"K={k}" + (" (re-run, register 44)" if key.startswith("e12b") else ""),
                          d(n(row["docs_per_s_mean"])), n(br["batches"]),
-                         f"{n(br['wall_s_median'], 1)} / {n(br['wall_s_max'], 1)}", held,
+                         f"{n(br['wall_s_median'], 1)} / {n(br['wall_s_max'], 1)}", held, pct(share),
                          (n(len(died)) + (" — **BLAST-RADIUS-DOMINATED**" if len(died) > 1 else
                                             f" — batch {died[0]}, blast radius" if died else "")),
-                         n(br.get("documents_lost_total")),
+                         f"{n(returned)} / {n(lost)} / {n(oc['completed'])}",
                          f"{gb(br.get('anon_mb_at_window_close'))} – {gb(br.get('memory_peak_mb_total'))}",
                          d(n(row.get("idle_core_equivalents"), 3))])
             F["stage4_envelope"][f"{arm}_k{k}"] = {"docs_per_s": row["docs_per_s_mean"], "batch_report": br,
                                                   "idle_core_equivalents": row.get("idle_core_equivalents"),
-                                                  "cpu_utilization": row.get("cpu_utilization")}
+                                                  "cpu_utilization": row.get("cpu_utilization"),
+                                                  "straggler_batch_share_of_span": share, "span_s": span,
+                                                  "documents": {"returned": returned, "lost": lost,
+                                                                "numerator_with_content": oc["completed"],
+                                                                "content_outcome": oc["content_outcome"],
+                                                                "by_reason": oc.get("by_reason")}}
             walls = ", ".join(f"{b}:{w}" for b, w in sorted(br["per_batch_wall_s"].items(), key=lambda kv: int(kv[0])))
             per_batch.append(f"- K={k} ({key}): {walls}")
         cr = cont_row(a, arm, 32)
         rows.append(["continuous C=32 (reference)", (f"{n(cr['docs_per_s'])} {DAG}" if arm == "rr" else n(cr["docs_per_s"])),
-                     "—", "—", "—", "—", "—", "—", (f"{n(cr['idle_core_equivalents'], 3)} {DAG}" if arm == "rr" else n(cr["idle_core_equivalents"], 3))])
+                     "—", "—", "—", "—", "—", "—", "—", (f"{n(cr['idle_core_equivalents'], 3)} {DAG}" if arm == "rr" else n(cr["idle_core_equivalents"], 3))])
         out += [f"### {label}", ""]
         out += table(["K", "Span docs/s", "Batches", "Batch wall median / max, s",
-                      f"Batch holding {STRAGGLER}: wall (spare to 1,800 s)", "Batches died", "Documents lost",
+                      f"Batch holding {STRAGGLER}: wall (spare to 1,800 s)", "That batch's share of the span",
+                      "Batches died", "Documents returned / lost / numerator of docs/s §",
                       "Peak engine anon, bracketed ¶", "Idle core-equiv."], rows)
         out += [""] + ([f"{DAG} {CAVEAT}", ""] if arm == "rr" else [])
         out += [f"{PARA} cgroup v2 keeps no anon high-water mark, so peak anon RSS is bracketed, not read: at least the "
-                "anon at the window's close, at most the container's total high-water `memory.peak`.", ""]
+                "anon at the window's close, at most the container's total high-water `memory.peak`. No memory was "
+                "sampled during a leg, so no statement about how memory moved with K is made.",
+                "§ Returned = documents with content + content outcomes (no text, parse failed); lost = deadline losses "
+                "+ other failures. docs/s divides the documents WITH CONTENT (the third number) by the span.", ""]
         out += ["<details><summary>Per-batch wall times, s (batch index: wall)</summary>", ""] + per_batch + ["", "</details>", ""]
+    k1 = {arm: F["stage4_envelope"].get(f"{arm}_k1024", {}).get("documents") for arm in ("rr", "li")}
+    if k1["rr"] and k1["li"]:
+        out += [f"**K=1,024, stated plainly.** RocketRide returned {n(k1['rr']['returned'])} documents "
+                f"({n(k1['rr']['numerator_with_content'])} with content, {n(k1['rr']['content_outcome'])} content outcomes) and "
+                f"lost {n(k1['rr']['lost'])} to the deadline {DAG}; LlamaIndex returned {n(k1['li']['returned'])} "
+                f"({n(k1['li']['numerator_with_content'])} with content, {n(k1['li']['content_outcome'])} content outcomes) and lost "
+                f"{n(k1['li']['lost'])}. Each arm's docs/s divides its documents with content — "
+                f"{n(k1['rr']['numerator_with_content'])} and {n(k1['li']['numerator_with_content'])} — by its span.", ""]
+    out += fd_note(s4, F)
+    out += straggler_order(s4, a, F)
     dec = load(s4 / "envelope_k512_decision.json", "envelope_k512_decision", required=False)
     if dec:
         F["k512_audit"] = dec
@@ -338,6 +379,64 @@ def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
             f"{cc.get('li', {}).get('verdict')}); across arms they differ, the null control that shows the "
             "comparator can see a difference.", "",
             f"Source: `{s4}/analysis_docs.json` → ranking.by_k, envelope_batch_report, check_C_content.", ""]
+    return out
+
+
+def fd_note(s4: Path, F: Dict[str, Any]) -> List[str]:
+    """R6: the two K=1,024 legs ran under different open-file limits; say so, with what each angle shows."""
+    e11 = s4 / "e11_rr_k1024" / "perdoc_rr_k1024_env.jsonl"
+    emfile = 0
+    reasons: Dict[str, int] = {}
+    for x in e11.read_text().splitlines():
+        if x.strip():
+            r = json.loads(x)
+            rs = str(r.get("reason"))
+            reasons[rs] = reasons.get(rs, 0) + 1
+            if "OSError" in rs or "Errno 24" in rs or "Too many open files" in rs:
+                emfile += 1
+    exp = find_export(s4, "e12b_li_k1024")
+    lim = (json.loads(exp.read_text())["data"]["posture"].get("driver_open_files") if exp else None) or {}
+    F["fd_note"] = {"e11_open_file_errors": emfile, "e11_reasons": reasons, "e12b_driver_open_files": lim}
+    return [f"**The two K=1,024 legs ran under different open-file limits.** RocketRide's e11 ran before the fix "
+            "(register 44), at the box's default soft limit of 1,024 descriptors; LlamaIndex's e12b ran at "
+            f"{n(lim.get('soft'))} (recorded in its export). No descriptor count was sampled during e11, so its peak is not "
+            f"measured. Its records carry {n(emfile)} open-file errors — every loss is `batch_error:TimeoutError`. SOURCE, "
+            "not measurement: the SDK opens a file only after the engine grants its pipe (`rocketride/mixins/data.py:651`), "
+            "and the engine grants at most 64 per token (`data_conn.py:138,477`), so RocketRide's open files stay near 64 "
+            "plus its one websocket, whatever K.", ""]
+
+
+def straggler_order(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
+    """R3: where 039_039660.pdf sat in each leg's submission order, and what that order did to the span."""
+    legs = [("p1_rr_cont32", "rr", "refc32_main"), ("p2_li_cont", "li", "refc32_main"), ("p3_rr_k128", "rr", "k128_main"),
+            ("p4_li_k128", "li", "k128_main"), ("e7_rr_k256", "rr", "k256_env"), ("e8_li_k256", "li", "k256_env"),
+            ("e9_rr_k512", "rr", "k512_env"), ("e10_li_k512", "li", "k512_env"), ("e11_rr_k1024", "rr", "k1024_env"),
+            ("e12b_li_k1024", "li", "k1024_env")]
+    rows, F["straggler_order"] = [], {}
+    tail = (a.get("check_E_tail") or {}).get("per_leg") or {}
+    for launch, arm, leg in legs:
+        f = s4 / launch / f"perdoc_{arm}_{leg}.jsonl"
+        rs = [json.loads(x) for x in f.read_text().splitlines() if x.strip()]
+        order = sorted(rs, key=lambda r: (r["submit_ns"], r["doc"]))
+        idx = next(i for i, r in enumerate(order) if r["doc"] == STRAGGLER) + 1
+        me = next(r for r in rs if r["doc"] == STRAGGLER)
+        sb = tail.get(f"{launch}/{leg}", {}).get("span_set_by", {})
+        F["straggler_order"][launch] = {"sent_at": idx, "of": len(rs), "batch": me.get("batch"),
+                                        "held_s": round((me["completion_ns"] - me["submit_ns"]) / 1e9, 1),
+                                        "set_the_span": sb.get("doc") == STRAGGLER}
+        d = (lambda x: f"{x} {DAG}") if arm == "rr" else (lambda x: x)
+        rows.append([launch, d(f"{n(idx)} of {n(len(rs))}"), "—" if me.get("batch") is None else f"#{me['batch']}",
+                     d(n(F["straggler_order"][launch]["held_s"], 1)), "yes" if sb.get("doc") == STRAGGLER else f"no — `{sb.get('doc')}`"])
+    out = [f"**Where `{STRAGGLER}` sat in each leg's submission order** (R3). Every leg sends the slice in the same "
+           "fixed order (the slice's sha256 order), so the document is sent at the same position in every leg:", ""]
+    out += table(["Leg", "Sent at", "Batch", "Held, s", "Set the span?"], rows)
+    p1 = F["straggler_order"]["p1_rr_cont32"]
+    from_last = p1["of"] - p1["sent_at"] + 1
+    out += ["", f"**The span is order-dependent.** `{STRAGGLER}` is the {n(from_last)}th document from the end of the order (position {n(p1['sent_at'])} of "
+            f"{n(p1['of'])}); on RocketRide it is then held {n(p1['held_s'], 1)} s {DAG}, so it outlasts the rest of the run and sets "
+            "the span of the continuous leg, and on batched legs it is in the last batch at every K. Sent early, that hold "
+            "would overlap the bulk of the run and the span would be set by the bulk. The span with it dropped from both arms (§1) and the p99 diagnostic are the "
+            "order-robust views; the span itself is a property of this order as much as of the arm.", ""]
     return out
 
 
@@ -364,7 +463,8 @@ def video_stage4(s4: Path, smoke: Path, s3b: Path, F: Dict[str, Any]) -> List[st
     lp = video_posture_text(s4 / "p5_li_video" / "li_k16", "s4_video_li_preflight")
     rp = video_posture_text(s4 / "p6_rr_video" / "rr_k16", "s4_video_rr_preflight")
     F["stage4_video"]["posture"] = {"li": lp, "rr": rp}
-    rows = [["Posture, read back in-process", f"{li.get('posture')}: {lp['text']}", f"{rr.get('posture')}: {rp['text']}"],
+    rows = [["Posture, read back in-process", f"{li.get('posture')}: {lp['text']}",
+             f"out of the box — {rr.get('posture')}: {rp['text']}"],
             ["Videos in flight, K", "16", "16"],
             ["Throughput, frames/s", n(li["frames_per_s"], 3), "**RANKING ONLY** — see rule below" if fired else n(rr["frames_per_s"], 3)],
             ["Engine CPU, cores (cgroup)", n(li["effective_cores"], 3), n(rr["effective_cores"], 3)],
@@ -465,6 +565,13 @@ def smoke_scale(s3b: Path, F: Dict[str, Any]) -> List[str]:
                 "dropped before the cold leg; every Stage 4 leg is prewarmed.", ""]
         out += table(["Arm", "Cell", "Warm runs, docs/s", "Cold run, docs/s", "Cold vs warm mean"], crows) + [""]
     out += [f"Source: `{s3b}/analysis_docs_384.json` (ranking, noise_floor, check_G3b_unit_sweep, check_G5a_cache_effect).", ""]
+    prov = load(s3b / "provenance_check.json", "s3b_provenance", required=False)
+    if prov:
+        F["provenance_s3b"] = prov
+        out += [f"**Provenance of these analyses** (R7): {prov['verdict']}. The misfiled `shake_rr` export names "
+                f"`{prov['misfiled_copy']['run_dir_it_names']}` and matched no launch; the check's null control (a planted "
+                "export naming another campaign) was rejected. Source: "
+                f"`{s3b}/provenance_check.json`.", ""]
     return out
 
 
@@ -576,7 +683,23 @@ def answers(F: Dict[str, Any]) -> List[str]:
                      f"beyond its spread, {(c.get('hypothesis_test') or {}).get('reading', '').split(' — ')[0]}.")
     d = s5.get("s5d")
     if d:
-        lines.append("S5-D (INSTRUMENTED): no admission queue — the time is inside the pipeline, the long holds in parse.")
+        lines.append("S5-D (INSTRUMENTED): no admission queue — the time is inside the pipeline, the long holds in parse; "
+                     "the parse-concurrency read of the same stamps finds those holds are the documents' own Tika cost, "
+                     "not a parse bound (§6).")
+    ef = s5.get("s5ef")
+    if ef:
+        m = (ef.get("s5e") or {}).get("docs_per_s") or {}
+        if "readable" in m:
+            cpu = (ef.get("s5e") or {}).get("cpu_s_per_doc") or {}
+            lines.append("S5-E (thread variables unset vs = 1, docs): " + (
+                ("unset is " + ("slower" if m["unset_vs_env1"] < 0 else "faster") + " and costs "
+                 + ("more" if (cpu.get("unset_vs_env1") or 0) > 0 else "less") + " CPU per document — READABLE beyond every "
+                 "noise measure; the banked docs posture, not the out-of-the-box one, is the faster RocketRide docs posture")
+                if m["readable"] else "the difference is NOT readable against the noise") + " (§6).")
+        f5 = ef.get("s5f") or {}
+        if f5.get("c5") and f5.get("c5_over_same_session_c32") is not None:
+            lines.append(f"S5-F (SDK default-5 equivalent, C=5): {n(f5['c5_over_same_session_c32'], 3)} of this session's "
+                         f"C=32 rate {DAG} (§6).")
     if lines:
         out += ["**Stage 5, segregated** (§6; no Stage 5 figure appears beside a baseline one):", ""] + [f"- {x}" for x in lines] + [""]
     return out
@@ -663,6 +786,20 @@ def self_audit(F: Dict[str, Any]) -> List[str]:
     if d:
         p = d.get("perturbation_vs_leg1") or {}
         nulls.append(f"S5-D instrument against leg 1: {(p.get('relative') or 0) * 100:+.2f}% — {p.get('verdict')}")
+    osf = s5.get("output_shift")
+    if osf:
+        for name, key in (("output-shift comparator, default vs its replicate", "null_control_default_vs_its_replicate"),
+                          ("output-shift comparator, patched B=1 vs default", "null_control_patched_B1_vs_default")):
+            c = osf[key]
+            nulls.append(f"{name}: {c['chunk_identical_videos']}/{c['videos']} chunk-identical, score shift {c['max_abs_score_delta_at_least']}")
+    prov = F.get("provenance_s3b")
+    if prov:
+        nulls.append(f"Stage 3b provenance: a planted export naming another campaign rejected — "
+                     f"{prov.get('null_control', {}).get('planted_export_for_another_campaign_rejected')}")
+    ef = s5.get("s5ef")
+    if ef:
+        nulls.append(f"S5-E/S5-F posture read-back: legs excluded for a read-back that contradicts their posture — "
+                     f"{json.dumps([x['leg'] for x in ef.get('excluded') or []])}")
     out = ["## SELF-AUDIT", "",
            "- **HYPOTHESIS.** Pre-registered, per stage: batch barriers cost a wait for each batch's slowest document "
            "(§2); intra-op width can widen one token (S5-A); batched detection is not bit-identical (S5-B); "
@@ -709,6 +846,12 @@ def pending(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
     items += ["No 10k-scale replicate exists for any K or C: the full-scale K ranking borrows the smoke-slice floors "
               "(pre-registered in `envelope_floors.json`) and is therefore an ordering, not a resolved ranking.",
               "The 168-video RocketRide leg ran once; its absolute frames/s is not quotable (leg-6 rule).",
+              "WITHDRAWN: the earlier RocketRide docs caveat, a posture cost computed ACROSS harness sessions (Stage 3's "
+              "24-core cpuset against Stage 3b's 32 vCPU); the caveat now carries S5-C's same-harness figures (register 46).",
+              "WITHDRAWN: an in-session statement that engine memory was flat with K. No memory was sampled during a leg; "
+              "the cgroup gives a bracket only (§2).",
+              "CORRECTED: an earlier statement (in-session and register 45) that one S5-B frame changed its label set. No label "
+              "or count changed: one detection's score crossed the edge of Tier 2's threshold band (§6, register 47).",
               "WITHDRAWN interim Stage 3b figures, reported in-session from scratch analyses that pooled unlike "
               "legs: the K=128 means (pooled the cold-cache leg with the warm runs) and LlamaIndex's C=32 "
               "cold-vs-warm delta (pooled three worker counts against a 24-worker cold leg). §5 carries the "
@@ -802,6 +945,41 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
                     "optimisation (the ruling), and carries no timing.** The pre-check passed Tier 2 on "
                     f"{n(pre.get('frames'))} frames of one video; end to end, over every frame of the 16 videos, the same "
                     "criterion failed — the pre-check licensed the build and the legs, never the claim.", ""]
+        osf = load(s5 / "analysis_output_shift.json", "s5_output_shift", required=False)
+        if osf:
+            F["stage5"]["output_shift"] = osf
+            cmp_rows = []
+            for name, c in ([("null: default vs its own replicate", osf["null_control_default_vs_its_replicate"]),
+                             ("null: patched B=1 vs default", osf["null_control_patched_B1_vs_default"])]
+                            + [(f"S5-A T={T} vs default (TUNED POSTURE)", c) for T, c in osf["s5a_thread_width_vs_default"].items()]
+                            + [(f"S5-B B={B} vs patched B=1 (PATCHED-ENGINE)", c) for B, c in osf["s5b_batch_vs_patched_B1"].items()]):
+                cmp_rows.append([name, f"{n(c['chunk_identical_videos'])}/{n(c['videos'])}",
+                                 f"{n(c['frames_label_multiset_identical'])}/{n(c['frames'])}",
+                                 f"{c['max_abs_score_delta_at_least']:.2e}"])
+            ex = osf.get("s5b_tier2_label_set_failures_explained") or {}
+            meas = {B: x["tier2_failing_frames_on_measured_videos"] for B, x in ex.items()}
+            warm = {B: x["tier2_failing_frames_on_warm_up_videos"] for B, x in ex.items()}
+            lsf = [(B, r) for B, x in ex.items() for r in x["label_set_failures"]]
+            changed = [r for _, r in lsf if r["any_label_or_count_changed"]]
+            out += ["**The stop, read as a measurement** (item 4). One comparator for every knob — per-frame label multisets "
+                    "and scores from the driver's own records, 16 measured videos; scores paired in sorted order, so each "
+                    "figure is a lower bound:", ""]
+            out += table(["Leg", "chunk-identical videos", "frames with every label kept", "score shift, at least"], cmp_rows) + [""]
+            out += ["A thread-width change alone (S5-A) moves scores by at least "
+                    f"{min(c['max_abs_score_delta_at_least'] for T, c in osf['s5a_thread_width_vs_default'].items() if c['chunk_identical_videos'] != c['videos']):.1e} "
+                    "with every label kept; batching (S5-B) moves them by up to "
+                    f"{max(c['max_abs_score_delta_at_least'] for c in osf['s5b_batch_vs_patched_B1'].values()):.1e}, also with every label kept "
+                    "on the measured frames. The pre-registered Tier 2 tolerance (1e-05 score, 1e-03 px) sits below both; the stop "
+                    "is that criterion's, and it stands.",
+                    f"Tier 2 failing frames on the 16 measured videos: {', '.join(f'B={B}: {n(v)}' for B, v in meas.items())}; on the two "
+                    f"warm-up videos the taps also cover: {', '.join(f'B={B}: {n(v)}' for B, v in warm.items())}. "
+                    + (f"The taps' {len(lsf)} \"label set or count differs\" failure(s) changed no label and no count: "
+                       + "; ".join(f"B={B} `{r['video']}` frame {r['frame']}, "
+                                   + ", ".join(f"{d_['label']} {d_['score_B1']} → {list(d_.values())[2]}" for d_ in r["detections_crossing_the_band_edge"])
+                                   for B, r in lsf)
+                       + " — a score crossing the edge of the ±0.001 band around the 0.3 threshold, which the rule filters on each "
+                       "side by that side's own scores." if lsf and not changed else ""), "",
+                    f"Source: `{s5}/analysis_output_shift.json`.", ""]
         rows = [[f"B={B}", "PATCHED-ENGINE", n(r["frames_per_s"], 3), n(r["effective_cores"], 3), pct(r["cpu_util_of_box"]),
                  n(r["idle_core_equivalents"], 3),
                  ", ".join(f"{k.replace('_bytes', '')} {v / 1024:.1f} GiB" for k, v in (r.get("engine_memory_mb") or {}).items()
@@ -844,11 +1022,11 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
             out += table(["Arm", "Cell against (a), unconstrained 32 vCPU", "CPU-s/doc", "docs/s", "CPUs"], comp) + [""]
         rb = (c.get("rocketride") or {}).get("b_0-23")
         if rb:
-            out += [f"**Beside the caveat.** The {DAG} caveat's figures compare Stage 3 (24-core cpuset, driver pinned to "
-                    "CPUs 24-31) with Stage 3b (unconstrained, driver unpinned). S5-C measures the same two cpusets under ONE "
-                    f"harness: RocketRide at 0-23 against 32 vCPU moves {rb['docs_per_s_vs_a'] * 100:+.1f}% in docs/s and "
-                    f"{rb['cpu_s_per_doc_vs_a'] * 100:+.1f}% in CPU-s/doc. The caveat is carried verbatim as ruled; this "
-                    "is its single-harness counterpart.", ""]
+            out += [f"**The caveat is this row.** RocketRide at cpuset 0-23 against 32 vCPU, same harness: "
+                    f"{rb['docs_per_s_vs_a'] * 100:+.1f}% docs/s, {rb['cpu_s_per_doc_vs_a'] * 100:+.1f}% CPU-s/doc — the {DAG} caveat on "
+                    "every RocketRide docs figure. It replaces an earlier caveat that compared Stage 3 (24-core cpuset, an "
+                    "earlier harness session) with Stage 3b (32 vCPU, a later one); that cross-session figure is WITHDRAWN "
+                    "(register 46).", ""]
         rows = []
         for name, cell in (c.get("cells") or {}).items():
             if not cell:
@@ -907,6 +1085,114 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
                     f"{n(ph['leg1']['held_s'], 1)} s in leg 1, {n(ph['instrumented']['held_s'], 1)} s instrumented); the same "
                     f"deadline loss in both ({', '.join(f'`{x}`' for x in ph['instrumented']['deadline_losses'])}).", ""]
         out += [f"Source: `{s5}/analysis_s5d_funnel.json`.", ""]
+        pc = load(s5 / "analysis_s5d_parse_concurrency.json", "s5d_parse_concurrency", required=False)
+        if pc:
+            F["stage5"]["s5d_parse"] = pc
+            ip, pl, th = pc["in_parse_documents"], pc["in_pipeline_documents"], pc["threads_measured"]
+            sm, bd = pc["small_documents"], pc["big_documents"]
+            holds = pc["long_parse_holds"]
+            dev = [abs(h["parse_s"] / h["stage4_leg1_rr_end_to_end_s"] - 1) for h in holds
+                   if h.get("stage4_leg1_rr_end_to_end_s") and h["stage4_leg1_rr_end_to_end_s"] < 1800]
+            thru = sorted(h["documents_through_parse_inside_its_interval"] for h in holds)
+            li_max = max((h["stage4_li_c32_end_to_end_s"] or 0) for h in holds) if holds else None
+            big_parse = max((x["parse_s"] for x in pc["big_documents_by_stage"]), default=None)
+            big_embed = [x["split_end_to_embed_end_s"] for x in pc["big_documents_by_stage"]]
+            out += ["**Parse concurrency inside one token** (item 5 — POST-HOC on the S5-D stamps; laptop only):", ""]
+            out += table(["Measured, time-weighted over the leg", "max", "p50", "p95"],
+                         [["documents in parse (waiting or parsing)", n(ip["max"]), n(ip["p50"]), n(ip["p95"])],
+                          ["documents in the pipeline", n(pl["max"]), n(pl["p50"]), n(pl["p95"])]]) + [""]
+            out += [f"- One process carries every stamp, on {n(th['distinct_threads_by_stage'].get('after_parse'))} threads per stage; "
+                    f"{n(th['documents_whose_parse_and_embed_ran_on_one_thread'])} of {n(th['documents_with_a_parse_stamp'])} documents "
+                    "ran parse and embed on the same thread (the rest are the content outcomes, which have no embed stamp). "
+                    f"Up to {n(th['distinct_threads_holding_a_document_in_parse']['max'])} threads held a document in parse at a "
+                    "sampled instant (every 25th admission; a lower bound on the maximum).",
+                    f"- The {n(bd['n'])} documents of {n(bd['pages_at_least'])}+ pages spent at most {n(big_parse, 1)} s in parse and "
+                    f"{n(min(big_embed), 1)}-{n(max(big_embed), 1)} s in embed; some such document was in parse for "
+                    f"{n(bd['seconds_with_any_in_parse'], 1)} s of the leg ({pct(bd['share_of_window'])}).",
+                    f"- Of {n(sm['n'])} documents under {n(sm['pages_below'])} pages, {n(sm['n_overlapping_a_big_parse'])} were in parse "
+                    f"while a {n(bd['pages_at_least'])}+ page document was — {pct(sm['share_of_small_parse_time_overlapping'])} of their parse time; median parse "
+                    f"{n(sm['parse_s_with_overlap']['p50'], 2)} s with overlap, {n(sm['parse_s_without_overlap']['p50'], 2)} s without.",
+                    f"- The {n(len(holds))} documents held in parse over 300 s reproduce: each one's parse time here is within "
+                    f"{pct(max(dev)) if dev else '—'} of its end-to-end time in Stage 4 leg 1, and each took at most {n(li_max, 1)} s "
+                    f"end to end on LlamaIndex. While each sat in parse, between {n(thru[0])} and {n(thru[-1])} other documents "
+                    f"entered and left parse; the fewest during `{min(holds, key=lambda h: h['documents_through_parse_inside_its_interval'])['doc']}`'s, "
+                    "which is sent near the end of the order.", "",
+                    "**The hypothesis — parse effectively bounded per token, small documents waiting behind large ones inside "
+                    "parse — is not supported on these stamps.** Thousands of documents pass through parse while a slow one "
+                    "sits there, so no lock holds parse for a whole document at a time; the large documents are in embed, not "
+                    "parse; and the long "
+                    "parse holds are the documents' own Tika cost, repeated run to run and absent on pypdf. What the stamps "
+                    f"cannot say: {pc['cannot_say']}.", "",
+                    "**SOURCE, not measurement — what bounds concurrency inside one task process:** "
+                    + pc["SOURCE_not_measurement"]["per_token_processing_bound"] + " "
+                    + pc["SOURCE_not_measurement"]["parse_itself"] + " "
+                    + pc["SOURCE_not_measurement"]["tika_config"], "",
+                    f"Source: `{s5}/analysis_s5d_parse_concurrency.json`.", ""]
+    return out
+
+
+def stage5ef(d: Optional[Path], F: Dict[str, Any]) -> List[str]:
+    out = ["### S5-E — the six thread variables unset against = 1, at one token, docs (384-document slice)", ""]
+    if d is None:
+        return out + ["PENDING / NOT RUN.", "", "### S5-F — SDK default-5 equivalent (PR #1895 / TypeScript maxConcurrent)", "",
+                      "PENDING / NOT RUN.", ""]
+    r = load(d / "analysis_s5ef.json", "s5ef", required=False)
+    if not r:
+        return out + ["PENDING — no analysis file.", ""]
+    F["stage5"] = F.get("stage5") or {}
+    F["stage5"]["s5ef"] = r
+    e = r["s5e"]
+    tt = e.get("torch_threads_in_process") or {}
+    out += [f"RocketRide, continuous C=32, two runs per posture, interleaved; torch intra-op threads read INSIDE the task "
+            f"process: = 1 → {tt.get('env1')}, unset → {tt.get('unset')}. Excluded legs: {json.dumps(r.get('excluded'))}. "
+            "Pre-registered in `preregistration.json` before any leg ran.", ""]
+    rows = []
+    for metric, label in (("docs_per_s", "span docs/s — PRIMARY"), ("docs_per_s_to_p90", "docs/s to p90 — pre-registered diagnostic"),
+                          ("cpu_s_per_doc", "CPU-s per document")):
+        m = e.get(metric) or {}
+        a, b = m.get("env1"), m.get("unset")
+        if not a or not b:
+            rows.append([label, "—", "—", "—", "—", "—"]); continue
+        rows.append([label, f"{', '.join(n(x) for x in a['runs'])} (spread {pct(a['spread'])}) {DAG}",
+                     f"{', '.join(n(x) for x in b['runs'])} (spread {pct(b['spread'])}) {DAG}",
+                     f"{m['unset_vs_env1'] * 100:+.2f}% {DAG}", pct(m["tolerance"]),
+                     ("**readable**" if m["readable"] else "not readable") + f"; {m['vs_0_82_floor']} the 0.82% floor"])
+    out += table(["Metric", "= 1: runs (spread)", "unset: runs (spread)", "unset vs = 1", "tolerance ‖", "Reading"], rows)
+    out += ["", f"{DAG} {CAVEAT}", "‖ the largest of the 0.82% Stage 3b floor, each posture pair's own spread, and S5-C's "
+            "null-control spread (same slice) — an effect is read only beyond all of them.", ""]
+    s5c = ((F.get("stage5") or {}).get("s5c") or {}).get("cells") or {}
+    a1, a2 = s5c.get("rr_a1"), s5c.get("rr_a2")
+    e1 = (e.get("docs_per_s") or {}).get("env1")
+    if a1 and a2 and e1:
+        prev = (a1["docs_per_s"] + a2["docs_per_s"]) / 2
+        F["stage5"]["s5ef_cross_session"] = {"s5c_same_cell_mean": prev, "s5e_env1_mean": e1["mean"], "relative": e1["mean"] / prev - 1}
+        out += [f"**Cross-session, labelled so.** S5-C ran the same cell — RocketRide, C=32, = 1, unconstrained, this slice — "
+                f"in an earlier session: {n(a1['docs_per_s'])} and {n(a2['docs_per_s'])} docs/s {DAG}. This session's = 1 runs average "
+                f"{n(e1['mean'])} {DAG}: {(e1['mean'] / prev - 1) * 100:+.1f}%, after a box restart and with every leg prewarmed. A "
+                "difference between sessions this large is why a posture cost measured ACROSS sessions was withdrawn from "
+                "the caveat (register 46), and why S5-E compares postures only inside one session.", ""]
+    f5 = r["s5f"]
+    out += ["### S5-F — SDK default-5 equivalent (PR #1895 / TypeScript maxConcurrent)", "",
+            "RocketRide, continuous C=5, the banked docs posture (= 1), two runs, same session as S5-E. Before it ran, the "
+            "source it rests on was read and recorded (SOURCE, not measurement): the installed Python SDK's `send_files` "
+            "gathers one coroutine per file with no client bound (`rocketride/mixins/data.py:719-725`), each waiting in "
+            "`pipe.open()` for the engine (`data.py:635-638`); our continuous driver sends each document with "
+            "`client.send()` under `asyncio.Semaphore(C)` (`working/scripts/exp_batchsize_sweep.py:651,656,661`). So C=5 "
+            "is the client-side bound the TypeScript SDK's default applies, reproduced with the Python primitive; the "
+            "batch-K labels are restated in §2 for the engine's own bound.", ""]
+    c5 = f5.get("c5")
+    if c5:
+        cs = f5.get("cross_session_stage3b_curve") or {}
+        out += table(["", "docs/s"],
+                      [["C=5, runs (spread)", f"{', '.join(n(x) for x in c5['runs'])} ({pct(c5['spread'])}) {DAG}"],
+                       ["C=5, mean", f"{n(c5['mean'])} {DAG}"],
+                       ["C=32 at = 1, this session (S5-E), mean", f"{n(f5.get('same_session_c32_env1_mean'))} {DAG}"],
+                       ["C=5 / C=32, same session", f"{n(f5.get('c5_over_same_session_c32'), 3)} {DAG}"],
+                       ["Stage 3b, C=4 / C=8 / C=32 — CROSS-SESSION, ranking context only",
+                        " / ".join(n(cs.get(k)) for k in ("4", "8", "32")) + f" {DAG}"]]) + ["", f"{DAG} {CAVEAT}", ""]
+        c5p = f5.get("c5_to_p90") or {}
+        out += [f"docs/s to p90 at C=5 (pre-registered diagnostic): {', '.join(n(x) for x in c5p.get('runs', []))}.", ""]
+    out += [f"Source: `{d}/analysis_s5ef.json`.", ""]
     return out
 
 
@@ -917,6 +1203,7 @@ def main() -> int:
     ap.add_argument("--s4", type=Path, default=RES / "batchsize_s4_20260921T013303Z")
     ap.add_argument("--s4-analysis", type=Path, default=None)
     ap.add_argument("--s5", type=Path, default=None)
+    ap.add_argument("--s5ef", type=Path, default=None, help="the S5-E/S5-F campaign directory")
     ap.add_argument("--out-md", type=Path, required=True)
     ap.add_argument("--out-json", type=Path, required=True)
     ap.add_argument("--supersedes", type=Path, default=None,
@@ -925,9 +1212,22 @@ def main() -> int:
     for p in (a.out_md, a.out_json):
         if p.exists():
             print(f"REFUSED: {p} exists — append-only"); return 3
+    global CAVEAT
+    if a.s5 is None:
+        print("REFUSED: the ruled caveat is computed from S5-C; pass --s5"); return 3
+    c5 = load(a.s5 / "analysis_s5c_smt.json", "s5c_for_caveat")
+    rb = c5["rocketride"]["b_0-23"]
+    sp = c5["null_control"]["spread"]
+    computed = (f"32 vCPU unconstrained per Ruling A; same-harness cpuset 0-23 measured {rb['docs_per_s_vs_a'] * 100:+.1f}% "
+                f"throughput, {rb['cpu_s_per_doc_vs_a'] * 100:+.1f}% CPU-s/doc (S5-C; its null control failed at {sp * 100:.2f}%, "
+                f"so differences under {sp * 100:.2f}% are unreadable)")
+    if computed != CAVEAT_RULED:
+        print(f"REFUSED: the caveat computed from S5-C differs from the ruled text:\n  computed: {computed}\n  ruled:    {CAVEAT_RULED}")
+        return 3
+    CAVEAT = computed
     s4a = load(a.s4_analysis or (a.s4 / "analysis_docs.json"), "s4_docs")
     F: Dict[str, Any] = {}
-    md = ["# Batch-size optimisation — RocketRide (one token, out of the box) and LlamaIndex, GovDocs PDFs and AMI video", "",
+    md = ["# Batch-size optimisation — RocketRide at one token and LlamaIndex, GovDocs PDFs and AMI video", "",
           f"Generated {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())} by `working/scripts/batchsize_final_report.py` "
           "from committed analysis artifacts; every table names its source, and `batchsize_final_summary.json` "
           "records each input's sha256. Box: one c7i.8xlarge, 32 vCPUs, one workload at a time.", ""]
@@ -941,11 +1241,15 @@ def main() -> int:
     body += smoke_video(a.smoke, a.s3b, F)
     body += checks(s4a, a.s4, F)
     body += stage5(a.s5, F)
+    body += stage5ef(a.s5ef, F)
     if a.supersedes:
         prev = load(a.supersedes / "batchsize_final_summary.json", "superseded_summary")
-        same = json.dumps(prev.get("figures"), sort_keys=True) == json.dumps(F, sort_keys=True)
-        md[3:3] = [f"Supersedes `{a.supersedes}` — every figure identical: **{same}**"
-                   + (" (only the generated text around them changed)." if same else " — see the diff of the two JSON twins."), ""]
+        pf = prev.get("figures") or {}
+        same = json.dumps(pf, sort_keys=True) == json.dumps(F, sort_keys=True)
+        changed = sorted(k for k in set(pf) | set(F) if json.dumps(pf.get(k), sort_keys=True) != json.dumps(F.get(k), sort_keys=True))
+        md[3:3] = ["", f"Supersedes `{a.supersedes}` — every figure identical: **{same}**"
+                   + (" (only the generated text around them changed)." if same else
+                      f"; the figure groups that differ, computed from the two JSON twins: {', '.join(f'`{k}`' for k in changed)}.")]
     md += answers(F) + body + pending(a.s5, F) + self_audit(F)
     md += ["## Inputs", ""] + [f"- {k}: `{v}`" for k, v in sorted(INPUTS.items())] + [""]
     a.out_md.write_text("\n".join(md) + "\n")
