@@ -591,6 +591,19 @@ def checks(s4a: Dict[str, Any], s4: Path, F: Dict[str, Any]) -> List[str]:
     return out
 
 
+def jvm_note(c: Dict[str, Any]) -> List[str]:
+    """What the process snapshots say about where the JVM runs — read from the analysis, never assumed."""
+    procs = [p for n_, cell in (c.get("cells") or {}).items() if cell and n_.startswith("rr")
+             for p in (cell.get("processes_top") or [])]
+    names = sorted({p.get("name") for p in procs})
+    javas = [p for p in procs if p.get("name") in ("java", "jspawnhelper")]
+    if javas and all(p.get("name") == "jspawnhelper" for p in javas):
+        return ["In every RocketRide cell's snapshot the only JVM process is `jspawnhelper` (1 thread), the JVM's "
+                "spawn helper: there is no standalone `java` process, so the JVM runs inside the task process and its "
+                f"threads are in the task-process column. Processes seen: {', '.join(f'`{x}`' for x in names)}."]
+    return [f"Processes seen in the RocketRide snapshots: {', '.join(f'`{x}`' for x in names)}."]
+
+
 def pending(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
     out = ["## Not verified / pending", ""]
     items = []
@@ -701,8 +714,33 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
     else:
         F["stage5"]["s5c"] = c
         nc = c.get("null_control") or {}
-        out += [f"Null control (two unconstrained RocketRide runs): spread {pct(nc.get('spread'))} against the "
-                f"{pct(nc.get('floor'))} floor — {'PASS' if nc.get('PASS') else 'FAIL'}.", ""]
+        out += [f"**Null control, pre-registered** (two unconstrained RocketRide runs, span docs/s): "
+                f"{n(nc.get('rr_a1'))} and {n(nc.get('rr_a2'))}, spread {pct(nc.get('spread'))} against the "
+                f"{pct(nc.get('floor'))} floor — **{'PASS' if nc.get('PASS') else 'FAILED'}**."
+                + ("" if nc.get("PASS") else
+                   f" No between-cell difference below {pct(nc.get('spread'))} is interpretable."), ""]
+        ph = nc.get("POST_HOC_DIAGNOSTIC")
+        if ph:
+            sb = ph.get("span_set_by") or {}
+            out += [f"POST-HOC DIAGNOSTIC ({ph.get('label')}): the same pair agrees within "
+                    f"{pct(ph.get('cpu_s_per_doc_spread'))} on CPU-s/doc — the metric the hypothesis turns on — and "
+                    f"{pct(ph.get('docs_per_s_to_p90_spread'))} on docs/s to p90; both spans were set by "
+                    + ", ".join(f"`{v.get('span_set_by')}` (held {n(v.get('held_s'), 1)} s)" for v in sb.values() if v)
+                    + ", so the span gap is one document's finishing time.", ""]
+        comp = []
+        for arm, label in (("rocketride", "RocketRide"), ("llamaindex", "LlamaIndex")):
+            for cell, v in (c.get(arm) or {}).items():
+                comp.append([label, {"b_0-23": "(b) cpuset 0-23", "c_one_per_core": "(c) one vCPU per physical core"}.get(cell, cell),
+                             f"{v['cpu_s_per_doc_vs_a'] * 100:+.1f}%", f"{v['docs_per_s_vs_a'] * 100:+.1f}%", n(v.get("cpuset_cpus"))])
+        if comp:
+            out += table(["Arm", "Cell against (a), unconstrained 32 vCPU", "CPU-s/doc", "docs/s", "CPUs"], comp) + [""]
+        rb = (c.get("rocketride") or {}).get("b_0-23")
+        if rb:
+            out += [f"**Beside the caveat.** The {DAG} caveat's figures compare Stage 3 (24-core cpuset, driver pinned to "
+                    "CPUs 24-31) with Stage 3b (unconstrained, driver unpinned). S5-C measures the same two cpusets under ONE "
+                    f"harness: RocketRide at 0-23 against 32 vCPU moves {rb['docs_per_s_vs_a'] * 100:+.1f}% in docs/s and "
+                    f"{rb['cpu_s_per_doc_vs_a'] * 100:+.1f}% in CPU-s/doc. The caveat is carried verbatim as ruled; this "
+                    "is its single-harness counterpart.", ""]
         rows = []
         for name, cell in (c.get("cells") or {}).items():
             if not cell:
@@ -718,7 +756,9 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
                       "task-process threads", "JVM threads"], rows)
         out += ["", f"{DAG} {CAVEAT}", f"{DDAG} RocketRide under a declared cpuset — an S5-C diagnostic outside Ruling A, "
                 "never a baseline figure.", "",
-                f"Hypothesis test: {json.dumps(c.get('hypothesis_test'))}.", f"Verdict: **{c.get('verdict')}**.", "",
+                f"Hypothesis reading, at the tolerance the failed control leaves ({pct((c.get('hypothesis_test') or {}).get('tolerance_used'))}): "
+                f"**{(c.get('hypothesis_test') or {}).get('reading')}**. Analyser verdict: {c.get('verdict')}.", "",
+] + jvm_note(c) + ["",
                 f"Source: `{s5}/analysis_s5c_smt.json`.", ""]
     # S5-D
     fd = load(s5 / "analysis_s5d_funnel.json", "s5d", required=False)

@@ -77,6 +77,30 @@ def main() -> int:
     if spread > FLOOR_RR:
         rep["verdict"] = ("NULL CONTROL FAILED — two runs of the same unconstrained cell differ by more than "
                           "the floor; no between-cell difference below that spread is interpretable")
+    # POST-HOC, and labelled so: defined after the first run of this probe failed its pre-registered
+    # control (2026-09-21). It never changes the verdict above; it says what the failure is made of,
+    # and how the DISCRIMINATING metric (CPU-s/doc) replicates, so a reader can weigh differences far
+    # above the failed spread without the control being rescued by a metric chosen after the fact.
+    def span_and_p90(n: str):
+        f = sorted((d / n).glob("perdoc_*_refc32_*.jsonl"))
+        rows = [json.loads(x) for x in f[0].read_text().splitlines() if x.strip()] if f else []
+        if not rows:
+            return None
+        t0 = min(r["submit_ns"] for r in rows)
+        ok = sorted((r for r in rows if r.get("ok")), key=lambda r: r["completion_ns"])
+        k90 = int(0.9 * len(ok))
+        last = max(rows, key=lambda r: r["completion_ns"])
+        return {"docs_per_s_to_p90": round(k90 / ((ok[k90 - 1]["completion_ns"] - t0) / 1e9), 4),
+                "span_set_by": last["doc"], "held_s": round((last["completion_ns"] - last["submit_ns"]) / 1e9, 1)}
+    s1, s2 = span_and_p90("rr_a1"), span_and_p90("rr_a2")
+    rep["null_control"]["POST_HOC_DIAGNOSTIC"] = {
+        "label": "defined after the pre-registered control failed; does not change the verdict",
+        "cpu_s_per_doc_spread": round(abs(a1["cpu_s_per_doc"] - a2["cpu_s_per_doc"])
+                                      / ((a1["cpu_s_per_doc"] + a2["cpu_s_per_doc"]) / 2), 4),
+        "docs_per_s_to_p90_spread": (round(abs(s1["docs_per_s_to_p90"] - s2["docs_per_s_to_p90"])
+                                           / ((s1["docs_per_s_to_p90"] + s2["docs_per_s_to_p90"]) / 2), 4)
+                                     if s1 and s2 else None),
+        "span_set_by": {"rr_a1": s1, "rr_a2": s2}}
     a_cpd = (a1["cpu_s_per_doc"] + a2["cpu_s_per_doc"]) / 2
     a_dps = (a1["docs_per_s"] + a2["docs_per_s"]) / 2
     tol = max(FLOOR_RR, spread)
