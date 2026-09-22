@@ -625,6 +625,16 @@ def jvm_note(c: Dict[str, Any]) -> List[str]:
     return [f"Processes seen in the RocketRide snapshots: {', '.join(f'`{x}`' for x in names)}."]
 
 
+def register_entries(since: str = "2026-09-20") -> str:
+    """The register entries this campaign added, read from their own dated headings."""
+    import re
+    f = ROOT / "working" / "video" / "METHODOLOGY_REGISTER.md"
+    got = [int(m.group(1)) for m in re.finditer(r"^## (\d+)\. .*\(added (\d{4}-\d{2}-\d{2})\)", f.read_text(), re.M)
+           if m.group(2) >= since]
+    return (f"Entries {min(got)}-{max(got)} were added during this campaign, dated {since} or later"
+            if got else f"No register entry is dated {since} or later")
+
+
 def self_audit(F: Dict[str, Any]) -> List[str]:
     """The contract's closing block, built from the verdicts the analyses recorded — each null control
     with the way it came out, including the ones that failed."""
@@ -661,7 +671,7 @@ def self_audit(F: Dict[str, Any]) -> List[str]:
            "- **EVIDENCE.** Every figure above is read from the committed analysis named beside it; the inputs and "
            "their sha256s close this document.",
            "- **NULL CONTROLS**, each as it came out:"] + [f"  - {x}" for x in nulls] + [
-           "- **REGISTER.** Entries 37-44 were added during this campaign (working/video/METHODOLOGY_REGISTER.md).",
+           f"- **REGISTER.** {register_entries()} (working/video/METHODOLOGY_REGISTER.md).",
            "- **NOT VERIFIED.** Listed in the section above; nothing absent from these tables is claimed.",
            "- **GATES.** Every landing passed autoland's gates with an ls-remote read-back; the commits are on "
            "`feat/batch-size-optimization`.", ""]
@@ -909,6 +919,8 @@ def main() -> int:
     ap.add_argument("--s5", type=Path, default=None)
     ap.add_argument("--out-md", type=Path, required=True)
     ap.add_argument("--out-json", type=Path, required=True)
+    ap.add_argument("--supersedes", type=Path, default=None,
+                    help="an earlier summary directory this one replaces; whether every figure is identical is COMPUTED")
     a = ap.parse_args()
     for p in (a.out_md, a.out_json):
         if p.exists():
@@ -929,6 +941,11 @@ def main() -> int:
     body += smoke_video(a.smoke, a.s3b, F)
     body += checks(s4a, a.s4, F)
     body += stage5(a.s5, F)
+    if a.supersedes:
+        prev = load(a.supersedes / "batchsize_final_summary.json", "superseded_summary")
+        same = json.dumps(prev.get("figures"), sort_keys=True) == json.dumps(F, sort_keys=True)
+        md[3:3] = [f"Supersedes `{a.supersedes}` — every figure identical: **{same}**"
+                   + (" (only the generated text around them changed)." if same else " — see the diff of the two JSON twins."), ""]
     md += answers(F) + body + pending(a.s5, F) + self_audit(F)
     md += ["## Inputs", ""] + [f"- {k}: `{v}`" for k, v in sorted(INPUTS.items())] + [""]
     a.out_md.write_text("\n".join(md) + "\n")
