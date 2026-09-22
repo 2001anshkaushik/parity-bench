@@ -1322,3 +1322,311 @@ than rewritten from memory, which is entry 2's point in miniature.
 > against the document it certifies — never in the same command that
 > produces it.** Corrected in the next commit with the run that actually
 > completed and the comparison recorded.
+
+## 36. A field that names a role and measures a container — the per-cgroup basis quoted as an arm total (added 2026-09-09)
+
+> The collector's `service` role carries every instance's root pid since
+> `7c1cd81` — the RSS row sums all sixteen LlamaIndex process trees, which is
+> what that fix was for. Its cgroup rows did not follow: `_sample_cgroup`
+> resolves ONE cgroup path from the first tracked pid and caches it, on the
+> stated assumption that "every process in the tree is in the same container
+> cgroup" — true for one container, false for an arm made of sixteen. So
+> `peak_cgroup_anon_mb` and `peak_cgroup_current_mb` are one instance's, and
+> nothing in either name says so. The end-to-end report published
+> "RR 41× higher" from that pair: RocketRide's whole service (45.5 GiB, one
+> container) against one sixteenth of LlamaIndex's (1.08 GiB). The tell was in
+> the artifact all along — the same leg's `peak_cgroup_current_mb` reads
+> **exactly 3072.0 MiB**, one instance's `--memory 3g` cap, while the summed
+> RSS reads 22.7 GiB — and the figure checker had verified the number against
+> the artifact and passed it, because it checked arithmetic, not basis.
+> The class: **a per-container field aggregated by a per-arm role name is
+> wrong by one factor of N, silently, and a checker that recomputes a figure
+> does not check what the figure is of. Any cgroup-basis figure carries its
+> instance count, from the export's own container list
+> (`preleg_container_idle_cores`, full since `7c1cd81`), and is comparable
+> across arms only when both counts are 1.** Fixed in the report (the row
+> states the basis and drops the ratio; the RSS row carries the comparison)
+> and in `probe/end_to_end_figures_check.py`, which now reads the instance
+> count per arm and fails if a cross-arm ratio appears on a per-cgroup row —
+> null-controlled by reinstating the old row, which fails it. Standing
+> consequence for the AMI cells: a LlamaIndex balanced (8-container) peak is
+> quotable on the summed-RSS basis only, and only from a post-`7c1cd81` run.
+
+## 37. The fix that changed nothing, and the error message that pointed away from the cause (added 2026-09-20)
+
+> Stage 3b needed the docs arms' thread state read from INSIDE the task
+> process, so `env_probe` was appended to `product_pdf.pipe` — the
+> a3_env_torch pattern the video driver already uses, chosen precisely so
+> the read would not be the one-armed check of entry 33. It returned an
+> empty response. The refusal said *"the node did not run, or the response
+> lane is wrong"*, and a real defect was standing right there to explain
+> it: the node baked into `rr:patched` is an OLDER copy than the repo's
+> (md5 `cba71b35…` against `0a2850a0…`). The runner was taught to compare
+> md5 and replace a stale node rather than only an absent one; the copy
+> landed, the md5 matched — **and the probe still returned nothing.**
+>
+> The cause was the second clause of the message, not the first. The probe
+> appends `response_text` with `config.laneName = 'envprobe'`, and the
+> engine keys the response BY THE LANE NAME; the reader asked for
+> `out['text']`. `driver_video.py:723` reads `result.get('envprobe')` and
+> has always been right. The instrument was healthy and the reader was
+> wrong the whole time.
+>
+> Two rules. **A plausible defect found while diagnosing is not thereby the
+> cause** — the md5 mismatch was real, was worth fixing, and was not it;
+> entry 10's shape with the layers swapped, since here the loud finding was
+> the *innocent* one. The discipline that resolves it is the same one that
+> resolves entry 10: change one thing and require the outcome to move, and
+> when it does not, say so and keep the fix rather than quietly assuming it
+> worked. **An error message that enumerates causes must not bury the one
+> the author controls** — "the node did not run" names the remote, exotic
+> failure; "the response lane is wrong" names the local, likely one, and it
+> was second. The message now names the lane it looked under and the key it
+> got back, so the next reader is told which clause fired.
+
+## 38. The escape hatch lasted a day, and the helper that could never say "found" (added 2026-09-21)
+
+> Two corrections from one session, both caught by exercising a path rather than trusting it.
+>
+> **The flaky class, reverted.** `thread_settings_matched` flips PASS/FAIL with the laptop
+> engine, which answers on its port but launches a task subprocess only on some `use()` calls.
+> A strict baseline can hold such a test only as always-failing or always-passing, so gate 3
+> refused most landings either way. The first fix was a `flaky` class in the gate that accepted
+> either outcome given recorded evidence of both. Ansh reverted it the same day: the cause was
+> known, and a gate that accepts either result is a gate that no longer judges that test. The
+> replacement lives INSIDE the test: a deterministic precondition probes first with a pipeline
+> that shares nothing with the test's own probe (`probe_minimal.pipe`, webhook -> response_text,
+> no custom node). Unreachable -> a SKIP that names the reason, counted against the skip budget
+> (raised 2 -> 3, the down state's named skips). Reachable -> the test must pass, and a
+> JSONDecodeError after a successful precondition is a FAILURE, never a skip. Independence is the
+> point: had the precondition reused the env-probe call, a real regression that broke only that
+> path would have read as "unreachable" and skipped forever. Null controls, stubbed engine:
+> unreachable skips and never passes; reachable-and-mismatched fails; reachable-then-garbage
+> fails. The gate now REFUSES any baseline still carrying a `flaky` section. Residual, stated:
+> the laptop engine fails per `use()`, so a passing precondition does not guarantee the test's
+> own call — a FAIL in that window is real by the ruling, and its cure is the engine, not a
+> wider gate.
+>
+> **The helper that could never say "found".** `s3_wait.sh` was written to stop an expired
+> token reading as "not landed", and its auth path was proven on the live expired token. Its
+> FOUND path was not exercised — and when it was, it reported TIMEOUT for a prefix that existed.
+> Under `set -o pipefail`, `aws s3 ls | grep -q` lets grep exit on its first match; aws then
+> dies writing into the closed pipe (rc 120) and pipefail reports the match as a miss
+> (`PIPESTATUS=120 0`, confirmed by toggling pipefail alone). The fix captures the listing and
+> searches it with no pipe. The same shape sat in `autoland.sh`'s `blob_is_stub`
+> (`git cat-file | head -1 | grep -qF`, under `set -euo pipefail`) — benign only by the accident
+> that stubs are small enough to be written before head exits — and in a Stage 5 pre-check; both
+> were rewritten without the pipe. Rule: **a helper is not verified until every exit path has
+> been driven**, and **under pipefail, never pipe into an early-exiting reader** (`grep -q`,
+> `head`) — capture first. Kin to entry 27 (a green run is a claim about the paths it ran) and
+> entry 4 (an unexecuted string).
+
+## 39. Two conditions pooled as one noise floor — twice in one afternoon (added 2026-09-21)
+
+> Stage 3b needed each arm's run-to-run spread to judge its concurrency knee and its best batch
+> size. The analyser computed the spread over "every leg at the same K". The first read put the
+> service arm's floor at 27.7% — which made every "within noise" verdict mean nothing — because
+> one of the three K=128 legs was the COLD-CACHE leg, run on purpose under a different condition
+> and the slowest of the three. Partitioned by cache condition, the warm spread was ~10%. The
+> fix landed, and the very next read did it again one level up: continuous C=32 legs at 16, 24
+> and 32 service workers — a worker-count SWEEP — were pooled as repeats of one cell, putting a
+> configuration effect into the floor. Partitioned by arm shape as well, the floor fell to 9.87%.
+>
+> Rule: **a replicate is the same work under the same conditions — partition by every condition
+> the experiment varies (cache state, arm shape, slice, posture) before a spread is computed,**
+> and let the partitioning be driven by recorded fields (the leg's own page_cache block, the
+> launch export's worker count), never by directory names. Kin to entry 2 (a check must cross an
+> independence boundary; here the boundary was drawn in the wrong place) and to the Stage 3 slip
+> that pooled the 16-document shakedown with the 384-document slice — the same class a third
+> time, which is why the analyser now refuses mixed document counts outright.
+
+## 40. The deadline shaped the headline (added 2026-09-21)
+
+> The first full-corpus continuous leg of the batch-size campaign spent its last 28 minutes with
+> ONE document in flight — 039_039660.pdf, 39 pages, 3.3 MB, clean in the manifest — while the
+> host idled at 2.3 cores; it completed at 1,722 s and set the span, so span throughput read 2.34
+> docs/s where throughput to the 99th-percentile completion read 3.93. The document was not new.
+> Both banked RocketRide 10k runs had carried it as their FINAL event, each marked a failure after
+> exactly 300 s — the blast leg's send timeout. Their spans ended when the HARNESS gave up on it,
+> not when the engine finished it; the service arm had parsed it in 67 s. A deadline nobody
+> reported as part of the measurement had been quietly deciding how long the banked leg lasted.
+>
+> Two rules. **A deadline is a measurement condition** (entry 3): a change in the client deadline
+> changes what span throughput measures, and spans taken under different deadlines are not
+> comparable until it is stated. And **every span names the document that set it** — the
+> analyser now records, per leg, which document finished last, how long it was held and how far
+> past the 99th-percentile completion it ran, and reports a symmetric view with that document
+> dropped from both arms beside the primary span. The percentile throughput was defined after the
+> leg was seen (entry 34) and is labelled a post-hoc diagnostic, never the headline.
+
+## 41. The fix that held for the path it was tested on, and the watcher that would have read "hung" (added 2026-09-21)
+
+> On 2026-09-20 a video run meant for `<campaign>/video/rep` landed under a top-level `video/` S3
+> prefix, because its key kept only the last two path components. The fix mirrored the whole path
+> under `working/results/` as `${OUT##*/working/results/}`, and it was verified on the input it
+> was written for: the video runner, which insists on an ABSOLUTE out_dir. The same expression
+> was then copied into five more scripts, whose callers pass RELATIVE paths. The pattern needs a
+> "/" before `working`, so a relative path never matches and the whole path, `working/results/`
+> included, becomes the key. The Stage 4 envelope chain was launched with a relative campaign
+> dir, so its audit and completion files go under `batch-size-optimization/working/results/<campaign>/`,
+> not the campaign's prefix. A seventh derivation, the docs runner's `basename(dirname(run_dir))`,
+> would have put every Stage 5 docs leg, which sits two levels deep (`<campaign>/s5c/rr_b`), under
+> a top-level `s5c/` prefix. Found while writing the Stage 5 umbrella, before any Stage 5 leg ran.
+>
+> The consequence that mattered was the WAIT, not the data. The laptop was polling the campaign's
+> own prefix for `envelope_done.json`. The file would never have appeared there, and after 300
+> minutes `s3_wait.sh` would have exited 4, "genuine timeout with working credentials", which reads
+> as a hung envelope. It was the same failure shape as entry 38's helper that could never say
+> "found": absence at the place we look was being read as absence of the event. The wait was
+> stopped and re-armed on the prefix the RUNNING code would use. That prefix was read from the
+> script revision the box was executing, not from the revision in the repo.
+>
+> Handling: the running chain was not touched. Bash reads a script as it executes, so editing one
+> mid-run is its own hazard. Once the chain ends, its misplaced files are to be copied to the
+> campaign prefix as NEW objects, and the misplaced copies stay, because S3 under `ansh/` is
+> append-only. Rules:
+>
+> - **A derived key has one definition**, tested on every input shape its callers use
+>   (`working/harness/results_prefix.sh`, `test_results_prefix.py`). The test's null control runs
+>   the same cases through the old expression and must see it fail. A static guard refuses any
+>   script that uploads without the helper.
+> - **Derive and validate the key before measuring**, not at upload time. An upload that refuses
+>   at the end strands a run that has already been paid for.
+> - **Watch where the running code will write**, never where it should write.
+>
+> Kin to entry 27 (a green run is a claim about the paths it ran) and entry 38.
+
+## 42. The partition rule lived in one function, and two others grouped replicates their own way (added 2026-09-21)
+
+> Entry 39's rule is that a replicate is the same work under the same conditions. It was
+> implemented inside the ranking and the noise floor. Two other functions still grouped legs by
+> K alone:
+>
+> - the tail check's replicate spread;
+> - the G5(a) cache comparison.
+>
+> The second produced a figure that was reported. LlamaIndex's cold-cache leg at C=32 ran with
+> 24 workers, but it was compared with a warm mean that pooled the 16-, 24- and 32-worker legs of
+> the worker sweep. Like-for-like, the committed analysis gives -7.1%. The delta reported
+> in-session at Stage 3b is withdrawn and not repeated here. The tail check's spreads had also
+> pooled the cold leg.
+>
+> A third route to the same error was a file layout. The committed tree keeps each launch's export
+> one level above its campaign directory. The analyser read only the campaign directory, so run on
+> the committed tree it lost every worker count and pooled the sweep into the floor again.
+>
+> All three were found the same way: by generating the final summary from COMMITTED files, not
+> from the scratch copies the interim reports used, and reading the rendered tables. One table
+> showed warm runs from three worker counts beside a cold run from one.
+>
+> Rules:
+>
+> - **A partition rule is one function** (`reference_units()`), and everything that groups legs as
+>   replicates calls it.
+> - **A missing partition key refuses; it is never guessed.** The analyser now finds exports in
+>   both layouts, and refuses when a service leg's worker count is unknown.
+> - **Final figures come from the committed tree.** An analysis of a scratch copy is a draft.
+>
+> Tested by `working/harness/test_analyse_layouts.py`. Its null controls revert each fix and must
+> see the tests fail. Kin to entries 39 and 2 (a check must cross an independence boundary; the
+> committed tree is one).
+
+## 43. A field named for what was asked, holding what was available (added 2026-09-21)
+
+> The envelope ruling asked for peak engine anon RSS on every leg. The batch report grew a
+> `peak_anon_mb` field and filled it with the anon figure the driver had, which was anon at the
+> close of the measurement window. That is not a peak. cgroup v2 keeps a high-water mark only for
+> the container's TOTAL memory (`memory.peak`), and the driver samples anon at two instants.
+> Interim envelope reports carried the figure under the requested name. The name answered the
+> ruling; the value did not.
+>
+> The honest reading is a bracket. Peak anon is at least the anon at close, and at most the total
+> high-water mark, because anon is part of that total. The field is now
+> `anon_mb_at_window_close`, beside `memory_peak_mb_total` and `peak_anon_bounds_mb`, and every
+> summary table labels the bracket. The Stage 3b analysis committed before this change keeps the
+> old key; append-only means it is superseded, not edited.
+>
+> Rule: **name a field for what the instrument measured, never for what the ruling requested.**
+> When the two differ, report the gap as a bound. Same class as entry 36 (a per-cgroup basis quoted
+> as an arm total).
+
+## 44. The leg that measured nothing, and the upload that sent an older launch's file (added 2026-09-21)
+
+> The envelope's last leg, LlamaIndex K=1024, died about twenty minutes in with
+> `OSError: [Errno 24] Too many open files`. The failure was in OUR driver, not in the arm. Batch
+> mode holds K requests open at once, and the box's default soft limit is 1,024 descriptors. K=512
+> had run cleanly under the same limit. No leg file and no export were written; the leg measured
+> nothing.
+>
+> It is a harness loss, not blast radius. The deadline pre-registration's "never a re-run" covers
+> a batch the ENGINE lost to the 1,800 s deadline. A driver crash is not that. The leg is therefore
+> run once more as a new launch, `e12b_li_k1024`, after the fix below. Whatever e12b shows,
+> including any batch lost to the deadline, is reported as it falls. It is re-run again only if the
+> harness itself fails. The crashed launch's partial records stay, unused by any analysis.
+>
+> The same crash exposed a second defect, in the runner. After a sweep it uploaded "the newest
+> export on disk". A driver that wrote no export therefore had an OLDER launch's export sent under
+> that export's own name. Twice so far:
+>
+> - **2026-09-20, ~21:38Z.** A Stage 3b launch that failed early filed a copy of the smoke
+>   campaign's `shake_rr` export under the Stage 3b prefix. That was a new key; no leg objects came
+>   with it.
+> - **2026-09-21, 20:01:51Z.** e12 re-put e10's export under its EXISTING key. The bytes are
+>   identical: the sha256 matches a copy pulled before the re-put. But an object under `ansh/` was
+>   written twice, and the append-only rule forbids that in form, whatever the content.
+>
+> Found by comparing each export's creation stamp with its upload time. Every other export was
+> uploaded within seconds of being written.
+>
+> Fixes:
+>
+> - The driver names its export inside its own run directory, and the runner uploads that file or
+>   nothing.
+> - The runner refuses a non-empty run directory.
+> - `exfil_s3.sh` refuses any key or prefix that already exists, whatever its caller believes.
+> - The runner raises the driver's open-file limit.
+> - The driver records the limit in its export, and refuses at the start a leg whose concurrency
+>   the limit cannot hold. The estimate is one descriptor per request in flight, plus overhead,
+>   which fits both observations: K=512 ran at 1,024, and K=1024 did not.
+>
+> Rules:
+>
+> - **A resource limit of the harness is a condition of the leg.** Check it before the first
+>   request, not twenty minutes in.
+> - **An uploader enforces append-only itself**, rather than trusting its caller to have chosen the
+>   right file.
+
+## 45. The pre-check that passed, and the control that stopped the claim (added 2026-09-22)
+
+> S5-B's read-only pre-check compared batched with single-frame detection on 24 frames of one video.
+> It passed the pre-registered Tier 2 criterion at every batch size: score changes up to 1.3e-6
+> and box changes up to 1.4e-4 output pixels.
+>
+> The end-to-end control applied the SAME criterion to every frame of the 16 videos, through the
+> patched node, and failed at every B>1. Between 131 and 132 of 3,526 frames were beyond tolerance,
+> with score changes up to 7.5e-3 and box changes up to 0.10 px, and one frame's label set changed.
+>
+> The sequence worked as designed. The pre-check licensed the build and the legs; the end-to-end
+> control decided the claim; B>1 carries no timing. What is worth writing down is why the pre-check
+> alone would have been wrong. A sample that passes shows the criterion CAN be met, not that it
+> IS met across the population. Here, frames about 4% of the population decided the claim.
+>
+> Two neighbours from the same night:
+>
+> - **S5-A.** Every intra-op width except 16 changed the detection scores: labels identical on
+>   every frame, scores moved by at least 2e-3. A tuned thread count is therefore not
+>   output-neutral, and its throughput is not a speed-up of the same computation. The first sweep
+>   leg showed it, and the analyser now reports it for every T, with the default cell's own
+>   replicate as the null control.
+> - **S5-C.** The null control failed: two unconstrained RocketRide runs on the 384 slice differed
+>   by 1.63%, against the 0.82% floor from Stage 3b. One 791-page PDF sets both spans, and it
+>   finished 2.6 s apart. The floor, taken from few replicates on a slice where one document sets
+>   the span, was an underestimate. The control is reported as failed. A post-hoc view is
+>   recorded beside it, labelled, without changing the verdict.
+>
+> Rules:
+>
+> - **A pre-check gates the build, never the claim.** An equivalence claim is decided on the
+>   population it is made about.
+> - **A replicate floor from two runs is a lower bound on the noise**, not the noise.
+

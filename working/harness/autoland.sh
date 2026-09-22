@@ -177,7 +177,16 @@ blob_at() {  # $1 = INDEX | HEAD | any ref, $2 = path -> blob id or empty
   if [[ "$1" == "INDEX" ]]; then git rev-parse -q --verify ":$2" 2>/dev/null || true
   else git rev-parse -q --verify "$1:$2" 2>/dev/null || true; fi
 }
-blob_is_stub() { git cat-file -p "$1" | head -1 | grep -qF "$STUB_MARKER"; }
+# No pipe into `head`/`grep -q` (2026-09-21): under `set -euo pipefail` an early-exiting reader
+# SIGPIPEs the writer and pipefail reports the MATCH as a failure — the defect that made
+# s3_wait.sh unable to report "found". Harmless here only by the accident that stubs are small;
+# the first line is now read from a file with no pipe at all.
+blob_is_stub() {
+  local f first; f="$(mktemp)"
+  git cat-file -p "$1" > "$f" 2>/dev/null || { rm -f "$f"; return 1; }
+  first="$(head -n 1 "$f")"; rm -f "$f"
+  [[ "$first" == *"$STUB_MARKER"* ]]
+}
 blob_in_history() {  # $1 blob, $2 path: is this blob any committed version of $path on HEAD?
   local c
   for c in $(git log --format=%H HEAD -- "$2"); do
@@ -210,8 +219,22 @@ if git rev-parse -q --verify "refs/remotes/origin/$OTHER" >/dev/null; then
     if [[ -z "$mine" && -n "$head_" ]]; then git reset -q; die "$sp is being DELETED on $BRANCH"; fi
     if [[ -z "$mine" ]]; then echo "  $sp: absent on $BRANCH"; continue; fi
     if [[ "$BRANCH" == "$CAMPAIGN_DST" ]]; then
+      # THE MERGE SHAPE IS CHECKED FIRST (2026-09-20), because the stub-content check below
+      # would otherwise fire on the same tree with a message that names the symptom and not the
+      # cause. The stub is a DELETION relative to the merge base, so a plain
+      # `git merge <feature>` into docs-bench resolves to "content removed" with no conflict to
+      # stop it; the operator needs to be told a merge did it and what to do instead.
+      if [[ -n "$(git rev-parse -q --verify HEAD^2 2>/dev/null)" ]]; then
+        for par in $(git rev-list --parents -n 1 HEAD | cut -d" " -f3-); do
+          pb="$(blob_at "$par" "$sp")"
+          if [[ -n "$pb" ]] && blob_is_stub "$pb"; then
+            git reset -q
+            die "HEAD is a MERGE into $CAMPAIGN_DST whose parent $(git rev-parse --short "$par") carries the $sp STUB. A plain merge from a stub-carrying branch deletes the canonical document without a conflict. Bring that branch's files across by explicit path instead: git checkout <branch> -- <paths>."
+          fi
+        done
+      fi
       if blob_is_stub "$mine"; then git reset -q; die "$sp on $CAMPAIGN_DST is a STUB — $CAMPAIGN_DST is the canonical home; a stub here leaves no document anywhere"; fi
-      echo "  $sp: canonical on $CAMPAIGN_DST"
+      echo "  $sp: canonical on $CAMPAIGN_DST (no stub-carrying merge parent)"
     else
       if ! blob_is_stub "$mine"; then git reset -q; die "$sp on $BRANCH is not the stub — only $CAMPAIGN_DST carries the document; every other branch carries a stub whose first line is: $STUB_MARKER"; fi
       echo "  $sp: stub on $BRANCH (canonical copy is on $CAMPAIGN_DST)"
@@ -303,6 +326,13 @@ failing = set(re.findall(r"^\s*FAILED (\S+?):", out, re.M))
 new = sorted(failing - base); fixed = sorted(base - failing)
 print(f"  parsed: completed={completed} rc={rc} failing={sorted(failing)} baseline={sorted(base)} skipped={skipped} max_skipped={bl.get('max_skipped')!r}")
 bad = []
+# The FLAKY class existed for one day (2026-09-21) and was REVERTED by ruling: an outcome that
+# flips with the laptop engine is handled INSIDE the test by a deterministic precondition
+# (unreachable -> SKIP with the reason, reachable -> must pass), never by a gate that accepts
+# either result. A baseline still carrying the key is refused so the hatch cannot return quietly.
+if bl.get("flaky"):
+    bad.append(f"{sys.argv[1]} carries a 'flaky' section — that class was reverted (register 38); "
+               "make the test deterministic with a precondition instead")
 if not completed:
     bad.append("the runner did not print its summary line — it crashed or was cut off; a suite that did not complete proves nothing (entry 35)")
 if "max_skipped" not in bl:

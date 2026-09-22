@@ -226,7 +226,60 @@ printf '%s\n# stub\n' "$STUB" > "$REPO/working/docs/DOCS_HANDOFF.md"
 run_al "$BASE_OK" --dry-run "m" working/docs/DOCS_HANDOFF.md
 chk "0b REFUSES a stub DOCS_HANDOFF on docs-bench (no document anywhere)" $([[ $RC -ne 0 ]] && has 'is a STUB'; echo $?) "rc=$RC $OUT"
 clean_tree
+
+# The stub-carrying MERGE (2026-09-20). A feature branch cut from docs-bench that replaced the
+# handoff with the stub carries a DELETION relative to the merge base, so `git merge` into
+# docs-bench removes the canonical document with no conflict. Seeded here as the real shape:
+# branch, stub it, merge it back, and assert the gate refuses the merge commit by name.
+G checkout -q -b feat-stubbed docs-bench
+printf '%s\n# stub\n' "$STUB" > "$REPO/working/docs/DOCS_HANDOFF.md"
+G add working/docs/DOCS_HANDOFF.md; G commit -q -m "feature branch carries the stub"
+G checkout -q docs-bench
+G merge -q --no-ff feat-stubbed -m "merge the feature branch" >/dev/null 2>&1 || true
+echo "z" > "$REPO/ss3.txt"
+run_al "$BASE_OK" --dry-run "m" ss3.txt
+chk "0b REFUSES a stub-carrying MERGE into docs-bench" $([[ $RC -ne 0 ]] && has 'is a MERGE into docs-bench' && has 'carries the' ; echo $?) "rc=$RC $OUT"
+chk "0b merge refusal restores a clean index" $([[ -z "$(G diff --cached --name-only)" ]]; echo $?)
+G reset -q --hard "docs-bench@{1}" 2>/dev/null || G reset -q --hard HEAD~1
+clean_tree
+# Null control's twin: the SAME merge shape from a branch that did NOT stub the document must
+# pass, so the gate is refusing the stub and not merges as such.
+G checkout -q -b feat-clean docs-bench
+echo "harmless" > "$REPO/feat_clean.txt"; G add feat_clean.txt; G commit -q -m "no handoff change"
+G checkout -q docs-bench
+G merge -q --no-ff feat-clean -m "merge a clean feature branch" >/dev/null 2>&1 || true
+echo "z2" > "$REPO/ss4.txt"
+run_al "$BASE_OK" --dry-run "m" ss4.txt
+chk "0b clean twin: a merge with no stub parent PASSES" $([[ $RC -eq 0 ]] && has 'no stub-carrying merge parent'; echo $?) "rc=$RC $OUT"
+G reset -q --hard "docs-bench@{1}" 2>/dev/null || G reset -q --hard HEAD~1
+clean_tree
 G checkout -q video-bench
+
+echo "=== gate 3: the precondition ruling (2026-09-21) — no flaky class, deterministic outcomes"
+clean_tree
+echo "p1" > "$REPO/pc1.txt"
+# unreachable engine: the test SKIPS (named). With the skip inside budget the gate passes, and
+# the test is NOT reported as passed.
+cat > "$REPO/working/harness/suite_baseline.json" <<'JEOF'
+{"runner": "working/scripts/regression_selftest.py", "baselined_at_commit": "sandbox",
+ "max_skipped": 1, "failing": {}}
+JEOF
+G add working/harness/suite_baseline.json; G commit -q -m "strict baseline, skip budget 1"
+run_al "FAKE_SKIPS=1" --dry-run "m" pc1.txt
+chk "precondition: UNREACHABLE engine -> test SKIPS within budget, gate passes, nothing reported passed" $([[ $RC -eq 0 ]] && has 'skipped=1' && ! has 'failing=\[.thread'; echo $?) "rc=$RC $OUT"
+# reachable engine, failing test: the gate REFUSES it as a failure not in the baseline.
+run_al "FAKE_FAILS=thread_settings_matched" --dry-run "m" pc1.txt
+chk "precondition: REACHABLE + FAILING -> gate REFUSES, naming the test" $([[ $RC -ne 0 ]] && has 'NEW failure' && has 'thread_settings_matched'; echo $?) "rc=$RC $OUT"
+# the reverted escape hatch cannot come back through the baseline file.
+cat > "$REPO/working/harness/suite_baseline.json" <<'JEOF'
+{"runner": "working/scripts/regression_selftest.py", "baselined_at_commit": "sandbox",
+ "max_skipped": 1, "failing": {},
+ "flaky": {"thread_settings_matched": {"observed_pass": "x", "observed_fail": "y"}}}
+JEOF
+G add working/harness/suite_baseline.json; G commit -q -m "a baseline that tries the reverted class"
+run_al --dry-run "m" pc1.txt
+chk "precondition: a baseline carrying the REVERTED flaky section is REFUSED" $([[ $RC -ne 0 ]] && has "carries a 'flaky' section"; echo $?) "rc=$RC $OUT"
+G reset -q --hard HEAD~2; clean_tree
 
 echo "=== gate 3: skip budget (entry 27)"
 echo "x" > "$REPO/sk.txt"

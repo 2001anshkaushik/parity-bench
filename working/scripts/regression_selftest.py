@@ -317,6 +317,71 @@ def t_no_setsid():
 
 
 # ---------------------------------------------------------------- 9. arms' thread settings match
+def engine_runs_pipelines(timeout: float = 60.0):
+    """PRECONDITION for tests that need OUR engine to execute a pipeline, not merely answer.
+
+    2026-09-21, Ansh's ruling on gate 3: the laptop engine answers /version on its port (so
+    engine_up() and our_engine_on_port() pass) yet on some invocations never launches a task
+    subprocess, and the env-probe read inside thread_settings_matched then raises
+    JSONDecodeError — a FAIL on one run, a PASS on the next. The cause is known and is not the
+    code under test. So the capability is probed FIRST, with a pipeline that shares nothing with
+    the test's own probe: probe_minimal.pipe (webhook -> response_text, no custom node). If THAT
+    cannot echo a ping, the engine is not running pipelines and the test SKIPS with the reason.
+    If it can, the engine is reachable and the real test must PASS; a JSONDecodeError after a
+    successful precondition is a genuine failure of the probe path, never a skip.
+
+    Independent on purpose: were the precondition the test's own env-probe call, a real
+    regression that broke only that path would read as "unreachable" and skip forever.
+    Returns (ran: bool, detail: str)."""
+    import asyncio
+
+    async def go():
+        from rocketride import RocketRideClient
+        base = json.loads((ROOT / "working" / "pipes" / "probe_minimal.pipe").read_text())
+        base["project_id"] = str(uuid.uuid4())
+        gp = ROOT / "working" / "pipes" / "generated" / f"precondition_{os.getpid()}.pipe"
+        gp.parent.mkdir(parents=True, exist_ok=True)
+        gp.write_text(json.dumps(base))
+        c = RocketRideClient()
+        await c.connect(timeout=30000)
+        tok = None
+        try:
+            tok = (await c.use(filepath=str(gp.relative_to(ROOT)), ttl=120))["token"]
+            out = await asyncio.wait_for(c.send(tok, "precondition-ping", mimetype="text/plain"),
+                                         timeout=timeout)
+            txt = "".join(out.get("text", []) if isinstance(out, dict) else [])
+            return ("precondition-ping" in txt, f"probe_minimal echoed {txt[:48]!r}")
+        finally:
+            if tok:
+                try:
+                    await asyncio.wait_for(c.terminate(tok), timeout=30)
+                except Exception:
+                    pass
+            await c.disconnect()
+
+    try:
+        return asyncio.run(go())
+    except Exception as e:
+        return False, f"probe_minimal raised {type(e).__name__}: {str(e)[:80]}"
+
+
+def _load_matched_replication():
+    """Separated so the precondition's null controls can drive the test without an engine."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("mr", ROOT / "matched_replication.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def engine_bundle_present() -> bool:
+    """This tree can drive an engine only if the (gitignored, provisioned) engine/ bundle is here —
+    a bare clone or a fresh worktree has none (PROVISIONING §1). A named function so a stubbed test
+    can replace it: inlined, it made the stubbed precondition tests pass only on a machine whose tree
+    happened to hold the bundle (found carrying them to video-bench, 2026-09-22)."""
+    return (ROOT / "engine").is_dir()
+
+
 def t_thread_settings_matched():
     """Session 14: a full 10,000-document comparison ran with RocketRide on 1 thread and
     LlamaIndex on 10, and nothing detected it. The mismatch was invisible for the whole run."""
@@ -330,7 +395,7 @@ def t_thread_settings_matched():
     # then fails opaquely inside probe_env. Require both, or skip. And (2026-09-08) the engine must
     # be OURS — the pid start_engine.sh recorded, holding the port, running our bundle — else SKIP
     # with the reason named; a foreign instance is neither a pass nor a failure of this tree.
-    if not engine_up() or not (ROOT / "engine").is_dir():
+    if not engine_up() or not engine_bundle_present():
         print("        skip reason: no engine on :5565 or no engine/ bundle in this tree")
         return "skip"
     ours, why = our_engine_on_port()
@@ -340,10 +405,16 @@ def t_thread_settings_matched():
     print(f"        engine identity: {why}")
     # The probe subprocess inherits this; the SDK lets a set environment variable win over .env.
     os.environ["ROCKETRIDE_URI"] = f"http://127.0.0.1:{our_engine_port()}"
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("mr", ROOT / "matched_replication.py")
-    m = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(m)
+    # Deterministic precondition (2026-09-21), probed immediately before the test's own engine
+    # call so the engine cannot change state between the two in any practical window.
+    ran, detail = engine_runs_pipelines()
+    if not ran:
+        print(f"        skip reason: our engine answers on :{our_engine_port()} but did not run a "
+              f"minimal pipeline just now ({detail}); the laptop engine runs pipelines only "
+              "intermittently — SKIPPED, never passed")
+        return "skip"
+    print(f"        precondition: {detail} — engine reachable, so this test must pass")
+    m = _load_matched_replication()
     et, lt = m.engine_threads(), m.llama_threads()
     assert et == lt, (
         f"ARMS ARE NOT MATCHED: engine task process reports {et} torch threads, LlamaIndex "
