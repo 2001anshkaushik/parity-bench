@@ -125,6 +125,26 @@ def main() -> int:
         "cannot_separate": ("a stage's own work from contention INSIDE that stage (a JVM pool, the GIL): "
                             "that needs each document's solo stage time, which a C=32 run does not contain"),
     }
+    # POST-HOC, labelled: defined after the pre-registered span comparison came out beyond the floor
+    # (2026-09-21). It does not change that verdict; it shows what the span gap is made of, because on
+    # this corpus one document sets every RocketRide continuous span (register 40).
+    def view(perdoc_path: Path) -> Dict[str, Any]:
+        rows = [json.loads(x) for x in perdoc_path.read_text().splitlines() if x.strip()]
+        t0 = min(r["submit_ns"] for r in rows)
+        ok = sorted((r for r in rows if r.get("ok")), key=lambda r: r["completion_ns"])
+        last = max(rows, key=lambda r: r["completion_ns"])
+        to = lambda k: round(k / ((ok[k - 1]["completion_ns"] - t0) / 1e9), 4)  # noqa: E731
+        return {"docs_per_s_to_p90": to(int(0.9 * len(ok))), "docs_per_s_to_p99": to(int(0.99 * len(ok))),
+                "span_set_by": last["doc"], "held_s": round((last["completion_ns"] - last["submit_ns"]) / 1e9, 1),
+                "deadline_losses": [r["doc"] for r in rows if str(r.get("reason", "")).endswith("TimeoutError")]}
+    p1 = sorted(leg1.parent.glob("perdoc_rr_refc32_*.jsonl"))
+    if p1:
+        a, b = view(p1[0]), view(perdoc[0])
+        rep["perturbation_vs_leg1"]["POST_HOC_DIAGNOSTIC"] = {
+            "label": "defined after the pre-registered comparison fell outside the floor; does not change the verdict",
+            "leg1": a, "instrumented": b,
+            "to_p90_relative": round(b["docs_per_s_to_p90"] / a["docs_per_s_to_p90"] - 1, 4),
+            "to_p99_relative": round(b["docs_per_s_to_p99"] / a["docs_per_s_to_p99"] - 1, 4)}
     text = json.dumps(rep, indent=1)
     if "--out" in sys.argv:
         p = Path(sys.argv[sys.argv.index("--out") + 1])

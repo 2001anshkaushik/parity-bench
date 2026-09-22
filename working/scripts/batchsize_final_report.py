@@ -773,12 +773,32 @@ def stage5(s5: Optional[Path], F: Dict[str, Any]) -> List[str]:
             if not s.get("n"):
                 continue
             rows.append([tname, n(s["n"])] + [f"{pct(s[k]['share_of_end_to_end'])} (p50 {n(s[k]['p50_s'], 2)} s)" for k in comps])
-        out += table(["Documents", "n", "admission wait", "parse (Tika, incl. contention)", "split", "embed", "return"], rows)
+        out += table(["Documents (share of end-to-end latency; p50)", "n", "admission wait", "parse (Tika, incl. contention)",
+                      "split", "embed", "return"], rows)
+        terc = [s for s in fd["by_page_tercile"].values() if s.get("n")]
+        adm_max = max(s["admission_wait"]["share_of_end_to_end"] for s in terc) if terc else None
+        adm_p99 = max(s["admission_wait"]["p99_s"] for s in terc) if terc else None
+        held = fd.get("outliers_held_by") or {}
+        n_out = sum(held.values())
+        top = max(held, key=lambda k: held[k]) if n_out else None
+        out += ["", f"**The lane hypothesis, at admission: not supported.** Waiting for admission is at most "
+                f"{pct(adm_max)} of end-to-end latency in any page tercile (p99 at most {n(adm_p99, 2)} s): documents enter "
+                "the pipeline as they are sent. The time is spent INSIDE it."
+                + (f" Of the {n_out} documents held over 300 s, {held[top]} were held in {top}"
+                   + ", ".join([""] + [f"{v} in {k}" for k, v in held.items() if v and k != top]) + "." if n_out else ""),
+                f"Joined {n(fd.get('joined_documents'))} documents; {n(fd.get('unjoined'))} unjoined (content outcomes and the "
+                f"deadline loss, which never reach every stage). Cannot separate: {fd.get('cannot_separate')}.", ""]
         p = fd.get("perturbation_vs_leg1") or {}
-        out += ["", f"Instrument perturbation against leg 1: {p.get('relative')} ({p.get('verdict')}). "
-                f"Outliers over 300 s held by: {json.dumps(fd.get('outliers_held_by'))}. Joined {n(fd.get('joined_documents'))} "
-                f"documents, {n(fd.get('unjoined'))} unjoined. Cannot separate: {fd.get('cannot_separate')}.", "",
-                f"Source: `{s5}/analysis_s5d_funnel.json`.", ""]
+        out += [f"**Instrument perturbation, pre-registered** (span docs/s against leg 1, floor {pct(p.get('floor'))}): "
+                f"{n(p.get('instrumented_docs_per_s'))} against {n(p.get('leg1_docs_per_s'))}, "
+                f"{(p.get('relative') or 0) * 100:+.2f}% — {p.get('verdict')}.", ""]
+        ph = p.get("POST_HOC_DIAGNOSTIC")
+        if ph:
+            out += [f"POST-HOC DIAGNOSTIC ({ph['label']}): docs/s to p90 {ph['to_p90_relative'] * 100:+.2f}%, to p99 "
+                    f"{ph['to_p99_relative'] * 100:+.2f}%; both spans set by `{ph['leg1']['span_set_by']}` (held "
+                    f"{n(ph['leg1']['held_s'], 1)} s in leg 1, {n(ph['instrumented']['held_s'], 1)} s instrumented); the same "
+                    f"deadline loss in both ({', '.join(f'`{x}`' for x in ph['instrumented']['deadline_losses'])}).", ""]
+        out += [f"Source: `{s5}/analysis_s5d_funnel.json`.", ""]
     return out
 
 
