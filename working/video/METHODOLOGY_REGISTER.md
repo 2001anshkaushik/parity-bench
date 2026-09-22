@@ -1689,3 +1689,36 @@ than rewritten from memory, which is entry 2's point in miniature.
 > - **Read an equivalence failure frame by frame before describing it.**
 > - **A bound read from what the client sends is not the bound the engine applies.** Trace it to
 >   the executor that runs the work.
+
+## 48. What a blind recomputation found that every internal check had passed (added 2026-09-22)
+
+> Before the closeout summary landed, a fresh agent recomputed its headline figures from the raw
+> records. It had only the file paths and the methodology's definitions, never the analyses. One
+> altered figure was planted in its copy, unannounced. It caught the plant ("no variant of the
+> calculation gives" it), and it found sixteen real mismatches in five classes. Every one had
+> survived the analysers' own checks, the figure guard and several readings:
+>
+> - **Two definitions of one figure.** The headline took span docs/s from the per-document stamps;
+>   the envelope table took the driver export's docs/s, over its monotonic span. They agree to the
+>   fourth decimal on most legs, and not on two.
+> - **A median that was not one.** For an even number of batches the analyser reported the upper
+>   middle wall. The verifier took the mean of the two middles, and they differed by up to 8.6 s.
+> - **Rounding before dividing.** A share of span computed from a wall and a span already rounded
+>   to 0.1 s moved the fourth significant figure.
+> - **A tie reported as a name.** On a batched RocketRide leg every row of a batch shares one
+>   return stamp. "The document that set the span" was the first tied row in file order, which the
+>   data cannot single out; the batch set the span.
+> - **A caption contradicting its own table.** It said the document was sent at the same position
+>   in every leg, beside ranks that varied from leg to leg. The send ORDER is fixed; the stamp-based
+>   rank is not.
+>
+> All five were fixed at the source. Every batched and span figure in the summary is now computed
+> from the raw records and rounded only for display. The analyser's median and tie handling were
+> corrected too. A second blind round, with a different plant, gates the landing.
+>
+> Rules:
+>
+> - **An internal check verifies consistency with itself.** Only an independent recomputation from
+>   raw records, with a planted error it must catch, verifies the figure.
+> - **One definition per figure**, applied everywhere it appears.
+> - **Round at display, never before arithmetic.**

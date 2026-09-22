@@ -273,9 +273,15 @@ def check_tail(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
             "docs_per_s_to_p99": round(c99, 4), "p99_over_span": round(c99 / a, 3),
             "p90_over_span": round(b / a, 3), "t90_s": round(t90, 1), "t99_s": round(t99, 1),
             "span_s": round(span, 1),
-            "span_set_by": {"doc": last["doc"], "held_s": round((last["completion_ns"]
-                                                                  - last["submit_ns"]) / 1e9, 1),
-                            "seconds_after_p99": round(span - t99, 1)}}
+            # A batch that returns as one stamps every row alike: the span is then set by the BATCH, and naming
+            # its first row in file order (as before 2026-09-22) named a document the data cannot single out.
+            "span_set_by": ({"doc": None, "tie": True, "batch": last.get("batch"),
+                             "tied_rows": sum(1 for r in rows if r["completion_ns"] == last["completion_ns"]),
+                             "straggler_among_them": any(r["doc"] == STRAGGLER and r["completion_ns"] == last["completion_ns"] for r in rows),
+                             "seconds_after_p99": round(span - t99, 1)}
+                            if sum(1 for r in rows if r["completion_ns"] == last["completion_ns"]) > 1 else
+                            {"doc": last["doc"], "held_s": round((last["completion_ns"] - last["submit_ns"]) / 1e9, 1),
+                             "seconds_after_p99": round(span - t99, 1)})}
         key = f"k{g['k']}" if g.get("k") else f"refc{g['reference_c']}"
         if g.get("condition") == "warm" and g.get("arm_units") == ref_units.get(g["arm"]):
             by_arm.setdefault(g["arm"], {}).setdefault(key, []).append((a, b))
@@ -363,6 +369,8 @@ def batch_report(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
         by: Dict[int, List[Dict[str, Any]]] = {}
         for r in rows:
             by.setdefault(r["batch"], []).append(r)
+        raw_walls = {b: (max(x["completion_ns"] for x in v) - min(x["submit_ns"] for x in v)) / 1e9
+                     for b, v in by.items()}
         walls = {b: round((max(x["completion_ns"] for x in v) - min(x["submit_ns"] for x in v)) / 1e9, 1)
                  for b, v in sorted(by.items())}
         died = {b: len(v) for b, v in by.items()
@@ -378,7 +386,9 @@ def batch_report(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
         mem = ((g.get("memory") or {}).get("at_window_close") or {})
         out[f"{g['_launch']}/{g['leg']}"] = {
             "k": g["k"], "batches": len(walls), "per_batch_wall_s": walls,
-            "wall_s_max": max(walls.values()), "wall_s_median": sorted(walls.values())[len(walls) // 2],
+            # A true median (2026-09-22): the upper middle of an even count was reported as the median until the
+            # independent verification recomputed the mean of the two middles and found them apart.
+            "wall_s_max": max(walls.values()), "wall_s_median": round(__import__("statistics").median(raw_walls.values()), 1),
             "straggler_batch": holder, "straggler_batch_wall_s": walls.get(holder),
             "batch_deadline_s": deadline, "batch_deadline_basis": deadline_basis,
             "straggler_margin_s": (round(deadline - walls[holder], 1)

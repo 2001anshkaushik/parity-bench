@@ -1,0 +1,2527 @@
+{
+ "figures_checked": 287,
+ "results": [
+  {
+   "section": "## 0. Answers",
+   "figure": "No batch size beats continuous submission on either arm",
+   "reported": "true",
+   "recomputed": "true (RR best batched 1.5142 < continuous 2.3395; LI best batched 3.8639 < continuous 5.0960)",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Within batch mode, throughput rises with K on both arms",
+   "reported": "true",
+   "recomputed": "true",
+   "match": true,
+   "note": "RR 0.964345, 1.195231, 1.391962, 1.514218; LI 1.926398, 2.459073, 3.046275, 3.863854"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=128 span docs/s",
+   "reported": "0.9643",
+   "recomputed": "0.9643",
+   "match": true,
+   "note": "raw 0.964345; per-document-stamp span 10251.5196 s; export throughput.span_s 10251.544 s, export docs_per_s 0.9643"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=256 span docs/s",
+   "reported": "1.1952",
+   "recomputed": "1.1952",
+   "match": true,
+   "note": "raw 1.195231; per-document-stamp span 8271.2035 s; export throughput.span_s 8271.254 s, export docs_per_s 1.1952"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=512 span docs/s",
+   "reported": "1.392",
+   "recomputed": "1.392",
+   "match": true,
+   "note": "raw 1.391962; per-document-stamp span 7102.2055 s; export throughput.span_s 7102.256 s, export docs_per_s 1.392"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=1024 span docs/s",
+   "reported": "1.5142",
+   "recomputed": "1.5142",
+   "match": true,
+   "note": "raw 1.514218; per-document-stamp span 6028.8556 s; export throughput.span_s 6028.86 s, export docs_per_s 1.5142"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=128 span docs/s",
+   "reported": "1.9264",
+   "recomputed": "1.9264",
+   "match": true,
+   "note": "raw 1.926398; per-document-stamp span 5125.1096 s; export throughput.span_s 5125.12 s, export docs_per_s 1.9264"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=256 span docs/s",
+   "reported": "2.4591",
+   "recomputed": "2.4591",
+   "match": true,
+   "note": "raw 2.459073; per-document-stamp span 4014.9275 s; export throughput.span_s 4014.951 s, export docs_per_s 2.4591"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=512 span docs/s",
+   "reported": "3.0462",
+   "recomputed": "3.0463",
+   "match": false,
+   "note": "raw 3.046275; per-document-stamp span 3241.0074 s; export throughput.span_s 3241.041 s, export docs_per_s 3.0462 — the reported figure equals the export docs_per_s (export monotonic span), not the defined per-document-stamp span; they differ in the 4th decimal"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=1024 span docs/s",
+   "reported": "3.8638",
+   "recomputed": "3.8639",
+   "match": false,
+   "note": "raw 3.863854; per-document-stamp span 2555.2206 s; export throughput.span_s 2555.288 s, export docs_per_s 3.8638 — the reported figure equals the export docs_per_s (export monotonic span), not the defined per-document-stamp span; they differ in the 4th decimal"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best batch / continuous rate, RocketRide (best = K=1024)",
+   "reported": "0.647",
+   "recomputed": "0.647",
+   "match": true,
+   "note": "raw 0.647238"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best batch / continuous rate, LlamaIndex (best = K=1024)",
+   "reported": "0.758",
+   "recomputed": "0.758",
+   "match": true,
+   "note": "raw 0.758207"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "† footnote: \"same-harness cpuset 0-23 measured -2.5% throughput, -11.7% CPU-s/doc (S5-C; its null control failed at 1.63%...)\"",
+   "reported": "-2.5%, -11.7%, 1.63%",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — S5-C figures; S5-C files are not among the files this verification may read (recurs in §0, §1 and §2)"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=128: seconds to spare, batch holding 039_039660.pdf",
+   "reported": "93.2",
+   "recomputed": "93.2",
+   "match": true,
+   "note": "raw 93.178053"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=256: seconds to spare, batch holding 039_039660.pdf",
+   "reported": "51.9",
+   "recomputed": "51.9",
+   "match": true,
+   "note": "raw 51.850847"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=512: seconds to spare, batch holding 039_039660.pdf",
+   "reported": "45.6",
+   "recomputed": "45.6",
+   "match": true,
+   "note": "raw 45.551552"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=1024: batch holding 039_039660.pdf",
+   "reported": "died at the deadline",
+   "recomputed": "died (batch #9 rows carry batch_error:TimeoutError; wall 1800.085 s, spare -0.085 s)",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=128: seconds to spare, batch holding 039_039660.pdf",
+   "reported": "1761.2",
+   "recomputed": "1761.2",
+   "match": true,
+   "note": "raw 1761.174365"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=256: seconds to spare, batch holding 039_039660.pdf",
+   "reported": "1694.7",
+   "recomputed": "1694.7",
+   "match": true,
+   "note": "raw 1694.694586"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=512: seconds to spare, batch holding 039_039660.pdf",
+   "reported": "1698.8",
+   "recomputed": "1698.8",
+   "match": true,
+   "note": "raw 1698.792867"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=1024: seconds to spare, batch holding 039_039660.pdf",
+   "reported": "1558.7",
+   "recomputed": "1558.7",
+   "match": true,
+   "note": "raw 1558.72898"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=1024 batches lost to the deadline",
+   "reported": "1",
+   "recomputed": "1",
+   "match": true,
+   "note": "raw 1"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=1024 documents lost with that batch",
+   "reported": "759",
+   "recomputed": "759",
+   "match": true,
+   "note": "raw 759"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "1,800 s batch deadline",
+   "reported": "1,800",
+   "recomputed": "1800",
+   "match": true,
+   "note": "raw 1800; deadlines.batch_timeout_s in the e7-e12b leg JSONs = [1800]; p3/p4 JSONs carry no deadlines block"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Videos in flight set to K=16 for both arms",
+   "reported": "16 / 16",
+   "recomputed": "16 / 16",
+   "match": true,
+   "note": "export provenance_leela.offered_concurrency"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide at one token moved X% from K=1 to K=16 (16-video smoke slice)",
+   "reported": "9.17%",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — smoke-slice video files are not among the listed files. For reference only: from the report's own §5 table (2.392 -> 2.623) the move is 9.21% of the pair mean or 9.66% of K=1; 9.17% is reachable only at the rounding edge of the pair-mean form"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "RocketRide K=16 replicate spread (16-video smoke slice)",
+   "reported": "9.76%",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — smoke-slice / S3b video files are not among the listed files"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best basis: 8 LlamaIndex instances (video)",
+   "reported": "8",
+   "recomputed": "8 (idle_burden.instances); 8 worker processes read back",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best basis: 24 LlamaIndex workers (docs)",
+   "reported": "24",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — the p2_li_cont export (the best-to-best docs leg) carries no process read-back; supporting evidence only: the batched LlamaIndex legs e8/e10/e12b show [24] uvicorn worker processes in every read-back snapshot"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Docs span docs/s, RocketRide",
+   "reported": "2.3395",
+   "recomputed": "2.3395",
+   "match": true,
+   "note": "raw 2.339508; per-document-stamp span 4225.2479 s; export throughput.span_s 4225.27 s, export docs_per_s 2.3395"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Docs span docs/s, LlamaIndex",
+   "reported": "5.096",
+   "recomputed": "5.096",
+   "match": true,
+   "note": "raw 5.09604; per-document-stamp span 1937.3868 s; export throughput.span_s 1937.406 s, export docs_per_s 5.096"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Docs CPU utilisation, RocketRide",
+   "reported": "56.16%",
+   "recomputed": "56.16%",
+   "match": true,
+   "note": "raw 56.16%; cost.cpu_utilization; engine cores/32 = 0.561562"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Docs CPU utilisation, LlamaIndex",
+   "reported": "72.59%",
+   "recomputed": "72.59%",
+   "match": true,
+   "note": "raw 72.59%; cost.cpu_utilization; engine cores/32 = 0.725875"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Docs idle core-equivalents, RocketRide",
+   "reported": "13.802",
+   "recomputed": "13.802",
+   "match": true,
+   "note": "raw 13.802434; percore_host.idle_core_equivalents 13.802"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Docs idle core-equivalents, LlamaIndex",
+   "reported": "8.714",
+   "recomputed": "8.714",
+   "match": true,
+   "note": "raw 8.71351; percore_host.idle_core_equivalents 8.714"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Docs idle spin, RocketRide",
+   "reported": "1.224",
+   "recomputed": "1.224",
+   "match": true,
+   "note": "raw 1.224; cost.idle_spin_measured.cores"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Docs idle spin, LlamaIndex",
+   "reported": "0.034",
+   "recomputed": "0.034",
+   "match": true,
+   "note": "raw 0.034; cost.idle_spin_measured.cores"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Video frames/s, LlamaIndex",
+   "reported": "13.524",
+   "recomputed": "13.524",
+   "match": true,
+   "note": "raw 13.524027; 23049 frames / 1704.3 s"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Video frames/s, RocketRide",
+   "reported": "RANKING ONLY",
+   "recomputed": "not quoted; recomputed 2.433 (23049 frames / 9473.5 s), below LlamaIndex",
+   "match": true,
+   "note": "ranking verified in §3"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Video CPU utilisation, RocketRide",
+   "reported": "18.29%",
+   "recomputed": "18.29%",
+   "match": true,
+   "note": "raw 18.29%; efficiency.cpu_util_of_box; effective_cores/32 = 0.182906"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Video CPU utilisation, LlamaIndex",
+   "reported": "89.27%",
+   "recomputed": "89.27%",
+   "match": true,
+   "note": "raw 89.27%; efficiency.cpu_util_of_box; effective_cores/32 = 0.892687"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Video idle core-equivalents, RocketRide",
+   "reported": "26.015",
+   "recomputed": "26.015",
+   "match": true,
+   "note": "raw 26.01451; 9456 of 9612 percore samples inside [min admit_ns, max done_ns]"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Best-to-best: Video idle core-equivalents, LlamaIndex",
+   "reported": "3.132",
+   "recomputed": "3.132",
+   "match": true,
+   "note": "raw 3.132234; 1691 of 1923 percore samples inside [min admit_ns, max done_ns]"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Per unit: anchor legs are one and eight documents in flight",
+   "reported": "C=1 and C=8",
+   "recomputed": "reference_c: rr 1/8, li 1/8",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Per unit: RocketRide token throughput grows (anchor C=8 / C=1)",
+   "reported": "5.00x",
+   "recomputed": "5.00",
+   "match": true,
+   "note": "raw 5.00413; C=1 0.320907, C=8 1.605863 docs/s"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "Per unit: LlamaIndex worker throughput grows (anchor C=8 / C=1)",
+   "reported": "1.01x",
+   "recomputed": "1.01",
+   "match": true,
+   "note": "raw 1.005184; C=1 0.447992, C=8 0.450314 docs/s"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Measured documents, RocketRide",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Warm-up documents, RocketRide",
+   "reported": "25",
+   "recomputed": "25",
+   "match": true,
+   "note": "raw 25; leg JSON warm_up.docs"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Posture: cpuset 0-31 of 32, RocketRide",
+   "reported": "cpuset 0-31 of 32",
+   "recomputed": "available_cpus 32; host nproc (Ruling A); arm cgroup reports '0-31' via cgroup cpuset.cpus.effective",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Submission: continuous, C=32, RocketRide",
+   "reported": "continuous, C=32",
+   "recomputed": "reference_c 32, k None; send per document, C=32 in flight, no barrier (the banked blast shape)",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Caches prewarmed / one workload on the box, RocketRide",
+   "reported": "prewarmed; Ruling C",
+   "recomputed": "prewarm.attempted True; other_containers []; strays clean True",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Measured documents, LlamaIndex",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Warm-up documents, LlamaIndex",
+   "reported": "25",
+   "recomputed": "25",
+   "match": true,
+   "note": "raw 25; leg JSON warm_up.docs"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Posture: cpuset 0-31 of 32, LlamaIndex",
+   "reported": "cpuset 0-31 of 32",
+   "recomputed": "available_cpus 32; host nproc (Ruling A); arm cgroup reports '0-31' via cgroup cpuset.cpus.effective",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Submission: continuous, C=32, LlamaIndex",
+   "reported": "continuous, C=32",
+   "recomputed": "reference_c 32, k None; POST /process_pdf per document, C=32 in flight, no barrier (the banked blast shape)",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Caches prewarmed / one workload on the box, LlamaIndex",
+   "reported": "prewarmed; Ruling C",
+   "recomputed": "prewarm.attempted True; other_containers []; strays clean True",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Posture, RocketRide: 1 token, threads= not passed, six thread variables at 1, torch threads read in task process: 1",
+   "reported": "1 token; six vars = 1; torch 1",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — the p1_rr_cont32 leg JSON carries no process/thread read-back block; no listed file records these for this leg"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Posture, LlamaIndex: 24 workers, six thread variables at 1, torch threads read in each worker: 1",
+   "reported": "24 workers; six vars = 1; torch 1",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — the p2_li_cont leg JSON carries no process/thread read-back block (24 worker processes are seen in the e8/e10/e12b read-backs; thread variables are not recorded in any listed docs file)"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "RocketRide C=32 is \"the knee\"",
+   "reported": "the knee",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — Stage 3b smoke-slice figure; files not listed"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "LlamaIndex C=32 is a TIE with C=16 (difference inside the 9.87% floor)",
+   "reported": "TIE (inside 9.87%)",
+   "recomputed": "C=16 4.6512 vs C=32 5.0960: difference 9.13% of the pair mean (9.56% of C=16, 8.73% of C=32) — under 9.87% on every normalisation",
+   "match": true,
+   "note": "the 9.87% floor value itself is a Stage 3b figure not recomputable from the listed files"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Span throughput docs/s, RocketRide",
+   "reported": "2.3395",
+   "recomputed": "2.3395",
+   "match": true,
+   "note": "raw 2.339508; per-document-stamp span 4225.2479 s; export throughput.span_s 4225.27 s, export docs_per_s 2.3395"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Span throughput docs/s, LlamaIndex",
+   "reported": "5.096",
+   "recomputed": "5.096",
+   "match": true,
+   "note": "raw 5.09604; per-document-stamp span 1937.3868 s; export throughput.span_s 1937.406 s, export docs_per_s 5.096"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Span with 039_039660.pdf dropped, RocketRide",
+   "reported": "3.6956",
+   "recomputed": "3.6956",
+   "match": true,
+   "note": "raw 3.695569"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Span with 039_039660.pdf dropped, LlamaIndex",
+   "reported": "5.0955",
+   "recomputed": "5.0955",
+   "match": true,
+   "note": "raw 5.095524"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "docs/s to the 99th-percentile completion, RocketRide",
+   "reported": "3.9344",
+   "recomputed": "3.9344",
+   "match": true,
+   "note": "raw 3.934401"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "docs/s to the 99th-percentile completion, LlamaIndex",
+   "reported": "5.3265",
+   "recomputed": "5.2865",
+   "match": false,
+   "note": "raw 5.286524; n_ok 9873, k = int(0.99*9873) = 9774; no variant tried reproduces 5.3265 (k-th vs (k+1)-th row: 5.2852; ceil(k): 5.2857; min submit over ok rows only: 5.2865; p99 over all rows incl. content outcomes: 5.3412; p90: 5.3114)"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Document that set the span, RocketRide",
+   "reported": "039_039660.pdf",
+   "recomputed": "039_039660.pdf (unique: 1 row at max completion_ns)",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Held by the span-setting document, RocketRide (s)",
+   "reported": "1722",
+   "recomputed": "1722",
+   "match": true,
+   "note": "raw 1721.961664"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Document that set the span, LlamaIndex",
+   "reported": "011_011575.pdf",
+   "recomputed": "011_011575.pdf (unique: 1 row at max completion_ns)",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Held by the span-setting document, LlamaIndex (s)",
+   "reported": "149.8",
+   "recomputed": "149.8",
+   "match": true,
+   "note": "raw 149.794216"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Engine container CPU cores, RocketRide",
+   "reported": "17.97",
+   "recomputed": "17.97",
+   "match": true,
+   "note": "raw 17.97; cost.engine_container_cores"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Driver CPU cores, RocketRide",
+   "reported": "0.036",
+   "recomputed": "0.036",
+   "match": true,
+   "note": "raw 0.036; cost.driver_cores"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Host busy cores, RocketRide",
+   "reported": "18.198",
+   "recomputed": "18.198",
+   "match": true,
+   "note": "raw 18.197566; mean of per-sample sum(busy) over all 4218 samples; percore_host.mean_busy_cores 18.198 (n_intervals 4218) — agree"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "CPU utilisation engine/32, RocketRide",
+   "reported": "56.16%",
+   "recomputed": "56.16%",
+   "match": true,
+   "note": "raw 56.16%; cost.cpu_utilization"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Idle core-equivalents (32 - host busy), RocketRide",
+   "reported": "13.802",
+   "recomputed": "13.802",
+   "match": true,
+   "note": "raw 13.802434; percore_host.idle_core_equivalents 13.802 — agree"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Idle spin, RocketRide",
+   "reported": "1.224",
+   "recomputed": "1.224",
+   "match": true,
+   "note": "raw 1.224; cost.idle_spin_measured.cores"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "CPU-seconds per document, RocketRide",
+   "reported": "7.681",
+   "recomputed": "7.681",
+   "match": true,
+   "note": "raw 7.6811; cost.cpu_s_per_doc"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Engine container CPU cores, LlamaIndex",
+   "reported": "23.228",
+   "recomputed": "23.228",
+   "match": true,
+   "note": "raw 23.228; cost.engine_container_cores"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Driver CPU cores, LlamaIndex",
+   "reported": "0.039",
+   "recomputed": "0.039",
+   "match": true,
+   "note": "raw 0.039; cost.driver_cores"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Host busy cores, LlamaIndex",
+   "reported": "23.286",
+   "recomputed": "23.286",
+   "match": true,
+   "note": "raw 23.28649; mean of per-sample sum(busy) over all 1934 samples; percore_host.mean_busy_cores 23.286 (n_intervals 1934) — agree"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "CPU utilisation engine/32, LlamaIndex",
+   "reported": "72.59%",
+   "recomputed": "72.59%",
+   "match": true,
+   "note": "raw 72.59%; cost.cpu_utilization"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Idle core-equivalents (32 - host busy), LlamaIndex",
+   "reported": "8.714",
+   "recomputed": "8.714",
+   "match": true,
+   "note": "raw 8.71351; percore_host.idle_core_equivalents 8.714 — agree"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Idle spin, LlamaIndex",
+   "reported": "0.034",
+   "recomputed": "0.034",
+   "match": true,
+   "note": "raw 0.034; cost.idle_spin_measured.cores"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "CPU-seconds per document, LlamaIndex",
+   "reported": "4.558",
+   "recomputed": "4.558",
+   "match": true,
+   "note": "raw 4.5581; cost.cpu_s_per_doc"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Documents completed, RocketRide",
+   "reported": "9,885",
+   "recomputed": "9885",
+   "match": true,
+   "note": "raw 9885"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Documents content outcome, RocketRide",
+   "reported": "89",
+   "recomputed": "89",
+   "match": true,
+   "note": "raw 89"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Documents lost to the deadline, RocketRide",
+   "reported": "1",
+   "recomputed": "1",
+   "match": true,
+   "note": "raw 1"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Documents other failure, RocketRide",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Documents completed, LlamaIndex",
+   "reported": "9,873",
+   "recomputed": "9873",
+   "match": true,
+   "note": "raw 9873"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Documents content outcome, LlamaIndex",
+   "reported": "102",
+   "recomputed": "102",
+   "match": true,
+   "note": "raw 102"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Documents lost to the deadline, LlamaIndex",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "Documents other failure, LlamaIndex",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "RocketRide leg: documents lost to the 1,800 s deadline",
+   "reported": "1",
+   "recomputed": "1",
+   "match": true,
+   "note": "raw 1"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "RocketRide deadline loss: document",
+   "reported": "011_011464.pdf",
+   "recomputed": "011_011464.pdf (reason error:TimeoutError)",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "RocketRide deadline loss: held (s)",
+   "reported": "1800",
+   "recomputed": "1800",
+   "match": true,
+   "note": "raw 1800.008549"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "039_039660.pdf finished N s after the 99th-percentile completion (RocketRide continuous)",
+   "reported": "1738",
+   "recomputed": "1738",
+   "match": true,
+   "note": "raw 1737.957051"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "039_039660.pdf set the span (RocketRide continuous)",
+   "reported": "yes",
+   "recomputed": "yes",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "039_039660.pdf page count",
+   "reported": "39 pages",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — no listed file records page counts"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "† footnote: \"same-harness cpuset 0-23 measured -2.5% throughput, -11.7% CPU-s/doc (S5-C; its null control failed at 1.63%...)\"",
+   "reported": "-2.5%, -11.7%, 1.63%",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — S5-C figures; S5-C files are not among the files this verification may read"
+  },
+  {
+   "section": "### Empty-content documents, both arms (C5)",
+   "figure": "Empty-content documents, RocketRide (continuous C=32)",
+   "reported": "89",
+   "recomputed": "89",
+   "match": true,
+   "note": "raw 89"
+  },
+  {
+   "section": "### Empty-content documents, both arms (C5)",
+   "figure": "Empty-content documents, LlamaIndex (continuous C=32)",
+   "reported": "102",
+   "recomputed": "102",
+   "match": true,
+   "note": "raw 102"
+  },
+  {
+   "section": "### Empty-content documents, both arms (C5)",
+   "figure": "Empty on both",
+   "reported": "89",
+   "recomputed": "89",
+   "match": true,
+   "note": "raw 89"
+  },
+  {
+   "section": "### Empty-content documents, both arms (C5)",
+   "figure": "Empty on LlamaIndex only (count)",
+   "reported": "13",
+   "recomputed": "13",
+   "match": true,
+   "note": "raw 13"
+  },
+  {
+   "section": "### Empty-content documents, both arms (C5)",
+   "figure": "Empty on LlamaIndex only (the 13 names)",
+   "reported": "002_002400.pdf, 004_004306.pdf, 008_008724.pdf, 009_009802.pdf, 014_014222.pdf, 018_018542.pdf, 020_020747.pdf, 020_020806.pdf, 022_022819.pdf, 027_027613.pdf, 033_033689.pdf, 037_037919.pdf, 040_040669.pdf",
+   "recomputed": "002_002400.pdf, 004_004306.pdf, 008_008724.pdf, 009_009802.pdf, 014_014222.pdf, 018_018542.pdf, 020_020747.pdf, 020_020806.pdf, 022_022819.pdf, 027_027613.pdf, 033_033689.pdf, 037_037919.pdf, 040_040669.pdf",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "### Empty-content documents, both arms (C5)",
+   "figure": "Empty on RocketRide only (count)",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Span docs/s",
+   "reported": "0.9643",
+   "recomputed": "0.9643",
+   "match": true,
+   "note": "raw 0.964345; per-document-stamp span 10251.5196 s; export throughput.span_s 10251.544 s, export docs_per_s 0.9643"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Batches",
+   "reported": "78",
+   "recomputed": "78",
+   "match": true,
+   "note": "raw 78"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Batch wall median, s",
+   "reported": "75.7",
+   "recomputed": "75.0",
+   "match": false,
+   "note": "raw 75.033769; 78 batches; median of an even count = mean of the two middle walls (74.4137, 75.6539); the reported value equals the upper middle wall sorted[n//2] = 75.6539, i.e. the leg JSON's batches.wall_s_p50 (75.654)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Batch wall max, s",
+   "reported": "1706.8",
+   "recomputed": "1706.8",
+   "match": true,
+   "note": "raw 1706.821947"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Batch holding 039_039660.pdf (index)",
+   "reported": "77",
+   "recomputed": "77",
+   "match": true,
+   "note": "raw 77"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "That batch's wall, s",
+   "reported": "1706.8",
+   "recomputed": "1706.8",
+   "match": true,
+   "note": "raw 1706.821947"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Spare to 1,800 s",
+   "reported": "93.2",
+   "recomputed": "93.2",
+   "match": true,
+   "note": "raw 93.178053"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "That batch's share of the span",
+   "reported": "16.65%",
+   "recomputed": "16.65%",
+   "match": true,
+   "note": "raw 16.649453%; wall 1706.821947 s / span 10251.519646 s"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Batches died",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0; died batches []"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Documents returned",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Documents lost",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Numerator of docs/s (documents with content)",
+   "reported": "9,886",
+   "recomputed": "9886",
+   "match": true,
+   "note": "raw 9886"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Idle core-equivalents",
+   "reported": "24.771",
+   "recomputed": "24.771",
+   "match": true,
+   "note": "raw 24.770877; percore_host.idle_core_equivalents 24.771 — agree; 10244 samples = n_intervals 10244"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Span docs/s",
+   "reported": "1.1952",
+   "recomputed": "1.1952",
+   "match": true,
+   "note": "raw 1.195231; per-document-stamp span 8271.2035 s; export throughput.span_s 8271.254 s, export docs_per_s 1.1952"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Batches",
+   "reported": "39",
+   "recomputed": "39",
+   "match": true,
+   "note": "raw 39"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Batch wall median, s",
+   "reported": "128.6",
+   "recomputed": "128.6",
+   "match": true,
+   "note": "raw 128.592164; 39 batches (odd count)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Batch wall max, s",
+   "reported": "1748.1",
+   "recomputed": "1748.1",
+   "match": true,
+   "note": "raw 1748.149153"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Batch holding 039_039660.pdf (index)",
+   "reported": "38",
+   "recomputed": "38",
+   "match": true,
+   "note": "raw 38"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "That batch's wall, s",
+   "reported": "1748.1",
+   "recomputed": "1748.1",
+   "match": true,
+   "note": "raw 1748.149153"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Spare to 1,800 s",
+   "reported": "51.9",
+   "recomputed": "51.9",
+   "match": true,
+   "note": "raw 51.850847"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "That batch's share of the span",
+   "reported": "21.13%",
+   "recomputed": "21.14%",
+   "match": false,
+   "note": "raw 21.135366%; wall 1748.149153 s / span 8271.203454 s; exact 21.13537%; wall / export span_s = 21.13524% (-> 21.14%); wall pre-rounded to 1748.1 s / stamp span = 21.13477% (-> 21.13%) — the reported figure is reproduced only from a pre-rounded wall"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Batches died",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0; died batches []"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Documents returned",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Documents lost",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Numerator of docs/s (documents with content)",
+   "reported": "9,886",
+   "recomputed": "9886",
+   "match": true,
+   "note": "raw 9886"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "Idle core-equivalents",
+   "reported": "22.848",
+   "recomputed": "22.848",
+   "match": true,
+   "note": "raw 22.848472; percore_host.idle_core_equivalents 22.848 — agree; 8264 samples = n_intervals 8264"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Span docs/s",
+   "reported": "1.392",
+   "recomputed": "1.392",
+   "match": true,
+   "note": "raw 1.391962; per-document-stamp span 7102.2055 s; export throughput.span_s 7102.256 s, export docs_per_s 1.392"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Batches",
+   "reported": "20",
+   "recomputed": "20",
+   "match": true,
+   "note": "raw 20"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Batch wall median, s",
+   "reported": "253.3",
+   "recomputed": "244.7",
+   "match": false,
+   "note": "raw 244.662705; 20 batches; median of an even count = mean of the two middle walls (236.0130, 253.3124); the reported value equals the upper middle wall sorted[n//2] = 253.3124, i.e. the leg JSON's batches.wall_s_p50 (253.312)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Batch wall max, s",
+   "reported": "1754.4",
+   "recomputed": "1754.4",
+   "match": true,
+   "note": "raw 1754.448448"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Batch holding 039_039660.pdf (index)",
+   "reported": "19",
+   "recomputed": "19",
+   "match": true,
+   "note": "raw 19"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "That batch's wall, s",
+   "reported": "1754.4",
+   "recomputed": "1754.4",
+   "match": true,
+   "note": "raw 1754.448448"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Spare to 1,800 s",
+   "reported": "45.6",
+   "recomputed": "45.6",
+   "match": true,
+   "note": "raw 45.551552"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "That batch's share of the span",
+   "reported": "24.70%",
+   "recomputed": "24.70%",
+   "match": true,
+   "note": "raw 24.702868%; wall 1754.448448 s / span 7102.205484 s"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Batches died",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0; died batches []"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Documents returned",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Documents lost",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Numerator of docs/s (documents with content)",
+   "reported": "9,886",
+   "recomputed": "9886",
+   "match": true,
+   "note": "raw 9886"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Idle core-equivalents",
+   "reported": "21.099",
+   "recomputed": "21.099",
+   "match": true,
+   "note": "raw 21.099101; percore_host.idle_core_equivalents 21.099 — agree; 7095 samples = n_intervals 7095"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Span docs/s",
+   "reported": "1.5142",
+   "recomputed": "1.5142",
+   "match": true,
+   "note": "raw 1.514218; per-document-stamp span 6028.8556 s; export throughput.span_s 6028.86 s, export docs_per_s 1.5142"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Batches",
+   "reported": "10",
+   "recomputed": "10",
+   "match": true,
+   "note": "raw 10"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Batch wall median, s",
+   "reported": "467.2",
+   "recomputed": "458.0",
+   "match": false,
+   "note": "raw 457.96534; 10 batches; median of an even count = mean of the two middle walls (448.7458, 467.1849); the reported value equals the upper middle wall sorted[n//2] = 467.1849, i.e. the leg JSON's batches.wall_s_p50 (467.185)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Batch wall max, s",
+   "reported": "1800.1",
+   "recomputed": "1800.1",
+   "match": true,
+   "note": "raw 1800.085034"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Batch holding 039_039660.pdf (index)",
+   "reported": "9",
+   "recomputed": "9",
+   "match": true,
+   "note": "raw 9"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "That batch's wall, s",
+   "reported": "1800.1",
+   "recomputed": "1800.1",
+   "match": true,
+   "note": "raw 1800.085034"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Batch holding 039_039660.pdf died at the deadline",
+   "reported": "DIED",
+   "recomputed": "DIED",
+   "match": true,
+   "note": "spare -0.085 s; every row of batch #9 (759 rows) carries batch_error:TimeoutError"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "That batch's share of the span",
+   "reported": "29.86%",
+   "recomputed": "29.86%",
+   "match": true,
+   "note": "raw 29.857823%; wall 1800.085034 s / span 6028.855588 s"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Batches died",
+   "reported": "1",
+   "recomputed": "1",
+   "match": true,
+   "note": "raw 1; died batches [9]"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Documents returned",
+   "reported": "9,216",
+   "recomputed": "9216",
+   "match": true,
+   "note": "raw 9216"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Documents lost",
+   "reported": "759",
+   "recomputed": "759",
+   "match": true,
+   "note": "raw 759"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Numerator of docs/s (documents with content)",
+   "reported": "9,129",
+   "recomputed": "9129",
+   "match": true,
+   "note": "raw 9129"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Idle core-equivalents",
+   "reported": "19.084",
+   "recomputed": "19.084",
+   "match": true,
+   "note": "raw 19.084482; percore_host.idle_core_equivalents 19.084 — agree; 6021 samples = n_intervals 6021"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, continuous C=32 (reference)",
+   "figure": "Span docs/s",
+   "reported": "2.3395",
+   "recomputed": "2.3395",
+   "match": true,
+   "note": "raw 2.339508; per-document-stamp span 4225.2479 s; export throughput.span_s 4225.27 s, export docs_per_s 2.3395"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, continuous C=32 (reference)",
+   "figure": "Idle core-equivalents",
+   "reported": "13.802",
+   "recomputed": "13.802",
+   "match": true,
+   "note": "raw 13.802434"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Batches died: which batch",
+   "reported": "batch 9",
+   "recomputed": "batch [9]",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table",
+   "figure": "† footnote: \"same-harness cpuset 0-23 measured -2.5% throughput, -11.7% CPU-s/doc (S5-C; its null control failed at 1.63%...)\"",
+   "reported": "-2.5%, -11.7%, 1.63%",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — S5-C figures; S5-C files are not among the files this verification may read"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Span docs/s",
+   "reported": "1.9264",
+   "recomputed": "1.9264",
+   "match": true,
+   "note": "raw 1.926398; per-document-stamp span 5125.1096 s; export throughput.span_s 5125.12 s, export docs_per_s 1.9264"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Batches",
+   "reported": "78",
+   "recomputed": "78",
+   "match": true,
+   "note": "raw 78"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Batch wall median, s",
+   "reported": "54.9",
+   "recomputed": "54.5",
+   "match": false,
+   "note": "raw 54.477008; 78 batches; median of an even count = mean of the two middle walls (54.0285, 54.9255); the reported value equals the upper middle wall sorted[n//2] = 54.9255, i.e. the leg JSON's batches.wall_s_p50 (54.926)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Batch wall max, s",
+   "reported": "236",
+   "recomputed": "236",
+   "match": true,
+   "note": "raw 235.975895"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Batch holding 039_039660.pdf (index)",
+   "reported": "77",
+   "recomputed": "77",
+   "match": true,
+   "note": "raw 77"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "That batch's wall, s",
+   "reported": "38.8",
+   "recomputed": "38.8",
+   "match": true,
+   "note": "raw 38.825635"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Spare to 1,800 s",
+   "reported": "1761.2",
+   "recomputed": "1761.2",
+   "match": true,
+   "note": "raw 1761.174365"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "That batch's share of the span",
+   "reported": "0.76%",
+   "recomputed": "0.76%",
+   "match": true,
+   "note": "raw 0.757557%; wall 38.825635 s / span 5125.109568 s"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Batches died",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0; died batches []"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Documents returned",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Documents lost",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Numerator of docs/s (documents with content)",
+   "reported": "9,873",
+   "recomputed": "9873",
+   "match": true,
+   "note": "raw 9873"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Idle core-equivalents",
+   "reported": "25.181",
+   "recomputed": "25.181",
+   "match": true,
+   "note": "raw 25.180758; percore_host.idle_core_equivalents 25.181 — agree; 5121 samples = n_intervals 5121"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Span docs/s",
+   "reported": "2.4591",
+   "recomputed": "2.4591",
+   "match": true,
+   "note": "raw 2.459073; per-document-stamp span 4014.9275 s; export throughput.span_s 4014.951 s, export docs_per_s 2.4591"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Batches",
+   "reported": "39",
+   "recomputed": "39",
+   "match": true,
+   "note": "raw 39"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Batch wall median, s",
+   "reported": "98.2",
+   "recomputed": "98.2",
+   "match": true,
+   "note": "raw 98.176751; 39 batches (odd count)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Batch wall max, s",
+   "reported": "251.3",
+   "recomputed": "251.3",
+   "match": true,
+   "note": "raw 251.251424"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Batch holding 039_039660.pdf (index)",
+   "reported": "38",
+   "recomputed": "38",
+   "match": true,
+   "note": "raw 38"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "That batch's wall, s",
+   "reported": "105.3",
+   "recomputed": "105.3",
+   "match": true,
+   "note": "raw 105.305414"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Spare to 1,800 s",
+   "reported": "1694.7",
+   "recomputed": "1694.7",
+   "match": true,
+   "note": "raw 1694.694586"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "That batch's share of the span",
+   "reported": "2.62%",
+   "recomputed": "2.62%",
+   "match": true,
+   "note": "raw 2.622847%; wall 105.305414 s / span 4014.927495 s"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Batches died",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0; died batches []"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Documents returned",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Documents lost",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Numerator of docs/s (documents with content)",
+   "reported": "9,873",
+   "recomputed": "9873",
+   "match": true,
+   "note": "raw 9873"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=256",
+   "figure": "Idle core-equivalents",
+   "reported": "22.47",
+   "recomputed": "22.47",
+   "match": true,
+   "note": "raw 22.470058; percore_host.idle_core_equivalents 22.47 — agree; 4011 samples = n_intervals 4011"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Span docs/s",
+   "reported": "3.0462",
+   "recomputed": "3.0463",
+   "match": false,
+   "note": "raw 3.046275; per-document-stamp span 3241.0074 s; export throughput.span_s 3241.041 s, export docs_per_s 3.0462 — the reported figure equals the export docs_per_s (export monotonic span), not the defined per-document-stamp span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Batches",
+   "reported": "20",
+   "recomputed": "20",
+   "match": true,
+   "note": "raw 20"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Batch wall median, s",
+   "reported": "145.4",
+   "recomputed": "143.3",
+   "match": false,
+   "note": "raw 143.278606; 20 batches; median of an even count = mean of the two middle walls (141.1578, 145.3995); the reported value equals the upper middle wall sorted[n//2] = 145.3995, i.e. the leg JSON's batches.wall_s_p50 (145.399)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Batch wall max, s",
+   "reported": "308.2",
+   "recomputed": "308.2",
+   "match": true,
+   "note": "raw 308.175213"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Batch holding 039_039660.pdf (index)",
+   "reported": "19",
+   "recomputed": "19",
+   "match": true,
+   "note": "raw 19"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "That batch's wall, s",
+   "reported": "101.2",
+   "recomputed": "101.2",
+   "match": true,
+   "note": "raw 101.207133"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Spare to 1,800 s",
+   "reported": "1698.8",
+   "recomputed": "1698.8",
+   "match": true,
+   "note": "raw 1698.792867"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "That batch's share of the span",
+   "reported": "3.12%",
+   "recomputed": "3.12%",
+   "match": true,
+   "note": "raw 3.122706%; wall 101.207133 s / span 3241.007374 s"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Batches died",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0; died batches []"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Documents returned",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Documents lost",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Numerator of docs/s (documents with content)",
+   "reported": "9,873",
+   "recomputed": "9873",
+   "match": true,
+   "note": "raw 9873"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Idle core-equivalents",
+   "reported": "19.422",
+   "recomputed": "19.422",
+   "match": true,
+   "note": "raw 19.422006; percore_host.idle_core_equivalents 19.422 — agree; 3238 samples = n_intervals 3238"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Span docs/s",
+   "reported": "3.8638",
+   "recomputed": "3.8639",
+   "match": false,
+   "note": "raw 3.863854; per-document-stamp span 2555.2206 s; export throughput.span_s 2555.288 s, export docs_per_s 3.8638 — the reported figure equals the export docs_per_s (export monotonic span), not the defined per-document-stamp span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Batches",
+   "reported": "10",
+   "recomputed": "10",
+   "match": true,
+   "note": "raw 10"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Batch wall median, s",
+   "reported": "241.3",
+   "recomputed": "240.3",
+   "match": false,
+   "note": "raw 240.337304; 10 batches; median of an even count = mean of the two middle walls (239.4036, 241.2710); the reported value equals the upper middle wall sorted[n//2] = 241.2710, i.e. the leg JSON's batches.wall_s_p50 (241.271)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Batch wall max, s",
+   "reported": "380.8",
+   "recomputed": "380.8",
+   "match": true,
+   "note": "raw 380.782552"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Batch holding 039_039660.pdf (index)",
+   "reported": "9",
+   "recomputed": "9",
+   "match": true,
+   "note": "raw 9"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "That batch's wall, s",
+   "reported": "241.3",
+   "recomputed": "241.3",
+   "match": true,
+   "note": "raw 241.27102"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Spare to 1,800 s",
+   "reported": "1558.7",
+   "recomputed": "1558.7",
+   "match": true,
+   "note": "raw 1558.72898"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "That batch's share of the span",
+   "reported": "9.44%",
+   "recomputed": "9.44%",
+   "match": true,
+   "note": "raw 9.442277%; wall 241.271020 s / span 2555.220646 s"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Batches died",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0; died batches []"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Documents returned",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Documents lost",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Numerator of docs/s (documents with content)",
+   "reported": "9,873",
+   "recomputed": "9873",
+   "match": true,
+   "note": "raw 9873"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Idle core-equivalents",
+   "reported": "14.995",
+   "recomputed": "14.995",
+   "match": true,
+   "note": "raw 14.99535; percore_host.idle_core_equivalents 14.995 — agree; 2552 samples = n_intervals 2552"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, continuous C=32 (reference)",
+   "figure": "Span docs/s",
+   "reported": "5.096",
+   "recomputed": "5.096",
+   "match": true,
+   "note": "raw 5.09604; per-document-stamp span 1937.3868 s; export throughput.span_s 1937.406 s, export docs_per_s 5.096"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, continuous C=32 (reference)",
+   "figure": "Idle core-equivalents",
+   "reported": "8.714",
+   "recomputed": "8.714",
+   "match": true,
+   "note": "raw 8.71351"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "RocketRide returned",
+   "reported": "9,216",
+   "recomputed": "9216",
+   "match": true,
+   "note": "raw 9216"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "RocketRide with content",
+   "reported": "9,129",
+   "recomputed": "9129",
+   "match": true,
+   "note": "raw 9129"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "RocketRide content outcomes",
+   "reported": "87",
+   "recomputed": "87",
+   "match": true,
+   "note": "raw 87"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "RocketRide lost to the deadline",
+   "reported": "759",
+   "recomputed": "759",
+   "match": true,
+   "note": "raw 759"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "LlamaIndex returned",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "LlamaIndex with content",
+   "reported": "9,873",
+   "recomputed": "9873",
+   "match": true,
+   "note": "raw 9873"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "LlamaIndex content outcomes",
+   "reported": "102",
+   "recomputed": "102",
+   "match": true,
+   "note": "raw 102"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "LlamaIndex lost",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "docs/s numerator, RocketRide",
+   "reported": "9,129",
+   "recomputed": "9129",
+   "match": true,
+   "note": "raw 9129"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'K=1,024, stated plainly'",
+   "figure": "docs/s numerator, LlamaIndex",
+   "reported": "9,873",
+   "recomputed": "9873",
+   "match": true,
+   "note": "raw 9873"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table (caption)",
+   "figure": "Caption claim: \"the document is sent at the same position in every leg\"",
+   "reported": "same position in every leg",
+   "recomputed": "positions differ: p1_rr_cont32 9,957, p2_li_cont 9,957, p3_rr_k128 9,973, p4_li_k128 9,960, e7_rr_k256 9,967, e8_li_k256 9,960, e9_rr_k512 9,967, e10_li_k512 9,957, e11_rr_k1024 9,949, e12b_li_k1024 9,955",
+   "match": false,
+   "note": "the table's own Sent-at figures (all reproduced) contradict the caption; on the four batched RocketRide legs 119/247/247/759 rows share one submit stamp, so the rank there is only 039_039660.pdf's alphabetical place inside its batch; the dispatch order itself (sha256 order) is not recorded in the listed files"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p1_rr_cont32",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,957",
+   "recomputed": "9957",
+   "match": true,
+   "note": "raw 9957; distinct per-document submit stamps"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p1_rr_cont32",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p1_rr_cont32",
+   "figure": "Held, s",
+   "reported": "1722",
+   "recomputed": "1722",
+   "match": true,
+   "note": "raw 1721.961664"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p1_rr_cont32",
+   "figure": "Set the span?",
+   "reported": "yes",
+   "recomputed": "yes",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p2_li_cont",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,957",
+   "recomputed": "9957",
+   "match": true,
+   "note": "raw 9957; distinct per-document submit stamps"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p2_li_cont",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p2_li_cont",
+   "figure": "Held, s",
+   "reported": "31",
+   "recomputed": "31",
+   "match": true,
+   "note": "raw 31.008039"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p2_li_cont",
+   "figure": "Set the span?",
+   "reported": "no — 011_011575.pdf",
+   "recomputed": "no — 011_011575.pdf",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p3_rr_k128",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,973",
+   "recomputed": "9973",
+   "match": true,
+   "note": "raw 9973; 119 rows share 039_039660.pdf's submit_ns (one batch stamp, 'per-document instants do not exist'); the rank is its alphabetical place inside the batch, not a submission position"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p3_rr_k128",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p3_rr_k128",
+   "figure": "Batch",
+   "reported": "77",
+   "recomputed": "77",
+   "match": true,
+   "note": "raw 77"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p3_rr_k128",
+   "figure": "Held, s",
+   "reported": "1706.8",
+   "recomputed": "1706.8",
+   "match": true,
+   "note": "raw 1706.821947; equals the batch wall — batched RocketRide rows carry the batch stamp only"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p3_rr_k128",
+   "figure": "Set the span?",
+   "reported": "no — 027_027335.pdf",
+   "recomputed": "tie — 039_039660.pdf's completion_ns equals the leg maximum, shared by all 119 rows of batch #77; no unique span-setting row",
+   "match": false,
+   "note": "the named document 027_027335.pdf is only the first of the 119 tied rows in file order and has the identical completion_ns; with one return stamp per batch the data cannot say 039_039660.pdf did not set the span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p4_li_k128",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,960",
+   "recomputed": "9960",
+   "match": true,
+   "note": "raw 9960; distinct per-document submit stamps"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p4_li_k128",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p4_li_k128",
+   "figure": "Batch",
+   "reported": "77",
+   "recomputed": "77",
+   "match": true,
+   "note": "raw 77"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p4_li_k128",
+   "figure": "Held, s",
+   "reported": "38.8",
+   "recomputed": "38.8",
+   "match": true,
+   "note": "raw 38.787618"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p4_li_k128",
+   "figure": "Set the span?",
+   "reported": "yes",
+   "recomputed": "yes",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e7_rr_k256",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,967",
+   "recomputed": "9967",
+   "match": true,
+   "note": "raw 9967; 247 rows share 039_039660.pdf's submit_ns (one batch stamp, 'per-document instants do not exist'); the rank is its alphabetical place inside the batch, not a submission position"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e7_rr_k256",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e7_rr_k256",
+   "figure": "Batch",
+   "reported": "38",
+   "recomputed": "38",
+   "match": true,
+   "note": "raw 38"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e7_rr_k256",
+   "figure": "Held, s",
+   "reported": "1748.1",
+   "recomputed": "1748.1",
+   "match": true,
+   "note": "raw 1748.149153; equals the batch wall — batched RocketRide rows carry the batch stamp only"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e7_rr_k256",
+   "figure": "Set the span?",
+   "reported": "no — 018_018488.pdf",
+   "recomputed": "tie — 039_039660.pdf's completion_ns equals the leg maximum, shared by all 247 rows of batch #38; no unique span-setting row",
+   "match": false,
+   "note": "the named document 018_018488.pdf is only the first of the 247 tied rows in file order and has the identical completion_ns; with one return stamp per batch the data cannot say 039_039660.pdf did not set the span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e8_li_k256",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,960",
+   "recomputed": "9960",
+   "match": true,
+   "note": "raw 9960; distinct per-document submit stamps"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e8_li_k256",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e8_li_k256",
+   "figure": "Batch",
+   "reported": "38",
+   "recomputed": "38",
+   "match": true,
+   "note": "raw 38"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e8_li_k256",
+   "figure": "Held, s",
+   "reported": "61.1",
+   "recomputed": "61.1",
+   "match": true,
+   "note": "raw 61.135373"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e8_li_k256",
+   "figure": "Set the span?",
+   "reported": "no — 033_033175.pdf",
+   "recomputed": "no — 033_033175.pdf",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e9_rr_k512",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,967",
+   "recomputed": "9967",
+   "match": true,
+   "note": "raw 9967; 247 rows share 039_039660.pdf's submit_ns (one batch stamp, 'per-document instants do not exist'); the rank is its alphabetical place inside the batch, not a submission position"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e9_rr_k512",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e9_rr_k512",
+   "figure": "Batch",
+   "reported": "19",
+   "recomputed": "19",
+   "match": true,
+   "note": "raw 19"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e9_rr_k512",
+   "figure": "Held, s",
+   "reported": "1754.4",
+   "recomputed": "1754.4",
+   "match": true,
+   "note": "raw 1754.448448; equals the batch wall — batched RocketRide rows carry the batch stamp only"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e9_rr_k512",
+   "figure": "Set the span?",
+   "reported": "no — 018_018488.pdf",
+   "recomputed": "tie — 039_039660.pdf's completion_ns equals the leg maximum, shared by all 247 rows of batch #19; no unique span-setting row",
+   "match": false,
+   "note": "the named document 018_018488.pdf is only the first of the 247 tied rows in file order and has the identical completion_ns; with one return stamp per batch the data cannot say 039_039660.pdf did not set the span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e10_li_k512",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,957",
+   "recomputed": "9957",
+   "match": true,
+   "note": "raw 9957; distinct per-document submit stamps"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e10_li_k512",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e10_li_k512",
+   "figure": "Batch",
+   "reported": "19",
+   "recomputed": "19",
+   "match": true,
+   "note": "raw 19"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e10_li_k512",
+   "figure": "Held, s",
+   "reported": "47.8",
+   "recomputed": "47.8",
+   "match": true,
+   "note": "raw 47.844175"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e10_li_k512",
+   "figure": "Set the span?",
+   "reported": "no — 009_009076.pdf",
+   "recomputed": "no — 009_009076.pdf",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e11_rr_k1024",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,949",
+   "recomputed": "9949",
+   "match": true,
+   "note": "raw 9949; 759 rows share 039_039660.pdf's submit_ns (one batch stamp, 'per-document instants do not exist'); the rank is its alphabetical place inside the batch, not a submission position"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e11_rr_k1024",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e11_rr_k1024",
+   "figure": "Batch",
+   "reported": "9",
+   "recomputed": "9",
+   "match": true,
+   "note": "raw 9"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e11_rr_k1024",
+   "figure": "Held, s",
+   "reported": "1800.1",
+   "recomputed": "1800.1",
+   "match": true,
+   "note": "raw 1800.085034; equals the batch wall — batched RocketRide rows carry the batch stamp only"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e11_rr_k1024",
+   "figure": "Set the span?",
+   "reported": "no — 019_019047.pdf",
+   "recomputed": "tie — 039_039660.pdf's completion_ns equals the leg maximum, shared by all 759 rows of batch #9; no unique span-setting row",
+   "match": false,
+   "note": "the named document 019_019047.pdf is only the first of the 759 tied rows in file order and has the identical completion_ns; with one return stamp per batch the data cannot say 039_039660.pdf did not set the span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e12b_li_k1024",
+   "figure": "Sent at (rank by (submit_ns, doc))",
+   "reported": "9,955",
+   "recomputed": "9955",
+   "match": true,
+   "note": "raw 9955; distinct per-document submit stamps"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e12b_li_k1024",
+   "figure": "Of N documents",
+   "reported": "9,975",
+   "recomputed": "9975",
+   "match": true,
+   "note": "raw 9975"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e12b_li_k1024",
+   "figure": "Batch",
+   "reported": "9",
+   "recomputed": "9",
+   "match": true,
+   "note": "raw 9"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e12b_li_k1024",
+   "figure": "Held, s",
+   "reported": "170.5",
+   "recomputed": "170.5",
+   "match": true,
+   "note": "raw 170.45538"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e12b_li_k1024",
+   "figure": "Set the span?",
+   "reported": "no — 018_018497.pdf",
+   "recomputed": "no — 018_018497.pdf",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Videos (measured records), LlamaIndex",
+   "reported": "168",
+   "recomputed": "168",
+   "match": true,
+   "note": "raw 168"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Videos (measured records), RocketRide",
+   "reported": "168",
+   "recomputed": "168",
+   "match": true,
+   "note": "raw 168"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Warm-up videos",
+   "reported": "2",
+   "recomputed": "2 (export provenance_leela.warmup_policy: \"2 disjoint manifest warm rows\"; the records file holds only the 168 measured rows)",
+   "match": true,
+   "note": "declared policy in the export, not a counted record"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Posture, LlamaIndex: workers[declared_workers=8]: 8 process(es) read back: six thread variables at 4; torch threads [4]",
+   "reported": "declared_workers=8; 8 read back; six vars 4; torch [4]",
+   "recomputed": "posture workers[declared_workers=8]; 8 readers; values {'OMP_NUM_THREADS': '4', 'MKL_NUM_THREADS': '4', 'OPENBLAS_NUM_THREADS': '4', 'VECLIB_MAXIMUM_THREADS': '4', 'NUMEXPR_NUM_THREADS': '4', 'TORCH_NUM_THREADS': '4', 'torch_num_threads': 4}",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Posture, RocketRide: default[tokens=1,threads=unset(engine-default-64)]: 1 process(es) read back: six thread variables unset; torch threads [16]",
+   "reported": "tokens=1; threads unset (64); 1 read back; six vars unset; torch [16]",
+   "recomputed": "posture default[tokens=1,threads=unset(engine-default-64)]; 1 reader; mode unset; declared {}; values {'torch_num_threads': 16}",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Videos in flight K, LlamaIndex",
+   "reported": "16",
+   "recomputed": "16",
+   "match": true,
+   "note": "raw 16; export provenance_leela.offered_concurrency"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Videos in flight K, RocketRide",
+   "reported": "16",
+   "recomputed": "16",
+   "match": true,
+   "note": "raw 16; export provenance_leela.offered_concurrency"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Total frames = export throughput.total_frames, LlamaIndex",
+   "reported": "23049",
+   "recomputed": "23049",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Total frames = export throughput.total_frames, RocketRide",
+   "reported": "23049",
+   "recomputed": "23049",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Throughput frames/s, LlamaIndex",
+   "reported": "13.524",
+   "recomputed": "13.524",
+   "match": true,
+   "note": "raw 13.524027; 23049 / 1704.3 s"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Ranking: LlamaIndex ahead of RocketRide (frames/s)",
+   "reported": "LlamaIndex ahead",
+   "recomputed": "LlamaIndex 13.524 > RocketRide 2.433",
+   "match": true,
+   "note": ""
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Engine CPU cores, LlamaIndex",
+   "reported": "28.566",
+   "recomputed": "28.566",
+   "match": true,
+   "note": "raw 28.566; efficiency.effective_cores"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Engine CPU cores, RocketRide",
+   "reported": "5.853",
+   "recomputed": "5.853",
+   "match": true,
+   "note": "raw 5.853; efficiency.effective_cores"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "CPU utilisation engine/32, LlamaIndex",
+   "reported": "89.27%",
+   "recomputed": "89.27%",
+   "match": true,
+   "note": "raw 89.27%; efficiency.cpu_util_of_box"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "CPU utilisation engine/32, RocketRide",
+   "reported": "18.29%",
+   "recomputed": "18.29%",
+   "match": true,
+   "note": "raw 18.29%; efficiency.cpu_util_of_box"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Idle core-equivalents, LlamaIndex",
+   "reported": "3.132",
+   "recomputed": "3.132",
+   "match": true,
+   "note": "raw 3.132234; 1691 of 1923 samples inside the measured window"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Idle core-equivalents, RocketRide",
+   "reported": "26.015",
+   "recomputed": "26.015",
+   "match": true,
+   "note": "raw 26.01451; 9456 of 9612 samples inside the measured window"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Idle spin, LlamaIndex",
+   "reported": "0.034",
+   "recomputed": "0.034",
+   "match": true,
+   "note": "raw 0.034; efficiency.idle_burden.idle_cores_with_instances_live"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Idle spin, RocketRide",
+   "reported": "1.226",
+   "recomputed": "1.226",
+   "match": true,
+   "note": "raw 1.226; efficiency.idle_burden.idle_cores_with_instances_live"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Videos, LlamaIndex",
+   "reported": "168",
+   "recomputed": "168",
+   "match": true,
+   "note": "raw 168; measured records without an error key"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Errors, LlamaIndex",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Videos, RocketRide",
+   "reported": "168",
+   "recomputed": "168",
+   "match": true,
+   "note": "raw 168; measured records without an error key"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "Errors, RocketRide",
+   "reported": "0",
+   "recomputed": "0",
+   "match": true,
+   "note": "raw 0"
+  },
+  {
+   "section": "## 3. AMI video at full scale",
+   "figure": "RocketRide's K=16 replicate spread on the 16-video slice (G5(b)), 2% threshold, LlamaIndex's K=8 replicate spread",
+   "reported": "9.76%; 2%; 12.25%",
+   "recomputed": null,
+   "match": null,
+   "note": "NOT RECOMPUTED — smoke-slice / Stage 3b video files are not among the listed files"
+  }
+ ],
+ "mismatches": [
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=512 span docs/s",
+   "reported": "3.0462",
+   "recomputed": "3.0463",
+   "match": false,
+   "note": "raw 3.046275; per-document-stamp span 3241.0074 s; export throughput.span_s 3241.041 s, export docs_per_s 3.0462 — the reported figure equals the export docs_per_s (export monotonic span), not the defined per-document-stamp span; they differ in the 4th decimal"
+  },
+  {
+   "section": "## 0. Answers",
+   "figure": "LlamaIndex K=1024 span docs/s",
+   "reported": "3.8638",
+   "recomputed": "3.8639",
+   "match": false,
+   "note": "raw 3.863854; per-document-stamp span 2555.2206 s; export throughput.span_s 2555.288 s, export docs_per_s 3.8638 — the reported figure equals the export docs_per_s (export monotonic span), not the defined per-document-stamp span; they differ in the 4th decimal"
+  },
+  {
+   "section": "## 1. Headline",
+   "figure": "docs/s to the 99th-percentile completion, LlamaIndex",
+   "reported": "5.3265",
+   "recomputed": "5.2865",
+   "match": false,
+   "note": "raw 5.286524; n_ok 9873, k = int(0.99*9873) = 9774; no variant tried reproduces 5.3265 (k-th vs (k+1)-th row: 5.2852; ceil(k): 5.2857; min submit over ok rows only: 5.2865; p99 over all rows incl. content outcomes: 5.3412; p90: 5.3114)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=128",
+   "figure": "Batch wall median, s",
+   "reported": "75.7",
+   "recomputed": "75.0",
+   "match": false,
+   "note": "raw 75.033769; 78 batches; median of an even count = mean of the two middle walls (74.4137, 75.6539); the reported value equals the upper middle wall sorted[n//2] = 75.6539, i.e. the leg JSON's batches.wall_s_p50 (75.654)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=256",
+   "figure": "That batch's share of the span",
+   "reported": "21.13%",
+   "recomputed": "21.14%",
+   "match": false,
+   "note": "raw 21.135366%; wall 1748.149153 s / span 8271.203454 s; exact 21.13537%; wall / export span_s = 21.13524% (-> 21.14%); wall pre-rounded to 1748.1 s / stamp span = 21.13477% (-> 21.13%) — the reported figure is reproduced only from a pre-rounded wall"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=512",
+   "figure": "Batch wall median, s",
+   "reported": "253.3",
+   "recomputed": "244.7",
+   "match": false,
+   "note": "raw 244.662705; 20 batches; median of an even count = mean of the two middle walls (236.0130, 253.3124); the reported value equals the upper middle wall sorted[n//2] = 253.3124, i.e. the leg JSON's batches.wall_s_p50 (253.312)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — RocketRide table, K=1024",
+   "figure": "Batch wall median, s",
+   "reported": "467.2",
+   "recomputed": "458.0",
+   "match": false,
+   "note": "raw 457.96534; 10 batches; median of an even count = mean of the two middle walls (448.7458, 467.1849); the reported value equals the upper middle wall sorted[n//2] = 467.1849, i.e. the leg JSON's batches.wall_s_p50 (467.185)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=128",
+   "figure": "Batch wall median, s",
+   "reported": "54.9",
+   "recomputed": "54.5",
+   "match": false,
+   "note": "raw 54.477008; 78 batches; median of an even count = mean of the two middle walls (54.0285, 54.9255); the reported value equals the upper middle wall sorted[n//2] = 54.9255, i.e. the leg JSON's batches.wall_s_p50 (54.926)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Span docs/s",
+   "reported": "3.0462",
+   "recomputed": "3.0463",
+   "match": false,
+   "note": "raw 3.046275; per-document-stamp span 3241.0074 s; export throughput.span_s 3241.041 s, export docs_per_s 3.0462 — the reported figure equals the export docs_per_s (export monotonic span), not the defined per-document-stamp span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=512",
+   "figure": "Batch wall median, s",
+   "reported": "145.4",
+   "recomputed": "143.3",
+   "match": false,
+   "note": "raw 143.278606; 20 batches; median of an even count = mean of the two middle walls (141.1578, 145.3995); the reported value equals the upper middle wall sorted[n//2] = 145.3995, i.e. the leg JSON's batches.wall_s_p50 (145.399)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Span docs/s",
+   "reported": "3.8638",
+   "recomputed": "3.8639",
+   "match": false,
+   "note": "raw 3.863854; per-document-stamp span 2555.2206 s; export throughput.span_s 2555.288 s, export docs_per_s 3.8638 — the reported figure equals the export docs_per_s (export monotonic span), not the defined per-document-stamp span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — LlamaIndex table, K=1024",
+   "figure": "Batch wall median, s",
+   "reported": "241.3",
+   "recomputed": "240.3",
+   "match": false,
+   "note": "raw 240.337304; 10 batches; median of an even count = mean of the two middle walls (239.4036, 241.2710); the reported value equals the upper middle wall sorted[n//2] = 241.2710, i.e. the leg JSON's batches.wall_s_p50 (241.271)"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table (caption)",
+   "figure": "Caption claim: \"the document is sent at the same position in every leg\"",
+   "reported": "same position in every leg",
+   "recomputed": "positions differ: p1_rr_cont32 9,957, p2_li_cont 9,957, p3_rr_k128 9,973, p4_li_k128 9,960, e7_rr_k256 9,967, e8_li_k256 9,960, e9_rr_k512 9,967, e10_li_k512 9,957, e11_rr_k1024 9,949, e12b_li_k1024 9,955",
+   "match": false,
+   "note": "the table's own Sent-at figures (all reproduced) contradict the caption; on the four batched RocketRide legs 119/247/247/759 rows share one submit stamp, so the rank there is only 039_039660.pdf's alphabetical place inside its batch; the dispatch order itself (sha256 order) is not recorded in the listed files"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, p3_rr_k128",
+   "figure": "Set the span?",
+   "reported": "no — 027_027335.pdf",
+   "recomputed": "tie — 039_039660.pdf's completion_ns equals the leg maximum, shared by all 119 rows of batch #77; no unique span-setting row",
+   "match": false,
+   "note": "the named document 027_027335.pdf is only the first of the 119 tied rows in file order and has the identical completion_ns; with one return stamp per batch the data cannot say 039_039660.pdf did not set the span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e7_rr_k256",
+   "figure": "Set the span?",
+   "reported": "no — 018_018488.pdf",
+   "recomputed": "tie — 039_039660.pdf's completion_ns equals the leg maximum, shared by all 247 rows of batch #38; no unique span-setting row",
+   "match": false,
+   "note": "the named document 018_018488.pdf is only the first of the 247 tied rows in file order and has the identical completion_ns; with one return stamp per batch the data cannot say 039_039660.pdf did not set the span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e9_rr_k512",
+   "figure": "Set the span?",
+   "reported": "no — 018_018488.pdf",
+   "recomputed": "tie — 039_039660.pdf's completion_ns equals the leg maximum, shared by all 247 rows of batch #19; no unique span-setting row",
+   "match": false,
+   "note": "the named document 018_018488.pdf is only the first of the 247 tied rows in file order and has the identical completion_ns; with one return stamp per batch the data cannot say 039_039660.pdf did not set the span"
+  },
+  {
+   "section": "## 2. Batch size at full scale — 'Where 039_039660.pdf sat' table, e11_rr_k1024",
+   "figure": "Set the span?",
+   "reported": "no — 019_019047.pdf",
+   "recomputed": "tie — 039_039660.pdf's completion_ns equals the leg maximum, shared by all 759 rows of batch #9; no unique span-setting row",
+   "match": false,
+   "note": "the named document 019_019047.pdf is only the first of the 759 tied rows in file order and has the identical completion_ns; with one return stamp per batch the data cannot say 039_039660.pdf did not set the span"
+  }
+ ]
+}

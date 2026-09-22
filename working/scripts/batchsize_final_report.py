@@ -141,6 +141,7 @@ def docs_posture(camp: Path, launch: str, name: str) -> Dict[str, Any]:
     env = set((p.get("thread_env") or {}).values())
     torch = rb.get("torch_num_threads", rb.get("health_torch_threads"))
     return {"thread_env": sorted(env), "in_process_torch_threads": torch, "ws1_workers": p.get("ws1_workers"),
+            "worker_processes_read": rb.get("n_worker_processes_read"), "all_workers_agree": rb.get("all_workers_agree"),
             "rr_tokens": p.get("rr_tokens"), "rr_threads_requested": p.get("rr_threads_requested"),
             "cpuset_effective": (p.get("cpuset_effective") or {}).get("raw"), "host_nproc": p.get("host_nproc"),
             "image_id": (p.get("image_id") or "")[:19]}
@@ -152,9 +153,15 @@ def docs_posture_text(pp: Dict[str, Any], arm: str) -> str:
     req = str(pp["rr_threads_requested"])
     unit = (f"{pp['rr_tokens']} token, threads= " + ("not passed" if req.startswith("NOT PASSED") else req) if arm == "rr"
             else f"{pp['ws1_workers']} workers")
-    who = "task process" if arm == "rr" else "each worker"
-    return (f"{unit}; {envs}; torch threads read in {who}: {pp['in_process_torch_threads']}; "
-            f"cpuset {pp['cpuset_effective']} of {pp['host_nproc']}")
+    if arm == "rr":
+        read = f"{envs}, and torch threads {pp['in_process_torch_threads']}, both read in the task process"
+    else:
+        # the variables are read in EVERY worker process; torch's count comes from ONE worker's /health answer
+        # (the blind verification's wording note, 2026-09-22)
+        read = (f"{envs} in every service process read"
+                + (", all agreeing" if pp.get("all_workers_agree") else " — they DISAGREE")
+                + f"; torch threads {pp['in_process_torch_threads']}, from one worker's /health answer")
+    return f"{unit}; {read}; cpuset {pp['cpuset_effective']} of {pp['host_nproc']}"
 
 
 def video_posture_text(leg_dir: Path, name: str) -> Dict[str, Any]:
@@ -169,6 +176,36 @@ def video_posture_text(leg_dir: Path, name: str) -> Dict[str, Any]:
     env_txt = ("six thread variables unset" if envs == {None} else
                "six thread variables at " + ", ".join(sorted(str(e) for e in envs)))
     return {"processes_read": len(rb), "text": f"{len(rb)} process(es) read back: {env_txt}; torch threads {torch}"}
+
+
+def leg_raw(perdoc: Path) -> Dict[str, Any]:
+    """Every span and batch figure the summary shows, computed from the RAW per-document records and
+    rounded only for display. The independent verification (2026-09-22) found the summary mixing the
+    driver export's monotonic-span docs/s with the stamp-based one, taking the upper middle wall as a
+    median, dividing already-rounded figures, and naming one of a batch's tied rows as the document
+    that set the span; this is the single definition that replaced all four."""
+    f = ROOT / perdoc if not perdoc.is_absolute() else perdoc
+    rows = [json.loads(x) for x in f.read_text().splitlines() if x.strip()]
+    t0 = min(r["submit_ns"] for r in rows)
+    t_end = max(r["completion_ns"] for r in rows)
+    span = (t_end - t0) / 1e9
+    ok = sum(1 for r in rows if r.get("ok"))
+    out: Dict[str, Any] = {"span_s": span, "docs_per_s": ok / span}
+    last = [r for r in rows if r["completion_ns"] == t_end]
+    out["span_set_by"] = ({"tie": True, "tied_rows": len(last), "batch": last[0].get("batch"),
+                           "straggler_among_them": any(r["doc"] == STRAGGLER for r in last)} if len(last) > 1 else
+                          {"tie": False, "doc": last[0]["doc"],
+                           "held_s": (last[0]["completion_ns"] - last[0]["submit_ns"]) / 1e9})
+    if any(r.get("batch") is not None for r in rows):
+        by: Dict[Any, List[Dict[str, Any]]] = {}
+        for r in rows:
+            by.setdefault(r.get("batch"), []).append(r)
+        walls = {b: (max(x["completion_ns"] for x in rs) - min(x["submit_ns"] for x in rs)) / 1e9 for b, rs in by.items()}
+        sb = next(r.get("batch") for r in rows if r["doc"] == STRAGGLER)
+        import statistics
+        out.update(batches=len(walls), wall_median_s=statistics.median(walls.values()), wall_max_s=max(walls.values()),
+                   straggler_batch=sb, straggler_batch_wall_s=walls[sb], straggler_share_of_span=walls[sb] / span)
+    return out
 
 
 def video_leg(p: Path, name: str) -> Dict[str, Any]:
@@ -262,7 +299,9 @@ def headline_docs(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
         out += [f"The RocketRide leg lost {lost['n']} document(s) to the driver's own 1,800 s deadline — a harness "
                 "loss, not an engine error: " + ", ".join(f"`{d['doc']}` (held {n(d['held_s'], 1)} s)" for d in lost["documents"]) + ".", ""]
     sp = R["tail"]["span_set_by"]
-    out += [f"**Why span and the diagnostics disagree on RocketRide.** `{STRAGGLER}` (39 pages) finished "
+    man = {json.loads(l)["file"]: json.loads(l) for l in (ROOT / "working/results/corpus_manifest.jsonl").read_text().splitlines() if l.strip()}
+    INPUTS["corpus_manifest"] = f"working/results/corpus_manifest.jsonl  sha256:{hashlib.sha256((ROOT / 'working/results/corpus_manifest.jsonl').read_bytes()).hexdigest()[:16]}"
+    out += [f"**Why span and the diagnostics disagree on RocketRide.** `{STRAGGLER}` ({n((man.get(STRAGGLER) or {}).get('pages'))} pages, per the corpus manifest) finished "
             f"{n(sp['seconds_after_p99'], 1)} s after the 99th-percentile completion and set the span (register 40). "
             "Dropping it from both arms is the symmetric view; the p99 figure was defined after this leg was "
             "seen (register 34) and is never the headline.", ""]
@@ -315,24 +354,26 @@ def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
                 continue
             d = (lambda x: f"{x} {DAG}") if arm == "rr" else (lambda x: x)
             died = br.get("batches_died") or []
-            held = (f"#{br['straggler_batch']}: DIED at the deadline ({n(br['straggler_batch_wall_s'], 1)} s)"
-                    if br.get("straggler_batch") in died else
-                    f"#{br['straggler_batch']}: {n(br['straggler_batch_wall_s'], 1)} s ({n(br['straggler_margin_s'], 1)} s spare)")
+            held = None   # filled below from the raw records
             launch, legname = key.split("/")
             oc = outcome_counts(s4 / launch / f"perdoc_{arm}_{legname}.jsonl", f"s4_perdoc_{arm}_{legname}")
-            span = ((a.get("check_E_tail") or {}).get("per_leg") or {}).get(key, {}).get("span_s")
-            share = (br["straggler_batch_wall_s"] / span) if span and br.get("straggler_batch_wall_s") else None
+            raw = leg_raw(s4 / launch / f"perdoc_{arm}_{legname}.jsonl")
+            span, share = raw["span_s"], raw["straggler_share_of_span"]
             returned = oc["completed"] + oc["content_outcome"]
             lost = oc["deadline_loss"] + oc["other_failure"]
+            sbw = raw["straggler_batch_wall_s"]
+            held = (f"#{raw['straggler_batch']}: DIED at the deadline ({sbw:.1f} s)" if raw["straggler_batch"] in died else
+                    f"#{raw['straggler_batch']}: {sbw:.1f} s ({1800 - sbw:.1f} s spare)")
             rows.append([f"K={k}" + (" (re-run, register 44)" if key.startswith("e12b") else ""),
-                         d(n(row["docs_per_s_mean"])), n(br["batches"]),
-                         f"{n(br['wall_s_median'], 1)} / {n(br['wall_s_max'], 1)}", held, pct(share),
+                         d(n(raw["docs_per_s"])), n(raw["batches"]),
+                         f"{raw['wall_median_s']:.1f} / {raw['wall_max_s']:.1f}", held, pct(share),
                          (n(len(died)) + (" — **BLAST-RADIUS-DOMINATED**" if len(died) > 1 else
                                             f" — batch {died[0]}, blast radius" if died else "")),
                          f"{n(returned)} / {n(lost)} / {n(oc['completed'])}",
                          f"{gb(br.get('anon_mb_at_window_close'))} – {gb(br.get('memory_peak_mb_total'))}",
                          d(n(row.get("idle_core_equivalents"), 3))])
-            F["stage4_envelope"][f"{arm}_k{k}"] = {"docs_per_s": row["docs_per_s_mean"], "batch_report": br,
+            F["stage4_envelope"][f"{arm}_k{k}"] = {"docs_per_s": round(raw["docs_per_s"], 4), "batch_report": br, "raw": {
+                                                  kk: (round(v, 6) if isinstance(v, float) else v) for kk, v in raw.items() if kk != "span_set_by"},
                                                   "idle_core_equivalents": row.get("idle_core_equivalents"),
                                                   "cpu_utilization": row.get("cpu_utilization"),
                                                   "straggler_batch_share_of_span": share, "span_s": span,
@@ -343,7 +384,8 @@ def envelope(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]:
             walls = ", ".join(f"{b}:{w}" for b, w in sorted(br["per_batch_wall_s"].items(), key=lambda kv: int(kv[0])))
             per_batch.append(f"- K={k} ({key}): {walls}")
         cr = cont_row(a, arm, 32)
-        rows.append(["continuous C=32 (reference)", (f"{n(cr['docs_per_s'])} {DAG}" if arm == "rr" else n(cr["docs_per_s"])),
+        craw = leg_raw(s4 / ("p1_rr_cont32" if arm == "rr" else "p2_li_cont") / f"perdoc_{arm}_refc32_main.jsonl")
+        rows.append(["continuous C=32 (reference)", (f"{n(craw['docs_per_s'])} {DAG}" if arm == "rr" else n(craw["docs_per_s"])),
                      "—", "—", "—", "—", "—", "—", "—", (f"{n(cr['idle_core_equivalents'], 3)} {DAG}" if arm == "rr" else n(cr["idle_core_equivalents"], 3))])
         out += [f"### {label}", ""]
         out += table(["K", "Span docs/s", "Batches", "Batch wall median / max, s",
@@ -413,26 +455,38 @@ def straggler_order(s4: Path, a: Dict[str, Any], F: Dict[str, Any]) -> List[str]
             ("e9_rr_k512", "rr", "k512_env"), ("e10_li_k512", "li", "k512_env"), ("e11_rr_k1024", "rr", "k1024_env"),
             ("e12b_li_k1024", "li", "k1024_env")]
     rows, F["straggler_order"] = [], {}
-    tail = (a.get("check_E_tail") or {}).get("per_leg") or {}
+    sl = load(Path("working/results/batchsize_main_20260920T160920Z/slice_docs_n9975_w25.json"), "slice_9975")
+    names = [x["file"] if isinstance(x, dict) else x for x in sl["measured"]]
+    slice_pos = names.index(STRAGGLER) + 1
     for launch, arm, leg in legs:
         f = s4 / launch / f"perdoc_{arm}_{leg}.jsonl"
         rs = [json.loads(x) for x in f.read_text().splitlines() if x.strip()]
         order = sorted(rs, key=lambda r: (r["submit_ns"], r["doc"]))
         idx = next(i for i, r in enumerate(order) if r["doc"] == STRAGGLER) + 1
         me = next(r for r in rs if r["doc"] == STRAGGLER)
-        sb = tail.get(f"{launch}/{leg}", {}).get("span_set_by", {})
-        F["straggler_order"][launch] = {"sent_at": idx, "of": len(rs), "batch": me.get("batch"),
-                                        "held_s": round((me["completion_ns"] - me["submit_ns"]) / 1e9, 1),
-                                        "set_the_span": sb.get("doc") == STRAGGLER}
+        raw = leg_raw(f)
+        ssb = raw["span_set_by"]
+        if ssb["tie"]:
+            setter = (f"its batch #{ssb['batch']} did — the last to return; its {n(ssb['tied_rows'])} rows share one return stamp"
+                      if ssb["straggler_among_them"] else f"batch #{ssb['batch']} ({n(ssb['tied_rows'])} tied rows)")
+        else:
+            setter = "yes" if ssb["doc"] == STRAGGLER else f"no — `{ssb['doc']}` (held {ssb['held_s']:.1f} s)"
+        F["straggler_order"][launch] = {"slice_position": slice_pos, "rank_by_submit_stamp": idx, "of": len(rs),
+                                        "batch": me.get("batch"), "held_s": round((me["completion_ns"] - me["submit_ns"]) / 1e9, 1),
+                                        "span_set_by": ssb}
         d = (lambda x: f"{x} {DAG}") if arm == "rr" else (lambda x: x)
-        rows.append([launch, d(f"{n(idx)} of {n(len(rs))}"), "—" if me.get("batch") is None else f"#{me['batch']}",
-                     d(n(F["straggler_order"][launch]["held_s"], 1)), "yes" if sb.get("doc") == STRAGGLER else f"no — `{sb.get('doc')}`"])
-    out = [f"**Where `{STRAGGLER}` sat in each leg's submission order** (R3). Every leg sends the slice in the same "
-           "fixed order (the slice's sha256 order), so the document is sent at the same position in every leg:", ""]
-    out += table(["Leg", "Sent at", "Batch", "Held, s", "Set the span?"], rows)
+        rows.append([launch, f"{n(slice_pos)} of {n(len(names))}", d(f"{n(idx)}"),
+                     "—" if me.get("batch") is None else f"#{me['batch']}",
+                     d(n(F["straggler_order"][launch]["held_s"], 1)), setter])
+    out = [f"**Where `{STRAGGLER}` sat in each leg's submission order** (R3). Every leg sends the slice in one fixed order, "
+           f"the slice file's, where the document is at position {n(slice_pos)} of {n(len(names))}. Its rank by submit stamp "
+           "differs by leg, for two reasons that do not change that order: a continuous leg stamps each document when a "
+           "worker actually sends it, so near-simultaneous sends interleave; and a RocketRide batch stamps all its rows at "
+           "once, so the rank inside a batch is only alphabetical (ties are broken by name).", ""]
+    out += table(["Leg", "Slice position (the send order)", "Rank by submit stamp", "Batch", "Held, s", "Set the span?"], rows)
     p1 = F["straggler_order"]["p1_rr_cont32"]
-    from_last = p1["of"] - p1["sent_at"] + 1
-    out += ["", f"**The span is order-dependent.** `{STRAGGLER}` is the {n(from_last)}th document from the end of the order (position {n(p1['sent_at'])} of "
+    from_last = p1["of"] - p1["slice_position"] + 1
+    out += ["", f"**The span is order-dependent.** `{STRAGGLER}` is the {n(from_last)}th document from the end of the order (position {n(p1['slice_position'])} of "
             f"{n(p1['of'])}); on RocketRide it is then held {n(p1['held_s'], 1)} s {DAG}, so it outlasts the rest of the run and sets "
             "the span of the continuous leg, and on batched legs it is in the last batch at every K. Sent early, that hold "
             "would overlap the bulk of the run and the span would be set by the bulk. The span with it dropped from both arms (§1) and the p99 diagnostic are the "
@@ -619,9 +673,9 @@ def answers(F: Dict[str, Any]) -> List[str]:
                     f" of RocketRide's continuous rate {DAG} and {n(best_b['li'][1]['docs_per_s'] / L['docs_per_s_span'], 3)}"
                     " of LlamaIndex's.")
     def spare(e: Dict[str, Any]) -> str:
-        br = e["batch_report"]
-        return ("died at the deadline" if br.get("straggler_batch") in (br.get("batches_died") or [])
-                else n(br["straggler_margin_s"], 1))
+        br, raw = e["batch_report"], e["raw"]
+        return ("died at the deadline" if raw.get("straggler_batch") in (br.get("batches_died") or [])
+                else f"{1800 - raw['straggler_batch_wall_s']:.1f}")
     margins = {arm: [(k, spare(e)) for k, e in ks(arm)] for arm in ("rr", "li")}
     deaths = [(arm, k, e["batch_report"]) for arm in ("rr", "li") for k, e in ks(arm) if e["batch_report"].get("batches_died")]
     died = sum(len(br["batches_died"]) for _, _, br in deaths)

@@ -1,0 +1,16 @@
+3c3
+< Generated 2026-09-22T04:53:36Z by `working/scripts/batchsize_final_report.py` from committed analysis artifacts; every table names its source, and `batchsize_final_summary.json` records each input's sha256. Box: one c7i.8xlarge, 32 vCPUs, one workload at a time.
+---
+> Generated 2026-09-22T05:05:13Z by `working/scripts/batchsize_final_report.py` from committed analysis artifacts; every table names its source, and `batchsize_final_summary.json` records each input's sha256. Box: one c7i.8xlarge, 32 vCPUs, one workload at a time.
+5c5
+< Supersedes `working/results/batchsize_final_20260922T023454Z` — every figure identical: **False**; the figure groups that differ, computed from the two JSON twins: `fd_note`, `provenance_s3b`, `stage4_envelope`, `stage5`, `straggler_order`.
+---
+> Supersedes `working/results/batchsize_final_20260922T023454Z` — every figure identical: **False**; the figure groups that differ, computed from the two JSON twins: `fd_note`, `provenance_s3b`, `stage4_docs_headline`, `stage4_envelope`, `stage5`, `straggler_order`.
+46c46
+< | Posture — banked docs posture: 1 token, six vars = 1, both arms (read back in-process) | 1 token, threads= not passed; six thread variables at 1; torch threads read in task process: 1; cpuset 0-31 of 32 † | 24 workers; six thread variables at 1; torch threads read in each worker: 1; cpuset 0-31 of 32 |
+---
+> | Posture — banked docs posture: 1 token, six vars = 1, both arms (read back in-process) | 1 token, threads= not passed; six thread variables at 1, and torch threads 1, both read in the task process; cpuset 0-31 of 32 † | 24 workers; six thread variables at 1 in every service process read, all agreeing; torch threads 1, from one worker's /health answer; cpuset 0-31 of 32 |
+464c464
+< - **REGISTER.** Entries 37-47 were added during this campaign, dated 2026-09-20 or later (working/video/METHODOLOGY_REGISTER.md).
+---
+> - **REGISTER.** Entries 37-48 were added during this campaign, dated 2026-09-20 or later (working/video/METHODOLOGY_REGISTER.md).

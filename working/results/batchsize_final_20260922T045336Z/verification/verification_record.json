@@ -1,0 +1,47 @@
+{
+ "what": "Independent verification of the closeout summary (item 7): a fresh agent, given only raw-file paths and the methodology's definitions, recomputed every headline figure from the records, never from the analysis files; one altered figure was planted in its copy, unannounced, each round.",
+ "round1": {
+  "text_checked": "a draft of this summary (not landed)",
+  "figures_checked": 287,
+  "mismatches": 17,
+  "plant": {
+   "figure": "\u00a71 headline, LlamaIndex docs/s to the 99th-percentile completion",
+   "true": "5.2865",
+   "planted": "5.3265",
+   "caught": true
+  },
+  "real_mismatches": 16,
+  "classes": [
+   "two definitions of span docs/s (stamps vs the export's monotonic span)",
+   "an upper-middle 'median' for even batch counts",
+   "rounding before dividing",
+   "a tied batch return reported as one document",
+   "a caption contradicting its own table"
+  ],
+  "outcome": "BLOCKED \u2014 every class fixed at the source (register 48) before round 2"
+ },
+ "round2": {
+  "text_checked": "this summary before the wording fix below",
+  "figures_checked": 333,
+  "mismatches": 1,
+  "plant": {
+   "figure": "\u00a72 RocketRide K=512, the straggler batch's share of the span",
+   "true": "24.70%",
+   "planted": "24.07%",
+   "caught": true
+  },
+  "real_mismatches": 0,
+  "outcome": "PASS \u2014 the plant caught, nothing else mismatched",
+  "wording_note_fixed": "LlamaIndex's torch thread count was read from one worker's /health answer, not in each worker; reworded without adding any figure"
+ },
+ "post_verification_changes": {
+  "diff": "post_verification.diff",
+  "measurement_figures_changed": false,
+  "digits_changed": "the generation timestamp and the register range's end (entry 48 written during round 2)"
+ },
+ "sha256": {
+  "verified_text": "07f5e634611377793822c479bd9fd26e0ad417e4db282c3f65d12a73c81a211d",
+  "landed_text": "b8d108b7f2877ee11fe085b5f4c4f8f4d042657afe88ccf537c466a37e62a397"
+ },
+ "planted_copies": "held outside the repository; the planted values appear here only as labelled plants"
+}
