@@ -1,0 +1,44 @@
+{
+ "written_utc": "2026-09-22T04:02:04Z",
+ "what": "S5-E and S5-F, pre-registered before any leg ran; landed on origin before the launch",
+ "slice": "working/results/batchsize_smoke_20260920T113000Z/slice_docs_n384_w25.json",
+ "arm": "RocketRide, 1 token, threads= not passed, continuous submission, every leg prewarmed, unconstrained (Ruling A)",
+ "s5e": {
+  "C": 32,
+  "postures": {
+   "env1": "six thread variables = 1 (the banked docs posture)",
+   "unset": "six thread variables absent (the engine's out-of-the-box posture)"
+  },
+  "order": [
+   "rr_env1_a",
+   "rr_unset_a",
+   "rr_env1_b",
+   "rr_unset_b"
+  ],
+  "readback": "torch intra-op threads and the six variables read inside the task process, every leg; a leg whose read-back does not match its posture is excluded, named",
+  "primary_metric": "span docs/s",
+  "diagnostic_defined_before_the_legs": "docs/s to p90 (one 791-page document sets this slice's span)",
+  "effect": "mean(unset) / mean(env1) - 1",
+  "readable_only_if": "the effect exceeds the 0.82% Stage 3b floor, each posture pair's own spread, and S5-C's null-control spread (1.63%, same slice)"
+ },
+ "s5f": {
+  "C": 5,
+  "posture": "env1 (banked docs posture)",
+  "runs": [
+   "rr_c5_a",
+   "rr_c5_b"
+  ],
+  "label": "SDK default-5 equivalent (PR #1895 / TypeScript maxConcurrent)",
+  "compared_with": {
+   "same_session": "this launch's env1 C=32 legs",
+   "cross_session": "Stage 3b C=4, C=8, C=32 on the same slice and posture (analysis_docs_384.json) \u2014 ranking context only"
+  }
+ },
+ "source_read_before_s5f": {
+  "sdk_send_files": "rocketride 1.3.0, rocketride/mixins/data.py:719-725: one coroutine per file, asyncio.gather over all of them \u2014 no client-side bound; each upload awaits self.pipe()/pipe.open(), 'waits for server to allocate' (data.py:635-638), and opens its file only after the pipe is granted (data.py:651)",
+  "driver_batch": "working/scripts/exp_batchsize_sweep.py:633-634: one client.send_files([K paths]) per barrier, under the batch deadline",
+  "driver_continuous": "working/scripts/exp_batchsize_sweep.py:651,656,661: client.send(token, bytes) per document, at most C in flight via asyncio.Semaphore(C)",
+  "engine_pipe_bound": "engine/ai/modules/data/data_conn.py:117,138,477,753: pipes are admitted under asyncio.Semaphore(threadCount); threadCount = 64 when threads= is not passed (engine/ai/constants.py:48; task_engine.py:247,382). So a batch of K opens K pipe requests at once and at most 64 are in flight per token.",
+  "label": "SOURCE, not measurement (register 1)"
+ }
+}
