@@ -168,6 +168,7 @@ ARGS=(--arm "$ARM" --slice "$SLICE" --run-dir "$RUN_DIR" --k "$KLIST" --corpus-d
 # now a reported number (cost.driver_cores), not a hidden one.
 MSPID=""
 if [ "${BSZ_MEMSTAT:-}" = "1" ]; then       # P1: the 1 Hz memory.stat sampler on the service container
+  mkdir -p "$RUN_DIR"                       # the driver creates it later; the redirect below needs it now
   "$PY" working/harness/memstat_sampler.py --container "$([ "$ARM" = rr ] && echo rr || echo li)" --out "$RUN_DIR/memstat.jsonl" --until "$RUN_DIR/.memstat_stop" > "$RUN_DIR/memstat_stdout.txt" 2>&1 &
   MSPID=$!
 fi
