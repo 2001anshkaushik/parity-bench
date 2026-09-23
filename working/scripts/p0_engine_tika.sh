@@ -39,8 +39,9 @@ run_one() {
   [ "$rc" = 124 ] && docker rm -f "$n" >/dev/null 2>&1
   echo "{\"doc\": \"$doc\", \"wall_s\": $(python3 -c "print(round($t1 - $t0, 3))"), \"rc\": $rc, \"stdout_bytes\": $(wc -c < "$OUT/${doc}.out"), \"stderr_bytes\": $(wc -c < "$OUT/${doc}.err")}" >> "$OUT/results_e1.jsonl"
 }
-for doc in $ELEVEN; do run_one "$doc" & done
-wait
+PIDS=()
+for doc in $ELEVEN; do run_one "$doc" & PIDS+=($!); done
+wait "${PIDS[@]}"          # the parses only — never the census, which runs until its SIGINT
 [ -n "${BPID:-}" ] && sudo -n kill -INT "$BPID"; sleep 3
 # keep only the head and tail of each document's output (the text itself is not the point)
 for doc in $ELEVEN; do
