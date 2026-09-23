@@ -1,0 +1,15 @@
+// P0 H2 GIL tracer (amendment 1): uprobes on CPython 3.12's take_gil / drop_gil in the engine
+// binary (local symbols, present in its .symtab). Per thread: time inside take_gil = WAITING for
+// the lock (an uncontended take returns at once); take_gil return -> next drop_gil = HOLDING it.
+uprobe:/proc/851674/root/opt/rocketride/engine/engine:take_gil /pid == 851674/ { @t0[tid] = nsecs; }
+uretprobe:/proc/851674/root/opt/rocketride/engine/engine:take_gil /pid == 851674 && @t0[tid]/ {
+  $w = nsecs - @t0[tid]; delete(@t0[tid]);
+  @wait_ns[tid] = sum($w); @takes[tid] = count(); @h0[tid] = nsecs;
+  @wait_by_s[nsecs / 1000000000] = sum($w); @wait_hist = hist($w);
+  if (@tfirst == 0) { @tfirst = nsecs; }
+  @tlast = nsecs;
+}
+uprobe:/proc/851674/root/opt/rocketride/engine/engine:drop_gil /pid == 851674 && @h0[tid]/ {
+  $h = nsecs - @h0[tid]; delete(@h0[tid]);
+  @hold_ns[tid] = sum($h); @hold_by_s[nsecs / 1000000000] = sum($h);
+}

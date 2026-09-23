@@ -1,0 +1,31 @@
+{
+ "stage_complete_utc": "2026-09-23T11:50:45Z",
+ "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+ "outcome": "complete",
+ "legs": [
+  "d1f_rr_s1:rc=0",
+  "d1f_rr_u1:rc=0",
+  "d1f_rr_s2:rc=0",
+  "d1f_rr_u2:rc=0",
+  "anf_rr_u1:rc=0",
+  "anf_li_u1:rc=0",
+  "anf_rr_s1:rc=0",
+  "anf_li_t1:rc=0",
+  "anf_rr_u2:rc=0",
+  "anf_li_u2:rc=0",
+  "anf_rr_s2:rc=0",
+  "anf_li_t2:rc=0",
+  "tool_gil3:rc=0",
+  "h2f_null_c1:rc=0",
+  "h2f_c32_a:rc=0",
+  "h2f_c32_b:rc=0",
+  "h1f_c32_a:rc=0",
+  "h1f_c64_a:rc=0",
+  "h1f_c32_b:rc=0",
+  "h1f_c64_b:rc=0",
+  "h7f_dbg_a:rc=0",
+  "h7f_nodbg_a:rc=0",
+  "h7f_dbg_b:rc=0",
+  "h7f_nodbg_b:rc=0"
+ ]
+}

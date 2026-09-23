@@ -1,0 +1,6 @@
+py-spy> Sampling process 100 times a second. Press Control-C to exit.
+
+
+py-spy> Stopped sampling because Control-C pressed
+py-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/h2f_c32_a/pyspy_gil_rr_refc32_h2f_c32_a.txt'. Samples: 2986 Errors: 182
+py-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG
