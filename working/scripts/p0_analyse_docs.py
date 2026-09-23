@@ -206,6 +206,24 @@ def li_d1(leg: Dict[str, Any]) -> Dict[str, Any]:
                     "returns before the stamps are added)"}
 
 
+def drain(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """POST-HOC DIAGNOSTIC (not pre-registered): how much of the span is the DRAIN — the time after
+    the last document was submitted, when fewer than C documents remain in flight. Span throughput
+    counts it; a steady-state view does not. From the client's own submit/completion stamps."""
+    t0 = min(r["submit_ns"] for r in rows) / 1e9
+    last_sub = max(r["submit_ns"] for r in rows) / 1e9 - t0
+    comp = sorted(r["completion_ns"] / 1e9 - t0 for r in rows)
+    span = comp[-1]
+    q = lambda f: comp[max(0, math.ceil(f * len(comp)) - 1)]  # noqa: E731
+    done_by_last_sub = sum(1 for c, r in zip(comp, rows) if c <= last_sub)
+    ok_by = sum(1 for r in rows if r.get("ok") and r["completion_ns"] / 1e9 - t0 <= last_sub)
+    return {"label": "POST-HOC DIAGNOSTIC", "span_s": span, "last_submit_s": last_sub,
+            "drain_share_of_span": (span - last_sub) / span if span else None,
+            "completed_by_last_submit": done_by_last_sub,
+            "steady_docs_per_s": ok_by / last_sub if last_sub > 0 else None,
+            "time_to_fraction_s": {"50%": q(.5), "90%": q(.9), "95%": q(.95), "99%": q(.99), "100%": span}}
+
+
 # ------------------------------------------------------------------ comparisons
 
 def pair_compare(a: List[Dict[str, Any]], b: List[Dict[str, Any]], floor: float) -> Dict[str, Any]:
@@ -329,7 +347,8 @@ def main() -> int:
                           "mandate": g["mandate"],
                           "engine_cores": (g["cost"] or {}).get("engine_container_cores"),
                           "cpu_s_per_doc": (g["cost"] or {}).get("cpu_s_per_doc"),
-                          "host_busy_cores": (g["percore_host"] or {}).get("mean_busy_cores")}
+                          "host_busy_cores": (g["percore_host"] or {}).get("mean_busy_cores"),
+                          "drain_posthoc": drain(g["rows"])}
     res["sessions"] = sorted({g["boot_id"] for g in legs.values() if g["boot_id"]})
     # ---- D1 overhead
     ov = {}

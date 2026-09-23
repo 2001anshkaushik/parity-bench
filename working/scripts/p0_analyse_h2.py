@@ -95,6 +95,39 @@ def gil_shares(d: Path, leg: str) -> Dict[str, Any]:
                                             key=lambda x: -x[1])[:5]}
 
 
+def steady_vs_drain(d: Path, leg: str) -> Dict[str, Any]:
+    """POST-HOC DIAGNOSTIC (not pre-registered): threads in state R while every document is still
+    being submitted (steady) against after the last submit (drain), from the /proc sampler and the
+    client's per-document stamps; Python threads = those that took the GIL."""
+    ts, pdoc = d / f"threadstate_{leg}.jsonl", sorted(d.glob("perdoc_*.jsonl"))
+    tr = bpf_maps(d / f"giltrace_{leg}.json")
+    if not ts.exists() or not pdoc or not tr.get("@takes"):
+        return {"status": "unavailable"}
+    py = set(int(t) for t in tr["@takes"])
+    rows = [json.loads(x) for x in pdoc[0].read_text().splitlines() if x.strip()]
+    t0 = min(r["submit_ns"] for r in rows) / 1e9
+    last_sub = max(r["submit_ns"] for r in rows) / 1e9
+    acc = {"steady": [0, 0, 0, 0], "drain": [0, 0, 0, 0]}
+    for line in ts.read_text().splitlines():
+        if not line.strip():
+            continue
+        snap = json.loads(line)
+        t = snap["t"]
+        if t < t0:
+            continue
+        k = "steady" if t <= last_sub else "drain"
+        inflight = sum(1 for r in rows if r["submit_ns"] / 1e9 <= t < r["completion_ns"] / 1e9)
+        a = acc[k]
+        a[0] += 1
+        a[1] += sum(1 for x in snap["th"] if x[0] in py and x[2] == "R")
+        a[2] += sum(1 for x in snap["th"] if x[2] == "R")
+        a[3] += inflight
+    return {"label": "POST-HOC DIAGNOSTIC", "last_submit_s": last_sub - t0,
+            **{k: {"samples": a[0], "docs_in_flight_mean": a[3] / a[0] if a[0] else None,
+                   "python_threads_R_mean": a[1] / a[0] if a[0] else None,
+                   "all_threads_R_mean": a[2] / a[0] if a[0] else None} for k, a in acc.items()}}
+
+
 LINE = re.compile(r"^(?P<stack>.*) (?P<n>\d+)$")
 
 
@@ -103,7 +136,9 @@ def pyspy_gil(d: Path, leg: str, rate: float, window_s: Optional[float]) -> Dict
     if not f.exists() or not f.stat().st_size:
         return {"status": "NO FILE"}
     fn, stage, total = Counter(), Counter(), 0
-    for line in f.read_text().splitlines():
+    # py-spy writes raw bytes from the target's memory (thread names, paths): a stray non-UTF-8 byte
+    # is replaced, never allowed to drop the file
+    for line in f.read_text(encoding="utf-8", errors="replace").splitlines():
         m = LINE.match(line.strip())
         if not m:
             continue
@@ -152,6 +187,7 @@ def main() -> int:
                           for k, v in py.items() if isinstance(v, dict) and "rc" in v},
             "gil": gil_shares(d, tag),
             "pyspy_gil": pyspy_gil(d, tag, 100.0, wsec),
+            "steady_vs_drain_posthoc": steady_vs_drain(d, tag),
             "recorder_n_native": ("NOT RUN — py-spy --native aborts on the engine binary "
                                   "(UNW_EBADREG), tooling leg 08:36Z; amendment 1")}
     # Amendment 3: h2_null_c1 / h2_c32_a / h2_c32_b ran with a tracer that never wrote (bpftrace
@@ -171,7 +207,7 @@ def main() -> int:
     mean_w = sum(vals) / len(vals) if len(vals) == 2 else None
     res["null_control"] = {"leg": "h2f_null_c1", "waiting_on_gil": null.get("waiting_on_gil"),
                            "threshold": NULL_MAX, "pass": null_ok}
-    res["gate"] = {"threshold": GATE, "metric": "mean waiting_on_gil of h2_c32_a and h2_c32_b",
+    res["gate"] = {"threshold": GATE, "metric": "mean waiting_on_gil of h2f_c32_a and h2f_c32_b (amendments 3 and 4)",
                    "measured": mean_w, "values": vals,
                    "fired": (mean_w is not None and null_ok and mean_w >= GATE),
                    "evaluable": mean_w is not None and null_ok,
