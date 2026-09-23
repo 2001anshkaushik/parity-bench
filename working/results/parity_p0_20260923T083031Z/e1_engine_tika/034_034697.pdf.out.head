@@ -1,0 +1,40 @@
+[143MB] Sep 23, 2026 12:00:34 PM com.rocketride.tika_api.TikaApi main
+        INFO: Extracting text: /corpus/034_034697.pdf
+[143MB] Sep 23, 2026 12:00:34 PM com.rocketride.tika_api.TikaApi init
+        INFO: Tika.rootPath (Before set): .
+[143MB] Sep 23, 2026 12:00:34 PM com.rocketride.tika_api.TikaApi init
+        INFO: Tika.rootPath (Before set): .
+[143MB] Sep 23, 2026 12:00:34 PM com.rocketride.tika_api.TikaApi init
+        INFO: Tika.rootPath: /opt/rocketride/engine/java/jre/..
+[143MB] Sep 23, 2026 12:00:34 PM com.rocketride.tika_api.TikaApi init
+        INFO: Tika.rootPath: /opt/rocketride/engine/java/jre/..
+[143MB] Sep 23, 2026 12:00:34 PM com.rocketride.tika_api.TikaApi init
+        INFO: Initializing TikaAPI ...
+[143MB] Sep 23, 2026 12:00:34 PM com.rocketride.tika_api.TikaApi init
+        INFO: Initializing TikaAPI ...
+[143MB] Sep 23, 2026 12:00:34 PM com.rocketride.tika_api.TikaApi init
+        INFO: Aspose parsers available: false
+[143MB] Sep 23, 2026 12:00:34 PM com.rocketride.tika_api.TikaApi init
+        INFO: Aspose parsers available: false
+[200MB] ? Max Heap Memory: 5000 MB
+[200MB] JVM Arg:
+[200MB] JVM Arg: -Xmx5000m
+[200MB] JVM Arg: -Xrs
+[200MB] JVM Arg: -XX:ErrorFile=/tmp/java_error%p.log
+[200MB] JVM Arg: -Djava.io.tmpdir=
+[200MB] JVM Arg: --add-opens=java.base/java.io=ALL-UNNAMED
+[200MB] JVM Arg: vfprintf
+[200MB] JVM Arg: abort
+[200MB] JVM Arg: exit
+[200MB] Extracted text:
+[200MB] ---------------------------------------------------------
+[200MB] Sep 23, 2026 12:00:35 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: The flags value is : 0
+[200MB] Sep 23, 2026 12:00:35 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: The flags value is : 0
+[202MB] Sep 23, 2026 12:00:35 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: 
+        Invoke parse() method (on doc type)
+[202MB] Sep 23, 2026 12:00:35 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: 
+        Invoke parse() method (on doc

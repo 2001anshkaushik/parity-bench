@@ -1,0 +1,48 @@
+ same timeInstant? 
+        35
+        Feature histories
+        ? A history can be built up by transmitting 
+        the sequence of changes:
+        36
+        xNOTAM TimeLine
+        37
+        AIXM Temporality document
+        Now on www.aixm.aero
+        38
+        Thank you!
+        39
+[698MB] Sep 23, 2026 12:29:06 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@128aa517
+[698MB] Sep 23, 2026 12:29:06 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@128aa517
+[698MB] Extracted metadata:
+[698MB] ---------------------------------------------------------
+[698MB] pdf:PDFVersion=1.3
+[698MB] xmp:CreatorTool=PScript5.dll Version 5.2
+[698MB] pdf:hasXFA=false
+[698MB] access_permission:modify_annotations=true
+[698MB] X-TIKA:Parsed-By-Full-Set=org.apache.tika.parser.CompositeParser; org.apache.tika.parser.pdf.PDFParser
+[698MB] dc:creator=vvallikat
+[698MB] pdf:num3DAnnotations=0
+[698MB] dcterms:created=2007-12-20T11:16:56Z
+[698MB] dcterms:modified=2007-12-20T11:16:56Z
+[698MB] dc:format=application/pdf; version=1.3
+[698MB] pdf:overallPercentageUnmappedUnicodeChars=0.0068515148013830185
+[698MB] access_permission:fill_in_form=true
+[698MB] pdf:hasCollection=false
+[698MB] dc:title=Microsoft PowerPoint - Temporality_DC.ppt
+[698MB] pdf:containsNonEmbeddedFont=false
+[698MB] pdf:hasMarkedContent=false
+[698MB] pdf:ocrPageCount=0
+[698MB] Content-Type=application/pdf
+[698MB] access_permission:can_print_faithful=true
+[698MB] pdf:producer=GPL Ghostscript 8.15
+[698MB] pdf:totalUnmappedUnicodeChars=64
+[698MB] access_permission:extract_for_accessibility=true
+[698MB] access_permission:assemble_document=true
+[698MB] xmpTPg:NPages=39
+[698MB] pdf:hasXMP=false
+[698MB] access_permission:extract_content=true
+[698MB] access_permission:can_print=true
+[698MB] access_permission:can_modify=true
+[698MB] pdf:containsDamagedFont=false

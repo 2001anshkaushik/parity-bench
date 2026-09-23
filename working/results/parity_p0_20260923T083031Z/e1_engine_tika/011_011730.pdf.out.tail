@@ -1,0 +1,49 @@
+SDO will Help Anyone Who Asks!
+        ? Workshops, Conferences, Publications
+        ? Education/Outreach
+        13
+        14
+        	Message
+        	Rapid II
+        	Award Ceremony
+        	Explorers
+        	NPOESS
+        	New Business
+        	A Reminder...
+        	Publication Info
+        	RSDO Presentation
+        	Dr. Ghassem Asrar?s letter
+[681MB] Sep 23, 2026 12:07:05 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@7ccd5235
+[681MB] Sep 23, 2026 12:07:05 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@7ccd5235
+[681MB] Extracted metadata:
+[681MB] ---------------------------------------------------------
+[681MB] pdf:PDFVersion=1.2
+[681MB] pdf:hasXFA=false
+[681MB] access_permission:modify_annotations=true
+[681MB] X-TIKA:Parsed-By-Full-Set=org.apache.tika.parser.CompositeParser; org.apache.tika.parser.pdf.PDFParser
+[681MB] dc:creator=009768
+[681MB] pdf:num3DAnnotations=0
+[681MB] dcterms:created=1999-09-13T15:28:11Z
+[681MB] dcterms:modified=1999-09-13T15:51:50Z
+[681MB] dc:format=application/pdf; version=1.2
+[681MB] pdf:overallPercentageUnmappedUnicodeChars=0.0015468929195776582
+[681MB] access_permission:fill_in_form=true
+[681MB] pdf:hasCollection=false
+[681MB] dc:title=9906_rsdo.PDF
+[681MB] pdf:containsNonEmbeddedFont=true
+[681MB] pdf:hasMarkedContent=false
+[681MB] pdf:ocrPageCount=0
+[681MB] Content-Type=application/pdf
+[681MB] access_permission:can_print_faithful=true
+[681MB] pdf:producer=Acrobat PDFWriter 3.02 for Windows NT
+[681MB] pdf:totalUnmappedUnicodeChars=35
+[681MB] access_permission:extract_for_accessibility=true
+[681MB] access_permission:assemble_document=true
+[681MB] xmpTPg:NPages=24
+[681MB] pdf:hasXMP=false
+[681MB] access_permission:extract_content=true
+[681MB] access_permission:can_print=true
+[681MB] access_permission:can_modify=true
+[681MB] pdf:containsDamagedFont=false
