@@ -35,6 +35,14 @@ LI_WORKERS="${BSZ_LI_WORKERS:-24}"  # G3b/G4: the service arm's worker count is 
 CPUSET="${BSZ_CPUSET:-}"
 CPUSET_ARGS=(); [ -n "$CPUSET" ] && CPUSET_ARGS=(--cpuset-cpus "$CPUSET")
 PY="$HOME/.venv/bin/python"
+# P0 (2026-09-23): the S3 root under ansh/ is a parameter; unset keeps every banked launch's key.
+S3_ROOT="${BSZ_S3_ROOT:-batch-size-optimization}"
+# P0 D1 on the service arm: BSZ_LI_TIMED=1 bind-mounts working/ws1/p0/service_timed.py (three stage
+# stamps, nothing else) over the image's service — ONLY if the image's own copy is the exact file
+# the timed copy was derived from. Anything else refuses: a timed copy of a different service
+# would measure a different arm.
+LI_TIMED_BASE_MD5="b5162a5175590f51ab7caa594e1873d5"
+LI_MOUNT=()
 CORPUS="${BSZ_CORPUS_DIR:-$HOME/parity-bench/corpus/govdocs1/pdfs}"
 cd "$(dirname "$0")/../.." || exit 2
 echo "worktree: $(pwd)  branch: $(git branch --show-current)  head: $(git rev-parse --short HEAD)  dirty: $(git status --porcelain | wc -l)"
@@ -87,7 +95,13 @@ if [ "$ARM" = "rr" ]; then
   CID=$(docker run -d --name rr --memory 58g "${CPUSET_ARGS[@]}" "${TARGS[@]}" -p 5565:5565 rr:patched) || exit 4
   READY='curl -sf http://127.0.0.1:5565/version'
 elif [ "$ARM" = "li" ]; then
-  CID=$(docker run -d --name li --memory 58g "${CPUSET_ARGS[@]}" -e WS1_WORKERS="$LI_WORKERS" "${TARGS[@]}" -p 8801:8801 ws1-llamaindex:x86_64) || exit 4
+  if [ "${BSZ_LI_TIMED:-}" = "1" ]; then
+    IMG_MD5="$(docker run --rm --entrypoint md5sum ws1-llamaindex:x86_64 /app/ws1/service.py | cut -d' ' -f1)"
+    [ "$IMG_MD5" = "$LI_TIMED_BASE_MD5" ] || { echo "REFUSED: image service.py md5 $IMG_MD5 != $LI_TIMED_BASE_MD5 (the timed copy's base)" >&2; exit 6; }
+    LI_MOUNT=(-v "$(pwd)/working/ws1/p0/service_timed.py:/app/ws1/service.py:ro")
+    echo "LI TIMED (P0 D1 PROFILE): image service.py md5 $IMG_MD5 matches the timed copy's base"
+  fi
+  CID=$(docker run -d --name li "${LI_MOUNT[@]}" --memory 58g "${CPUSET_ARGS[@]}" -e WS1_WORKERS="$LI_WORKERS" "${TARGS[@]}" -p 8801:8801 ws1-llamaindex:x86_64) || exit 4
   READY='curl -sf http://127.0.0.1:8801/health'
 else
   echo "arm must be rr or li" >&2; exit 2
@@ -158,7 +172,7 @@ echo "sweep rc=$RC"
 # re-upload (overwrite) an earlier launch's objects — S3 under ansh/ is append-only too. STAMP was
 # fixed at the top; for a leg one level under its campaign it equals the old
 # basename(dirname(RUN_DIR)), so every banked launch's key is unchanged.
-if aws s3 ls "s3://rocketride-benchmark-data/ansh/batch-size-optimization/$STAMP/$(basename "$RUN_DIR")/" >/dev/null 2>&1; then
+if aws s3 ls "s3://rocketride-benchmark-data/ansh/$S3_ROOT/$STAMP/$(basename "$RUN_DIR")/" >/dev/null 2>&1; then
   echo "!! S3 prefix for this launch already exists — NOT uploading over it; results remain in $RUN_DIR"; exit "$RC"
 fi
 # THIS launch's export, as its driver named it — never "the newest export on disk". A driver that
@@ -170,7 +184,7 @@ if [ -n "$LATEST_EXPORT" ] && [ -f "$LATEST_EXPORT" ]; then
 else
   LATEST_EXPORT=""; echo "!! the driver wrote no export (rc=$RC) — only the run dir is uploaded; no older export is re-sent"
 fi
-BENCH_S3="s3://rocketride-benchmark-data/ansh/batch-size-optimization" RUN_STAMP="$STAMP" \
+BENCH_S3="s3://rocketride-benchmark-data/ansh/$S3_ROOT" RUN_STAMP="$STAMP" \
   bash working/scripts/exfil_s3.sh "$RUN_DIR" "${LATEST_EXPORT:-}" \
   || echo "!! exfil failed — results remain in $RUN_DIR on the box"
 echo "DONE arm=$ARM rc=$RC"

@@ -1,0 +1,247 @@
+{
+ "preregistration": "P0 \u2014 diagnosis under the single-instance mandate",
+ "written_utc": "2026-09-23T08:31:40Z",
+ "landed_before_first_leg": true,
+ "branch": "feat/parity-p0",
+ "base_commit": "5f4fc022dd82540a73f8a936346385372ee10d04",
+ "base_note": "feat/parity-p0 was cut from feat/batch-size-optimization at its landed closeout head; every campaign figure cited here is from that verified campaign",
+ "mandate": {
+  "text": "ONE engine process, ONE pipeline, ONE model inference instance per model. No second token, no second pipeline, no model or engine pool, not even as a diagnostic. Threads are unrestricted inside that single process.",
+  "parity_target": "ONE LlamaIndex instance (the G4 anchor: one worker / one video instance), interleaved in the same box session. LlamaIndex's multi-instance optimum appears only as labelled context.",
+  "out_of_bounds": "any fix needing extra processes or instances is recorded OUT OF BOUNDS, never proposed",
+  "readback_consequence": "the banked G2 read-back used a SEPARATE token before each leg (exp_batchsize_sweep.rr_inprocess_readback; driver_video.rr_readback). Under the mandate that is a second token, so P0 reads env and instances ON THE MEASURED TOKEN (env_probe schema 3 appended to the measured pipeline, probed before and after the window)."
+ },
+ "evidence_rules": {
+  "no_relaxation": "no floor, tolerance or null control below is relaxed, widened, dropped or reinterpreted after data is seen",
+  "figures": "every figure in the morning report is computed from a committed artifact; any experiment not run cleanly is reported NOT RUN with its reason",
+  "session": "every comparison is ABAB-interleaved within ONE box session (register 46: +15.4% for the same cell across one stop/start). Each leg records boot_id; legs with different boot ids are never compared",
+  "per_leg_records": "boot_id; /proc/stat steal over the window (share and cores); CPU model and MHz at open/close and every D0 sample; IMDS placement (host-id only if exposed)",
+  "floors": {
+   "rr_docs": 0.0082,
+   "li_docs": 0.0987,
+   "s5c_null_control_spread": 0.0163,
+   "video_rr_k16_replicate": 0.0976,
+   "video_li_k8_replicate": 0.1225,
+   "cross_session_drift_register_46": 0.154
+  },
+  "readability": "a difference between two cells is READABLE only if it exceeds the larger of the arm's floor and each cell's own within-session replicate spread (|a-b|/mean of its two runs)",
+  "profile_rule": "every leg with D1 stamps is labelled PROFILE; every py-spy leg DIAGNOSTIC. Their absolute times never appear beside baseline figures; shares, rankings and distributions may",
+  "rulings": "A (32 vCPU unconstrained, denominator 32), C (nothing else on the box during a measured leg), one workload at a time, autoland for every landing, blind recompute with a planted figure at the end, box stopped at the end"
+ },
+ "slices": {
+  "docs_384": {
+   "path": "working/results/batchsize_smoke_20260920T113000Z/slice_docs_n384_w25.json",
+   "slice_sha256_16": "411f96f117512f9c",
+   "measured": 384,
+   "warm": 25
+  },
+  "docs_96_anchor": {
+   "path": "working/results/batchsize_main_20260920T160920Z/slice_docs_n96_w25.json",
+   "slice_sha256_16": "a4764c0dab96bc40",
+   "measured": 96,
+   "warm": 25
+  },
+  "docs_9975": {
+   "path": "working/results/batchsize_main_20260920T160920Z/slice_docs_n9975_w25.json",
+   "slice_sha256_16": "6e476fd0db49c2e4",
+   "measured": 9975,
+   "warm": 25
+  },
+  "pathological_11": [
+   "011_011464.pdf",
+   "039_039660.pdf",
+   "008_008871.pdf",
+   "011_011730.pdf",
+   "014_014261.pdf",
+   "000_000344.pdf",
+   "031_031239.pdf",
+   "002_002489.pdf",
+   "034_034697.pdf",
+   "033_033172.pdf",
+   "014_014969.pdf"
+  ],
+  "video_16": "the 16-video AMI smoke slice (3,203 frames), driver_video.py --n 16",
+  "video_168": "the 168-video AMI full slice (23,049 frames), driver_video.py --n 168"
+ },
+ "D0_instance_accounting": {
+  "applies_to": "every cell, both arms",
+  "rocketride_inside": "env_probe schema 3 on the measured token, before and after the window: torch.nn.Module roots with parameters grouped by class with DISTINCT weight tensors counted (a second copy of a model is a second instance even under the same class); OS threads; Python threads by name",
+  "rocketride_outside": "every 5 s through the window, the arm cgroup's processes; a TASK INSTANCE is a process named 'engine' running ai/node.py",
+  "expect": "RocketRide: exactly 1 task process, 1 loaded embedding model (docs) / 1 loaded detector (video). Threads are in bounds; instances are not",
+  "violation": "any cell showing more than one RocketRide task process or more than one distinct loaded instance of a model: the chain STOPS and the morning report leads with it",
+  "llamaindex": "one worker process (docs WS1_WORKERS=1; video one li_video instance, WS1V_WORKERS=1); processes and threads read from outside; one model per worker by source (ws1/pipeline.py, li_video/pipeline.py)"
+ },
+ "D1_node_telemetry": {
+  "metric_set_per_stage": [
+   "count",
+   "sum",
+   "share of run total",
+   "min",
+   "mean",
+   "sd",
+   "p50",
+   "p90",
+   "p95",
+   "p99",
+   "max",
+   "mean/p50"
+  ],
+  "run_total": "the sum over documents (frames) of end-to-end latency; stage shares partition it",
+  "occupancy_per_stage": "number of documents inside the stage interval, as a time-weighted distribution over the leg's measured window: max, mean, p50, p95",
+  "python_stage_gil_share": "for Python stages, the share of H2's GIL-holding samples whose stack passes through that stage's node code",
+  "quantiles": "nearest-rank on the sorted values (rank ceil(q*n)); the median is the true median (mean of the two middle values when n is even)",
+  "rocketride_docs_stages": {
+   "admission": "open_t(first stamp node) - client submit \u2014 OUTSIDE",
+   "parse_bracket": "after_parse.last_t - open_t \u2014 OUTSIDE: parse is native C++ in the engine binary; the bracket also holds upload, the wait for an executor thread and engine glue",
+   "split": "after_split.last_t - after_parse.last_t \u2014 at node boundaries INSIDE the pipeline (LangChain splitter, Python)",
+   "embed": "after_embed.last_t - after_split.last_t \u2014 at node boundaries INSIDE the pipeline (MiniLM, Python/torch; includes the node's buffered flush)",
+   "return": "client completion - after_embed.last_t \u2014 OUTSIDE"
+  },
+  "llamaindex_docs_stages": "extract (pypdf), split, embed from three perf_counter stamps inside process_pdf (working/ws1/p0/service_timed.py, bind-mounted only when the image's service.py md5 is b5162a5175590f51ab7caa594e1873d5); queue = client latency - service total",
+  "video_stages": "per frame, both arms, from V2's stamps (below)",
+  "overhead_check": {
+   "rocketride": "384 slice, C=32, six vars = 1: stamped vs unstamped, ABAB, two each (d1_rr_s1,u1,s2,u2); also the 96-slice C=8 anchor pairs",
+   "llamaindex": "96 slice, one worker, C=8: timed vs untimed service, ABAB, two each, interleaved with RocketRide",
+   "overhead": "(mean unstamped span docs/s - mean stamped) / mean unstamped, with each pair's spread; readable only beyond max(floor, both spreads)",
+   "null_control": "per document completed in both, the chunk_sha256 list of a stamped leg equals the unstamped leg's. A mismatch on a document whose two unstamped legs agree is a CORRECTNESS FAILURE: the chain stops. A document on which the two unstamped legs themselves disagree is reported as non-deterministic, not as a stamp effect"
+  }
+ },
+ "H1_per_process_ceiling": {
+  "hypothesis": "the single task process runs at most 32 documents at once because pipe work runs on asyncio's default executor (data_conn.py:737; min(32, cpu_count+4) = 32 here)",
+  "evidence_before": "C=32 is the knee and C=64 flat (Stage 3b rr_u32a/b)",
+  "legs": "384 slice, stamped (PROFILE): h1_c32_a, h1_c64_a, h1_c32_b, h1_c64_b",
+  "measures": {
+   "executor_width_seen": "distinct asyncio_N threads (and native ids) that ran a document's close(), per leg, from the stamps' tname/native_id \u2014 an UPPER bound on documents executing at once",
+   "executing_concurrency": "max and time-weighted p95 of concurrent [after_parse.first_t, after_embed.close_t] intervals \u2014 a LOWER bound on documents executing at once",
+   "engine_open_concurrency": "max concurrent [open_t, close_t] at the parse stamp \u2014 documents admitted (pipe open), executing or not",
+   "throughput": "span docs/s per leg (PROFILE: compared within P0 only)"
+  },
+  "verdict": "HOLDS if at C=64 the executor width seen is <= 32 and the executing concurrency never exceeds 32 (a plateau at 32 while admission can exceed it). REFUTED if any C=64 leg shows more than 32 documents executing at once. The C=64 vs C=32 throughput difference is read against max(0.82%, both pair spreads)",
+  "source_part": "what would have to change to widen that pool and what binds next: source only, labelled SOURCE"
+ },
+ "H2_interpreter_lock": {
+  "hypothesis": "at 32 in flight the process keeps only ~18 of 32 cores busy because its Python threads contend for one GIL",
+  "evidence_before": "Stage 4 leg 1: 56% of 32 at C=32, one task process",
+  "instrument": "harness/p0_session.H2Profiler: py-spy 0.4.2 on the host as root against the task pid \u2014 recorder N (blocking, --native --idle --threads, 20 Hz) and recorder G (--gil --nonblocking --threads, 100 Hz) \u2014 plus a 2 Hz /proc sampler of every OS thread. The arm container is not given SYS_PTRACE. Every H2 leg DIAGNOSTIC",
+  "categories_per_python_thread_sample_of_recorder_N": {
+   "waiting_on_gil": "any native frame named take_gil (CPython 3.12's GIL acquire) in the stack",
+   "idle": "not waiting on the GIL, and the innermost native frame is a blocking wait: futex / pthread_cond_* / sem_* / epoll_wait / poll / select / nanosleep / clock_nanosleep / accept / recv* / read",
+   "native": "neither of the above, innermost native frame outside the CPython interpreter (engine C++, JVM, torch, BLAS, libc compute)",
+   "holding_gil": "the remainder: innermost frame is Python code or the CPython interpreter",
+   "shares": "each category / all Python-thread samples of recorder N (idle included), so the four sum to 100%"
+  },
+  "gil_occupancy": "recorder G's samples / (its rate x window seconds): the share of wall time some thread held the GIL",
+  "top10": "recorder G's samples attributed to the innermost Python function (file:function), top 10 by share \u2014 the rewrite target list",
+  "null_control": "FIRST: RocketRide C=1 on the 96 slice with the profiler; waiting_on_gil must be < 2% of samples. If it is not, the classifier is not trustworthy and H2 is UNREADABLE (no gate decision)",
+  "smoke": "384 slice, C=32, two runs (h2_c32_a, h2_c32_b)",
+  "gate": {
+   "threshold": "waiting_on_gil >= 15% of recorder-N samples (mean of the two smoke runs)",
+   "if_fired": "one 9,975-document profile run (p0_docs_chain.sh h2full)",
+   "if_not": "record the value and skip the full run"
+  },
+  "instrument_failure": "if recorder N cannot unwind native frames on the engine binary, waiting cannot be separated from other sleeping: H2's classification is NOT RUN (reported with the reason), GIL occupancy and the top-10 from recorder G are still reported, and the gate is not evaluated"
+ },
+ "H5_tika_config_tail": {
+  "hypothesis": "Tika's enabled PDF features, not PDF parsing itself, cause the pathological holds",
+  "evidence_before": "11 documents held over 300 s (max 1,839 s), reproducing within 4.86%; pypdf handled the same files in at most 31 s",
+  "instrument": "an ISOLATED Tika: the engine's own Tika 3.2.3 jars and bundled JRE from rr:patched, a batch harness (working/tika/TikaBatch.java, compiled against those jars) timing each parse inside the JVM (wall and thread CPU), one document per JVM, the engine's tika-config.xml or a copy with ONE PDFParser param changed",
+  "configs": {
+   "shipped": "engine/java/tika-config.xml as bundled (sortByPosition, extractAcroFormContent, extractAnnotationText, extractBookmarksText all true)",
+   "no_sortByPosition": "sortByPosition=false",
+   "no_acroform": "extractAcroFormContent=false",
+   "no_annotations": "extractAnnotationText=false",
+   "no_bookmarks": "extractBookmarksText=false"
+  },
+  "runs": "each of the 11 documents: shipped twice (replicate spread) and each single-feature variant once; per-parse timeout 2,400 s",
+  "per_feature_report": "time change (variant/shipped - 1) and extracted-text length change per document",
+  "gate": {
+   "threshold": "some single feature removes >= 50% of parse time (variant <= 0.5 x shipped mean) on >= 6 of the 11, with text length within 5% of shipped on each of those documents",
+   "best_config": "among features passing the gate, the one with the largest median time reduction over the 11",
+   "if_fired": "a 384-slice isolated-Tika sweep at the best config against shipped (time and text-length distributions); the best config joins H6",
+   "if_not": "record the per-feature table and skip the sweep"
+  },
+  "context": "the isolated shipped-config time per document is set beside its in-engine hold (S5-D stamps) as context only: if isolated Tika is far faster, the hold is not Tika's own cost"
+ },
+ "H6_parser_bakeoff": {
+  "scope": "read-only: NO new node and NO pipeline change in P0",
+  "hypothesis": "a non-Tika parser is much faster on the tail, but Tika has coverage the alternatives lack",
+  "evidence_before": "the 11 holds; Stage 4 empty-content counts Tika 89 vs pypdf 102, with 13 documents named that Tika extracts and pypdf returns empty on",
+  "parsers": {
+   "tika_shipped": "isolated Tika, shipped config (H5 harness)",
+   "tika_best": "isolated Tika at H5's best config, only if H5's gate fired",
+   "pypdf": "pypdf 6.15.0 (the LlamaIndex image's version), page.extract_text joined with newlines exactly as ws1/pipeline.py",
+   "pypdfium2": "pypdfium2 5.13.0 (PDFium, C++; Apache-2.0 / BSD-3-Clause \u2014 MIT-compatible), get_textpage().get_text_range() per page joined with newlines"
+  },
+  "pymupdf_licence": "PyMuPDF / MuPDF is AGPL-3.0 (or a commercial Artifex licence): incompatible with shipping inside MIT-licensed RocketRide without relicensing the product under AGPL or buying a licence. Substituted by pypdfium2; not run",
+  "timing": "each parse timed in-process around the parse call (Tika inside the JVM); per-document timeout 1,800 s for every parser; the same worker count for every parser, one parser phase at a time",
+  "empty": "a parser returns EMPTY on a document if it raises, times out, or returns text whose whitespace-stripped length is 0",
+  "smoke": {
+   "i_tail": "the 11 pathological documents: p50 parse time per parser",
+   "ii_coverage": "the 384 slice: per parser, empties, and the set of documents it returns empty on while tika_shipped returns text"
+  },
+  "gate": {
+   "threshold": "some candidate is >= 2x faster than tika_shipped at p50 on the 11 (p50_tika / p50_candidate >= 2) AND on the 384 slice returns empty on no document tika_shipped extracts text from",
+   "if_fired": "full 9,975-document bake-off for every parser",
+   "speed_pass_coverage_fail": "that is itself the finding: run the full corpus ONLY for the hybrid question (candidate first, tika_shipped fallback on empty or error), sized to measure coverage",
+   "if_neither": "no full run"
+  },
+  "full_report": {
+   "a_speed": "the D1 metric set per parser, and the same set restricted to the 11",
+   "b_coverage": "empties per parser and the named set difference against tika_shipped both ways",
+   "c_fidelity": "per document vs tika_shipped: character-count ratio, and Sorensen-Dice similarity of the whitespace-token multisets after collapsing whitespace (order-insensitive, since parsers order text differently), as distributions (min, p5, p25, p50, p75, p95) \u2014 evidence, not a gate",
+   "d_failures": "exceptions and timeouts per parser, named"
+  },
+  "verdict": "a parser is a CANDIDATE only if it is faster on the tail (>= 2x at p50 on the 11) AND loses no document tika_shipped recovers on the corpus it was run on. If none clears both, the hybrid shape the data supports is reported as a P1 recommendation, not built in P0"
+ },
+ "V1_matched_single_instance": {
+  "hypothesis": "at equal intra-op threads, one RocketRide detector instance is materially slower than one LlamaIndex instance",
+  "evidence_before": "cross-session, so HYPOTHESIS until rerun: RR T=4 2.233 f/s (S5-A) vs LI one instance T=4 3.068 f/s (G4)",
+  "legs": "16-video slice, K=16 in flight, fresh container per leg, same session, ABAB: rr_t4_a, li_t4_a, rr_def_a, rr_t4_b, li_t4_b, rr_def_b. rr_t4 = one token, six vars = 4; li_t4 = one li_video instance, one worker, six vars = 4; rr_def = the default posture (vars unset, torch 16), reference",
+  "report": "frames/s (total frames / span), CPU-s per frame (engine container), engine cores",
+  "gap": "mean li_t4 frames/s / mean rr_t4 frames/s - 1",
+  "gate": {
+   "threshold": "gap - max(0.82%, spread(rr_t4), spread(li_t4)) >= 10 percentage points (read as 'exceeds by at least 10%' \u2014 a relative 10% of a sub-1% floor would not be material)",
+   "if_fired": "a 168-video confirmation: rr_t4 and li_t4 once each, same session, interleaved",
+   "if_not": "record and skip"
+  },
+  "correctness_note": "S5-A: only T=16/unset reproduces default output bit-for-bit; every other T shifts scores while keeping labels. Any T recommendation states its output effect; 'T=2 is the throughput knee' is not adoptable on speed alone"
+ },
+ "V2_duty_cycle": {
+  "hypothesis": "the single instance is saturated (K=1 2.39 -> K=16 2.62 f/s) and the gap lies in the work around the forward pass, not in it",
+  "stamps": "per frame, both arms, at matched T=4: wait-for-lock, preprocess (including the facade's 560px LANCZOS pre-downscale), forward pass, postprocess, output formatting, and decode/handoff outside the lock; instrumented copies of the detect code copied into the RUNNING container's writable layer (the image, rr:patched-video, is never modified, retagged or removed)",
+  "report": "(a) duty cycle = share of the window the device lock is held; (b) the D1 metric set per component per arm",
+  "reading": "equal forward-pass time with a larger lock-held total = overhead inside the lock (in scope); unequal forward-pass time at equal T = a model-runtime configuration difference, named from both images (torch, oneDNN/MKL, dtype, input size)",
+  "null_control": "RocketRide stamps on vs off (two each, ABAB): frames/s agree within max(0.82%, both pair spreads) AND the output (detections) is identical frame by frame; a failure makes V2 unreadable",
+  "if_not_instrumentable": "if either arm's detect code cannot be stamped without changing its output, V2 is NOT RUN for that arm with the reason"
+ },
+ "V3_lock_scope": "SOURCE only: what RocketRide's detect path holds the device lock around vs LlamaIndex's, file:line on both; every operation inside the lock that is not the forward pass",
+ "roi_rule": {
+  "columns": [
+   "(a) share of run total from D1",
+   "(b) ceiling if that stage cost zero = 1/(1-share), from the measured share",
+   "(c) scope: CONFIG | THREADING | PYTHON | CPP"
+  ],
+  "rank": "by scope (CONFIG and THREADING above PYTHON above CPP), then by share within a scope",
+  "cpp_threshold": "a CPP item is proposed only if its share of run total exceeds 15%; below that it is recorded as measured-but-not-worth-rewriting",
+  "no_invented_score": "never a single composite score"
+ },
+ "stop_conditions": [
+  "a mandate violation (D0)",
+  "a correctness failure in output (a null control on output identity)",
+  "the box unreachable after retries"
+ ],
+ "not_stop_conditions": [
+  "a gate declining a full run",
+  "a leg failing three times (recorded FAILED, chain continues)"
+ ],
+ "night_order": [
+  "D1 build + overhead",
+  "H2 smoke",
+  "H1",
+  "H5",
+  "H6 smoke (full only if its gate fires)",
+  "V1 smoke",
+  "V2",
+  "V3 (source, laptop, while the box measures)"
+ ]
+}

@@ -67,7 +67,11 @@ class IInstance(IInstanceBase):
         rec = {"doc": self._doc, "stage": self._stage, "open_t": self._open_t,
                "first_t": self._first_t, "last_t": self._last_t,
                "closing_t": getattr(self, "_closing_t", None), "close_t": time.time(),
-               "n_events": self._n, "pid": os.getpid(), "tid": threading.get_ident()}
+               "n_events": self._n, "pid": os.getpid(), "tid": threading.get_ident(),
+               # P0 (2026-09-23): the executing thread's NAME. asyncio's default executor names
+               # its workers asyncio_0..asyncio_N-1, so the highest index seen is the pool width
+               # that actually ran pipelines (H1), read from the engine rather than inferred.
+               "tname": threading.current_thread().name, "native_id": threading.get_native_id()}
         with _WRITE_LOCK:
             with open(_OUT, "a") as f:
                 f.write(json.dumps(rec) + "\n")

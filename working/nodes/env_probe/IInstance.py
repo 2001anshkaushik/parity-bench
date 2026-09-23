@@ -18,6 +18,61 @@ KEYS = ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
         "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS", "TORCH_NUM_THREADS")
 
 
+def _d0() -> dict:
+    """Instance accounting read INSIDE this process (schema 3).
+
+    root_modules_with_params: every torch.nn.Module the garbage collector tracks, reduced to the
+    ROOTS (modules that are no other module's child) that own parameters, grouped by class, with
+    the number of DISTINCT weight tensors (first parameter's data_ptr) so a second copy of a model
+    is visible even when it shares a class with the first. python_threads: threading.enumerate()
+    grouped by name with the trailing index removed (asyncio_0..asyncio_31 -> asyncio, count 32).
+    proc_threads: every OS thread of the process (/proc/self/status), Python or not.
+    """
+    import gc
+    import re
+    from collections import Counter
+    out: dict = {"d0_schema": 1, "pid": os.getpid(), "ppid": os.getppid()}
+    try:
+        with open("/proc/self/status") as f:
+            m = re.search(r"^Threads:\s+(\d+)", f.read(), re.M)
+        out["proc_threads"] = int(m.group(1)) if m else None
+    except OSError as e:
+        out["proc_threads_error"] = str(e)
+    names = [t.name for t in threading.enumerate()]
+    out["python_threads"] = len(names)
+    out["python_threads_by_prefix"] = dict(Counter(re.sub(r"[_-]?\d+$", "", n) for n in names))
+    idx = [int(n.split("_", 1)[1]) for n in names
+           if n.startswith("asyncio_") and n.split("_", 1)[1].isdigit()]
+    out["asyncio_executor_threads_alive"] = len(idx)
+    out["asyncio_executor_max_index"] = max(idx) if idx else None
+    try:
+        import torch
+        import warnings
+        with warnings.catch_warnings():          # isinstance() on deprecated torch aliases warns
+            warnings.simplefilter("ignore")
+            mods = [o for o in gc.get_objects() if isinstance(o, torch.nn.Module)]
+        child = set()
+        for m_ in mods:
+            for c in m_.children():
+                child.add(id(c))
+        roots: dict = {}
+        for m_ in mods:
+            if id(m_) in child:
+                continue
+            ps = list(m_.parameters())
+            if not ps:
+                continue
+            key = f"{type(m_).__module__}.{type(m_).__qualname__}"
+            roots.setdefault(key, []).append((sum(p.numel() for p in ps), ps[0].data_ptr()))
+        out["root_modules_with_params"] = {
+            k: {"count": len(v), "distinct_weights": len({x[1] for x in v}),
+                "params": sorted(x[0] for x in v)} for k, v in roots.items()}
+        out["model_instances_total"] = sum(len({x[1] for x in v}) for v in roots.values())
+    except Exception as e:                       # torch absent: no models to count
+        out["modules_error"] = f"{type(e).__name__}: {e}"
+    return out
+
+
 class IInstance(IInstanceBase):
     buf: str = ""
 
@@ -37,7 +92,7 @@ class IInstance(IInstanceBase):
             # this key is present and >= its required version BEFORE reading any
             # field, so a stale instrument fails loud with "rebuild", never
             # silently as None. Bump when the emitted field set changes.
-            "env_probe_schema": 2,
+            "env_probe_schema": 3,
             "pid": os.getpid(),
             "env": {k: os.environ.get(k) for k in KEYS},
             "os_cpu_count": os.cpu_count(),
@@ -86,6 +141,10 @@ class IInstance(IInstanceBase):
             except PackageNotFoundError:
                 pkgs[pkg] = None
         info["package_versions"] = pkgs
+        # Schema 3 (P0, 2026-09-23): D0 INSTANCE ACCOUNTING from inside the task process. The
+        # parity mandate is ONE engine process, ONE pipeline, ONE model instance per model; this
+        # counts what is actually loaded here rather than what the pipe declares.
+        info["d0"] = _d0()
         self.instance.writeText(json.dumps(info))
 
     def close(self):

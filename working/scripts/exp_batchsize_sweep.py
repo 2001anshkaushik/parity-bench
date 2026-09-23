@@ -81,6 +81,7 @@ from harness.jsonl_stream import JsonlWriter                    # noqa: E402
 from harness.percore_sampler import PerCoreSampler              # noqa: E402
 from harness.resultio import write_result                       # noqa: E402
 from harness.rr_credentials import RR_TTL_S                     # noqa: E402
+from harness import p0_session                                  # noqa: E402
 
 EXPECTED_IMAGE = {
     "rr": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",  # rr:patched
@@ -104,7 +105,18 @@ PREWARM = os.environ.get("BSZ_PREWARM", "") not in ("", "0")
 # boundaries (proven on the laptop engine: chunk hashes identical with and without them) and names
 # every send so engine-side stamps join client-side records. An INSTRUMENTED leg, labelled so.
 STAMP = os.environ.get("BSZ_STAMP", "") not in ("", "0")
-ENVPROBE_SCHEMA_MIN = 2                      # driver_video.py:679, same contract
+# P0 (2026-09-23, diagnosis under the single-instance mandate). OFF by default: every banked
+# campaign leg ran without it and a re-run of those scripts behaves exactly as before.
+#   * D0/G2 are read ON THE MEASURED TOKEN: env_probe (schema 3, with instance accounting) is
+#     appended to the measured pipeline and a text probe is sent on the same token before the
+#     window and after it. The mandate forbids a second token even as a diagnostic, which the
+#     banked separate-token read-back (rr_inprocess_readback) would be.
+#   * every leg records its session (boot id, steal, CPU MHz, placement) and samples the arm's
+#     processes and threads through the window (harness/p0_session.py).
+#   * BSZ_PYSPY=1 adds the H2 profiler against the task process (DIAGNOSTIC legs only).
+P0 = os.environ.get("BSZ_P0", "") not in ("", "0")
+P0_PYSPY = os.environ.get("BSZ_PYSPY", "") not in ("", "0")
+ENVPROBE_SCHEMA_MIN = 3 if P0 else 2         # driver_video.py:679, same contract; P0 needs d0
 ENVPROBE_REQUIRED = ("env_probe_schema", "env", "torch_num_threads", "python_version")
 DOCUMENT_OUTCOMES = ("no_documents", "empty_extraction", "parse_failed")
 PIPE = ROOT / "working" / "pipes" / "product_pdf.pipe"
@@ -572,6 +584,63 @@ def rr_batch_records(files: List[Path], out: Any, bi: int, t0_ns: int, t1_ns: in
     return recs
 
 
+def probe_pipeline(pipe: Dict[str, Any]) -> Dict[str, Any]:
+    """P0: env_probe on the MEASURED pipeline, fed only by the webhook's text lane. PDFs enter on
+    the tags lane, so the probe fires only for the text/plain probe sent outside the window."""
+    pipe["components"].append({"id": "envprobe_1", "provider": "env_probe", "config": {},
+                               "input": [{"lane": "text", "from": "webhook_1"}]})
+    pipe["components"].append({"id": "resp_env", "provider": "response_text",
+                               "config": {"laneName": "envprobe"},
+                               "input": [{"lane": "text", "from": "envprobe_1"}]})
+    return pipe
+
+
+async def rr_probe_on_token(c, tok) -> Dict[str, Any]:
+    """P0 D0/G2 read-back on the measured token itself (one token, one pipeline, one process)."""
+    out = await asyncio.wait_for(c.send(tok, "readback probe", mimetype="text/plain"), timeout=300)
+    texts = (out or {}).get("envprobe") or []
+    if not texts:
+        raise SystemExit("REFUSED: env_probe returned nothing under 'envprobe' on the measured "
+                         f"token; keys returned: {sorted((out or {}).keys())} (register 37)")
+    info = json.loads(texts[0])
+    _assert_envprobe_complete(info)
+    if "d0" not in info:
+        raise SystemExit("REFUSED: env_probe answered without the d0 block — a schema-2 node is "
+                         "in the container; the runner must copy the repo's node in")
+    info["t_utc"] = time.strftime("%H:%M:%SZ", time.gmtime())
+    return info
+
+
+def d0_mandate(arm: str, pre: Optional[Dict[str, Any]], post: Optional[Dict[str, Any]],
+               ext: Dict[str, Any], expect_torch: Optional[int]) -> Dict[str, Any]:
+    """The single-instance mandate, checked from inside and outside the process. A violation is
+    recorded in the leg and the chain script stops on it; it is never averaged away."""
+    v: List[str] = []
+    if arm == "rr":
+        n_ext = ext.get("task_instances_max")
+        if n_ext is None or n_ext != 1:
+            v.append(f"task processes observed in the window: max {n_ext} (mandate: exactly 1)")
+        if ext.get("task_instances_min") not in (1, None):
+            v.append(f"task processes dropped to {ext.get('task_instances_min')} inside the window")
+        for tag, info in (("pre", pre), ("post", post)):
+            if not info:
+                v.append(f"no {tag}-window in-process read-back")
+                continue
+            roots = (info.get("d0") or {}).get("root_modules_with_params") or {}
+            for cls, r in roots.items():
+                if r.get("distinct_weights", 0) > 1:
+                    v.append(f"{tag}: {r['distinct_weights']} distinct {cls} instances loaded")
+            if expect_torch is not None and info.get("torch_num_threads") != expect_torch:
+                v.append(f"{tag}: torch threads {info.get('torch_num_threads')} != declared "
+                         f"{expect_torch}")
+        if pre and post and pre.get("pid") != post.get("pid"):
+            v.append(f"the read-back pid changed across the window ({pre.get('pid')} -> "
+                     f"{post.get('pid')}): the task process was replaced")
+    return {"mandate_violation": bool(v), "violations": v,
+            "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per "
+                    "model; threads unrestricted"}
+
+
 def stamp_pipeline(pipe: Dict[str, Any]) -> Dict[str, Any]:
     """product_pdf.pipe with a pass-through stamp at each stage boundary. Same wiring the laptop
     test proved: every node keeps its inputs except that each stage now reads from the stamp
@@ -597,6 +666,8 @@ async def rr_open(threads: Optional[int]):
     pipe = json.loads(PIPE.read_text())
     if STAMP:
         pipe = stamp_pipeline(pipe)
+    if P0:
+        pipe = probe_pipeline(pipe)
     pipe["project_id"] = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"bsz-{os.getpid()}-{time.time()}"))
     pp = ROOT / "working" / "pipes" / "generated" / f"bsz_{os.getpid()}.pipe"
     pp.parent.mkdir(parents=True, exist_ok=True)
@@ -657,7 +728,7 @@ async def rr_send_continuous(c, tok, files: List[Path], conc: int, w: Optional[J
             row: Dict[str, Any] = {"doc": p.name, "batch": None, "submit_ns": time.time_ns(),
                                    "timing_source": "per-document submit/return (MEASURED)"}
             try:
-                kw = {"objinfo": {"name": p.name}} if STAMP else {}
+                kw = {"objinfo": {"name": p.name}} if (STAMP or P0) else {}
                 o = await asyncio.wait_for(c.send(tok, b, mimetype="application/pdf", **kw),
                                            timeout=DOC_TIMEOUT_S)
                 texts = [d.get("page_content", "") for d in documents_from(o)]
@@ -690,6 +761,9 @@ def li_post(p: Path, bi: Optional[int]) -> Dict[str, Any]:
         row.update(completion_ns=time.time_ns(), ok=bool(texts), n_chunks=len(texts),
                    chunk_sha256=[gs.chunk_hash(t) for t in texts],
                    reason="completed" if texts else (out.get("error_class") or "no_documents"))
+        if P0:      # the service's own stage stamps (a timed service adds extract/split/embed)
+            row["svc_timing_ms"] = out.get("timing_ms")
+            row["svc_pid"] = out.get("pid") or out.get("worker_pid")
     except Exception as e:
         row.update(completion_ns=time.time_ns(), ok=False, n_chunks=0, chunk_sha256=[],
                    reason=f"error:{type(e).__name__}")
@@ -774,6 +848,16 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
         return r.ru_utime + r.ru_stime + ch.ru_utime + ch.ru_stime
 
     def open_window() -> None:
+        if P0:
+            state["session"] = p0_session.LegSession(arm, cg, run_dir / f"d0_procs_{arm}_{leg}.jsonl")
+            state["session"].open()
+            if P0_PYSPY and arm == "rr":
+                tp = p0_session.rr_task_pids(cg)
+                if len(tp) != 1:
+                    raise SystemExit(f"REFUSED: H2 needs exactly one task process, found {tp}")
+                state["pyspy"] = p0_session.H2Profiler(tp[0], run_dir, f"{arm}_{leg}")
+                state["pyspy"].start()
+                time.sleep(2.0)      # both recorders attached before the first document is sent
         state["mem_start"] = cgroup_mem(cg)
         import threading as _th
         state["snap_timer"] = _th.Timer(30.0, lambda: state.__setitem__("proc_mid", proc_snapshot(cg)))
@@ -793,6 +877,10 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                                                     cgroup_usage_usec(cg))
         state["d1"] = driver_cpu_s()
         state["percore"] = state["sampler"].stop()
+        if P0:                                   # after the window's own stamps: never extends it
+            state["session_rec"] = state["session"].close()
+            if state.get("pyspy"):
+                state["pyspy_rec"] = state["pyspy"].stop()
 
     state["caches"] = drop_caches() if DROP_CACHES else {"attempted": False}
     if DROP_CACHES:
@@ -817,12 +905,23 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                     else:
                         await rr_send_continuous(c, tok, warm, conc, None)
                 state["warm_s"] = round(time.perf_counter() - tw, 2)
+                if P0:      # D0/G2 on the measured token, BEFORE the idle-spin window
+                    state["d0_pre"] = await rr_probe_on_token(c, tok)
+                    env_want = facts.get("thread_env_expected")
+                    got = (state["d0_pre"].get("env") or {})
+                    bad = [k_ for k_, v_ in got.items()
+                           if v_ != (None if env_want == "unset" else env_want)]
+                    if bad:
+                        raise SystemExit(f"REFUSED: in-process thread variables {bad} differ from "
+                                         f"the declared posture {env_want}: {got}")
                 state["idle_spin"] = measure_idle_spin(cg)   # loaded, nothing submitted
                 with JsonlWriter(perdoc) as w:
                     open_window()
                     recs = (await rr_send_batches(c, tok, shape(measured), w) if k
                             else await rr_send_continuous(c, tok, measured, conc, w))
                     close_window()
+                if P0:
+                    state["d0_post"] = await rr_probe_on_token(c, tok)
                 return recs
             finally:
                 leaked = await rr_close(c, tok)
@@ -917,6 +1016,19 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                              "at_window_close": state.get("proc_end")},
         "cpuset_declared_for_s5c": facts.get("declared_cpuset"),
         "instrumented_s5d_stamps": STAMP,
+        "p0": ({"session": state.get("session_rec"),
+                "d0_in_process": {"pre": state.get("d0_pre"), "post": state.get("d0_post"),
+                                  "source": "env_probe schema 3 on the measured token"
+                                  if arm == "rr" else "n/a (service arm: process accounting "
+                                  "from outside; one model per worker process by source)"},
+                "mandate": d0_mandate(arm, state.get("d0_pre"), state.get("d0_post"),
+                                      (state.get("session_rec") or {}).get("d0_external") or {},
+                                      (None if facts.get("thread_env_expected") in (None, "unset")
+                                       else (1 if facts.get("thread_env_expected") == "1" else None))),
+                "profile_label": ("PROFILE — stage stamps" if STAMP else None),
+                "diagnostic_label": ("DIAGNOSTIC — py-spy H2 profiler attached"
+                                     if state.get("pyspy_rec") else None),
+                "pyspy": state.get("pyspy_rec")} if P0 else None),
         "memory": {"at_window_open": state.get("mem_start"),
                    "at_window_close": state.get("mem_end")},
         # BLAST RADIUS (envelope). One failed send_files costs the WHOLE batch, so the price of
@@ -1022,8 +1134,14 @@ def main() -> int:
         f"{facts['thread_env_expected']}  threads_requested="
         f"{'NOT PASSED' if threads is None else threads}")
     # G2: the DECLARED posture above is the container's; this is the one the work actually ran in.
-    facts["in_process_readback"] = (asyncio.run(rr_inprocess_readback(threads)) if a.arm == "rr"
-                                    else li_inprocess_readback())
+    # P0 reads it on the measured token inside every leg instead (no second token, ever).
+    facts["in_process_readback"] = (
+        {"source": "P0: env_probe schema 3 read on the MEASURED token, pre- and post-window, "
+                   "recorded per leg under p0.d0_in_process"} if (P0 and a.arm == "rr")
+        else asyncio.run(rr_inprocess_readback(threads)) if a.arm == "rr"
+        else li_inprocess_readback())
+    if P0:
+        facts["placement"] = p0_session.imds_placement()
     ipr = facts["in_process_readback"]
     say(f"  in-process read-back: torch intra-op="
         f"{ipr.get('torch_num_threads', ipr.get('health_torch_threads'))}  six vars="
