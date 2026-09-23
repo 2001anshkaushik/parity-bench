@@ -174,6 +174,9 @@ fi
 SMOKE_PORT=8801 "$PY" working/scripts/exp_batchsize_sweep.py "${ARGS[@]}"
 RC=$?
 [ -n "$MSPID" ] && { touch "$RUN_DIR/.memstat_stop"; wait "$MSPID"; }
+if [ -n "${P1C_VARIANT:-}" ]; then      # P1-C: the prototype node's own counters (docs, text, fallback, errors)
+  docker cp "$CID":/tmp/p1_pdfium_${P1C_VARIANT}.json "$RUN_DIR/p1_pdfium_${P1C_VARIANT}.json" 2>/dev/null || echo "no p1_pdfium counters (written every 50 documents)"
+fi
 if [ "${BSZ_STAMP:-}" = "1" ] && [ "$ARM" = "rr" ]; then
   docker cp "$CID":/tmp/stamp_probe.jsonl "$RUN_DIR/stamp_probe.jsonl" && echo "stamps copied out: $(wc -l < "$RUN_DIR/stamp_probe.jsonl") records" || echo "!! no stamp file came out of the container"
 fi

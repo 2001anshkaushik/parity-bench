@@ -40,13 +40,15 @@ for f in pathlib.Path(sys.argv[1]).glob("leg_*.json"):
 sys.exit(1)
 PYV
 }
-# leg <name> <image> <slice> [texts]
+# leg <name> <image> <slice> [texts|-] [pure|hybrid]
 leg() {
-  local name="$1" img="$2" slice="$3" texts="${4:-}" try dir rc
+  local name="$1" img="$2" slice="$3" texts="${4:-}" variant="${5:-}" try dir rc
+  [ "$texts" = "-" ] && texts=""
   for try in "" _r1 _r2; do
     dir="$D/${name}${try}"
-    echo "===== LEG ${name}${try} ($img, $(basename "$slice")${texts:+, texts}) $(date -u +%H:%M:%SZ) ====="
+    echo "===== LEG ${name}${try} ($img, $(basename "$slice")${texts:+, texts}${variant:+, $variant}) $(date -u +%H:%M:%SZ) ====="
     ( export BSZ_RR_IMAGE="$img"; [ -n "$texts" ] && export P1_TEXT_DUMP="$dir/texts.jsonl.gz"
+      [ -n "$variant" ] && export P1C_VARIANT="$variant"
       bash working/scripts/batchsize_docs_run.sh rr "$slice" "$dir" "" 0 "${name}${try}" 1 )
     rc=$?
     echo "===== LEG ${name}${try} rc=$rc $(date -u +%H:%M:%SZ) ====="
@@ -91,7 +93,17 @@ case "$STAGE" in
     fi
     ;;
   p1c)
-    echo "REFUSED: p1c is not implemented yet (the prototype node and its variant switch land first)" >&2; exit 5
+    docker image inspect rr:p1-pdfium >/dev/null 2>&1 || { echo "REFUSED: rr:p1-pdfium absent" >&2; exit 5; }
+    # correctness first: the full runs decide adoptability (texts captured); they double as the full runs
+    leg p1c_hyb_full rr:p1-pdfium "$S9975" texts hybrid
+    leg p1c_pure_full rr:p1-pdfium "$S9975" texts pure
+    # then the 384 ABAB: P1-B fixed Tika vs HYBRID vs PURE, two runs each
+    leg p1c_fix_a rr:p1-tikafix "$S384"
+    leg p1c_hyb_a rr:p1-pdfium "$S384" - hybrid
+    leg p1c_pure_a rr:p1-pdfium "$S384" - pure
+    leg p1c_fix_b rr:p1-tikafix "$S384"
+    leg p1c_hyb_b rr:p1-pdfium "$S384" - hybrid
+    leg p1c_pure_b rr:p1-pdfium "$S384" - pure
     ;;
   *) echo "unknown stage $STAGE" >&2; exit 2 ;;
 esac

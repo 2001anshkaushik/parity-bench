@@ -649,21 +649,46 @@ def d0_mandate(arm: str, pre: Optional[Dict[str, Any]], post: Optional[Dict[str,
                     "model; threads unrestricted"}
 
 
+P1C_VARIANT = os.environ.get("P1C_VARIANT") or None      # P1-C: pure | hybrid (rr:p1-pdfium only)
+
+
+def p1c_pipeline(pipe: Dict[str, Any], variant: str) -> Dict[str, Any]:
+    """P1-C: the prototype parse node on the raw document (the parse node's own input). PURE: it
+    replaces the Tika parse node. HYBRID: Tika stays, fed only by the node's replayed tags (empty
+    text or error). Wiring proven on the laptop engine: replayed tags gave chunks identical to the
+    product pipe's."""
+    if variant not in ("pure", "hybrid"):
+        raise SystemExit(f"P1C_VARIANT must be pure or hybrid, not {variant!r}")
+    comp = {c["id"]: c for c in pipe["components"]}
+    node = {"id": "pdfium_1", "provider": f"pdfium_{variant}", "config": {},
+            "input": [{"lane": "tags", "from": "webhook_1"}]}
+    if variant == "pure":
+        pipe["components"] = [node if c["id"] == "parse_1" else c for c in pipe["components"]]
+        comp["preprocessor_1"]["input"] = [{"lane": "text", "from": "pdfium_1"} if i["from"] == "parse_1" else i
+                                           for i in comp["preprocessor_1"]["input"]]
+    else:
+        pipe["components"].insert(1, node)
+        comp["parse_1"]["input"] = [{"lane": "tags", "from": "pdfium_1"}]
+        comp["preprocessor_1"]["input"] = [{"lane": "text", "from": "pdfium_1"}] + comp["preprocessor_1"]["input"]
+    return pipe
+
+
 def stamp_pipeline(pipe: Dict[str, Any]) -> Dict[str, Any]:
     """product_pdf.pipe with a pass-through stamp at each stage boundary. Same wiring the laptop
     test proved: every node keeps its inputs except that each stage now reads from the stamp
-    that follows the stage before it."""
+    that follows the stage before it. P1-C: the parse boundary follows every parser node that
+    feeds the splitter (parse_1 and/or pdfium_1)."""
     comp = {c["id"]: c for c in pipe["components"]}
+    parsers = [i["from"] for i in comp["preprocessor_1"]["input"] if i["from"] in ("parse_1", "pdfium_1")]
     pipe["components"] += [
         {"id": "stamp_parse", "provider": "stamp_probe", "config": {},
-         "input": [{"lane": "text", "from": "parse_1"}]},
+         "input": [{"lane": "text", "from": x} for x in parsers]},
         {"id": "stamp_split", "provider": "stamp_probe", "config": {},
          "input": [{"lane": "documents", "from": "preprocessor_1"}]},
         {"id": "stamp_embed", "provider": "stamp_probe", "config": {},
          "input": [{"lane": "documents", "from": "embedding_1"}]}]
-    comp["preprocessor_1"]["input"] = [{"lane": "text", "from": "stamp_parse"}
-                                       if i["from"] == "parse_1" else i
-                                       for i in comp["preprocessor_1"]["input"]]
+    kept = [i for i in comp["preprocessor_1"]["input"] if i["from"] not in parsers]
+    comp["preprocessor_1"]["input"] = [{"lane": "text", "from": "stamp_parse"}] + kept
     comp["embedding_1"]["input"] = [{"lane": "documents", "from": "stamp_split"}]
     comp["response_1"]["input"] = [{"lane": "documents", "from": "stamp_embed"}]
     return pipe
@@ -672,6 +697,8 @@ def stamp_pipeline(pipe: Dict[str, Any]) -> Dict[str, Any]:
 async def rr_open(threads: Optional[int]):
     from rocketride import RocketRideClient
     pipe = json.loads(PIPE.read_text())
+    if P1C_VARIANT:
+        pipe = p1c_pipeline(pipe, P1C_VARIANT)
     if STAMP:
         pipe = stamp_pipeline(pipe)
     if P0:
