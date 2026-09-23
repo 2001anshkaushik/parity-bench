@@ -2409,6 +2409,22 @@ async def amain() -> int:
     if not args.skip_warmup:
         await run_warmup(args, arm, posture, warm, pf, out_dir, stem)
 
+    # ---- P1-A E2: hand the measured window to an external tracer ---------------
+    # OFF unless P1_SYNC_DIR is set. The tracer attaches between warm-up and the leg (never during
+    # warm-up); a tracer that is not ready is a failed leg, never a silently untraced one.
+    p1_sync = Path(os.environ['P1_SYNC_DIR']) if os.environ.get('P1_SYNC_DIR') else None
+    p1_sync_meta: dict = {}
+    if p1_sync is not None:
+        (p1_sync / '.warm_done').write_text(str(time.time()))
+        t_wait0 = time.monotonic()
+        while not (p1_sync / '.tracer_ready').exists():
+            if time.monotonic() - t_wait0 > float(os.environ.get('P1_SYNC_TIMEOUT_S', '600')):
+                (p1_sync / '.window_closed').write_text('tracer never ready')
+                raise SystemExit('NOT DONE — P1 tracer not ready; an untraced leg is not this leg')
+            await asyncio.sleep(0.2)
+        p1_sync_meta = {'tracer_wait_s': round(time.monotonic() - t_wait0, 3)}
+        say(f'P1 sync: tracer ready after {p1_sync_meta["tracer_wait_s"]} s')
+
     # ---- the leg, under the collector -------------------------------------
     rec_path = out_dir / f'records_{stem}.jsonl'
     prior, done_keys, torn = read_completed(rec_path, key='video')
@@ -2485,6 +2501,8 @@ async def amain() -> int:
         leg_wall = time.monotonic() - t_leg0
         cg_leg1 = containers_cpu_usage_usec(svc_containers)
         dr1 = resource.getrusage(resource.RUSAGE_SELF)
+        if p1_sync is not None:
+            (p1_sync / '.window_closed').write_text(str(time.time()))
         # bracket closed, tokens still alive: the END reading sees their memory
         try:
             ls_end = lifetime_state.read_state(svc_containers, spool_paths, host_paths, 'leg_end')
@@ -2493,6 +2511,8 @@ async def amain() -> int:
             ls_end = {'phase': 'leg_end', 'state': f'unavailable: {exc!r}'}
             say(f'WARNING: lifetime_state leg_end reading failed: {exc!r}')
     finally:
+        if p1_sync is not None and not (p1_sync / '.window_closed').exists():
+            (p1_sync / '.window_closed').write_text('leg ended abnormally')
         # stop() terminates every token BEFORE disconnect (Ticket 4): a leg
         # that dies mid-flight must not leave tokens idle-spinning in the
         # cgroup the next leg's collector and quiet-box baseline read — and
@@ -2687,6 +2707,7 @@ async def amain() -> int:
             'thread_pins_by_arm': pf['thread_pin_parity'],
             'task_census': pf.get('task_census'),
             'p0': pf.get('p0'),
+            'p1_sync': p1_sync_meta or None,
             'network_mode': pf.get('network_mode'),
             'image': image_provenance(svc_container, args.image_lineage),
             'container_lifetime': (json.loads(args.container_lifetime)

@@ -1,0 +1,69 @@
+{
+ "label": "P1 pre-registration \u2014 written before the first P1 leg; every hypothesis, verdict rule and gate threshold below is fixed before data",
+ "written_utc": "2026-09-23T18:55Z (see the commit time)",
+ "branch": "feat/parity-p1, cut from feat/parity-p0 at fb211c288520 (the P0 deliverable), confirmed against origin; autoland self-test PASS on the new branch",
+ "session": {
+  "box_boot_id": "e293381c-aa59-4b05-92e2-c0e4f6167125 (the P1 box session; every P1 comparison is interleaved ABAB inside it; banked P0 figures are context only)",
+  "per_leg": "steal (/proc/stat open/close), CPU model, MHz, boot id, percore sampler, and the P1 1 Hz memory sampler (working/harness/memstat_sampler.py: cgroup memory.stat anon + file, memory.current as total) on the service container; the P1 memory figure is the SAMPLED peak; the window-close reading and memory.peak are context only",
+  "D0": "every cell reads back its instances; RocketRide: one task process, one loaded instance per model (P0_ONTOKEN on-token probe, pre and post); LlamaIndex: one worker process; a violation stops the chain",
+  "rulings": "A (32 vCPU unconstrained) and C (one workload at a time)",
+  "retries": "a failed leg is retried at most twice, then recorded FAILED",
+  "images": "every engine change ships as a NEW tag (rr:p1-tikafix, rr:p1-pdfium); rr:patched (sha256:073b43d8b5f9\u2026) and rr:patched-video (sha256:b7f51acc9533\u2026) are never modified, retagged or removed; their IDs are read back before and after every build and at every chain end",
+  "correctness_first": "on every changed cell, correctness is decided before speed is reported",
+  "budget": "11 hours from the start of P1 (18:31Z 2026-09-23) -> 05:31Z 2026-09-24: the leg in flight finishes, the rest is NOT RUN, the report is written, the box is stopped",
+  "order": "P1-A -> P1-B -> P1-C -> P1-D",
+  "floors": "video frames/s and RocketRide docs docs/s: 0.82%; a comparison is readable iff |delta| > max(floor, the spread of each ABAB pair); a one-run-each comparison is readable iff |delta| > the floor",
+  "mandate": "ONE engine process, ONE pipeline (one token), ONE instance per model; threads unrestricted; anything needing more is OUT OF BOUNDS"
+ },
+ "P1_A_E2_video_thread_stall": {
+  "hypothesis": "at equal torch threads (T=4) RocketRide's forward pass is slower because its intra-op threads are stalled, not computing",
+  "evidence_before": "P0 V2 (post-hoc): forward pass 0.373 s vs 0.289 s per frame at T=4; identical torch/torchvision/rfdetr/libgomp and identical RFDETRBase() construction; 2.4 vs 3.1 cores busy during the lock hold at about the same CPU per frame",
+  "design": "16-video AMI slice, K=16, T=4 (six thread variables), both arms, the P1 stamped copies on EVERY leg (working/nodes/p1_detect_stamped, working/video/li_video/p1/pipeline_stamped.py; installed only over the base md5s of P0's copies), tracer ON vs OFF, ABAB two runs each, in this order: e2_rr_on_a, e2_li_on_a, e2_rr_off_a, e2_li_off_a, e2_rr_on_b, e2_li_on_b, e2_rr_off_b, e2_li_off_b (working/scripts/p1_video_chain.sh e2)",
+  "tracer": "working/harness/p1_tracer.py, attached between warm-up and the measured window, to the ONE process that runs the detector (RocketRide task process; LlamaIndex uvicorn worker): bpftrace uprobes on PyEval_RestoreThread (both arms; LlamaIndex's libpython has no .symtab, so take_gil is reachable only in RocketRide's engine binary, where P0's take_gil/drop_gil probes are also kept) = per-thread GIL wait, plus sparse 10 ms buckets of waits > 20 us; tracepoint sched_switch/sched_wakeup = per-thread on-CPU, run-queue wait and sleep; py-spy --gil --nonblocking --rate 100; a 5 Hz /proc sampler of every thread (state, utime, stime, last CPU, Cpus_allowed_list)",
+  "in_process_readback": "both arms, once per process after its third recorded frame, from inside the detector's own process: torch.get_num_threads, get_num_interop_threads, torch.__config__.parallel_info, torch.backends.cpu.get_cpu_capability, mkldnn, default dtype, float32 matmul precision, grad/inference mode INSIDE forward, OMP_/MKL_/KMP_/GOMP_/OPENBLAS_/TORCH_/ATEN_/DNNL_/PYTORCH_ env (incl. OMP_WAIT_POLICY, KMP_*), process and per-thread CPU affinity, sys.getswitchinterval, sys.monitoring tools, sys.gettrace/getprofile, Python thread names",
+  "per_frame": "forward wall (fw0->fw1), forward interval on CLOCK_MONOTONIC, the calling thread's CPU across it (time.thread_time) and the process's CPU across it (time.process_time); the measured frames are the last N stamp rows by time, N = the export's total_frames (P0 rule)",
+  "definitions": {
+   "F_arm": "mean forward wall per frame over the arm's measured frames, mean of its two legs (OFF legs primary; ON legs reported beside)",
+   "D": "F_rr - F_li on the OFF legs; D_on the same on the ON legs",
+   "caller_cpu_ratio": "sum fw_thread_cpu / sum forward wall",
+   "cores_in_forward": "sum fw_proc_cpu / sum forward wall; for RocketRide also net of the idle burden measured in the export (efficiency.idle_burden.idle_cores_with_instances_live), labelled",
+   "compute_threads": "the forward callers (tids in the stamp rows) plus the arm's OMP workers = the T-1 threads with the most on-CPU time that are not callers",
+   "G_arm": "per frame, the calling thread's GIL wait (PyEval_RestoreThread buckets, waits > 20 us) overlapping its forward interval, bucket overlap pro rata; mean over frames (ON legs)",
+   "R_arm": "run-queue wait of the compute threads over the window / frames (ON legs)"
+  },
+  "readings": {
+   "a_GIL": "SUPPORTED if G_rr - G_li >= 0.5 x D_on",
+   "b_pool_or_affinity": "SUPPORTED if the read-backs differ between arms in intra-op/inter-op threads, parallel_info settings, OMP/MKL/KMP/GOMP env, CPU capability, forward grad/inference mode or the compute threads' affinity, AND the ON legs show fewer busy OMP workers in RocketRide (busy = on-CPU >= 50% of the window); a difference without fewer busy workers is reported as 'read back, not shown to cause'",
+   "c_CPU_contention": "SUPPORTED if R_rr - R_li >= 0.5 x D_on",
+   "none": "if no reading is SUPPORTED, report 'none' with where RocketRide's forward time goes (caller CPU ratio, compute threads' sleep vs run-queue vs on-CPU, GIL holders from py-spy)",
+   "note": "several readings may be SUPPORTED at once; 0.5 x D is the pre-registered 'explains at least half the gap' bar"
+  },
+  "null_control": "per arm, tracer ON vs OFF: frames/s within max(0.82%, both pair spreads) AND identical output (per-video chunk hashes and frame scores) on both pairs; a failure makes the ON-leg readings unreadable (E2 then reports only the OFF legs' F and read-backs)"
+ },
+ "P1_B_tika_wrapper_fix": {
+  "source_step": "from source (the wrapper jar's bytecode \u2014 com.rocketride.tika_api.TikaApi, ConfigBuilder, EmbeddedContentProcessor \u2014 the parse node's config and tika-config.xml), establish whether inline-image extraction and the per-image exiftool/ffmpeg/sox probing can be turned off by a setting. If yes: scope CONFIG, apply it. If no: the smallest wrapper patch, scope PATCH, built into rr:p1-tikafix (FROM rr:patched). State which, with file:line (bytecode offset where no source exists)",
+  "hypothesis": "image extraction and probing cause the pathological holds, and the text lane is unaffected by them",
+  "evidence_before": "E1: 039_039660.pdf 1,714.8 s in the engine path vs 2.3 s isolated Tika; about 1.12 M helper processes across the eleven; the product pipe listens only to the text lane",
+  "correctness_gate": "FIRST: the 384 slice (slice_docs_n384_w25.json), C=32, baseline (rr:patched) vs fixed, one run each (legs p1b_base_a, p1b_fix_a): every document ok in both has an identical chunk_sha256 list, and no document is lost. PASS = pure win. FAIL = label the fix OUTPUT-CHANGING, report the per-document text diff, and do NOT proceed to the full run on speed alone",
+  "smoke_gate": "E1's engine path (engine --tika per document, the eleven at once) baseline vs fixed, with the box-wide exec census: FIRES iff p50(baseline wall)/p50(fixed wall) >= 10 on the eleven AND the fixed census total is <= 10% of the baseline's (a drop of at least 90%)",
+  "speed": "384 slice ABAB two runs each (p1b_base_a, p1b_fix_a, [smoke], p1b_base_b, p1b_fix_b), stamped PROFILE on both arms (stamp_probe nodes, P0 D1 method); then, only if both gates pass, one full 9,975 run each (p1b_base_full, p1b_fix_full) with the pipeline texts captured client-side (the reference for P1-C). Delta = mean fixed / mean baseline span docs/s - 1, readable iff > max(0.82%, both spreads); full runs: readable iff > 0.82%",
+  "metrics": "the full D1 metric set per stage (admission, parse_bracket, split, embed, return: count, sum, share of run total, min, mean, sd, p50, p90, p95, p99, max, mean/p50, occupancy); span docs/s; the excluded-straggler view = docs/s over the documents that are not the eleven (ok non-straggler rows / (max completion - min submit) over non-straggler rows); utilisation = engine cores (cost.engine_container_cores); idle cores (cost.idle_spin_measured); the sampled memory peak; lost documents (rows not ok)",
+  "verdict": "the hypothesis is SUPPORTED iff the correctness gate passes AND the smoke gate fires"
+ },
+ "P1_C_native_parser_prototype": {
+  "parser": "pypdfium2 5.13.0 (PDFium: Apache-2.0 / BSD-3-Clause, compatible with the MIT product); PyMuPDF/MuPDF is AGPL-3.0 (or commercial) \u2014 out of scope for an MIT product; pypdf excluded (slower than Tika in H6)",
+  "build": "rr:p1-pdfium FROM rr:p1-tikafix: pypdfium2 installed into the engine's Python, and a prototype parse node in two variants: PURE (pypdfium2 only) and HYBRID (pypdfium2 first; P1-B's fixed Tika as fallback on empty text or error)",
+  "hypothesis": "with the wrapper fixed, a native parser gains little on docs/s because parse is 36.2% of document time and embedding 62.2%; the hybrid matches Tika's coverage",
+  "evidence_before": "H6 full: pypdfium2 1.06x on the tail and empty on 5 documents Tika extracts; hybrid parser-only 350 s vs Tika 873 s at equal coverage",
+  "correctness": "FIRST, on the full corpus against P1-B's fixed full run: text = a document's chunk texts as returned by the pipeline, joined in order (captured client-side in every full run); empty = zero chunks or not ok; report empty documents and the named set difference both ways, per-document character ratio and Sorensen-Dice similarity of whitespace-token multisets (after collapsing whitespace) as distributions (min, p5, p25, p50, p75, p95), failures named. No chunk-identity gate (output legitimately differs). A variant is ADOPTABLE iff it is empty on no document P1-B's fixed run recovers. PURE is expected to fail; it is reported either way",
+  "order": "the full runs of HYBRID and PURE (texts captured) come first and decide correctness; they are also the one full run each for any adoptable variant. Then P1-B-fixed vs HYBRID vs PURE on the 384 slice, ABAB, two runs each (p1c_fix_a, p1c_hyb_a, p1c_pure_a, p1c_fix_b, p1c_hyb_b, p1c_pure_b), stamped PROFILE",
+  "metrics": "as P1-B, plus the parse stage's share of run total",
+  "verdict": "between P1-B (fixed Tika) and HYBRID \u2014 only if HYBRID is adoptable: SPEED from the 384 ABAB (readable iff > max(0.82%, spreads)), MEMORY from the sampled peaks (reported, no pre-registered floor: a difference is named, not ranked), COVERAGE from the correctness step; HYBRID is OPTIMAL iff it is readably faster and no worse in coverage; P1-B is OPTIMAL iff HYBRID is not adoptable or readably slower; otherwise TIE within the floor"
+ },
+ "P1_D_V1_confirmation_168": {
+  "design": "168-video AMI manifest, K=16, T=4 (six vars), RocketRide one token on rr:patched-video vs LlamaIndex one instance, one run each, same session, D0 read-back, no stamps, no tracer, no video patches (p1_video_chain.sh v1full)",
+  "verdict": "gap = LI frames/s / RR frames/s - 1. CONFIRMED iff gap - max(0.82%, P0 V1's larger pair spread 3.80%) >= 10 percentage points (P0's gate margin; one run each gives no spread of its own); REFUTED iff gap <= max(0.82%, 3.80%); otherwise PRESENT BUT SMALLER. The difference from P0's 16-video +34.7% is reported beside it",
+  "determinism": "each arm's outputs (per-video chunk hashes and frame scores) for the videos also in P0 V1's 16-video slice equal P0 V1's outputs for the same arm at T=4"
+ },
+ "deliverable": "one P1 report: verdicts per experiment; a gate table (threshold, measured, fired); correctness before speed; the P1-B vs P1-C recommendation; the E2 cause; ROI in P0's three-column form ((a) share of run total from D1, (b) 1/(1-share), (c) scope CONFIG | THREADING | PYTHON | CPP | PATCH), ranked by scope then share; NOT RUN list; register entries; a blind recomputation with planted figures as in P0; then box.sh stop and a read-back of its state"
+}
