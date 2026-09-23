@@ -663,7 +663,15 @@ def main() -> int:
     roi = A["roi"] or {}
     if roi:
         items = [dict(x, share=resolve_share(x.get("share_from", "none"), A)) for x in roi.get("items", [])]
-        head += ["## Bottlenecks and in-bounds fixes, ranked by ROI (scope first, then share)", ""] + roi_table(items)
+        head += ["## Bottlenecks and in-bounds fixes, ranked by ROI (scope first, then share)", "",
+                 "(a) is the mean share of run total over the two PROFILE legs that carry the stage: "
+                 "d1f_rr_s1/s2 (384 slice, C=32) for docs items, the two stamped RocketRide V2 legs "
+                 "for video items. (b) is the per-document (per-frame) time bound if that stage cost "
+                 "nothing. A CPP item is proposed only above 15% of run total.", ""] + roi_table(items)
+        if roi.get("measured_no_readable_effect"):
+            head += ["### Measured, with no readable effect", ""] + [f"- {x}" for x in roi["measured_no_readable_effect"]] + [""]
+        if roi.get("measured_source_not_traced"):
+            head += ["### Measured, source not traced", ""] + [f"- {x}" for x in roi["measured_source_not_traced"]] + [""]
         head += ["### Out of bounds (recorded, not proposed)", ""] + [f"- {x}" for x in roi.get("out_of_bounds", [])] + [""]
         head += ["### NOT RUN", ""] + [f"- {x}" for x in roi.get("not_run", [])] + [""]
     tail = sec_session(A["docs"], F, [A["v1"], A["v2"], A["v1f"]])
