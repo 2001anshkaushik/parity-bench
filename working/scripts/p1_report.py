@@ -179,6 +179,14 @@ def sec_docs(d: Optional[Dict[str, Any]], b1: Optional[Dict[str, Any]], c1: Opti
         f"lost by the fix {n(len(co.get('lost_by_b') or []))}; gained {n(len(co.get('gained_by_b') or []))} → "
         f"**{'PASS (pure win)' if co.get('pass') else 'FAIL — OUTPUT-CHANGING'}**" if co else "NOT RUN") + ".")
     out.append("")
+    cf = b.get("correctness_full_corpus_context") or {}
+    if cf:
+        out.append(f"**Context — chunk identity over the full 9,975 (not the gate; the eleven stragglers are only here):** "
+                   f"{n(cf.get('documents_ok_in_both'))} documents ok in both; differ {n(len(cf.get('chunk_lists_differ') or []))} "
+                   f"({(cf.get('chunk_lists_differ') or [])[:10]}); lost by the fix {n(len(cf.get('lost_by_b') or []))}; gained "
+                   f"{n(len(cf.get('gained_by_b') or []))}; stragglers ok in both {n(len(cf.get('stragglers_ok_in_both') or []))}, of which differ "
+                   f"{n(len(cf.get('stragglers_differ') or []))}.")
+        out.append("")
     sm = b.get("smoke") or {}
     if sm:
         out.append(f"**Smoke (E1's engine path on the 11, this session):** p50 baseline {n(sm['base']['p50_wall_s'], 1)} s vs fixed "

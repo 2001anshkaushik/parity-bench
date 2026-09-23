@@ -194,6 +194,12 @@ def main() -> int:
                                       [L["p1b_fix_a"]["_g"], L["p1b_fix_b"]["_g"]], FLOOR)
     if "p1b_base_full" in L and "p1b_fix_full" in L:
         b["full"] = one_vs_one(L["p1b_base_full"], L["p1b_fix_full"])
+        # CONTEXT, not the pre-registered gate (that is the 384 slice): chunk identity over the whole corpus,
+        # which is where the eleven stragglers are
+        ci = correctness_identity(L["p1b_base_full"], L["p1b_fix_full"])
+        ci["stragglers_differ"] = sorted(set(ci["chunk_lists_differ"]) & ELEVEN)
+        ci["stragglers_ok_in_both"] = sorted(ELEVEN & set(L["p1b_base_full"]["chunks"]) & set(L["p1b_fix_full"]["chunks"]))
+        b["correctness_full_corpus_context"] = ci
     if b.get("correctness") and b.get("smoke"):
         b["verdict"] = ("SUPPORTED" if b["correctness"]["pass"] and b["smoke"]["fired"] else
                         "NOT SUPPORTED" if b["correctness"]["pass"] else "OUTPUT-CHANGING")
