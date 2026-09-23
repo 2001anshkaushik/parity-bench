@@ -63,10 +63,24 @@ def _wrap(orig, a, b):
     return w
 
 
+_INSTALL_ERR = []
+
+
 def _install():
+    # An instrumentation failure must NEVER reach the frame: the node's own except below would drop
+    # the frame and change the output. Failures are recorded and the frame runs uninstrumented.
     with _WLOCK:
         if _INSTALLED:
             return
+        _INSTALLED.append(True)
+        try:
+            _install_inner()
+        except Exception as e:                   # noqa: BLE001
+            _INSTALL_ERR.append(f"{type(e).__name__}: {e}")
+
+
+def _install_inner():
+    if True:
         from ai.common.image import dense_resize as _dr
         from ai.common.models.vision import detection as _det
         _dr.resize_for_inference = _wrap(_dr.resize_for_inference, 'rs0', 'rs1')
@@ -80,16 +94,16 @@ def _install():
         def rfd(self, *args, **kw):
             m = getattr(self, '_model', None)
             if m is not None and not getattr(self, '_p0_hooked', False):
+                self._p0_hooked = True
                 try:
                     import torch
                     mod = getattr(getattr(m, 'model', None), 'model', None)
                     if isinstance(mod, torch.nn.Module):
                         mod.register_forward_pre_hook(lambda *x: _m('fw0'))
                         mod.register_forward_hook(lambda *x: _m('fw1'))
-                except Exception:
-                    pass
-                m.predict = _wrap(m.predict, 'pr0', 'pr1')
-                self._p0_hooked = True
+                    m.predict = _wrap(m.predict, 'pr0', 'pr1')
+                except Exception as e:           # noqa: BLE001
+                    _INSTALL_ERR.append(f"hooks: {type(e).__name__}: {e}")
             _m('rfd0')
             r = orig_detect(self, *args, **kw)
             _m('rfd1')
@@ -115,9 +129,14 @@ def _record(d, n_dets):
            'predict_post': _span(d, 'fw1', 'pr1'), 'dict_build': _span(d, 'pr1', 'rfd1'),
            'inside_other': (lk_held - sum(x for x in inside if x is not None)) if lk_held is not None else None,
            'emit': _span(d, 'lk3', 'em1')}
-    with _WLOCK:
-        with open(_OUT, 'a') as f:
-            f.write(json.dumps(rec) + '\n')
+    if _INSTALL_ERR:
+        rec['instrument_error'] = _INSTALL_ERR[:3]
+    try:
+        with _WLOCK:
+            with open(_OUT, 'a') as f:
+                f.write(json.dumps(rec) + '\n')
+    except Exception:                            # noqa: BLE001 — never the frame's problem
+        pass
 
 
 class IInstance(IInstanceBase):
@@ -206,7 +225,10 @@ class IInstance(IInstanceBase):
                 t0 = time.perf_counter()
                 self._emit(image, detections)
                 _m('em1')
-                _record(_TL.d, len(detections))
+                try:
+                    _record(_TL.d, len(detections))
+                except Exception:                # noqa: BLE001 — never the frame's problem
+                    pass
                 _TL.d = None
                 t_emit = (time.perf_counter() - t0) * 1000
                 debug(

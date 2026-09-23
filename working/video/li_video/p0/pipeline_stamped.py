@@ -95,9 +95,12 @@ def _p0_m(k):
 
 
 def _p0_write(rec):
-    with _P0_WLOCK:
-        with open(_P0_OUT, 'a') as f:
-            f.write(json.dumps(rec) + '\n')
+    try:
+        with _P0_WLOCK:
+            with open(_P0_OUT, 'a') as f:
+                f.write(json.dumps(rec) + '\n')
+    except Exception:                            # noqa: BLE001 — never the request's problem
+        pass
 
 
 def _p0_span(d, a, b):
@@ -239,26 +242,27 @@ class LlamaIndexVideoPipeline:
             return im.convert('RGB').copy()
 
     def _p0_hook(self):
+        # an instrumentation failure must never fail a request: recorded, frame runs as shipped
         if getattr(self, '_p0_hooked', False):
             return
-        m = self._detector
+        self._p0_hooked = True
         try:
+            m = self._detector
             import torch
             mod = getattr(getattr(m, 'model', None), 'model', None)
             if isinstance(mod, torch.nn.Module):
                 mod.register_forward_pre_hook(lambda *x: _p0_m('fw0'))
                 mod.register_forward_hook(lambda *x: _p0_m('fw1'))
-        except Exception:
-            pass
-        op = m.predict
+            op = m.predict
 
-        def pw(*a, **k):
-            _p0_m('pr0')
-            r = op(*a, **k)
-            _p0_m('pr1')
-            return r
-        m.predict = pw
-        self._p0_hooked = True
+            def pw(*a, **k):
+                _p0_m('pr0')
+                r = op(*a, **k)
+                _p0_m('pr1')
+                return r
+            m.predict = pw
+        except Exception as e:                   # noqa: BLE001
+            self._p0_err = f"{type(e).__name__}: {e}"
 
     def _detect_frame(self, img) -> list[dict]:
         self._p0_hook()
