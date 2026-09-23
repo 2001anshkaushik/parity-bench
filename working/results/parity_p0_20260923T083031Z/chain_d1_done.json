@@ -1,0 +1,20 @@
+{
+ "stage_complete_utc": "2026-09-23T09:23:39Z",
+ "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+ "outcome": "complete",
+ "legs": [
+  "tool_pyspy:rc=0",
+  "d1_rr_s1:rc=0",
+  "d1_rr_u1:rc=0",
+  "d1_rr_s2:rc=0",
+  "d1_rr_u2:rc=0",
+  "an_rr_u1:rc=0",
+  "an_li_u1:rc=0",
+  "an_rr_s1:rc=0",
+  "an_li_t1:rc=0",
+  "an_rr_u2:rc=0",
+  "an_li_u2:rc=0",
+  "an_rr_s2:rc=0",
+  "an_li_t2:rc=0"
+ ]
+}
