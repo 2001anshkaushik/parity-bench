@@ -1,0 +1,40 @@
+uprobe:/proc/23241/root/opt/rocketride/engine/engine:PyEval_RestoreThread /pid == 23241/ { @r0[tid] = nsecs; }
+uretprobe:/proc/23241/root/opt/rocketride/engine/engine:PyEval_RestoreThread /pid == 23241 && @r0[tid]/ {
+  $w = nsecs - @r0[tid]; delete(@r0[tid]);
+  @rt_ns[tid] = @rt_ns[tid] + $w; @rt_n[tid] = @rt_n[tid] + 1;
+  if ($w > 50000) { $b = nsecs / 50000000; @rt_b[tid, $b] = @rt_b[tid, $b] + $w; }
+  if (@tfirst == 0) { @tfirst = nsecs; }
+  @tlast = nsecs;
+}
+uprobe:/proc/23241/root/opt/rocketride/engine/engine:take_gil /pid == 23241/ { @t0[tid] = nsecs; }
+uretprobe:/proc/23241/root/opt/rocketride/engine/engine:take_gil /pid == 23241 && @t0[tid]/ {
+  $w = nsecs - @t0[tid]; delete(@t0[tid]);
+  @wait_ns[tid] = @wait_ns[tid] + $w; @takes[tid] = @takes[tid] + 1; @h0[tid] = nsecs;
+}
+uprobe:/proc/23241/root/opt/rocketride/engine/engine:drop_gil /pid == 23241 && @h0[tid]/ {
+  $h = nsecs - @h0[tid]; delete(@h0[tid]); @hold_ns[tid] = @hold_ns[tid] + $h;
+}
+tracepoint:sched:sched_switch {
+  if (pid == 23241) {
+    $p = args->prev_pid;
+    @mine[$p] = 1;
+    if (@on0[$p]) { @oncpu_ns[$p] = @oncpu_ns[$p] + (nsecs - @on0[$p]); delete(@on0[$p]); }
+    @off0[$p] = nsecs;
+    if (args->prev_state == 0) { @offr[$p] = 1; } else { @offr[$p] = 0; }
+  }
+  $n = args->next_pid;
+  if (@mine[$n]) {
+    if (@off0[$n]) {
+      if (@offr[$n]) { @runq_ns[$n] = @runq_ns[$n] + (nsecs - @off0[$n]); }
+      else {
+        if (@wk[$n]) { @sleep_ns[$n] = @sleep_ns[$n] + (@wk[$n] - @off0[$n]); @runq_ns[$n] = @runq_ns[$n] + (nsecs - @wk[$n]); }
+        else { @sleep_ns[$n] = @sleep_ns[$n] + (nsecs - @off0[$n]); }
+      }
+      delete(@off0[$n]);
+    }
+    if (@wk[$n]) { delete(@wk[$n]); }
+    @on0[$n] = nsecs;
+    @nsw[$n] = @nsw[$n] + 1;
+  }
+}
+tracepoint:sched:sched_wakeup /@mine[args->pid]/ { @wk[args->pid] = nsecs; }

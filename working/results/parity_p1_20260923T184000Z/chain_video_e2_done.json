@@ -1,0 +1,19 @@
+{
+ "stage_complete_utc": "2026-09-23T22:51:53Z",
+ "boot_id": "e293381c-aa59-4b05-92e2-c0e4f6167125",
+ "outcome": "complete",
+ "legs": [
+  "e2_rr_on_a:rc=0",
+  "e2_li_on_a:rc=0",
+  "e2_rr_off_a:rc=0",
+  "e2_li_off_a:rc=0",
+  "e2_rr_on_b:rc=0",
+  "e2_li_on_b:rc=0",
+  "e2_rr_off_b:rc=0",
+  "e2_li_off_b:rc=0"
+ ],
+ "protected_image_ids_at_end": {
+  "rr:patched": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+ }
+}

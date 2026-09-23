@@ -1,0 +1,184 @@
+{
+ "preleg_load1": 2.64,
+ "preleg_container_idle_cores": {
+  "li_bal_0": 0.007
+ },
+ "preleg_own_process_cores": 0.005,
+ "preleg_foreign_excess": 0.01,
+ "preleg_quiet_box": {
+  "PASS": true,
+  "threshold": 2.0,
+  "readings": [
+   {
+    "load1": 2.64,
+    "host_busy_cores": 0.02,
+    "container_idle_cores": {
+     "li_bal_0": 0.007
+    },
+    "container_attributed": 0.01,
+    "own_process_cores": 0.005,
+    "foreign_now": 0.01,
+    "foreign_by_load1": 2.6,
+    "foreign_excess": 0.01,
+    "basis": "instantaneous (/proc/stat busy \u2212 containers \u2212 ours)"
+   }
+  ],
+  "n_readings": 1,
+  "trend": "SINGLE READING",
+  "settle_wall_s": 4.1,
+  "load1": 2.64,
+  "host_busy_cores": 0.02,
+  "container_idle_cores": {
+   "li_bal_0": 0.007
+  },
+  "container_attributed": 0.01,
+  "own_process_cores": 0.005,
+  "foreign_now": 0.01,
+  "foreign_by_load1": 2.6,
+  "foreign_excess": 0.01,
+  "basis": "instantaneous (/proc/stat busy \u2212 containers \u2212 ours)",
+  "note": "foreign = load1 minus our containers minus our own process tree; own_process_cores is CPU-seconds/window (a lower bound \u2014 load1 also counts uninterruptible sleep)"
+ },
+ "manifest_meta": {
+  "built_utc": "2026-08-23T09:11:56Z",
+  "mirror": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror/amicorpus",
+  "selection_rule": "meeting list leela_ami_full.txt taken in FILE ORDER (sha256 601620b4bfbf9c2b, 170 ids); first 168 = measured, next 2 = warm (positional, matching the list owner's convention); files are pre-staged and never fetched",
+  "meeting_list": "working/video/team_docs_received/leela_ami_full.txt",
+  "meeting_list_sha256": "601620b4bfbf9c2b79036fb4607d2d4dcf922fd4963abde0f1c9a5a4b883e501",
+  "n_measured": 168,
+  "n_warm": 2,
+  "mux": "none \u2014 fetched as shipped (video-only AVIs; audio out of scope this phase)",
+  "measured_columns": {
+   "interval_s": 15,
+   "expected_frames_method": "MEASURED at build (Crossroad 23): fps=1/15 through the arms' own imageio-ffmpeg binary via pipe:0, PNG emissions counted. No formula \u2014 arithmetic from a measured duration is still an assertion.",
+   "ffmpeg": {
+    "imageio_ffmpeg_version": "0.6.0",
+    "exe": "/home/ssm-user/.venv-floor/lib/python3.12/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2"
+   },
+   "measured_dpf": 7.77,
+   "measured_chars_per_det": 222.2,
+   "chunk_stride": 3800,
+   "dup_trigger_chunks": 64,
+   "note": "est_chunks_from_measured derives from three measured inputs (per-row frames, probe dpf, probe chars/det) and is STILL an estimate, planning only; the duplication gate uses MEASURED n_chunks at run time (NOT-RUN below 64, approved rule)."
+  },
+  "skipped": [],
+  "corpus_dir": "/home/ssm-user/parity-bench-video/corpus/ami/full",
+  "corpus_dir_stamped": {
+   "utc": "2026-08-23T13:40:40Z",
+   "proof": "sha256 verify 170/170 against this directory",
+   "previous": null
+  }
+ },
+ "readbacks": {
+  "li_worker_8802_1": {
+   "env": {
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4",
+    "VECLIB_MAXIMUM_THREADS": "4",
+    "NUMEXPR_NUM_THREADS": "4",
+    "TORCH_NUM_THREADS": "4"
+   },
+   "torch_num_threads": 4
+  }
+ },
+ "identity": {
+  "sdk": {
+   "skipped": "LI leg \u2014 the rocketride SDK is not on this path"
+  },
+  "li": {
+   "detect_impl": [
+    "rfdetr"
+   ],
+   "python_version": "3.12.13",
+   "versions": {
+    "rfdetr": "1.5.2",
+    "torch": "2.10.0+cu128",
+    "torchvision": "0.25.0+cu128",
+    "transformers": "4.53.3",
+    "supervision": "0.30.0",
+    "llama-index-core": "0.14.24",
+    "llama-index-embeddings-huggingface": "0.7.0",
+    "sentence-transformers": "5.7.0",
+    "imageio-ffmpeg": "0.6.0",
+    "fastapi": "0.141.1",
+    "uvicorn": "0.52.4"
+   },
+   "chunk_config_readback": {
+    "expected": {
+     "chunk_size": 4000,
+     "chunk_overlap": 0,
+     "split_unit": "chars"
+    },
+    "per_worker": {
+     "li_worker_8802_1": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     }
+    }
+   },
+   "rfdetr_checkpoint_md5_by_container": {
+    "li_bal_0": "b4d3ce46099eaed50626ede388caf979"
+   },
+   "rfdetr_checkpoint_md5_ok": true
+  }
+ },
+ "thread_pin_parity": {
+  "PASS": true,
+  "arms": {
+   "li": {
+    "within_arm": {
+     "PASS": true,
+     "readers": [
+      "li_worker_8802_1"
+     ],
+     "disagreements": null,
+     "values_agreed": {
+      "OMP_NUM_THREADS": "4",
+      "MKL_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "4",
+      "VECLIB_MAXIMUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "TORCH_NUM_THREADS": "4",
+      "torch_num_threads": 4
+     }
+    },
+    "declared": {
+     "OMP_NUM_THREADS": "4",
+     "MKL_NUM_THREADS": "4",
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4"
+    },
+    "declared_vs_measured_mismatch": null
+   }
+  },
+  "cross_arm_values": {
+   "li": 4
+  },
+  "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm optima, difference recorded never failed (Crossroad 17)"
+ },
+ "network_mode": {
+  "li_bal_0": "host"
+ },
+ "pipe_sha256": "6330773fb63bf7f286563cc37b39a671e3b25c1874ae9bcfc4b936c9c2e5b911",
+ "corpus_dir": "/home/ssm-user/parity-bench-video/corpus/ami/full",
+ "corpus_dir_source": "manifest meta",
+ "manifest_sha256": "f5a2255cc5c9ad8744c096c7267f7c8845182aec902213329eea4e3669e65c19",
+ "idle_burden": {
+  "instances": 1,
+  "instance_kind": "li_workers",
+  "idle_cores_before_instances": 0.007,
+  "idle_cores_with_instances_live": 0.005,
+  "sample_s": 6.0,
+  "idle_share_of_box": 0.0002,
+  "box_cpus": 32,
+  "marginal_cores_per_instance": null,
+  "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+  "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve"
+ },
+ "posture": "workers[declared_workers=1]",
+ "pass": 1
+}

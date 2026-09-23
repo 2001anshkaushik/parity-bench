@@ -1,0 +1,31 @@
+{
+ "label": "DIAGNOSTIC (P1-A E2): uprobes, scheduler tracepoints and a sampling profiler perturb what they measure; the tracer-off legs are the null control",
+ "arm": "li",
+ "container": "li_bal_0",
+ "pid": 10928,
+ "uprobe_binary": "/proc/10928/root/usr/local/lib/libpython3.12.so.1.0",
+ "bpftrace_attached": true,
+ "clock_at_ready": {
+  "time": 1790192962.2155247,
+  "monotonic_ns": 4520999032787
+ },
+ "pyspy_running_at_ready": true,
+ "clock_at_close": {
+  "time": 1790193996.2120612,
+  "monotonic_ns": 5554995566452
+ },
+ "bpftrace_signalled_pids": [
+  12762
+ ],
+ "pyspy_signalled_pids": [
+  12766
+ ],
+ "bpftrace_rc": 0,
+ "pyspy_rc": 0,
+ "files": {
+  "e2trace_e2_li_on_a.json": 66782,
+  "pyspy_gil_e2_li_on_a.txt": 2689389,
+  "threadstate_e2_li_on_a.jsonl": 14516617
+ },
+ "bpftrace_log_tail": "\n\n"
+}

@@ -1,0 +1,31 @@
+{
+ "label": "DIAGNOSTIC (P1-A E2): uprobes, scheduler tracepoints and a sampling profiler perturb what they measure; the tracer-off legs are the null control",
+ "arm": "rr",
+ "container": "rr",
+ "pid": 7581,
+ "uprobe_binary": "/proc/7581/root/opt/rocketride/engine/engine",
+ "bpftrace_attached": true,
+ "clock_at_ready": {
+  "time": 1790190726.504875,
+  "monotonic_ns": 2285288380793
+ },
+ "pyspy_running_at_ready": true,
+ "clock_at_close": {
+  "time": 1790192072.6690865,
+  "monotonic_ns": 3631452591477
+ },
+ "bpftrace_signalled_pids": [
+  8264
+ ],
+ "pyspy_signalled_pids": [
+  8268
+ ],
+ "bpftrace_rc": 0,
+ "pyspy_rc": 0,
+ "files": {
+  "e2trace_e2_rr_on_a.json": 376394,
+  "pyspy_gil_e2_rr_on_a.txt": 4781625,
+  "threadstate_e2_rr_on_a.jsonl": 83881238
+ },
+ "bpftrace_log_tail": "\n\n"
+}

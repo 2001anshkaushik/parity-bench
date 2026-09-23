@@ -91,11 +91,23 @@ def gil_in_forward(fr: List[Dict[str, Any]], buckets: Dict[str, int]) -> Dict[st
     return {"frames": len(per), "mean_s": statistics.mean(per) if per else None, "metric_set": metric_set(per)}
 
 
+def text_of(f: Path) -> Optional[str]:
+    """A raw text file, or its lossless .gz copy (the large sampler and profiler files land gzipped;
+    the uncompressed originals are in S3 under the same leg)."""
+    if f.exists():
+        return f.read_text(encoding="utf-8", errors="replace")
+    g = f.with_name(f.name + ".gz")
+    if g.exists():
+        import gzip
+        return gzip.decompress(g.read_bytes()).decode("utf-8", errors="replace")
+    return None
+
+
 def thread_names(d: Path, leg: str) -> Dict[int, str]:
     names: Dict[int, str] = {}
-    f = d / f"threadstate_{leg}.jsonl"
-    if f.exists():
-        for line in f.read_text().splitlines():
+    txt = text_of(d / f"threadstate_{leg}.jsonl")
+    if txt:
+        for line in txt.splitlines():
             for th in json.loads(line)["th"]:
                 names[int(th[0])] = th[1]
     return names
@@ -103,9 +115,9 @@ def thread_names(d: Path, leg: str) -> Dict[int, str]:
 
 def affinity_of(d: Path, leg: str, tids: List[int]) -> Dict[int, str]:
     out: Dict[int, str] = {}
-    f = d / f"threadstate_{leg}.jsonl"
-    if f.exists():
-        for line in f.read_text().splitlines():
+    txt = text_of(d / f"threadstate_{leg}.jsonl")
+    if txt:
+        for line in txt.splitlines():
             for th in json.loads(line)["th"]:
                 if int(th[0]) in tids:
                     out[int(th[0])] = th[6]
@@ -113,11 +125,11 @@ def affinity_of(d: Path, leg: str, tids: List[int]) -> Dict[int, str]:
 
 
 def pyspy_top(d: Path, leg: str, k: int = 10) -> Dict[str, Any]:
-    f = d / f"pyspy_gil_{leg}.txt"
-    if not f.exists() or not f.stat().st_size:
+    txt = text_of(d / f"pyspy_gil_{leg}.txt")
+    if not txt:
         return {"status": "NO FILE"}
     c, tot = Counter(), 0
-    for line in f.read_text(encoding="utf-8", errors="replace").splitlines():
+    for line in txt.splitlines():
         m = re.match(r"^(?P<stack>.*) (?P<n>\d+)$", line.strip())
         if not m:
             continue

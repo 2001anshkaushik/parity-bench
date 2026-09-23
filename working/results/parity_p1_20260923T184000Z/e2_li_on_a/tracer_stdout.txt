@@ -1,0 +1,1 @@
+{"pid": 10928, "bpftrace_attached": true, "files": {"e2trace_e2_li_on_a.json": 66782, "pyspy_gil_e2_li_on_a.txt": 2689389, "threadstate_e2_li_on_a.jsonl": 14516617}}
