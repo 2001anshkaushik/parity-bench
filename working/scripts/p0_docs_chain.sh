@@ -102,6 +102,13 @@ case "$STAGE" in
     leg an_li_t2 "${C8[@]}" BSZ_LI_WORKERS=1 BSZ_LI_TIMED=1 -- li "$S96" 1
     ;;
   h2h1)
+    # Amendment 1: the GIL tracer needs bpftrace on the host. Installed here, with the box idle
+    # (no leg running), and proven before any H2 leg relies on it.
+    if ! command -v bpftrace >/dev/null 2>&1; then
+      sudo -n apt-get install -y -q bpftrace </dev/null >/dev/null 2>&1 || echo "!! bpftrace install failed"
+    fi
+    echo "bpftrace: $(sudo -n bpftrace --version 2>&1 </dev/null)"
+    leg tool_gil "${C32[@]}" BSZ_PYSPY=1 -- rr "$S96" 1
     # H2 null control FIRST: one document in flight must show near-zero GIL waiting
     leg h2_null_c1 "${C1[@]}"  BSZ_PYSPY=1 -- rr "$S96" 1
     leg h2_c32_a   "${C32[@]}" BSZ_PYSPY=1 -- rr "$S384" 1

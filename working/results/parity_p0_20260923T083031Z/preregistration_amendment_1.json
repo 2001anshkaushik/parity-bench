@@ -1,0 +1,28 @@
+{
+ "amendment": 1,
+ "amends": "preregistration.json H2_interpreter_lock.instrument / categories",
+ "written_utc": "2026-09-23T08:42:05Z",
+ "landed_before_any_h2_leg": true,
+ "reason": "INSTRUMENT FAILURE, not data: in the tooling leg (tool_pyspy, 96 slice, 2026-09-23 08:35Z) py-spy's blocking native recorder aborted at once on the engine binary with 'UNW_EBADREG: bad register number' (libunwind; the task process also runs JVM-compiled code with no unwind tables). Its GIL recorder ran but could not be stopped through sudo (SIGINT to the sudo process was not relayed) and was killed without writing. No H2 leg had run; no H2 measurement exists.",
+ "what_the_original_said": "on recorder-N failure: classification NOT RUN, GIL occupancy and top-10 still reported, gate not evaluated. That clause is kept as the reported outcome FOR RECORDER N.",
+ "replacement_instrument": "bpftrace uprobes on the engine binary's own CPython 3.12 take_gil (entry and return) and drop_gil (entry) \u2014 local symbols present in its .symtab (take_gil 0x1f8a140, drop_gil 0x1f8a610; the binary also carries DWARF). Filtered to the task pid. Per thread: WAITING = time inside take_gil; HOLDING = take_gil return to the next drop_gil. The same quantity the pre-registration's take_gil-frame classification sampled, now timed exactly instead of sampled.",
+ "categories_as_time_shares_of_python_thread_time": {
+  "python_threads": "the threads that entered take_gil during the window (a thread that never takes the GIL runs no Python)",
+  "denominator": "n_python_threads x window seconds",
+  "waiting_on_gil": "sum of per-thread wait time / denominator",
+  "holding_gil": "sum of per-thread hold time / denominator (the lock's occupancy = sum of hold time / window, at most 1)",
+  "native": "Python-thread /proc samples in state R (5 Hz), as a share, minus holding_gil (floored at 0): running without the lock (engine C++, JVM, torch)",
+  "idle": "the remainder, 1 - waiting - holding - native"
+ },
+ "unchanged": [
+  "the gate threshold: waiting_on_gil >= 15% (mean of the two C=32 smoke runs)",
+  "the null control: C=1 on the 96 slice first, waiting_on_gil < 2% or H2 is UNREADABLE",
+  "top-10 from py-spy's --gil recorder (now stopped by SIGINT to its root child)",
+  "every H2 leg DIAGNOSTIC"
+ ],
+ "added_checks": [
+  "tool_gil: a tooling leg (96 slice, C=32) before the null control proves the tracer attaches and writes",
+  "consistency: the traced GIL occupancy must not exceed 1.0 (two holders at once would mean the probes misread); reported beside py-spy's gil-tick occupancy"
+ ],
+ "morning_report_rule": "both are reported: recorder N 'NOT RUN (UNW_EBADREG)' per the original clause, and the amended tracer's values with this amendment named beside every H2 figure, so the amendment can be rejected by the reader"
+}

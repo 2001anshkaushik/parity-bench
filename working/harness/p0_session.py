@@ -20,18 +20,18 @@ command runs ai/node.py (the task process); the server (`./engine ai/eaas.py`) a
 forked helpers are listed but are not task instances. The mandate expects exactly one. The
 in-process half of D0 (loaded models) is env_probe schema 3, read on the measured token.
 
-H2 PROFILER. py-spy runs on the HOST as root against the task process's host pid (the arm's own
-container is not given SYS_PTRACE, so nothing about the arm changes). Two recorders run at once:
-  native  `record --native --idle --threads` (BLOCKING: pauses the process per sample to unwind
-          native frames) — every Python thread's merged Python+native stack, idle ones included.
-          A thread waiting for the GIL shows `take_gil` in its native frames; this is the only
-          external signal that separates waiting-for-the-lock from other sleeping.
-  gil     `record --gil --threads --nonblocking` — only the GIL holder's stack each tick, without
-          pausing the process; its tick count over the window is the lock's occupancy, and its
-          stacks are the functions that hold it.
+H2 PROFILER (as amended, preregistration_amendment_1.json). On the HOST as root against the task
+process's host pid — the arm's own container is not given SYS_PTRACE, so nothing about the arm
+changes:
+  giltrace  bpftrace uprobes on CPython 3.12's take_gil / drop_gil in the engine binary (local
+          symbols in its .symtab): per thread, time inside take_gil is time WAITING for the lock,
+          and take_gil's return to the next drop_gil is time HOLDING it.
+  gil     `py-spy record --gil --threads --nonblocking` — only the GIL holder's stack each tick,
+          without pausing the process; its stacks are the functions that hold the lock.
 Plus a /proc sampler of every OS thread in the task process (state and CPU ticks per thread,
-Python or not: the JVM and any torch/OpenMP threads appear only here). Every H2 leg is labelled
-DIAGNOSTIC: the blocking recorder perturbs what it measures, so its absolute times are never
+Python or not: the JVM and any torch/OpenMP threads appear only here). The pre-registered
+recorder N (py-spy --native, blocking) aborts on this binary (UNW_EBADREG) and is not run. Every
+H2 leg is labelled DIAGNOSTIC: uprobes perturb what they measure, so absolute times are never
 figures.
 """
 from __future__ import annotations
@@ -224,18 +224,38 @@ class LegSession:
         return self.rec
 
 
+GIL_BT = """// P0 H2 GIL tracer (amendment 1): uprobes on CPython 3.12's take_gil / drop_gil in the engine
+// binary (local symbols, present in its .symtab). Per thread: time inside take_gil = WAITING for
+// the lock (an uncontended take returns at once); take_gil return -> next drop_gil = HOLDING it.
+uprobe:BIN:take_gil /pid == PID/ { @t0[tid] = nsecs; }
+uretprobe:BIN:take_gil /pid == PID && @t0[tid]/ {
+  $w = nsecs - @t0[tid]; delete(@t0[tid]);
+  @wait_ns[tid] = sum($w); @takes[tid] = count(); @h0[tid] = nsecs;
+  @wait_by_s[nsecs / 1000000000] = sum($w); @wait_hist = hist($w);
+}
+uprobe:BIN:drop_gil /pid == PID && @h0[tid]/ {
+  $h = nsecs - @h0[tid]; delete(@h0[tid]);
+  @hold_ns[tid] = sum($h); @hold_by_s[nsecs / 1000000000] = sum($h);
+}
+BEGIN { @start_ns = nsecs; }
+END { @end_ns = nsecs; clear(@t0); clear(@h0); }
+"""
+
+
 class H2Profiler:
-    """py-spy (host, root) against one task process, plus a /proc thread sampler."""
+    """py-spy's GIL recorder + a bpftrace GIL tracer (host, root) against one task process, plus
+    a /proc thread sampler. py-spy's blocking native recorder was dropped by amendment 1: on the
+    engine binary it aborts at once (UNW_EBADREG, tooling leg 2026-09-23 08:36Z)."""
 
     def __init__(self, pid: int, run_dir: Path, leg: str, native_rate: int = 20,
-                 gil_rate: int = 100, proc_hz: float = 2.0):
+                 gil_rate: int = 100, proc_hz: float = 5.0):
         self.pid, self.dir, self.leg = pid, run_dir, leg
         self.native_rate, self.gil_rate, self.proc_hz = native_rate, gil_rate, proc_hz
         self.procs: Dict[str, subprocess.Popen] = {}
         self._stop = threading.Event()
         self._thr: Optional[threading.Thread] = None
-        self.files = {"native": run_dir / f"pyspy_native_{leg}.txt",
-                      "gil": run_dir / f"pyspy_gil_{leg}.txt",
+        self.files = {"gil": run_dir / f"pyspy_gil_{leg}.txt",
+                      "giltrace": run_dir / f"giltrace_{leg}.json",
                       "threads": run_dir / f"threadstate_{leg}.jsonl"}
         self.started: Dict[str, Any] = {}
 
@@ -245,6 +265,16 @@ class H2Profiler:
         log = open(self.dir / f"pyspy_{key}_{self.leg}.log", "w")
         self.procs[key] = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT)
         self.started[key] = {"cmd": " ".join(cmd), "t": time.time()}
+
+    def _spawn_bpftrace(self) -> None:
+        binp = f"/proc/{self.pid}/root/opt/rocketride/engine/engine"
+        script = self.dir / f"giltrace_{self.leg}.bt"
+        script.write_text(GIL_BT.replace("BIN", binp).replace("PID", str(self.pid)))
+        cmd = ["sudo", "-n", "bpftrace", "-f", "json", "-o", str(self.files["giltrace"]),
+               str(script)]
+        log = open(self.dir / f"giltrace_{self.leg}.log", "w")
+        self.procs["giltrace"] = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT)
+        self.started["giltrace"] = {"cmd": " ".join(cmd), "t": time.time(), "binary": binp}
 
     def _thread_sampler(self) -> None:
         """Every OS thread of the task: comm, state, cumulative utime+stime ticks."""
@@ -270,20 +300,28 @@ class H2Profiler:
                 f.write(json.dumps({"t": time.time(), "th": snap}) + "\n")
 
     def start(self) -> None:
-        self._spawn("native", ["--native", "--idle", "--rate", str(self.native_rate)])
+        self._spawn_bpftrace()
         self._spawn("gil", ["--gil", "--nonblocking", "--rate", str(self.gil_rate)])
         self._thr = threading.Thread(target=self._thread_sampler, daemon=True,
                                      name="p0-thread-sampler")
         self._thr.start()
 
+    @staticmethod
+    def _children(pid: int) -> List[int]:
+        try:
+            return [int(x) for x in Path(f"/proc/{pid}/task/{pid}/children").read_text().split()]
+        except OSError:
+            return []
+
     def stop(self) -> Dict[str, Any]:
         self._stop.set()
+        # SIGINT to the ROOT child, as root: a signal to the sudo process was not relayed in the
+        # tooling leg (py-spy ran on 3 minutes after the window and was killed without writing).
         for key, p in self.procs.items():
             if p.poll() is None:
-                try:
-                    p.send_signal(signal.SIGINT)          # sudo relays it; py-spy writes on ^C
-                except ProcessLookupError:
-                    pass
+                kids = self._children(p.pid) or [p.pid]
+                subprocess.run(["sudo", "-n", "kill", "-INT"] + [str(k) for k in kids],
+                               capture_output=True)
         out: Dict[str, Any] = {}
         for key, p in self.procs.items():
             try:
@@ -292,15 +330,17 @@ class H2Profiler:
                 p.kill()
                 rc = "killed after 180 s"
             f = self.files[key]
+            logf = self.dir / (f"giltrace_{self.leg}.log" if key == "giltrace"
+                               else f"pyspy_{key}_{self.leg}.log")
             out[key] = {"rc": rc, **self.started[key],
                         "bytes": f.stat().st_size if f.exists() else 0,
-                        "log_tail": (self.dir / f"pyspy_{key}_{self.leg}.log").read_text()[-600:]}
+                        "log_tail": logf.read_text()[-600:] if logf.exists() else None}
         if self._thr:
             self._thr.join(timeout=10)
         out["threads"] = {"file": self.files["threads"].name, "hz": self.proc_hz,
                           "bytes": self.files["threads"].stat().st_size
                           if self.files["threads"].exists() else 0}
-        out["label"] = ("DIAGNOSTIC — py-spy's blocking native recorder pauses the process per "
-                        "sample; shares and rankings from this leg are evidence, its absolute "
-                        "times are never figures")
+        out["label"] = ("DIAGNOSTIC — uprobes on the GIL and a sampling profiler perturb what "
+                        "they measure; shares and rankings from this leg are evidence, its "
+                        "absolute times are never figures")
         return out

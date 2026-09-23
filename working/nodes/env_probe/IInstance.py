@@ -31,7 +31,22 @@ def _d0() -> dict:
     import gc
     import re
     from collections import Counter
-    out: dict = {"d0_schema": 1, "pid": os.getpid(), "ppid": os.getppid()}
+    import sys
+    out: dict = {"d0_schema": 2, "pid": os.getpid(), "ppid": os.getppid()}
+    # d0_schema 2 (2026-09-23): is any TRACER installed? Every engine thread starts through
+    # pydevd's wrapper (_pydev_bundle/pydev_monkey.py in each stack); an active trace function
+    # would run on every Python line of every thread. Read, never changed.
+    out["trace"] = {"sys_gettrace_this_thread": repr(sys.gettrace()),
+                    "threading_trace_hook": repr(getattr(threading, "_trace_hook", None)),
+                    "threading_profile_hook": repr(getattr(threading, "_profile_hook", None)),
+                    "sys_getprofile_this_thread": repr(sys.getprofile()),
+                    "pydevd_loaded": "pydevd" in sys.modules,
+                    "debugpy_loaded": "debugpy" in sys.modules}
+    try:
+        out["trace"]["sys_monitoring_tools"] = {i: sys.monitoring.get_tool(i) for i in range(6)
+                                                if sys.monitoring.get_tool(i)}
+    except Exception as e:
+        out["trace"]["sys_monitoring_error"] = f"{type(e).__name__}: {e}"
     try:
         with open("/proc/self/status") as f:
             m = re.search(r"^Threads:\s+(\d+)", f.read(), re.M)
