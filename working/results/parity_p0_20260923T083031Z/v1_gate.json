@@ -1,0 +1,11 @@
+{
+ "gate": "V1 (preregistration.json V1_matched_single_instance.gate)",
+ "written_utc": "2026-09-23T14:40:41Z",
+ "computed_from": "the four V1 exports (v1_rr_t4_a/b, v1_li_t4_a/b): frames/s = total_frames / total_span_s (working/scripts/p0_analyse_video.py v1 recomputes it)",
+ "threshold": "gap - max(0.82%, spread rr_t4, spread li_t4) >= 10 percentage points",
+ "fired": true,
+ "consequence_preregistered": "a 168-video confirmation: rr_t4 and li_t4 once each, same session, interleaved",
+ "decision": "NOT RUN",
+ "why_not_run": "about 5 hours of box time (roughly 2.5 h RocketRide + 2 h LlamaIndex + start-up). Queued behind V2 (a pre-registered smoke experiment, ~2.7 h) and the fired H6 full bake-off (~0.75 h), it would end near 23:30Z, the estimated end of the SSO session (approved 07:57Z; the last session lasted ~15.5 h). The box can only be stopped from the laptop (our role cannot read the instance's shutdown behaviour, so an OS-initiated shutdown could TERMINATE it), and a confirmation that outlives the credentials would leave the box running with no way to stop it. V2 and H6 full carry more information: V2 decomposes the gap this run confirms in-session on both pairs.",
+ "what_it_would_need": "a fresh SSO approval at its start and ~5 h of box time in the same box session as the V1 smoke (the gate fired in boot a58bf81c)"
+}
