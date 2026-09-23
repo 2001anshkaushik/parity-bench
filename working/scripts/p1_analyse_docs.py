@@ -41,15 +41,23 @@ def leg_dir(camp: Path, name: str) -> Optional[Path]:
     return None
 
 
+MEMWATCH: List[Dict[str, Any]] = []      # rows from p1_memwatch/ (the outside watcher), loaded in main()
+
+
 def mem_peak(d: Path, t0: float, t1: float) -> Dict[str, Any]:
     f = d / "memstat.jsonl"
-    if not f.exists():
-        return {"status": "NO FILE"}
-    rows = [json.loads(x) for x in f.read_text().splitlines() if x.strip()]
+    if f.exists():
+        rows, source = [json.loads(x) for x in f.read_text().splitlines() if x.strip()], "the leg's own sampler"
+    elif MEMWATCH:
+        rows, source = MEMWATCH, "p1_memwatch (outside watcher; the leg's own sampler did not run)"
+    else:
+        return {"status": "NOT RECORDED (the runner's sampler did not run on this leg and no watcher covered it)"}
     win = [r for r in rows if t0 <= r["t"] <= t1]
+    if win and "cid" in win[0] and len({r["cid"] for r in win}) > 1:
+        return {"status": f"MORE THAN ONE CONTAINER IN THE WINDOW ({sorted({r['cid'] for r in win})})", "source": source}
     if not win:
         return {"status": "NO SAMPLES IN WINDOW", "samples_total": len(rows)}
-    return {"samples_in_window": len(win), "hz": 1.0,
+    return {"samples_in_window": len(win), "hz": 1.0, "source": source,
             "peak_bytes": {k: max(r[k] for r in win) for k in ("anon", "file", "total")},
             "peak_anon_plus_file_bytes": max(r["anon"] + r["file"] for r in win)}
 
@@ -158,6 +166,8 @@ def main() -> int:
     ap.add_argument("--texts-dir", type=Path, default=None)
     a = ap.parse_args()
     camp = a.campaign
+    for f in sorted((camp / "p1_memwatch").glob("memwatch_*.jsonl")):
+        MEMWATCH.extend(json.loads(x) for x in f.read_text().splitlines() if x.strip())
     names = ["p1b_base_a", "p1b_fix_a", "p1b_base_b", "p1b_fix_b", "p1b_base_full", "p1b_fix_full",
              "p1c_hyb_full", "p1c_pure_full", "p1c_fix_a", "p1c_hyb_a", "p1c_pure_a", "p1c_fix_b", "p1c_hyb_b", "p1c_pure_b"]
     L = {n: leg_summary(d) for n in names if (d := leg_dir(camp, n))}
