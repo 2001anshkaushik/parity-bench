@@ -291,6 +291,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("campaign", type=Path)
     ap.add_argument("--out", default="analysis_docs_p0.json")
+    ap.add_argument("--gen", choices=("1", "f"), default="f",
+                    help="f = the amendment-4 legs (env_probe answers only its probe) under the "
+                         "pre-registered names; 1 = the first generation (per-document D0 scan)")
     a = ap.parse_args()
     legs: Dict[str, Dict[str, Any]] = {}
     for d in sorted(a.campaign.iterdir()):
@@ -298,7 +301,18 @@ def main() -> int:
             g = load_leg(d)
             if g:
                 legs[d.name] = g
-    res: Dict[str, Any] = {"campaign": a.campaign.name, "legs": {}}
+    # Amendment 4: the first-generation RocketRide docs legs carried a per-document garbage-collector
+    # scan (env_probe schema 3 answered every pipe instance). Their designs re-ran with suffix f;
+    # --gen f maps those legs onto the pre-registered names, --gen 1 keeps the first generation for
+    # disclosure. The LlamaIndex legs re-ran too, so the anchor block stays interleaved.
+    F_MAP = {"d1f_": "d1_", "anf_": "an_", "h1f_": "h1_", "h7f_": "h7_"}
+    if a.gen == "f":
+        legs = {pre + n[len(fp):]: g for n, g in legs.items() for fp, pre in F_MAP.items()
+                if n.startswith(fp)}
+    else:
+        legs = {n: g for n, g in legs.items() if not any(n.startswith(fp) for fp in F_MAP)}
+    res: Dict[str, Any] = {"campaign": a.campaign.name, "generation": a.gen,
+                           "leg_dirs": {n: g["dir"] for n, g in legs.items()}, "legs": {}}
     for n, g in legs.items():
         res["legs"][n] = {"arm": g["arm"], "leg": g["leg"], "verdict": g["verdict"],
                           "span": g["span"], "stamped_profile": g["stamped"],

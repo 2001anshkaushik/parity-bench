@@ -235,7 +235,8 @@ uretprobe:BIN:take_gil /pid == PID && @t0[tid]/ {
   $w = nsecs - @t0[tid]; delete(@t0[tid]);
   @wait_ns[tid] = sum($w); @takes[tid] = count(); @h0[tid] = nsecs;
   @wait_by_s[nsecs / 1000000000] = sum($w); @wait_hist = hist($w);
-  @tmin = min(nsecs); @tmax = max(nsecs);
+  if (@tfirst == 0) { @tfirst = nsecs; }
+  @tlast = nsecs;
 }
 uprobe:BIN:drop_gil /pid == PID && @h0[tid]/ {
   $h = nsecs - @h0[tid]; delete(@h0[tid]);
@@ -244,7 +245,8 @@ uprobe:BIN:drop_gil /pid == PID && @h0[tid]/ {
 """
 # No BEGIN/END blocks: Ubuntu 22.04's bpftrace 0.14 binary is stripped, and BEGIN/END are uprobes on
 # its own BEGIN_trigger symbol ("Could not resolve symbol: /proc/self/exe:BEGIN_trigger", tooling
-# leg tool_gil 09:26Z). The tracer's window is its first to last traced acquisition (@tmin..@tmax).
+# leg tool_gil 09:26Z). The tracer's window is its first to last traced acquisition (@tfirst..@tlast;
+# bpftrace 0.14 does not print a min() map, tooling leg tool_gil2).
 
 
 class H2Profiler:

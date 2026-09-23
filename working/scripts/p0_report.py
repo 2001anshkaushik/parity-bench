@@ -235,7 +235,7 @@ def sec_h2(h2: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
                f"measured {share(gate.get('measured'))}; **{'FIRED' if gate.get('fired') else 'not fired'}**"
                + ("" if gate.get("evaluable") else " (NOT EVALUABLE: " + str(gate.get("note")) + ")") + ".")
     out.append("")
-    for name in ("h2b_c32_a", "h2b_c32_b", "h2_full_c32"):
+    for name in ("h2f_c32_a", "h2f_c32_b", "h2_full_c32"):
         x = (h2.get("legs") or {}).get(name) or {}
         ps = x.get("pyspy_gil") or {}
         if ps.get("status") != "OK":

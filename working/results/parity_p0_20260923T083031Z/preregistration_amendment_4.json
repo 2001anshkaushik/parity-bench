@@ -1,0 +1,11 @@
+{
+ "amendment": 4,
+ "amends": "which legs carry the RocketRide docs designs (D1, the anchor block, H2, H1, H7); not any design, threshold or rule",
+ "written_utc": "2026-09-23T10:22:41Z",
+ "fault": "MY INSTRUMENT PERTURBED THE MEASUREMENT. env_probe was appended to every P0 measured pipeline (the on-token D0/G2 read-back) and its closing() runs for EVERY pipe instance, so for every PDF it built its read-back including schema 3's garbage-collector instance scan, which holds the GIL for roughly 0.1 s. Found in tool_gil2's py-spy --gil samples: _d0 (nodes/env_probe) is the top GIL holder INSIDE the measured window, about 1,299 of 1,979 GIL-holding samples over a 96-document leg \u2014 the same pattern the earlier tooling legs showed and I first misattributed to the post-window probe.",
+ "affected": "every RocketRide docs leg of the first generation: tool_pyspy, d1_rr_*, an_rr_*, tool_gil, h2_*, h1_*, h7_*, tool_gil2, h2b_null_c1 (stopped mid-leg). Comparisons WITHIN that generation (stamped vs unstamped, C=64 vs C=32, noDebug vs default) had the load on both sides; absolute RocketRide docs throughput, the D1 stage shares and anything about the GIL did not survive it. LlamaIndex legs never carried env_probe.",
+ "fix": "env_probe's closing() returns at once unless the node received text (only the probe sends it text); verified by the chain itself: the pre-window probe must still answer or the leg refuses",
+ "re_run": "stage 'rerun' of p0_docs_chain.sh, in the pre-registered order: d1f_rr_s1/u1/s2/u2, the anchor block anf_* (both arms, interleaved), tool_gil3, h2f_null_c1, h2f_c32_a/b, h1f_c32/c64 a/b, h7f_dbg/nodbg a/b. Verdicts and figures come from the f legs; the first generation is reported beside them, labelled PERTURBED, never merged",
+ "also": "bpftrace 0.14 prints no min() map, so the tracer's window is @tfirst..@tlast (first and last traced acquisition)",
+ "order_note": "the parse chain (H5) runs after the re-run; reordering independent work only"
+}

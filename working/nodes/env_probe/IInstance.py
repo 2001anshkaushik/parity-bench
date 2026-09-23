@@ -99,6 +99,12 @@ class IInstance(IInstanceBase):
         self.preventDefault()
 
     def closing(self):
+        # Answer ONLY a probe (2026-09-23, amendment 4). closing() runs for EVERY pipe instance, so on
+        # a measured pipe this node used to build its whole read-back — and, since schema 3, a full
+        # garbage-collector scan holding the GIL (~0.1 s) — for every PDF, which never reaches its
+        # text lane. A document that sent this node no text gets nothing: no scan, no output.
+        if not self.buf:
+            return
         import sys
         info = {
             # Schema version (2026-08-22): a STALE baked node emits an older

@@ -20,7 +20,7 @@
 # the operating rules say is never worked around.
 set -uo pipefail
 echo "p0_docs_chain.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
-[ "$#" -eq 3 ] || { echo "usage: $0 <campaign_dir> <expect_head> <d1|h2h1|h2b|h2full>" >&2; exit 2; }
+[ "$#" -eq 3 ] || { echo "usage: $0 <campaign_dir> <expect_head> <d1|h2h1|h2b|rerun|h2full>" >&2; exit 2; }
 D="$1"; H="$2"; STAGE="$3"
 cd "$(dirname "$0")/../.." || exit 2
 . working/harness/results_prefix.sh || { echo "REFUSED: working/harness/results_prefix.sh absent" >&2; exit 2; }
@@ -130,6 +130,35 @@ case "$STAGE" in
     leg h2b_null_c1 "${C1[@]}"  BSZ_PYSPY=1 -- rr "$S96" 1
     leg h2b_c32_a   "${C32[@]}" BSZ_PYSPY=1 -- rr "$S384" 1
     leg h2b_c32_b   "${C32[@]}" BSZ_PYSPY=1 -- rr "$S384" 1
+    ;;
+  rerun)
+    # Amendment 4: every RocketRide docs design again with env_probe answering ONLY its probe (the
+    # first generation carried a per-document garbage-collector scan holding the GIL). Same order,
+    # same designs, suffix f; LlamaIndex legs re-run too so the anchor block stays interleaved.
+    leg d1f_rr_s1 "${C32[@]}" BSZ_STAMP=1 -- rr "$S384" 1
+    leg d1f_rr_u1 "${C32[@]}"             -- rr "$S384" 1
+    leg d1f_rr_s2 "${C32[@]}" BSZ_STAMP=1 -- rr "$S384" 1
+    leg d1f_rr_u2 "${C32[@]}"             -- rr "$S384" 1
+    leg anf_rr_u1 "${C8[@]}"                              -- rr "$S96" 1
+    leg anf_li_u1 "${C8[@]}" BSZ_LI_WORKERS=1             -- li "$S96" 1
+    leg anf_rr_s1 "${C8[@]}" BSZ_STAMP=1                  -- rr "$S96" 1
+    leg anf_li_t1 "${C8[@]}" BSZ_LI_WORKERS=1 BSZ_LI_TIMED=1 -- li "$S96" 1
+    leg anf_rr_u2 "${C8[@]}"                              -- rr "$S96" 1
+    leg anf_li_u2 "${C8[@]}" BSZ_LI_WORKERS=1             -- li "$S96" 1
+    leg anf_rr_s2 "${C8[@]}" BSZ_STAMP=1                  -- rr "$S96" 1
+    leg anf_li_t2 "${C8[@]}" BSZ_LI_WORKERS=1 BSZ_LI_TIMED=1 -- li "$S96" 1
+    leg tool_gil3   "${C32[@]}" BSZ_PYSPY=1 -- rr "$S96" 1
+    leg h2f_null_c1 "${C1[@]}"  BSZ_PYSPY=1 -- rr "$S96" 1
+    leg h2f_c32_a   "${C32[@]}" BSZ_PYSPY=1 -- rr "$S384" 1
+    leg h2f_c32_b   "${C32[@]}" BSZ_PYSPY=1 -- rr "$S384" 1
+    leg h1f_c32_a "${C32[@]}" BSZ_STAMP=1 -- rr "$S384" 1
+    leg h1f_c64_a "${C64[@]}" BSZ_STAMP=1 -- rr "$S384" 1
+    leg h1f_c32_b "${C32[@]}" BSZ_STAMP=1 -- rr "$S384" 1
+    leg h1f_c64_b "${C64[@]}" BSZ_STAMP=1 -- rr "$S384" 1
+    leg h7f_dbg_a   "${C32[@]}"               -- rr "$S384" 1
+    leg h7f_nodbg_a "${C32[@]}" BSZ_NODEBUG=1 -- rr "$S384" 1
+    leg h7f_dbg_b   "${C32[@]}"               -- rr "$S384" 1
+    leg h7f_nodbg_b "${C32[@]}" BSZ_NODEBUG=1 -- rr "$S384" 1
     ;;
   h2full)
     [ -f "$D/h2_gate_fired.json" ] || { echo "REFUSED: the H2 full run needs $D/h2_gate_fired.json (the smoke gate's committed outcome)" >&2; exit 5; }
