@@ -1,0 +1,14 @@
+{
+ "label": "P1 amendment 1 \u2014 before any measured leg (only tooling tests had run)",
+ "written_utc": "2026-09-23T19:15Z (see the commit time)",
+ "changes": {
+  "P1_A_E2.definitions.G_arm": {
+   "was": "sparse 10 ms buckets of GIL waits > 20 us",
+   "now": "sparse 50 ms buckets of GIL waits > 50 us; waits at or under 50 us are in the per-thread totals only",
+   "why": "bpftrace (0.14) preallocates every map to BPFTRACE_MAP_KEYS_MAX keys, and count()/sum() maps are per-CPU: at the key limit the finer buckets need, the tooling tracers held gigabytes of kernel memory and did not exit on SIGINT (tooling legs 18:51Z and 18:59Z; a stray tracer ran 10 minutes past its signal). The tracer now uses plain hash maps updated by explicit addition (each key is a thread id updated only in that thread's context, so no races) at 131,072 keys, which bounds the bucket count: 50 ms buckets over a ~20 min leg fit many threads; the 50 us floor keeps uncontended takes out of them. The reading rule (G_rr - G_li >= 0.5 x D_on) is unchanged; with forward passes of ~0.3-0.4 s the bucket pro-rata overlap spans several buckets per frame"
+  },
+  "P1_A_E2.tracer": {
+   "now": "if bpftrace outlives its 240 s stop wait, the tracer SIGKILLs the bpftrace process itself (not only its sudo parent) and records it"
+  }
+ }
+}

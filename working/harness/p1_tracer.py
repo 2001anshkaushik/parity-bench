@@ -7,7 +7,7 @@ The driver (P1_SYNC_DIR=<L>) writes <L>/.warm_done after its warm-up and waits f
 it writes <L>/.window_closed when the leg's CPU bracket closes. Between those marks this attaches:
   * bpftrace (root): GIL waits by uprobes on PyEval_RestoreThread — exported by BOTH arms' Python
     (RocketRide's engine binary; LlamaIndex's libpython, whose .symtab is stripped so take_gil is
-    not reachable there) — per thread, plus sparse 10 ms buckets of waits > 20 us; on RocketRide
+    not reachable there) — per thread, plus sparse 50 ms buckets of waits > 50 us; on RocketRide
     also P0's take_gil / drop_gil probes; and per-thread scheduler accounting from sched_switch /
     sched_wakeup: on-CPU, runnable-but-waiting (run queue) and sleeping nanoseconds.
   * py-spy --gil --nonblocking (which Python functions hold the GIL).
@@ -34,8 +34,8 @@ from harness.p0_session import PYSPY, H2Profiler, _cgroup_procs, is_rr_task  # n
 GIL_RT = """uprobe:BIN:PyEval_RestoreThread /pid == PID/ { @r0[tid] = nsecs; }
 uretprobe:BIN:PyEval_RestoreThread /pid == PID && @r0[tid]/ {
   $w = nsecs - @r0[tid]; delete(@r0[tid]);
-  @rt_ns[tid] = sum($w); @rt_n[tid] = count();
-  if ($w > 20000) { @rt_b[tid, nsecs / 10000000] = sum($w); }
+  @rt_ns[tid] = @rt_ns[tid] + $w; @rt_n[tid] = @rt_n[tid] + 1;
+  if ($w > 50000) { $b = nsecs / 50000000; @rt_b[tid, $b] = @rt_b[tid, $b] + $w; }
   if (@tfirst == 0) { @tfirst = nsecs; }
   @tlast = nsecs;
 }
@@ -43,37 +43,43 @@ uretprobe:BIN:PyEval_RestoreThread /pid == PID && @r0[tid]/ {
 GIL_TAKE = """uprobe:BIN:take_gil /pid == PID/ { @t0[tid] = nsecs; }
 uretprobe:BIN:take_gil /pid == PID && @t0[tid]/ {
   $w = nsecs - @t0[tid]; delete(@t0[tid]);
-  @wait_ns[tid] = sum($w); @takes[tid] = count(); @h0[tid] = nsecs;
+  @wait_ns[tid] = @wait_ns[tid] + $w; @takes[tid] = @takes[tid] + 1; @h0[tid] = nsecs;
 }
 uprobe:BIN:drop_gil /pid == PID && @h0[tid]/ {
-  $h = nsecs - @h0[tid]; delete(@h0[tid]); @hold_ns[tid] = sum($h);
+  $h = nsecs - @h0[tid]; delete(@h0[tid]); @hold_ns[tid] = @hold_ns[tid] + $h;
 }
 """
 SCHED = """tracepoint:sched:sched_switch {
   if (pid == PID) {
     $p = args->prev_pid;
     @mine[$p] = 1;
-    if (@on0[$p]) { @oncpu_ns[$p] = sum(nsecs - @on0[$p]); delete(@on0[$p]); }
+    if (@on0[$p]) { @oncpu_ns[$p] = @oncpu_ns[$p] + (nsecs - @on0[$p]); delete(@on0[$p]); }
     @off0[$p] = nsecs;
     if (args->prev_state == 0) { @offr[$p] = 1; } else { @offr[$p] = 0; }
   }
   $n = args->next_pid;
   if (@mine[$n]) {
     if (@off0[$n]) {
-      if (@offr[$n]) { @runq_ns[$n] = sum(nsecs - @off0[$n]); }
+      if (@offr[$n]) { @runq_ns[$n] = @runq_ns[$n] + (nsecs - @off0[$n]); }
       else {
-        if (@wk[$n]) { @sleep_ns[$n] = sum(@wk[$n] - @off0[$n]); @runq_ns[$n] = sum(nsecs - @wk[$n]); }
-        else { @sleep_ns[$n] = sum(nsecs - @off0[$n]); }
+        if (@wk[$n]) { @sleep_ns[$n] = @sleep_ns[$n] + (@wk[$n] - @off0[$n]); @runq_ns[$n] = @runq_ns[$n] + (nsecs - @wk[$n]); }
+        else { @sleep_ns[$n] = @sleep_ns[$n] + (nsecs - @off0[$n]); }
       }
       delete(@off0[$n]);
     }
     if (@wk[$n]) { delete(@wk[$n]); }
     @on0[$n] = nsecs;
-    @nsw[$n] = count();
+    @nsw[$n] = @nsw[$n] + 1;
   }
 }
 tracepoint:sched:sched_wakeup /@mine[args->pid]/ { @wk[args->pid] = nsecs; }
 """
+# Plain hash maps updated by explicit addition, never count()/sum(): those are PER-CPU maps, and
+# bpftrace preallocates every map to BPFTRACE_MAP_KEYS_MAX keys — per-CPU x 32 CPUs at the size the
+# GIL buckets need is gigabytes of kernel memory (the tooling tracers never exited). Each key is a
+# thread id and is updated only in that thread's own context (uprobes fire in it; sched_switch
+# updates a thread as it leaves or enters its CPU), so the additions cannot race.
+MAP_KEYS_MAX = "131072"
 # No BEGIN/END: the box's bpftrace 0.14 binary is stripped (P0 amendment 3).
 
 
@@ -172,7 +178,7 @@ def main() -> int:
     btout, btlog = L / f"e2trace_{a.leg}.json", L / f"e2trace_{a.leg}.log"
     procs: Dict[str, subprocess.Popen] = {}
     procs["bpftrace"] = subprocess.Popen(
-        ["sudo", "-n", "env", "BPFTRACE_MAP_KEYS_MAX=4000000", "bpftrace", "-f", "json", "-o", str(btout), str(bt)],
+        ["sudo", "-n", "env", f"BPFTRACE_MAP_KEYS_MAX={MAP_KEYS_MAX}", "bpftrace", "-f", "json", "-o", str(btout), str(bt)],
         stdout=open(btlog, "w"), stderr=subprocess.STDOUT)
     t_att = time.monotonic() + 180
     attached = False
@@ -213,8 +219,11 @@ def main() -> int:
         try:
             meta[f"{key}_rc"] = p.wait(timeout=240)
         except subprocess.TimeoutExpired:
+            # the root tool itself, never only its sudo parent (a killed sudo leaves bpftrace running)
+            for k in meta.get(f"{key}_signalled_pids") or []:
+                subprocess.run(["sudo", "-n", "kill", "-9", str(k)], capture_output=True)
             p.kill()
-            meta[f"{key}_rc"] = "killed after 240 s"
+            meta[f"{key}_rc"] = "killed after 240 s (SIGKILL to the tool itself)"
     samp.join(timeout=10)
     meta["files"] = {f.name: f.stat().st_size for f in (btout, gil, L / f"threadstate_{a.leg}.jsonl") if f.exists()}
     meta["bpftrace_log_tail"] = btlog.read_text(errors="replace")[-800:] if btlog.exists() else None
