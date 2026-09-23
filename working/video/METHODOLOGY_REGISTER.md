@@ -1779,3 +1779,21 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   same inputs and config, before attributing a hold to it.
 > - **A wrapper's options are part of the parser.** Read what the integration enables (here
 >   inline-image extraction and per-image external-tool probes), not only the library's config file.
+
+## 52. The gate that fired on a cold runtime (added 2026-09-23)
+
+> H6's smoke timed the eleven tail documents on eleven workers, one document each, after a single
+> warm-up parse per worker. For pypdf and pypdfium2 that is their steady cost. For Tika it is a
+> JVM that has barely started compiling. The smoke gate (a candidate at least 2x faster than
+> Tika at p50 on the eleven) fired for pypdfium2. The pre-registered full run parsed the same
+> eleven on JVMs already warm from hundreds of documents. There Tika's p50 on the eleven fell to
+> about a fifth of its smoke value, the other parsers barely moved, and no candidate cleared the
+> rule. The full run decided the verdict, as registered. The smoke only spent box time.
+>
+> Rules:
+>
+> - **Time a JIT runtime warm, or say that it is cold.** Before a speed gate compares a JVM (or any
+>   JIT) against native code, give each worker enough warm-up to reach steady state, or report
+>   the figure as a cold-start cost.
+> - **A smoke that runs one item per worker measures start-up.** Size the smoke so each worker
+>   parses many documents, or put the tail documents after a warm-up batch.
