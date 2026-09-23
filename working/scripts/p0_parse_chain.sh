@@ -14,7 +14,7 @@
 # without the committed gate outcome file h6_gate.json naming the fired branch.
 set -uo pipefail
 echo "p0_parse_chain.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
-[ "$#" -ge 3 ] || { echo "usage: $0 <campaign_dir> <expect_head> <h5|h6smoke|h6full|h6hybrid> [cfg|candidate]" >&2; exit 2; }
+[ "$#" -ge 3 ] || { echo "usage: $0 <campaign_dir> <expect_head> <h5|h6smoke|h6best|h6full|h6hybrid> [cfg|candidate]" >&2; exit 2; }
 D="$1"; H="$2"; STAGE="$3"; ARG4="${4:-}"
 cd "$(dirname "$0")/../.." || exit 2
 . working/harness/results_prefix.sh || { echo "REFUSED: results_prefix.sh absent" >&2; exit 2; }
@@ -115,6 +115,17 @@ PYJOBS
     CANDS="h6_384_pypdf,h6_384_pypdfium2${ARG4:+,h6_384_tika_best}"
     "$PY" working/scripts/p0_parse_fidelity.py --texts "$HOME/p0_texts" --ref h6_384_tika_shipped --cands "$CANDS" --docs "$S384" --out "$D/h6smoke/fidelity_384.jsonl"
     upload h6smoke
+    ;;
+  h6best)
+    # H5's gate fired AFTER h6smoke ran: the best-config Tika phases alone, same workers/timeouts,
+    # in their own directory (the analyser merges them into the smoke analysis)
+    [ -n "$ARG4" ] || { echo "REFUSED: h6best needs the best config name" >&2; exit 2; }
+    build || { echo "BUILD FAILED"; exit 4; }
+    mkdir -p "$D/h6best"
+    phase h6best h6_tail_tika_best tika "$ELEVEN" 11 --config "$BUILD/cfg/$ARG4"
+    phase h6best h6_384_tika_best tika "$S384" 12 --config "$BUILD/cfg/$ARG4"
+    "$PY" working/scripts/p0_parse_fidelity.py --texts "$HOME/p0_texts" --ref h6_384_tika_shipped --cands h6_384_tika_best --docs "$S384" --out "$D/h6best/fidelity_384_best.jsonl"
+    upload h6best
     ;;
   h6full|h6hybrid)
     [ -f "$D/h6_gate.json" ] || { echo "REFUSED: $D/h6_gate.json (the committed smoke-gate outcome) is absent" >&2; exit 5; }

@@ -125,10 +125,12 @@ def h6(camp: Path, stage: str) -> Dict[str, Any]:
     d = camp / stage
     tail_prefix, big_prefix = ("h6_tail_", "h6_384_") if stage == "h6smoke" else (None, f"{stage}_")
     out: Dict[str, Any] = {"parsers": {}}
-    labels = sorted(p.stem.replace("results_", "") for p in d.glob("results_*.jsonl"))
-    tail = {l.replace(tail_prefix, ""): {r["doc"]: r for r in rows(d / f"results_{l}.jsonl")}
+    dirs = [d] + ([camp / "h6best"] if stage == "h6smoke" and (camp / "h6best").is_dir() else [])
+    files = {p.stem.replace("results_", ""): p for dd in dirs for p in dd.glob("results_*.jsonl")}
+    labels = sorted(files)
+    tail = {l.replace(tail_prefix, ""): {r["doc"]: r for r in rows(files[l])}
             for l in labels if tail_prefix and l.startswith(tail_prefix)}
-    big = {l.replace(big_prefix, ""): {r["doc"]: r for r in rows(d / f"results_{l}.jsonl")}
+    big = {l.replace(big_prefix, ""): {r["doc"]: r for r in rows(files[l])}
            for l in labels if l.startswith(big_prefix)}
     if stage != "h6smoke":           # the full corpus contains the 11: restrict to them for (a)
         tail = {p: {k: v for k, v in rr.items() if k in ELEVEN} for p, rr in big.items()}
@@ -166,7 +168,7 @@ def h6(camp: Path, stage: str) -> Dict[str, Any]:
         "candidates": full_pass if stage != "h6smoke" else None}
     fid = d / ("fidelity_384.jsonl" if stage == "h6smoke" else "fidelity_9975.jsonl")
     if fid.exists():
-        fr = rows(fid)
+        fr = rows(fid) + (rows(camp / "h6best" / "fidelity_384_best.jsonl") if stage == "h6smoke" else [])
         fd = {}
         for c in sorted({r["cand"] for r in fr}):
             xs = [r for r in fr if r["cand"] == c and "missing" not in r]
