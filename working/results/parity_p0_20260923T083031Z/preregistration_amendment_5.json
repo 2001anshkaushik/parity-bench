@@ -1,0 +1,10 @@
+{
+ "amendment": 5,
+ "adds": "E1 \u2014 an EXPLORATORY DIAGNOSTIC (no hypothesis verdict, no gate), registered before it runs",
+ "written_utc": "2026-09-23T11:58:36Z",
+ "why": "H5's first rows (isolated Tika = the engine's jars, JRE and tika-config.xml via TikaBatch) parse the 11 long-hold documents in about 0.5-2.4 s each, against in-pipeline parse brackets of 392-1,839 s (S5-D). The gap is not Tika's parse. SOURCE (bytecode constant pools of engine/java/lib/tika.jar, not a measurement): the engine's wrapper com.rocketride.tika_api.TikaApi calls PDFParserConfig.setExtractInlineImages and setExtractUniqueInlineImagesOnly, routes every embedded image through EmbeddedContentProcessor (its own AutoDetectParser and ConfigBuilder.getConfig) and a JNI onWriteImageBuffer callback, and ConfigBuilder probes the external tools exiftool / ffmpeg / sox (-ver / -version), which spawns processes; D0 process samples showed jspawnhelper, Java 'process reaper' threads and one-thread forked children during legs.",
+ "measurement": "the engine's own CLI parse path, `engine --tika <document>` (no pipeline, no token), one fresh rr:patched container per document, the 11 at once, timeout 2,400 s; a box-wide bpftrace census of every exec'd path over the stage (nothing else runs)",
+ "reported": "per document: engine --tika wall seconds beside isolated Tika (H5 shipped mean) and the S5-D in-pipeline bracket; exec counts by path. DIAGNOSTIC and exploratory: evidence about WHERE the hold lives (the engine's parse path vs the pipeline around it), never a gate or a throughput figure",
+ "script": "working/scripts/p0_engine_tika.sh",
+ "order": "after H6 smoke, before V1; reordering independent work only"
+}
