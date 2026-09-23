@@ -78,7 +78,9 @@ BANNED: List[Tuple[str, re.Pattern, str, str]] = [
      "the 52.8% / 52.9% cross-harness match",
      "measured with the engine UNPINNED at torch=16. Honest version: 49.7% pinned vs his 52.9%, different corpora"),
     ("pipe-371",
-     re.compile(r"\b371\b"),
+     # the COUNT 371, not the digits 371 inside another number: \b371\b also fired on the
+     # fractional part of a decimal ("sd 2.371 s" in a P0 stage table) and would on 1,371
+     re.compile(r"(?<![\w.,])371(?!\w|[.,]\d)"),
      "the 371 PipeException failures",
      "self-inflicted: 1800s client deadline against a 900s engine idle ttl. A harness footnote, never a reliability result"),
     ("batchpos-latency",
@@ -197,6 +199,13 @@ def null_control() -> int:
             print("NULL CONTROL FAILED — the commit-message path refused a CAVEATED message; "
                   "a gate that refuses everything is as broken as one that refuses nothing",
                   file=sys.stderr)
+            return 3
+        # the clean twin of a number pattern: the banned digits inside OTHER numbers must pass
+        o = Path(d) / "other_numbers.md"
+        o.write_text("| stage | 95 | 2.371 | 0.371 | 1,371 | 13714 | 3d8a371f | 3,140.5 | 16.9x |\n", encoding="utf-8")
+        if scan(o):
+            print("NULL CONTROL FAILED — a banned pattern fired on the digits of an unrelated "
+                  f"number: {scan(o)}", file=sys.stderr)
             return 3
     print(f"NULL CONTROL PASSED — all {len(BANNED)} patterns fired on the seeded file and on "
           f"the seeded commit message; the caveated message passed.")
