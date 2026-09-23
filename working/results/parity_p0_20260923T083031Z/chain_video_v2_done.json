@@ -1,0 +1,13 @@
+{
+ "stage_complete_utc": "2026-09-23T17:35:47Z",
+ "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+ "outcome": "complete",
+ "legs": [
+  "v2_rr_s_a:rc=0",
+  "v2_rr_u_a:rc=0",
+  "v2_li_s_a:rc=0",
+  "v2_rr_s_b:rc=0",
+  "v2_rr_u_b:rc=0",
+  "v2_li_s_b:rc=0"
+ ]
+}

@@ -1,0 +1,17 @@
+== /usr/local/lib/python3.12/site-packages/torch/version.py
+from typing import Optional
+
+__all__ = ['__version__', 'debug', 'cuda', 'git_version', 'hip', 'rocm', 'xpu']
+__version__ = '2.13.0+cu130'
+debug = False
+cuda: Optional[str] = '13.0'
+git_version = 'cf30153c4c131c8164ee7798e5022d810682e2cb'
+hip: Optional[str] = None
+rocm: Optional[str] = None
+xpu: Optional[str] = None
+== dist-info: /usr/local/lib/python3.12/site-packages/transformers-5.14.1.dist-info
+== dist-info: /usr/local/lib/python3.12/site-packages/torch-2.13.0.dist-info
+== dist-info: /usr/local/lib/python3.12/site-packages/numpy-2.5.1.dist-info
+== lib: /usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1
+== cpu flags seen by the image:
+amx_bf amx_int amx_tile avx512_bf avx512_bitalg avx512_fp avx512_vbmi avx512_vnni avx512_vpopcntdq avx512bw avx512cd avx512dq avx512f avx512ifma avx512vbmi avx512vl 

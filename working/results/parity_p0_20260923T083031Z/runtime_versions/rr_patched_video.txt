@@ -1,0 +1,36 @@
+== /opt/rocketride/engine/lib/python3.12/site-packages/torch/version.py
+from typing import Optional
+
+__all__ = ['__version__', 'debug', 'cuda', 'git_version', 'hip', 'rocm', 'xpu']
+__version__ = '2.10.0+cu128'
+debug = False
+cuda: Optional[str] = '12.8'
+git_version = '449b1768410104d3ed79d3bcfe4ba1d65c7f22c0'
+hip: Optional[str] = None
+rocm: Optional[str] = None
+xpu: Optional[str] = None
+== /root/.cache/uv/archive-v0/FJ9MfDSW9cnbeOqP/torch/version.py
+from typing import Optional
+
+__all__ = ['__version__', 'debug', 'cuda', 'git_version', 'hip', 'rocm', 'xpu']
+__version__ = '2.10.0+cu128'
+debug = False
+cuda: Optional[str] = '12.8'
+git_version = '449b1768410104d3ed79d3bcfe4ba1d65c7f22c0'
+hip: Optional[str] = None
+rocm: Optional[str] = None
+xpu: Optional[str] = None
+== dist-info: /opt/rocketride/engine/lib/python3.12/site-packages/numpy-2.5.2.dist-info
+== dist-info: /opt/rocketride/engine/lib/python3.12/site-packages/rfdetr-1.5.2.dist-info
+== dist-info: /opt/rocketride/engine/lib/python3.12/site-packages/torch-2.10.0+cu128.dist-info
+== dist-info: /opt/rocketride/engine/lib/python3.12/site-packages/torchvision-0.25.0+cu128.dist-info
+== dist-info: /opt/rocketride/engine/lib/python3.12/site-packages/transformers-4.53.3.dist-info
+== dist-info: /root/.cache/uv/archive-v0/wQ21Jub0Nxaaka1j/torchvision-0.25.0+cu128.dist-info
+== dist-info: /root/.cache/uv/archive-v0/FJ9MfDSW9cnbeOqP/torch-2.10.0+cu128.dist-info
+== dist-info: /root/.cache/uv/archive-v0/Psmsp9DB3XjM2rCt/rfdetr-1.5.2.dist-info
+== dist-info: /root/.cache/uv/archive-v0/WZdRO_vGuk6ETYsq/numpy-2.5.2.dist-info
+== dist-info: /root/.cache/uv/archive-v0/0_uto2OAePUOqa9U/transformers-4.53.3.dist-info
+== lib: /opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1
+== lib: /root/.cache/uv/archive-v0/FJ9MfDSW9cnbeOqP/torch/lib/libgomp.so.1
+== cpu flags seen by the image:
+amx_bf amx_int amx_tile avx512_bf avx512_bitalg avx512_fp avx512_vbmi avx512_vnni avx512_vpopcntdq avx512bw avx512cd avx512dq avx512f avx512ifma avx512vbmi avx512vl 
