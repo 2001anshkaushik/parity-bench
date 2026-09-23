@@ -94,7 +94,9 @@ def target_pid(arm: str, container: str) -> int:
 def uprobe_binary(arm: str, pid: int) -> str:
     if arm == "rr":
         return f"/proc/{pid}/root/opt/rocketride/engine/engine"
-    for ln in Path(f"/proc/{pid}/maps").read_text().splitlines():
+    # a container's maps are not readable by the unprivileged launch user; the tracer runs under launch
+    maps = subprocess.run(["sudo", "-n", "cat", f"/proc/{pid}/maps"], capture_output=True, text=True).stdout
+    for ln in maps.splitlines():
         parts = ln.split()
         if len(parts) >= 6 and "libpython3" in parts[5] and parts[5].endswith(".so.1.0"):
             return f"/proc/{pid}/root{parts[5]}"
@@ -178,7 +180,8 @@ def main() -> int:
         if btlog.exists() and "Attaching" in btlog.read_text(errors="replace"):
             attached = True
             break
-        if btout.exists() and "Attaching" in btout.read_text(errors="replace")[:4000]:
+        head = btout.read_text(errors="replace")[:4000] if btout.exists() else ""
+        if "Attaching" in head or "attached_probes" in head:           # -f json reports it as attached_probes
             attached = True
             break
         time.sleep(0.5)
