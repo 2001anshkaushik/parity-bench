@@ -96,22 +96,22 @@ PYJOBS
     cp "$BUILD"/cfg/*.xml "$D/h5/" 2>/dev/null
     echo "===== H5 $(date -u +%H:%M:%SZ) ====="
     "$PY" working/scripts/p0_parse_bench.py --parser tika --jobs "$D/h5/jobs.jsonl" --fresh \
-      --warmup-doc "$WARMUP" --label h5 --docs "$ELEVEN" --out "$D/h5" --workers 16 --timeout 2400
+      --warmup-doc "$WARMUP" --label h5 --docs "$ELEVEN" --out "$D/h5" --workers 12 --timeout 2400
     echo "===== H5 rc=$? $(date -u +%H:%M:%SZ) ====="
     upload h5
     ;;
   h6smoke)
     build || { echo "BUILD FAILED"; exit 4; }
     cp "$BUILD"/cfg/*.xml "$D/" 2>/dev/null; mkdir -p "$D/h6smoke"
-    # (i) the 11, every parser, 11 workers (one per document); (ii) the 384 slice, 16 workers
+    # (i) the 11, every parser, 11 workers (one per document); (ii) the 384 slice, 12 workers (12 x 4g heap fits the box)
     phase h6smoke h6_tail_tika_shipped tika "$ELEVEN" 11 --config "$BUILD/cfg/shipped.xml"
     [ -n "$ARG4" ] && phase h6smoke h6_tail_tika_best tika "$ELEVEN" 11 --config "$BUILD/cfg/$ARG4"
     phase h6smoke h6_tail_pypdf pypdf "$ELEVEN" 11
     phase h6smoke h6_tail_pypdfium2 pypdfium2 "$ELEVEN" 11
-    phase h6smoke h6_384_tika_shipped tika "$S384" 16 --config "$BUILD/cfg/shipped.xml"
-    [ -n "$ARG4" ] && phase h6smoke h6_384_tika_best tika "$S384" 16 --config "$BUILD/cfg/$ARG4"
-    phase h6smoke h6_384_pypdf pypdf "$S384" 16
-    phase h6smoke h6_384_pypdfium2 pypdfium2 "$S384" 16
+    phase h6smoke h6_384_tika_shipped tika "$S384" 12 --config "$BUILD/cfg/shipped.xml"
+    [ -n "$ARG4" ] && phase h6smoke h6_384_tika_best tika "$S384" 12 --config "$BUILD/cfg/$ARG4"
+    phase h6smoke h6_384_pypdf pypdf "$S384" 12
+    phase h6smoke h6_384_pypdfium2 pypdfium2 "$S384" 12
     CANDS="h6_384_pypdf,h6_384_pypdfium2${ARG4:+,h6_384_tika_best}"
     "$PY" working/scripts/p0_parse_fidelity.py --texts "$HOME/p0_texts" --ref h6_384_tika_shipped --cands "$CANDS" --docs "$S384" --out "$D/h6smoke/fidelity_384.jsonl"
     upload h6smoke
@@ -120,15 +120,15 @@ PYJOBS
     [ -f "$D/h6_gate.json" ] || { echo "REFUSED: $D/h6_gate.json (the committed smoke-gate outcome) is absent" >&2; exit 5; }
     build || { echo "BUILD FAILED"; exit 4; }
     mkdir -p "$D/$STAGE"
-    phase "$STAGE" "${STAGE}_tika_shipped" tika "$S9975" 16 --config "$BUILD/cfg/shipped.xml"
+    phase "$STAGE" "${STAGE}_tika_shipped" tika "$S9975" 12 --config "$BUILD/cfg/shipped.xml"
     if [ "$STAGE" = "h6full" ]; then
-      [ -n "$ARG4" ] && phase h6full h6full_tika_best tika "$S9975" 16 --config "$BUILD/cfg/$ARG4"
-      phase h6full h6full_pypdf pypdf "$S9975" 16
-      phase h6full h6full_pypdfium2 pypdfium2 "$S9975" 16
+      [ -n "$ARG4" ] && phase h6full h6full_tika_best tika "$S9975" 12 --config "$BUILD/cfg/$ARG4"
+      phase h6full h6full_pypdf pypdf "$S9975" 12
+      phase h6full h6full_pypdfium2 pypdfium2 "$S9975" 12
       CANDS="h6full_pypdf,h6full_pypdfium2${ARG4:+,h6full_tika_best}"
       "$PY" working/scripts/p0_parse_fidelity.py --texts "$HOME/p0_texts" --ref h6full_tika_shipped --cands "$CANDS" --docs "$S9975" --out "$D/h6full/fidelity_9975.jsonl"
     else
-      phase h6hybrid "h6hybrid_$ARG4" "$ARG4" "$S9975" 16
+      phase h6hybrid "h6hybrid_$ARG4" "$ARG4" "$S9975" 12
     fi
     upload "$STAGE"
     ;;

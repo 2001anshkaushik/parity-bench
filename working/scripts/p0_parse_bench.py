@@ -33,7 +33,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-P0VENV_PY = Path.home() / "p0venv" / "bin" / "python"
+P0VENV_PY = Path(os.environ.get("P0_PARSE_PY", str(Path.home() / "p0venv" / "bin" / "python")))
 BUILD = Path(os.environ.get("P0_TIKA_BUILD", str(Path.home() / "p0_build")))
 TEXTS = Path(os.environ.get("P0_TEXTS", str(Path.home() / "p0_texts")))
 JAVA = "/opt/rocketride/engine/java/jre/bin/java"
@@ -150,7 +150,7 @@ def main() -> int:
     ap.add_argument("--timeout", type=float, default=1800.0)
     ap.add_argument("--fresh", action="store_true")
     ap.add_argument("--warmup-doc", default=None)
-    ap.add_argument("--jvm-heap", default="6g")
+    ap.add_argument("--jvm-heap", default="4g")   # 12 workers x 4g stays under the 61 GiB box
     ap.add_argument("--jobs", type=Path, default=None,
                     help="H5: a JSONL of {doc, config, label} jobs run in ONE pool (requires "
                          "--fresh); each job's text goes to $P0_TEXTS/<its label>/")
