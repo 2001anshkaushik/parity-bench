@@ -1,0 +1,74 @@
+{
+ "label": "SOURCE \u2014 read from the engine bundle and repository files named here; no figure in this file is a measurement",
+ "written_utc": "2026-09-23T09:03:26Z",
+ "engine_bundle": "engine/ (the local RocketRide 3.3.1.35 bundle; the box image rr:patched reports the same version string in every leg)",
+ "H1_executor_ceiling": {
+  "where_pipe_work_runs": [
+   "engine/ai/modules/data/data_conn.py:737 \u2014 close(): results = await asyncio.to_thread(close_sync); the whole pipeline (parse -> split -> embed -> response) runs inside close_sync's pipe.close() (data_conn.py:711)",
+   "engine/ai/modules/data/data_conn.py:541 open_sync, :666 write_sync, :749 cleanup \u2014 the SAME to_thread pool also runs every pipe open, every 1 MiB write and every cleanup",
+   "engine/lib/python3.12/asyncio/threads.py:25 \u2014 to_thread = loop.run_in_executor(None, ...)",
+   "engine/lib/python3.12/asyncio/base_events.py:853-865 \u2014 executor None creates the loop's default concurrent.futures.ThreadPoolExecutor once",
+   "engine/lib/python3.12/concurrent/futures/thread.py:146 \u2014 max_workers = min(32, (os.cpu_count() or 1) + 4) = 32 with 32 vCPUs visible (Ruling A: the container is unconstrained)"
+  ],
+  "pipe_admission": "engine/ai/constants.py:48 CONST_DEFAULT_MAX_THREADS = 64 -> task_engine.py:247 self._threads -> data_conn.py:117 _thread_count -> data_conn.py:138 asyncio.Semaphore(64): at most 64 pipes open per token",
+  "what_would_widen_it": "a larger executor for the data connection's loop: loop.set_default_executor(ThreadPoolExecutor(max_workers=N)) where the task process creates its loop (engine/ai/node.py:25), or a dedicated executor passed to run_in_executor in data_conn.py. One or two lines of Python, no rewrite: scope THREADING",
+  "what_binds_next": [
+   "the pipe semaphore at threadCount = 64 (data_conn.py:138) unless use(threads=) raises it \u2014 admission beyond 64 queues",
+   "writes and closes share one pool, so a wider pool also admits more concurrent uploads",
+   "the interpreter lock for Python-held work inside each document (H2 measures it)",
+   "32 vCPUs",
+   "per-document memory held by in-flight pipes"
+  ],
+  "observed_in_p0_D0": "the executor threads are named 'External' (not asyncio_N) and each starts through pydevd's thread wrapper; 32 were alive after a C=32 window (tooling leg, env_probe d0)",
+  "two_event_loops": "engine/ai/node.py:23-37 creates a loop and a thread named GlobalEventLoop at MODULE IMPORT; node.py runs as __main__ and is imported again as ai.node (engine/ai/common/models/base.py:320 'ai_node.server_loop'), so the task process carries TWO GlobalEventLoop threads (D0 read-back: python_threads_by_prefix GlobalEventLoop = 2). Observation, not a measured cost"
+ },
+ "H7_attached_debugger": {
+  "launch": "engine/ai/modules/task/task_engine.py:1494-1507 \u2014 in the production branch, unless self._noDebug, a debug port is assigned and the child gets --debug_port=<port> --debug_host=localhost; task_engine.py:296 self._noDebug = launch_args.get('noDebug', False)",
+  "launch_args_source": "engine/ai/modules/task/task_server.py:1011 args = request.get('arguments', {}) ... :1149 launch_args=args \u2014 the execute request's arguments dict",
+  "in_the_task_process": "engine/ai/node.py:80-101 \u2014 debugpy.listen((host, port), in_process_debug_adapter=True); debugpy.debug_this_thread(); every later thread starts through pydevd's _NewThreadStartupWithTrace (engine/lib/python3.12/site-packages/debugpy/_vendored/pydevd/_pydev_bundle/pydev_monkey.py:1123-1150), which calls _on_set_trace_for_new_thread(py_db) when a debugger object exists",
+  "sdk": "rocketride 1.3.0 mixins/execution.py use(): builds arguments {pipeline, args, ttl, token, threads, useExisting, pipelineTraceLevel, env, name, teamId} and sends self.call('execute', **arguments) \u2014 no noDebug parameter",
+  "observed": "tooling leg D0 process sample: the measured task ran '... ai/node.py /tmp/task-....json --autoterm --monitor=app --debug_port=20000 --debug_h[ost=localhost]'"
+ },
+ "V3_lock_scope": {
+  "rocketride": {
+   "lock": "engine/nodes/detect/IGlobal.py:79-81 make_device_lock() -> engine/ai/common/models/base.py:241-252: threading.Lock() in local (non-model-server) mode, nullcontext when a model server proxies",
+   "held_around": "engine/nodes/detect/IInstance.py:106-107 `with self.IGlobal.device_lock: detections = self.IGlobal.detector.detect(image)` \u2014 ONE FRAME per acquisition, the whole facade call",
+   "outside_the_lock": [
+    "IInstance.py:96-99 accumulate the frame's bytes",
+    "IInstance.py:103 ImageProcessor.load_image_from_bytes (decode)",
+    "IInstance.py:110 _emit: json.dumps (:77) and, only when an image listener exists, annotate + JPEG encode (:79-83)",
+    "upstream: frame_grabber extracts frames from the video"
+   ],
+   "inside_the_lock_not_the_forward_pass": [
+    "detection.py:509 metrics.counter",
+    "detection.py:518 resize_for_inference(image, 560) -> engine/ai/common/image/dense_resize.py:70 image.resize(..., Image.LANCZOS): the facade's 560 px pre-downscale",
+    "detection.py:534 DetectorLoader.preprocess -> :369-391 convert to RGB",
+    "detection.py:537 DetectorLoader.inference -> :393-417 -> RFDetrLoader.detect :153-195 -> :172 self._model.predict (rfdetr: its own tensor conversion, normalisation and resize BEFORE the forward pass, box decoding AFTER it)",
+    "detection.py:182-194 Python loop turning each box into a dict (float conversions, class-name lookup)",
+    "detection.py:540 DetectorLoader.postprocess :419-435 (wrapping)",
+    "detection.py:543-552 metrics.add_time",
+    "detection.py:554 _rescale_to_original :557-574 (box mapping back to the original resolution)"
+   ]
+  },
+  "llamaindex": {
+   "lock": "working/video/li_video/pipeline.py:127 self._lock = threading.Lock() (one per worker process)",
+   "held_around": "pipeline.py:251-259 `with self._lock:` around the WHOLE per-video frame loop \u2014 one acquisition per VIDEO, not per frame; pipeline.py:275 takes it again for the video's embedding",
+   "outside_the_lock": [
+    "pipeline.py:197 ffmpeg frame extraction to PNG files (per video)",
+    "splitting the detections text (pipeline.py:268-270)"
+   ],
+   "inside_the_lock_not_the_forward_pass": [
+    "pipeline.py:254 _load_frame -> :206-212 PNG decode + RGB convert + copy",
+    "pipeline.py:215 rfdetr predict's own pre- and post-processing around its forward pass (no 560 px LANCZOS pre-downscale on this arm)",
+    "pipeline.py:216-221 dict building per box",
+    "pipeline.py:256-259 label/score bookkeeping and json.dumps per frame"
+   ]
+  },
+  "in_bounds_fix_candidates": [
+   "RocketRide: narrow the lock to the forward pass only \u2014 take the LANCZOS resize, RGB convert, rfdetr pre/post-processing, dict building, metrics and rescale out of it, so one thread prepares the next frame while another runs the current forward pass (THREADING/PYTHON scope, one model instance)",
+   "RocketRide: on CPU the lock exists 'to serialize GPU access' (base.py:244-251); whether it is needed at all for CPU inference on one model instance is a question for the engine owners, not answered here",
+   "both arms: the pre-downscale is RocketRide-only; rfdetr resizes again internally \u2014 input size is a runtime difference to name, not to fix, in P0"
+  ],
+  "p0_scope": "source only; V2 measures the time inside and outside each lock"
+ }
+}

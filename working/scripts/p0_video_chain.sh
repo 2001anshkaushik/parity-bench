@@ -58,7 +58,7 @@ leg() {
       [ "$rc" = 0 ] && { "$PY" working/video/probe/wait_ready.py --arm rr --port 5565 --deadline 1800 --container rr || rc=5; }
     else
       refuse_existing li_bal_0 || return 1
-      ours+=("$(docker run -d --name li_bal_0 --memory 16g $(envargs "$T") -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c "rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30")") || rc=4
+      ours+=("$(docker run -d --name li_bal_0 --memory 7g $(envargs "$T") -e WS1V_WORKERS=1 --log-opt max-size=200m --network host --entrypoint sh li:video -c "rm -rf /tmp/ws1v_warm; exec python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-alive 30")") || rc=4
       if [ "$rc" = 0 ] && [ -n "$stamped" ]; then
         bash working/scripts/p0_v2_stamp.sh li install li_bal_0 || rc=6
         [ "$rc" = 0 ] && { docker restart li_bal_0 >/dev/null || rc=6; }
