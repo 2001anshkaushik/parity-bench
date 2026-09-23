@@ -80,8 +80,10 @@ def sec_d0(docs: Optional[Dict[str, Any]], v1: Optional[Dict[str, Any]], v2: Opt
            F: Dict[str, Any]) -> List[str]:
     out = ["## D0 — instance accounting (every cell)", ""]
     rows, viol = [], []
+    dirs = (docs or {}).get("leg_dirs") or {}
     for name, leg in sorted(((docs or {}).get("legs") or {}).items()):
         m = leg.get("mandate") or {}
+        name = dirs.get(name, name)
         ext = leg.get("d0_external") or {}
         models = leg.get("d0_models_pre") or {}
         mtxt = "; ".join(f"{k.rsplit('.', 1)[-1]} ×{v.get('distinct_weights')}" for k, v in models.items()) or "—"
@@ -138,9 +140,11 @@ def sec_d1(docs: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
                + "; ".join(f"{p['b']} vs {p['a']} ({p['kind']}): {p['identical']}/{p['compared']} documents chunk-identical"
                            for p in nc.get("pairs", [])) + ".")
     out.append("")
-    for name, t in (docs.get("d1_stages") or {}).items():
-        if not name.startswith(("d1_", "an_")):
+    dirs = docs.get("leg_dirs") or {}
+    for alias, t in (docs.get("d1_stages") or {}).items():
+        if not alias.startswith(("d1_", "an_")):
             continue
+        name = dirs.get(alias, alias)
         if t["arm"] == "rr":
             out.append(f"### {name} — RocketRide stages (PROFILE; {t['docs_with_complete_stamps']} documents with a "
                        f"complete stamp set, {t['docs_incomplete_stamps']} without)")
@@ -175,8 +179,10 @@ def sec_h1(docs: Optional[Dict[str, Any]], src: Optional[Dict[str, Any]], F: Dic
     out = ["## H1 — per-process ceiling (executor width)", ""]
     h = (docs or {}).get("h1") or {}
     rows = []
-    for name in ("h1_c32_a", "h1_c64_a", "h1_c32_b", "h1_c64_b"):
-        x = h.get(name) or {}
+    dirs = (docs or {}).get("leg_dirs") or {}
+    for alias in ("h1_c32_a", "h1_c64_a", "h1_c32_b", "h1_c64_b"):
+        x = h.get(alias) or {}
+        name = dirs.get(alias, alias)
         if "span" not in x:
             rows.append([name, "NOT RUN", "", "", "", ""])
             continue
@@ -210,19 +216,22 @@ def sec_h2(h2: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
            "own `take_gil` / `drop_gil` time waiting and holding per Python thread; py-spy's `--gil` "
            "recorder names the holders. The pre-registered py-spy `--native` recorder is **NOT RUN** "
            "(it aborts on the engine binary with UNW_EBADREG, tooling leg 08:36Z). Per "
-           "**preregistration_amendment_3.json** the first three H2 legs (h2_null_c1, h2_c32_a/b) are VOID "
-           "— the tracer never wrote (bpftrace's stripped BEGIN_trigger) and py-spy stopped late — and the "
-           "design is carried by h2b_null_c1 and h2b_c32_a/b. Shares are of Python-thread time "
+           "**amendment 3** the legs h2_null_c1 and h2_c32_a/b are VOID (the tracer never wrote: bpftrace "
+           "0.14's stripped BEGIN_trigger; py-spy stopped late); per **amendment 4** every first-generation "
+           "RocketRide docs leg carried env_probe's per-document instance scan, so tool_gil2 is PERTURBED "
+           "(its trace also has no window: bpftrace 0.14 prints no min() map) and h2b_null_c1 was stopped. "
+           "The design is carried by **h2f_null_c1 and h2f_c32_a/b**. Shares are of Python-thread time "
            "(n threads × tracer window).", ""]
     if not h2:
         return out + ["NOT RUN.", ""]
     rows = []
     for name, x in (h2.get("legs") or {}).items():
         g = x.get("gil") or {}
+        tag = (" (VOID)" if x.get("void_for_h2") else " (PERTURBED)" if name in ("tool_gil2",) else "")
         if x.get("status") == "NOT RUN" or g.get("status") != "OK":
-            rows.append([name, x.get("status") or g.get("status") or "—"] + [""] * 7)
+            rows.append([name + tag, x.get("status") or g.get("status") or "—"] + [""] * 7)
             continue
-        rows.append([name, n(g["python_threads"]), share(g["waiting_on_gil"]), share(g["holding_gil"]),
+        rows.append([name + tag, n(g["python_threads"]), share(g["waiting_on_gil"]), share(g["holding_gil"]),
                      share(g["native"]), share(g["idle"]), share(g["gil_occupancy"]),
                      n(g["gil_occupancy"] <= 1.0), n(x.get("engine_cores"), 2)])
     out += table(["leg", "Python threads", "waiting on GIL", "holding GIL", "native (running, lock free)",
@@ -523,7 +532,8 @@ def main() -> int:
     ap.add_argument("--out-json", type=Path, required=True)
     a = ap.parse_args()
     c = a.campaign
-    A = {"docs": load(c, "analysis_docs_p0.json"), "h2": load(c, "analysis_h2.json"),
+    A = {"docs": load(c, "analysis_docs_p0.json"), "docs_g1": load(c, "analysis_docs_p0_gen1.json"),
+         "e1": load(c, "analysis_e1.json"), "h2": load(c, "analysis_h2.json"),
          "h5": load(c, "analysis_h5.json"), "h6s": load(c, "analysis_h6smoke.json"),
          "h6f": load(c, "analysis_h6full.json"), "v1": load(c, "analysis_v1.json"),
          "v1f": load(c, "analysis_v1full.json"), "v2": load(c, "analysis_v2.json"),
@@ -533,15 +543,22 @@ def main() -> int:
     body: List[str] = []
     body += sec_d0(A["docs"], A["v1"], A["v2"], F)
     body += sec_d1(A["docs"], F)
+    body += sec_perturbation(A["docs_g1"], A["docs"], F)
     body += sec_parity(A["docs"], F)
+    body += sec_posthoc(A["docs"], A["h2"], F)
     body += sec_h2(A["h2"], F)
     body += sec_h1(A["docs"], A["src"], F)
     body += sec_h7(A["docs"], A["src"], F)
     body += sec_h5(A["h5"], F)
+    body += sec_e1(A["e1"])
     body += sec_h6(A["h6s"], A["h6f"], F)
+    g6 = load(c, "h6_gate.json")
+    if g6:
+        body += [f"**Harness disclosure (h6_gate.json):** {g6.get('disclosure')}", ""]
     body += sec_v1(A["v1"], A["v1f"], F)
     body += sec_v2(A["v2"], A["src"], F)
     body += sec_v3(A["src"])
+    body += sec_amendments(c)
     head = [f"# P0 — diagnosis under the single-instance mandate", "",
             f"Campaign `{c.name}`, branch feat/parity-p0 (cut from the closeout head 5f4fc02). Generated "
             f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())} from committed analysis files; every figure is "
@@ -559,11 +576,105 @@ def main() -> int:
         head += ["### Out of bounds (recorded, not proposed)", ""] + [f"- {x}" for x in roi.get("out_of_bounds", [])] + [""]
         head += ["### NOT RUN", ""] + [f"- {x}" for x in roi.get("not_run", [])] + [""]
     tail = sec_session(A["docs"], F)
+    if summ.get("self_audit"):
+        tail += ["## SELF-AUDIT", ""] + [f"- **{k}:** {v}" for k, v in summ["self_audit"].items()] + [""]
     md = "\n".join(head + body + tail) + "\n"
     a.out_md.write_text(md)
     a.out_json.write_text(json.dumps({"inputs_sha256_16": INPUTS, "figures": F}, indent=1, default=str))
     print(f"wrote {a.out_md} and {a.out_json}")
     return 0
+
+
+
+def sec_perturbation(g1: Optional[Dict[str, Any]], f: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
+    out = ["## The first generation, PERTURBED by my own instrument (amendment 4)", "",
+           "env_probe was appended to every P0 measured pipeline for the on-token read-back, and its "
+           "closing() runs for every pipe instance: every PDF triggered its garbage-collector instance scan, "
+           "holding the GIL inside the window. Every RocketRide docs design was re-run with the probe "
+           "answering only its probe document (suffix f); verdicts come from the f legs only. The first "
+           "generation, same session, for disclosure — never merged with the f legs:", ""]
+    if not (g1 and f):
+        return out + ["(analysis missing)", ""]
+    rows = []
+    for alias in ("d1_rr_u1", "d1_rr_u2", "an_rr_u1", "an_rr_u2", "an_li_u1", "an_li_u2"):
+        a, b = (g1["legs"].get(alias) or {}), (f["legs"].get(alias) or {})
+        if not a or not b:
+            continue
+        va, vb = a["span"]["docs_per_s"], b["span"]["docs_per_s"]
+        rows.append([f"{alias} → {(f.get('leg_dirs') or {}).get(alias, alias)}", n(va, 4), n(vb, 4), pct(vb / va - 1, 1),
+                     "never carried env_probe" if a["arm"] == "li" else "carried the scan"])
+    out += table(["uninstrumented leg (first → f)", "first generation span docs/s", "f generation span docs/s",
+                  "f / first − 1", "note"], rows)
+    return out
+
+
+def sec_posthoc(docs: Optional[Dict[str, Any]], h2: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
+    out = ["## POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)", "",
+           "Span throughput counts the DRAIN — the time after the last document was submitted, when "
+           "fewer than C documents remain in flight. On the 384 slice a few long documents set it.", ""]
+    rows = []
+    dirs = (docs or {}).get("leg_dirs") or {}
+    for alias in ("d1_rr_u1", "d1_rr_u2", "an_rr_u1", "an_rr_u2", "an_li_u1", "an_li_u2"):
+        l = ((docs or {}).get("legs") or {}).get(alias)
+        if not l:
+            continue
+        dr = l.get("drain_posthoc") or {}
+        tq = dr.get("time_to_fraction_s") or {}
+        rows.append([dirs.get(alias, alias), n(l["span"]["docs_per_s"], 4), share(dr.get("drain_share_of_span")),
+                     n(dr.get("steady_docs_per_s"), 3), f"{n(tq.get('50%'), 1)} / {n(tq.get('90%'), 1)} / {n(tq.get('99%'), 1)} / {n(tq.get('100%'), 1)}",
+                     n(l.get("cpu_s_per_doc"), 3), n(l.get("engine_cores"), 2)])
+    out += table(["leg (uninstrumented)", "span docs/s", "drain share of span", "steady-phase docs/s",
+                  "seconds to 50% / 90% / 99% / 100% done", "CPU-s per document (engine cgroup)", "engine cores"], rows)
+    rows = []
+    for name in ("h2f_c32_a", "h2f_c32_b"):
+        x = (((h2 or {}).get("legs") or {}).get(name) or {}).get("steady_vs_drain_posthoc") or {}
+        if x.get("status") == "unavailable" or not x:
+            continue
+        for ph in ("steady", "drain"):
+            y = x.get(ph) or {}
+            rows.append([name, ph, n(y.get("docs_in_flight_mean"), 1), n(y.get("python_threads_R_mean"), 1),
+                         n(y.get("all_threads_R_mean"), 1)])
+    if rows:
+        out.append("Threads in the run state (R = running or runnable) in the DIAGNOSTIC H2 legs, while every "
+                   "document is still being submitted (steady) against after the last submit (drain):")
+        out.append("")
+        out += table(["leg", "phase", "documents in flight", "Python threads in R", "all task threads in R"], rows)
+    return out
+
+
+def sec_e1(e1: Optional[Dict[str, Any]]) -> List[str]:
+    out = ["## E1 — where the long parse holds live (EXPLORATORY DIAGNOSTIC, amendment 5)", ""]
+    if not e1:
+        return out + ["NOT RUN.", ""]
+    rows = []
+    for d, x in e1["per_document"].items():
+        rows.append([d, n(x["isolated_tika_s"], 2), n(x["engine_tika_s"], 1) + (" (timed out)" if x["engine_timed_out"] else ""),
+                     n(x["in_pipeline_s_S5D"], 1), n(x["engine_over_isolated"], 0), n(x["in_pipeline_over_isolated"], 0),
+                     n(x["engine_stdout_mb"], 1)])
+    out += table(["document", "isolated Tika s (H5, shipped mean)", "engine --tika s (E1)", "in-pipeline parse bracket s (S5-D)",
+                  "engine / isolated", "in-pipeline / isolated", "engine stdout MB"], rows)
+    out.append("Exec census over the stage (box-wide, nothing else running): " +
+               (", ".join(f"{k} ×{v}" for k, v in list(e1.get("exec_census_box_wide", {}).items())[:12]) or "no execs recorded") + ".")
+    out.append("")
+    out.append("**Reading (with SOURCE, not measurement):** the engine's Tika wrapper "
+               "(engine/java/lib/tika.jar, com.rocketride.tika_api.TikaApi) calls "
+               "PDFParserConfig.setExtractInlineImages and setExtractUniqueInlineImagesOnly and sends every "
+               "embedded image, PNG-encoded, through the JNI callback onWriteImageBuffer; isolated Tika "
+               "(the same jars and config, default ParseContext) does not extract inline images. The "
+               "product pipeline listens only to the parser's text lane.")
+    out.append("")
+    return out
+
+
+def sec_amendments(c: Path) -> List[str]:
+    out = ["## Amendments to the pre-registration (each landed before the legs it governs)", ""]
+    for f in sorted(c.glob("preregistration_amendment_*.json")):
+        j = json.loads(f.read_text())
+        what = j.get("amends") or j.get("adds") or ""
+        why = (j.get("reason") or j.get("fault") or j.get("why") or j.get("discovery") or "")
+        out.append(f"- **{f.name}** ({j.get('written_utc')}): {what}. {why[:400]}{'…' if len(why) > 400 else ''}")
+    out.append("")
+    return out
 
 
 if __name__ == "__main__":
