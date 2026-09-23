@@ -115,6 +115,37 @@ def sec_d0(docs: Optional[Dict[str, Any]], v1: Optional[Dict[str, Any]], v2: Opt
     return out
 
 
+def sec_d1_scope_and_gil(h2: Optional[Dict[str, Any]]) -> List[str]:
+    out = ["### What is timed from inside and what from outside", "",
+           "- **Inside the pipeline, at node boundaries** (RocketRide stamp nodes adjacent to the stage): "
+           "split (LangChain splitter, Python) and embed (MiniLM, Python/torch, including the node's "
+           "buffered flush).",
+           "- **From outside:** admission (client submit to the engine's pipe open), the parse bracket "
+           "(pipe open to the parser's last text — the parse node is native C++ in the engine binary, so it "
+           "can only be bracketed; the bracket also holds the upload, the wait for an executor thread and "
+           "the engine's handling of the parser's output) and return (the embed node's last documents to "
+           "the client's completion).",
+           "- **LlamaIndex:** extract (pypdf), split and embed are timed inside the service by three "
+           "perf_counter stamps; queue = client latency minus service total.",
+           "- **Video (V2):** every component is timed inside the detect code of each arm (instrumented "
+           "copies, additions only).", ""]
+    rows = []
+    for name in ("h2f_c32_a", "h2f_c32_b"):
+        ps = (((h2 or {}).get("legs") or {}).get(name) or {}).get("pyspy_gil") or {}
+        if ps.get("status") != "OK":
+            continue
+        bs = ps["by_stage"]
+        rows.append([name] + [share((bs.get(k) or {}).get("share")) for k in
+                              ("embed", "split", "engine glue (data_conn)", "response", "other")])
+    if rows:
+        out.append("Share of H2's GIL-holding samples by the stage whose code is on the stack "
+                   "(DIAGNOSTIC legs; 'other' is mostly the engine's websocket transport and JSON encoding):")
+        out.append("")
+        out += table(["leg", "embed (Python stage)", "split (Python stage)", "engine glue", "response node",
+                      "other"], rows)
+    return out
+
+
 def sec_d1(docs: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
     out = ["## D1 — node-level telemetry", "",
            "Every table below is from a **PROFILE** leg (stage stamps or a timed service): shares, "
@@ -471,6 +502,64 @@ def sec_v3(src: Optional[Dict[str, Any]]) -> List[str]:
     return out
 
 
+def sec_verdicts(A: Dict[str, Any], summ: Dict[str, Any]) -> List[str]:
+    """Every number in this table is read from an analysis file; the reading text is summary_spec's."""
+    d, h2, h5, h6s, h6f, v1, v2, e1 = (A.get(k) or {} for k in ("docs", "h2", "h5", "h6s", "h6f", "v1", "v2", "e1"))
+    notes = (summ or {}).get("readings") or {}
+    rows = []
+    viol = [n for n, l in (d.get("legs") or {}).items() if (l.get("mandate") or {}).get("mandate_violation")]
+    rows.append(["D0 (mandate)", "no violation" if not viol else "VIOLATION", f"{len(d.get('legs') or {})} docs cells checked"
+                 + (f"; violations {viol}" if viol else ""), notes.get("D0", "")])
+    ov = d.get("d1_overhead") or {}
+    nc = (d.get("d1_null_control_chunk_identity") or {}).get("pass")
+    rows.append(["D1 (telemetry)", "overhead unreadable" if ov and not any(v["readable"] for v in ov.values()) else "see D1",
+                 "; ".join(f"{k} {pct(v['overhead'])} vs {share(v['threshold'], 2)}" for k, v in ov.items())
+                 + f"; output identity {'PASS' if nc else 'FAIL'}", notes.get("D1", "")])
+    h1v = ((d.get("h1") or {}).get("verdict") or {})
+    t = h1v.get("c64_vs_c32_throughput") or {}
+    widths = sorted({(d.get("h1") or {}).get(k, {}).get("executor_threads_seen") for k in ("h1_c64_a", "h1_c64_b")} - {None})
+    ex = [((d.get("h1") or {}).get(k, {}).get("executing_concurrency") or {}).get("max") for k in ("h1_c64_a", "h1_c64_b")]
+    rows.append(["H1 (per-process ceiling)", h1v.get("h1") or "NOT RUN",
+                 f"executor threads at C=64: {', '.join(str(w) for w in widths) or '—'}; executing at once max "
+                 f"{', '.join(str(x) for x in ex if x is not None) or '—'}; C=64 vs C=32 {pct(t.get('delta_b_vs_a'))} vs "
+                 f"{share(t.get('threshold'), 2)}", notes.get("H1", "")])
+    g = h2.get("gate") or {}
+    rows.append(["H2 (interpreter lock)", "NOT SUPPORTED" if g.get("evaluable") and not g.get("fired") else ("SUPPORTED" if g.get("fired") else "UNREADABLE"),
+                 f"GIL waiting {share(g.get('measured'))} vs gate 15%; null control {share((h2.get('null_control') or {}).get('waiting_on_gil'), 2)} vs < 2%",
+                 notes.get("H2", "")])
+    h7 = d.get("h7") or {}
+    c7 = h7.get("nodebug_vs_debug") or {}
+    rows.append(["H7 (attached debugger, amendment 2)", h7.get("verdict", "NOT RUN"),
+                 f"noDebug vs default {pct(c7.get('delta_b_vs_a'))} vs {share(c7.get('threshold'), 2)}", notes.get("H7", "")])
+    g5 = h5.get("gate") or {}
+    iso = [x["in_engine_over_isolated"] for x in (h5.get("per_document") or {}).values() if x.get("in_engine_over_isolated")]
+    rows.append(["H5 (Tika features)", "NOT SUPPORTED" if g5 and not g5.get("fired") else ("SUPPORTED" if g5.get("fired") else "NOT RUN"),
+                 f"documents passing per feature {list((g5.get('n_passing_by_feature') or {}).values())} (gate: ≥ 6 of 11); in-engine holds {n(min(iso), 0) if iso else '—'}x–{n(max(iso), 0) if iso else '—'}x isolated Tika",
+                 notes.get("H5", "")])
+    pe = e1.get("per_document") or {}
+    cen = e1.get("exec_census_box_wide") or {}
+    rows.append(["E1 (where the hold lives, amendment 5)", "EXPLORATORY",
+                 f"engine --tika {n(min((x['engine_tika_s'] for x in pe.values() if x.get('engine_tika_s')), default=None), 0)}–"
+                 f"{n(max((x['engine_tika_s'] for x in pe.values() if x.get('engine_tika_s')), default=None), 0)} s; "
+                 f"jspawnhelper execs {n(cen.get('/opt/rocketride/engine/java/jre/lib/jspawnhelper'))}", notes.get("E1", "")])
+    g6 = h6s.get("gate") or {}
+    v6 = h6f.get("verdict") or {}
+    sp = ((h6s.get("parsers") or {}).get("pypdfium2") or {}).get("tail_11") or {}
+    rows.append(["H6 (parser bake-off)", ("CANDIDATE: " + ", ".join(v6.get("candidates") or [])) if v6.get("candidates") else
+                 ("full run: no candidate" if h6f else ("smoke gate FIRED" if g6.get("fired") else "not fired")),
+                 f"pypdfium2 {n(sp.get('speed_ratio_vs_tika_shipped'), 2)}x Tika-as-shipped at p50 on the 11", notes.get("H6", "")])
+    gp = v1.get("gap") or {}
+    rows.append(["V1 (matched single instance)", ("SUPPORTED — gate fired" if gp.get("gate_fired") else "see V1") if gp else "NOT RUN",
+                 f"LlamaIndex / RocketRide − 1 at T=4 {pct(gp.get('li_over_rr_minus_1'), 1)}; margin {pct(gp.get('margin_pp'), 1)} vs +10 points",
+                 notes.get("V1", "")])
+    nc2 = (v2.get("null_control") or {})
+    rows.append(["V2 (duty cycle)", ("null control PASS" if nc2.get("pass") else "UNREADABLE (null control)") if nc2 else "NOT RUN",
+                 "; ".join(f"{k}: duty {share(x.get('duty_cycle'))}" for k, x in list((v2.get("rr_components") or {}).items())[:1]
+                           + list((v2.get("li_components") or {}).items())[:1]), notes.get("V2", "")])
+    rows.append(["V3 (lock scope)", "SOURCE", "see V3", notes.get("V3", "")])
+    return ["## Verdicts", ""] + table(["hypothesis", "verdict", "measured (from the analysis files)", "reading"], rows)
+
+
 def roi_table(items: List[Dict[str, Any]]) -> List[str]:
     rank = {"CONFIG": 0, "THREADING": 0, "PYTHON": 1, "CPP": 2}
     items = sorted(items, key=lambda x: (rank.get(x["scope"], 9), -(x.get("share") or 0)))
@@ -492,15 +581,18 @@ def roi_table(items: List[Dict[str, Any]]) -> List[str]:
     return out
 
 
-def sec_session(docs: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
+def sec_session(docs: Optional[Dict[str, Any]], F: Dict[str, Any], vids: Optional[List[Dict[str, Any]]] = None) -> List[str]:
     legs = (docs or {}).get("legs") or {}
+    vl = [l for a in (vids or []) if a for l in (a.get("legs") or {}).values()]
     boots = sorted({v.get("boot_id") for v in legs.values() if v.get("boot_id")})
     steal = [((v.get("steal") or {}).get("share")) for v in legs.values() if (v.get("steal") or {}).get("share") is not None]
     mhz = [((v.get("mhz") or {}).get("mean_of_samples")) for v in legs.values() if (v.get("mhz") or {}).get("mean_of_samples")]
     models = sorted({m for v in legs.values() for m in (v.get("cpu_model") or [])})
+    boots = sorted(set(boots) | {l.get("boot_id") for l in vl if l.get("boot_id")})
+    steal += [(l.get("session") or {}).get("steal_share") for l in vl if (l.get("session") or {}).get("steal_share") is not None]
     F["sessions"] = boots
     return ["## Session", "",
-            f"Box sessions seen in the docs legs: {', '.join(boots) or '—'} (every comparison above is inside one). "
+            f"Box sessions seen across the docs and video legs: {', '.join(boots) or '—'} (every comparison above is inside one). "
             f"CPU: {', '.join(models) or '—'}. Steal over the windows: max {share(max(steal), 3) if steal else '—'}. "
             f"Mean core MHz per leg: {n(min(mhz), 0) if mhz else '—'} to {n(max(mhz), 0) if mhz else '—'}. "
             "IMDS placement is recorded per export (host-id is exposed only on dedicated hosts).", ""]
@@ -543,6 +635,7 @@ def main() -> int:
     body: List[str] = []
     body += sec_d0(A["docs"], A["v1"], A["v2"], F)
     body += sec_d1(A["docs"], F)
+    body += sec_d1_scope_and_gil(A["h2"])
     body += sec_perturbation(A["docs_g1"], A["docs"], F)
     body += sec_parity(A["docs"], F)
     body += sec_posthoc(A["docs"], A["h2"], F)
@@ -565,9 +658,7 @@ def main() -> int:
             "computed from raw per-document / per-frame / per-parse records and rounded only here.", "",
             f"{DAG} on every RocketRide docs throughput figure: {CAVEAT}.", ""]
     summ = A["summary"] or {}
-    if summ:
-        head += ["## Verdicts", ""] + table(["hypothesis", "verdict", "one line"],
-                                            [[x["h"], x["verdict"], x["line"]] for x in summ.get("verdicts", [])])
+    head += sec_verdicts(A, summ)
     head += sec_gates(F)
     roi = A["roi"] or {}
     if roi:
@@ -575,7 +666,7 @@ def main() -> int:
         head += ["## Bottlenecks and in-bounds fixes, ranked by ROI (scope first, then share)", ""] + roi_table(items)
         head += ["### Out of bounds (recorded, not proposed)", ""] + [f"- {x}" for x in roi.get("out_of_bounds", [])] + [""]
         head += ["### NOT RUN", ""] + [f"- {x}" for x in roi.get("not_run", [])] + [""]
-    tail = sec_session(A["docs"], F)
+    tail = sec_session(A["docs"], F, [A["v1"], A["v2"], A["v1f"]])
     if summ.get("self_audit"):
         tail += ["## SELF-AUDIT", ""] + [f"- **{k}:** {v}" for k, v in summ["self_audit"].items()] + [""]
     md = "\n".join(head + body + tail) + "\n"

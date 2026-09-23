@@ -85,11 +85,38 @@ def load(d: Path) -> Optional[Dict[str, Any]]:
             "cpu_s_per_frame": (cpu_s / frames) if (cpu_s and frames) else None,
             "engine_cores": eff.get("effective_cores"), "service_cpu_s": cpu_s,
             "boot_id": (d / "boot_id.txt").read_text().strip() if (d / "boot_id.txt").exists() else None,
-            "p0": e.get("p0"), "task_census": e.get("task_census"),
+            "p0": e.get("p0") or (e.get("provenance_video") or {}).get("p0"),
+            "task_census": e.get("task_census") or (e.get("provenance_video") or {}).get("task_census"),
+            "session": session_facts(d),
             "thread_pins": (e.get("thread_pins_by_arm") or {}).get("cross_arm_values"),
             "by_video": {r["video"]: {"chunk_sha256": r.get("chunk_sha256"),
                                       "frame_scores": r.get("frame_scores"),
                                       "labels": r.get("frame_label_multisets")} for r in ok}}
+
+
+def session_facts(d: Path) -> Dict[str, Any]:
+    """The leg's own records: boot id, steal over the leg (aggregate /proc/stat at open and close),
+    mean core MHz at open and close, CPU model."""
+    out: Dict[str, Any] = {}
+    try:
+        a = [int(x) for x in (d / "procstat_open.txt").read_text().split()[1:]]
+        b = [int(x) for x in (d / "procstat_close.txt").read_text().split()[1:]]
+        dl = [y - x for x, y in zip(a, b)]
+        total = sum(dl[:8])
+        out["steal_share"] = dl[7] / total if total else None
+    except (OSError, ValueError, IndexError):
+        out["steal_share"] = None
+    for tag in ("open", "close"):
+        try:
+            v = [float(l.split(":")[1]) for l in (d / f"mhz_{tag}.txt").read_text().splitlines() if ":" in l]
+            out[f"mhz_{tag}_mean"] = sum(v) / len(v) if v else None
+        except OSError:
+            out[f"mhz_{tag}_mean"] = None
+    try:
+        out["cpu_model"] = (d / "cpu_model.txt").read_text().split(":", 1)[1].strip()
+    except (OSError, IndexError):
+        out["cpu_model"] = None
+    return out
 
 
 def cell(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
