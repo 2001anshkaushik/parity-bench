@@ -134,21 +134,25 @@ def ns_to_host(d: Path, leg: str, fr: List[Dict[str, Any]], m: Dict[str, Dict[st
     between thread creations). The N forward callers (N = distinct stamp tids) are the process's N
     busiest GIL re-acquirers (every forward pass releases and re-takes the GIL at each torch op), so the
     sorted callers are paired with those N host threads sorted by id — ACCEPTED only if the offsets never
-    decrease and drift by at most 50 in total; the offsets are reported."""
+    decrease and the least busy caller re-took the GIL at least twice as often as the busiest non-caller;
+    the offsets and both counts are reported."""
     callers = sorted({r["tid"] for r in fr if r.get("tid") is not None})
     rtn = {int(k): v for k, v in (m.get("@rt_n") or {}).items() if v > 0}
     heavy = sorted(sorted(rtn, key=lambda h: -rtn[h])[:len(callers)])
     if len(heavy) != len(callers):
         return {"map": {}, "error": f"{len(heavy)} host Python threads for {len(callers)} callers"}
     ks = [h - c for c, h in zip(callers, heavy)]
-    ok = all(b >= a for a, b in zip(ks, ks[1:])) and ks[-1] - ks[0] <= 50 and ks[0] >= 0
+    nxt = sorted(rtn.values(), reverse=True)[len(callers)] if len(rtn) > len(callers) else 0
+    # creation order is kept in both namespaces, so offsets never decrease; and the callers must stand
+    # clearly apart from every other Python thread (the least busy caller at least twice the next one)
+    ok = all(b >= a for a, b in zip(ks, ks[1:])) and ks[0] >= 0 and min(rtn[h] for h in heavy) >= 2 * nxt
     out = {"offsets": ks, "offset_min": min(ks), "offset_max": max(ks), "accepted": ok,
            "gil_reacquisitions_mapped": sum(rtn[h] for h in heavy), "gil_reacquisitions_all": sum(rtn.values()),
            "next_busiest_after_callers": sorted(rtn.values(), reverse=True)[len(callers)] if len(rtn) > len(callers) else None,
            "least_busy_caller": min(rtn[h] for h in heavy)}
     out["map"] = {str(c): h for c, h in zip(callers, heavy)} if ok else {}
     if not ok:
-        out["error"] = "offsets decrease or drift beyond 50: mapping refused"
+        out["error"] = "offsets decrease, or the callers do not stand apart: mapping refused"
     return out
 
 
