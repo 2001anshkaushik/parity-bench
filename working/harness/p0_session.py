@@ -235,14 +235,16 @@ uretprobe:BIN:take_gil /pid == PID && @t0[tid]/ {
   $w = nsecs - @t0[tid]; delete(@t0[tid]);
   @wait_ns[tid] = sum($w); @takes[tid] = count(); @h0[tid] = nsecs;
   @wait_by_s[nsecs / 1000000000] = sum($w); @wait_hist = hist($w);
+  @tmin = min(nsecs); @tmax = max(nsecs);
 }
 uprobe:BIN:drop_gil /pid == PID && @h0[tid]/ {
   $h = nsecs - @h0[tid]; delete(@h0[tid]);
   @hold_ns[tid] = sum($h); @hold_by_s[nsecs / 1000000000] = sum($h);
 }
-BEGIN { @start_ns = nsecs; }
-END { @end_ns = nsecs; clear(@t0); clear(@h0); }
 """
+# No BEGIN/END blocks: Ubuntu 22.04's bpftrace 0.14 binary is stripped, and BEGIN/END are uprobes on
+# its own BEGIN_trigger symbol ("Could not resolve symbol: /proc/self/exe:BEGIN_trigger", tooling
+# leg tool_gil 09:26Z). The tracer's window is its first to last traced acquisition (@tmin..@tmax).
 
 
 class H2Profiler:
@@ -310,21 +312,35 @@ class H2Profiler:
         self._thr.start()
 
     @staticmethod
-    def _children(pid: int) -> List[int]:
-        try:
-            return [int(x) for x in Path(f"/proc/{pid}/task/{pid}/children").read_text().split()]
-        except OSError:
-            return []
+    def _tool_pids(pattern: str, comm: str) -> List[int]:
+        """The ROOT tool process itself (comm py-spy / bpftrace) whose command line carries this
+        leg's unique output path — never the sudo parent or sudo's pty monitor. The tooling legs
+        showed SIGINT to sudo reaching py-spy only after the post-window probe had run."""
+        r = subprocess.run(["pgrep", "-f", pattern], capture_output=True, text=True)
+        out = []
+        for x in r.stdout.split():
+            try:
+                if Path(f"/proc/{x}/comm").read_text().strip() == comm:
+                    out.append(int(x))
+            except OSError:
+                continue
+        return out
 
     def stop(self) -> Dict[str, Any]:
         self._stop.set()
         # SIGINT to the ROOT child, as root: a signal to the sudo process was not relayed in the
         # tooling leg (py-spy ran on 3 minutes after the window and was killed without writing).
+        self.stopped_utc = time.time()
         for key, p in self.procs.items():
             if p.poll() is None:
-                kids = self._children(p.pid) or [p.pid]
-                subprocess.run(["sudo", "-n", "kill", "-INT"] + [str(k) for k in kids],
-                               capture_output=True)
+                comm = "bpftrace" if key == "giltrace" else "py-spy"
+                pids = self._tool_pids(str(self.files[key]), comm)
+                self.started[key]["signalled_pids"] = pids
+                if pids:
+                    subprocess.run(["sudo", "-n", "kill", "-INT"] + [str(k) for k in pids],
+                                   capture_output=True)
+                else:                                  # recorded, never silent
+                    self.started[key]["signal_note"] = f"no {comm} process found for {self.files[key]}"
         out: Dict[str, Any] = {}
         for key, p in self.procs.items():
             try:
@@ -340,6 +356,7 @@ class H2Profiler:
                         "log_tail": logf.read_text()[-600:] if logf.exists() else None}
         if self._thr:
             self._thr.join(timeout=10)
+        out["stop_signalled_at_utc"] = getattr(self, "stopped_utc", None)
         out["threads"] = {"file": self.files["threads"].name, "hz": self.proc_hz,
                           "bytes": self.files["threads"].stat().st_size
                           if self.files["threads"].exists() else 0}

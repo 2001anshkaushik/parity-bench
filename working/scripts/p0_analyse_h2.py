@@ -59,7 +59,7 @@ def gil_shares(d: Path, leg: str) -> Dict[str, Any]:
     if not m:
         return {"status": "NO TRACE", "file": f"giltrace_{leg}.json"}
     wait, hold, takes = as_int_map(m.get("@wait_ns")), as_int_map(m.get("@hold_ns")), as_int_map(m.get("@takes"))
-    t_start, t_end = m.get("@start_ns"), m.get("@end_ns")
+    t_start, t_end = m.get("@start_ns", m.get("@tmin")), m.get("@end_ns", m.get("@tmax"))
     if not (isinstance(t_start, int) and isinstance(t_end, int)) or t_end <= t_start:
         return {"status": "NO WINDOW", "maps": sorted(m)}
     T = (t_end - t_start) / 1e9
@@ -130,7 +130,8 @@ def main() -> int:
     ap.add_argument("--out", default="analysis_h2.json")
     a = ap.parse_args()
     res: Dict[str, Any] = {"legs": {}}
-    for name in ("tool_gil", "h2_null_c1", "h2_c32_a", "h2_c32_b", "h2_full_c32"):
+    for name in ("tool_gil", "tool_gil2", "h2_null_c1", "h2_c32_a", "h2_c32_b",
+                 "h2b_null_c1", "h2b_c32_a", "h2b_c32_b", "h2_full_c32"):
         d = a.campaign / name
         lj = sorted(d.glob("leg_*.json")) if d.is_dir() else []
         if not lj:
@@ -153,13 +154,18 @@ def main() -> int:
             "pyspy_gil": pyspy_gil(d, tag, 100.0, wsec),
             "recorder_n_native": ("NOT RUN — py-spy --native aborts on the engine binary "
                                   "(UNW_EBADREG), tooling leg 08:36Z; amendment 1")}
-    null = res["legs"].get("h2_null_c1", {}).get("gil", {})
-    smoke = [res["legs"].get(n, {}).get("gil", {}) for n in ("h2_c32_a", "h2_c32_b")]
+    # Amendment 3: h2_null_c1 / h2_c32_a / h2_c32_b ran with a tracer that never wrote (bpftrace
+    # BEGIN_trigger) and a late-stopping py-spy — VOID for H2. The design is carried by h2b_*.
+    for v in ("h2_null_c1", "h2_c32_a", "h2_c32_b"):
+        if v in res["legs"] and res["legs"][v].get("status") != "NOT RUN":
+            res["legs"][v]["void_for_h2"] = "amendment 3: instrument failure (no GIL trace; py-spy stopped late)"
+    null = res["legs"].get("h2b_null_c1", {}).get("gil", {})
+    smoke = [res["legs"].get(n, {}).get("gil", {}) for n in ("h2b_c32_a", "h2b_c32_b")]
     null_ok = null.get("status") == "OK" and null.get("waiting_on_gil") is not None \
         and null["waiting_on_gil"] < NULL_MAX
     vals = [s["waiting_on_gil"] for s in smoke if s.get("status") == "OK" and s.get("waiting_on_gil") is not None]
     mean_w = sum(vals) / len(vals) if len(vals) == 2 else None
-    res["null_control"] = {"leg": "h2_null_c1", "waiting_on_gil": null.get("waiting_on_gil"),
+    res["null_control"] = {"leg": "h2b_null_c1", "waiting_on_gil": null.get("waiting_on_gil"),
                            "threshold": NULL_MAX, "pass": null_ok}
     res["gate"] = {"threshold": GATE, "metric": "mean waiting_on_gil of h2_c32_a and h2_c32_b",
                    "measured": mean_w, "values": vals,

@@ -20,7 +20,7 @@
 # the operating rules say is never worked around.
 set -uo pipefail
 echo "p0_docs_chain.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
-[ "$#" -eq 3 ] || { echo "usage: $0 <campaign_dir> <expect_head> <d1|h2h1|h2full>" >&2; exit 2; }
+[ "$#" -eq 3 ] || { echo "usage: $0 <campaign_dir> <expect_head> <d1|h2h1|h2b|h2full>" >&2; exit 2; }
 D="$1"; H="$2"; STAGE="$3"
 cd "$(dirname "$0")/../.." || exit 2
 . working/harness/results_prefix.sh || { echo "REFUSED: working/harness/results_prefix.sh absent" >&2; exit 2; }
@@ -123,6 +123,13 @@ case "$STAGE" in
     leg h7_nodbg_a "${C32[@]}" BSZ_NODEBUG=1 -- rr "$S384" 1
     leg h7_dbg_b   "${C32[@]}"               -- rr "$S384" 1
     leg h7_nodbg_b "${C32[@]}" BSZ_NODEBUG=1 -- rr "$S384" 1
+    ;;
+  h2b)
+    # Amendment 3: H2 re-run with the fixed tracer (no BEGIN/END) and the fixed stop signal
+    leg tool_gil2   "${C32[@]}" BSZ_PYSPY=1 -- rr "$S96" 1
+    leg h2b_null_c1 "${C1[@]}"  BSZ_PYSPY=1 -- rr "$S96" 1
+    leg h2b_c32_a   "${C32[@]}" BSZ_PYSPY=1 -- rr "$S384" 1
+    leg h2b_c32_b   "${C32[@]}" BSZ_PYSPY=1 -- rr "$S384" 1
     ;;
   h2full)
     [ -f "$D/h2_gate_fired.json" ] || { echo "REFUSED: the H2 full run needs $D/h2_gate_fired.json (the smoke gate's committed outcome)" >&2; exit 5; }

@@ -1,0 +1,14 @@
+{
+ "amendment": 3,
+ "amends": "which legs carry H2's pre-registered design (not the design)",
+ "written_utc": "2026-09-23T09:28:38Z",
+ "reason": "INSTRUMENT FAILURE, found in the tooling leg tool_gil (09:26Z) before any H2 figure was read: (1) Ubuntu 22.04's bpftrace 0.14.0 aborts on its own BEGIN/END probes ('Could not resolve symbol: /proc/self/exe:BEGIN_trigger' \u2014 the packaged binary is stripped), so no GIL trace was written; (2) SIGINT sent to py-spy's sudo parent reached py-spy only after the post-window read-back had run, so its GIL samples include the ~14 s env_probe instance scan (_d0) outside the window. The chain that was already running (h2h1) executed h2_null_c1, h2_c32_a and h2_c32_b with the same broken instrument; those three legs are VOID for H2 (their records are kept and landed; nothing from them is used).",
+ "fix": "the tracer has no BEGIN/END blocks \u2014 its window is its first to last traced acquisition (@tmin..@tmax); the stop signal goes to the py-spy / bpftrace process itself, found by its unique output path and its process name, never to sudo",
+ "legs_carrying_H2": {
+  "tooling": "tool_gil2 (96 slice, C=32) proves the fixed tracer writes before the others",
+  "null_control": "h2b_null_c1 (C=1, 96 slice)",
+  "smoke": "h2b_c32_a, h2b_c32_b (384 slice, C=32)"
+ },
+ "unchanged": "every category definition, the 15% gate, the < 2% null control, DIAGNOSTIC labelling, the instrument of amendment 1",
+ "order": "run as its own launch right after the h2h1 launch completes (H1 and H7 in that launch do not use the profiler and are unaffected)"
+}

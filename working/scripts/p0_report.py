@@ -209,8 +209,11 @@ def sec_h2(h2: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
            "Instrument per **preregistration_amendment_1.json**: bpftrace uprobes on the engine binary's "
            "own `take_gil` / `drop_gil` time waiting and holding per Python thread; py-spy's `--gil` "
            "recorder names the holders. The pre-registered py-spy `--native` recorder is **NOT RUN** "
-           "(it aborts on the engine binary with UNW_EBADREG, tooling leg 08:36Z). Shares are of "
-           "Python-thread time (n threads × tracer window).", ""]
+           "(it aborts on the engine binary with UNW_EBADREG, tooling leg 08:36Z). Per "
+           "**preregistration_amendment_3.json** the first three H2 legs (h2_null_c1, h2_c32_a/b) are VOID "
+           "— the tracer never wrote (bpftrace's stripped BEGIN_trigger) and py-spy stopped late — and the "
+           "design is carried by h2b_null_c1 and h2b_c32_a/b. Shares are of Python-thread time "
+           "(n threads × tracer window).", ""]
     if not h2:
         return out + ["NOT RUN.", ""]
     rows = []
@@ -232,7 +235,7 @@ def sec_h2(h2: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
                f"measured {share(gate.get('measured'))}; **{'FIRED' if gate.get('fired') else 'not fired'}**"
                + ("" if gate.get("evaluable") else " (NOT EVALUABLE: " + str(gate.get("note")) + ")") + ".")
     out.append("")
-    for name in ("h2_c32_a", "h2_c32_b", "h2_full_c32"):
+    for name in ("h2b_c32_a", "h2b_c32_b", "h2_full_c32"):
         x = (h2.get("legs") or {}).get(name) or {}
         ps = x.get("pyspy_gil") or {}
         if ps.get("status") != "OK":
