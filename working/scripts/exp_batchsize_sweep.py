@@ -116,6 +116,11 @@ STAMP = os.environ.get("BSZ_STAMP", "") not in ("", "0")
 #   * BSZ_PYSPY=1 adds the H2 profiler against the task process (DIAGNOSTIC legs only).
 P0 = os.environ.get("BSZ_P0", "") not in ("", "0")
 P0_PYSPY = os.environ.get("BSZ_PYSPY", "") not in ("", "0")
+# P0 H7 (amendment 2): launch the task WITHOUT the debugger. The engine attaches debugpy to every
+# task process unless the execute request carries noDebug (task_engine.py:296,1494-1507;
+# node.py:80-97); SDK 1.3.0's use() has no such parameter, so this adds exactly that one field to
+# the execute call use() itself builds and sends (execution.py: self.call('execute', **arguments)).
+P0_NODEBUG = os.environ.get("BSZ_NODEBUG", "") not in ("", "0")
 ENVPROBE_SCHEMA_MIN = 3 if P0 else 2         # driver_video.py:679, same contract; P0 needs d0
 ENVPROBE_REQUIRED = ("env_probe_schema", "env", "torch_num_threads", "python_version")
 DOCUMENT_OUTCOMES = ("no_documents", "empty_extraction", "parse_failed")
@@ -677,6 +682,19 @@ async def rr_open(threads: Optional[int]):
     kw: Dict[str, Any] = dict(filepath=str(pp.relative_to(ROOT)), ttl=RR_TTL_S)
     if threads is not None:                  # out of the box = NOT PASSED, never passed as None
         kw["threads"] = threads
+    if P0_NODEBUG:
+        orig_call = c.call
+
+        async def call_nodebug(method, **a):
+            if method == "execute":
+                a["noDebug"] = True
+            return await orig_call(method, **a)
+        c.call = call_nodebug
+        try:
+            tok = (await c.use(**kw))["token"]
+        finally:
+            c.call = orig_call
+        return c, tok
     tok = (await c.use(**kw))["token"]       # exactly ONE use(): one token, one task
     return c, tok
 
@@ -1026,6 +1044,7 @@ def run_leg(arm: str, leg: str, k: Optional[int], conc: Optional[int], measured:
                                       (None if facts.get("thread_env_expected") in (None, "unset")
                                        else (1 if facts.get("thread_env_expected") == "1" else None))),
                 "profile_label": ("PROFILE — stage stamps" if STAMP else None),
+                "nodebug_launch": P0_NODEBUG,
                 "diagnostic_label": ("DIAGNOSTIC — py-spy H2 profiler attached"
                                      if state.get("pyspy_rec") else None),
                 "pyspy": state.get("pyspy_rec")} if P0 else None),

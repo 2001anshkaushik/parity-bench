@@ -373,6 +373,24 @@ def main() -> int:
                          "floor is the larger of the two arms' (9.87%)")
         res["parity_anchor_same_session"] = pc
     res["h1"] = h1(legs)
+    # ---- H7 (amendment 2): attached debugger vs noDebug launch
+    if have("h7_dbg_a", "h7_nodbg_a", "h7_dbg_b", "h7_nodbg_b"):
+        h7 = pair_compare([legs["h7_dbg_a"], legs["h7_dbg_b"]],
+                          [legs["h7_nodbg_a"], legs["h7_nodbg_b"]], FLOOR["rr"])
+        cpu = {n: (legs[n]["cost"] or {}).get("cpu_s_per_doc") for n in
+               ("h7_dbg_a", "h7_dbg_b", "h7_nodbg_a", "h7_nodbg_b")}
+        cmd = {n: ((legs[n]["session"] or {}).get("task_cmdlines")) for n in
+               ("h7_dbg_a", "h7_dbg_b", "h7_nodbg_a", "h7_nodbg_b")}
+        trace = {n: ((((legs[n]["d0_in"] or {}).get("pre") or {}).get("d0") or {}).get("trace"))
+                 for n in ("h7_dbg_a", "h7_dbg_b", "h7_nodbg_a", "h7_nodbg_b")}
+        nc7 = [chunk_identity(legs["h7_dbg_a"], legs["h7_nodbg_a"], legs["h7_dbg_b"]),
+               chunk_identity(legs["h7_dbg_b"], legs["h7_nodbg_b"], legs["h7_dbg_a"])]
+        res["h7"] = {"nodebug_vs_debug": h7, "cpu_s_per_doc": cpu, "task_cmdlines": cmd,
+                     "trace_readback": trace, "null_control_chunk_identity": nc7,
+                     "null_control_pass": all(not x["differing_attributable_to_instrument"] for x in nc7),
+                     "verdict": ("SUPPORTED" if (h7["readable"] and h7["delta_b_vs_a"] > 0) else
+                                 "NOT SUPPORTED (unreadable)" if not h7["readable"] else
+                                 "REVERSED (noDebug slower beyond the threshold)")}
     out = a.campaign / a.out
     out.write_text(json.dumps(res, indent=1, default=str))
     print(f"wrote {out}")

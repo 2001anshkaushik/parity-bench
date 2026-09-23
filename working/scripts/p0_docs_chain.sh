@@ -118,6 +118,11 @@ case "$STAGE" in
     leg h1_c64_a "${C64[@]}" BSZ_STAMP=1 -- rr "$S384" 1
     leg h1_c32_b "${C32[@]}" BSZ_STAMP=1 -- rr "$S384" 1
     leg h1_c64_b "${C64[@]}" BSZ_STAMP=1 -- rr "$S384" 1
+    # H7 (amendment 2): the attached debugger — default launch vs noDebug, unstamped, ABAB
+    leg h7_dbg_a   "${C32[@]}"               -- rr "$S384" 1
+    leg h7_nodbg_a "${C32[@]}" BSZ_NODEBUG=1 -- rr "$S384" 1
+    leg h7_dbg_b   "${C32[@]}"               -- rr "$S384" 1
+    leg h7_nodbg_b "${C32[@]}" BSZ_NODEBUG=1 -- rr "$S384" 1
     ;;
   h2full)
     [ -f "$D/h2_gate_fired.json" ] || { echo "REFUSED: the H2 full run needs $D/h2_gate_fired.json (the smoke gate's committed outcome)" >&2; exit 5; }

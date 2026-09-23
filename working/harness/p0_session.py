@@ -220,6 +220,9 @@ class LegSession:
                                "every process in the service container, with thread counts"),
             },
         })
+        # the task's own command line (160 chars): shows --debug_port when the debugger is attached
+        self.rec["task_cmdlines"] = (sorted({p["cmd"] for s in good for p in s["procs"] if is_rr_task(p)})
+                                     if self.arm == "rr" else None)
         self.rec["same_session"] = self.rec["boot_id"] == self.rec["boot_id_close"]
         return self.rec
 

@@ -1,0 +1,15 @@
+{
+ "amendment": 2,
+ "adds": "H7_attached_debugger (a new hypothesis, registered before any of its legs)",
+ "written_utc": "2026-09-23T08:58:21Z",
+ "landed_before_any_h7_leg": true,
+ "discovery": "SOURCE and a PROCESS RECORD, not a measurement of any effect: the tooling leg's D0 process sample shows the measured task process launched as '.../engine .../ai/node.py /tmp/task-....json --autoterm --monitor=app --debug_port=20000 --debug_h[ost=localhost]'. task_engine.py:1494-1507 adds --debug_port/--debug_host to every task launch unless the execute request's arguments carry noDebug (task_engine.py:296 reads launch_args.get('noDebug')); node.py:80-97 then runs debugpy.listen(...) and debug_this_thread() inside the task process; every executor thread's stack starts in pydevd's _NewThreadStartupWithTrace (pydev_monkey.py:1123-1150), which sets tracing for each new thread when a debugger object exists. SDK 1.3.0's use() exposes no noDebug parameter (execution.py builds 'arguments' and sends self.call('execute', **arguments)).",
+ "hypothesis": "the debugger attached to the production task process slows the single process",
+ "legs": "384 slice, RocketRide one token, C=32, six vars = 1, unstamped: h7_dbg_a, h7_nodbg_a, h7_dbg_b, h7_nodbg_b (ABAB, same session, after H1). noDebug legs add exactly one field, noDebug: true, to the execute call use() builds (BSZ_NODEBUG=1); nothing else differs",
+ "metrics": "span docs/s from the raw records; CPU-s per document; engine cores",
+ "readability": "delta = mean(nodbg)/mean(dbg) - 1, readable only if |delta| > max(0.82%, spread(dbg), spread(nodbg))",
+ "mechanism_readback": "per leg: the task command line (D0 process sample: --debug_port present or absent) and env_probe d0.trace (sys.gettrace in an executor thread, threading trace hook, sys.monitoring tools, pydevd/debugpy loaded)",
+ "null_control": "per document, chunk_sha256 identical between debugger and noDebug legs (a debugger must not change output); a mismatch on a document whose two debugger legs agree is a correctness failure and stops the chain",
+ "verdict": "SUPPORTED if noDebug is faster beyond the readability threshold; NOT SUPPORTED if the difference is unreadable; the fix's scope is CONFIG where a launch flag reaches it (the engine's own noDebug), but SDK 1.3.0 cannot set it, so the user-reachable fix is an SDK or engine default change \u2014 reported as such",
+ "order_note": "runs after H1 in the same launch; it displaces nothing pre-registered"
+}
