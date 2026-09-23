@@ -84,7 +84,10 @@ from harness.rr_credentials import RR_TTL_S                     # noqa: E402
 from harness import p0_session                                  # noqa: E402
 
 EXPECTED_IMAGE = {
-    "rr": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",  # rr:patched
+    # P1: a changed engine ships as a NEW tag (rr:p1-tikafix, rr:p1-pdfium); the runner passes that
+    # tag's read-back id here. Unset keeps rr:patched's id, as every banked leg had.
+    "rr": os.environ.get("BSZ_RR_EXPECT_ID") or
+          "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",  # rr:patched
     "li": "sha256:3d2f1f436a4620698dfd975b048053cce87637611ae78c3e862fe16163e6e00f",  # ws1-llamaindex:x86_64
 }
 THREAD_VARS = ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
@@ -753,6 +756,7 @@ async def rr_send_continuous(c, tok, files: List[Path], conc: int, w: Optional[J
                 row.update(completion_ns=time.time_ns(), ok=bool(texts), n_chunks=len(texts),
                            chunk_sha256=[gs.chunk_hash(t) for t in texts],
                            reason="completed" if texts else "no_documents")
+                text_dump(p.name, texts)
             except Exception as e:
                 row.update(completion_ns=time.time_ns(), ok=False, n_chunks=0, chunk_sha256=[],
                            reason=f"error:{type(e).__name__}")
@@ -761,6 +765,23 @@ async def rr_send_continuous(c, tok, files: List[Path], conc: int, w: Optional[J
             w.write(row)
     await asyncio.gather(*(one(p) for p in files))
     return recs
+
+
+# P1 correctness (P1-B / P1-C full runs only): every document's chunk texts as returned, appended
+# client-side AFTER the document's completion stamp, to a gzipped JSONL. OFF unless P1_TEXT_DUMP.
+TEXT_DUMP = os.environ.get("P1_TEXT_DUMP") or None
+_TD: List[Any] = []
+
+
+def text_dump(doc: str, texts: List[str]) -> None:
+    if not TEXT_DUMP:
+        return
+    if not _TD:
+        import atexit
+        import gzip
+        _TD.append(gzip.open(TEXT_DUMP, "at", encoding="utf-8"))
+        atexit.register(_TD[0].close)
+    _TD[0].write(json.dumps({"doc": doc, "texts": texts}) + "\n")
 
 
 # ------------------------------------------------------------------ llamaindex

@@ -92,7 +92,12 @@ if [ "$TENV" != "unset" ]; then
 fi
 
 if [ "$ARM" = "rr" ]; then
-  CID=$(docker run -d --name rr --memory 58g "${CPUSET_ARGS[@]}" "${TARGS[@]}" -p 5565:5565 rr:patched) || exit 4
+  # P1: BSZ_RR_IMAGE names a NEW tag (rr:p1-tikafix, rr:p1-pdfium); unset = rr:patched. Its id is read
+  # back here and handed to the driver, which refuses a container running anything else.
+  RR_IMAGE="${BSZ_RR_IMAGE:-rr:patched}"
+  export BSZ_RR_EXPECT_ID="$(docker image inspect -f '{{.Id}}' "$RR_IMAGE")" || exit 4
+  echo "rr image $RR_IMAGE $BSZ_RR_EXPECT_ID"
+  CID=$(docker run -d --name rr --memory 58g "${CPUSET_ARGS[@]}" "${TARGS[@]}" -p 5565:5565 "$RR_IMAGE") || exit 4
   READY='curl -sf http://127.0.0.1:5565/version'
 elif [ "$ARM" = "li" ]; then
   if [ "${BSZ_LI_TIMED:-}" = "1" ]; then
@@ -161,8 +166,14 @@ ARGS=(--arm "$ARM" --slice "$SLICE" --run-dir "$RUN_DIR" --k "$KLIST" --corpus-d
 # arm's 0-23 cpuset; with the arm unconstrained across every vCPU, a pinned driver would both
 # contradict the ruling and hide its own cost in 8 cores it does not own. The driver's CPU is
 # now a reported number (cost.driver_cores), not a hidden one.
+MSPID=""
+if [ "${BSZ_MEMSTAT:-}" = "1" ]; then       # P1: the 1 Hz memory.stat sampler on the service container
+  "$PY" working/harness/memstat_sampler.py --container "$([ "$ARM" = rr ] && echo rr || echo li)" --out "$RUN_DIR/memstat.jsonl" --until "$RUN_DIR/.memstat_stop" > "$RUN_DIR/memstat_stdout.txt" 2>&1 &
+  MSPID=$!
+fi
 SMOKE_PORT=8801 "$PY" working/scripts/exp_batchsize_sweep.py "${ARGS[@]}"
 RC=$?
+[ -n "$MSPID" ] && { touch "$RUN_DIR/.memstat_stop"; wait "$MSPID"; }
 if [ "${BSZ_STAMP:-}" = "1" ] && [ "$ARM" = "rr" ]; then
   docker cp "$CID":/tmp/stamp_probe.jsonl "$RUN_DIR/stamp_probe.jsonl" && echo "stamps copied out: $(wc -l < "$RUN_DIR/stamp_probe.jsonl") records" || echo "!! no stamp file came out of the container"
 fi
