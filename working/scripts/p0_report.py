@@ -157,6 +157,10 @@ def sec_d1_scope_and_gil(h2: Optional[Dict[str, Any]]) -> List[str]:
         out.append("")
         out += table(["leg", "embed (Python stage)", "split (Python stage)", "engine glue", "response node",
                       "other"], rows)
+        rule = next((((h2 or {}).get("legs") or {}).get(k, {}).get("pyspy_gil") or {}).get("stage_rule")
+                    for k in ((h2 or {}).get("legs") or {}))
+        if rule:
+            out += [f"Attribution rule: {rule}.", ""]
     return out
 
 
@@ -214,7 +218,7 @@ def sec_parity(docs: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
                    n(p["b_mean"], 4), share(p["b_spread"], 2)]])
     out.append(f"RocketRide / LlamaIndex − 1 = **{pct(p['delta_b_vs_a'], 1)}**, threshold {share(p['threshold'], 2)} "
                f"(the larger arm floor) → {'readable' if p['readable'] else 'UNREADABLE'}; 96-document anchor slice, "
-               "C=8, six thread variables = 1 on both, same box session.")
+               "C=8, six thread variables = 1 on both (RocketRide read back in-process before and after each leg; LlamaIndex as its harness sets them, with no in-process read-back in these legs), same box session.")
     out.append("")
     F["parity_docs"] = p["delta_b_vs_a"]
     return out
@@ -298,7 +302,7 @@ def sec_h2(h2: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
         out.append("")
         out += table(["function (file)", "share of GIL-holding samples"],
                      [[t["function"], share(t["share"])] for t in ps["top10"]])
-        out.append("By stage (first node/library pattern in the stack): " + ", ".join(
+        out.append("By stage (attribution rule under D1): " + ", ".join(
             f"{k} {share(v['share'])}" for k, v in ps["by_stage"].items()) + ".")
         out.append("")
     F["h2_gate"] = gate

@@ -402,7 +402,7 @@ def main() -> int:
         pc = pair_compare([legs["an_li_u1"], legs["an_li_u2"]], [legs["an_rr_u1"], legs["an_rr_u2"]],
                           max(FLOOR["rr"], FLOOR["li"]))
         pc["reading"] = ("delta_b_vs_a = RocketRide one token / LlamaIndex one worker - 1, span "
-                         "docs/s, 96-document anchor slice, C=8, six thread vars = 1 on both; the "
+                         "docs/s, 96-document anchor slice, C=8, six thread vars = 1 on both (RocketRide read back in-process; LlamaIndex as its harness sets them, not read back); the "
                          "floor is the larger of the two arms' (9.87%)")
         res["parity_anchor_same_session"] = pc
     res["h1"] = h1(legs)

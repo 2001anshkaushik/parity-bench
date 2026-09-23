@@ -155,8 +155,8 @@ def pyspy_gil(d: Path, leg: str, rate: float, window_s: Optional[float]) -> Dict
             "occupancy_from_ticks": (total / (rate * window_s)) if window_s else None,
             "top10": [{"function": k, "samples": v, "share": v / total} for k, v in fn.most_common(10)],
             "by_stage": {k: {"samples": v, "share": v / total} for k, v in stage.most_common()},
-            "stage_rule": "a sample is attributed to the first node/library pattern found in its "
-                          "stack: " + ", ".join(f"{p}->{s}" for p, s in STAGE_OF)}
+            "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring "
+                          "anywhere in its ';'-joined stack (else 'other'): " + ", ".join(f"{p}->{s}" for p, s in STAGE_OF)}
 
 
 def main() -> int:
