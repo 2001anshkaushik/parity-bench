@@ -44,6 +44,9 @@ PYV
 leg() {
   local name="$1" img="$2" slice="$3" texts="${4:-}" variant="${5:-}" try dir rc
   [ "$texts" = "-" ] && texts=""
+  if [ -n "${P1_DEADLINE_EPOCH:-}" ] && [ "$(date +%s)" -ge "$P1_DEADLINE_EPOCH" ]; then
+    echo "!! $name NOT RUN: the P1 11-hour budget (preregistration.json session.budget) has passed"; R+=("${name}:NOT_RUN_budget"); LAST=""; return 1
+  fi
   for try in "" _r1 _r2; do
     dir="$D/${name}${try}"
     echo "===== LEG ${name}${try} ($img, $(basename "$slice")${texts:+, texts}${variant:+, $variant}) $(date -u +%H:%M:%SZ) ====="

@@ -41,6 +41,9 @@ refuse_existing() { for c in "$@"; do docker inspect "$c" >/dev/null 2>&1 && { e
 # leg <name> <arm rr|li> <T> <n> <stamped 0|1> <traced 0|1>
 leg() {
   local name="$1" arm="$2" T="$3" n="$4" stamped="$5" traced="$6" try L rc C TPID
+  if [ -n "${P1_DEADLINE_EPOCH:-}" ] && [ "$(date +%s)" -ge "$P1_DEADLINE_EPOCH" ]; then
+    echo "!! $name NOT RUN: the P1 11-hour budget (preregistration.json session.budget) has passed"; R+=("${name}:NOT_RUN_budget"); LAST=""; return 1
+  fi
   for try in "" _r1 _r2; do
     L="$D/${name}${try}"
     [ -e "$L" ] && { echo "REFUSED: $L exists (append-only)"; continue; }
