@@ -136,12 +136,23 @@ def identity(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
             "identical": not chunk_diff and not score_diff}
 
 
-def v2_components(d: Path, arm: str) -> Dict[str, Any]:
+def v2_components(d: Path, arm: str, measured_frames: Optional[int] = None) -> Dict[str, Any]:
+    """The stamp file also holds the warm-up videos' frames, which run strictly BEFORE the leg (the
+    driver's warm-up completes before the first measured video is admitted). The measured frames are
+    therefore the last `measured_frames` frame stamps by wall time (and, for LlamaIndex, the videos
+    whose lock was released after the first measured frame began)."""
     st = rows(d / "p0_v2_stamps.jsonl")
     if not st:
         return {"status": "NO STAMPS"}
+    frames_all = [r for r in st if r.get("kind", "frame") == "frame"]
+    frames_all.sort(key=lambda r: r["t_wall"])
+    excluded = 0
+    if measured_frames is not None and len(frames_all) > measured_frames:
+        excluded = len(frames_all) - measured_frames
+        frames_all = frames_all[excluded:]
+    t_first = frames_all[0]["t_wall"] if frames_all else None
     if arm == "rr":
-        fr = st
+        fr = frames_all
         comps = ("decode", "lock_wait", "resize", "preprocess", "predict_pre", "forward",
                  "predict_post", "dict_build", "loader_post", "rescale", "inside_other",
                  "lock_held", "emit")
@@ -151,20 +162,20 @@ def v2_components(d: Path, arm: str) -> Dict[str, Any]:
         t0 = min(r["t_wall"] for r in fr)
         t1 = max(r["t_wall"] + tot for r, tot in zip(fr, per_frame_total))
         held = sum(r.get("lock_held") or 0 for r in fr)
-        out = {"frames": len(fr), "run_total_s": run_total, "window_s": t1 - t0,
+        out = {"frames": len(fr), "warmup_frames_excluded": excluded, "run_total_s": run_total, "window_s": t1 - t0,
                "duty_cycle": held / (t1 - t0) if t1 > t0 else None,
                "components": {c: metric_set([r.get(c) for r in fr], run_total) for c in comps},
                "forward_hooks_fired": sum(1 for r in fr if r.get("forward") is not None),
                "inside_lock_not_forward_s": sum((r.get("lock_held") or 0) - (r.get("forward") or 0) for r in fr)}
         return out
-    fr = [r for r in st if r.get("kind") == "frame"]
-    vids = [r for r in st if r.get("kind") == "video"]
+    fr = frames_all
+    vids = [r for r in st if r.get("kind") == "video" and t_first is not None and r["t_wall_release"] >= t_first]
     comps = ("load_decode", "predict_pre", "forward", "predict_post", "dict_build", "format", "lock_held")
     run_total = sum(r.get("lock_held") or 0 for r in fr) + sum(r.get("lock_wait") or 0 for r in vids)
     t0 = min(r["t_wall"] for r in fr) if fr else None
     t1 = max(r["t_wall_release"] for r in vids) if vids else None
     held = sum(r.get("lock_held") or 0 for r in vids)
-    return {"frames": len(fr), "videos": len(vids), "run_total_s_in_detect": run_total,
+    return {"frames": len(fr), "warmup_frames_excluded": excluded, "videos": len(vids), "run_total_s_in_detect": run_total,
             "window_s": (t1 - t0) if (t0 and t1) else None,
             "duty_cycle": (held / (t1 - t0)) if (t0 and t1 and t1 > t0) else None,
             "components": {c: metric_set([r.get(c) for r in fr], run_total) for c in comps},
@@ -215,8 +226,8 @@ def main() -> int:
                                    "throughput_within": abs(d) <= thr, "output_identity": ids,
                                    "unstamped_determinism": det,
                                    "pass": abs(d) <= thr and all(x["identical"] for x in ids)}
-        res["rr_components"] = {g["dir"]: v2_components(camp / g["dir"], "rr") for g in rs}
-        res["li_components"] = {g["dir"]: v2_components(camp / g["dir"], "li") for g in ls}
+        res["rr_components"] = {g["dir"]: v2_components(camp / g["dir"], "rr", g["frames"]) for g in rs}
+        res["li_components"] = {g["dir"]: v2_components(camp / g["dir"], "li", g["frames"]) for g in ls}
     out = camp / f"analysis_{stage}.json"
     out.write_text(json.dumps(res, indent=1, default=str))
     print(f"wrote {out}")
