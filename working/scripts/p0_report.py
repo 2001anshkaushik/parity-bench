@@ -611,9 +611,9 @@ def resolve_share(spec: str, A: Dict[str, Any]) -> Optional[float]:
         else:
             v2 = A.get("v2") or {}
             st = ((v2.get("rr_components") or {}).get(leg) or (v2.get("li_components") or {}).get(leg) or {}).get("components") or {}
-        x = (st.get(comp) or {}).get("share_of_run_total")
-        if x is not None:
-            vals.append(x)
+        parts = [(st.get(c) or {}).get("share_of_run_total") for c in comp.split("|")]
+        if parts and all(x is not None for x in parts):
+            vals.append(sum(parts))              # 'a|b|c' sums several components of one leg
     return sum(vals) / len(vals) if vals else None
 
 

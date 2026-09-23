@@ -1722,3 +1722,60 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   raw records, with a planted error it must catch, verifies the figure.
 > - **One definition per figure**, applied everywhere it appears.
 > - **Round at display, never before arithmetic.**
+
+## 49. The read-back that became part of the measurement (added 2026-09-23)
+
+> P0's mandate forbids a second token even as a diagnostic, so the env/instance read-back moved
+> onto the MEASURED token: env_probe was appended to every measured pipeline, fed only by the
+> webhook's text lane, which PDFs never use. Its schema 3 added a garbage-collector scan to count
+> loaded model instances. But a RocketRide node's closing() runs for EVERY pipe instance, whether
+> or not the node received data, so every PDF triggered the scan, holding the GIL for roughly
+> 0.1 s inside the measured window. The first tooling leg's GIL profile showed the scan as its top
+> holder, and it was misattributed to the post-window probe. It was found only when a second
+> tooling leg with the stop timing fixed still showed it. By then the D1, anchor, H1, H2 and H7 legs
+> had run. RocketRide docs throughput was 20% low at C=32 and 9% low at C=8; LlamaIndex, which never
+> carried the probe, did not move. Every design was re-run with the probe answering only its probe
+> (amendment 4). The first generation is kept and shown beside the second, never merged.
+>
+> Rules:
+>
+> - **A node on a measured pipeline runs for every document.** Anything it does in open(),
+>   closing() or close() is paid per document, whether or not its lane ever carries data. A probe
+>   must return at once unless it received its probe input.
+> - **A profile's top frame is a claim about the window.** Before attributing it to something
+>   outside the window, prove the recorder stopped before that thing ran.
+
+## 50. The kill command that killed itself, and the sudo that ate the session (added 2026-09-23)
+
+> Stopping a running chain with `pkill -f "<pattern>"` inside a `box.sh launch` also matched the
+> launch's own shell, whose command line contains the pattern. The shell died partway through,
+> leaving the leg's runner, driver, profilers and container orphaned. Separately, `sudo` inside a
+> one-shot `box.sh run` consumed the piped `echo __RC` and `exit` lines as its own terminal input,
+> and the SSM session hung; four sessions leaked before the cause was seen. And a signal sent to
+> sudo reached the root tool only after the next step had begun.
+>
+> Rules:
+>
+> - **Kill by pid, never by a pattern the killer's own command line contains.**
+> - **sudo goes through `launch` only** (stdin is not the session's terminal there).
+> - **Signal the tool process itself** (found by its unique output path AND its process name),
+>   never its sudo parent.
+
+## 51. The hold that was not the parser (added 2026-09-23)
+
+> For two campaigns, the eleven 300-1,839 s parse holds were read as Tika's own cost: they
+> reproduced within 4.86%, and pypdf handled the same files in at most 31 s. P0's isolated Tika
+> used the engine's own jars, JRE and tika-config.xml, with no pipeline and a default ParseContext.
+> It parsed all eleven in 0.5-2.5 s. The engine's own CLI parse path (`engine --tika`) reproduced
+> the holds: 039_039660.pdf took 1,715 s against a 1,773 s in-pipeline bracket. A box-wide exec
+> census over those eleven parses counted 2,249,820 jspawnhelper and 1,124,910 /usr/bin/env
+> executions. The engine's JNI wrapper enables PDF inline-image extraction and sends every
+> embedded image through native code. Its config builder probes external media tools by spawning
+> them, and the wrapper's bytecode calls that builder once per embedded image (source).
+>
+> Rules:
+>
+> - **"It reproduces" is not "it is the component's cost".** Time the component alone, with the
+>   same inputs and config, before attributing a hold to it.
+> - **A wrapper's options are part of the parser.** Read what the integration enables (here
+>   inline-image extraction and per-image external-tool probes), not only the library's config file.
