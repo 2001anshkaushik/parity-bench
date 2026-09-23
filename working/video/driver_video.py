@@ -639,12 +639,29 @@ class LIArm:
 # Read-backs (preflight; fail-closed, absence first)
 # ---------------------------------------------------------------------------
 
+# P0 (2026-09-23, the single-instance mandate: no second token, not even as a
+# diagnostic). OFF unless P0_ONTOKEN=1. The banked preflight read the task env
+# on a SEPARATE envprobe token (rr_readback) — a second token. Under P0 the
+# measured pipe carries env_probe on the webhook's text lane (the video enters
+# on the video lane, so the probe fires only for the text/plain probe) and the
+# read-back is sent on the MEASURED token after the census, before any work,
+# and again after the leg. Same assertions, same thread-pin gate, same place in
+# the export; plus env_probe schema 3's instance accounting (D0).
+P0_ONTOKEN = os.environ.get('P0_ONTOKEN', '') not in ('', '0')
+
+
 def generate_task_pipe(tag: str) -> tuple[Path, str]:
     """Measured pipe + a FRESH project_id, nothing else changed (Phase 1's
     pattern — minimal/rr/client.py, smoke_phase2.py; the why lives on
     probe_rr.fresh_project_pipe). The measured identity stays PIPE_PATH's
     sha256; the per-token project_id is recorded in provenance."""
     cfg = fresh_project_pipe(PIPE_PATH, f'video-{tag}')
+    if P0_ONTOKEN:
+        cfg['components'].append({'id': 'envprobe_1', 'provider': 'env_probe', 'config': {},
+                                  'input': [{'lane': 'text', 'from': 'webhook_1'}]})
+        cfg['components'].append({'id': 'resp_env', 'provider': 'response_text',
+                                  'config': {'laneName': 'envprobe'},
+                                  'input': [{'lane': 'text', 'from': 'envprobe_1'}]})
     GENERATED_DIR.mkdir(parents=True, exist_ok=True)
     out = GENERATED_DIR / f'video_task_{tag}_{os.getpid()}.pipe'
     out.write_text(json.dumps(cfg, indent=1))
@@ -704,6 +721,32 @@ def assert_envprobe_complete(info: dict, source: str) -> None:
             "docker run --rm rr:patched-video sh -c 'md5sum "
             "/opt/rocketride/engine/nodes/env_probe/IInstance.py' vs md5sum on the repo file. "
             'A missing field read as a value is one config change from reading as success.')
+
+
+async def p0_probe_on_token(arm) -> dict:
+    """P0: env_probe (schema >= 3) on the MEASURED token — the only token."""
+    result = await arm.client.send(arm.tokens[0], 'readback probe', mimetype='text/plain')
+    texts = (result or {}).get('envprobe') or []
+    info = json.loads(texts[0]) if texts else {}
+    info['_readback_token'] = 'measured token (P0)'
+    return info
+
+
+def p0_mandate(info_pre: dict, info_post: Optional[dict], new_task_pids: list) -> dict:
+    """ONE task process, ONE loaded instance per model (distinct weights), same process."""
+    v = []
+    if len(new_task_pids) != 1:
+        v.append(f'{len(new_task_pids)} task processes for the leg (mandate: exactly 1)')
+    for tag, info in (('pre', info_pre), ('post', info_post)):
+        if not info:
+            continue
+        roots = ((info.get('d0') or {}).get('root_modules_with_params') or {})
+        for cls, r in roots.items():
+            if r.get('distinct_weights', 0) > 1:
+                v.append(f"{tag}: {r['distinct_weights']} distinct {cls} instances loaded")
+    if info_pre and info_post and info_pre.get('pid') != info_post.get('pid'):
+        v.append('the task process was replaced across the leg')
+    return {'mandate_violation': bool(v), 'violations': v}
 
 
 async def rr_readback(port: int) -> dict:
@@ -1409,7 +1452,14 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
         identity['sdk'] = sdk_identity.readback(strict=True)
         say(f"preflight: SDK rocketride {identity['sdk']['package_version']} at "
             f"{identity['sdk']['module_path']} — entry points verified, null control fired")
-        info = await rr_readback(args.rr_port)
+        if P0_ONTOKEN:
+            # deferred: read on the MEASURED token right after the census (amain)
+            identity['rr'] = {'deferred': 'P0: env_probe read on the measured token'}
+            readbacks['rr_task'] = {'deferred': True}
+            info = None
+        else:
+            info = await rr_readback(args.rr_port)
+    if rr_arm_active and info is not None:
         # Absence fails before agreement: a missing field is a stale-node
         # verdict, distinct from a field the node set to a negative value.
         assert_envprobe_complete(info, 'RR task')
@@ -1435,7 +1485,7 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
         if md5 != RFDETR_BASE_MD5:
             raise SystemExit(f'NOT DONE — RR rf-detr-base.pth md5 {md5!r} != registry '
                              f'{RFDETR_BASE_MD5} (rfdetr 1.5.2 lineage): wrong or absent weights.')
-    else:
+    elif not rr_arm_active:
         identity['sdk'] = {'skipped': 'LI leg — the rocketride SDK is not on this path'}
         per_worker = await li_readbacks(arm)
         if len(per_worker) < (arm.declared_workers or 1):
@@ -1493,16 +1543,19 @@ async def preflight(args, arm, rr_arm_active: bool) -> dict:
     gs.thread_pins_self_test()
     arm_label = 'rr' if rr_arm_active else 'li'
     expected = {'rr': args.rr_threads_env} if rr_arm_active else None
-    pins = gs.thread_pins_by_arm({arm_label: readbacks},
-                                 {arm_label: containers_declared_threads(args._svc_containers)},
-                                 expected_by_arm=expected)
-    if pins['PASS'] is not True:
-        raise SystemExit(f'NOT DONE — thread pins (declared vs measured vs expected '
-                         f'{expected}, per arm): {json.dumps(pins)}')
-    if rr_arm_active:
-        say(f"preflight: RR thread env expected {args.rr_threads_env!r} — declared "
-            f"{pins['arms']['rr'].get('declared')}, in-process torch "
-            f"{pins['cross_arm_values'].get('rr')} (read back, fail-closed)")
+    if rr_arm_active and P0_ONTOKEN:
+        pins = {'deferred': 'P0: checked on the measured token after the census', 'PASS': None}
+    else:
+        pins = gs.thread_pins_by_arm({arm_label: readbacks},
+                                     {arm_label: containers_declared_threads(args._svc_containers)},
+                                     expected_by_arm=expected)
+        if pins['PASS'] is not True:
+            raise SystemExit(f'NOT DONE — thread pins (declared vs measured vs expected '
+                             f'{expected}, per arm): {json.dumps(pins)}')
+        if rr_arm_active:
+            say(f"preflight: RR thread env expected {args.rr_threads_env!r} — declared "
+                f"{pins['arms']['rr'].get('declared')}, in-process torch "
+                f"{pins['cross_arm_values'].get('rr')} (read back, fail-closed)")
 
     return pf_extra | {'manifest_meta': meta, 'rows': rows, 'readbacks': readbacks,
             'identity': identity, 'thread_pin_parity': pins,
@@ -2239,6 +2292,49 @@ async def amain() -> int:
             'project_ids': arm.project_ids}
         say(f'census: {posture.tokens} token(s) -> {len(new_procs)} new task '
             f'process(es) {[p["pid"] for p in new_procs]} (declared==measured)')
+        if P0_ONTOKEN:
+            # the preflight's deferred read-back, now on the measured token: the same
+            # assertions and the same thread-pin gate, before any work is sent
+            try:
+                info = await p0_probe_on_token(arm)
+                assert_envprobe_complete(info, 'RR task (measured token)')
+                if 'd0' not in info:
+                    raise SystemExit('NOT DONE — env_probe answered without d0 (schema < 3)')
+                if info['rfdetr_import_ok'] is not True:
+                    raise SystemExit(f'NOT DONE — rfdetr_import_ok={info["rfdetr_import_ok"]!r} '
+                                     f'({info.get("rfdetr_import_error")!r})')
+                md5 = rfdetr_checkpoint_md5(args._svc_containers[0], RFDETR_PATHS['rr'])
+                if md5 != RFDETR_BASE_MD5:
+                    raise SystemExit(f'NOT DONE — RR rf-detr-base.pth md5 {md5!r} != {RFDETR_BASE_MD5}')
+                pf['readbacks'] = {'rr_task': {'env': info.get('env') or {},
+                                               'torch_num_threads': info.get('torch_num_threads')}}
+                pf['identity']['env_probe_schema'] = info.get('env_probe_schema')
+                pf['identity']['rr'] = {'rfdetr_import_ok': info.get('rfdetr_import_ok'),
+                                        'python_version': info.get('python_version'),
+                                        'python_executable': info.get('python_executable'),
+                                        'versions': info.get('package_versions') or {},
+                                        'rfdetr_checkpoint_md5': md5,
+                                        'rfdetr_checkpoint_md5_ok': True,
+                                        'readback_token': 'measured (P0)'}
+                pins = gs.thread_pins_by_arm({'rr': pf['readbacks']},
+                                             {'rr': containers_declared_threads(args._svc_containers)},
+                                             expected_by_arm={'rr': args.rr_threads_env})
+                if pins['PASS'] is not True:
+                    raise SystemExit(f'NOT DONE — thread pins on the measured token: {json.dumps(pins)}')
+                pf['thread_pin_parity'] = pins
+                pf['p0'] = {'d0_pre': info.get('d0'), 'probe_pid': info.get('pid'),
+                            'torch_num_threads': info.get('torch_num_threads'),
+                            'env': info.get('env')}
+                pf['p0']['mandate'] = p0_mandate(info, None, [p['pid'] for p in new_procs])
+                say(f"P0 on-token read-back: torch {info.get('torch_num_threads')}, models "
+                    f"{(info.get('d0') or {}).get('root_modules_with_params')}, mandate "
+                    f"{pf['p0']['mandate']}")
+                if pf['p0']['mandate']['mandate_violation']:
+                    (out_dir / 'MANDATE_VIOLATION.json').write_text(json.dumps(pf['p0'], indent=1))
+                    raise SystemExit(f"NOT DONE — MANDATE VIOLATION: {pf['p0']['mandate']}")
+            except BaseException:
+                await arm.stop()
+                raise
 
     # TICKET 4 BURDEN (2026-08-21): the engine idles at ~1.0 core + ~0.26 cores
     # per live token (PARTIAL; probe_concurrency T=8 sweep, M=1..16). The
@@ -2403,6 +2499,18 @@ async def amain() -> int:
         # under Crossroad 43 they are ttl=0, so nothing reaps what this misses.
         if collector:
             collector_summary = collector.stop()   # its own summary, kept in the export
+        if P0_ONTOKEN and args.arm == 'rocketride' and pf.get('p0') is not None:
+            try:          # after the bracket closed: the same process, the same models?
+                post = await p0_probe_on_token(arm)
+                pf['p0']['d0_post'] = post.get('d0')
+                pf['p0']['post_pid'] = post.get('pid')
+                pf['p0']['mandate'] = p0_mandate({'pid': pf['p0'].get('probe_pid'),
+                                                  'd0': pf['p0'].get('d0_pre')}, post,
+                                                 pf.get('task_census', {}).get('new_task_pids') or [])
+                if pf['p0']['mandate']['mandate_violation']:
+                    (out_dir / 'MANDATE_VIOLATION.json').write_text(json.dumps(pf['p0'], indent=1))
+            except Exception as exc:   # a post read-back must never cost a leg its export
+                pf['p0']['d0_post'] = f'unavailable: {exc!r}'
         await arm.stop()
     fs_stream = await fs_sampler.stop() if fs_sampler else None
     mem_traj = lifetime_state.service_memory_trajectory(out_dir / f'collector_{stem}.jsonl')
@@ -2578,6 +2686,7 @@ async def amain() -> int:
             'identity_readback': pf['identity'],
             'thread_pins_by_arm': pf['thread_pin_parity'],
             'task_census': pf.get('task_census'),
+            'p0': pf.get('p0'),
             'network_mode': pf.get('network_mode'),
             'image': image_provenance(svc_container, args.image_lineage),
             'container_lifetime': (json.loads(args.container_lifetime)
