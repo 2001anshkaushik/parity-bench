@@ -53,8 +53,9 @@ def version(parser: str) -> str:
     if parser == "pypdf":
         import pypdf
         return pypdf.__version__
+    from importlib.metadata import version as _v       # pypdfium2 5.x dropped V_PYPDFIUM2
     import pypdfium2
-    return f"{pypdfium2.V_PYPDFIUM2} (pdfium {pypdfium2.V_LIBPDFIUM})"
+    return f"{_v('pypdfium2')} (pdfium {getattr(pypdfium2, 'PDFIUM_INFO', '?')})"
 
 
 def main() -> int:

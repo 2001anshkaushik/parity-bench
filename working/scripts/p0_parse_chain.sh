@@ -55,7 +55,7 @@ for f in sorted(d.glob("*.xml")):
     print(f"config {f.name} sha256 {hashlib.sha256(f.read_bytes()).hexdigest()}")
 PYCFG
   "$HOME/p0venv/bin/pip" install -q "pypdf==6.15.0" 2>&1 | grep -v "notice" || true
-  "$HOME/p0venv/bin/python" -c 'import pypdf, pypdfium2; print("p0venv pypdf", pypdf.__version__, "pypdfium2", pypdfium2.V_PYPDFIUM2, "pdfium", pypdfium2.V_LIBPDFIUM)'
+  "$HOME/p0venv/bin/python" -c 'import sys, pypdf, pypdfium2; from importlib.metadata import version as v; print("p0venv python", sys.version.split()[0], "pypdf", pypdf.__version__, "pypdfium2", v("pypdfium2"), "pdfium", getattr(pypdfium2, "PDFIUM_INFO", "?"))'
 }
 
 upload() {  # $1 = sub dir of $D
