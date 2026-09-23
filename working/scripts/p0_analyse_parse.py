@@ -166,6 +166,20 @@ def h6(camp: Path, stage: str) -> Dict[str, Any]:
         "fired": bool(full_pass) if stage == "h6smoke" else None,
         "hybrid_branch": (bool(speed_pass) and not full_pass) if stage == "h6smoke" else None,
         "candidates": full_pass if stage != "h6smoke" else None}
+    if stage != "h6smoke" and big.get(ref):
+        # the pre-registered consequence when no candidate clears the rule: the hybrid shape the data
+        # supports — candidate first, tika_shipped on the candidate's empty (raise, timeout, no text)
+        hy = {}
+        for p in cands:
+            cr = big.get(p) or {}
+            docs = sorted(set(cr) & set(big[ref]))
+            fb = [k for k in docs if empty(cr[k])]
+            hy[p] = {"docs": len(docs), "fallbacks": len(fb),
+                     "covered": sum(1 for k in docs if not empty(cr[k]) or not empty(big[ref][k])),
+                     "tika_covered": sum(1 for k in docs if not empty(big[ref][k])),
+                     "cost_s": sum(t_of(cr[k]) or 0 for k in docs) + sum(t_of(big[ref][k]) or 0 for k in fb),
+                     "tika_cost_s": sum(t_of(big[ref][k]) or 0 for k in docs)}
+        out["hybrid_candidate_first_tika_on_empty"] = hy
     fid = d / ("fidelity_384.jsonl" if stage == "h6smoke" else "fidelity_9975.jsonl")
     if fid.exists():
         fr = rows(fid) + (rows(camp / "h6best" / "fidelity_384_best.jsonl") if stage == "h6smoke" else [])

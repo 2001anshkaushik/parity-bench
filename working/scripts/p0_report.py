@@ -380,7 +380,7 @@ def sec_h6(h6s: Optional[Dict[str, Any]], h6f: Optional[Dict[str, Any]], F: Dict
         rows = []
         for p, x in a["parsers"].items():
             t, c = x["tail_11"], x["corpus"]
-            rows.append([p, n(t["p50_s"], 3), n(t["speed_ratio_vs_tika_shipped"], 1), n(len(t["timeouts"])),
+            rows.append([p, n(t["p50_s"], 3), n(t["speed_ratio_vs_tika_shipped"], 2), n(len(t["timeouts"])),
                          n(c["n"]), n(c["empty"]), n(c["n_loses"]), n(c["n_gains"]),
                          n(len(c["timeouts"])), n(len(c["errors"]))])
         out += table(["parser", "p50 parse s on the 11", "speed vs Tika-as-shipped", "timeouts on the 11",
@@ -394,8 +394,48 @@ def sec_h6(h6s: Optional[Dict[str, Any]], h6f: Optional[Dict[str, Any]], F: Dict
         out.append(f"**{'Gate H6' if 'gate' in a else 'Verdict'}:** {g.get('rule')}; speed pass {g.get('speed_pass')}; "
                    f"speed and coverage pass {g.get('speed_and_coverage_pass')}"
                    + (f"; **{'FIRED' if g.get('fired') else 'not fired'}**; hybrid branch {n(g.get('hybrid_branch'))}"
-                      if 'gate' in a else "") + ".")
+                      if 'gate' in a else
+                      f" → **{'CANDIDATE: ' + ', '.join(g.get('candidates')) if g.get('candidates') else 'NO CANDIDATE'}**"
+                      + ("" if g.get("candidates") else " (pre-registered consequence: the hybrid shape the data "
+                         "supports is a P1 recommendation, not built in P0)")) + ".")
         out.append("")
+        if "gate" not in a:
+            # the pre-registered full report: (a) the D1 metric set per parser, corpus-wide and on the 11; (d) failures named
+            for scope, key in (("the whole corpus", "corpus"), ("the 11", "tail_11")):
+                out.append(f"Parse seconds per document, {scope} (D1 metric set; nearest-rank quantiles):")
+                out.append("")
+                mrows = []
+                for p, x in a["parsers"].items():
+                    m = x[key].get("metric_set_s") or {}
+                    mrows.append([p, n(m.get("count")), n(m.get("sum"), 1), n(m.get("min")), n(m.get("mean")),
+                                  n(m.get("sd")), n(m.get("p50")), n(m.get("p90")), n(m.get("p95")),
+                                  n(m.get("p99")), n(m.get("max")), n(m.get("mean_over_p50"), 2)])
+                out += table(["parser", "count", "sum s", "min s", "mean s", "sd s", "p50 s", "p90 s", "p95 s",
+                              "p99 s", "max s", "mean/p50"], mrows)
+            for p, x in a["parsers"].items():
+                errs = x["corpus"].get("errors") or {}
+                if errs:
+                    out.append(f"- {p} exceptions ({len(errs)}): " + "; ".join(
+                        f"{d}: {str(e)[:90]}" for d, e in sorted(errs.items())[:20]))
+            out.append("")
+            hy = a.get("hybrid_candidate_first_tika_on_empty") or {}
+            if hy:
+                out.append("The hybrid shape (candidate first, Tika-as-shipped on the candidate's empty), computed from "
+                           "the same full-run records (isolated parse seconds, 12 workers):")
+                out.append("")
+                out += table(["candidate", "documents", "fallbacks to Tika", "documents with text (hybrid)",
+                              "documents with text (Tika alone)", "parse s (hybrid)", "parse s (Tika alone)"],
+                             [[c, n(x["docs"]), n(x["fallbacks"]), n(x["covered"]), n(x["tika_covered"]),
+                               n(x["cost_s"], 1), n(x["tika_cost_s"], 1)] for c, x in hy.items()])
+            ts, tf = ((h6s or {}).get("parsers") or {}).get("tika_shipped"), (a["parsers"].get("tika_shipped") or {})
+            if ts and tf:
+                out.append(f"**Disclosure:** Tika-as-shipped's p50 on the 11 was {n(ts['tail_11']['p50_s'])} s in the smoke and "
+                           f"{n(tf['tail_11']['p50_s'])} s in the full run; the other parsers' p50s on the 11 moved little "
+                           "(tables above). The smoke parsed each of the 11 on its own JVM after one warm-up document; the "
+                           "full run parsed them on JVMs that had already parsed hundreds of documents. JIT warm-up is the "
+                           "likely reason; it was not measured separately. The smoke gate fired on the cold figure; the "
+                           "pre-registered full run decides the verdict.")
+                out.append("")
         fd = a.get("fidelity_vs_tika_shipped") or {}
         if fd:
             out += table(["candidate", "char ratio p5 / p50 / p95", "Dice p5 / p50 / p95", "min Dice", "missing"],
