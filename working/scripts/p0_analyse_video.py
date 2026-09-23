@@ -28,6 +28,23 @@ from typing import Any, Dict, List, Optional
 FLOOR = 0.0082
 
 
+def container_procs(e: Dict[str, Any]) -> Dict[str, Any]:
+    """D0 for either arm from the export's own measurements: processes in each service container
+    at leg start and leg end (lifetime_state, from /proc inside the container) with the largest
+    process's command line, and the collector's peak process count for the service role over the
+    leg (transient children included)."""
+    ls = e.get("lifetime_state") or {}
+    out: Dict[str, Any] = {}
+    for when in ("leg_start", "leg_end"):
+        for c, x in ((ls.get(when) or {}).get("containers") or {}).items():
+            pr = (x or {}).get("procs") or {}
+            top = (pr.get("top_by_rss") or [{}])[0]
+            out.setdefault(c, {})[when] = {"n": pr.get("n"), "state": pr.get("state"), "top_cmd": top.get("cmd")}
+    svc = (((e.get("collector_summary") or {}).get("roles") or {}).get("service") or {})
+    return {"containers": out, "service_peak_process_count": svc.get("peak_process_count"),
+            "service_distinct_pids_seen": svc.get("distinct_pids_seen")}
+
+
 def rows(p: Path) -> List[Dict[str, Any]]:
     return [json.loads(x) for x in p.read_text().splitlines() if x.strip()] if p.exists() else []
 
@@ -88,6 +105,7 @@ def load(d: Path) -> Optional[Dict[str, Any]]:
             "p0": e.get("p0") or (e.get("provenance_video") or {}).get("p0"),
             "task_census": e.get("task_census") or (e.get("provenance_video") or {}).get("task_census"),
             "session": session_facts(d),
+            "container_procs": container_procs(e),
             "thread_pins": (e.get("thread_pins_by_arm") or {}).get("cross_arm_values"),
             "by_video": {r["video"]: {"chunk_sha256": r.get("chunk_sha256"),
                                       "frame_scores": r.get("frame_scores"),

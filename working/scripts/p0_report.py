@@ -16,6 +16,7 @@ import argparse
 import time
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -100,8 +101,16 @@ def sec_d0(docs: Optional[Dict[str, Any]], v1: Optional[Dict[str, Any]], v2: Opt
             models = ((p0.get("d0_pre") or {}).get("root_modules_with_params")) or {}
             mtxt = "; ".join(f"{k.rsplit('.', 1)[-1]} ×{v.get('distinct_weights')}" for k, v in models.items()) or "—"
             mv = (p0.get("mandate") or {})
+            cp = leg.get("container_procs") or {}
+            def wk(x: Dict[str, Any]) -> str:
+                m = re.search(r"--workers (\d+)", ((x.get("leg_start") or {}).get("top_cmd") or ""))
+                return f", uvicorn --workers {m.group(1)}" if m else ""
+            li_n = "; ".join(f"{c}: {(x.get('leg_start') or {}).get('n')} at start, {(x.get('leg_end') or {}).get('n')} at end{wk(x)}"
+                             for c, x in (cp.get("containers") or {}).items())
+            li_txt = (f"{li_n} (peak {cp.get('service_peak_process_count')} with transient children)" if li_n
+                      else "not measured")
             rows.append([name, "rr" if "_rr_" in name else "li",
-                         n(len(census.get("new_task_pids") or [])) if census else "1 instance (li)",
+                         n(len(census.get("new_task_pids") or [])) if census else li_txt,
                          mtxt, n(((p0.get("d0_pre") or {}).get("proc_threads"))), n(p0.get("torch_num_threads")),
                          "VIOLATION" if mv.get("mandate_violation") else "ok"])
             if mv.get("mandate_violation"):
@@ -445,20 +454,23 @@ def v2_reading(v2: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     lock hold. The pre-registration names no tolerance for 'equal'; the committed video floor and the
     spreads are used and printed beside the difference."""
     def arm(key: str) -> Dict[str, Any]:
-        fw, held, nf, fsh = [], [], [], []
-        for x in ((v2 or {}).get(key) or {}).values():
+        fw, held, nf, fsh, fps = [], [], [], [], []
+        for leg, x in ((v2 or {}).get(key) or {}).items():
             c = x.get("components") or {}
             if not (c.get("forward") and c.get("lock_held") and x.get("frames")):
                 continue
             fw.append(c["forward"]["mean"]); held.append(c["lock_held"]["mean"])
             nf.append((c["lock_held"]["sum"] - c["forward"]["sum"]) / c["forward"]["count"])
             fsh.append(c["forward"]["sum"] / c["lock_held"]["sum"])
+            fps.append((((v2 or {}).get("legs") or {}).get(leg) or {}).get("frames_per_s"))
         if not fw:
             return {}
         m = lambda v: sum(v) / len(v)
         sp = abs(fw[0] - fw[1]) / ((fw[0] + fw[1]) / 2) if len(fw) == 2 else None
         return {"legs": len(fw), "forward_mean_s": m(fw), "forward_spread": sp, "lock_held_mean_s": m(held),
-                "in_lock_not_forward_s": m(nf), "forward_share_of_hold": m(fsh)}
+                "in_lock_not_forward_s": m(nf), "forward_share_of_hold": m(fsh),
+                "fps_implied_by_hold": 1 / m(held),
+                "fps_measured": m(fps) if fps and all(x is not None for x in fps) else None}
     rr, li = arm("rr_components"), arm("li_components")
     if not (rr and li):
         return {"rr": rr, "li": li, "reading": None}
@@ -502,7 +514,11 @@ def sec_v2(v2: Optional[Dict[str, Any]], src: Optional[Dict[str, Any]], F: Dict[
         return out + ["NOT RUN.", ""]
     nc = v2.get("null_control") or {}
     if nc:
-        out.append(f"**Null control:** stamped vs unstamped RocketRide frames/s {pct(nc.get('delta'))} against "
+        st, un = nc.get("stamped") or {}, nc.get("unstamped") or {}
+        out.append(f"**Null control:** stamped {', '.join(n(x) for x in st.get('frames_per_s') or [])} vs unstamped "
+                   f"{', '.join(n(x) for x in un.get('frames_per_s') or [])} frames/s (pairs a, b; spreads "
+                   f"{share(st.get('spread'), 2)} / {share(un.get('spread'), 2)}): "
+                   f"stamped vs unstamped RocketRide frames/s {pct(nc.get('delta'))} against "
                    f"{share(nc.get('threshold'), 2)}; output identical {[x['identical'] for x in nc.get('output_identity', [])]} "
                    f"→ **{'PASS' if nc.get('pass') else 'FAIL — V2 UNREADABLE'}**.")
         out.append("")
@@ -516,6 +532,10 @@ def sec_v2(v2: Optional[Dict[str, Any]], src: Optional[Dict[str, Any]], F: Dict[
                    f"forward pass {n(1000 * r['rr']['in_lock_not_forward_s'], 1)} ms vs {n(1000 * r['li']['in_lock_not_forward_s'], 1)} ms "
                    f"per frame; the forward pass is {share(r['rr']['forward_share_of_hold'])} / {share(r['li']['forward_share_of_hold'])} "
                    f"of the lock hold → **{r['reading']}**. (Legs per arm: {r['rr']['legs']} / {r['li']['legs']}.)")
+        out.append("")
+        out.append(f"Frames/s implied by the lock hold alone (1 / mean hold): RocketRide {n(r['rr']['fps_implied_by_hold'])} vs "
+                   f"measured {n(r['rr']['fps_measured'])}; LlamaIndex {n(r['li']['fps_implied_by_hold'])} vs measured "
+                   f"{n(r['li']['fps_measured'])} (stamped legs, export frames / leg wall).")
         out.append("")
         out.append("With the lock held for nearly the whole window, each arm's frames/s is set by its lock hold per "
                    "frame, not by the frames queued behind it; 'share of run total' below sums every frame's queueing "
@@ -582,7 +602,10 @@ def sec_verdicts(A: Dict[str, Any], summ: Dict[str, Any]) -> List[str]:
     notes = (summ or {}).get("readings") or {}
     rows = []
     viol = [n for n, l in (d.get("legs") or {}).items() if (l.get("mandate") or {}).get("mandate_violation")]
-    rows.append(["D0 (mandate)", "no violation" if not viol else "VIOLATION", f"{len(d.get('legs') or {})} docs cells checked"
+    nv = sum(len((x or {}).get("legs") or {}) for x in (v1, v2))
+    viol += [n for x in (v1, v2) for n, l in ((x or {}).get("legs") or {}).items()
+             if ((l.get("p0") or {}).get("mandate") or {}).get("mandate_violation")]
+    rows.append(["D0 (mandate)", "no violation" if not viol else "VIOLATION", f"{len(d.get('legs') or {})} docs cells and {nv} video cells checked"
                  + (f"; violations {viol}" if viol else ""), notes.get("D0", "")])
     ov = d.get("d1_overhead") or {}
     nc = (d.get("d1_null_control_chunk_identity") or {}).get("pass")
