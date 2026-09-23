@@ -35,11 +35,14 @@ build() {
   # TikaBatch compiled against the ENGINE's jars (copied out of rr:patched, read-only) on the
   # bundled JRE's major version, 17; the configs extracted from the same image.
   mkdir -p "$BUILD/cfg" "$HOME/p0_texts"
-  if [ ! -f "$BUILD/TikaBatch.class" ]; then
+  SRC_SHA="$(sha256sum working/tika/TikaBatch.java | cut -d' ' -f1)"
+  if [ ! -f "$BUILD/TikaBatch.class" ] || [ "$(cat "$BUILD/.source_sha" 2>/dev/null)" != "$SRC_SHA" ]; then
+    rm -f "$BUILD/TikaBatch.class"
     rm -rf "$HOME/p0_build_jars"; docker rm -f p0jars >/dev/null 2>&1
     docker create --name p0jars rr:patched >/dev/null && docker cp p0jars:/opt/rocketride/engine/java/lib "$HOME/p0_build_jars" && docker rm p0jars >/dev/null || return 1
     docker run --rm -v "$HOME/p0_build_jars:/jars:ro" -v "$(pwd)/working/tika:/src:ro" -v "$BUILD:/out" eclipse-temurin:17-jdk \
       javac --release 17 -cp "/jars/*" -d /out /src/TikaBatch.java || return 1
+    echo "$SRC_SHA" > "$BUILD/.source_sha"
   fi
   echo "TikaBatch.class sha256 $(sha256sum "$BUILD/TikaBatch.class" | cut -d' ' -f1)  source sha256 $(sha256sum working/tika/TikaBatch.java | cut -d' ' -f1)"
   docker run --rm --entrypoint cat rr:patched /opt/rocketride/engine/java/tika-config.xml > "$BUILD/cfg/shipped.xml" || return 1

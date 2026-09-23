@@ -39,7 +39,10 @@ public class TikaBatch {
     Parser p = new AutoDetectParser(cfg);
     ThreadMXBean tb = ManagementFactory.getThreadMXBean();
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+    // The protocol owns stdout. Library code that prints to System.out (seen on 040_040669.pdf in the
+    // H6 smoke) would otherwise interleave with the JSON lines, so System.out now goes to stderr.
     PrintStream out = new PrintStream(new FileOutputStream(FileDescriptor.out), true, "UTF-8");
+    System.setOut(System.err);
     out.println("{\"ready\":true,\"config\":\"" + esc(a[0]) + "\"}");
     String line;
     while ((line = in.readLine()) != null) {

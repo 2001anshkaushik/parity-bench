@@ -1,0 +1,195 @@
+{
+ "parser": "tika",
+ "label": "h6_384_tika_shipped",
+ "config": "shipped.xml",
+ "jobs_file": null,
+ "docs": 384,
+ "records": 384,
+ "workers": 12,
+ "timeout_s": 1800.0,
+ "fresh_jvm_per_doc": false,
+ "warmup_doc": "028_028070.pdf",
+ "timeouts": [],
+ "errors": {
+  "040_040669.pdf": "worker start: JSONDecodeError: Extra data: line 1 column 5 (char 4)",
+  "025_025065.pdf": "worker start: RuntimeError: worker 3 did not become ready: ''"
+ },
+ "empty": [
+  "014_014961.pdf",
+  "025_025065.pdf",
+  "039_039457.pdf",
+  "040_040669.pdf"
+ ],
+ "phase_wall_s": 11.602,
+ "worker_versions": {
+  "1": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "2": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "4": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "0": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "3": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "8": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "6": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "5": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "11": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "7": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "10": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "9": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  }
+ },
+ "warmups": [
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.511074148,
+   "cpu_s": 0.33731517,
+   "jchars": 21436,
+   "t_start": 1790164599.9219103,
+   "t_end": 1790164600.4410226,
+   "worker": 1
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.574434957,
+   "cpu_s": 0.33674145,
+   "jchars": 21436,
+   "t_start": 1790164600.0742316,
+   "t_end": 1790164600.6555867,
+   "worker": 2
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.567403642,
+   "cpu_s": 0.339865294,
+   "jchars": 21436,
+   "t_start": 1790164600.077728,
+   "t_end": 1790164600.6658506,
+   "worker": 4
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.594585028,
+   "cpu_s": 0.343768732,
+   "jchars": 21436,
+   "t_start": 1790164600.0935438,
+   "t_end": 1790164600.7015011,
+   "worker": 0
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.559423879,
+   "cpu_s": 0.341722985,
+   "jchars": 21436,
+   "t_start": 1790164600.2047276,
+   "t_end": 1790164600.7710872,
+   "worker": 3
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.671200734,
+   "cpu_s": 0.351957975,
+   "jchars": 21436,
+   "t_start": 1790164600.2127717,
+   "t_end": 1790164600.8928006,
+   "worker": 8
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.643850993,
+   "cpu_s": 0.34574146,
+   "jchars": 21436,
+   "t_start": 1790164600.2492065,
+   "t_end": 1790164600.9128706,
+   "worker": 6
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.678196012,
+   "cpu_s": 0.354766715,
+   "jchars": 21436,
+   "t_start": 1790164600.292583,
+   "t_end": 1790164600.9874995,
+   "worker": 5
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.675453479,
+   "cpu_s": 0.360939955,
+   "jchars": 21436,
+   "t_start": 1790164600.3310058,
+   "t_end": 1790164601.016878,
+   "worker": 10
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.684691687,
+   "cpu_s": 0.349295325,
+   "jchars": 21436,
+   "t_start": 1790164600.318158,
+   "t_end": 1790164601.0211432,
+   "worker": 11
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.713697874,
+   "cpu_s": 0.360136779,
+   "jchars": 21436,
+   "t_start": 1790164600.3295724,
+   "t_end": 1790164601.0556252,
+   "worker": 7
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.717310637,
+   "cpu_s": 0.364822872,
+   "jchars": 21436,
+   "t_start": 1790164600.3888724,
+   "t_end": 1790164601.1369574,
+   "worker": 9
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.783323736,
+   "cpu_s": 0.389806832,
+   "jchars": 21436,
+   "t_start": 1790164605.6624463,
+   "t_end": 1790164606.4549332,
+   "worker": 3
+  }
+ ],
+ "host_cpus": 32,
+ "image": "rr:patched"
+}

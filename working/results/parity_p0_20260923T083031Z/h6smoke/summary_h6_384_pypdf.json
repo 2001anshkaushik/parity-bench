@@ -1,0 +1,184 @@
+{
+ "parser": "pypdf",
+ "label": "h6_384_pypdf",
+ "config": null,
+ "jobs_file": null,
+ "docs": 384,
+ "records": 384,
+ "workers": 12,
+ "timeout_s": 1800.0,
+ "fresh_jvm_per_doc": false,
+ "warmup_doc": "028_028070.pdf",
+ "timeouts": [],
+ "errors": {
+  "040_040669.pdf": "PdfReadError: Invalid Elementary Object starting with b')' @10165: b't.) Tj\\rE370\\rn of the) Tj\\rET\\r241.5 492.70069 0 rg \\r549 5statemen  TD\\r-0.0855  T37'"
+ },
+ "empty": [
+  "014_014961.pdf",
+  "039_039457.pdf",
+  "040_040669.pdf"
+ ],
+ "phase_wall_s": 12.896,
+ "worker_versions": {
+  "1": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "0": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "3": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "2": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "4": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "5": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "8": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "7": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "6": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "9": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "11": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  },
+  "10": {
+   "ready": true,
+   "parser": "pypdf",
+   "version": "6.15.0"
+  }
+ },
+ "warmups": [
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.044901829000082216,
+   "cpu_s": 0.044904525,
+   "t_start": 1790164610.0343266,
+   "t_end": 1790164610.0799792,
+   "worker": 0
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.04474444100014807,
+   "cpu_s": 0.04474742499999999,
+   "t_start": 1790164610.0345912,
+   "t_end": 1790164610.0801134,
+   "worker": 3
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.045194413998615346,
+   "cpu_s": 0.045197887000000006,
+   "t_start": 1790164610.0342188,
+   "t_end": 1790164610.0803037,
+   "worker": 1
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.045147860000724904,
+   "cpu_s": 0.04515031200000001,
+   "t_start": 1790164610.034899,
+   "t_end": 1790164610.0816662,
+   "worker": 2
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.04467881600066903,
+   "cpu_s": 0.044681376999999994,
+   "t_start": 1790164610.0359645,
+   "t_end": 1790164610.0833952,
+   "worker": 7
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.044814852000854444,
+   "cpu_s": 0.04481760900000001,
+   "t_start": 1790164610.035308,
+   "t_end": 1790164610.0835161,
+   "worker": 4
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.04546456200114335,
+   "cpu_s": 0.04546726500000001,
+   "t_start": 1790164610.0354228,
+   "t_end": 1790164610.0847483,
+   "worker": 5
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.04530372599947441,
+   "cpu_s": 0.045306295999999996,
+   "t_start": 1790164610.0356364,
+   "t_end": 1790164610.0862415,
+   "worker": 8
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.04483137399984116,
+   "cpu_s": 0.044834241999999996,
+   "t_start": 1790164610.0365696,
+   "t_end": 1790164610.0875208,
+   "worker": 9
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.04498504199909803,
+   "cpu_s": 0.044987532,
+   "t_start": 1790164610.036476,
+   "t_end": 1790164610.0892327,
+   "worker": 6
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.0446005010016961,
+   "cpu_s": 0.04460314200000001,
+   "t_start": 1790164610.0369563,
+   "t_end": 1790164610.0906365,
+   "worker": 11
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.04468426099992939,
+   "cpu_s": 0.04468672700000001,
+   "t_start": 1790164610.0370622,
+   "t_end": 1790164610.0920367,
+   "worker": 10
+  }
+ ],
+ "host_cpus": 32,
+ "image": null
+}

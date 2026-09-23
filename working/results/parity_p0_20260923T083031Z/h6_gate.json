@@ -1,0 +1,25 @@
+{
+ "gate": "H6 smoke (preregistration.json H6_parser_bakeoff.gate)",
+ "written_utc": "2026-09-23T12:02:12Z",
+ "computed_by": "working/scripts/p0_analyse_parse.py h6smoke over h6smoke/results_*.jsonl",
+ "threshold": "a candidate with p50(tika_shipped)/p50(candidate) >= 2 on the 11 AND no empty on a 384-slice document tika_shipped extracts",
+ "fired": true,
+ "branch": "h6full (every parser on the 9,975 slice)",
+ "speed_pass": [
+  "pypdfium2"
+ ],
+ "speed_and_coverage_pass": [
+  "pypdfium2"
+ ],
+ "disclosure": "two tika_shipped rows on the 384 slice (040_040669.pdf, 025_025065.pdf) are HARNESS failures, not Tika's: library output on stdout broke the worker's line protocol and the restart then failed; Tika therefore has no reading for those two, and pypdfium2 extracted text from both, so its no-loss result does not depend on them. The protocol is fixed (TikaBatch keeps stdout to itself; the orchestrator skips and records non-protocol lines) before the full run.",
+ "h5_gate": {
+  "fired": false,
+  "n_passing_by_feature": {
+   "no_sortByPosition": 0,
+   "no_acroform": 0,
+   "no_annotations": 0,
+   "no_bookmarks": 0
+  },
+  "consequence": "no best config: tika_best is not run in H6"
+ }
+}

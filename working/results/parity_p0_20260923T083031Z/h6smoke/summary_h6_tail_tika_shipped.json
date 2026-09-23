@@ -1,0 +1,165 @@
+{
+ "parser": "tika",
+ "label": "h6_tail_tika_shipped",
+ "config": "shipped.xml",
+ "jobs_file": null,
+ "docs": 11,
+ "records": 11,
+ "workers": 11,
+ "timeout_s": 1800.0,
+ "fresh_jvm_per_doc": false,
+ "warmup_doc": "028_028070.pdf",
+ "timeouts": [],
+ "errors": {},
+ "empty": [],
+ "phase_wall_s": 4.823,
+ "worker_versions": {
+  "2": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "0": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "3": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "1": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "9": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "4": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "6": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "8": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "10": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "7": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  },
+  "5": {
+   "ready": true,
+   "config": "/work/cfg/shipped.xml"
+  }
+ },
+ "warmups": [
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.472533291,
+   "cpu_s": 0.317332302,
+   "jchars": 21436,
+   "t_start": 1790164579.0801687,
+   "t_end": 1790164579.5630856,
+   "worker": 2
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.44160333,
+   "cpu_s": 0.315918205,
+   "jchars": 21436,
+   "t_start": 1790164579.1138315,
+   "t_end": 1790164579.5675693,
+   "worker": 0
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.530858828,
+   "cpu_s": 0.327235097,
+   "jchars": 21436,
+   "t_start": 1790164579.2039204,
+   "t_end": 1790164579.746491,
+   "worker": 1
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.57203286,
+   "cpu_s": 0.338588981,
+   "jchars": 21436,
+   "t_start": 1790164579.1909072,
+   "t_end": 1790164579.7707374,
+   "worker": 3
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.529196724,
+   "cpu_s": 0.33601833,
+   "jchars": 21436,
+   "t_start": 1790164579.2435293,
+   "t_end": 1790164579.7836483,
+   "worker": 9
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.549542884,
+   "cpu_s": 0.34219948,
+   "jchars": 21436,
+   "t_start": 1790164579.2648773,
+   "t_end": 1790164579.8300047,
+   "worker": 4
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.696049771,
+   "cpu_s": 0.338414765,
+   "jchars": 21436,
+   "t_start": 1790164579.3536766,
+   "t_end": 1790164580.0688744,
+   "worker": 8
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.678130235,
+   "cpu_s": 0.355296013,
+   "jchars": 21436,
+   "t_start": 1790164579.3773816,
+   "t_end": 1790164580.0743232,
+   "worker": 10
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.695061215,
+   "cpu_s": 0.358900035,
+   "jchars": 21436,
+   "t_start": 1790164579.38208,
+   "t_end": 1790164580.0911746,
+   "worker": 7
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.740187987,
+   "cpu_s": 0.354037271,
+   "jchars": 21436,
+   "t_start": 1790164579.3460948,
+   "t_end": 1790164580.1148105,
+   "worker": 6
+  },
+  {
+   "doc": "028_028070.pdf",
+   "wall_s": 0.741241938,
+   "cpu_s": 0.363760604,
+   "jchars": 21436,
+   "t_start": 1790164579.3918965,
+   "t_end": 1790164580.1517954,
+   "worker": 5
+  }
+ ],
+ "host_cpus": 32,
+ "image": "rr:patched"
+}

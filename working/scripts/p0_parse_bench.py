@@ -99,17 +99,28 @@ class Worker:
         t_start = time.time()
         self.proc.stdin.write(self.path_for(name) + "\n")
         self.proc.stdin.flush()
-        line = self._next(timeout)
-        if line is None:
-            self.kill()
-            return {"doc": name, "timeout": True, "timeout_s": timeout, "t_start": t_start,
-                    "t_end": time.time()}
-        if line == "":
-            self.kill()
-            return {"doc": name, "error": "worker died (EOF)", "t_start": t_start,
-                    "t_end": time.time()}
-        rec = json.loads(line)
+        noise = []
+        while True:
+            line = self._next(max(1.0, timeout - (time.time() - t_start)))
+            if line is None:
+                self.kill()
+                return {"doc": name, "timeout": True, "timeout_s": timeout, "t_start": t_start,
+                        "t_end": time.time(), "stdout_noise": noise[:5]}
+            if line == "":
+                self.kill()
+                return {"doc": name, "error": "worker died (EOF)", "t_start": t_start,
+                        "t_end": time.time(), "stdout_noise": noise[:5]}
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError:
+                noise.append(line[:200])              # not the protocol: recorded, skipped
+                continue
+            if isinstance(rec, dict) and rec.get("doc") == name:
+                break
+            noise.append(line[:200])
         rec.update(t_start=t_start, t_end=time.time())
+        if noise:
+            rec["stdout_noise"] = noise[:5]
         return rec
 
     def kill(self) -> None:
@@ -202,19 +213,30 @@ def main() -> int:
                 w = Worker(a.parser, a.corpus, TEXTS / job["label"],
                            (BUILD / "cfg" / job["config"]) if job.get("config") else None,
                            job["label"], wid, a.jvm_heap)
-            try:
-                if not started or w.proc is None:
-                    w.start()
-                    started = True
-                    meta["versions"][str(wid)] = w.ready
-                    if a.warmup_doc:                  # every worker start, restarts included
-                        wu = w.run(a.warmup_doc, a.timeout)
-                        with lock:
-                            meta.setdefault("warmups", []).append({**wu, "worker": wid})
-                rec = w.run(name, a.timeout)
-            except Exception as e:                   # a worker that cannot start is data too
-                rec = {"doc": name, "error": f"worker start: {type(e).__name__}: {e}"}
-                w.kill()
+            rec = None
+            for attempt in range(3):                 # a worker that cannot start is retried
+                try:
+                    if not started or w.proc is None:
+                        w.start()
+                        started = True
+                        meta["versions"][str(wid)] = w.ready
+                        if a.warmup_doc:              # every worker start, restarts included
+                            wu = w.run(a.warmup_doc, a.timeout)
+                            with lock:
+                                meta.setdefault("warmups", []).append({**wu, "worker": wid})
+                    break
+                except Exception as e:
+                    rec = {"doc": name, "error": f"worker start (attempt {attempt + 1}): {type(e).__name__}: {e}"}
+                    w.kill()
+                    started = False
+            else:
+                pass
+            if w.proc is not None:
+                try:
+                    rec = w.run(name, a.timeout)
+                except Exception as e:
+                    rec = {"doc": name, "error": f"parse call: {type(e).__name__}: {e}"}
+                    w.kill()
             rec.update(parser=a.parser, label=job["label"], worker=wid, config=job.get("config"),
                        rep=job.get("rep"),
                        **(text_facts(TEXTS / job["label"], name)
