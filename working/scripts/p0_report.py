@@ -49,6 +49,11 @@ def pct(x: Optional[float], nd: int = 2) -> str:
     return "—" if x is None else f"{100 * x:+.{nd}f}%"
 
 
+def pts(x: Optional[float], nd: int = 1) -> str:
+    """A difference of two percentages, in percentage points."""
+    return "—" if x is None else f"{100 * x:+.{nd}f} points"
+
+
 def share(x: Optional[float], nd: int = 1) -> str:
     return "—" if x is None else f"{100 * x:.{nd}f}%"
 
@@ -310,13 +315,15 @@ def sec_h7(docs: Optional[Dict[str, Any]], src: Optional[Dict[str, Any]], F: Dic
     if not h:
         return out + ["NOT RUN.", ""]
     c = h["nodebug_vs_debug"]
+    alias = {v: k for k, v in ((docs or {}).get("leg_dirs") or {}).items()}   # f-leg dir -> pre-registered name
+    cpu = {k: h["cpu_s_per_doc"].get(alias.get(k, k)) for k in list(c["cell_a"]) + list(c["cell_b"])}
     out += table(["cell", "legs", "span docs/s", "mean", "spread", "CPU-s/doc"],
                  [[f"debugger attached (default){DAG}", ", ".join(c["cell_a"]), " / ".join(n(x, 4) for x in c["a_docs_per_s"]),
                    n(c["a_mean"], 4), share(c["a_spread"], 2),
-                   " / ".join(n(h["cpu_s_per_doc"].get(k), 4) for k in c["cell_a"])],
+                   " / ".join(n(cpu.get(k), 4) for k in c["cell_a"])],
                   [f"noDebug launch{DAG}", ", ".join(c["cell_b"]), " / ".join(n(x, 4) for x in c["b_docs_per_s"]),
                    n(c["b_mean"], 4), share(c["b_spread"], 2),
-                   " / ".join(n(h["cpu_s_per_doc"].get(k), 4) for k in c["cell_b"])]])
+                   " / ".join(n(cpu.get(k), 4) for k in c["cell_b"])]])
     out.append(f"noDebug / default − 1 = **{pct(c['delta_b_vs_a'])}**, threshold {share(c['threshold'], 2)} → "
                f"**{h['verdict']}**. Output identity (null control): {'PASS' if h['null_control_pass'] else 'FAIL'}.")
     out.append("")
@@ -467,7 +474,7 @@ def sec_v1(v1: Optional[Dict[str, Any]], v1f: Optional[Dict[str, Any]], F: Dict[
     out += table(["cell", "legs", "frames/s", "mean", "spread", "CPU-s per frame ; engine cores"], rows)
     g = v1.get("gap") or {}
     out.append(f"**Gate V1:** LlamaIndex / RocketRide − 1 at T=4 = {pct(g.get('li_over_rr_minus_1'), 1)}; threshold "
-               f"max(0.82%, spreads) = {share(g.get('threshold'), 2)}; margin {pct(g.get('margin_pp'), 1)} against "
+               f"max(0.82%, spreads) = {share(g.get('threshold'), 2)}; margin {pts(g.get('margin_pp'), 1)} against "
                f"≥ +10 points → **{'FIRED' if g.get('gate_fired') else 'not fired'}**.")
     out.append("")
     for k in ("rr_t4_determinism", "rr_default_determinism", "rr_t4_vs_default_output"):
@@ -653,13 +660,14 @@ def sec_gates(F: Dict[str, Any]) -> List[str]:
                  "FIRED" if g.get("fired") else ("not fired" if g.get("evaluable") else "NOT EVALUABLE")])
     g = F.get("h5_gate") or {}
     rows.append(["H5 (384-slice sweep at best config)", "one feature ≥50% faster on ≥6 of 11, length within 5%",
-                 str(g.get("n_passing_by_feature")), "FIRED" if g.get("fired") else "not fired" if g else "NOT RUN"])
+                 " / ".join(f"{k.replace('h5_no_', '')} {v}" for k, v in (g.get("n_passing_by_feature") or {}).items())
+                 + " documents passing", "FIRED" if g.get("fired") else "not fired" if g else "NOT RUN"])
     g = ((F.get("h6") or {}).get("smoke")) or {}
-    rows.append(["H6 (full bake-off)", "≥2x Tika p50 on the 11 AND no coverage loss on 384",
+    rows.append(["H6 smoke gate (→ the full 9,975 bake-off)", "≥2x Tika p50 on the 11 AND no coverage loss on 384",
                  f"speed pass {g.get('speed_pass')}; both {g.get('speed_and_coverage_pass')}",
                  "FIRED" if g.get("fired") else ("hybrid branch" if g.get("hybrid_branch") else "not fired") if g else "NOT RUN"])
     g = F.get("v1_gap") or {}
-    rows.append(["V1 (168-video confirmation)", "gap − max(0.82%, spreads) ≥ +10 points", pct(g.get("margin_pp"), 1),
+    rows.append(["V1 (168-video confirmation)", "gap − max(0.82%, spreads) ≥ +10 points", pts(g.get("margin_pp"), 1),
                  "FIRED" if g.get("gate_fired") else "not fired" if g else "NOT RUN"])
     return ["## Gates", ""] + table(["gate", "threshold", "measured", "outcome"], rows)
 
@@ -740,7 +748,7 @@ def sec_verdicts(A: Dict[str, Any], summ: Dict[str, Any]) -> List[str]:
                  notes.get("H6", "")])
     gp = v1.get("gap") or {}
     rows.append(["V1 (matched single instance)", ("SUPPORTED — gate fired" if gp.get("gate_fired") else "see V1") if gp else "NOT RUN",
-                 f"LlamaIndex / RocketRide − 1 at T=4 {pct(gp.get('li_over_rr_minus_1'), 1)}; margin {pct(gp.get('margin_pp'), 1)} vs +10 points",
+                 f"LlamaIndex / RocketRide − 1 at T=4 {pct(gp.get('li_over_rr_minus_1'), 1)}; margin {pts(gp.get('margin_pp'), 1)} vs +10 points",
                  notes.get("V1", "")])
     nc2 = (v2.get("null_control") or {})
     r2 = v2_reading(v2) if v2 else {}
@@ -871,7 +879,10 @@ def main() -> int:
                  "(a) is the mean share of run total over the two PROFILE legs that carry the stage: "
                  "d1f_rr_s1/s2 (384 slice, C=32) for docs items, the two stamped RocketRide V2 legs "
                  "for video items. (b) is the per-document (per-frame) time bound if that stage cost "
-                 "nothing. A CPP item is proposed only above 15% of run total.", ""] + roi_table(items)
+                 "nothing. A CPP item is proposed only above 15% of run total. For video items the run total "
+                 "includes every frame's queueing behind a lock held nearly the whole window, so (a) and (b) are "
+                 "small for in-lock work; V2 gives the lock-hold basis that bounds video throughput (the forward "
+                 "pass is nearly all of the hold, and 1/hold matches the measured frames/s).", ""] + roi_table(items)
         if roi.get("context_items"):
             head += ["### Not a separate bottleneck (shown with the pre-registered columns, not ranked)", ""]
             for x in roi["context_items"]:
