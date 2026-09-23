@@ -438,6 +438,64 @@ def sec_v1(v1: Optional[Dict[str, Any]], v1f: Optional[Dict[str, Any]], F: Dict[
     return out
 
 
+def v2_reading(v2: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """The pre-registered V2 reading from the stamped legs: forward-pass time per frame by arm (mean
+    over each arm's stamped legs), their difference against max(0.82%, each arm's leg-to-leg spread
+    of that mean), the in-lock time that is not the forward pass, and the forward pass's share of the
+    lock hold. The pre-registration names no tolerance for 'equal'; the committed video floor and the
+    spreads are used and printed beside the difference."""
+    def arm(key: str) -> Dict[str, Any]:
+        fw, held, nf, fsh = [], [], [], []
+        for x in ((v2 or {}).get(key) or {}).values():
+            c = x.get("components") or {}
+            if not (c.get("forward") and c.get("lock_held") and x.get("frames")):
+                continue
+            fw.append(c["forward"]["mean"]); held.append(c["lock_held"]["mean"])
+            nf.append((c["lock_held"]["sum"] - c["forward"]["sum"]) / c["forward"]["count"])
+            fsh.append(c["forward"]["sum"] / c["lock_held"]["sum"])
+        if not fw:
+            return {}
+        m = lambda v: sum(v) / len(v)
+        sp = abs(fw[0] - fw[1]) / ((fw[0] + fw[1]) / 2) if len(fw) == 2 else None
+        return {"legs": len(fw), "forward_mean_s": m(fw), "forward_spread": sp, "lock_held_mean_s": m(held),
+                "in_lock_not_forward_s": m(nf), "forward_share_of_hold": m(fsh)}
+    rr, li = arm("rr_components"), arm("li_components")
+    if not (rr and li):
+        return {"rr": rr, "li": li, "reading": None}
+    d = rr["forward_mean_s"] / li["forward_mean_s"] - 1
+    tol = max([0.0082] + [x for x in (rr["forward_spread"], li["forward_spread"]) if x is not None])
+    dh = rr["lock_held_mean_s"] / li["lock_held_mean_s"] - 1
+    if abs(d) > tol:
+        reading = ("UNEQUAL forward-pass time at equal T: a model-runtime configuration difference "
+                   "(pre-registered reading), named from both images under 'runtime versions'")
+    elif dh > tol:
+        reading = "equal forward-pass time with a larger lock-held total: overhead inside the lock (in scope)"
+    else:
+        reading = "equal forward-pass time and equal lock-held total"
+    return {"rr": rr, "li": li, "forward_rr_over_li_minus_1": d, "lock_held_rr_over_li_minus_1": dh,
+            "tolerance": tol, "reading": reading}
+
+
+def sec_runtime_versions(camp: Path) -> List[str]:
+    """V2's naming step: the read-only listing of each image (runtime_versions/<image>.txt)."""
+    d = camp / "runtime_versions"
+    out = ["### Runtime versions (V2's naming step; read-only listing of each image)", ""]
+    if not d.is_dir():
+        return out + ["NOT RUN.", ""]
+    for f in sorted(d.glob("*.txt")):
+        INPUTS[f"runtime_versions/{f.name}"] = hashlib.sha256(f.read_bytes()).hexdigest()[:16]
+        lines = f.read_text(errors="replace").splitlines()
+        ver = [l.strip() for l in lines if l.strip().split(" ")[0] in ("__version__", "git_version", "cuda", "cuda:", "hip", "hip:", "debug")
+               or l.startswith("__version__") or l.startswith("git_version")]
+        dist = sorted({l.split("/")[-1] for l in lines if l.startswith("== dist-info:")})
+        libs = sorted({l.split("/")[-1] for l in lines if l.startswith("== lib:")})
+        flags = next((lines[i + 1].strip() for i, l in enumerate(lines) if l.startswith("== cpu flags") and i + 1 < len(lines)), "")
+        out.append(f"- **{f.stem}**: torch version file {'; '.join(dict.fromkeys(ver)) or '—'}; "
+                   f"dist-info {', '.join(dist) or '—'}; torch-bundled math libraries {', '.join(libs) or 'none'}; "
+                   f"CPU flags seen {flags or '—'}")
+    return out + [""]
+
+
 def sec_v2(v2: Optional[Dict[str, Any]], src: Optional[Dict[str, Any]], F: Dict[str, Any]) -> List[str]:
     out = ["## V2 — duty cycle and per-frame decomposition (PROFILE, T=4)", ""]
     if not v2:
@@ -447,6 +505,22 @@ def sec_v2(v2: Optional[Dict[str, Any]], src: Optional[Dict[str, Any]], F: Dict[
         out.append(f"**Null control:** stamped vs unstamped RocketRide frames/s {pct(nc.get('delta'))} against "
                    f"{share(nc.get('threshold'), 2)}; output identical {[x['identical'] for x in nc.get('output_identity', [])]} "
                    f"→ **{'PASS' if nc.get('pass') else 'FAIL — V2 UNREADABLE'}**.")
+        out.append("")
+    r = v2_reading(v2)
+    F["v2_reading"] = r
+    if r.get("reading"):
+        out.append(f"**Reading (pre-registered rule):** forward pass per frame RocketRide {n(r['rr']['forward_mean_s'])} s vs "
+                   f"LlamaIndex {n(r['li']['forward_mean_s'])} s → {pct(r['forward_rr_over_li_minus_1'], 1)} against "
+                   f"max(0.82%, each arm's leg-to-leg spread of that mean) = {share(r['tolerance'], 2)}; lock held per frame "
+                   f"{n(r['rr']['lock_held_mean_s'])} s vs {n(r['li']['lock_held_mean_s'])} s; in-lock time that is not the "
+                   f"forward pass {n(1000 * r['rr']['in_lock_not_forward_s'], 1)} ms vs {n(1000 * r['li']['in_lock_not_forward_s'], 1)} ms "
+                   f"per frame; the forward pass is {share(r['rr']['forward_share_of_hold'])} / {share(r['li']['forward_share_of_hold'])} "
+                   f"of the lock hold → **{r['reading']}**. (Legs per arm: {r['rr']['legs']} / {r['li']['legs']}.)")
+        out.append("")
+        out.append("With the lock held for nearly the whole window, each arm's frames/s is set by its lock hold per "
+                   "frame, not by the frames queued behind it; 'share of run total' below sums every frame's queueing "
+                   "behind the lock into the denominator (pre-registered D1 metric set), so the in-lock components' "
+                   "shares of the lock hold are the ones that bound throughput here.")
         out.append("")
     for arm, key, order in (("RocketRide", "rr_components", ["decode", "lock_wait", "resize", "preprocess", "predict_pre",
                                                                "forward", "predict_post", "dict_build", "loader_post",
@@ -553,9 +627,17 @@ def sec_verdicts(A: Dict[str, Any], summ: Dict[str, Any]) -> List[str]:
                  f"LlamaIndex / RocketRide − 1 at T=4 {pct(gp.get('li_over_rr_minus_1'), 1)}; margin {pct(gp.get('margin_pp'), 1)} vs +10 points",
                  notes.get("V1", "")])
     nc2 = (v2.get("null_control") or {})
-    rows.append(["V2 (duty cycle)", ("null control PASS" if nc2.get("pass") else "UNREADABLE (null control)") if nc2 else "NOT RUN",
-                 "; ".join(f"{k}: duty {share(x.get('duty_cycle'))}" for k, x in list((v2.get("rr_components") or {}).items())[:1]
-                           + list((v2.get("li_components") or {}).items())[:1]), notes.get("V2", "")])
+    r2 = v2_reading(v2) if v2 else {}
+    duty = "; ".join(f"{k}: duty {share(x.get('duty_cycle'))}" for k, x in list((v2.get("rr_components") or {}).items())
+                     + list((v2.get("li_components") or {}).items()))
+    if r2.get("reading"):
+        duty = (f"forward pass per frame RR {n(r2['rr']['forward_mean_s'])} s vs LI {n(r2['li']['forward_mean_s'])} s "
+                f"({pct(r2['forward_rr_over_li_minus_1'], 1)} vs {share(r2['tolerance'], 2)}); in-lock non-forward "
+                f"{n(1000 * r2['rr']['in_lock_not_forward_s'], 1)} / {n(1000 * r2['li']['in_lock_not_forward_s'], 1)} ms per frame; " + duty)
+    verdict = "NOT RUN"
+    if nc2:
+        verdict = (r2.get("reading") or "null control PASS").split(":")[0] if nc2.get("pass") else "UNREADABLE (null control)"
+    rows.append(["V2 (duty cycle)", verdict, duty, notes.get("V2", "")])
     rows.append(["V3 (lock scope)", "SOURCE", "see V3", notes.get("V3", "")])
     return ["## Verdicts", ""] + table(["hypothesis", "verdict", "measured (from the analysis files)", "reading"], rows)
 
@@ -650,6 +732,7 @@ def main() -> int:
         body += [f"**Harness disclosure (h6_gate.json):** {g6.get('disclosure')}", ""]
     body += sec_v1(A["v1"], A["v1f"], F)
     body += sec_v2(A["v2"], A["src"], F)
+    body += sec_runtime_versions(c)
     body += sec_v3(A["src"])
     body += sec_amendments(c)
     head = [f"# P0 — diagnosis under the single-instance mandate", "",
@@ -668,6 +751,13 @@ def main() -> int:
                  "d1f_rr_s1/s2 (384 slice, C=32) for docs items, the two stamped RocketRide V2 legs "
                  "for video items. (b) is the per-document (per-frame) time bound if that stage cost "
                  "nothing. A CPP item is proposed only above 15% of run total.", ""] + roi_table(items)
+        if roi.get("context_items"):
+            head += ["### Not a separate bottleneck (shown with the pre-registered columns, not ranked)", ""]
+            for x in roi["context_items"]:
+                sh = resolve_share(x.get("share_from", "none"), A)
+                head.append(f"- {x['bottleneck']}: (a) {share(sh)} of run total, (b) by the pre-registered rule "
+                            f"{n(1 / (1 - sh), 2) + 'x' if sh is not None and sh < 1 else '—'} — {x['why']}")
+            head.append("")
         if roi.get("measured_no_readable_effect"):
             head += ["### Measured, with no readable effect", ""] + [f"- {x}" for x in roi["measured_no_readable_effect"]] + [""]
         if roi.get("measured_source_not_traced"):
