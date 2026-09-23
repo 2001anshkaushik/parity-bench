@@ -106,6 +106,8 @@ def load(d: Path) -> Optional[Dict[str, Any]]:
             "task_census": e.get("task_census") or (e.get("provenance_video") or {}).get("task_census"),
             "session": session_facts(d),
             "container_procs": container_procs(e),
+            "idle_burden": {k: ((eff.get("idle_burden") or {}).get(k)) for k in
+                            ("instance_kind", "idle_cores_before_instances", "idle_cores_with_instances_live")},
             "thread_pins": (e.get("thread_pins_by_arm") or {}).get("cross_arm_values"),
             "by_video": {r["video"]: {"chunk_sha256": r.get("chunk_sha256"),
                                       "frame_scores": r.get("frame_scores"),

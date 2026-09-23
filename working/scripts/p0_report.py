@@ -488,12 +488,45 @@ def v2_reading(v2: Optional[Dict[str, Any]]) -> Dict[str, Any]:
             "tolerance": tol, "reading": reading}
 
 
-def sec_runtime_versions(camp: Path) -> List[str]:
+def v2_posthoc_cores(v2: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    for key in ("rr_components", "li_components"):
+        for leg, x in ((v2 or {}).get(key) or {}).items():
+            L = ((v2 or {}).get("legs") or {}).get(leg) or {}
+            held = ((x.get("components") or {}).get("lock_held") or {}).get("sum")
+            idle = (L.get("idle_burden") or {}).get("idle_cores_with_instances_live")
+            if not (held and L.get("service_cpu_s") and L.get("span_s") and L.get("frames") and idle is not None):
+                continue
+            work = L["service_cpu_s"] - idle * L["span_s"]
+            out[leg] = {"cpu_s_per_frame": L["service_cpu_s"] / L["frames"], "idle_cores": idle,
+                        "work_cpu_s_per_frame": work / L["frames"], "cores_during_hold": work / held}
+    return out
+
+
+def sec_runtime_versions(camp: Path, F: Dict[str, Any]) -> List[str]:
     """V2's naming step: the read-only listing of each image (runtime_versions/<image>.txt)."""
     d = camp / "runtime_versions"
     out = ["### Runtime versions (V2's naming step; read-only listing of each image)", ""]
     if not d.is_dir():
         return out + ["NOT RUN.", ""]
+    def facts(f: Path) -> Dict[str, Any]:
+        L = f.read_text(errors="replace").splitlines()
+        return {"version_lines": sorted({l.strip() for l in L if l.startswith(("__version__", "git_version"))}),
+                "dist": sorted({l.split("/")[-1] for l in L if l.startswith("== dist-info:")}),
+                "libs": sorted({l.split("/")[-1] for l in L if l.startswith("== lib:")})}
+    a, b = d / "rr_patched_video.txt", d / "li_video.txt"
+    if a.exists() and b.exists():
+        fa, fb = facts(a), facts(b)
+        same = {k: fa[k] == fb[k] for k in fa}
+        out.append(f"**The two video images (rr:patched-video vs li:video):** torch version and git hash identical: "
+                   f"{n(same['version_lines'])}; torch / torchvision / rfdetr / transformers / numpy dist-info identical: "
+                   f"{n(same['dist'])}; torch-bundled math libraries identical: {n(same['libs'])}. Both arms build the "
+                   "detector as RFDETRBase() with defaults and call predict(image, threshold) on a PIL RGB image "
+                   "(RocketRide engine/ai/common/models/vision/detection.py:138 and :172, same bundle basis as V3; "
+                   "LlamaIndex working/video/li_video/pipeline.py:141 and :215), so dtype and input size follow the "
+                   "same library defaults (SOURCE, not measured).")
+        out.append("")
+        F["runtime_versions_video_identical"] = same
     for f in sorted(d.glob("*.txt")):
         INPUTS[f"runtime_versions/{f.name}"] = hashlib.sha256(f.read_bytes()).hexdigest()[:16]
         lines = f.read_text(errors="replace").splitlines()
@@ -505,6 +538,9 @@ def sec_runtime_versions(camp: Path) -> List[str]:
         out.append(f"- **{f.stem}**: torch version file {'; '.join(dict.fromkeys(ver)) or '—'}; "
                    f"dist-info {', '.join(dist) or '—'}; torch-bundled math libraries {', '.join(libs) or 'none'}; "
                    f"CPU flags seen {flags or '—'}")
+    out.append("")
+    out.append("The docs images are listed as context (V2 concerns video); where the listing found no torch "
+               "version file in an image, the row shows —.")
     return out + [""]
 
 
@@ -542,6 +578,18 @@ def sec_v2(v2: Optional[Dict[str, Any]], src: Optional[Dict[str, Any]], F: Dict[
                    "behind the lock into the denominator (pre-registered D1 metric set), so the in-lock components' "
                    "shares of the lock hold are the ones that bound throughput here.")
         out.append("")
+    ph = v2_posthoc_cores(v2)
+    F["v2_posthoc_cores"] = ph
+    if ph:
+        out.append("**POST-HOC (not pre-registered; never used by a verdict).** Work CPU per frame net of the "
+                   "engine's idle spin = (service CPU − idle cores measured with the instance live before any work × "
+                   "leg wall) / frames; cores busy during the hold = that work / Σ lock held. It assumes the idle "
+                   "spin continues unchanged during work.")
+        out.append("")
+        out += table(["leg", "CPU-s per frame (gross)", "idle cores (instance live, before work)",
+                      "work CPU-s per frame (net)", "cores busy during the lock hold"],
+                     [[k, n(x["cpu_s_per_frame"]), n(x["idle_cores"]), n(x["work_cpu_s_per_frame"]),
+                       n(x["cores_during_hold"], 2)] for k, x in ph.items()])
     for arm, key, order in (("RocketRide", "rr_components", ["decode", "lock_wait", "resize", "preprocess", "predict_pre",
                                                                "forward", "predict_post", "dict_build", "loader_post",
                                                                "rescale", "inside_other", "lock_held", "emit"]),
@@ -644,7 +692,12 @@ def sec_verdicts(A: Dict[str, Any], summ: Dict[str, Any]) -> List[str]:
     sp = ((h6s.get("parsers") or {}).get("pypdfium2") or {}).get("tail_11") or {}
     rows.append(["H6 (parser bake-off)", ("CANDIDATE: " + ", ".join(v6.get("candidates") or [])) if v6.get("candidates") else
                  ("full run: no candidate" if h6f else ("smoke gate FIRED" if g6.get("fired") else "not fired")),
-                 f"pypdfium2 {n(sp.get('speed_ratio_vs_tika_shipped'), 2)}x Tika-as-shipped at p50 on the 11", notes.get("H6", "")])
+                 (f"smoke: pypdfium2 {n(sp.get('speed_ratio_vs_tika_shipped'), 2)}x Tika-as-shipped at p50 on the 11"
+                  + "".join(f"; full: {p} {n(((x.get('tail_11') or {}).get('speed_ratio_vs_tika_shipped')), 2)}x at p50 on the 11, "
+                            f"loses {n((x.get('corpus') or {}).get('n_loses'))} of the documents Tika extracts "
+                            f"({n((x.get('corpus') or {}).get('empty'))} empty of {n((x.get('corpus') or {}).get('n'))})"
+                            for p, x in sorted((h6f.get("parsers") or {}).items()) if p != "tika_shipped")),
+                 notes.get("H6", "")])
     gp = v1.get("gap") or {}
     rows.append(["V1 (matched single instance)", ("SUPPORTED — gate fired" if gp.get("gate_fired") else "see V1") if gp else "NOT RUN",
                  f"LlamaIndex / RocketRide − 1 at T=4 {pct(gp.get('li_over_rr_minus_1'), 1)}; margin {pct(gp.get('margin_pp'), 1)} vs +10 points",
@@ -659,7 +712,12 @@ def sec_verdicts(A: Dict[str, Any], summ: Dict[str, Any]) -> List[str]:
                 f"{n(1000 * r2['rr']['in_lock_not_forward_s'], 1)} / {n(1000 * r2['li']['in_lock_not_forward_s'], 1)} ms per frame; " + duty)
     verdict = "NOT RUN"
     if nc2:
-        verdict = (r2.get("reading") or "null control PASS").split(":")[0] if nc2.get("pass") else "UNREADABLE (null control)"
+        rd = r2.get("reading") or ""
+        # the pre-registered hypothesis: the gap lies in the work AROUND the forward pass, not in it
+        verdict = ("UNREADABLE (null control)" if not nc2.get("pass") else
+                   "NOT SUPPORTED — unequal forward-pass time at equal T" if rd.startswith("UNEQUAL") else
+                   "SUPPORTED — overhead inside the lock" if rd.startswith("equal forward-pass time with a larger") else
+                   "NOT SUPPORTED — equal forward pass and equal hold" if rd else "null control PASS")
     rows.append(["V2 (duty cycle)", verdict, duty, notes.get("V2", "")])
     rows.append(["V3 (lock scope)", "SOURCE", "see V3", notes.get("V3", "")])
     return ["## Verdicts", ""] + table(["hypothesis", "verdict", "measured (from the analysis files)", "reading"], rows)
@@ -755,7 +813,7 @@ def main() -> int:
         body += [f"**Harness disclosure (h6_gate.json):** {g6.get('disclosure')}", ""]
     body += sec_v1(A["v1"], A["v1f"], F)
     body += sec_v2(A["v2"], A["src"], F)
-    body += sec_runtime_versions(c)
+    body += sec_runtime_versions(c, F)
     body += sec_v3(A["src"])
     body += sec_amendments(c)
     head = [f"# P0 — diagnosis under the single-instance mandate", "",
