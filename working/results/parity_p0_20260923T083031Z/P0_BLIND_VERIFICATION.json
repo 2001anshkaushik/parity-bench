@@ -1,0 +1,246 @@
+{
+ "label": "P0 blind recomputation (closeout item 7 form): independent verifiers, each given only the report copy and the raw files, one planted figure per verifier's sections; a plant must be reported as a MISMATCH, and any other mismatch blocks the report",
+ "written_utc": "2026-09-23T18:04:53Z",
+ "copies": {
+  "P0_verify_copy.md (plants A-D)": "8477a9484235f4ed",
+  "P0_verify_copy2.md (plant E)": "8f2aa98ad4d7c6df"
+ },
+ "verifiers": {
+  "A": {
+   "scope_prompt": "blind_verification/prompt_A.md",
+   "findings": "blind_verification/out_A.json",
+   "figures_checked": 466,
+   "plant": {
+    "where": "D1 overhead table, instrumented leg d1f_rr_s1 span docs/s",
+    "true": "2.9287",
+    "planted": "2.9827",
+    "planted_value": "2.9827"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+     "figure": "embed (Python stage)",
+     "report": "62.4%",
+     "status": "UNVERIFIABLE",
+     "reason": "Categorisation of py-spy stacks into embed / split / engine glue / response node / other is not defined in the stated methodology, so these 10 figures cannot be recomputed as specified. Informational only: sample totals 2,986 (h2f_c32_a) and 3,024 (h2f_c32_b); an inferred rule (any frame on the stack in embedding code [nodes/embedding_transformer, ai/common/models/transformers, sentence_transformers, torch, transformers] -> embed; else langchain/preprocessor -> split; else nodes/response -> response) reproduces embed 62.4%/59.7%, split 1.8%/2.4%, response 0.5%/0.5%; the engine-glue vs other split depends on how transport frames under ai/modules/data/data_conn.py are assigned (e.g. glue excluding stacks through rocketride/core/transport_websocket.send gives 5.1% / 5.4% vs reported 5.1% / 5.3%; other variants give 5.0% / 5.1%), so no rule could be confirmed."
+    },
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+     "figure": "split (Python stage)",
+     "report": "1.8%",
+     "status": "UNVERIFIABLE",
+     "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+    },
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+     "figure": "engine glue",
+     "report": "5.1%",
+     "status": "UNVERIFIABLE",
+     "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+    },
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+     "figure": "response node",
+     "report": "0.5%",
+     "status": "UNVERIFIABLE",
+     "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+    },
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+     "figure": "other",
+     "report": "30.3%",
+     "status": "UNVERIFIABLE",
+     "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+    },
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+     "figure": "embed (Python stage)",
+     "report": "59.7%",
+     "status": "UNVERIFIABLE",
+     "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+    },
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+     "figure": "split (Python stage)",
+     "report": "2.4%",
+     "status": "UNVERIFIABLE",
+     "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+    },
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+     "figure": "engine glue",
+     "report": "5.3%",
+     "status": "UNVERIFIABLE",
+     "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+    },
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+     "figure": "response node",
+     "report": "0.5%",
+     "status": "UNVERIFIABLE",
+     "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+    },
+    {
+     "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+     "figure": "other",
+     "report": "32.1%",
+     "status": "UNVERIFIABLE",
+     "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+    }
+   ]
+  },
+  "B": {
+   "scope_prompt": "blind_verification/prompt_B.md",
+   "findings": "blind_verification/out_B.json",
+   "figures_checked": 186,
+   "plant": {
+    "where": "H7 table, noDebug cell mean span docs/s",
+    "true": "2.9339",
+    "planted": "2.9393",
+    "planted_value": "2.9393"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    {
+     "section": "Same-session single-instance docs cell (context for the parity target)",
+     "figure": "six thread variables = 1 (LlamaIndex side)",
+     "report": "= 1 on both",
+     "reason": "the LlamaIndex leg exports (anf_li_u1/u2) carry no env block (d0_in_process pre/post are null) and no listed file records the service container environment"
+    },
+    {
+     "section": "H1 \u2014 per-process ceiling (executor width)",
+     "figure": "pipe semaphore threadCount = 64 (data_conn.py:138)",
+     "report": "64",
+     "reason": "SOURCE claim about engine code; no listed raw file records it"
+    },
+    {
+     "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+     "figure": "rocketride 1.3.0 SDK use() has no noDebug parameter",
+     "report": "1.3.0",
+     "reason": "SOURCE claim about the SDK; no listed raw file records it"
+    }
+   ]
+  },
+  "C": {
+   "scope_prompt": "blind_verification/prompt_C.md",
+   "findings": "blind_verification/out_C.json",
+   "figures_checked": 448,
+   "plant": {
+    "where": "H6 full, parse seconds on the 11, pypdfium2 mean",
+    "true": "| 0.401 |",
+    "planted": "| 0.410 |",
+    "planted_value": "0.410"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_a embed",
+     "reported": "62.4%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    },
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_a other",
+     "reported": "30.3%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    },
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_a engine glue (data_conn)",
+     "reported": "5.1%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    },
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_a split",
+     "reported": "1.8%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    },
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_a response",
+     "reported": "0.5%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    },
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_b embed",
+     "reported": "59.7%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    },
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_b other",
+     "reported": "32.1%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    },
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_b engine glue (data_conn)",
+     "reported": "5.3%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    },
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_b split",
+     "reported": "2.4%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    },
+    {
+     "section": "H2 py-spy by stage",
+     "figure": "h2f_c32_b response",
+     "reported": "0.5%",
+     "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+    }
+   ]
+  },
+  "D": {
+   "scope_prompt": "blind_verification/prompt_D.md",
+   "findings": "blind_verification/out_D.json",
+   "figures_checked": 570,
+   "plant": {
+    "where": "V1 table, LlamaIndex v1_li_t4_b frames/s",
+    "true": "3.374",
+    "planted": "3.347",
+    "planted_value": "3.347"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    {
+     "section": "## Gates",
+     "location": "V1 row gate name '(168-video confirmation)'",
+     "value": "168",
+     "reason": "a label for the NOT-RUN confirmation leg; no 168-video leg exists among the listed files"
+    },
+    {
+     "section": "## V1",
+     "location": "'Correctness note carried from S5-A: only T=16/unset reproduces default output bit-for-bit; every other T shifts scores'",
+     "value": "T=16",
+     "reason": "carried from campaign S5-A; no S5-A video file is in the list. (The in-session part that is checkable - t4 vs default outputs differ on 16/16 videos - matches.)"
+    }
+   ]
+  },
+  "E": {
+   "scope_prompt": "blind_verification/prompt_E.md",
+   "findings": "blind_verification/out_E.json",
+   "figures_checked": 22,
+   "plant": {
+    "where": "H2 h2f_c32_b By stage line, split",
+    "true": "split 2.4%, response 0.5%.",
+    "planted": "split 4.2%, response 0.5%.",
+    "planted_value": "4.2"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": []
+  }
+ },
+ "outcome": "PASS \u2014 every plant caught, no other mismatch",
+ "after_verification": "wording only, no figure: the anchor cell now says LlamaIndex's thread variables are its harness's setting (verifier B could not verify them from the raw files); the H2 stage-attribution rule is printed (verifier A and C could not verify the by-stage shares without it; verifier E then verified them under the printed rule). The final report differs from the A-D copy only in the four plants and these lines."
+}

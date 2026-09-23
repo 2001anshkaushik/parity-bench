@@ -1,0 +1,3946 @@
+{
+ "report": "/private/tmp/claude-501/-Users-ansh-RocketRide-Benchmarking-benchmark-A/99b99d9b-386c-4d1e-8b7e-cd129b6411f0/scratchpad/p0verify/P0_verify_copy.md",
+ "scope": "'## D1 — node-level telemetry' (overhead table, null-control line, stage-table headings, stage tables d1f_rr_s1, d1f_rr_s2, anf_rr_s1, anf_rr_s2, anf_li_t1, anf_li_t2 incl. occupancy, and the GIL-share-by-stage table inside the section) plus the 'D1 (telemetry)' row of '## Verdicts'",
+ "raw_files_used": "perdoc_*.jsonl, leg_*.json (window.t0_ns/t1_ns, p0.session.boot_id/same_session) and stamp_probe.jsonl in d1f_rr_{s1,u1,s2,u2}, anf_rr_{u1,u2,s1,s2}, anf_li_{u1,u2,t1,t2}; pyspy_gil_rr_*.txt in h2f_c32_a, h2f_c32_b (GIL table attempt only)",
+ "method_notes": [
+  "Span docs/s = ok rows / ((max completion_ns - min submit_ns)/1e9) over all rows; spread, overhead, threshold as defined.",
+  "RocketRide stages: measured docs = perdoc docs whose 3 stamp records all carry a stage (27 warm-up docs in stamp_probe are not in perdoc and are excluded); run total = sum(completion-submit) over those docs.",
+  "LlamaIndex stages: the 95 rows carrying svc_timing_ms (the 96th is ok=false, parse_failed); run total = sum(completion-submit) over those 95.",
+  "Metric set: population sd, true median, nearest-rank p90/p95/p99 (rank ceil(q*n)).",
+  "Occupancy (definition only partly given): reconstructed as the time-weighted distribution of the number of documents inside the stage interval over [leg window t0_ns, t1_ns]; RocketRide intervals admission [submit, open], parse_bracket [open, after_parse.last_t], split [.., after_split.last_t], embed [.., after_embed.last_t], return [.., completion]; LlamaIndex intervals from svc_timing_ms.t0_wall + extract, + split, + embed. p50/p95 = smallest count whose cumulative time share >= q. All 108 occupancy figures reproduce under this reconstruction."
+ ],
+ "counts": {
+  "figures_checked": 466,
+  "match": 465,
+  "mismatch": 1,
+  "unverifiable": 10
+ },
+ "mismatches": [
+  {
+   "where": "D1 overhead table, rr_384_c32",
+   "figure": "instrumented d1f_rr_s1 span docs/s",
+   "report": "2.9827",
+   "recomputed": "2.9287",
+   "raw": 2.928650019232026,
+   "status": "MISMATCH",
+   "note": "Digit transposition: recomputed span docs/s for d1f_rr_s1 is 2.928650 (382 ok rows over the leg's first-submit-to-last-completion span). The row's own overhead (-0.06%) and threshold (0.82%) are consistent with 2.9287, not 2.9827: with 2.9827 the instrumented mean would be 2.9509, the overhead -0.98% and the instrumented spread 2.16%."
+  }
+ ],
+ "unverifiable": [
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+   "figure": "embed (Python stage)",
+   "report": "62.4%",
+   "status": "UNVERIFIABLE",
+   "reason": "Categorisation of py-spy stacks into embed / split / engine glue / response node / other is not defined in the stated methodology, so these 10 figures cannot be recomputed as specified. Informational only: sample totals 2,986 (h2f_c32_a) and 3,024 (h2f_c32_b); an inferred rule (any frame on the stack in embedding code [nodes/embedding_transformer, ai/common/models/transformers, sentence_transformers, torch, transformers] -> embed; else langchain/preprocessor -> split; else nodes/response -> response) reproduces embed 62.4%/59.7%, split 1.8%/2.4%, response 0.5%/0.5%; the engine-glue vs other split depends on how transport frames under ai/modules/data/data_conn.py are assigned (e.g. glue excluding stacks through rocketride/core/transport_websocket.send gives 5.1% / 5.4% vs reported 5.1% / 5.3%; other variants give 5.0% / 5.1%), so no rule could be confirmed."
+  },
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+   "figure": "split (Python stage)",
+   "report": "1.8%",
+   "status": "UNVERIFIABLE",
+   "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+  },
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+   "figure": "engine glue",
+   "report": "5.1%",
+   "status": "UNVERIFIABLE",
+   "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+  },
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+   "figure": "response node",
+   "report": "0.5%",
+   "status": "UNVERIFIABLE",
+   "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+  },
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_a",
+   "figure": "other",
+   "report": "30.3%",
+   "status": "UNVERIFIABLE",
+   "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+  },
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+   "figure": "embed (Python stage)",
+   "report": "59.7%",
+   "status": "UNVERIFIABLE",
+   "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+  },
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+   "figure": "split (Python stage)",
+   "report": "2.4%",
+   "status": "UNVERIFIABLE",
+   "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+  },
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+   "figure": "engine glue",
+   "report": "5.3%",
+   "status": "UNVERIFIABLE",
+   "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+  },
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+   "figure": "response node",
+   "report": "0.5%",
+   "status": "UNVERIFIABLE",
+   "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+  },
+  {
+   "where": "D1 section, 'Share of H2's GIL-holding samples by stage' table, h2f_c32_b",
+   "figure": "other",
+   "report": "32.1%",
+   "status": "UNVERIFIABLE",
+   "reason": "see first UNVERIFIABLE entry (same table, categorisation rule not defined)"
+  }
+ ],
+ "all_checks": [
+  {
+   "where": "D1 overhead table, rr_384_c32",
+   "figure": "uninstrumented d1f_rr_u1 span docs/s",
+   "report": "2.9251",
+   "recomputed": "2.9251",
+   "raw": 2.9250632697291885,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_384_c32",
+   "figure": "uninstrumented d1f_rr_u2 span docs/s",
+   "report": "2.9193",
+   "recomputed": "2.9193",
+   "raw": 2.919334323009205,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_384_c32",
+   "figure": "instrumented d1f_rr_s1 span docs/s",
+   "report": "2.9827",
+   "recomputed": "2.9287",
+   "raw": 2.928650019232026,
+   "status": "MISMATCH",
+   "note": "Digit transposition: recomputed span docs/s for d1f_rr_s1 is 2.928650 (382 ok rows over the leg's first-submit-to-last-completion span). The row's own overhead (-0.06%) and threshold (0.82%) are consistent with 2.9287, not 2.9827: with 2.9827 the instrumented mean would be 2.9509, the overhead -0.98% and the instrumented spread 2.16%."
+  },
+  {
+   "where": "D1 overhead table, rr_384_c32",
+   "figure": "instrumented d1f_rr_s2 span docs/s",
+   "report": "2.9191",
+   "recomputed": "2.9191",
+   "raw": 2.9190967699318535,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_384_c32",
+   "figure": "overhead",
+   "report": "-0.06%",
+   "recomputed": "-0.06%",
+   "raw": -0.0005730610165276799,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_384_c32",
+   "figure": "threshold",
+   "report": "0.82%",
+   "recomputed": "0.82%",
+   "raw": 0.0082,
+   "status": "MATCH",
+   "note": "spreads: uninstrumented 0.1960%, instrumented 0.3267%, floor 0.82%"
+  },
+  {
+   "where": "D1 overhead table, rr_384_c32",
+   "figure": "reading",
+   "report": "UNREADABLE (within the threshold)",
+   "recomputed": "UNREADABLE (within the threshold)",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_384_c32",
+   "figure": "same session",
+   "report": "yes",
+   "recomputed": "yes",
+   "raw": null,
+   "status": "MATCH",
+   "note": "boot_ids=['a58bf81c-644d-4573-9b8f-f29f6f936437']; p0.session.same_session all true=True"
+  },
+  {
+   "where": "D1 overhead table, rr_96_c8",
+   "figure": "uninstrumented anf_rr_u1 span docs/s",
+   "report": "1.8399",
+   "recomputed": "1.8399",
+   "raw": 1.8399147020864535,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_96_c8",
+   "figure": "uninstrumented anf_rr_u2 span docs/s",
+   "report": "1.8413",
+   "recomputed": "1.8413",
+   "raw": 1.8413098478558374,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_96_c8",
+   "figure": "instrumented anf_rr_s1 span docs/s",
+   "report": "1.8597",
+   "recomputed": "1.8597",
+   "raw": 1.8597058320859872,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_96_c8",
+   "figure": "instrumented anf_rr_s2 span docs/s",
+   "report": "1.8259",
+   "recomputed": "1.8259",
+   "raw": 1.8259053231756321,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_96_c8",
+   "figure": "overhead",
+   "report": "-0.12%",
+   "recomputed": "-0.12%",
+   "raw": -0.0011916157951834222,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_96_c8",
+   "figure": "threshold",
+   "report": "1.83%",
+   "recomputed": "1.83%",
+   "raw": 0.018341874650613123,
+   "status": "MATCH",
+   "note": "spreads: uninstrumented 0.0758%, instrumented 1.8342%, floor 0.82%"
+  },
+  {
+   "where": "D1 overhead table, rr_96_c8",
+   "figure": "reading",
+   "report": "UNREADABLE (within the threshold)",
+   "recomputed": "UNREADABLE (within the threshold)",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, rr_96_c8",
+   "figure": "same session",
+   "report": "yes",
+   "recomputed": "yes",
+   "raw": null,
+   "status": "MATCH",
+   "note": "boot_ids=['a58bf81c-644d-4573-9b8f-f29f6f936437']; p0.session.same_session all true=True"
+  },
+  {
+   "where": "D1 overhead table, li_96_c8_one_worker",
+   "figure": "uninstrumented anf_li_u1 span docs/s",
+   "report": "0.4970",
+   "recomputed": "0.4970",
+   "raw": 0.49699406735334284,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, li_96_c8_one_worker",
+   "figure": "uninstrumented anf_li_u2 span docs/s",
+   "report": "0.4925",
+   "recomputed": "0.4925",
+   "raw": 0.4924533457411287,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, li_96_c8_one_worker",
+   "figure": "instrumented anf_li_t1 span docs/s",
+   "report": "0.4911",
+   "recomputed": "0.4911",
+   "raw": 0.4910868989545381,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, li_96_c8_one_worker",
+   "figure": "instrumented anf_li_t2 span docs/s",
+   "report": "0.4913",
+   "recomputed": "0.4913",
+   "raw": 0.4912960187970115,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, li_96_c8_one_worker",
+   "figure": "overhead",
+   "report": "+0.71%",
+   "recomputed": "+0.71%",
+   "raw": 0.0071398391156815835,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, li_96_c8_one_worker",
+   "figure": "threshold",
+   "report": "9.87%",
+   "recomputed": "9.87%",
+   "raw": 0.0987,
+   "status": "MATCH",
+   "note": "spreads: uninstrumented 0.9178%, instrumented 0.0426%, floor 9.87%"
+  },
+  {
+   "where": "D1 overhead table, li_96_c8_one_worker",
+   "figure": "reading",
+   "report": "UNREADABLE (within the threshold)",
+   "recomputed": "UNREADABLE (within the threshold)",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 overhead table, li_96_c8_one_worker",
+   "figure": "same session",
+   "report": "yes",
+   "recomputed": "yes",
+   "raw": null,
+   "status": "MATCH",
+   "note": "boot_ids=['a58bf81c-644d-4573-9b8f-f29f6f936437']; p0.session.same_session all true=True"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "d1f_rr_s1 vs d1f_rr_u1 chunk-identical documents",
+   "report": "382/382",
+   "recomputed": "382/382",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "d1f_rr_s2 vs d1f_rr_u2 chunk-identical documents",
+   "report": "382/382",
+   "recomputed": "382/382",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "anf_rr_s1 vs anf_rr_u1 chunk-identical documents",
+   "report": "96/96",
+   "recomputed": "96/96",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "anf_rr_s2 vs anf_rr_u2 chunk-identical documents",
+   "report": "96/96",
+   "recomputed": "96/96",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "anf_li_t1 vs anf_li_u1 chunk-identical documents",
+   "report": "95/95",
+   "recomputed": "95/95",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "anf_li_t2 vs anf_li_u2 chunk-identical documents",
+   "report": "95/95",
+   "recomputed": "95/95",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "d1f_rr_u2 vs d1f_rr_u1 chunk-identical documents",
+   "report": "382/382",
+   "recomputed": "382/382",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "anf_rr_u2 vs anf_rr_u1 chunk-identical documents",
+   "report": "96/96",
+   "recomputed": "96/96",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "anf_li_u2 vs anf_li_u1 chunk-identical documents",
+   "report": "95/95",
+   "recomputed": "95/95",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 null control line",
+   "figure": "null control verdict",
+   "report": "PASS",
+   "recomputed": "PASS",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 heading",
+   "figure": "documents with a complete stamp set",
+   "report": "382",
+   "recomputed": "382",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 heading",
+   "figure": "documents without a complete stamp set",
+   "report": "2",
+   "recomputed": "2",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "share of run total",
+   "report": "0.2%",
+   "recomputed": "0.2%",
+   "raw": 0.0023532353946214384,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "min s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.0012352466583251953,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "mean s",
+   "report": "0.013",
+   "recomputed": "0.013",
+   "raw": 0.013381894970439491,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "sd s",
+   "report": "0.042",
+   "recomputed": "0.042",
+   "raw": 0.042106551478765415,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "p50 s",
+   "report": "0.004",
+   "recomputed": "0.004",
+   "raw": 0.004466056823730469,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "p90 s",
+   "report": "0.025",
+   "recomputed": "0.025",
+   "raw": 0.025199413299560547,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "p95 s",
+   "report": "0.036",
+   "recomputed": "0.036",
+   "raw": 0.03640437126159668,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "p99 s",
+   "report": "0.117",
+   "recomputed": "0.117",
+   "raw": 0.11732840538024902,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "max s",
+   "report": "0.468",
+   "recomputed": "0.468",
+   "raw": 0.46751856803894043,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "mean/p50",
+   "report": "3.00",
+   "recomputed": "3.00",
+   "raw": 2.996355733615964,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "occupancy max",
+   "report": "30",
+   "recomputed": "30",
+   "raw": 30,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "occupancy mean",
+   "report": "0.04",
+   "recomputed": "0.04",
+   "raw": 0.03919042701250931,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, admission",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "share of run total",
+   "report": "36.4%",
+   "recomputed": "36.4%",
+   "raw": 0.36449897965158895,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "min s",
+   "report": "0.016",
+   "recomputed": "0.016",
+   "raw": 0.016274452209472656,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "mean s",
+   "report": "2.073",
+   "recomputed": "2.073",
+   "raw": 2.072757818311921,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "sd s",
+   "report": "8.232",
+   "recomputed": "8.232",
+   "raw": 8.231914306182377,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "p50 s",
+   "report": "0.316",
+   "recomputed": "0.316",
+   "raw": 0.3156205415725708,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "p90 s",
+   "report": "3.301",
+   "recomputed": "3.301",
+   "raw": 3.3014566898345947,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "p95 s",
+   "report": "6.945",
+   "recomputed": "6.945",
+   "raw": 6.945124626159668,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "p99 s",
+   "report": "47.380",
+   "recomputed": "47.380",
+   "raw": 47.38044023513794,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "max s",
+   "report": "110.989",
+   "recomputed": "110.989",
+   "raw": 110.98863077163696,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "mean/p50",
+   "report": "6.57",
+   "recomputed": "6.57",
+   "raw": 6.567246250780958,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "occupancy max",
+   "report": "32",
+   "recomputed": "32",
+   "raw": 32,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "occupancy mean",
+   "report": "6.07",
+   "recomputed": "6.07",
+   "raw": 6.070310981561494,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "occupancy p50",
+   "report": "5",
+   "recomputed": "5",
+   "raw": 5,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, parse_bracket",
+   "figure": "occupancy p95",
+   "report": "14",
+   "recomputed": "14",
+   "raw": 14,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "share of run total",
+   "report": "0.1%",
+   "recomputed": "0.1%",
+   "raw": 0.0007305421934527463,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "min s",
+   "report": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.0004086494445800781,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "mean s",
+   "report": "0.004",
+   "recomputed": "0.004",
+   "raw": 0.00415429706972931,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "sd s",
+   "report": "0.006",
+   "recomputed": "0.006",
+   "raw": 0.006239676110436039,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "p50 s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.0020134449005126953,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "p90 s",
+   "report": "0.010",
+   "recomputed": "0.010",
+   "raw": 0.009834766387939453,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "p95 s",
+   "report": "0.013",
+   "recomputed": "0.013",
+   "raw": 0.013317346572875977,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "p99 s",
+   "report": "0.037",
+   "recomputed": "0.037",
+   "raw": 0.03670001029968262,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "max s",
+   "report": "0.064",
+   "recomputed": "0.064",
+   "raw": 0.06351137161254883,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "mean/p50",
+   "report": "2.06",
+   "recomputed": "2.06",
+   "raw": 2.063278249467605,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "occupancy max",
+   "report": "2",
+   "recomputed": "2",
+   "raw": 2,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "occupancy mean",
+   "report": "0.01",
+   "recomputed": "0.01",
+   "raw": 0.012166339405528966,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, split",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "share of run total",
+   "report": "62.0%",
+   "recomputed": "62.0%",
+   "raw": 0.6196227705622308,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "min s",
+   "report": "0.056",
+   "recomputed": "0.056",
+   "raw": 0.055864810943603516,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "mean s",
+   "report": "3.524",
+   "recomputed": "3.524",
+   "raw": 3.5235433122874555,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "sd s",
+   "report": "6.876",
+   "recomputed": "6.876",
+   "raw": 6.876293187270559,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "p50 s",
+   "report": "1.546",
+   "recomputed": "1.546",
+   "raw": 1.5460186004638672,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "p90 s",
+   "report": "7.739",
+   "recomputed": "7.739",
+   "raw": 7.739109992980957,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "p95 s",
+   "report": "11.380",
+   "recomputed": "11.380",
+   "raw": 11.379964590072632,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "p99 s",
+   "report": "27.188",
+   "recomputed": "27.188",
+   "raw": 27.188268184661865,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "max s",
+   "report": "98.664",
+   "recomputed": "98.664",
+   "raw": 98.66360473632812,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "mean/p50",
+   "report": "2.28",
+   "recomputed": "2.28",
+   "raw": 2.2791079688370193,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "occupancy max",
+   "report": "26",
+   "recomputed": "26",
+   "raw": 26,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "occupancy mean",
+   "report": "10.32",
+   "recomputed": "10.32",
+   "raw": 10.319104081346834,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "occupancy p50",
+   "report": "5",
+   "recomputed": "5",
+   "raw": 5,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, embed",
+   "figure": "occupancy p95",
+   "report": "23",
+   "recomputed": "23",
+   "raw": 23,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "share of run total",
+   "report": "1.3%",
+   "recomputed": "1.3%",
+   "raw": 0.012794472198106033,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "min s",
+   "report": "0.005",
+   "recomputed": "0.005",
+   "raw": 0.005427360534667969,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "mean s",
+   "report": "0.073",
+   "recomputed": "0.073",
+   "raw": 0.0727569726125108,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "sd s",
+   "report": "0.099",
+   "recomputed": "0.099",
+   "raw": 0.09853020898341766,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "p50 s",
+   "report": "0.045",
+   "recomputed": "0.045",
+   "raw": 0.04507851600646973,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "p90 s",
+   "report": "0.150",
+   "recomputed": "0.150",
+   "raw": 0.1501750946044922,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "p95 s",
+   "report": "0.214",
+   "recomputed": "0.214",
+   "raw": 0.21406102180480957,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "p99 s",
+   "report": "0.444",
+   "recomputed": "0.444",
+   "raw": 0.4439387321472168,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "max s",
+   "report": "1.240",
+   "recomputed": "1.240",
+   "raw": 1.2397818565368652,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "mean/p50",
+   "report": "1.61",
+   "recomputed": "1.61",
+   "raw": 1.6140054965888544,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "occupancy max",
+   "report": "5",
+   "recomputed": "5",
+   "raw": 5,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "occupancy mean",
+   "report": "0.21",
+   "recomputed": "0.21",
+   "raw": 0.21307720850600115,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s1 stage table, return",
+   "figure": "occupancy p95",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 heading",
+   "figure": "documents with a complete stamp set",
+   "report": "382",
+   "recomputed": "382",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 heading",
+   "figure": "documents without a complete stamp set",
+   "report": "2",
+   "recomputed": "2",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "share of run total",
+   "report": "0.2%",
+   "recomputed": "0.2%",
+   "raw": 0.001932202489127979,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "min s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.001184225082397461,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "mean s",
+   "report": "0.011",
+   "recomputed": "0.011",
+   "raw": 0.01088593393096125,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "sd s",
+   "report": "0.030",
+   "recomputed": "0.030",
+   "raw": 0.029908708040749136,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "p50 s",
+   "report": "0.004",
+   "recomputed": "0.004",
+   "raw": 0.004019498825073242,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "p90 s",
+   "report": "0.021",
+   "recomputed": "0.021",
+   "raw": 0.02103590965270996,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "p95 s",
+   "report": "0.038",
+   "recomputed": "0.038",
+   "raw": 0.038282155990600586,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "p99 s",
+   "report": "0.082",
+   "recomputed": "0.082",
+   "raw": 0.08242177963256836,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "max s",
+   "report": "0.388",
+   "recomputed": "0.388",
+   "raw": 0.38801145553588867,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "mean/p50",
+   "report": "2.71",
+   "recomputed": "2.71",
+   "raw": 2.7082814063922234,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "occupancy max",
+   "report": "31",
+   "recomputed": "31",
+   "raw": 31,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "occupancy mean",
+   "report": "0.03",
+   "recomputed": "0.03",
+   "raw": 0.03177582294610896,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, admission",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "share of run total",
+   "report": "36.0%",
+   "recomputed": "36.0%",
+   "raw": 0.3599350200937435,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "min s",
+   "report": "0.018",
+   "recomputed": "0.018",
+   "raw": 0.017795324325561523,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "mean s",
+   "report": "2.028",
+   "recomputed": "2.028",
+   "raw": 2.027856226366852,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "sd s",
+   "report": "8.119",
+   "recomputed": "8.119",
+   "raw": 8.119347144258517,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "p50 s",
+   "report": "0.305",
+   "recomputed": "0.305",
+   "raw": 0.3046320676803589,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "p90 s",
+   "report": "3.432",
+   "recomputed": "3.432",
+   "raw": 3.4315621852874756,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "p95 s",
+   "report": "6.883",
+   "recomputed": "6.883",
+   "raw": 6.882615566253662,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "p99 s",
+   "report": "45.983",
+   "recomputed": "45.983",
+   "raw": 45.98276448249817,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "max s",
+   "report": "110.333",
+   "recomputed": "110.333",
+   "raw": 110.33274006843567,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "mean/p50",
+   "report": "6.66",
+   "recomputed": "6.66",
+   "raw": 6.656739199546843,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "occupancy max",
+   "report": "32",
+   "recomputed": "32",
+   "raw": 32,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "occupancy mean",
+   "report": "5.92",
+   "recomputed": "5.92",
+   "raw": 5.919271678282898,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "occupancy p50",
+   "report": "5",
+   "recomputed": "5",
+   "raw": 5,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, parse_bracket",
+   "figure": "occupancy p95",
+   "report": "14",
+   "recomputed": "14",
+   "raw": 14,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "share of run total",
+   "report": "0.1%",
+   "recomputed": "0.1%",
+   "raw": 0.0006497911971427515,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "min s",
+   "report": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.0004253387451171875,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "mean s",
+   "report": "0.004",
+   "recomputed": "0.004",
+   "raw": 0.003660891692675845,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "sd s",
+   "report": "0.004",
+   "recomputed": "0.004",
+   "raw": 0.004412509649522271,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "p50 s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.0018720626831054688,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "p90 s",
+   "report": "0.009",
+   "recomputed": "0.009",
+   "raw": 0.009181022644042969,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "p95 s",
+   "report": "0.013",
+   "recomputed": "0.013",
+   "raw": 0.012814521789550781,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "p99 s",
+   "report": "0.020",
+   "recomputed": "0.020",
+   "raw": 0.020215272903442383,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "max s",
+   "report": "0.041",
+   "recomputed": "0.041",
+   "raw": 0.04056358337402344,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "mean/p50",
+   "report": "1.96",
+   "recomputed": "1.96",
+   "raw": 1.9555390563113941,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "occupancy max",
+   "report": "3",
+   "recomputed": "3",
+   "raw": 3,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "occupancy mean",
+   "report": "0.01",
+   "recomputed": "0.01",
+   "raw": 0.010686069471769869,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, split",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "share of run total",
+   "report": "62.4%",
+   "recomputed": "62.4%",
+   "raw": 0.624479210224787,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "min s",
+   "report": "0.051",
+   "recomputed": "0.051",
+   "raw": 0.05086398124694824,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "mean s",
+   "report": "3.518",
+   "recomputed": "3.518",
+   "raw": 3.5182852014821235,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "sd s",
+   "report": "6.872",
+   "recomputed": "6.872",
+   "raw": 6.871706635843937,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "p50 s",
+   "report": "1.634",
+   "recomputed": "1.634",
+   "raw": 1.6338646411895752,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "p90 s",
+   "report": "7.634",
+   "recomputed": "7.634",
+   "raw": 7.634395122528076,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "p95 s",
+   "report": "10.891",
+   "recomputed": "10.891",
+   "raw": 10.891122817993164,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "p99 s",
+   "report": "27.232",
+   "recomputed": "27.232",
+   "raw": 27.2319757938385,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "max s",
+   "report": "99.413",
+   "recomputed": "99.413",
+   "raw": 99.4132764339447,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "mean/p50",
+   "report": "2.15",
+   "recomputed": "2.15",
+   "raw": 2.1533516992696224,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "occupancy max",
+   "report": "27",
+   "recomputed": "27",
+   "raw": 27,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "occupancy mean",
+   "report": "10.27",
+   "recomputed": "10.27",
+   "raw": 10.26980398238917,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "occupancy p50",
+   "report": "5",
+   "recomputed": "5",
+   "raw": 5,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, embed",
+   "figure": "occupancy p95",
+   "report": "23",
+   "recomputed": "23",
+   "raw": 23,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "count",
+   "report": "382",
+   "recomputed": "382",
+   "raw": 382,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "share of run total",
+   "report": "1.3%",
+   "recomputed": "1.3%",
+   "raw": 0.01300377599519868,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "min s",
+   "report": "0.006",
+   "recomputed": "0.006",
+   "raw": 0.005914926528930664,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "mean s",
+   "report": "0.073",
+   "recomputed": "0.073",
+   "raw": 0.07326263532588619,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "sd s",
+   "report": "0.098",
+   "recomputed": "0.098",
+   "raw": 0.09829744099417859,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "p50 s",
+   "report": "0.043",
+   "recomputed": "0.043",
+   "raw": 0.042740464210510254,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "p90 s",
+   "report": "0.160",
+   "recomputed": "0.160",
+   "raw": 0.1596534252166748,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "p95 s",
+   "report": "0.238",
+   "recomputed": "0.238",
+   "raw": 0.23818421363830566,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "p99 s",
+   "report": "0.408",
+   "recomputed": "0.408",
+   "raw": 0.4077565670013428,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "max s",
+   "report": "1.228",
+   "recomputed": "1.228",
+   "raw": 1.2282702922821045,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "mean/p50",
+   "report": "1.71",
+   "recomputed": "1.71",
+   "raw": 1.7141282079914861,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "occupancy max",
+   "report": "8",
+   "recomputed": "8",
+   "raw": 8,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "occupancy mean",
+   "report": "0.21",
+   "recomputed": "0.21",
+   "raw": 0.21385216403523974,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 d1f_rr_s2 stage table, return",
+   "figure": "occupancy p95",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 heading",
+   "figure": "documents with a complete stamp set",
+   "report": "96",
+   "recomputed": "96",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 heading",
+   "figure": "documents without a complete stamp set",
+   "report": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "share of run total",
+   "report": "0.1%",
+   "recomputed": "0.1%",
+   "raw": 0.0006325303147186002,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "min s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.0009722709655761719,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "mean s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.0020046010613441467,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "sd s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.0021422962570757684,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "p50 s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.0014958381652832031,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "p90 s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.002180337905883789,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "p95 s",
+   "report": "0.006",
+   "recomputed": "0.006",
+   "raw": 0.005921602249145508,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "p99 s",
+   "report": "0.018",
+   "recomputed": "0.018",
+   "raw": 0.018314361572265625,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "max s",
+   "report": "0.018",
+   "recomputed": "0.018",
+   "raw": 0.018314361572265625,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "mean/p50",
+   "report": "1.34",
+   "recomputed": "1.34",
+   "raw": 1.3401189432578897,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "occupancy max",
+   "report": "8",
+   "recomputed": "8",
+   "raw": 8,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "occupancy mean",
+   "report": "0.00",
+   "recomputed": "0.00",
+   "raw": 0.0037278158634399543,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, admission",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "share of run total",
+   "report": "31.9%",
+   "recomputed": "31.9%",
+   "raw": 0.3186462463733971,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "min s",
+   "report": "0.015",
+   "recomputed": "0.015",
+   "raw": 0.014928817749023438,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "mean s",
+   "report": "1.010",
+   "recomputed": "1.010",
+   "raw": 1.0098466252287228,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "sd s",
+   "report": "3.504",
+   "recomputed": "3.504",
+   "raw": 3.503510437181415,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "p50 s",
+   "report": "0.159",
+   "recomputed": "0.159",
+   "raw": 0.1592329740524292,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "p90 s",
+   "report": "2.265",
+   "recomputed": "2.265",
+   "raw": 2.2654922008514404,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "p95 s",
+   "report": "4.436",
+   "recomputed": "4.436",
+   "raw": 4.436387300491333,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "p99 s",
+   "report": "32.954",
+   "recomputed": "32.954",
+   "raw": 32.954094648361206,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "max s",
+   "report": "32.954",
+   "recomputed": "32.954",
+   "raw": 32.954094648361206,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "mean/p50",
+   "report": "6.34",
+   "recomputed": "6.34",
+   "raw": 6.341944130844531,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "occupancy max",
+   "report": "8",
+   "recomputed": "8",
+   "raw": 8,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "occupancy mean",
+   "report": "1.88",
+   "recomputed": "1.88",
+   "raw": 1.8779408740034826,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "occupancy p50",
+   "report": "2",
+   "recomputed": "2",
+   "raw": 2,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, parse_bracket",
+   "figure": "occupancy p95",
+   "report": "4",
+   "recomputed": "4",
+   "raw": 4,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "share of run total",
+   "report": "0.0%",
+   "recomputed": "0.0%",
+   "raw": 0.00039429359996068144,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "min s",
+   "report": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.0002880096435546875,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "mean s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.001249586542447408,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "sd s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.001234173292540792,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "p50 s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.0007966756820678711,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "p90 s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.002314329147338867,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "p95 s",
+   "report": "0.003",
+   "recomputed": "0.003",
+   "raw": 0.003268003463745117,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "p99 s",
+   "report": "0.007",
+   "recomputed": "0.007",
+   "raw": 0.007227897644042969,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "max s",
+   "report": "0.007",
+   "recomputed": "0.007",
+   "raw": 0.007227897644042969,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "mean/p50",
+   "report": "1.57",
+   "recomputed": "1.57",
+   "raw": 1.5685009227392888,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "occupancy max",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "occupancy mean",
+   "report": "0.00",
+   "recomputed": "0.00",
+   "raw": 0.0023237683674341898,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, split",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "share of run total",
+   "report": "66.8%",
+   "recomputed": "66.8%",
+   "raw": 0.6684945396480223,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "min s",
+   "report": "0.015",
+   "recomputed": "0.015",
+   "raw": 0.01522970199584961,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "mean s",
+   "report": "2.119",
+   "recomputed": "2.119",
+   "raw": 2.118578086296717,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "sd s",
+   "report": "3.766",
+   "recomputed": "3.766",
+   "raw": 3.765745431578886,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "p50 s",
+   "report": "1.016",
+   "recomputed": "1.016",
+   "raw": 1.0163896083831787,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "p90 s",
+   "report": "4.612",
+   "recomputed": "4.612",
+   "raw": 4.612025260925293,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "p95 s",
+   "report": "7.437",
+   "recomputed": "7.437",
+   "raw": 7.43675971031189,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "p99 s",
+   "report": "29.254",
+   "recomputed": "29.254",
+   "raw": 29.254275798797607,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "max s",
+   "report": "29.254",
+   "recomputed": "29.254",
+   "raw": 29.254275798797607,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "mean/p50",
+   "report": "2.08",
+   "recomputed": "2.08",
+   "raw": 2.084415335244173,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "occupancy max",
+   "report": "8",
+   "recomputed": "8",
+   "raw": 8,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "occupancy mean",
+   "report": "3.94",
+   "recomputed": "3.94",
+   "raw": 3.9397709351393506,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "occupancy p50",
+   "report": "4",
+   "recomputed": "4",
+   "raw": 4,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, embed",
+   "figure": "occupancy p95",
+   "report": "7",
+   "recomputed": "7",
+   "raw": 7,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "share of run total",
+   "report": "1.2%",
+   "recomputed": "1.2%",
+   "raw": 0.011832390063901275,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "min s",
+   "report": "0.004",
+   "recomputed": "0.004",
+   "raw": 0.0039014816284179688,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "mean s",
+   "report": "0.037",
+   "recomputed": "0.037",
+   "raw": 0.03749894847472509,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "sd s",
+   "report": "0.053",
+   "recomputed": "0.053",
+   "raw": 0.052810459931783925,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "p50 s",
+   "report": "0.021",
+   "recomputed": "0.021",
+   "raw": 0.02128124237060547,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "p90 s",
+   "report": "0.077",
+   "recomputed": "0.077",
+   "raw": 0.07710385322570801,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "p95 s",
+   "report": "0.121",
+   "recomputed": "0.121",
+   "raw": 0.12064075469970703,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "p99 s",
+   "report": "0.386",
+   "recomputed": "0.386",
+   "raw": 0.3863856792449951,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "max s",
+   "report": "0.386",
+   "recomputed": "0.386",
+   "raw": 0.3863856792449951,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "mean/p50",
+   "report": "1.76",
+   "recomputed": "1.76",
+   "raw": 1.7620657582717156,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "occupancy max",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "occupancy mean",
+   "report": "0.07",
+   "recomputed": "0.07",
+   "raw": 0.06973416191482246,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s1 stage table, return",
+   "figure": "occupancy p95",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 heading",
+   "figure": "documents with a complete stamp set",
+   "report": "96",
+   "recomputed": "96",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 heading",
+   "figure": "documents without a complete stamp set",
+   "report": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "share of run total",
+   "report": "0.1%",
+   "recomputed": "0.1%",
+   "raw": 0.0006240722086598868,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "min s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.0007338523864746094,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "mean s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.001996013025442759,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "sd s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.0016203333872276994,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "p50 s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.001501321792602539,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "p90 s",
+   "report": "0.003",
+   "recomputed": "0.003",
+   "raw": 0.002906322479248047,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "p95 s",
+   "report": "0.006",
+   "recomputed": "0.006",
+   "raw": 0.005840778350830078,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "p99 s",
+   "report": "0.011",
+   "recomputed": "0.011",
+   "raw": 0.011276006698608398,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "max s",
+   "report": "0.011",
+   "recomputed": "0.011",
+   "raw": 0.011276006698608398,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "mean/p50",
+   "report": "1.33",
+   "recomputed": "1.33",
+   "raw": 1.3295037981049176,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "occupancy max",
+   "report": "8",
+   "recomputed": "8",
+   "raw": 8,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "occupancy mean",
+   "report": "0.00",
+   "recomputed": "0.00",
+   "raw": 0.00364437216793763,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, admission",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "share of run total",
+   "report": "31.9%",
+   "recomputed": "31.9%",
+   "raw": 0.31936473426225814,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "min s",
+   "report": "0.012",
+   "recomputed": "0.012",
+   "raw": 0.012335777282714844,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "mean s",
+   "report": "1.021",
+   "recomputed": "1.021",
+   "raw": 1.0214461733897526,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "sd s",
+   "report": "3.499",
+   "recomputed": "3.499",
+   "raw": 3.4986154888896643,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "p50 s",
+   "report": "0.155",
+   "recomputed": "0.155",
+   "raw": 0.15492260456085205,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "p90 s",
+   "report": "2.254",
+   "recomputed": "2.254",
+   "raw": 2.2536251544952393,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "p95 s",
+   "report": "4.615",
+   "recomputed": "4.615",
+   "raw": 4.614914655685425,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "p99 s",
+   "report": "32.810",
+   "recomputed": "32.810",
+   "raw": 32.81034588813782,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "max s",
+   "report": "32.810",
+   "recomputed": "32.810",
+   "raw": 32.81034588813782,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "mean/p50",
+   "report": "6.59",
+   "recomputed": "6.59",
+   "raw": 6.593267498214173,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "occupancy max",
+   "report": "8",
+   "recomputed": "8",
+   "raw": 8,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "occupancy mean",
+   "report": "1.86",
+   "recomputed": "1.86",
+   "raw": 1.8649828222049156,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "occupancy p50",
+   "report": "2",
+   "recomputed": "2",
+   "raw": 2,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, parse_bracket",
+   "figure": "occupancy p95",
+   "report": "5",
+   "recomputed": "5",
+   "raw": 5,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "share of run total",
+   "report": "0.0%",
+   "recomputed": "0.0%",
+   "raw": 0.0004116829262562696,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "min s",
+   "report": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.0003058910369873047,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "mean s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.0013167137900988262,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "sd s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.001365579012762877,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "p50 s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.0008220672607421875,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "p90 s",
+   "report": "0.003",
+   "recomputed": "0.003",
+   "raw": 0.0026063919067382812,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "p95 s",
+   "report": "0.005",
+   "recomputed": "0.005",
+   "raw": 0.005106925964355469,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "p99 s",
+   "report": "0.007",
+   "recomputed": "0.007",
+   "raw": 0.007158756256103516,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "max s",
+   "report": "0.007",
+   "recomputed": "0.007",
+   "raw": 0.007158756256103516,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "mean/p50",
+   "report": "1.60",
+   "recomputed": "1.60",
+   "raw": 1.6017105326759475,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "occupancy max",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "occupancy mean",
+   "report": "0.00",
+   "recomputed": "0.00",
+   "raw": 0.002404090067854842,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, split",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "share of run total",
+   "report": "66.7%",
+   "recomputed": "66.7%",
+   "raw": 0.6666959295109726,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "min s",
+   "report": "0.017",
+   "recomputed": "0.017",
+   "raw": 0.01743006706237793,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "mean s",
+   "report": "2.132",
+   "recomputed": "2.132",
+   "raw": 2.13233940054973,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "sd s",
+   "report": "3.819",
+   "recomputed": "3.819",
+   "raw": 3.818634927986763,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "p50 s",
+   "report": "0.993",
+   "recomputed": "0.993",
+   "raw": 0.992997407913208,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "p90 s",
+   "report": "4.559",
+   "recomputed": "4.559",
+   "raw": 4.558810472488403,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "p95 s",
+   "report": "7.508",
+   "recomputed": "7.508",
+   "raw": 7.508044481277466,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "p99 s",
+   "report": "29.900",
+   "recomputed": "29.900",
+   "raw": 29.899693489074707,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "max s",
+   "report": "29.900",
+   "recomputed": "29.900",
+   "raw": 29.899693489074707,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "mean/p50",
+   "report": "2.15",
+   "recomputed": "2.15",
+   "raw": 2.1473766029569585,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "occupancy max",
+   "report": "8",
+   "recomputed": "8",
+   "raw": 8,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "occupancy mean",
+   "report": "3.89",
+   "recomputed": "3.89",
+   "raw": 3.8932803869035166,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "occupancy p50",
+   "report": "4",
+   "recomputed": "4",
+   "raw": 4,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, embed",
+   "figure": "occupancy p95",
+   "report": "7",
+   "recomputed": "7",
+   "raw": 7,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "count",
+   "report": "96",
+   "recomputed": "96",
+   "raw": 96,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "share of run total",
+   "report": "1.3%",
+   "recomputed": "1.3%",
+   "raw": 0.012903581091853154,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "min s",
+   "report": "0.003",
+   "recomputed": "0.003",
+   "raw": 0.0033388137817382812,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "mean s",
+   "report": "0.041",
+   "recomputed": "0.041",
+   "raw": 0.04127041002114614,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "sd s",
+   "report": "0.061",
+   "recomputed": "0.061",
+   "raw": 0.061072130558673506,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "p50 s",
+   "report": "0.022",
+   "recomputed": "0.022",
+   "raw": 0.02169477939605713,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "p90 s",
+   "report": "0.085",
+   "recomputed": "0.085",
+   "raw": 0.08511829376220703,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "p95 s",
+   "report": "0.134",
+   "recomputed": "0.134",
+   "raw": 0.13394522666931152,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "p99 s",
+   "report": "0.427",
+   "recomputed": "0.427",
+   "raw": 0.42705607414245605,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "max s",
+   "report": "0.427",
+   "recomputed": "0.427",
+   "raw": 0.42705607414245605,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "mean/p50",
+   "report": "1.90",
+   "recomputed": "1.90",
+   "raw": 1.9023198746444383,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "occupancy max",
+   "report": "2",
+   "recomputed": "2",
+   "raw": 2,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "occupancy mean",
+   "report": "0.08",
+   "recomputed": "0.08",
+   "raw": 0.07535258123231746,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_rr_s2 stage table, return",
+   "figure": "occupancy p95",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: time-weighted count of documents inside the stage interval over the leg window [t0_ns,t1_ns] (H1-style definition applied to the stage intervals); p50/p95 = time-weighted quantiles"
+  },
+  {
+   "where": "D1 anf_li_t1 heading",
+   "figure": "documents",
+   "report": "95",
+   "recomputed": "95",
+   "raw": null,
+   "status": "MATCH",
+   "note": "96 rows; rows with svc_timing_ms = ok rows = 95"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "count",
+   "report": "95",
+   "recomputed": "95",
+   "raw": 95,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "share of run total",
+   "report": "87.2%",
+   "recomputed": "87.2%",
+   "raw": 0.8723423629737187,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "min s",
+   "report": "0.016",
+   "recomputed": "0.016",
+   "raw": 0.01612853999999997,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "mean s",
+   "report": "13.843",
+   "recomputed": "13.843",
+   "raw": 13.84302048388421,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "sd s",
+   "report": "9.854",
+   "recomputed": "9.854",
+   "raw": 9.853549640800583,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "p50 s",
+   "report": "12.618",
+   "recomputed": "12.618",
+   "raw": 12.617783965,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "p90 s",
+   "report": "22.919",
+   "recomputed": "22.919",
+   "raw": 22.918763675,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "p95 s",
+   "report": "32.885",
+   "recomputed": "32.885",
+   "raw": 32.884940795,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "p99 s",
+   "report": "61.723",
+   "recomputed": "61.723",
+   "raw": 61.723395511999996,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "max s",
+   "report": "61.723",
+   "recomputed": "61.723",
+   "raw": 61.723395511999996,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "mean/p50",
+   "report": "1.10",
+   "recomputed": "1.10",
+   "raw": 1.097103938558692,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, queue",
+   "figure": "occupancy",
+   "report": "—",
+   "recomputed": "—",
+   "raw": null,
+   "status": "MATCH",
+   "note": "no occupancy for queue"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "count",
+   "report": "95",
+   "recomputed": "95",
+   "raw": 95,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "share of run total",
+   "report": "2.9%",
+   "recomputed": "2.9%",
+   "raw": 0.028855061419498226,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "min s",
+   "report": "0.003",
+   "recomputed": "0.003",
+   "raw": 0.003156,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "mean s",
+   "report": "0.458",
+   "recomputed": "0.458",
+   "raw": 0.457895,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "sd s",
+   "report": "1.053",
+   "recomputed": "1.053",
+   "raw": 1.0525395741193821,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "p50 s",
+   "report": "0.143",
+   "recomputed": "0.143",
+   "raw": 0.142821,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "p90 s",
+   "report": "0.900",
+   "recomputed": "0.900",
+   "raw": 0.900072,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "p95 s",
+   "report": "2.159",
+   "recomputed": "2.159",
+   "raw": 2.158953,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "p99 s",
+   "report": "8.428",
+   "recomputed": "8.428",
+   "raw": 8.428156999999999,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "max s",
+   "report": "8.428",
+   "recomputed": "8.428",
+   "raw": 8.428156999999999,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "mean/p50",
+   "report": "3.21",
+   "recomputed": "3.21",
+   "raw": 3.2060761372627273,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "occupancy max",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "occupancy mean",
+   "report": "0.22",
+   "recomputed": "0.22",
+   "raw": 0.22486215149506236,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, extract",
+   "figure": "occupancy p95",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "count",
+   "report": "95",
+   "recomputed": "95",
+   "raw": 95,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "share of run total",
+   "report": "0.0%",
+   "recomputed": "0.0%",
+   "raw": 0.00012536090812419743,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "min s",
+   "report": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.000364,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "mean s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.0019893263157894736,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "sd s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.0022348423725981463,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "p50 s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.00114,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "p90 s",
+   "report": "0.005",
+   "recomputed": "0.005",
+   "raw": 0.004911,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "p95 s",
+   "report": "0.007",
+   "recomputed": "0.007",
+   "raw": 0.006927,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "p99 s",
+   "report": "0.013",
+   "recomputed": "0.013",
+   "raw": 0.012927,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "max s",
+   "report": "0.013",
+   "recomputed": "0.013",
+   "raw": 0.012927,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "mean/p50",
+   "report": "1.75",
+   "recomputed": "1.75",
+   "raw": 1.745023084025854,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "occupancy max",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "occupancy mean",
+   "report": "0.00",
+   "recomputed": "0.00",
+   "raw": 0.0009769121973592686,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_split",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "count",
+   "report": "95",
+   "recomputed": "95",
+   "raw": 95,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "share of run total",
+   "report": "9.9%",
+   "recomputed": "9.9%",
+   "raw": 0.09867553712605219,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "min s",
+   "report": "0.013",
+   "recomputed": "0.013",
+   "raw": 0.013125999999999999,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "mean s",
+   "report": "1.566",
+   "recomputed": "1.566",
+   "raw": 1.5658616842105262,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "sd s",
+   "report": "2.371",
+   "recomputed": "2.371",
+   "raw": 2.371324898072096,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "p50 s",
+   "report": "0.827",
+   "recomputed": "0.827",
+   "raw": 0.8273579999999999,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "p90 s",
+   "report": "3.603",
+   "recomputed": "3.603",
+   "raw": 3.602741,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "p95 s",
+   "report": "5.250",
+   "recomputed": "5.250",
+   "raw": 5.249899999999999,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "p99 s",
+   "report": "15.324",
+   "recomputed": "15.324",
+   "raw": 15.323616,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "max s",
+   "report": "15.324",
+   "recomputed": "15.324",
+   "raw": 15.323616,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "mean/p50",
+   "report": "1.89",
+   "recomputed": "1.89",
+   "raw": 1.8926047541820183,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "occupancy max",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "occupancy mean",
+   "report": "0.77",
+   "recomputed": "0.77",
+   "raw": 0.7689601858319406,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "occupancy p50",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t1 stage table, svc_embed",
+   "figure": "occupancy p95",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 heading",
+   "figure": "documents",
+   "report": "95",
+   "recomputed": "95",
+   "raw": null,
+   "status": "MATCH",
+   "note": "96 rows; rows with svc_timing_ms = ok rows = 95"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "count",
+   "report": "95",
+   "recomputed": "95",
+   "raw": 95,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "share of run total",
+   "report": "87.2%",
+   "recomputed": "87.2%",
+   "raw": 0.8724471008500647,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "min s",
+   "report": "0.006",
+   "recomputed": "0.006",
+   "raw": 0.005791086000000001,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "mean s",
+   "report": "13.851",
+   "recomputed": "13.851",
+   "raw": 13.850785384189473,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "sd s",
+   "report": "9.881",
+   "recomputed": "9.881",
+   "raw": 9.880545580319128,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "p50 s",
+   "report": "11.974",
+   "recomputed": "11.974",
+   "raw": 11.973991205999999,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "p90 s",
+   "report": "21.880",
+   "recomputed": "21.880",
+   "raw": 21.879557026999997,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "p95 s",
+   "report": "33.167",
+   "recomputed": "33.167",
+   "raw": 33.167173651000006,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "p99 s",
+   "report": "61.544",
+   "recomputed": "61.544",
+   "raw": 61.54398943700001,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "max s",
+   "report": "61.544",
+   "recomputed": "61.544",
+   "raw": 61.54398943700001,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "mean/p50",
+   "report": "1.16",
+   "recomputed": "1.16",
+   "raw": 1.156739231380848,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, queue",
+   "figure": "occupancy",
+   "report": "—",
+   "recomputed": "—",
+   "raw": null,
+   "status": "MATCH",
+   "note": "no occupancy for queue"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "count",
+   "report": "95",
+   "recomputed": "95",
+   "raw": 95,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "share of run total",
+   "report": "2.9%",
+   "recomputed": "2.9%",
+   "raw": 0.028800656742698175,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "min s",
+   "report": "0.003",
+   "recomputed": "0.003",
+   "raw": 0.0033039999999999996,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "mean s",
+   "report": "0.457",
+   "recomputed": "0.457",
+   "raw": 0.45723312631578944,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "sd s",
+   "report": "1.053",
+   "recomputed": "1.053",
+   "raw": 1.053336064476263,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "p50 s",
+   "report": "0.143",
+   "recomputed": "0.143",
+   "raw": 0.143066,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "p90 s",
+   "report": "1.013",
+   "recomputed": "1.013",
+   "raw": 1.012832,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "p95 s",
+   "report": "2.176",
+   "recomputed": "2.176",
+   "raw": 2.176494,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "p99 s",
+   "report": "8.432",
+   "recomputed": "8.432",
+   "raw": 8.431998,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "max s",
+   "report": "8.432",
+   "recomputed": "8.432",
+   "raw": 8.431998,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "mean/p50",
+   "report": "3.20",
+   "recomputed": "3.20",
+   "raw": 3.195959391580036,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "occupancy max",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "occupancy mean",
+   "report": "0.22",
+   "recomputed": "0.22",
+   "raw": 0.22463327500319702,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, extract",
+   "figure": "occupancy p95",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "count",
+   "report": "95",
+   "recomputed": "95",
+   "raw": 95,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "share of run total",
+   "report": "0.0%",
+   "recomputed": "0.0%",
+   "raw": 0.0001268054736819511,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "min s",
+   "report": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.00041999999999999996,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "mean s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.002013136842105263,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "sd s",
+   "report": "0.002",
+   "recomputed": "0.002",
+   "raw": 0.0022774559703897046,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "p50 s",
+   "report": "0.001",
+   "recomputed": "0.001",
+   "raw": 0.0011259999999999998,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "p90 s",
+   "report": "0.005",
+   "recomputed": "0.005",
+   "raw": 0.004889,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "p95 s",
+   "report": "0.007",
+   "recomputed": "0.007",
+   "raw": 0.007123999999999999,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "p99 s",
+   "report": "0.013",
+   "recomputed": "0.013",
+   "raw": 0.012908,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "max s",
+   "report": "0.013",
+   "recomputed": "0.013",
+   "raw": 0.012908,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "mean/p50",
+   "report": "1.79",
+   "recomputed": "1.79",
+   "raw": 1.7878657567542304,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "occupancy max",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "occupancy mean",
+   "report": "0.00",
+   "recomputed": "0.00",
+   "raw": 0.0009890326949928805,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "occupancy p50",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_split",
+   "figure": "occupancy p95",
+   "report": "0",
+   "recomputed": "0",
+   "raw": 0,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "count",
+   "report": "95",
+   "recomputed": "95",
+   "raw": 95,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "share of run total",
+   "report": "9.9%",
+   "recomputed": "9.9%",
+   "raw": 0.09862376938269807,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "min s",
+   "report": "0.014",
+   "recomputed": "0.014",
+   "raw": 0.014486,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "mean s",
+   "report": "1.566",
+   "recomputed": "1.566",
+   "raw": 1.5657300736842106,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "sd s",
+   "report": "2.383",
+   "recomputed": "2.383",
+   "raw": 2.3827965757831753,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "p50 s",
+   "report": "0.830",
+   "recomputed": "0.830",
+   "raw": 0.8297530000000001,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "p90 s",
+   "report": "3.530",
+   "recomputed": "3.530",
+   "raw": 3.52973,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "p95 s",
+   "report": "5.350",
+   "recomputed": "5.350",
+   "raw": 5.349769,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "p99 s",
+   "report": "15.438",
+   "recomputed": "15.438",
+   "raw": 15.43834,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "max s",
+   "report": "15.438",
+   "recomputed": "15.438",
+   "raw": 15.43834,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "mean/p50",
+   "report": "1.89",
+   "recomputed": "1.89",
+   "raw": 1.8869833235724491,
+   "status": "MATCH"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "occupancy max",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "occupancy mean",
+   "report": "0.77",
+   "recomputed": "0.77",
+   "raw": 0.7692248323801073,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "occupancy p50",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "D1 anf_li_t2 stage table, svc_embed",
+   "figure": "occupancy p95",
+   "report": "1",
+   "recomputed": "1",
+   "raw": 1,
+   "status": "MATCH",
+   "note": "occupancy reconstructed: intervals [t0_wall, +extract], [+split], [+embed] from svc_timing_ms, time-weighted over the leg window [t0_ns,t1_ns]"
+  },
+  {
+   "where": "Verdicts table, D1 (telemetry) row",
+   "figure": "verdict",
+   "report": "overhead unreadable",
+   "recomputed": "overhead unreadable",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "where": "Verdicts table, D1 (telemetry) row",
+   "figure": "rr_384_c32 overhead",
+   "report": "-0.06%",
+   "recomputed": "-0.06%",
+   "raw": -0.0005730610165276799,
+   "status": "MATCH"
+  },
+  {
+   "where": "Verdicts table, D1 (telemetry) row",
+   "figure": "rr_384_c32 threshold",
+   "report": "0.82%",
+   "recomputed": "0.82%",
+   "raw": 0.0082,
+   "status": "MATCH"
+  },
+  {
+   "where": "Verdicts table, D1 (telemetry) row",
+   "figure": "rr_96_c8 overhead",
+   "report": "-0.12%",
+   "recomputed": "-0.12%",
+   "raw": -0.0011916157951834222,
+   "status": "MATCH"
+  },
+  {
+   "where": "Verdicts table, D1 (telemetry) row",
+   "figure": "rr_96_c8 threshold",
+   "report": "1.83%",
+   "recomputed": "1.83%",
+   "raw": 0.018341874650613123,
+   "status": "MATCH"
+  },
+  {
+   "where": "Verdicts table, D1 (telemetry) row",
+   "figure": "li_96_c8_one_worker overhead",
+   "report": "+0.71%",
+   "recomputed": "+0.71%",
+   "raw": 0.0071398391156815835,
+   "status": "MATCH"
+  },
+  {
+   "where": "Verdicts table, D1 (telemetry) row",
+   "figure": "li_96_c8_one_worker threshold",
+   "report": "9.87%",
+   "recomputed": "9.87%",
+   "raw": 0.0987,
+   "status": "MATCH"
+  },
+  {
+   "where": "Verdicts table, D1 (telemetry) row",
+   "figure": "output identity",
+   "report": "PASS",
+   "recomputed": "PASS",
+   "raw": null,
+   "status": "MATCH"
+  }
+ ]
+}

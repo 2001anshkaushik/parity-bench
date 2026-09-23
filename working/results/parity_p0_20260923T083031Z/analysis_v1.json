@@ -1,0 +1,876 @@
+{
+ "legs": {
+  "v1_li_t4_a": {
+   "dir": "v1_li_t4_a",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "frames_match_export": true,
+   "span_s": 913.8,
+   "frames_per_s": 3.5051433574086235,
+   "records_span_s": 901.980217993,
+   "records_frames_per_s": 3.551075662309988,
+   "export_frames_per_s": 3.505,
+   "export_total_frames": 3203,
+   "cpu_s_per_frame": 0.871807680299719,
+   "engine_cores": 3.056,
+   "service_cpu_s": 2792.4,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "p0": null,
+   "task_census": null,
+   "session": {
+    "steal_share": 2.6600541267813718e-06,
+    "mhz_open_mean": 2695.70546875,
+    "mhz_close_mean": 2593.59803125,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "container_procs": {
+    "containers": {
+     "li_bal_0": {
+      "leg_start": {
+       "n": 1,
+       "state": "measured",
+       "top_cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+      },
+      "leg_end": {
+       "n": 1,
+       "state": "measured",
+       "top_cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+      }
+     }
+    },
+    "service_peak_process_count": 10,
+    "service_distinct_pids_seen": 17
+   },
+   "idle_burden": {
+    "instance_kind": "li_workers",
+    "idle_cores_before_instances": 0.006,
+    "idle_cores_with_instances_live": 0.005
+   },
+   "thread_pins": null
+  },
+  "v1_li_t4_b": {
+   "dir": "v1_li_t4_b",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "frames_match_export": true,
+   "span_s": 949.2,
+   "frames_per_s": 3.3744205646860514,
+   "records_span_s": 937.211614484,
+   "records_frames_per_s": 3.4175846206979346,
+   "export_frames_per_s": 3.375,
+   "export_total_frames": 3203,
+   "cpu_s_per_frame": 0.8850452700593194,
+   "engine_cores": 2.987,
+   "service_cpu_s": 2834.8,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "p0": null,
+   "task_census": null,
+   "session": {
+    "steal_share": 2.58411109334774e-06,
+    "mhz_open_mean": 2757.17065625,
+    "mhz_close_mean": 2573.9570625,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "container_procs": {
+    "containers": {
+     "li_bal_0": {
+      "leg_start": {
+       "n": 1,
+       "state": "measured",
+       "top_cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+      },
+      "leg_end": {
+       "n": 1,
+       "state": "measured",
+       "top_cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+      }
+     }
+    },
+    "service_peak_process_count": 10,
+    "service_distinct_pids_seen": 17
+   },
+   "idle_burden": {
+    "instance_kind": "li_workers",
+    "idle_cores_before_instances": 0.006,
+    "idle_cores_with_instances_live": 0.005
+   },
+   "thread_pins": null
+  },
+  "v1_rr_def_a": {
+   "dir": "v1_rr_def_a",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "frames_match_export": true,
+   "span_s": 1256.1,
+   "frames_per_s": 2.5499562136772553,
+   "records_span_s": 1244.290546332,
+   "records_frames_per_s": 2.5741576269642246,
+   "export_frames_per_s": 2.55,
+   "export_total_frames": 3203,
+   "cpu_s_per_frame": 2.1014985950671248,
+   "engine_cores": 5.359,
+   "service_cpu_s": 6731.1,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "p0": {
+    "d0_pre": {
+     "d0_schema": 2,
+     "pid": 89,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 272,
+     "python_threads": 5,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "scanner": 1,
+      "External": 1
+     },
+     "asyncio_executor_threads_alive": 0,
+     "asyncio_executor_max_index": null,
+     "root_modules_with_params": {
+      "rfdetr.models.lwdetr.LWDETR": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        32174530
+       ]
+      },
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 2
+    },
+    "probe_pid": 89,
+    "torch_num_threads": 16,
+    "env": {
+     "OMP_NUM_THREADS": null,
+     "MKL_NUM_THREADS": null,
+     "OPENBLAS_NUM_THREADS": null,
+     "VECLIB_MAXIMUM_THREADS": null,
+     "NUMEXPR_NUM_THREADS": null,
+     "TORCH_NUM_THREADS": null
+    },
+    "mandate": {
+     "mandate_violation": false,
+     "violations": []
+    },
+    "d0_post": {
+     "d0_schema": 2,
+     "pid": 89,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 528,
+     "python_threads": 21,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "scanner": 1,
+      "External": 17
+     },
+     "asyncio_executor_threads_alive": 0,
+     "asyncio_executor_max_index": null,
+     "root_modules_with_params": {
+      "rfdetr.models.lwdetr.LWDETR": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        32174530
+       ]
+      },
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 2
+    },
+    "post_pid": 89
+   },
+   "task_census": {
+    "declared_tokens": 1,
+    "census_before": 0,
+    "census_after": 1,
+    "new_task_pids": [
+     89
+    ],
+    "project_ids": [
+     "6b9519b6-b642-554d-bc71-05287c9ef029"
+    ]
+   },
+   "session": {
+    "steal_share": 2.9524760372502545e-06,
+    "mhz_open_mean": 2747.27803125,
+    "mhz_close_mean": 2786.3045,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "container_procs": {
+    "containers": {
+     "rr": {
+      "leg_start": {
+       "n": 2,
+       "state": "measured",
+       "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-d2fb6e22.webhook_1-wbnjdh59.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+      },
+      "leg_end": {
+       "n": 2,
+       "state": "measured",
+       "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-d2fb6e22.webhook_1-wbnjdh59.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+      }
+     }
+    },
+    "service_peak_process_count": 18,
+    "service_distinct_pids_seen": 18
+   },
+   "idle_burden": {
+    "instance_kind": "rr_tokens",
+    "idle_cores_before_instances": 1.007,
+    "idle_cores_with_instances_live": 1.24
+   },
+   "thread_pins": null
+  },
+  "v1_rr_def_b": {
+   "dir": "v1_rr_def_b",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "frames_match_export": true,
+   "span_s": 1250.0,
+   "frames_per_s": 2.5624,
+   "records_span_s": 1238.085488044,
+   "records_frames_per_s": 2.5870588347338495,
+   "export_frames_per_s": 2.562,
+   "export_total_frames": 3203,
+   "cpu_s_per_frame": 2.0866999687792696,
+   "engine_cores": 5.347,
+   "service_cpu_s": 6683.7,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "p0": {
+    "d0_pre": {
+     "d0_schema": 2,
+     "pid": 87,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 272,
+     "python_threads": 5,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "scanner": 1,
+      "External": 1
+     },
+     "asyncio_executor_threads_alive": 0,
+     "asyncio_executor_max_index": null,
+     "root_modules_with_params": {
+      "rfdetr.models.lwdetr.LWDETR": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        32174530
+       ]
+      },
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 2
+    },
+    "probe_pid": 87,
+    "torch_num_threads": 16,
+    "env": {
+     "OMP_NUM_THREADS": null,
+     "MKL_NUM_THREADS": null,
+     "OPENBLAS_NUM_THREADS": null,
+     "VECLIB_MAXIMUM_THREADS": null,
+     "NUMEXPR_NUM_THREADS": null,
+     "TORCH_NUM_THREADS": null
+    },
+    "mandate": {
+     "mandate_violation": false,
+     "violations": []
+    },
+    "d0_post": {
+     "d0_schema": 2,
+     "pid": 87,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 528,
+     "python_threads": 21,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "scanner": 1,
+      "External": 17
+     },
+     "asyncio_executor_threads_alive": 0,
+     "asyncio_executor_max_index": null,
+     "root_modules_with_params": {
+      "rfdetr.models.lwdetr.LWDETR": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        32174530
+       ]
+      },
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 2
+    },
+    "post_pid": 87
+   },
+   "task_census": {
+    "declared_tokens": 1,
+    "census_before": 0,
+    "census_after": 1,
+    "new_task_pids": [
+     87
+    ],
+    "project_ids": [
+     "6d4ff129-8edb-53c4-b8dc-f9f549275d89"
+    ]
+   },
+   "session": {
+    "steal_share": 2.9868022399178768e-06,
+    "mhz_open_mean": 2788.68646875,
+    "mhz_close_mean": 2635.3475,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "container_procs": {
+    "containers": {
+     "rr": {
+      "leg_start": {
+       "n": 2,
+       "state": "measured",
+       "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-9f49a74b.webhook_1-xzjtzprb.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+      },
+      "leg_end": {
+       "n": 2,
+       "state": "measured",
+       "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-9f49a74b.webhook_1-xzjtzprb.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+      }
+     }
+    },
+    "service_peak_process_count": 18,
+    "service_distinct_pids_seen": 18
+   },
+   "idle_burden": {
+    "instance_kind": "rr_tokens",
+    "idle_cores_before_instances": 1.007,
+    "idle_cores_with_instances_live": 1.238
+   },
+   "thread_pins": null
+  },
+  "v1_rr_t4_a": {
+   "dir": "v1_rr_t4_a",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "frames_match_export": true,
+   "span_s": 1266.7,
+   "frames_per_s": 2.5286176679561065,
+   "records_span_s": 1254.629308226,
+   "records_frames_per_s": 2.5529453034449876,
+   "export_frames_per_s": 2.529,
+   "export_total_frames": 3203,
+   "cpu_s_per_frame": 1.4372151108335933,
+   "engine_cores": 3.634,
+   "service_cpu_s": 4603.4,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "p0": {
+    "d0_pre": {
+     "d0_schema": 2,
+     "pid": 89,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 176,
+     "python_threads": 5,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "scanner": 1,
+      "External": 1
+     },
+     "asyncio_executor_threads_alive": 0,
+     "asyncio_executor_max_index": null,
+     "root_modules_with_params": {
+      "rfdetr.models.lwdetr.LWDETR": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        32174530
+       ]
+      },
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 2
+    },
+    "probe_pid": 89,
+    "torch_num_threads": 4,
+    "env": {
+     "OMP_NUM_THREADS": "4",
+     "MKL_NUM_THREADS": "4",
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4"
+    },
+    "mandate": {
+     "mandate_violation": false,
+     "violations": []
+    },
+    "d0_post": {
+     "d0_schema": 2,
+     "pid": 89,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 239,
+     "python_threads": 20,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "scanner": 1,
+      "External": 16
+     },
+     "asyncio_executor_threads_alive": 0,
+     "asyncio_executor_max_index": null,
+     "root_modules_with_params": {
+      "rfdetr.models.lwdetr.LWDETR": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        32174530
+       ]
+      },
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 2
+    },
+    "post_pid": 89
+   },
+   "task_census": {
+    "declared_tokens": 1,
+    "census_before": 0,
+    "census_after": 1,
+    "new_task_pids": [
+     89
+    ],
+    "project_ids": [
+     "d6d35c01-63ed-5d35-a0f6-5483479b02c8"
+    ]
+   },
+   "session": {
+    "steal_share": 2.675696249610352e-06,
+    "mhz_open_mean": 2723.99328125,
+    "mhz_close_mean": 2745.626625,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "container_procs": {
+    "containers": {
+     "rr": {
+      "leg_start": {
+       "n": 2,
+       "state": "measured",
+       "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-e63f7e18.webhook_1-z3rc8fl0.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+      },
+      "leg_end": {
+       "n": 2,
+       "state": "measured",
+       "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-e63f7e18.webhook_1-z3rc8fl0.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+      }
+     }
+    },
+    "service_peak_process_count": 18,
+    "service_distinct_pids_seen": 18
+   },
+   "idle_burden": {
+    "instance_kind": "rr_tokens",
+    "idle_cores_before_instances": 1.006,
+    "idle_cores_with_instances_live": 1.226
+   },
+   "thread_pins": null
+  },
+  "v1_rr_t4_b": {
+   "dir": "v1_rr_t4_b",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "frames_match_export": true,
+   "span_s": 1243.0,
+   "frames_per_s": 2.576830249396621,
+   "records_span_s": 1231.041801509,
+   "records_frames_per_s": 2.601861282105767,
+   "export_frames_per_s": 2.577,
+   "export_total_frames": 3203,
+   "cpu_s_per_frame": 1.4088042460193568,
+   "engine_cores": 3.63,
+   "service_cpu_s": 4512.4,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "p0": {
+    "d0_pre": {
+     "d0_schema": 2,
+     "pid": 89,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 176,
+     "python_threads": 5,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "scanner": 1,
+      "External": 1
+     },
+     "asyncio_executor_threads_alive": 0,
+     "asyncio_executor_max_index": null,
+     "root_modules_with_params": {
+      "rfdetr.models.lwdetr.LWDETR": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        32174530
+       ]
+      },
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 2
+    },
+    "probe_pid": 89,
+    "torch_num_threads": 4,
+    "env": {
+     "OMP_NUM_THREADS": "4",
+     "MKL_NUM_THREADS": "4",
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4"
+    },
+    "mandate": {
+     "mandate_violation": false,
+     "violations": []
+    },
+    "d0_post": {
+     "d0_schema": 2,
+     "pid": 89,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 240,
+     "python_threads": 21,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "scanner": 1,
+      "External": 17
+     },
+     "asyncio_executor_threads_alive": 0,
+     "asyncio_executor_max_index": null,
+     "root_modules_with_params": {
+      "rfdetr.models.lwdetr.LWDETR": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        32174530
+       ]
+      },
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 2
+    },
+    "post_pid": 89
+   },
+   "task_census": {
+    "declared_tokens": 1,
+    "census_before": 0,
+    "census_after": 1,
+    "new_task_pids": [
+     89
+    ],
+    "project_ids": [
+     "2de736ce-c97d-5a3e-8aa8-b810db1b069a"
+    ]
+   },
+   "session": {
+    "steal_share": 2.5489307814674195e-06,
+    "mhz_open_mean": 2667.23275,
+    "mhz_close_mean": 2732.217,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "container_procs": {
+    "containers": {
+     "rr": {
+      "leg_start": {
+       "n": 2,
+       "state": "measured",
+       "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-fb26d70a.webhook_1-nfarhto4.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+      },
+      "leg_end": {
+       "n": 2,
+       "state": "measured",
+       "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-fb26d70a.webhook_1-nfarhto4.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+      }
+     }
+    },
+    "service_peak_process_count": 18,
+    "service_distinct_pids_seen": 18
+   },
+   "idle_burden": {
+    "instance_kind": "rr_tokens",
+    "idle_cores_before_instances": 1.007,
+    "idle_cores_with_instances_live": 1.235
+   },
+   "thread_pins": null
+  }
+ },
+ "sessions": [
+  "a58bf81c-644d-4573-9b8f-f29f6f936437"
+ ],
+ "cells": {
+  "rr_t4": {
+   "legs": [
+    "v1_rr_t4_a",
+    "v1_rr_t4_b"
+   ],
+   "frames_per_s": [
+    2.5286176679561065,
+    2.576830249396621
+   ],
+   "mean": 2.5527239586763635,
+   "spread": 0.018886719528230338,
+   "cpu_s_per_frame": [
+    1.4372151108335933,
+    1.4088042460193568
+   ],
+   "engine_cores": [
+    3.634,
+    3.63
+   ]
+  },
+  "li_t4": {
+   "legs": [
+    "v1_li_t4_a",
+    "v1_li_t4_b"
+   ],
+   "frames_per_s": [
+    3.5051433574086235,
+    3.3744205646860514
+   ],
+   "mean": 3.4397819610473377,
+   "spread": 0.03800322061191629,
+   "cpu_s_per_frame": [
+    0.871807680299719,
+    0.8850452700593194
+   ],
+   "engine_cores": [
+    3.056,
+    2.987
+   ]
+  },
+  "rr_default": {
+   "legs": [
+    "v1_rr_def_a",
+    "v1_rr_def_b"
+   ],
+   "frames_per_s": [
+    2.5499562136772553,
+    2.5624
+   ],
+   "mean": 2.556178106838628,
+   "spread": 0.004868121782849631,
+   "cpu_s_per_frame": [
+    2.1014985950671248,
+    2.0866999687792696
+   ],
+   "engine_cores": [
+    5.359,
+    5.347
+   ]
+  }
+ },
+ "gap": {
+  "li_over_rr_minus_1": 0.34749468282929064,
+  "threshold": 0.03800322061191629,
+  "margin_pp": 0.30949146221737434,
+  "gate_fired": true,
+  "rule": "gap - max(0.82%, spread rr_t4, spread li_t4) >= 10 percentage points"
+ },
+ "rr_t4_determinism": {
+  "a": "v1_rr_t4_a",
+  "b": "v1_rr_t4_b",
+  "videos_compared": 16,
+  "chunk_hash_differs": [],
+  "frame_scores_differ": [],
+  "identical": true
+ },
+ "rr_default_determinism": {
+  "a": "v1_rr_def_a",
+  "b": "v1_rr_def_b",
+  "videos_compared": 16,
+  "chunk_hash_differs": [],
+  "frame_scores_differ": [],
+  "identical": true
+ },
+ "rr_t4_vs_default_output": {
+  "a": "v1_rr_def_a",
+  "b": "v1_rr_t4_a",
+  "videos_compared": 16,
+  "chunk_hash_differs": [
+   "EN2001a.avi",
+   "EN2001b.avi",
+   "EN2001d.avi",
+   "EN2001e.avi",
+   "EN2002a.avi",
+   "EN2002b.avi",
+   "EN2002c.avi",
+   "EN2002d.avi",
+   "EN2003a.avi",
+   "EN2004a.avi",
+   "EN2005a.avi",
+   "EN2006a.avi",
+   "EN2006b.avi",
+   "EN2009b.avi",
+   "EN2009c.avi",
+   "EN2009d.avi"
+  ],
+  "frame_scores_differ": [
+   "EN2001a.avi",
+   "EN2001b.avi",
+   "EN2001d.avi",
+   "EN2001e.avi",
+   "EN2002a.avi",
+   "EN2002b.avi",
+   "EN2002c.avi",
+   "EN2002d.avi",
+   "EN2003a.avi",
+   "EN2004a.avi",
+   "EN2005a.avi",
+   "EN2006a.avi",
+   "EN2006b.avi",
+   "EN2009b.avi",
+   "EN2009c.avi",
+   "EN2009d.avi"
+  ],
+  "identical": false
+ }
+}

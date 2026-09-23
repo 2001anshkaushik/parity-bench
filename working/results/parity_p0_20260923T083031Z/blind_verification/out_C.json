@@ -1,0 +1,3678 @@
+{
+ "verifier": "C",
+ "report": "/private/tmp/claude-501/-Users-ansh-RocketRide-Benchmarking-benchmark-A/99b99d9b-386c-4d1e-8b7e-cd129b6411f0/scratchpad/p0verify/P0_verify_copy.md",
+ "sections": [
+  "H2",
+  "H5",
+  "E1",
+  "H6 (smoke, full, hybrid)",
+  "Verdicts rows H2/H5/E1/H6",
+  "Gates rows H2/H5/H6 smoke (no separate E1 gate row exists)"
+ ],
+ "figures_checked": 448,
+ "matches": 447,
+ "mismatches": [
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 mean",
+   "reported": "0.410",
+   "recomputed": "0.401",
+   "raw": 0.40081834772784286,
+   "status": "MISMATCH"
+  }
+ ],
+ "unverifiable": [
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_a embed",
+   "reported": "62.4%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  },
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_a other",
+   "reported": "30.3%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  },
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_a engine glue (data_conn)",
+   "reported": "5.1%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  },
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_a split",
+   "reported": "1.8%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  },
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_a response",
+   "reported": "0.5%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  },
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_b embed",
+   "reported": "59.7%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  },
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_b other",
+   "reported": "32.1%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  },
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_b engine glue (data_conn)",
+   "reported": "5.3%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  },
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_b split",
+   "reported": "2.4%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  },
+  {
+   "section": "H2 py-spy by stage",
+   "figure": "h2f_c32_b response",
+   "reported": "0.5%",
+   "reason": "the stage classification patterns (\"first node/library pattern in the stack\") are not given in the definitions; the prompt allows these to be UNVERIFIABLE"
+  }
+ ],
+ "notes": [
+  "H2 native share uses all threadstate rows of the leg (threadstate epoch clock cannot be aligned to the bpftrace monotonic @tfirst/@tlast); all four legs matched at the report rounding.",
+  "Report has no E1 row in the Gates table; E1 verified in the Verdicts row and its section.",
+  "Fidelity p5/p95 recomputed nearest-rank over rows with a non-null value; min Dice over non-null Dice; missing = rows carrying a missing key.",
+  "H6 time per row = wall_s unless error (none); there were no timeouts in any H6 file."
+ ],
+ "checks": [
+  {
+   "section": "H2 table",
+   "figure": "tool_gil3 Python threads",
+   "reported": "36",
+   "recomputed": "36",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "tool_gil3 waiting",
+   "reported": "1.7%",
+   "recomputed": "1.7%",
+   "raw": 0.01736129660383983,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "tool_gil3 holding",
+   "reported": "0.4%",
+   "recomputed": "0.4%",
+   "raw": 0.004077325515369468,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "tool_gil3 native",
+   "reported": "18.4%",
+   "recomputed": "18.4%",
+   "raw": 0.18445314043445132,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "tool_gil3 idle",
+   "reported": "79.4%",
+   "recomputed": "79.4%",
+   "raw": 0.7941082374463395,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "tool_gil3 occupancy",
+   "reported": "14.7%",
+   "recomputed": "14.7%",
+   "raw": 0.14678371855330088,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "tool_gil3 occupancy<=1",
+   "reported": "yes",
+   "recomputed": "yes",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "tool_gil3 engine cores",
+   "reported": "12.35",
+   "recomputed": "12.35",
+   "raw": 12.348,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_null_c1 Python threads",
+   "reported": "5",
+   "recomputed": "5",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_null_c1 waiting",
+   "reported": "0.0%",
+   "recomputed": "0.0%",
+   "raw": 0.00018995302301759236,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_null_c1 holding",
+   "reported": "0.3%",
+   "recomputed": "0.3%",
+   "raw": 0.0025066932314307946,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_null_c1 native",
+   "reported": "13.1%",
+   "recomputed": "13.1%",
+   "raw": 0.13067947306731828,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_null_c1 idle",
+   "reported": "86.7%",
+   "recomputed": "86.7%",
+   "raw": 0.8666238806782333,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_null_c1 occupancy",
+   "reported": "1.3%",
+   "recomputed": "1.3%",
+   "raw": 0.012533466157153972,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_null_c1 occupancy<=1",
+   "reported": "yes",
+   "recomputed": "yes",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_null_c1 engine cores",
+   "reported": "2.32",
+   "recomputed": "2.32",
+   "raw": 2.324,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_a Python threads",
+   "reported": "36",
+   "recomputed": "36",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_a waiting",
+   "reported": "3.3%",
+   "recomputed": "3.3%",
+   "raw": 0.032899830714458914,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_a holding",
+   "reported": "0.6%",
+   "recomputed": "0.6%",
+   "raw": 0.00624233992534667,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_a native",
+   "reported": "25.4%",
+   "recomputed": "25.4%",
+   "raw": 0.254028070891086,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_a idle",
+   "reported": "70.7%",
+   "recomputed": "70.7%",
+   "raw": 0.7068297584691086,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_a occupancy",
+   "reported": "22.5%",
+   "recomputed": "22.5%",
+   "raw": 0.22472423731248012,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_a occupancy<=1",
+   "reported": "yes",
+   "recomputed": "yes",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_a engine cores",
+   "reported": "15.74",
+   "recomputed": "15.74",
+   "raw": 15.737,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_b Python threads",
+   "reported": "36",
+   "recomputed": "36",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_b waiting",
+   "reported": "3.3%",
+   "recomputed": "3.3%",
+   "raw": 0.0333605120468062,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_b holding",
+   "reported": "0.6%",
+   "recomputed": "0.6%",
+   "raw": 0.006326026561915835,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_b native",
+   "reported": "25.4%",
+   "recomputed": "25.4%",
+   "raw": 0.2538376254622013,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_b idle",
+   "reported": "70.6%",
+   "recomputed": "70.6%",
+   "raw": 0.7064758359290766,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_b occupancy",
+   "reported": "22.8%",
+   "recomputed": "22.8%",
+   "raw": 0.22773695622897008,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_b occupancy<=1",
+   "reported": "yes",
+   "recomputed": "yes",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 table",
+   "figure": "h2f_c32_b engine cores",
+   "reported": "15.73",
+   "recomputed": "15.73",
+   "raw": 15.73,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 text",
+   "figure": "null control waiting",
+   "reported": "0.02%",
+   "recomputed": "0.02%",
+   "raw": 0.00018995302301759236,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 text",
+   "figure": "null control verdict",
+   "reported": "PASS",
+   "recomputed": "PASS",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 text",
+   "figure": "gate measured",
+   "reported": "3.3%",
+   "recomputed": "3.3%",
+   "raw": 0.03313017138063255,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 text",
+   "figure": "gate outcome",
+   "reported": "not fired",
+   "recomputed": "not fired",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a total samples",
+   "reported": "2,986",
+   "recomputed": "2,986",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #1 forward (transformers/models/bert/modeling_bert.py) share",
+   "reported": "10.6%",
+   "recomputed": "10.6%",
+   "raw": 0.1058271935699933,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #2 _transport_receive (rocketride/core/transport.py) share",
+   "reported": "8.9%",
+   "recomputed": "8.9%",
+   "raw": 0.08874748827863363,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #3 send (rocketride/core/transport_websocket.py) share",
+   "reported": "8.7%",
+   "recomputed": "8.7%",
+   "raw": 0.087073007367716,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #4 forward (torch/nn/modules/linear.py) share",
+   "reported": "8.6%",
+   "recomputed": "8.6%",
+   "raw": 0.08573342263898191,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #5 transpose_for_scores (transformers/models/bert/modeling_bert.py) share",
+   "reported": "7.5%",
+   "recomputed": "7.5%",
+   "raw": 0.07468184862692566,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #6 iterencode (json/encoder.py) share",
+   "reported": "7.5%",
+   "recomputed": "7.5%",
+   "raw": 0.07468184862692566,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #7 as_tensor (transformers/tokenization_utils_base.py) share",
+   "reported": "6.7%",
+   "recomputed": "6.7%",
+   "raw": 0.06697923643670463,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #8 writeDocuments (nodes/response/IInstance.py) share",
+   "reported": "5.8%",
+   "recomputed": "5.8%",
+   "raw": 0.05760214333556597,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #9 _call_impl (torch/nn/modules/module.py) share",
+   "reported": "4.1%",
+   "recomputed": "4.1%",
+   "raw": 0.0405224380442063,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a #10 close_sync (ai/modules/data/data_conn.py) share",
+   "reported": "2.6%",
+   "recomputed": "2.6%",
+   "raw": 0.026456798392498326,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_a top-10 membership",
+   "reported": "True",
+   "recomputed": "True",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b total samples",
+   "reported": "3,024",
+   "recomputed": "3,024",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #1 forward (transformers/models/bert/modeling_bert.py) share",
+   "reported": "10.3%",
+   "recomputed": "10.3%",
+   "raw": 0.10251322751322751,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #2 _transport_receive (rocketride/core/transport.py) share",
+   "reported": "9.2%",
+   "recomputed": "9.2%",
+   "raw": 0.0916005291005291,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #3 send (rocketride/core/transport_websocket.py) share",
+   "reported": "8.6%",
+   "recomputed": "8.6%",
+   "raw": 0.08564814814814815,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #4 iterencode (json/encoder.py) share",
+   "reported": "8.5%",
+   "recomputed": "8.5%",
+   "raw": 0.08498677248677249,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #5 transpose_for_scores (transformers/models/bert/modeling_bert.py) share",
+   "reported": "7.3%",
+   "recomputed": "7.3%",
+   "raw": 0.07308201058201058,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #6 forward (torch/nn/modules/linear.py) share",
+   "reported": "7.0%",
+   "recomputed": "7.0%",
+   "raw": 0.0701058201058201,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #7 as_tensor (transformers/tokenization_utils_base.py) share",
+   "reported": "6.7%",
+   "recomputed": "6.7%",
+   "raw": 0.06712962962962964,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #8 writeDocuments (nodes/response/IInstance.py) share",
+   "reported": "6.0%",
+   "recomputed": "6.0%",
+   "raw": 0.05952380952380952,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #9 _call_impl (torch/nn/modules/module.py) share",
+   "reported": "4.9%",
+   "recomputed": "4.9%",
+   "raw": 0.04894179894179894,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b #10 close_sync (ai/modules/data/data_conn.py) share",
+   "reported": "2.7%",
+   "recomputed": "2.7%",
+   "raw": 0.027116402116402115,
+   "status": "MATCH"
+  },
+  {
+   "section": "H2 py-spy",
+   "figure": "h2f_c32_b top-10 membership",
+   "reported": "True",
+   "recomputed": "True",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H2",
+   "figure": "GIL waiting",
+   "reported": "3.3%",
+   "recomputed": "3.3%",
+   "raw": 0.03313017138063255,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H2",
+   "figure": "null control",
+   "reported": "0.02%",
+   "recomputed": "0.02%",
+   "raw": 0.00018995302301759236,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H2",
+   "figure": "measured",
+   "reported": "3.3%",
+   "recomputed": "3.3%",
+   "raw": 0.03313017138063255,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H2",
+   "figure": "outcome",
+   "reported": "not fired",
+   "recomputed": "not fired",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011464.pdf shipped r1",
+   "reported": "1.6",
+   "recomputed": "1.6",
+   "raw": 1.623449353,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011464.pdf shipped r2",
+   "reported": "1.3",
+   "recomputed": "1.3",
+   "raw": 1.305777312,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011464.pdf replicate spread",
+   "reported": "21.7%",
+   "recomputed": "21.7%",
+   "raw": 0.2168982310558067,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011464.pdf text chars",
+   "reported": "10,866",
+   "recomputed": "10,866",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011464.pdf in-engine hold s",
+   "reported": "1,839.1",
+   "recomputed": "1,839.1",
+   "raw": 1839.1171209812164,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011464.pdf in-engine/isolated",
+   "reported": "1,255.7",
+   "recomputed": "1,255.7",
+   "raw": 1255.701474355667,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "039_039660.pdf shipped r1",
+   "reported": "2.3",
+   "recomputed": "2.3",
+   "raw": 2.307535701,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "039_039660.pdf shipped r2",
+   "reported": "2.3",
+   "recomputed": "2.3",
+   "raw": 2.295748848,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "039_039660.pdf replicate spread",
+   "reported": "0.5%",
+   "recomputed": "0.5%",
+   "raw": 0.005121062091440926,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "039_039660.pdf text chars",
+   "reported": "10,340",
+   "recomputed": "10,340",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "039_039660.pdf in-engine hold s",
+   "reported": "1,773.1",
+   "recomputed": "1,773.1",
+   "raw": 1773.097050189972,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "039_039660.pdf in-engine/isolated",
+   "reported": "770.4",
+   "recomputed": "770.4",
+   "raw": 770.3616977469502,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "008_008871.pdf shipped r1",
+   "reported": "1.2",
+   "recomputed": "1.2",
+   "raw": 1.198405882,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "008_008871.pdf shipped r2",
+   "reported": "1.7",
+   "recomputed": "1.7",
+   "raw": 1.654367439,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "008_008871.pdf replicate spread",
+   "reported": "32.0%",
+   "recomputed": "32.0%",
+   "raw": 0.3196619609721876,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "008_008871.pdf text chars",
+   "reported": "481,270",
+   "recomputed": "481,270",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "008_008871.pdf in-engine hold s",
+   "reported": "1,008.9",
+   "recomputed": "1,008.9",
+   "raw": 1008.8782644271851,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "008_008871.pdf in-engine/isolated",
+   "reported": "707.3",
+   "recomputed": "707.3",
+   "raw": 707.2964802359669,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011730.pdf shipped r1",
+   "reported": "1.1",
+   "recomputed": "1.1",
+   "raw": 1.105311357,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011730.pdf shipped r2",
+   "reported": "1.2",
+   "recomputed": "1.2",
+   "raw": 1.180116329,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011730.pdf replicate spread",
+   "reported": "6.5%",
+   "recomputed": "6.5%",
+   "raw": 0.06546255867839358,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011730.pdf text chars",
+   "reported": "23,485",
+   "recomputed": "23,485",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011730.pdf in-engine hold s",
+   "reported": "971.8",
+   "recomputed": "971.8",
+   "raw": 971.781555891037,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "011_011730.pdf in-engine/isolated",
+   "reported": "850.4",
+   "recomputed": "850.4",
+   "raw": 850.4154927709552,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014261.pdf shipped r1",
+   "reported": "0.5",
+   "recomputed": "0.5",
+   "raw": 0.539300014,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014261.pdf shipped r2",
+   "reported": "0.8",
+   "recomputed": "0.8",
+   "raw": 0.847984153,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014261.pdf replicate spread",
+   "reported": "44.5%",
+   "recomputed": "44.5%",
+   "raw": 0.4450193353933087,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014261.pdf text chars",
+   "reported": "45,846",
+   "recomputed": "45,846",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014261.pdf in-engine hold s",
+   "reported": "771.2",
+   "recomputed": "771.2",
+   "raw": 771.1694581508636,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014261.pdf in-engine/isolated",
+   "reported": "1,111.8",
+   "recomputed": "1,111.8",
+   "raw": 1111.7685568610164,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "000_000344.pdf shipped r1",
+   "reported": "0.8",
+   "recomputed": "0.8",
+   "raw": 0.804156404,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "000_000344.pdf shipped r2",
+   "reported": "0.7",
+   "recomputed": "0.7",
+   "raw": 0.734839362,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "000_000344.pdf replicate spread",
+   "reported": "9.0%",
+   "recomputed": "9.0%",
+   "raw": 0.09008087420560193,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "000_000344.pdf text chars",
+   "reported": "1,521",
+   "recomputed": "1,521",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "000_000344.pdf in-engine hold s",
+   "reported": "733.8",
+   "recomputed": "733.8",
+   "raw": 733.7795021533966,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "000_000344.pdf in-engine/isolated",
+   "reported": "953.6",
+   "recomputed": "953.6",
+   "raw": 953.5822233748713,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "031_031239.pdf shipped r1",
+   "reported": "2.0",
+   "recomputed": "2.0",
+   "raw": 2.001798886,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "031_031239.pdf shipped r2",
+   "reported": "2.5",
+   "recomputed": "2.5",
+   "raw": 2.516419908,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "031_031239.pdf replicate spread",
+   "reported": "22.8%",
+   "recomputed": "22.8%",
+   "raw": 0.2277981857290287,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "031_031239.pdf text chars",
+   "reported": "431,892",
+   "recomputed": "431,892",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "031_031239.pdf in-engine hold s",
+   "reported": "579.3",
+   "recomputed": "579.3",
+   "raw": 579.3089323043823,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "031_031239.pdf in-engine/isolated",
+   "reported": "256.4",
+   "recomputed": "256.4",
+   "raw": 256.43243885120376,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "002_002489.pdf shipped r1",
+   "reported": "0.9",
+   "recomputed": "0.9",
+   "raw": 0.878584193,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "002_002489.pdf shipped r2",
+   "reported": "0.9",
+   "recomputed": "0.9",
+   "raw": 0.874801682,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "002_002489.pdf replicate spread",
+   "reported": "0.4%",
+   "recomputed": "0.4%",
+   "raw": 0.004314522038681353,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "002_002489.pdf text chars",
+   "reported": "10,177",
+   "recomputed": "10,177",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "002_002489.pdf in-engine hold s",
+   "reported": "557.6",
+   "recomputed": "557.6",
+   "raw": 557.599550485611,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "002_002489.pdf in-engine/isolated",
+   "reported": "636.0",
+   "recomputed": "636.0",
+   "raw": 636.0260550012825,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "034_034697.pdf shipped r1",
+   "reported": "0.5",
+   "recomputed": "0.5",
+   "raw": 0.493114988,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "034_034697.pdf shipped r2",
+   "reported": "1.5",
+   "recomputed": "1.5",
+   "raw": 1.502493601,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "034_034697.pdf replicate spread",
+   "reported": "101.2%",
+   "recomputed": "101.2%",
+   "raw": 1.0115997882187908,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "034_034697.pdf text chars",
+   "reported": "154,980",
+   "recomputed": "154,980",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "034_034697.pdf in-engine hold s",
+   "reported": "421.0",
+   "recomputed": "421.0",
+   "raw": 420.9520888328552,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "034_034697.pdf in-engine/isolated",
+   "reported": "421.9",
+   "recomputed": "421.9",
+   "raw": 421.8784095770949,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "033_033172.pdf shipped r1",
+   "reported": "2.2",
+   "recomputed": "2.2",
+   "raw": 2.162181412,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "033_033172.pdf shipped r2",
+   "reported": "2.2",
+   "recomputed": "2.2",
+   "raw": 2.231110085,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "033_033172.pdf replicate spread",
+   "reported": "3.1%",
+   "recomputed": "3.1%",
+   "raw": 0.03137905738650343,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "033_033172.pdf text chars",
+   "reported": "170,544",
+   "recomputed": "170,544",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "033_033172.pdf in-engine hold s",
+   "reported": "410.3",
+   "recomputed": "410.3",
+   "raw": 410.33576107025146,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "033_033172.pdf in-engine/isolated",
+   "reported": "186.8",
+   "recomputed": "186.8",
+   "raw": 186.80106309834122,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014969.pdf shipped r1",
+   "reported": "1.3",
+   "recomputed": "1.3",
+   "raw": 1.337734592,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014969.pdf shipped r2",
+   "reported": "0.7",
+   "recomputed": "0.7",
+   "raw": 0.675277452,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014969.pdf replicate spread",
+   "reported": "65.8%",
+   "recomputed": "65.8%",
+   "raw": 0.6581750387182481,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014969.pdf text chars",
+   "reported": "31,495",
+   "recomputed": "31,495",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014969.pdf in-engine hold s",
+   "reported": "392.0",
+   "recomputed": "392.0",
+   "raw": 392.0479335784912,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 table",
+   "figure": "014_014969.pdf in-engine/isolated",
+   "reported": "389.5",
+   "recomputed": "389.5",
+   "raw": 389.5137485610506,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_sortByPosition documents passing",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_sortByPosition median time reduction",
+   "reported": "-5.1%",
+   "recomputed": "-5.1%",
+   "raw": -0.05064352180196785,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_sortByPosition time change min",
+   "reported": "-32.72%",
+   "recomputed": "-32.72%",
+   "raw": -0.32723553342038525,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_sortByPosition time change max",
+   "reported": "+32.42%",
+   "recomputed": "+32.42%",
+   "raw": 0.32416611682562757,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_sortByPosition text-length change min",
+   "reported": "+0.00%",
+   "recomputed": "+0.00%",
+   "raw": 1.0389178631609042e-05,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_sortByPosition text-length change max",
+   "reported": "+3.95%",
+   "recomputed": "+3.95%",
+   "raw": 0.03950083521666503,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_sortByPosition passing documents",
+   "reported": "none",
+   "recomputed": "none",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_acroform documents passing",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_acroform median time reduction",
+   "reported": "-4.3%",
+   "recomputed": "-4.3%",
+   "raw": -0.04341470201823938,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_acroform time change min",
+   "reported": "-30.52%",
+   "recomputed": "-30.52%",
+   "raw": -0.30519583518199755,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_acroform time change max",
+   "reported": "+49.76%",
+   "recomputed": "+49.76%",
+   "raw": 0.4975658766319331,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_acroform text-length change min",
+   "reported": "+0.00%",
+   "recomputed": "+0.00%",
+   "raw": 0.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_acroform text-length change max",
+   "reported": "+0.00%",
+   "recomputed": "+0.00%",
+   "raw": 0.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_acroform passing documents",
+   "reported": "none",
+   "recomputed": "none",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_annotations documents passing",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_annotations median time reduction",
+   "reported": "-2.2%",
+   "recomputed": "-2.2%",
+   "raw": -0.021905885947666848,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_annotations time change min",
+   "reported": "-35.06%",
+   "recomputed": "-35.06%",
+   "raw": -0.35057346830260694,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_annotations time change max",
+   "reported": "+55.98%",
+   "recomputed": "+55.98%",
+   "raw": 0.5597759305895629,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_annotations text-length change min",
+   "reported": "+0.00%",
+   "recomputed": "+0.00%",
+   "raw": 0.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_annotations text-length change max",
+   "reported": "+0.00%",
+   "recomputed": "+0.00%",
+   "raw": 0.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_annotations passing documents",
+   "reported": "none",
+   "recomputed": "none",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_bookmarks documents passing",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_bookmarks median time reduction",
+   "reported": "2.3%",
+   "recomputed": "2.3%",
+   "raw": 0.023376367737649284,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_bookmarks time change min",
+   "reported": "-34.70%",
+   "recomputed": "-34.70%",
+   "raw": -0.3470481222813786,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_bookmarks time change max",
+   "reported": "+55.21%",
+   "recomputed": "+55.21%",
+   "raw": 0.55205415684849,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_bookmarks text-length change min",
+   "reported": "-0.63%",
+   "recomputed": "-0.63%",
+   "raw": -0.006344475196934263,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_bookmarks text-length change max",
+   "reported": "+0.00%",
+   "recomputed": "+0.00%",
+   "raw": 0.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 features",
+   "figure": "h5_no_bookmarks passing documents",
+   "reported": "none",
+   "recomputed": "none",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 gate",
+   "figure": "h5_no_sortByPosition passing count",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 gate",
+   "figure": "h5_no_acroform passing count",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 gate",
+   "figure": "h5_no_annotations passing count",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 gate",
+   "figure": "h5_no_bookmarks passing count",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H5 gate",
+   "figure": "outcome",
+   "reported": "not fired",
+   "recomputed": "not fired",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H5",
+   "figure": "documents passing [0] h5_no_sortByPosition",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H5",
+   "figure": "documents passing [1] h5_no_acroform",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H5",
+   "figure": "documents passing [2] h5_no_annotations",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H5",
+   "figure": "documents passing [3] h5_no_bookmarks",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H5",
+   "figure": "in-engine / isolated min",
+   "reported": "187",
+   "recomputed": "187",
+   "raw": 186.80106309834122,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H5",
+   "figure": "in-engine / isolated max",
+   "reported": "1,256",
+   "recomputed": "1,256",
+   "raw": 1255.701474355667,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H5",
+   "figure": "sortByPosition documents passing",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H5",
+   "figure": "acroform documents passing",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H5",
+   "figure": "annotations documents passing",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H5",
+   "figure": "bookmarks documents passing",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H5",
+   "figure": "outcome",
+   "reported": "not fired",
+   "recomputed": "not fired",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011464.pdf isolated Tika s",
+   "reported": "1.46",
+   "recomputed": "1.46",
+   "raw": 1.4646133325,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011464.pdf engine --tika s",
+   "reported": "770.3",
+   "recomputed": "770.3",
+   "raw": 770.318,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011464.pdf in-pipeline bracket s",
+   "reported": "1,839.1",
+   "recomputed": "1,839.1",
+   "raw": 1839.1171209812164,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011464.pdf engine/isolated",
+   "reported": "526",
+   "recomputed": "526",
+   "raw": 525.9531528947078,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011464.pdf in-pipeline/isolated",
+   "reported": "1,256",
+   "recomputed": "1,256",
+   "raw": 1255.701474355667,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011464.pdf engine stdout MB",
+   "reported": "276.2",
+   "recomputed": "276.2",
+   "raw": 276.213862,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "039_039660.pdf isolated Tika s",
+   "reported": "2.30",
+   "recomputed": "2.30",
+   "raw": 2.3016422745,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "039_039660.pdf engine --tika s",
+   "reported": "1,714.8",
+   "recomputed": "1,714.8",
+   "raw": 1714.791,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "039_039660.pdf in-pipeline bracket s",
+   "reported": "1,773.1",
+   "recomputed": "1,773.1",
+   "raw": 1773.097050189972,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "039_039660.pdf engine/isolated",
+   "reported": "745",
+   "recomputed": "745",
+   "raw": 745.0293292742525,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "039_039660.pdf in-pipeline/isolated",
+   "reported": "770",
+   "recomputed": "770",
+   "raw": 770.3616977469502,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "039_039660.pdf engine stdout MB",
+   "reported": "638.4",
+   "recomputed": "638.4",
+   "raw": 638.414032,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "008_008871.pdf isolated Tika s",
+   "reported": "1.43",
+   "recomputed": "1.43",
+   "raw": 1.4263866605,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "008_008871.pdf engine --tika s",
+   "reported": "450.5",
+   "recomputed": "450.5",
+   "raw": 450.465,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "008_008871.pdf in-pipeline bracket s",
+   "reported": "1,008.9",
+   "recomputed": "1,008.9",
+   "raw": 1008.8782644271851,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "008_008871.pdf engine/isolated",
+   "reported": "316",
+   "recomputed": "316",
+   "raw": 315.80847779528153,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "008_008871.pdf in-pipeline/isolated",
+   "reported": "707",
+   "recomputed": "707",
+   "raw": 707.2964802359669,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "008_008871.pdf engine stdout MB",
+   "reported": "151.8",
+   "recomputed": "151.8",
+   "raw": 151.844329,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011730.pdf isolated Tika s",
+   "reported": "1.14",
+   "recomputed": "1.14",
+   "raw": 1.1427138430000001,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011730.pdf engine --tika s",
+   "reported": "393.5",
+   "recomputed": "393.5",
+   "raw": 393.46,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011730.pdf in-pipeline bracket s",
+   "reported": "971.8",
+   "recomputed": "971.8",
+   "raw": 971.781555891037,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011730.pdf engine/isolated",
+   "reported": "344",
+   "recomputed": "344",
+   "raw": 344.320673465404,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011730.pdf in-pipeline/isolated",
+   "reported": "850",
+   "recomputed": "850",
+   "raw": 850.4154927709552,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "011_011730.pdf engine stdout MB",
+   "reported": "127.8",
+   "recomputed": "127.8",
+   "raw": 127.825957,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014261.pdf isolated Tika s",
+   "reported": "0.69",
+   "recomputed": "0.69",
+   "raw": 0.6936420835,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014261.pdf engine --tika s",
+   "reported": "325.8",
+   "recomputed": "325.8",
+   "raw": 325.839,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014261.pdf in-pipeline bracket s",
+   "reported": "771.2",
+   "recomputed": "771.2",
+   "raw": 771.1694581508636,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014261.pdf engine/isolated",
+   "reported": "470",
+   "recomputed": "470",
+   "raw": 469.7509100887763,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014261.pdf in-pipeline/isolated",
+   "reported": "1,112",
+   "recomputed": "1,112",
+   "raw": 1111.7685568610164,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014261.pdf engine stdout MB",
+   "reported": "102.8",
+   "recomputed": "102.8",
+   "raw": 102.799602,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "000_000344.pdf isolated Tika s",
+   "reported": "0.77",
+   "recomputed": "0.77",
+   "raw": 0.769497883,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "000_000344.pdf engine --tika s",
+   "reported": "312.1",
+   "recomputed": "312.1",
+   "raw": 312.12,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "000_000344.pdf in-pipeline bracket s",
+   "reported": "733.8",
+   "recomputed": "733.8",
+   "raw": 733.7795021533966,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "000_000344.pdf engine/isolated",
+   "reported": "406",
+   "recomputed": "406",
+   "raw": 405.61515099061035,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "000_000344.pdf in-pipeline/isolated",
+   "reported": "954",
+   "recomputed": "954",
+   "raw": 953.5822233748713,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "000_000344.pdf engine stdout MB",
+   "reported": "97.7",
+   "recomputed": "97.7",
+   "raw": 97.685834,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "031_031239.pdf isolated Tika s",
+   "reported": "2.26",
+   "recomputed": "2.26",
+   "raw": 2.259109397,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "031_031239.pdf engine --tika s",
+   "reported": "259.7",
+   "recomputed": "259.7",
+   "raw": 259.746,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "031_031239.pdf in-pipeline bracket s",
+   "reported": "579.3",
+   "recomputed": "579.3",
+   "raw": 579.3089323043823,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "031_031239.pdf engine/isolated",
+   "reported": "115",
+   "recomputed": "115",
+   "raw": 114.97716770375595,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "031_031239.pdf in-pipeline/isolated",
+   "reported": "256",
+   "recomputed": "256",
+   "raw": 256.43243885120376,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "031_031239.pdf engine stdout MB",
+   "reported": "70.9",
+   "recomputed": "70.9",
+   "raw": 70.870953,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "002_002489.pdf isolated Tika s",
+   "reported": "0.88",
+   "recomputed": "0.88",
+   "raw": 0.8766929375,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "002_002489.pdf engine --tika s",
+   "reported": "249.2",
+   "recomputed": "249.2",
+   "raw": 249.233,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "002_002489.pdf in-pipeline bracket s",
+   "reported": "557.6",
+   "recomputed": "557.6",
+   "raw": 557.599550485611,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "002_002489.pdf engine/isolated",
+   "reported": "284",
+   "recomputed": "284",
+   "raw": 284.28767854651505,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "002_002489.pdf in-pipeline/isolated",
+   "reported": "636",
+   "recomputed": "636",
+   "raw": 636.0260550012825,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "002_002489.pdf engine stdout MB",
+   "reported": "73.8",
+   "recomputed": "73.8",
+   "raw": 73.789056,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "034_034697.pdf isolated Tika s",
+   "reported": "1.00",
+   "recomputed": "1.00",
+   "raw": 0.9978042945000001,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "034_034697.pdf engine --tika s",
+   "reported": "195.4",
+   "recomputed": "195.4",
+   "raw": 195.438,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "034_034697.pdf in-pipeline bracket s",
+   "reported": "421.0",
+   "recomputed": "421.0",
+   "raw": 420.9520888328552,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "034_034697.pdf engine/isolated",
+   "reported": "196",
+   "recomputed": "196",
+   "raw": 195.86806859548946,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "034_034697.pdf in-pipeline/isolated",
+   "reported": "422",
+   "recomputed": "422",
+   "raw": 421.8784095770949,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "034_034697.pdf engine stdout MB",
+   "reported": "55.4",
+   "recomputed": "55.4",
+   "raw": 55.37814,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "033_033172.pdf isolated Tika s",
+   "reported": "2.20",
+   "recomputed": "2.20",
+   "raw": 2.1966457485,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "033_033172.pdf engine --tika s",
+   "reported": "278.5",
+   "recomputed": "278.5",
+   "raw": 278.509,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "033_033172.pdf in-pipeline bracket s",
+   "reported": "410.3",
+   "recomputed": "410.3",
+   "raw": 410.33576107025146,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "033_033172.pdf engine/isolated",
+   "reported": "127",
+   "recomputed": "127",
+   "raw": 126.78830903443694,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "033_033172.pdf in-pipeline/isolated",
+   "reported": "187",
+   "recomputed": "187",
+   "raw": 186.80106309834122,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "033_033172.pdf engine stdout MB",
+   "reported": "83.5",
+   "recomputed": "83.5",
+   "raw": 83.474646,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014969.pdf isolated Tika s",
+   "reported": "1.01",
+   "recomputed": "1.01",
+   "raw": 1.006506022,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014969.pdf engine --tika s",
+   "reported": "187.8",
+   "recomputed": "187.8",
+   "raw": 187.76,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014969.pdf in-pipeline bracket s",
+   "reported": "392.0",
+   "recomputed": "392.0",
+   "raw": 392.0479335784912,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014969.pdf engine/isolated",
+   "reported": "187",
+   "recomputed": "187",
+   "raw": 186.54632550226313,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014969.pdf in-pipeline/isolated",
+   "reported": "390",
+   "recomputed": "390",
+   "raw": 389.5137485610506,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 table",
+   "figure": "014_014969.pdf engine stdout MB",
+   "reported": "52.0",
+   "recomputed": "52.0",
+   "raw": 51.954811,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/opt/rocketride/engine/java/jre/lib/jspawnhelper",
+   "reported": "2249820",
+   "recomputed": "2249820",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/bin/env",
+   "reported": "1124910",
+   "recomputed": "1124910",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/bin/sh",
+   "reported": "100",
+   "recomputed": "100",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/bin/id",
+   "reported": "80",
+   "recomputed": "80",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/bin/runc",
+   "reported": "44",
+   "recomputed": "44",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/lib/open-iscsi/net-interface-handler",
+   "reported": "44",
+   "recomputed": "44",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/sbin/iptables",
+   "reported": "44",
+   "recomputed": "44",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/bin/networkctl",
+   "reported": "41",
+   "recomputed": "41",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/bin/containerd-shim-runc-v2",
+   "reported": "33",
+   "recomputed": "33",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/bin/ps",
+   "reported": "28",
+   "recomputed": "28",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/bin/date",
+   "reported": "23",
+   "recomputed": "23",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "/usr/bin/chronyc",
+   "reported": "23",
+   "recomputed": "23",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "E1 exec census",
+   "figure": "listed paths are the 12 highest counts (ties at 23 resolved either way)",
+   "reported": "12",
+   "recomputed": "12",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts E1",
+   "figure": "engine --tika min s",
+   "reported": "188",
+   "recomputed": "188",
+   "raw": 187.76,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts E1",
+   "figure": "engine --tika max s",
+   "reported": "1,715",
+   "recomputed": "1,715",
+   "raw": 1714.791,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts E1",
+   "figure": "jspawnhelper execs",
+   "reported": "2,249,820",
+   "recomputed": "2,249,820",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdf p50 parse s on the 11",
+   "reported": "2.451",
+   "recomputed": "2.451",
+   "raw": 2.450717943998825,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdf speed vs Tika",
+   "reported": "0.56",
+   "recomputed": "0.56",
+   "raw": 0.5630778806590653,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdf timeouts on the 11",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdf corpus docs",
+   "reported": "384",
+   "recomputed": "384",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdf empty",
+   "reported": "3",
+   "recomputed": "3",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdf empty where Tika extracts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdf extracts where Tika empty",
+   "reported": "1",
+   "recomputed": "1",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdf timeouts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdf exceptions",
+   "reported": "1",
+   "recomputed": "1",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdfium2 p50 parse s on the 11",
+   "reported": "0.248",
+   "recomputed": "0.248",
+   "raw": 0.24844600999858812,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdfium2 speed vs Tika",
+   "reported": "5.55",
+   "recomputed": "5.55",
+   "raw": 5.55430560550295,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdfium2 timeouts on the 11",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdfium2 corpus docs",
+   "reported": "384",
+   "recomputed": "384",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdfium2 empty",
+   "reported": "2",
+   "recomputed": "2",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdfium2 empty where Tika extracts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdfium2 extracts where Tika empty",
+   "reported": "2",
+   "recomputed": "2",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdfium2 timeouts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "pypdfium2 exceptions",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "tika_shipped p50 parse s on the 11",
+   "reported": "1.380",
+   "recomputed": "1.380",
+   "raw": 1.379945066,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "tika_shipped speed vs Tika",
+   "reported": "1.00",
+   "recomputed": "1.00",
+   "raw": 1.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "tika_shipped timeouts on the 11",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "tika_shipped corpus docs",
+   "reported": "384",
+   "recomputed": "384",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "tika_shipped empty",
+   "reported": "4",
+   "recomputed": "4",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "tika_shipped empty where Tika extracts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "tika_shipped extracts where Tika empty",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "tika_shipped timeouts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke table",
+   "figure": "tika_shipped exceptions",
+   "reported": "2",
+   "recomputed": "2",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke gate",
+   "figure": "speed pass",
+   "reported": "['pypdfium2']",
+   "recomputed": "['pypdfium2']",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke gate",
+   "figure": "speed and coverage pass",
+   "reported": "['pypdfium2']",
+   "recomputed": "['pypdfium2']",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke gate",
+   "figure": "outcome",
+   "reported": "FIRED",
+   "recomputed": "FIRED",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdf char ratio p5",
+   "reported": "0.882",
+   "recomputed": "0.882",
+   "raw": 0.8821656050955414,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdf char ratio p50",
+   "reported": "0.993",
+   "recomputed": "0.993",
+   "raw": 0.9932305005533189,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdf char ratio p95",
+   "reported": "1.010",
+   "recomputed": "1.010",
+   "raw": 1.0096103702600014,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdf Dice p5",
+   "reported": "0.753",
+   "recomputed": "0.753",
+   "raw": 0.7530364372469636,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdf Dice p50",
+   "reported": "0.986",
+   "recomputed": "0.986",
+   "raw": 0.9855816374701345,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdf Dice p95",
+   "reported": "1.000",
+   "recomputed": "1.000",
+   "raw": 1.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdf min Dice",
+   "reported": "0.084",
+   "recomputed": "0.084",
+   "raw": 0.08438818565400844,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdf missing",
+   "reported": "2",
+   "recomputed": "2",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdfium2 char ratio p5",
+   "reported": "0.772",
+   "recomputed": "0.772",
+   "raw": 0.7722479423868313,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdfium2 char ratio p50",
+   "reported": "0.981",
+   "recomputed": "0.981",
+   "raw": 0.9813620938787498,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdfium2 char ratio p95",
+   "reported": "0.997",
+   "recomputed": "0.997",
+   "raw": 0.9968548368446614,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdfium2 Dice p5",
+   "reported": "0.838",
+   "recomputed": "0.838",
+   "raw": 0.8380628717077315,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdfium2 Dice p50",
+   "reported": "0.991",
+   "recomputed": "0.991",
+   "raw": 0.9905303981568934,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdfium2 Dice p95",
+   "reported": "1.000",
+   "recomputed": "1.000",
+   "raw": 1.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdfium2 min Dice",
+   "reported": "0.096",
+   "recomputed": "0.096",
+   "raw": 0.09567901234567901,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 smoke fidelity",
+   "figure": "h6_384_pypdfium2 missing",
+   "reported": "2",
+   "recomputed": "2",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdf char ratio p5",
+   "reported": "0.902",
+   "recomputed": "0.902",
+   "raw": 0.9024356869184456,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdf char ratio p50",
+   "reported": "0.994",
+   "recomputed": "0.994",
+   "raw": 0.9938843367771049,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdf char ratio p95",
+   "reported": "1.013",
+   "recomputed": "1.013",
+   "raw": 1.0129802536117596,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdf Dice p5",
+   "reported": "0.785",
+   "recomputed": "0.785",
+   "raw": 0.7852246331652598,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdf Dice p50",
+   "reported": "0.986",
+   "recomputed": "0.986",
+   "raw": 0.9862848802314742,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdf Dice p95",
+   "reported": "1.000",
+   "recomputed": "1.000",
+   "raw": 1.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdf min Dice",
+   "reported": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdf missing",
+   "reported": "8",
+   "recomputed": "8",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdfium2 char ratio p5",
+   "reported": "0.804",
+   "recomputed": "0.804",
+   "raw": 0.803792526491913,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdfium2 char ratio p50",
+   "reported": "0.981",
+   "recomputed": "0.981",
+   "raw": 0.9807028929206685,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdfium2 char ratio p95",
+   "reported": "1.000",
+   "recomputed": "1.000",
+   "raw": 0.9997396240170807,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdfium2 Dice p5",
+   "reported": "0.867",
+   "recomputed": "0.867",
+   "raw": 0.866719856775901,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdfium2 Dice p50",
+   "reported": "0.993",
+   "recomputed": "0.993",
+   "raw": 0.992875559777446,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdfium2 Dice p95",
+   "reported": "1.000",
+   "recomputed": "1.000",
+   "raw": 1.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdfium2 min Dice",
+   "reported": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full fidelity",
+   "figure": "h6full_pypdfium2 missing",
+   "reported": "1",
+   "recomputed": "1",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdf p50 parse s on the 11",
+   "reported": "2.701",
+   "recomputed": "2.701",
+   "raw": 2.701139630000398,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdf speed vs Tika",
+   "reported": "0.10",
+   "recomputed": "0.10",
+   "raw": 0.10104232708620095,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdf timeouts on the 11",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdf corpus docs",
+   "reported": "9,975",
+   "recomputed": "9,975",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdf empty",
+   "reported": "102",
+   "recomputed": "102",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdf empty where Tika extracts",
+   "reported": "12",
+   "recomputed": "12",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdf extracts where Tika empty",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdf timeouts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdf exceptions",
+   "reported": "8",
+   "recomputed": "8",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdfium2 p50 parse s on the 11",
+   "reported": "0.257",
+   "recomputed": "0.257",
+   "raw": 0.25700624900491675,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdfium2 speed vs Tika",
+   "reported": "1.06",
+   "recomputed": "1.06",
+   "raw": 1.0619564117866203,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdfium2 timeouts on the 11",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdfium2 corpus docs",
+   "reported": "9,975",
+   "recomputed": "9,975",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdfium2 empty",
+   "reported": "94",
+   "recomputed": "94",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdfium2 empty where Tika extracts",
+   "reported": "5",
+   "recomputed": "5",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdfium2 extracts where Tika empty",
+   "reported": "1",
+   "recomputed": "1",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdfium2 timeouts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "pypdfium2 exceptions",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "tika_shipped p50 parse s on the 11",
+   "reported": "0.273",
+   "recomputed": "0.273",
+   "raw": 0.272929434,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "tika_shipped speed vs Tika",
+   "reported": "1.00",
+   "recomputed": "1.00",
+   "raw": 1.0,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "tika_shipped timeouts on the 11",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "tika_shipped corpus docs",
+   "reported": "9,975",
+   "recomputed": "9,975",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "tika_shipped empty",
+   "reported": "90",
+   "recomputed": "90",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "tika_shipped empty where Tika extracts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "tika_shipped extracts where Tika empty",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "tika_shipped timeouts",
+   "reported": "0",
+   "recomputed": "0",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full table",
+   "figure": "tika_shipped exceptions",
+   "reported": "1",
+   "recomputed": "1",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full lists",
+   "figure": "pypdf empty-where-Tika-extracts document list",
+   "reported": "['002_002400.pdf', '004_004306.pdf', '008_008724.pdf', '009_009802.pdf', '014_014222.pdf', '018_018542.pdf', '020_020747.pdf', '020_020806.pdf', '022_022819.pdf', '027_027613.pdf', '033_033689.pdf', '037_037919.pdf']",
+   "recomputed": "['002_002400.pdf', '004_004306.pdf', '008_008724.pdf', '009_009802.pdf', '014_014222.pdf', '018_018542.pdf', '020_020747.pdf', '020_020806.pdf', '022_022819.pdf', '027_027613.pdf', '033_033689.pdf', '037_037919.pdf']",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full lists",
+   "figure": "pypdfium2 empty-where-Tika-extracts document list",
+   "reported": "['004_004306.pdf', '008_008724.pdf', '009_009802.pdf', '018_018542.pdf', '037_037919.pdf']",
+   "recomputed": "['004_004306.pdf', '008_008724.pdf', '009_009802.pdf', '018_018542.pdf', '037_037919.pdf']",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full verdict",
+   "figure": "speed pass",
+   "reported": "[]",
+   "recomputed": "[]",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full verdict",
+   "figure": "speed and coverage pass",
+   "reported": "[]",
+   "recomputed": "[]",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full verdict",
+   "figure": "outcome",
+   "reported": "NO CANDIDATE",
+   "recomputed": "NO CANDIDATE",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf count",
+   "reported": "9,967",
+   "recomputed": "9,967",
+   "raw": 9967,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf sum",
+   "reported": "3,548.0",
+   "recomputed": "3,548.0",
+   "raw": 3547.970397716541,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf min",
+   "reported": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.00045811499876435846,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf mean",
+   "reported": "0.356",
+   "recomputed": "0.356",
+   "raw": 0.3559717465352203,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf sd",
+   "reported": "0.800",
+   "recomputed": "0.800",
+   "raw": 0.7996481391699476,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf p50",
+   "reported": "0.125",
+   "recomputed": "0.125",
+   "raw": 0.12535049999860348,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf p90",
+   "reported": "0.791",
+   "recomputed": "0.791",
+   "raw": 0.791355573994224,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf p95",
+   "reported": "1.419",
+   "recomputed": "1.419",
+   "raw": 1.4187839700025506,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf p99",
+   "reported": "3.920",
+   "recomputed": "3.920",
+   "raw": 3.9204019469980267,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf max",
+   "reported": "15.606",
+   "recomputed": "15.606",
+   "raw": 15.605643241993675,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdf mean_p50",
+   "reported": "2.84",
+   "recomputed": "2.84",
+   "raw": 2.8398111418716807,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 count",
+   "reported": "9,975",
+   "recomputed": "9,975",
+   "raw": 9975,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 sum",
+   "reported": "348.6",
+   "recomputed": "348.6",
+   "raw": 348.5596892378235,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 min",
+   "reported": "0.000",
+   "recomputed": "0.000",
+   "raw": 0.00015280499792424962,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 mean",
+   "reported": "0.035",
+   "recomputed": "0.035",
+   "raw": 0.03494332724188706,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 sd",
+   "reported": "0.073",
+   "recomputed": "0.073",
+   "raw": 0.07323817616493321,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 p50",
+   "reported": "0.015",
+   "recomputed": "0.015",
+   "raw": 0.015275490994099528,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 p90",
+   "reported": "0.078",
+   "recomputed": "0.078",
+   "raw": 0.07778039100230671,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 p95",
+   "reported": "0.123",
+   "recomputed": "0.123",
+   "raw": 0.12306506000459194,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 p99",
+   "reported": "0.309",
+   "recomputed": "0.309",
+   "raw": 0.3094704009999987,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 max",
+   "reported": "2.221",
+   "recomputed": "2.221",
+   "raw": 2.2211892280029133,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "pypdfium2 mean_p50",
+   "reported": "2.29",
+   "recomputed": "2.29",
+   "raw": 2.287542001457409,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped count",
+   "reported": "9,974",
+   "recomputed": "9,974",
+   "raw": 9974,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped sum",
+   "reported": "873.1",
+   "recomputed": "873.1",
+   "raw": 873.139169522,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped min",
+   "reported": "0.003",
+   "recomputed": "0.003",
+   "raw": 0.0026682,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped mean",
+   "reported": "0.088",
+   "recomputed": "0.088",
+   "raw": 0.08754152491698415,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped sd",
+   "reported": "0.198",
+   "recomputed": "0.198",
+   "raw": 0.19765150331142453,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped p50",
+   "reported": "0.038",
+   "recomputed": "0.038",
+   "raw": 0.037563548,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped p90",
+   "reported": "0.192",
+   "recomputed": "0.192",
+   "raw": 0.19248714,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped p95",
+   "reported": "0.331",
+   "recomputed": "0.331",
+   "raw": 0.331095876,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped p99",
+   "reported": "0.799",
+   "recomputed": "0.799",
+   "raw": 0.798793632,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped max",
+   "reported": "10.924",
+   "recomputed": "10.924",
+   "raw": 10.924047542,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (corpus)",
+   "figure": "tika_shipped mean_p50",
+   "reported": "2.33",
+   "recomputed": "2.33",
+   "raw": 2.3304913826825984,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf count",
+   "reported": "11",
+   "recomputed": "11",
+   "raw": 11,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf sum",
+   "reported": "45.6",
+   "recomputed": "45.6",
+   "raw": 45.58193753399246,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf min",
+   "reported": "0.794",
+   "recomputed": "0.794",
+   "raw": 0.7942354400001932,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf mean",
+   "reported": "4.144",
+   "recomputed": "4.144",
+   "raw": 4.143812503090223,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf sd",
+   "reported": "3.678",
+   "recomputed": "3.678",
+   "raw": 3.677957265632026,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf p50",
+   "reported": "2.701",
+   "recomputed": "2.701",
+   "raw": 2.701139630000398,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf p90",
+   "reported": "6.459",
+   "recomputed": "6.459",
+   "raw": 6.4592912969965255,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf p95",
+   "reported": "14.846",
+   "recomputed": "14.846",
+   "raw": 14.845629453993752,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf p99",
+   "reported": "14.846",
+   "recomputed": "14.846",
+   "raw": 14.845629453993752,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf max",
+   "reported": "14.846",
+   "recomputed": "14.846",
+   "raw": 14.845629453993752,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdf mean_p50",
+   "reported": "1.53",
+   "recomputed": "1.53",
+   "raw": 1.5340978515389123,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 count",
+   "reported": "11",
+   "recomputed": "11",
+   "raw": 11,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 sum",
+   "reported": "4.4",
+   "recomputed": "4.4",
+   "raw": 4.409001825006271,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 min",
+   "reported": "0.078",
+   "recomputed": "0.078",
+   "raw": 0.07822063400089974,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 mean",
+   "reported": "0.410",
+   "recomputed": "0.401",
+   "raw": 0.40081834772784286,
+   "status": "MISMATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 sd",
+   "reported": "0.450",
+   "recomputed": "0.450",
+   "raw": 0.4501445927291955,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 p50",
+   "reported": "0.257",
+   "recomputed": "0.257",
+   "raw": 0.25700624900491675,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 p90",
+   "reported": "0.439",
+   "recomputed": "0.439",
+   "raw": 0.43852192500344245,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 p95",
+   "reported": "1.784",
+   "recomputed": "1.784",
+   "raw": 1.7842308330000378,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 p99",
+   "reported": "1.784",
+   "recomputed": "1.784",
+   "raw": 1.7842308330000378,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 max",
+   "reported": "1.784",
+   "recomputed": "1.784",
+   "raw": 1.7842308330000378,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "pypdfium2 mean_p50",
+   "reported": "1.56",
+   "recomputed": "1.56",
+   "raw": 1.559566544703646,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped count",
+   "reported": "11",
+   "recomputed": "11",
+   "raw": 11,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped sum",
+   "reported": "4.9",
+   "recomputed": "4.9",
+   "raw": 4.905963879,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped min",
+   "reported": "0.178",
+   "recomputed": "0.178",
+   "raw": 0.178324412,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped mean",
+   "reported": "0.446",
+   "recomputed": "0.446",
+   "raw": 0.44599671627272724,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped sd",
+   "reported": "0.348",
+   "recomputed": "0.348",
+   "raw": 0.3482550212767198,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped p50",
+   "reported": "0.273",
+   "recomputed": "0.273",
+   "raw": 0.272929434,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped p90",
+   "reported": "1.038",
+   "recomputed": "1.038",
+   "raw": 1.037819605,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped p95",
+   "reported": "1.258",
+   "recomputed": "1.258",
+   "raw": 1.257880991,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped p99",
+   "reported": "1.258",
+   "recomputed": "1.258",
+   "raw": 1.257880991,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped max",
+   "reported": "1.258",
+   "recomputed": "1.258",
+   "raw": 1.257880991,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full metric set (the 11)",
+   "figure": "tika_shipped mean_p50",
+   "reported": "1.63",
+   "recomputed": "1.63",
+   "raw": 1.6341099958926644,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full exceptions",
+   "figure": "pypdf exception count",
+   "reported": "8",
+   "recomputed": "8",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full exceptions",
+   "figure": "pypdf exception document list",
+   "reported": "['002_002400.pdf', '014_014222.pdf', '020_020747.pdf', '020_020806.pdf', '022_022819.pdf', '027_027613.pdf', '033_033689.pdf', '040_040669.pdf']",
+   "recomputed": "['002_002400.pdf', '014_014222.pdf', '020_020747.pdf', '020_020806.pdf', '022_022819.pdf', '027_027613.pdf', '033_033689.pdf', '040_040669.pdf']",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full exceptions",
+   "figure": "tika_shipped exception count",
+   "reported": "1",
+   "recomputed": "1",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 full exceptions",
+   "figure": "tika_shipped exception document list",
+   "reported": "['040_040669.pdf']",
+   "recomputed": "['040_040669.pdf']",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdf docs",
+   "reported": "9,975",
+   "recomputed": "9,975",
+   "raw": 9975,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdf fb",
+   "reported": "102",
+   "recomputed": "102",
+   "raw": 102,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdf wt",
+   "reported": "9,885",
+   "recomputed": "9,885",
+   "raw": 9885,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdf wt_t",
+   "reported": "9,885",
+   "recomputed": "9,885",
+   "raw": 9885,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdf ps",
+   "reported": "3,550.9",
+   "recomputed": "3,550.9",
+   "raw": 3550.920921153541,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdf ta",
+   "reported": "873.1",
+   "recomputed": "873.1",
+   "raw": 873.139169522,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdfium2 docs",
+   "reported": "9,975",
+   "recomputed": "9,975",
+   "raw": 9975,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdfium2 fb",
+   "reported": "94",
+   "recomputed": "94",
+   "raw": 94,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdfium2 wt",
+   "reported": "9,886",
+   "recomputed": "9,886",
+   "raw": 9886,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdfium2 wt_t",
+   "reported": "9,885",
+   "recomputed": "9,885",
+   "raw": 9885,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdfium2 ps",
+   "reported": "350.0",
+   "recomputed": "350.0",
+   "raw": 349.9552149158235,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 hybrid",
+   "figure": "pypdfium2 ta",
+   "reported": "873.1",
+   "recomputed": "873.1",
+   "raw": 873.139169522,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 disclosure",
+   "figure": "Tika p50 on the 11, smoke",
+   "reported": "1.380",
+   "recomputed": "1.380",
+   "raw": 1.379945066,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 disclosure",
+   "figure": "Tika p50 on the 11, full",
+   "reported": "0.273",
+   "recomputed": "0.273",
+   "raw": 0.272929434,
+   "status": "MATCH"
+  },
+  {
+   "section": "H6 harness disclosure",
+   "figure": "tika_shipped error docs on 384 slice",
+   "reported": "['025_025065.pdf', '040_040669.pdf']",
+   "recomputed": "['025_025065.pdf', '040_040669.pdf']",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "smoke pypdfium2 speed",
+   "reported": "5.55",
+   "recomputed": "5.55",
+   "raw": 5.55430560550295,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "full pypdf speed",
+   "reported": "0.10",
+   "recomputed": "0.10",
+   "raw": 0.10104232708620095,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "full pypdf loses",
+   "reported": "12",
+   "recomputed": "12",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "full pypdf empty",
+   "reported": "102",
+   "recomputed": "102",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "full pypdf corpus",
+   "reported": "9,975",
+   "recomputed": "9,975",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "full pypdfium2 speed",
+   "reported": "1.06",
+   "recomputed": "1.06",
+   "raw": 1.0619564117866203,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "full pypdfium2 loses",
+   "reported": "5",
+   "recomputed": "5",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "full pypdfium2 empty",
+   "reported": "94",
+   "recomputed": "94",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "full pypdfium2 corpus",
+   "reported": "9,975",
+   "recomputed": "9,975",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts H6",
+   "figure": "verdict",
+   "reported": "full run: no candidate",
+   "recomputed": "full run: no candidate",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H6",
+   "figure": "speed pass",
+   "reported": "['pypdfium2']",
+   "recomputed": "['pypdfium2']",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H6",
+   "figure": "both",
+   "reported": "['pypdfium2']",
+   "recomputed": "['pypdfium2']",
+   "raw": null,
+   "status": "MATCH"
+  },
+  {
+   "section": "Gates H6",
+   "figure": "outcome",
+   "reported": "FIRED",
+   "recomputed": "FIRED",
+   "raw": null,
+   "status": "MATCH"
+  }
+ ]
+}

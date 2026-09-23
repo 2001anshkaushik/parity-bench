@@ -1,0 +1,40 @@
+{
+  "verifier": "E",
+  "report": "/private/tmp/claude-501/-Users-ansh-RocketRide-Benchmarking-benchmark-A/99b99d9b-386c-4d1e-8b7e-cd129b6411f0/scratchpad/p0verify/P0_verify_copy2.md",
+  "scope": "D1 GIL-holding-sample share table (report lines 192-199) and the two H2 'By stage' lines plus the h2f_c32_* heading sample totals (report lines 267, 282, 284, 299)",
+  "method": "Parsed h2f_c32_a/pyspy_gil_rr_refc32_h2f_c32_a.txt and h2f_c32_b/pyspy_gil_rr_refc32_h2f_c32_b.txt (the files present matching pyspy_gil_rr_<leg>.txt; the arm tag in the filename is rr_refc32). Each line split on its last space into stack and integer count; a few non-UTF-8 bytes in frame names were decoded as latin-1 (identical results with utf-8 replace). Each sample was assigned to the first rule-ordered pattern occurring as a substring of the stack, else 'other'. Share = category count / total count, rounded to 1 decimal.",
+  "raw_counts": {
+    "h2f_c32_a": {"total": 2986, "lines": 1427, "unparsed_lines": 0, "embed": 1863, "other": 904, "engine glue (data_conn)": 152, "split": 53, "response": 14, "stamp_probe": 0, "env_probe": 0},
+    "h2f_c32_b": {"total": 3024, "lines": 1393, "unparsed_lines": 0, "embed": 1804, "other": 972, "engine glue (data_conn)": 161, "split": 72, "response": 15, "stamp_probe": 0, "env_probe": 0}
+  },
+  "figures_checked": 22,
+  "results": [
+    {"section": "D1 table", "leg": "h2f_c32_a", "figure": "embed", "report": "62.4%", "recomputed": "62.4%", "exact": 62.3912, "status": "MATCH"},
+    {"section": "D1 table", "leg": "h2f_c32_a", "figure": "split", "report": "1.8%", "recomputed": "1.8%", "exact": 1.7749, "status": "MATCH"},
+    {"section": "D1 table", "leg": "h2f_c32_a", "figure": "engine glue", "report": "5.1%", "recomputed": "5.1%", "exact": 5.0904, "status": "MATCH"},
+    {"section": "D1 table", "leg": "h2f_c32_a", "figure": "response node", "report": "0.5%", "recomputed": "0.5%", "exact": 0.4689, "status": "MATCH"},
+    {"section": "D1 table", "leg": "h2f_c32_a", "figure": "other", "report": "30.3%", "recomputed": "30.3%", "exact": 30.2746, "status": "MATCH"},
+    {"section": "D1 table", "leg": "h2f_c32_b", "figure": "embed", "report": "59.7%", "recomputed": "59.7%", "exact": 59.6561, "status": "MATCH"},
+    {"section": "D1 table", "leg": "h2f_c32_b", "figure": "split", "report": "2.4%", "recomputed": "2.4%", "exact": 2.3810, "status": "MATCH"},
+    {"section": "D1 table", "leg": "h2f_c32_b", "figure": "engine glue", "report": "5.3%", "recomputed": "5.3%", "exact": 5.3241, "status": "MATCH"},
+    {"section": "D1 table", "leg": "h2f_c32_b", "figure": "response node", "report": "0.5%", "recomputed": "0.5%", "exact": 0.4960, "status": "MATCH"},
+    {"section": "D1 table", "leg": "h2f_c32_b", "figure": "other", "report": "32.1%", "recomputed": "32.1%", "exact": 32.1429, "status": "MATCH"},
+    {"section": "H2 heading", "leg": "h2f_c32_a", "figure": "py-spy --gil sample total", "report": "2,986", "recomputed": "2986", "status": "MATCH"},
+    {"section": "H2 By stage", "leg": "h2f_c32_a", "figure": "embed", "report": "62.4%", "recomputed": "62.4%", "exact": 62.3912, "status": "MATCH"},
+    {"section": "H2 By stage", "leg": "h2f_c32_a", "figure": "other", "report": "30.3%", "recomputed": "30.3%", "exact": 30.2746, "status": "MATCH"},
+    {"section": "H2 By stage", "leg": "h2f_c32_a", "figure": "engine glue (data_conn)", "report": "5.1%", "recomputed": "5.1%", "exact": 5.0904, "status": "MATCH"},
+    {"section": "H2 By stage", "leg": "h2f_c32_a", "figure": "split", "report": "1.8%", "recomputed": "1.8%", "exact": 1.7749, "status": "MATCH"},
+    {"section": "H2 By stage", "leg": "h2f_c32_a", "figure": "response", "report": "0.5%", "recomputed": "0.5%", "exact": 0.4689, "status": "MATCH"},
+    {"section": "H2 heading", "leg": "h2f_c32_b", "figure": "py-spy --gil sample total", "report": "3,024", "recomputed": "3024", "status": "MATCH"},
+    {"section": "H2 By stage", "leg": "h2f_c32_b", "figure": "embed", "report": "59.7%", "recomputed": "59.7%", "exact": 59.6561, "status": "MATCH"},
+    {"section": "H2 By stage", "leg": "h2f_c32_b", "figure": "other", "report": "32.1%", "recomputed": "32.1%", "exact": 32.1429, "status": "MATCH"},
+    {"section": "H2 By stage", "leg": "h2f_c32_b", "figure": "engine glue (data_conn)", "report": "5.3%", "recomputed": "5.3%", "exact": 5.3241, "status": "MATCH"},
+    {"section": "H2 By stage", "leg": "h2f_c32_b", "figure": "split", "report": "4.2%", "recomputed": "2.4%", "exact": 2.3810, "count": "72 / 3024", "status": "MISMATCH", "note": "Report line 299 says split 4.2%; the raw data gives 2.4% (72 of 3,024 samples), which is what the D1 table itself shows for the same leg. The printed H2 line's shares add up to 101.8%, while the recomputed ones add up to 100.0%. It looks like the digits were transposed."},
+    {"section": "H2 By stage", "leg": "h2f_c32_b", "figure": "response", "report": "0.5%", "recomputed": "0.5%", "exact": 0.4960, "status": "MATCH"}
+  ],
+  "mismatches": [
+    {"location": "H2 section, h2f_c32_b 'By stage (attribution rule under D1)' line (report line 299)", "figure": "split", "report": "4.2%", "recomputed": "2.4%"}
+  ],
+  "unverifiable": [],
+  "summary": "22 figures checked: 21 MATCH, 1 MISMATCH (H2 h2f_c32_b By-stage split: the report says 4.2%, recomputed 2.4%), 0 UNVERIFIABLE."
+}

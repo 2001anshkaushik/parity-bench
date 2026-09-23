@@ -1,0 +1,535 @@
+{
+ "per_document": {
+  "011_011464.pdf": {
+   "shipped_r1_s": 1.623449353,
+   "shipped_r2_s": 1.305777312,
+   "shipped_mean_s": 1.4646133325,
+   "shipped_timeout": false,
+   "replicate_spread": 0.2168982310558067,
+   "shipped_chars_r1": 10866,
+   "shipped_chars_r2": 10866,
+   "shipped_cpu_r1_s": 0.730766844,
+   "in_engine_hold_s_S5D_context": 1839.1171209812164,
+   "in_engine_over_isolated": 1255.701474355667
+  },
+  "039_039660.pdf": {
+   "shipped_r1_s": 2.307535701,
+   "shipped_r2_s": 2.295748848,
+   "shipped_mean_s": 2.3016422745,
+   "shipped_timeout": false,
+   "replicate_spread": 0.005121062091440926,
+   "shipped_chars_r1": 10340,
+   "shipped_chars_r2": 10340,
+   "shipped_cpu_r1_s": 1.600326576,
+   "in_engine_hold_s_S5D_context": 1773.097050189972,
+   "in_engine_over_isolated": 770.3616977469502
+  },
+  "008_008871.pdf": {
+   "shipped_r1_s": 1.198405882,
+   "shipped_r2_s": 1.654367439,
+   "shipped_mean_s": 1.4263866605,
+   "shipped_timeout": false,
+   "replicate_spread": 0.3196619609721876,
+   "shipped_chars_r1": 481270,
+   "shipped_chars_r2": 481270,
+   "shipped_cpu_r1_s": 0.859355997,
+   "in_engine_hold_s_S5D_context": 1008.8782644271851,
+   "in_engine_over_isolated": 707.2964802359669
+  },
+  "011_011730.pdf": {
+   "shipped_r1_s": 1.105311357,
+   "shipped_r2_s": 1.180116329,
+   "shipped_mean_s": 1.1427138430000001,
+   "shipped_timeout": false,
+   "replicate_spread": 0.06546255867839358,
+   "shipped_chars_r1": 23485,
+   "shipped_chars_r2": 23485,
+   "shipped_cpu_r1_s": 0.620132545,
+   "in_engine_hold_s_S5D_context": 971.781555891037,
+   "in_engine_over_isolated": 850.4154927709552
+  },
+  "014_014261.pdf": {
+   "shipped_r1_s": 0.539300014,
+   "shipped_r2_s": 0.847984153,
+   "shipped_mean_s": 0.6936420835,
+   "shipped_timeout": false,
+   "replicate_spread": 0.4450193353933087,
+   "shipped_chars_r1": 45846,
+   "shipped_chars_r2": 45846,
+   "shipped_cpu_r1_s": 0.444934099,
+   "in_engine_hold_s_S5D_context": 771.1694581508636,
+   "in_engine_over_isolated": 1111.7685568610164
+  },
+  "000_000344.pdf": {
+   "shipped_r1_s": 0.804156404,
+   "shipped_r2_s": 0.734839362,
+   "shipped_mean_s": 0.769497883,
+   "shipped_timeout": false,
+   "replicate_spread": 0.09008087420560193,
+   "shipped_chars_r1": 1521,
+   "shipped_chars_r2": 1521,
+   "shipped_cpu_r1_s": 0.526686496,
+   "in_engine_hold_s_S5D_context": 733.7795021533966,
+   "in_engine_over_isolated": 953.5822233748713
+  },
+  "031_031239.pdf": {
+   "shipped_r1_s": 2.001798886,
+   "shipped_r2_s": 2.516419908,
+   "shipped_mean_s": 2.259109397,
+   "shipped_timeout": false,
+   "replicate_spread": 0.2277981857290287,
+   "shipped_chars_r1": 431892,
+   "shipped_chars_r2": 431892,
+   "shipped_cpu_r1_s": 1.698635433,
+   "in_engine_hold_s_S5D_context": 579.3089323043823,
+   "in_engine_over_isolated": 256.43243885120376
+  },
+  "002_002489.pdf": {
+   "shipped_r1_s": 0.878584193,
+   "shipped_r2_s": 0.874801682,
+   "shipped_mean_s": 0.8766929375,
+   "shipped_timeout": false,
+   "replicate_spread": 0.004314522038681353,
+   "shipped_chars_r1": 10177,
+   "shipped_chars_r2": 10177,
+   "shipped_cpu_r1_s": 0.535023866,
+   "in_engine_hold_s_S5D_context": 557.599550485611,
+   "in_engine_over_isolated": 636.0260550012825
+  },
+  "034_034697.pdf": {
+   "shipped_r1_s": 0.493114988,
+   "shipped_r2_s": 1.502493601,
+   "shipped_mean_s": 0.9978042945000001,
+   "shipped_timeout": false,
+   "replicate_spread": 1.0115997882187908,
+   "shipped_chars_r1": 154980,
+   "shipped_chars_r2": 154980,
+   "shipped_cpu_r1_s": 0.446045279,
+   "in_engine_hold_s_S5D_context": 420.9520888328552,
+   "in_engine_over_isolated": 421.8784095770949
+  },
+  "033_033172.pdf": {
+   "shipped_r1_s": 2.162181412,
+   "shipped_r2_s": 2.231110085,
+   "shipped_mean_s": 2.1966457485,
+   "shipped_timeout": false,
+   "replicate_spread": 0.03137905738650343,
+   "shipped_chars_r1": 170544,
+   "shipped_chars_r2": 170544,
+   "shipped_cpu_r1_s": 1.083708736,
+   "in_engine_hold_s_S5D_context": 410.33576107025146,
+   "in_engine_over_isolated": 186.80106309834122
+  },
+  "014_014969.pdf": {
+   "shipped_r1_s": 1.337734592,
+   "shipped_r2_s": 0.675277452,
+   "shipped_mean_s": 1.006506022,
+   "shipped_timeout": false,
+   "replicate_spread": 0.6581750387182481,
+   "shipped_chars_r1": 31495,
+   "shipped_chars_r2": 31495,
+   "shipped_cpu_r1_s": 0.695239656,
+   "in_engine_hold_s_S5D_context": 392.0479335784912,
+   "in_engine_over_isolated": 389.5137485610506
+  }
+ },
+ "per_feature": {
+  "h5_no_sortByPosition": {
+   "docs_passing": [],
+   "rows": {
+    "011_011464.pdf": {
+     "variant_s": 1.423138226,
+     "variant_timeout": false,
+     "time_change": -0.028318127098573176,
+     "chars": 10946,
+     "length_change": 0.007362414872078116,
+     "passes": false
+    },
+    "039_039660.pdf": {
+     "variant_s": 2.124206701,
+     "variant_timeout": false,
+     "time_change": -0.07709085615337219,
+     "chars": 10408,
+     "length_change": 0.006576402321083252,
+     "passes": false
+    },
+    "008_008871.pdf": {
+     "variant_s": 1.61435615,
+     "variant_timeout": false,
+     "time_change": 0.1317801790393287,
+     "chars": 481275,
+     "length_change": 1.0389178631609042e-05,
+     "passes": false
+    },
+    "011_011730.pdf": {
+     "variant_s": 1.117766315,
+     "variant_timeout": false,
+     "time_change": -0.02183182443515752,
+     "chars": 23494,
+     "length_change": 0.0003832233340430591,
+     "passes": false
+    },
+    "014_014261.pdf": {
+     "variant_s": 0.853992527,
+     "variant_timeout": false,
+     "time_change": 0.2311717344064519,
+     "chars": 46512,
+     "length_change": 0.014526894385551659,
+     "passes": false
+    },
+    "000_000344.pdf": {
+     "variant_s": 0.769017311,
+     "variant_timeout": false,
+     "time_change": -0.0006245267344029415,
+     "chars": 1532,
+     "length_change": 0.007232084155161189,
+     "passes": false
+    },
+    "031_031239.pdf": {
+     "variant_s": 2.373518653,
+     "variant_timeout": false,
+     "time_change": 0.05064352180196785,
+     "chars": 435408,
+     "length_change": 0.008140924119918846,
+     "passes": false
+    },
+    "002_002489.pdf": {
+     "variant_s": 0.998398048,
+     "variant_timeout": false,
+     "time_change": 0.1388229621731154,
+     "chars": 10579,
+     "length_change": 0.03950083521666503,
+     "passes": false
+    },
+    "034_034697.pdf": {
+     "variant_s": 1.321258638,
+     "variant_timeout": false,
+     "time_change": 0.32416611682562757,
+     "chars": 155109,
+     "length_change": 0.0008323654665118863,
+     "passes": false
+    },
+    "033_033172.pdf": {
+     "variant_s": 2.316325407,
+     "variant_timeout": false,
+     "time_change": 0.05448291267798844,
+     "chars": 171356,
+     "length_change": 0.004761234637395528,
+     "passes": false
+    },
+    "014_014969.pdf": {
+     "variant_s": 0.677141487,
+     "variant_timeout": false,
+     "time_change": -0.32723553342038525,
+     "chars": 31582,
+     "length_change": 0.0027623432290839744,
+     "passes": false
+    }
+   },
+   "n_passing": 0,
+   "median_time_reduction": -0.05064352180196785,
+   "param": "sortByPosition"
+  },
+  "h5_no_acroform": {
+   "docs_passing": [],
+   "rows": {
+    "011_011464.pdf": {
+     "variant_s": 1.491028475,
+     "variant_timeout": false,
+     "time_change": 0.0180355742460101,
+     "chars": 10866,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "039_039660.pdf": {
+     "variant_s": 2.401567388,
+     "variant_timeout": false,
+     "time_change": 0.04341470201823938,
+     "chars": 10340,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "008_008871.pdf": {
+     "variant_s": 1.659758025,
+     "variant_timeout": false,
+     "time_change": 0.16361017034342917,
+     "chars": 481270,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "011_011730.pdf": {
+     "variant_s": 1.050190457,
+     "variant_timeout": false,
+     "time_change": -0.08096811512941482,
+     "chars": 23485,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "014_014261.pdf": {
+     "variant_s": 0.745814766,
+     "variant_timeout": false,
+     "time_change": 0.07521556684788422,
+     "chars": 45846,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "000_000344.pdf": {
+     "variant_s": 0.755948149,
+     "variant_timeout": false,
+     "time_change": -0.01760853967157705,
+     "chars": 1521,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "031_031239.pdf": {
+     "variant_s": 2.376992739,
+     "variant_timeout": false,
+     "time_change": 0.05218133400557923,
+     "chars": 431892,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "002_002489.pdf": {
+     "variant_s": 0.933980459,
+     "variant_timeout": false,
+     "time_change": 0.06534502452291058,
+     "chars": 10177,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "034_034697.pdf": {
+     "variant_s": 1.494277663,
+     "variant_timeout": false,
+     "time_change": 0.4975658766319331,
+     "chars": 154980,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "033_033172.pdf": {
+     "variant_s": 2.249780357,
+     "variant_timeout": false,
+     "time_change": 0.024188974729440815,
+     "chars": 170544,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "014_014969.pdf": {
+     "variant_s": 0.699324576,
+     "variant_timeout": false,
+     "time_change": -0.30519583518199755,
+     "chars": 31495,
+     "length_change": 0.0,
+     "passes": false
+    }
+   },
+   "n_passing": 0,
+   "median_time_reduction": -0.04341470201823938,
+   "param": "extractAcroFormContent"
+  },
+  "h5_no_annotations": {
+   "docs_passing": [],
+   "rows": {
+    "011_011464.pdf": {
+     "variant_s": 1.519974122,
+     "variant_timeout": false,
+     "time_change": 0.0377989113382593,
+     "chars": 10866,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "039_039660.pdf": {
+     "variant_s": 2.147866674,
+     "variant_timeout": false,
+     "time_change": -0.06681125134156896,
+     "chars": 10340,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "008_008871.pdf": {
+     "variant_s": 1.649636627,
+     "variant_timeout": false,
+     "time_change": 0.15651433982265583,
+     "chars": 481270,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "011_011730.pdf": {
+     "variant_s": 0.915215391,
+     "variant_timeout": false,
+     "time_change": -0.19908610838452934,
+     "chars": 23485,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "014_014261.pdf": {
+     "variant_s": 0.681163116,
+     "variant_timeout": false,
+     "time_change": -0.01799049941871067,
+     "chars": 45846,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "000_000344.pdf": {
+     "variant_s": 0.830044085,
+     "variant_timeout": false,
+     "time_change": 0.07868274018370514,
+     "chars": 1521,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "031_031239.pdf": {
+     "variant_s": 2.425819865,
+     "variant_timeout": false,
+     "time_change": 0.07379477426873793,
+     "chars": 431892,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "002_002489.pdf": {
+     "variant_s": 0.895897673,
+     "variant_timeout": false,
+     "time_change": 0.021905885947666848,
+     "chars": 10177,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "034_034697.pdf": {
+     "variant_s": 1.556351122,
+     "variant_timeout": false,
+     "time_change": 0.5597759305895629,
+     "chars": 154980,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "033_033172.pdf": {
+     "variant_s": 2.101432359,
+     "variant_timeout": false,
+     "time_change": -0.043344899633915634,
+     "chars": 170544,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "014_014969.pdf": {
+     "variant_s": 0.653651715,
+     "variant_timeout": false,
+     "time_change": -0.35057346830260694,
+     "chars": 31495,
+     "length_change": 0.0,
+     "passes": false
+    }
+   },
+   "n_passing": 0,
+   "median_time_reduction": -0.021905885947666848,
+   "param": "extractAnnotationText"
+  },
+  "h5_no_bookmarks": {
+   "docs_passing": [],
+   "rows": {
+    "011_011464.pdf": {
+     "variant_s": 1.179443967,
+     "variant_timeout": false,
+     "time_change": -0.19470624715209595,
+     "chars": 10866,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "039_039660.pdf": {
+     "variant_s": 2.200952488,
+     "variant_timeout": false,
+     "time_change": -0.043746931317497295,
+     "chars": 10340,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "008_008871.pdf": {
+     "variant_s": 1.761465265,
+     "variant_timeout": false,
+     "time_change": 0.23491428641273382,
+     "chars": 481270,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "011_011730.pdf": {
+     "variant_s": 0.996601556,
+     "variant_timeout": false,
+     "time_change": -0.12786428369188851,
+     "chars": 23336,
+     "length_change": -0.006344475196934263,
+     "passes": false
+    },
+    "014_014261.pdf": {
+     "variant_s": 0.784178544,
+     "variant_timeout": false,
+     "time_change": 0.13052330972072568,
+     "chars": 45846,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "000_000344.pdf": {
+     "variant_s": 0.770149601,
+     "variant_timeout": false,
+     "time_change": 0.0008469393021057758,
+     "chars": 1521,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "031_031239.pdf": {
+     "variant_s": 2.25590565,
+     "variant_timeout": false,
+     "time_change": -0.0014181460199557128,
+     "chars": 431892,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "002_002489.pdf": {
+     "variant_s": 0.856199041,
+     "variant_timeout": false,
+     "time_change": -0.023376367737649284,
+     "chars": 10177,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "034_034697.pdf": {
+     "variant_s": 1.548646303,
+     "variant_timeout": false,
+     "time_change": 0.55205415684849,
+     "chars": 154980,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "033_033172.pdf": {
+     "variant_s": 1.978669463,
+     "variant_timeout": false,
+     "time_change": -0.09923142393298834,
+     "chars": 170544,
+     "length_change": 0.0,
+     "passes": false
+    },
+    "014_014969.pdf": {
+     "variant_s": 0.657199997,
+     "variant_timeout": false,
+     "time_change": -0.3470481222813786,
+     "chars": 31495,
+     "length_change": 0.0,
+     "passes": false
+    }
+   },
+   "n_passing": 0,
+   "median_time_reduction": 0.023376367737649284,
+   "param": "extractBookmarksText"
+  }
+ },
+ "gate": {
+  "threshold": ">= 50% time removed on >= 6 of the 11 with text length within 5%",
+  "fired": false,
+  "features_passing": [],
+  "best_config": null,
+  "n_passing_by_feature": {
+   "h5_no_sortByPosition": 0,
+   "h5_no_acroform": 0,
+   "h5_no_annotations": 0,
+   "h5_no_bookmarks": 0
+  }
+ },
+ "records": 66
+}

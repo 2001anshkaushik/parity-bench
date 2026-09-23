@@ -1,0 +1,1234 @@
+{
+ "legs": {
+  "tool_gil": {
+   "leg": "refc32_tool_gil",
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "mandate": false,
+   "docs_per_s_DIAGNOSTIC": 2.1305,
+   "engine_cores": 10.371,
+   "host_busy_cores": 10.511,
+   "recorders": {
+    "giltrace": {
+     "rc": 255,
+     "bytes": 51,
+     "log_tail": "ERROR: Could not resolve symbol: /proc/self/exe:BEGIN_trigger\n"
+    },
+    "gil": {
+     "rc": 0,
+     "bytes": 276788,
+     "log_tail": "py-spy> Sampling process 100 times a second. Press Control-C to exit.\n\n\npy-spy> Stopped sampling because Control-C pressed\npy-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/tool_gil/pyspy_gil_rr_refc32_tool_gil.txt'. Samples: 1937 Errors: 33\npy-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG\n"
+    }
+   },
+   "gil": {
+    "status": "NO TRACE",
+    "file": "giltrace_rr_refc32_tool_gil.json"
+   },
+   "pyspy_gil": {
+    "status": "OK",
+    "samples": 1937,
+    "occupancy_from_ticks": 0.42987113566592483,
+    "top10": [
+     {
+      "function": "_d0 (nodes/env_probe/IInstance.py)",
+      "samples": 1283,
+      "share": 0.6623644811564274
+     },
+     {
+      "function": "_call_impl (torch/nn/modules/module.py)",
+      "samples": 72,
+      "share": 0.0371708828084667
+     },
+     {
+      "function": "send (rocketride/core/transport_websocket.py)",
+      "samples": 57,
+      "share": 0.02942694889003614
+     },
+     {
+      "function": "_transport_receive (rocketride/core/transport.py)",
+      "samples": 52,
+      "share": 0.026845637583892617
+     },
+     {
+      "function": "as_tensor (transformers/tokenization_utils_base.py)",
+      "samples": 48,
+      "share": 0.0247805885389778
+     },
+     {
+      "function": "iterencode (json/encoder.py)",
+      "samples": 46,
+      "share": 0.023748064016520392
+     },
+     {
+      "function": "writeDocuments (nodes/response/IInstance.py)",
+      "samples": 35,
+      "share": 0.018069179143004648
+     },
+     {
+      "function": "forward (torch/nn/modules/linear.py)",
+      "samples": 31,
+      "share": 0.01600413009808983
+     },
+     {
+      "function": "__init__ (pydantic/main.py)",
+      "samples": 17,
+      "share": 0.008776458440887971
+     },
+     {
+      "function": "<genexpr> (transformers/tokenization_utils_base.py)",
+      "samples": 17,
+      "share": 0.008776458440887971
+     }
+    ],
+    "by_stage": {
+     "env_probe": {
+      "samples": 1358,
+      "share": 0.7010841507485803
+     },
+     "embed": {
+      "samples": 336,
+      "share": 0.1734641197728446
+     },
+     "other": {
+      "samples": 185,
+      "share": 0.09550851832731028
+     },
+     "split": {
+      "samples": 33,
+      "share": 0.017036654620547237
+     },
+     "engine glue (data_conn)": {
+      "samples": 24,
+      "share": 0.0123902942694889
+     },
+     "response": {
+      "samples": 1,
+      "share": 0.0005162622612287042
+     }
+    },
+    "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring anywhere in its ';'-joined stack (else 'other'): embedding_transformer->embed, sentence_transformers->embed, transformers/->embed, torch/->embed, tokenizers->embed, preprocessor_langchain->split, langchain->split, nodes/response->response, stamp_probe->stamp_probe, env_probe->env_probe, data_conn->engine glue (data_conn)"
+   },
+   "steady_vs_drain_posthoc": {
+    "status": "unavailable"
+   },
+   "recorder_n_native": "NOT RUN \u2014 py-spy --native aborts on the engine binary (UNW_EBADREG), tooling leg 08:36Z; amendment 1"
+  },
+  "tool_gil2": {
+   "leg": "refc32_tool_gil2",
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "mandate": false,
+   "docs_per_s_DIAGNOSTIC": 2.1044,
+   "engine_cores": 10.321,
+   "host_busy_cores": 10.574,
+   "recorders": {
+    "giltrace": {
+     "rc": 0,
+     "bytes": 5384,
+     "log_tail": "\n\n"
+    },
+    "gil": {
+     "rc": 0,
+     "bytes": 404221,
+     "log_tail": "py-spy> Sampling process 100 times a second. Press Control-C to exit.\n\n\npy-spy> Stopped sampling because Control-C pressed\npy-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/tool_gil2/pyspy_gil_rr_refc32_tool_gil2.txt'. Samples: 1979 Errors: 49\npy-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG\n"
+    }
+   },
+   "gil": {
+    "status": "NO WINDOW",
+    "maps": [
+     "@h0",
+     "@hold_by_s",
+     "@hold_ns",
+     "@takes",
+     "@tmax",
+     "@wait_by_s",
+     "@wait_hist",
+     "@wait_ns"
+    ]
+   },
+   "pyspy_gil": {
+    "status": "OK",
+    "samples": 1979,
+    "occupancy_from_ticks": 0.4338044487510584,
+    "top10": [
+     {
+      "function": "_d0 (nodes/env_probe/IInstance.py)",
+      "samples": 1238,
+      "share": 0.6255684689236989
+     },
+     {
+      "function": "_call_impl (torch/nn/modules/module.py)",
+      "samples": 77,
+      "share": 0.03890853966649823
+     },
+     {
+      "function": "forward (transformers/models/bert/modeling_bert.py)",
+      "samples": 58,
+      "share": 0.029307731177362305
+     },
+     {
+      "function": "send (rocketride/core/transport_websocket.py)",
+      "samples": 56,
+      "share": 0.02829711975745326
+     },
+     {
+      "function": "iterencode (json/encoder.py)",
+      "samples": 50,
+      "share": 0.025265285497726123
+     },
+     {
+      "function": "<lambda> (torch/nn/modules/module.py)",
+      "samples": 42,
+      "share": 0.021222839818089943
+     },
+     {
+      "function": "transpose_for_scores (transformers/models/bert/modeling_bert.py)",
+      "samples": 40,
+      "share": 0.0202122283981809
+     },
+     {
+      "function": "_transport_receive (rocketride/core/transport.py)",
+      "samples": 40,
+      "share": 0.0202122283981809
+     },
+     {
+      "function": "as_tensor (transformers/tokenization_utils_base.py)",
+      "samples": 34,
+      "share": 0.017180394138453764
+     },
+     {
+      "function": "writeDocuments (nodes/response/IInstance.py)",
+      "samples": 30,
+      "share": 0.015159171298635674
+     }
+    ],
+    "by_stage": {
+     "env_probe": {
+      "samples": 1299,
+      "share": 0.6563921172309247
+     },
+     "embed": {
+      "samples": 432,
+      "share": 0.21829206670035373
+     },
+     "other": {
+      "samples": 181,
+      "share": 0.09146033350176858
+     },
+     "engine glue (data_conn)": {
+      "samples": 41,
+      "share": 0.020717534108135423
+     },
+     "split": {
+      "samples": 25,
+      "share": 0.012632642748863061
+     },
+     "response": {
+      "samples": 1,
+      "share": 0.0005053057099545225
+     }
+    },
+    "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring anywhere in its ';'-joined stack (else 'other'): embedding_transformer->embed, sentence_transformers->embed, transformers/->embed, torch/->embed, tokenizers->embed, preprocessor_langchain->split, langchain->split, nodes/response->response, stamp_probe->stamp_probe, env_probe->env_probe, data_conn->engine glue (data_conn)"
+   },
+   "steady_vs_drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "last_submit_s": 17.65011715888977,
+    "steady": {
+     "samples": 85,
+     "docs_in_flight_mean": 32.0,
+     "python_threads_R_mean": 9.623529411764705,
+     "all_threads_R_mean": 15.0
+    },
+    "drain": {
+     "samples": 134,
+     "docs_in_flight_mean": 5.149253731343284,
+     "python_threads_R_mean": 3.388059701492537,
+     "all_threads_R_mean": 4.447761194029851
+    }
+   },
+   "recorder_n_native": "NOT RUN \u2014 py-spy --native aborts on the engine binary (UNW_EBADREG), tooling leg 08:36Z; amendment 1"
+  },
+  "tool_gil3": {
+   "leg": "refc32_tool_gil3",
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "mandate": false,
+   "docs_per_s_DIAGNOSTIC": 2.4875,
+   "engine_cores": 12.348,
+   "host_busy_cores": 12.661,
+   "recorders": {
+    "giltrace": {
+     "rc": 0,
+     "bytes": 4922,
+     "log_tail": "\n\n"
+    },
+    "gil": {
+     "rc": 0,
+     "bytes": 408387,
+     "log_tail": "py-spy> Sampling process 100 times a second. Press Control-C to exit.\n\n\npy-spy> Stopped sampling because Control-C pressed\npy-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/tool_gil3/pyspy_gil_rr_refc32_tool_gil3.txt'. Samples: 595 Errors: 51\npy-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG\n"
+    }
+   },
+   "gil": {
+    "status": "OK",
+    "tracer_window_s": 40.122810391,
+    "python_threads": 36,
+    "gil_takes": 72651,
+    "wait_s_total": 25.077024424,
+    "hold_s_total": 5.889375308,
+    "waiting_on_gil": 0.01736129660383983,
+    "holding_gil": 0.004077325515369468,
+    "native": 0.18445314043445132,
+    "idle": 0.7941082374463395,
+    "python_thread_R_state_share": 0.18853046594982079,
+    "gil_occupancy": 0.14678371855330088,
+    "occupancy_le_1": true,
+    "wait_s_per_second_max": 4.582108916,
+    "top_waiting_threads_s": [
+     [
+      "723577",
+      1.28277986
+     ],
+     [
+      "723534",
+      1.207915014
+     ],
+     [
+      "723576",
+      1.140922149
+     ],
+     [
+      "723458",
+      1.126781905
+     ],
+     [
+      "728587",
+      1.122421238
+     ]
+    ]
+   },
+   "pyspy_gil": {
+    "status": "OK",
+    "samples": 595,
+    "occupancy_from_ticks": 0.1541749672376653,
+    "top10": [
+     {
+      "function": "forward (transformers/models/bert/modeling_bert.py)",
+      "samples": 67,
+      "share": 0.11260504201680673
+     },
+     {
+      "function": "iterencode (json/encoder.py)",
+      "samples": 54,
+      "share": 0.0907563025210084
+     },
+     {
+      "function": "send (rocketride/core/transport_websocket.py)",
+      "samples": 52,
+      "share": 0.08739495798319327
+     },
+     {
+      "function": "_transport_receive (rocketride/core/transport.py)",
+      "samples": 49,
+      "share": 0.08235294117647059
+     },
+     {
+      "function": "as_tensor (transformers/tokenization_utils_base.py)",
+      "samples": 44,
+      "share": 0.07394957983193277
+     },
+     {
+      "function": "transpose_for_scores (transformers/models/bert/modeling_bert.py)",
+      "samples": 44,
+      "share": 0.07394957983193277
+     },
+     {
+      "function": "forward (torch/nn/modules/linear.py)",
+      "samples": 43,
+      "share": 0.07226890756302522
+     },
+     {
+      "function": "writeDocuments (nodes/response/IInstance.py)",
+      "samples": 32,
+      "share": 0.05378151260504202
+     },
+     {
+      "function": "_call_impl (torch/nn/modules/module.py)",
+      "samples": 25,
+      "share": 0.04201680672268908
+     },
+     {
+      "function": "layer_norm (torch/nn/functional.py)",
+      "samples": 20,
+      "share": 0.03361344537815126
+     }
+    ],
+    "by_stage": {
+     "embed": {
+      "samples": 360,
+      "share": 0.6050420168067226
+     },
+     "other": {
+      "samples": 190,
+      "share": 0.31932773109243695
+     },
+     "engine glue (data_conn)": {
+      "samples": 35,
+      "share": 0.058823529411764705
+     },
+     "split": {
+      "samples": 8,
+      "share": 0.013445378151260505
+     },
+     "response": {
+      "samples": 2,
+      "share": 0.0033613445378151263
+     }
+    },
+    "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring anywhere in its ';'-joined stack (else 'other'): embedding_transformer->embed, sentence_transformers->embed, transformers/->embed, torch/->embed, tokenizers->embed, preprocessor_langchain->split, langchain->split, nodes/response->response, stamp_probe->stamp_probe, env_probe->env_probe, data_conn->engine glue (data_conn)"
+   },
+   "steady_vs_drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "last_submit_s": 8.968591213226318,
+    "steady": {
+     "samples": 42,
+     "docs_in_flight_mean": 32.0,
+     "python_threads_R_mean": 17.547619047619047,
+     "all_threads_R_mean": 29.452380952380953
+    },
+    "drain": {
+     "samples": 143,
+     "docs_in_flight_mean": 6.1328671328671325,
+     "python_threads_R_mean": 4.041958041958042,
+     "all_threads_R_mean": 5.601398601398602
+    }
+   },
+   "recorder_n_native": "NOT RUN \u2014 py-spy --native aborts on the engine binary (UNW_EBADREG), tooling leg 08:36Z; amendment 1"
+  },
+  "h2_null_c1": {
+   "leg": "refc1_h2_null_c1",
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "mandate": false,
+   "docs_per_s_DIAGNOSTIC": 0.3358,
+   "engine_cores": 2.321,
+   "host_busy_cores": 2.35,
+   "recorders": {
+    "giltrace": {
+     "rc": 255,
+     "bytes": 51,
+     "log_tail": "ERROR: Could not resolve symbol: /proc/self/exe:BEGIN_trigger\n"
+    },
+    "gil": {
+     "rc": 0,
+     "bytes": 79655,
+     "log_tail": "py-spy> Sampling process 100 times a second. Press Control-C to exit.\n\n\npy-spy> Stopped sampling because Control-C pressed\npy-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/h2_null_c1/pyspy_gil_rr_refc1_h2_null_c1.txt'. Samples: 1222 Errors: 58\npy-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG\n"
+    }
+   },
+   "gil": {
+    "status": "NO TRACE",
+    "file": "giltrace_rr_refc1_h2_null_c1.json"
+   },
+   "pyspy_gil": {
+    "status": "OK",
+    "samples": 1222,
+    "occupancy_from_ticks": 0.042741168090091874,
+    "top10": [
+     {
+      "function": "_d0 (nodes/env_probe/IInstance.py)",
+      "samples": 902,
+      "share": 0.7381342062193126
+     },
+     {
+      "function": "iterencode (json/encoder.py)",
+      "samples": 40,
+      "share": 0.03273322422258593
+     },
+     {
+      "function": "as_tensor (transformers/tokenization_utils_base.py)",
+      "samples": 36,
+      "share": 0.029459901800327332
+     },
+     {
+      "function": "send (rocketride/core/transport_websocket.py)",
+      "samples": 36,
+      "share": 0.029459901800327332
+     },
+     {
+      "function": "_transport_receive (rocketride/core/transport.py)",
+      "samples": 28,
+      "share": 0.022913256955810146
+     },
+     {
+      "function": "writeDocuments (nodes/response/IInstance.py)",
+      "samples": 19,
+      "share": 0.015548281505728314
+     },
+     {
+      "function": "_run_once (asyncio/base_events.py)",
+      "samples": 17,
+      "share": 0.013911620294599018
+     },
+     {
+      "function": "encode (ai/common/models/transformers/sentence_transformers.py)",
+      "samples": 8,
+      "share": 0.006546644844517185
+     },
+     {
+      "function": "_call_impl (torch/nn/modules/module.py)",
+      "samples": 7,
+      "share": 0.0057283142389525366
+     },
+     {
+      "function": "close_sync (ai/modules/data/data_conn.py)",
+      "samples": 7,
+      "share": 0.0057283142389525366
+     }
+    ],
+    "by_stage": {
+     "env_probe": {
+      "samples": 918,
+      "share": 0.7512274959083469
+     },
+     "other": {
+      "samples": 170,
+      "share": 0.13911620294599017
+     },
+     "embed": {
+      "samples": 115,
+      "share": 0.09410801963993454
+     },
+     "engine glue (data_conn)": {
+      "samples": 13,
+      "share": 0.010638297872340425
+     },
+     "split": {
+      "samples": 5,
+      "share": 0.004091653027823241
+     },
+     "response": {
+      "samples": 1,
+      "share": 0.0008183306055646482
+     }
+    },
+    "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring anywhere in its ';'-joined stack (else 'other'): embedding_transformer->embed, sentence_transformers->embed, transformers/->embed, torch/->embed, tokenizers->embed, preprocessor_langchain->split, langchain->split, nodes/response->response, stamp_probe->stamp_probe, env_probe->env_probe, data_conn->engine glue (data_conn)"
+   },
+   "steady_vs_drain_posthoc": {
+    "status": "unavailable"
+   },
+   "recorder_n_native": "NOT RUN \u2014 py-spy --native aborts on the engine binary (UNW_EBADREG), tooling leg 08:36Z; amendment 1",
+   "void_for_h2": "amendment 3: instrument failure (no GIL trace; py-spy stopped late)"
+  },
+  "h2_c32_a": {
+   "leg": "refc32_h2_c32_a",
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "mandate": false,
+   "docs_per_s_DIAGNOSTIC": 2.4206,
+   "engine_cores": 12.589,
+   "host_busy_cores": 12.821,
+   "recorders": {
+    "giltrace": {
+     "rc": 255,
+     "bytes": 51,
+     "log_tail": "ERROR: Could not resolve symbol: /proc/self/exe:BEGIN_trigger\n"
+    },
+    "gil": {
+     "rc": 0,
+     "bytes": 1021941,
+     "log_tail": "py-spy> Sampling process 100 times a second. Press Control-C to exit.\n\n\npy-spy> Stopped sampling because Control-C pressed\npy-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/h2_c32_a/pyspy_gil_rr_refc32_h2_c32_a.txt'. Samples: 8405 Errors: 153\npy-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG\n"
+    }
+   },
+   "gil": {
+    "status": "NO TRACE",
+    "file": "giltrace_rr_refc32_h2_c32_a.json"
+   },
+   "pyspy_gil": {
+    "status": "OK",
+    "samples": 8405,
+    "occupancy_from_ticks": 0.532603623439869,
+    "top10": [
+     {
+      "function": "_d0 (nodes/env_probe/IInstance.py)",
+      "samples": 5606,
+      "share": 0.6669839381320642
+     },
+     {
+      "function": "_call_impl (torch/nn/modules/module.py)",
+      "samples": 279,
+      "share": 0.03319452706722189
+     },
+     {
+      "function": "send (rocketride/core/transport_websocket.py)",
+      "samples": 271,
+      "share": 0.03224271267102915
+     },
+     {
+      "function": "_transport_receive (rocketride/core/transport.py)",
+      "samples": 265,
+      "share": 0.03152885187388459
+     },
+     {
+      "function": "iterencode (json/encoder.py)",
+      "samples": 223,
+      "share": 0.026531826293872695
+     },
+     {
+      "function": "writeDocuments (nodes/response/IInstance.py)",
+      "samples": 174,
+      "share": 0.02070196311719215
+     },
+     {
+      "function": "as_tensor (transformers/tokenization_utils_base.py)",
+      "samples": 168,
+      "share": 0.01998810232004759
+     },
+     {
+      "function": "forward (torch/nn/modules/linear.py)",
+      "samples": 114,
+      "share": 0.013563355145746579
+     },
+     {
+      "function": "__init__ (pydantic/main.py)",
+      "samples": 92,
+      "share": 0.010945865556216537
+     },
+     {
+      "function": "close_sync (ai/modules/data/data_conn.py)",
+      "samples": 83,
+      "share": 0.009875074360499702
+     }
+    ],
+    "by_stage": {
+     "env_probe": {
+      "samples": 5835,
+      "share": 0.6942296252230815
+     },
+     "embed": {
+      "samples": 1303,
+      "share": 0.1550267697798929
+     },
+     "other": {
+      "samples": 907,
+      "share": 0.10791195716835217
+     },
+     "split": {
+      "samples": 178,
+      "share": 0.02117787031528852
+     },
+     "engine glue (data_conn)": {
+      "samples": 173,
+      "share": 0.020582986317668056
+     },
+     "response": {
+      "samples": 9,
+      "share": 0.0010707911957168353
+     }
+    },
+    "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring anywhere in its ';'-joined stack (else 'other'): embedding_transformer->embed, sentence_transformers->embed, transformers/->embed, torch/->embed, tokenizers->embed, preprocessor_langchain->split, langchain->split, nodes/response->response, stamp_probe->stamp_probe, env_probe->env_probe, data_conn->engine glue (data_conn)"
+   },
+   "steady_vs_drain_posthoc": {
+    "status": "unavailable"
+   },
+   "recorder_n_native": "NOT RUN \u2014 py-spy --native aborts on the engine binary (UNW_EBADREG), tooling leg 08:36Z; amendment 1",
+   "void_for_h2": "amendment 3: instrument failure (no GIL trace; py-spy stopped late)"
+  },
+  "h2_c32_b": {
+   "leg": "refc32_h2_c32_b",
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "mandate": false,
+   "docs_per_s_DIAGNOSTIC": 2.4275,
+   "engine_cores": 12.723,
+   "host_busy_cores": 12.92,
+   "recorders": {
+    "giltrace": {
+     "rc": 255,
+     "bytes": 51,
+     "log_tail": "ERROR: Could not resolve symbol: /proc/self/exe:BEGIN_trigger\n"
+    },
+    "gil": {
+     "rc": 0,
+     "bytes": 998942,
+     "log_tail": "py-spy> Sampling process 100 times a second. Press Control-C to exit.\n\n\npy-spy> Stopped sampling because Control-C pressed\npy-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/h2_c32_b/pyspy_gil_rr_refc32_h2_c32_b.txt'. Samples: 8402 Errors: 156\npy-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG\n"
+    }
+   },
+   "gil": {
+    "status": "NO TRACE",
+    "file": "giltrace_rr_refc32_h2_c32_b.json"
+   },
+   "pyspy_gil": {
+    "status": "OK",
+    "samples": 8402,
+    "occupancy_from_ticks": 0.5339198806345238,
+    "top10": [
+     {
+      "function": "_d0 (nodes/env_probe/IInstance.py)",
+      "samples": 5703,
+      "share": 0.6787669602475601
+     },
+     {
+      "function": "_call_impl (torch/nn/modules/module.py)",
+      "samples": 289,
+      "share": 0.03439657224470364
+     },
+     {
+      "function": "_transport_receive (rocketride/core/transport.py)",
+      "samples": 256,
+      "share": 0.030468935967626756
+     },
+     {
+      "function": "send (rocketride/core/transport_websocket.py)",
+      "samples": 224,
+      "share": 0.02666031897167341
+     },
+     {
+      "function": "iterencode (json/encoder.py)",
+      "samples": 220,
+      "share": 0.026184241847179244
+     },
+     {
+      "function": "as_tensor (transformers/tokenization_utils_base.py)",
+      "samples": 151,
+      "share": 0.017971911449654845
+     },
+     {
+      "function": "writeDocuments (nodes/response/IInstance.py)",
+      "samples": 143,
+      "share": 0.017019757200666508
+     },
+     {
+      "function": "forward (torch/nn/modules/linear.py)",
+      "samples": 136,
+      "share": 0.016186622232801713
+     },
+     {
+      "function": "_convert_encoding (transformers/tokenization_utils_fast.py)",
+      "samples": 116,
+      "share": 0.013806236610330874
+     },
+     {
+      "function": "__init__ (pydantic/main.py)",
+      "samples": 96,
+      "share": 0.011425850987860033
+     }
+    ],
+    "by_stage": {
+     "env_probe": {
+      "samples": 5917,
+      "share": 0.7042370864079981
+     },
+     "embed": {
+      "samples": 1339,
+      "share": 0.15936681742442277
+     },
+     "other": {
+      "samples": 839,
+      "share": 0.09985717686265175
+     },
+     "split": {
+      "samples": 162,
+      "share": 0.019281123542013806
+     },
+     "engine glue (data_conn)": {
+      "samples": 130,
+      "share": 0.015472506546060461
+     },
+     "response": {
+      "samples": 15,
+      "share": 0.0017852892168531303
+     }
+    },
+    "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring anywhere in its ';'-joined stack (else 'other'): embedding_transformer->embed, sentence_transformers->embed, transformers/->embed, torch/->embed, tokenizers->embed, preprocessor_langchain->split, langchain->split, nodes/response->response, stamp_probe->stamp_probe, env_probe->env_probe, data_conn->engine glue (data_conn)"
+   },
+   "steady_vs_drain_posthoc": {
+    "status": "unavailable"
+   },
+   "recorder_n_native": "NOT RUN \u2014 py-spy --native aborts on the engine binary (UNW_EBADREG), tooling leg 08:36Z; amendment 1",
+   "void_for_h2": "amendment 3: instrument failure (no GIL trace; py-spy stopped late)"
+  },
+  "h2b_null_c1": {
+   "status": "NOT RUN"
+  },
+  "h2f_null_c1": {
+   "leg": "refc1_h2f_null_c1",
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "mandate": false,
+   "docs_per_s_DIAGNOSTIC": 0.3468,
+   "engine_cores": 2.324,
+   "host_busy_cores": 2.35,
+   "recorders": {
+    "giltrace": {
+     "rc": 0,
+     "bytes": 11327,
+     "log_tail": "\n\n"
+    },
+    "gil": {
+     "rc": 0,
+     "bytes": 91081,
+     "log_tail": "py-spy> Sampling process 100 times a second. Press Control-C to exit.\n\n\npy-spy> Stopped sampling because Control-C pressed\npy-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/h2f_null_c1/pyspy_gil_rr_refc1_h2f_null_c1.txt'. Samples: 298 Errors: 31\npy-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG\n"
+    }
+   },
+   "gil": {
+    "status": "OK",
+    "tracer_window_s": 278.271967249,
+    "python_threads": 5,
+    "gil_takes": 80690,
+    "wait_s_total": 0.264293007,
+    "hold_s_total": 3.487712284,
+    "waiting_on_gil": 0.00018995302301759236,
+    "holding_gil": 0.0025066932314307946,
+    "native": 0.13067947306731828,
+    "idle": 0.8666238806782333,
+    "python_thread_R_state_share": 0.13318616629874908,
+    "gil_occupancy": 0.012533466157153972,
+    "occupancy_le_1": true,
+    "wait_s_per_second_max": 0.035550703,
+    "top_waiting_threads_s": [
+     [
+      "787317",
+      0.105919696
+     ],
+     [
+      "787852",
+      0.078263089
+     ],
+     [
+      "787788",
+      0.047174043
+     ],
+     [
+      "787316",
+      0.032827883
+     ],
+     [
+      "787681",
+      0.000108296
+     ]
+    ]
+   },
+   "pyspy_gil": {
+    "status": "OK",
+    "samples": 298,
+    "occupancy_from_ticks": 0.010766314640719882,
+    "top10": [
+     {
+      "function": "send (rocketride/core/transport_websocket.py)",
+      "samples": 42,
+      "share": 0.14093959731543623
+     },
+     {
+      "function": "_transport_receive (rocketride/core/transport.py)",
+      "samples": 37,
+      "share": 0.12416107382550336
+     },
+     {
+      "function": "iterencode (json/encoder.py)",
+      "samples": 28,
+      "share": 0.09395973154362416
+     },
+     {
+      "function": "writeDocuments (nodes/response/IInstance.py)",
+      "samples": 25,
+      "share": 0.08389261744966443
+     },
+     {
+      "function": "as_tensor (transformers/tokenization_utils_base.py)",
+      "samples": 25,
+      "share": 0.08389261744966443
+     },
+     {
+      "function": "forward (transformers/models/bert/modeling_bert.py)",
+      "samples": 11,
+      "share": 0.03691275167785235
+     },
+     {
+      "function": "_call_impl (torch/nn/modules/module.py)",
+      "samples": 11,
+      "share": 0.03691275167785235
+     },
+     {
+      "function": "transpose_for_scores (transformers/models/bert/modeling_bert.py)",
+      "samples": 11,
+      "share": 0.03691275167785235
+     },
+     {
+      "function": "_run_once (asyncio/base_events.py)",
+      "samples": 10,
+      "share": 0.03355704697986577
+     },
+     {
+      "function": "close_sync (ai/modules/data/data_conn.py)",
+      "samples": 5,
+      "share": 0.016778523489932886
+     }
+    ],
+    "by_stage": {
+     "other": {
+      "samples": 160,
+      "share": 0.5369127516778524
+     },
+     "embed": {
+      "samples": 120,
+      "share": 0.40268456375838924
+     },
+     "engine glue (data_conn)": {
+      "samples": 11,
+      "share": 0.03691275167785235
+     },
+     "split": {
+      "samples": 5,
+      "share": 0.016778523489932886
+     },
+     "response": {
+      "samples": 2,
+      "share": 0.006711409395973154
+     }
+    },
+    "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring anywhere in its ';'-joined stack (else 'other'): embedding_transformer->embed, sentence_transformers->embed, transformers/->embed, torch/->embed, tokenizers->embed, preprocessor_langchain->split, langchain->split, nodes/response->response, stamp_probe->stamp_probe, env_probe->env_probe, data_conn->engine glue (data_conn)"
+   },
+   "steady_vs_drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "last_submit_s": 274.76179027557373,
+    "steady": {
+     "samples": 1340,
+     "docs_in_flight_mean": 1.0,
+     "python_threads_R_mean": 0.6708955223880597,
+     "all_threads_R_mean": 1.2111940298507462
+    },
+    "drain": {
+     "samples": 10,
+     "docs_in_flight_mean": 1.0,
+     "python_threads_R_mean": 0.6,
+     "all_threads_R_mean": 1.3
+    }
+   },
+   "recorder_n_native": "NOT RUN \u2014 py-spy --native aborts on the engine binary (UNW_EBADREG), tooling leg 08:36Z; amendment 1"
+  },
+  "h2f_c32_a": {
+   "leg": "refc32_h2f_c32_a",
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "mandate": false,
+   "docs_per_s_DIAGNOSTIC": 2.881,
+   "engine_cores": 15.737,
+   "host_busy_cores": 16.012,
+   "recorders": {
+    "giltrace": {
+     "rc": 0,
+     "bytes": 8797,
+     "log_tail": "\n\n"
+    },
+    "gil": {
+     "rc": 0,
+     "bytes": 1556450,
+     "log_tail": "py-spy> Sampling process 100 times a second. Press Control-C to exit.\n\n\npy-spy> Stopped sampling because Control-C pressed\npy-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/h2f_c32_a/pyspy_gil_rr_refc32_h2f_c32_a.txt'. Samples: 2986 Errors: 182\npy-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG\n"
+    }
+   },
+   "gil": {
+    "status": "OK",
+    "tracer_window_s": 134.099033693,
+    "python_threads": 36,
+    "gil_takes": 297391,
+    "wait_s_total": 158.826078269,
+    "hold_s_total": 30.135303071,
+    "waiting_on_gil": 0.032899830714458914,
+    "holding_gil": 0.00624233992534667,
+    "native": 0.254028070891086,
+    "idle": 0.7068297584691086,
+    "python_thread_R_state_share": 0.26027041081643265,
+    "gil_occupancy": 0.22472423731248012,
+    "occupancy_le_1": true,
+    "wait_s_per_second_max": 9.132923745,
+    "top_waiting_threads_s": [
+     [
+      "852267",
+      6.833593143
+     ],
+     [
+      "852295",
+      6.771758414
+     ],
+     [
+      "852299",
+      6.724777025
+     ],
+     [
+      "852287",
+      6.717605367
+     ],
+     [
+      "852290",
+      6.464653762
+     ]
+    ]
+   },
+   "pyspy_gil": {
+    "status": "OK",
+    "samples": 2986,
+    "occupancy_from_ticks": 0.22520207118841737,
+    "top10": [
+     {
+      "function": "forward (transformers/models/bert/modeling_bert.py)",
+      "samples": 316,
+      "share": 0.1058271935699933
+     },
+     {
+      "function": "_transport_receive (rocketride/core/transport.py)",
+      "samples": 265,
+      "share": 0.08874748827863363
+     },
+     {
+      "function": "send (rocketride/core/transport_websocket.py)",
+      "samples": 260,
+      "share": 0.087073007367716
+     },
+     {
+      "function": "forward (torch/nn/modules/linear.py)",
+      "samples": 256,
+      "share": 0.08573342263898191
+     },
+     {
+      "function": "transpose_for_scores (transformers/models/bert/modeling_bert.py)",
+      "samples": 223,
+      "share": 0.07468184862692566
+     },
+     {
+      "function": "iterencode (json/encoder.py)",
+      "samples": 223,
+      "share": 0.07468184862692566
+     },
+     {
+      "function": "as_tensor (transformers/tokenization_utils_base.py)",
+      "samples": 200,
+      "share": 0.06697923643670463
+     },
+     {
+      "function": "writeDocuments (nodes/response/IInstance.py)",
+      "samples": 172,
+      "share": 0.05760214333556597
+     },
+     {
+      "function": "_call_impl (torch/nn/modules/module.py)",
+      "samples": 121,
+      "share": 0.0405224380442063
+     },
+     {
+      "function": "close_sync (ai/modules/data/data_conn.py)",
+      "samples": 79,
+      "share": 0.026456798392498326
+     }
+    ],
+    "by_stage": {
+     "embed": {
+      "samples": 1863,
+      "share": 0.6239115874079035
+     },
+     "other": {
+      "samples": 904,
+      "share": 0.30274614869390487
+     },
+     "engine glue (data_conn)": {
+      "samples": 152,
+      "share": 0.050904219691895514
+     },
+     "split": {
+      "samples": 53,
+      "share": 0.017749497655726726
+     },
+     "response": {
+      "samples": 14,
+      "share": 0.004688546550569324
+     }
+    },
+    "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring anywhere in its ';'-joined stack (else 'other'): embedding_transformer->embed, sentence_transformers->embed, transformers/->embed, torch/->embed, tokenizers->embed, preprocessor_langchain->split, langchain->split, nodes/response->response, stamp_probe->stamp_probe, env_probe->env_probe, data_conn->engine glue (data_conn)"
+   },
+   "steady_vs_drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "last_submit_s": 58.81426477432251,
+    "steady": {
+     "samples": 276,
+     "docs_in_flight_mean": 31.992753623188406,
+     "python_threads_R_mean": 18.452898550724637,
+     "all_threads_R_mean": 26.641304347826086
+    },
+    "drain": {
+     "samples": 356,
+     "docs_in_flight_mean": 4.426966292134831,
+     "python_threads_R_mean": 2.5646067415730336,
+     "all_threads_R_mean": 4.084269662921348
+    }
+   },
+   "recorder_n_native": "NOT RUN \u2014 py-spy --native aborts on the engine binary (UNW_EBADREG), tooling leg 08:36Z; amendment 1"
+  },
+  "h2f_c32_b": {
+   "leg": "refc32_h2f_c32_b",
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "mandate": false,
+   "docs_per_s_DIAGNOSTIC": 2.8723,
+   "engine_cores": 15.73,
+   "host_busy_cores": 16.042,
+   "recorders": {
+    "giltrace": {
+     "rc": 0,
+     "bytes": 8934,
+     "log_tail": "\n\n"
+    },
+    "gil": {
+     "rc": 0,
+     "bytes": 1474844,
+     "log_tail": "py-spy> Sampling process 100 times a second. Press Control-C to exit.\n\n\npy-spy> Stopped sampling because Control-C pressed\npy-spy> Wrote raw flamegraph data to 'working/results/parity_p0_20260923T083031Z/h2f_c32_b/pyspy_gil_rr_refc32_h2f_c32_b.txt'. Samples: 3024 Errors: 180\npy-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG\n"
+    }
+   },
+   "gil": {
+    "status": "OK",
+    "tracer_window_s": 134.521361861,
+    "python_threads": 36,
+    "gil_takes": 297453,
+    "wait_s_total": 161.557254465,
+    "hold_s_total": 30.635485498,
+    "waiting_on_gil": 0.0333605120468062,
+    "holding_gil": 0.006326026561915835,
+    "native": 0.2538376254622013,
+    "idle": 0.7064758359290766,
+    "python_thread_R_state_share": 0.2601636520241171,
+    "gil_occupancy": 0.22773695622897008,
+    "occupancy_le_1": true,
+    "wait_s_per_second_max": 9.366643742,
+    "top_waiting_threads_s": [
+     [
+      "1081073",
+      6.39443051
+     ],
+     [
+      "1081116",
+      6.305700886
+     ],
+     [
+      "1081065",
+      6.303518113
+     ],
+     [
+      "1081110",
+      6.290989005
+     ],
+     [
+      "1081061",
+      6.098977938
+     ]
+    ]
+   },
+   "pyspy_gil": {
+    "status": "OK",
+    "samples": 3024,
+    "occupancy_from_ticks": 0.2273794871814484,
+    "top10": [
+     {
+      "function": "forward (transformers/models/bert/modeling_bert.py)",
+      "samples": 310,
+      "share": 0.10251322751322751
+     },
+     {
+      "function": "_transport_receive (rocketride/core/transport.py)",
+      "samples": 277,
+      "share": 0.0916005291005291
+     },
+     {
+      "function": "send (rocketride/core/transport_websocket.py)",
+      "samples": 259,
+      "share": 0.08564814814814815
+     },
+     {
+      "function": "iterencode (json/encoder.py)",
+      "samples": 257,
+      "share": 0.08498677248677249
+     },
+     {
+      "function": "transpose_for_scores (transformers/models/bert/modeling_bert.py)",
+      "samples": 221,
+      "share": 0.07308201058201058
+     },
+     {
+      "function": "forward (torch/nn/modules/linear.py)",
+      "samples": 212,
+      "share": 0.0701058201058201
+     },
+     {
+      "function": "as_tensor (transformers/tokenization_utils_base.py)",
+      "samples": 203,
+      "share": 0.06712962962962964
+     },
+     {
+      "function": "writeDocuments (nodes/response/IInstance.py)",
+      "samples": 180,
+      "share": 0.05952380952380952
+     },
+     {
+      "function": "_call_impl (torch/nn/modules/module.py)",
+      "samples": 148,
+      "share": 0.04894179894179894
+     },
+     {
+      "function": "close_sync (ai/modules/data/data_conn.py)",
+      "samples": 82,
+      "share": 0.027116402116402115
+     }
+    ],
+    "by_stage": {
+     "embed": {
+      "samples": 1804,
+      "share": 0.5965608465608465
+     },
+     "other": {
+      "samples": 972,
+      "share": 0.32142857142857145
+     },
+     "engine glue (data_conn)": {
+      "samples": 161,
+      "share": 0.05324074074074074
+     },
+     "split": {
+      "samples": 72,
+      "share": 0.023809523809523808
+     },
+     "response": {
+      "samples": 15,
+      "share": 0.00496031746031746
+     }
+    },
+    "stage_rule": "a sample goes to the first pattern, in this order, that occurs as a substring anywhere in its ';'-joined stack (else 'other'): embedding_transformer->embed, sentence_transformers->embed, transformers/->embed, torch/->embed, tokenizers->embed, preprocessor_langchain->split, langchain->split, nodes/response->response, stamp_probe->stamp_probe, env_probe->env_probe, data_conn->engine glue (data_conn)"
+   },
+   "steady_vs_drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "last_submit_s": 59.20371389389038,
+    "steady": {
+     "samples": 279,
+     "docs_in_flight_mean": 32.0,
+     "python_threads_R_mean": 18.387096774193548,
+     "all_threads_R_mean": 26.92831541218638
+    },
+    "drain": {
+     "samples": 357,
+     "docs_in_flight_mean": 4.473389355742297,
+     "python_threads_R_mean": 2.5518207282913163,
+     "all_threads_R_mean": 4.064425770308123
+    }
+   },
+   "recorder_n_native": "NOT RUN \u2014 py-spy --native aborts on the engine binary (UNW_EBADREG), tooling leg 08:36Z; amendment 1"
+  },
+  "h2_full_c32": {
+   "status": "NOT RUN"
+  }
+ },
+ "null_control": {
+  "leg": "h2f_null_c1",
+  "waiting_on_gil": 0.00018995302301759236,
+  "threshold": 0.02,
+  "pass": true
+ },
+ "gate": {
+  "threshold": 0.15,
+  "metric": "mean waiting_on_gil of h2f_c32_a and h2f_c32_b (amendments 3 and 4)",
+  "measured": 0.03313017138063255,
+  "values": [
+   0.032899830714458914,
+   0.0333605120468062
+  ],
+  "fired": false,
+  "evaluable": true,
+  "note": null,
+  "amendment": "instrument per preregistration_amendment_1.json (bpftrace on take_gil/drop_gil); recorder N NOT RUN (UNW_EBADREG)"
+ }
+}

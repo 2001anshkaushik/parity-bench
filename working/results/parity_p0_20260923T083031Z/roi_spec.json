@@ -1,0 +1,68 @@
+{
+ "items": [
+  {
+   "bottleneck": "the docs parse tail: the engine's Tika wrapper extracts every PDF inline image, PNG-encodes it and sends it through JNI, and probes external media tools (exiftool / ffmpeg / sox) by spawning a process per embedded image (E1's exec census counts the spawns)",
+   "fix": "extract inline images only when a node listens on the parser's image lane (TikaApi sets PDFParserConfig.setExtractInlineImages / setExtractUniqueInlineImagesOnly unconditionally), and probe the external tools once per process instead of per embedded image (ConfigBuilder.getConfig per EmbeddedContentProcessor). The flag is hard-set in the engine's Java wrapper (engine/java/lib/tika.jar), not the C++ binary: a flag-level change there, or exposing it as a node setting \u2014 scope recorded as CONFIG on that basis. Output effect: text unchanged by construction if no node consumes images (to be verified document by document in P1)",
+   "scope": "CONFIG",
+   "share_from": "docs:d1_rr_s1+d1_rr_s2:parse_bracket",
+   "evidence": "E1 (engine path vs isolated Tika, exec census) + H5 + source (tika.jar bytecode)"
+  },
+  {
+   "bottleneck": "per-document embedding (MiniLM, Python/torch at one intra-op thread) \u2014 the largest share of document time",
+   "fix": "encode the chunks of several in-flight documents in one call (fewer, larger matrix products) inside the one model instance; output effect must be verified (batch composition can move floats, cf. S5-B on video)",
+   "scope": "PYTHON",
+   "share_from": "docs:d1_rr_s1+d1_rr_s2:embed",
+   "evidence": "D1 stage shares; H2 (embed is the largest holder of the GIL, yet GIL waiting is far below the gate); RocketRide's CPU per document is above LlamaIndex's (see POST-HOC)"
+  },
+  {
+   "bottleneck": "response path: vectors serialised as JSON text and sent over the websocket from the event loop",
+   "fix": "binary vector encoding on the response lane",
+   "scope": "PYTHON",
+   "share_from": "docs:d1_rr_s1+d1_rr_s2:return",
+   "evidence": "D1 return stage; H2 ('other' GIL-holding samples are mostly transport + json)"
+  },
+  {
+   "bottleneck": "video: work inside RocketRide's device lock that is not the forward pass (560 px LANCZOS resize, RGB convert, rfdetr pre/post-processing, dict building, rescale)",
+   "fix": "narrow the device lock to the forward pass so one thread prepares the next frame while another runs the current forward pass (one model instance; threads only)",
+   "scope": "THREADING",
+   "share_from": "v2:v2_rr_s_a+v2_rr_s_b:resize|preprocess|predict_pre|predict_post|dict_build|loader_post|rescale|inside_other",
+   "evidence": "V2 stamps + V3 source"
+  },
+  {
+   "bottleneck": "video: RocketRide's forward pass at T=4 is slower than LlamaIndex's with identical libraries, identical model construction and (post-hoc) about the same CPU work per frame, spread over fewer busy cores \u2014 its threads wait rather than compute",
+   "fix": "find what keeps the four intra-op threads from running inside the task process before changing code: the engine burns CPU with no task (idle spin, source untraced), the debugger is attached (pydevd as sys.monitoring tool 0), and thread settings beyond intra-op T are unmeasured; P1 experiment E2 (see NOT RUN). Scope THREADING is provisional: it names the symptom, the cause is untraced. Output effect: none expected from removing a wait, to be verified frame by frame",
+   "scope": "THREADING",
+   "share_from": "v2:v2_rr_s_a+v2_rr_s_b:forward",
+   "evidence": "V2 stamps + runtime versions + V2 POST-HOC (cores busy during the hold)"
+  }
+ ],
+ "context_items": [
+  {
+   "bottleneck": "video: frames waiting for RocketRide's device lock",
+   "share_from": "v2:v2_rr_s_a+v2_rr_s_b:lock_wait",
+   "why": "not a separate cost: sixteen videos' frames queue behind one lock held for nearly the whole window (V2 duty cycle), so the wait shrinks only as the hold per frame shrinks; no fix of its own, and its (b) is not an achievable ceiling"
+  }
+ ],
+ "measured_no_readable_effect": [
+  "the debugger attached to every task process (H7): the noDebug difference is inside the threshold (see H7) \u2014 a hygiene item, not a throughput fix",
+  "widening the executor (H1): C=64 is flat against C=32 (see H1); in the steady phase most of the box's vCPUs already have a runnable thread (see POST-HOC)",
+  "a different PDF parser for the tail (H6 full): no parser clears the pre-registered rule; warm isolated Tika is about as fast as pypdfium2 on the 11 (see H6). The hybrid shape the data supports \u2014 pypdfium2 first, Tika on empty or error \u2014 keeps Tika's coverage on this corpus and costs less isolated parse time corpus-wide (see H6's corpus table); it is the P1 recommendation for corpus-wide parse cost, not a fix for the tail, and it changes extracted text (fidelity)"
+ ],
+ "measured_source_not_traced": [
+  "the engine's idle spin (cores burned with nothing submitted; measured in every docs leg as cost.idle_spin_measured and in every video leg as efficiency.idle_burden): part of RocketRide's extra CPU per document and per frame, and a candidate for the video threads' waiting; its source was not traced in P0"
+ ],
+ "out_of_bounds": [
+  "a second token or more task processes (LlamaIndex's own multi-instance optima run many worker processes; context only)",
+  "the engine's model-server (proxy) mode \u2014 make_device_lock returns a no-op lock only when a separate model-server process serves inference",
+  "model or engine pools, and frame micro-batching across videos (S5-B: changes output; excluded by the mandate)"
+ ],
+ "not_run": [
+  "py-spy's --native recorder (H2 recorder N): aborts on the engine binary (UNW_EBADREG) \u2014 replaced before any H2 leg by the bpftrace tracer (amendment 1)",
+  "the 9,975-document H2 profile: its gate did not fire (see H2)",
+  "H5's 384-slice sweep at a best config, and H6's tika_best parser: H5's gate did not fire",
+  "the V1 168-video confirmation: its gate fired, but its box time would end near the end of the SSO session and the box can only be stopped from the laptop (v1_gate.json) \u2014 it needs a fresh approval at its start",
+  "the h2b legs: stopped mid-leg when the per-document probe scan was found (amendment 4); the first-generation docs legs are superseded and shown only as PERTURBED",
+  "an off-CPU stack census of the executor threads (considered after H2, not pre-registered, not run)",
+  "E2 (designed for P1, not pre-registered, not run): what RocketRide's T=4 intra-op threads wait on during the video forward pass \u2014 the bpftrace GIL tracer, py-spy --gil and the 5 Hz thread sampler on one RocketRide and one LlamaIndex T=4 video leg (16 videos, same session), then RocketRide with noDebug; it needs the H2 profiler wired into the video chain (about an hour of code and an hour of box time), which the night order did not include"
+ ]
+}

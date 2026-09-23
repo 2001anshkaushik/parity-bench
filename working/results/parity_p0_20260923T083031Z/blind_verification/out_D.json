@@ -1,0 +1,291 @@
+{
+ "verifier": "D",
+ "report": "/private/tmp/claude-501/-Users-ansh-RocketRide-Benchmarking-benchmark-A/99b99d9b-386c-4d1e-8b7e-cd129b6411f0/scratchpad/p0verify/P0_verify_copy.md",
+ "raw_root": "/Users/ansh/RocketRide/Benchmarking/benchmark-A/working/results/parity_p0_20260923T083031Z",
+ "files_read": [
+  "v1_{rr_t4,li_t4,rr_def}_{a,b}/export_*.json",
+  "v1_*/records_*.jsonl",
+  "v2_{rr_s,rr_u,li_s}_{a,b}/export_*.json",
+  "v2_*/records_*.jsonl",
+  "v2_{rr_s,li_s}_{a,b}/p0_v2_stamps.jsonl",
+  "d1f_rr_s1|s2/stamp_probe.jsonl",
+  "d1f_rr_s1|s2/perdoc_rr_refc32_*.jsonl"
+ ],
+ "figures_checked": 570,
+ "counts": {
+  "match": 567,
+  "mismatch": 1,
+  "unverifiable": 2
+ },
+ "mismatches": [
+  {
+   "section": "## V1 \u2014 matched single instance (video)",
+   "location": "table row 'LlamaIndex one instance, six vars = 4', frames/s column, leg v1_li_t4_b",
+   "report_value": "3.347",
+   "recomputed_value": "3.374",
+   "basis": "v1_li_t4_b export: throughput.total_frames 3203 / throughput.total_span_s 949.2 = 3.37442 (export's own total_frames_per_s 3.375). The row's mean 3.440 and spread 3.80%, and the gate figures (+34.7%, 3.80%, +30.9 points), all match only with 3.374, so the printed per-leg value is a digit transposition; nothing downstream is affected."
+  }
+ ],
+ "unverifiable": [
+  {
+   "section": "## Gates",
+   "location": "V1 row gate name '(168-video confirmation)'",
+   "value": "168",
+   "reason": "a label for the NOT-RUN confirmation leg; no 168-video leg exists among the listed files"
+  },
+  {
+   "section": "## V1",
+   "location": "'Correctness note carried from S5-A: only T=16/unset reproduces default output bit-for-bit; every other T shifts scores'",
+   "value": "T=16",
+   "reason": "carried from campaign S5-A; no S5-A video file is in the list. (The in-session part that is checkable - t4 vs default outputs differ on 16/16 videos - matches.)"
+  }
+ ],
+ "matched": {
+  "V1_intro_labels": {
+   "16-video slice": "16 measured records per leg, 0 errors",
+   "K=16": "provenance_leela.offered_concurrency 16",
+   "one token / one worker": "task_census census_after 1 / declared_workers 1",
+   "six vars = 4": "all six env vars 4, torch_num_threads 4 (both arms)",
+   "RR default torch 16": "out_of_box torch_num_threads 16"
+  },
+  "V1_table": {
+   "rr_t4": {
+    "frames_s": [
+     "2.529",
+     "2.577"
+    ],
+    "mean": "2.553",
+    "spread": "1.89%",
+    "cpu_s_per_frame": [
+     "1.437",
+     "1.409"
+    ],
+    "cores": [
+     "3.63",
+     "3.63"
+    ],
+    "exact": {
+     "fps": [
+      2.528618,
+      2.57683
+     ],
+     "cpf": [
+      1.437215,
+      1.408804
+     ],
+     "cores": [
+      3.634,
+      3.63
+     ]
+    }
+   },
+   "li_t4": {
+    "frames_s": [
+     "3.505",
+     "3.374 (report 3.347 - MISMATCH)"
+    ],
+    "mean": "3.440",
+    "spread": "3.80%",
+    "cpu_s_per_frame": [
+     "0.872",
+     "0.885"
+    ],
+    "cores": [
+     "3.06",
+     "2.99"
+    ],
+    "exact": {
+     "fps": [
+      3.505143,
+      3.374421
+     ],
+     "cpf": [
+      0.871808,
+      0.885045
+     ],
+     "cores": [
+      3.056,
+      2.987
+     ]
+    }
+   },
+   "rr_def": {
+    "frames_s": [
+     "2.550",
+     "2.562"
+    ],
+    "mean": "2.556",
+    "spread": "0.49%",
+    "cpu_s_per_frame": [
+     "2.101",
+     "2.087"
+    ],
+    "cores": [
+     "5.36",
+     "5.35"
+    ],
+    "exact": {
+     "fps": [
+      2.549956,
+      2.5624
+     ],
+     "cpf": [
+      2.101499,
+      2.0867
+     ],
+     "cores": [
+      5.359,
+      5.347
+     ]
+    }
+   }
+  },
+  "V1_gate": {
+   "gap": "+34.7% (34.7495%)",
+   "threshold": "3.80% (3.8003%, = li_t4 spread)",
+   "margin": "+30.9 points (30.9491)",
+   "outcome": "FIRED"
+  },
+  "V1_output_identity": {
+   "rr_t4_determinism (t4_a vs t4_b)": "16 videos, 0 chunk diffs, 0 score diffs, identical yes",
+   "rr_default_determinism (def_a vs def_b)": "16, 0, 0, yes",
+   "rr_t4_vs_default_output (t4_a vs def_a; also t4_b vs def_b)": "16, 16, 16, no"
+  },
+  "V2_heading_T4": "torch_num_threads 4 and six vars 4 in all RR V2 exports; LI thread pins 4",
+  "V2_null_control": {
+   "stamped": [
+    "2.621",
+    "2.574"
+   ],
+   "unstamped": [
+    "2.574",
+    "2.518"
+   ],
+   "spreads": [
+    "1.82%",
+    "2.18%"
+   ],
+   "delta": "+2.04% (2.0400%)",
+   "threshold": "2.18% (2.1775%)",
+   "output_identical": [
+    true,
+    true
+   ],
+   "outcome": "PASS (|delta| < threshold, outputs identical)"
+  },
+  "V2_reading": {
+   "forward_RR": "0.373 (0.372506)",
+   "forward_LI": "0.289 (0.289299)",
+   "difference": "+28.8% (28.7616%)",
+   "tolerance": "2.29% (2.2931%, LI spread; RR spread 1.82%)",
+   "lock_held": [
+    "0.380 (0.379749)",
+    "0.296 (0.295540)"
+   ],
+   "in_lock_non_forward_ms": [
+    "7.2 (7.243)",
+    "6.2 (6.241)"
+   ],
+   "forward_share_of_hold": [
+    "98.1% (98.093)",
+    "97.9% (97.888)"
+   ],
+   "legs_per_arm": "2 / 2",
+   "reading": "UNEQUAL"
+  },
+  "V2_implied": {
+   "RR": "implied 2.633 vs measured 2.598",
+   "LI": "implied 3.384 vs measured 3.235"
+  },
+  "V2_posthoc": {
+   "v2_rr_s_a": [
+    "1.384",
+    "1.237",
+    "0.912",
+    "2.42"
+   ],
+   "v2_rr_s_b": [
+    "1.424",
+    "1.230",
+    "0.946",
+    "2.47"
+   ],
+   "v2_li_s_a": [
+    "0.895",
+    "0.004",
+    "0.894",
+    "3.06"
+   ],
+   "v2_li_s_b": [
+    "0.926",
+    "0.005",
+    "0.924",
+    "3.09"
+   ]
+  },
+  "V2_stage_tables": {
+   "figures": 452,
+   "note": "4 headings (duty 99.9/99.9/99.9/100.0% - exact 99.925/99.924/99.905/99.9998%; 3203 frames; forward present on 3203) and every cell of the 40 stage rows (count, share, min, mean, sd, p50, p90, p95, p99, max, mean/p50) recomputed after dropping 323 RR / 2584 LI warm-up frame rows (last 3203 by t_wall kept); LI counted videos 16 of 32, carrying exactly 3203 frames; all match"
+  },
+  "Verdicts_V1": {
+   "gap": "+34.7%",
+   "margin": "+30.9 points",
+   "verdict": "SUPPORTED - gate fired"
+  },
+  "Verdicts_V2": {
+   "forward": "0.373 vs 0.289",
+   "diff_vs_tol": "+28.8% vs 2.29%",
+   "non_forward": "7.2 / 6.2 ms",
+   "duties": [
+    "99.9%",
+    "99.9%",
+    "99.9%",
+    "100.0%"
+   ],
+   "verdict": "NOT SUPPORTED - unequal forward-pass time"
+  },
+  "Gates_V1": {
+   "measured": "+30.9 points",
+   "outcome": "FIRED"
+  },
+  "ROI": {
+   "rank1_docs_parse_bracket": {
+    "a": "36.2% (s1 36.4499, s2 35.9935, mean 36.2217)",
+    "b": "1.57x (1.5679)"
+   },
+   "rank2_video_forward": {
+    "a": "7.1% (7.1477)",
+    "b": "1.08x (1.0770)"
+   },
+   "rank3_video_in_lock_non_forward": {
+    "a": "0.1% (0.1387 summing resize|preprocess|predict_pre|predict_post|dict_build|loader_post|rescale|inside_other; any subset of these gives 0.14%)",
+    "b": "1.00x (1.0014)"
+   },
+   "rank4_docs_embed": {
+    "a": "62.2% (s1 61.9623, s2 62.4479, mean 62.2051)",
+    "b": "2.65x (2.6459)"
+   },
+   "rank5_docs_return": {
+    "a": "1.3% (1.2899)",
+    "b": "1.01x (1.0131)"
+   },
+   "not_separate_video_lock_wait": {
+    "a": "92.7% (92.6712)",
+    "b": "13.64x (13.6449)"
+   },
+   "docs_basis": "382 of 384 documents per leg with a complete stamp set (2 without: 014_014961.pdf, 039_039457.pdf, stage None)"
+  }
+ },
+ "notes": [
+  "Export field cpu_s_per_frame for v1_rr_def_a is 2.102 while service_cpu_s/total_frames = 2.1015 -> 2.101; the report prints 2.101, which matches the stated definition.",
+  "Helper scripts used for the arithmetic are in scratchpad/p0verify/work_D/ (new files; no existing file was modified)."
+ ],
+ "count_breakdown": {
+  "V1 section": 44,
+  "V2 section (excl. runtime versions)": 496,
+  "Verdicts V1+V2": 14,
+  "Gates V1": 2,
+  "ROI (a)/(b) incl. not-separate line": 12,
+  "unverifiable": 2
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "A": [
+  "2.9287",
+  "2.9827",
+  "D1 overhead table, instrumented leg d1f_rr_s1 span docs/s"
+ ],
+ "B": [
+  "2.9339",
+  "2.9393",
+  "H7 table, noDebug cell mean span docs/s"
+ ],
+ "C": [
+  "| 0.401 |",
+  "| 0.410 |",
+  "H6 full, parse seconds on the 11, pypdfium2 mean"
+ ],
+ "D": [
+  "3.374",
+  "3.347",
+  "V1 table, LlamaIndex v1_li_t4_b frames/s"
+ ],
+ "E": [
+  "split 2.4%, response 0.5%.",
+  "split 4.2%, response 0.5%.",
+  "H2 h2f_c32_b By stage line, split"
+ ]
+}

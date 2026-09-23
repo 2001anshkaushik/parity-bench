@@ -1,0 +1,147 @@
+{
+ "inputs_sha256_16": {
+  "analysis_docs_p0.json": "3b2b5a71dadf7dc9",
+  "analysis_docs_p0_gen1.json": "4047b423ecc6f8ae",
+  "analysis_e1.json": "edab891bb9d34472",
+  "analysis_h2.json": "8ffcafc2ac03f0ab",
+  "analysis_h5.json": "f44ab3c96ab4bc79",
+  "analysis_h6smoke.json": "a281ea4f80e75e9d",
+  "analysis_h6full.json": "7dd0350d17aae542",
+  "analysis_v1.json": "c081ce4f6d2a9282",
+  "analysis_v2.json": "bd34d7c47e907bdc",
+  "source_traces.json": "c55b19b1584a16ed",
+  "roi_spec.json": "5d85f7d8ea084559",
+  "summary_spec.json": "74c9031bd1d98966",
+  "h6_gate.json": "ec8a885f081e7a1d",
+  "runtime_versions/li_docs.txt": "cc2bf8979efe406b",
+  "runtime_versions/li_video.txt": "0195a53cd40271b9",
+  "runtime_versions/rr_patched_docs.txt": "c073c573924ec8d4",
+  "runtime_versions/rr_patched_video.txt": "a75249eaa5254b3f",
+  "P0_BLIND_VERIFICATION.json": "6a1fbee3dbf1c093"
+ },
+ "figures": {
+  "d0_violations": [],
+  "d1_overhead": {
+   "rr_384_c32": -0.0005730610165276799,
+   "rr_96_c8": -0.0011916157951834222,
+   "li_96_c8_one_worker": 0.0071398391156815835
+  },
+  "parity_docs": 2.720485294341571,
+  "h2_gate": {
+   "threshold": 0.15,
+   "metric": "mean waiting_on_gil of h2f_c32_a and h2f_c32_b (amendments 3 and 4)",
+   "measured": 0.03313017138063255,
+   "values": [
+    0.032899830714458914,
+    0.0333605120468062
+   ],
+   "fired": false,
+   "evaluable": true,
+   "note": null,
+   "amendment": "instrument per preregistration_amendment_1.json (bpftrace on take_gil/drop_gil); recorder N NOT RUN (UNW_EBADREG)"
+  },
+  "h1": "HOLDS",
+  "h7": "NOT SUPPORTED (unreadable)",
+  "h5_gate": {
+   "threshold": ">= 50% time removed on >= 6 of the 11 with text length within 5%",
+   "fired": false,
+   "features_passing": [],
+   "best_config": null,
+   "n_passing_by_feature": {
+    "h5_no_sortByPosition": 0,
+    "h5_no_acroform": 0,
+    "h5_no_annotations": 0,
+    "h5_no_bookmarks": 0
+   }
+  },
+  "h6": {
+   "smoke": {
+    "rule": "p50(tika_shipped)/p50(candidate) >= 2 on the 11 AND no empty on a document tika_shipped extracts",
+    "speed_pass": [
+     "pypdfium2"
+    ],
+    "speed_and_coverage_pass": [
+     "pypdfium2"
+    ],
+    "fired": true,
+    "hybrid_branch": false,
+    "candidates": null
+   },
+   "full": {
+    "rule": "p50(tika_shipped)/p50(candidate) >= 2 on the 11 AND no empty on a document tika_shipped extracts",
+    "speed_pass": [],
+    "speed_and_coverage_pass": [],
+    "fired": null,
+    "hybrid_branch": null,
+    "candidates": []
+   }
+  },
+  "v1_gap": {
+   "li_over_rr_minus_1": 0.34749468282929064,
+   "threshold": 0.03800322061191629,
+   "margin_pp": 0.30949146221737434,
+   "gate_fired": true,
+   "rule": "gap - max(0.82%, spread rr_t4, spread li_t4) >= 10 percentage points"
+  },
+  "v2_reading": {
+   "rr": {
+    "legs": 2,
+    "forward_mean_s": 0.3725055706105176,
+    "forward_spread": 0.018235687034686084,
+    "lock_held_mean_s": 0.3797488459887616,
+    "in_lock_not_forward_s": 0.007243275378244025,
+    "forward_share_of_hold": 0.9809263618479546,
+    "fps_implied_by_hold": 2.633319391389525,
+    "fps_measured": 2.5977327552340697
+   },
+   "li": {
+    "legs": 2,
+    "forward_mean_s": 0.28929861213893143,
+    "forward_spread": 0.022930530515831684,
+    "lock_held_mean_s": 0.29553997890334505,
+    "in_lock_not_forward_s": 0.006241366764413652,
+    "forward_share_of_hold": 0.978879478890951,
+    "fps_implied_by_hold": 3.3836369742959387,
+    "fps_measured": 3.2347653104206335
+   },
+   "forward_rr_over_li_minus_1": 0.28761616883121177,
+   "lock_held_rr_over_li_minus_1": 0.2849322362337876,
+   "tolerance": 0.022930530515831684,
+   "reading": "UNEQUAL forward-pass time at equal T: a model-runtime configuration difference (pre-registered reading), named from both images under 'runtime versions'"
+  },
+  "v2_posthoc_cores": {
+   "v2_rr_s_a": {
+    "cpu_s_per_frame": 1.384295972525757,
+    "idle_cores": 1.237,
+    "work_cpu_s_per_frame": 0.9123976584452074,
+    "cores_during_hold": 2.4248027250497914
+   },
+   "v2_rr_s_b": {
+    "cpu_s_per_frame": 1.4241024039962533,
+    "idle_cores": 1.23,
+    "work_cpu_s_per_frame": 0.9462725569778332,
+    "cores_during_hold": 2.469263125025474
+   },
+   "v2_li_s_a": {
+    "cpu_s_per_frame": 0.8950046831095847,
+    "idle_cores": 0.004,
+    "work_cpu_s_per_frame": 0.8937815797689664,
+    "cores_during_hold": 3.058747504507682
+   },
+   "v2_li_s_b": {
+    "cpu_s_per_frame": 0.9256322197939433,
+    "idle_cores": 0.005,
+    "work_cpu_s_per_frame": 0.9240693100218547,
+    "cores_during_hold": 3.0918267120326206
+   }
+  },
+  "runtime_versions_video_identical": {
+   "version_lines": true,
+   "dist": true,
+   "libs": true
+  },
+  "sessions": [
+   "a58bf81c-644d-4573-9b8f-f29f6f936437"
+  ]
+ }
+}

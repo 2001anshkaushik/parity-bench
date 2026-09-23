@@ -1,0 +1,3429 @@
+{
+ "campaign": "parity_p0_20260923T083031Z",
+ "generation": "f",
+ "leg_dirs": {
+  "an_li_t1": "anf_li_t1",
+  "an_li_t2": "anf_li_t2",
+  "an_li_u1": "anf_li_u1",
+  "an_li_u2": "anf_li_u2",
+  "an_rr_s1": "anf_rr_s1",
+  "an_rr_s2": "anf_rr_s2",
+  "an_rr_u1": "anf_rr_u1",
+  "an_rr_u2": "anf_rr_u2",
+  "d1_rr_s1": "d1f_rr_s1",
+  "d1_rr_s2": "d1f_rr_s2",
+  "d1_rr_u1": "d1f_rr_u1",
+  "d1_rr_u2": "d1f_rr_u2",
+  "h1_c32_a": "h1f_c32_a",
+  "h1_c32_b": "h1f_c32_b",
+  "h1_c64_a": "h1f_c64_a",
+  "h1_c64_b": "h1f_c64_b",
+  "h7_dbg_a": "h7f_dbg_a",
+  "h7_dbg_b": "h7f_dbg_b",
+  "h7_nodbg_a": "h7f_nodbg_a",
+  "h7_nodbg_b": "h7f_nodbg_b"
+ },
+ "legs": {
+  "an_li_t1": {
+   "arm": "li",
+   "leg": "refc8_anf_li_t1",
+   "verdict": "OK",
+   "span": {
+    "span_s": 193.448451185,
+    "ok": 95,
+    "n": 96,
+    "docs_per_s": 0.4910868989545381
+   },
+   "stamped_profile": false,
+   "li_timed_profile": true,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 5,
+    "total_ticks": 618991,
+    "share": 8e-06,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 2491.2,
+    "min": 2425.5,
+    "max": 2987.2,
+    "n": 40
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 40,
+    "every_s": 5.0,
+    "n_processes_max": 1,
+    "task_instances_max": null,
+    "task_instances_min": null,
+    "li_worker_processes_max": 1,
+    "max_threads_by_process": {
+     "python|python -m uvicorn ws1.service:app --host 0.0.0.0": 7
+    },
+    "definition": "every process in the service container, with thread counts"
+   },
+   "d0_models_pre": null,
+   "d0_threads_pre": {
+    "proc_threads": null,
+    "python_threads": null,
+    "asyncio_executor_threads_alive": null
+   },
+   "torch_threads_pre": null,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 1.0,
+   "cpu_s_per_doc": 2.0361,
+   "host_busy_cores": 1.004,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 193.44845128059387,
+    "last_submit_s": 176.8998577594757,
+    "drain_share_of_span": 0.08554523652978072,
+    "completed_by_last_submit": 88,
+    "steady_docs_per_s": 0.49180367413460974,
+    "time_to_fraction_s": {
+     "50%": 78.55454659461975,
+     "90%": 175.317373752594,
+     "95%": 185.97125482559204,
+     "99%": 193.44845128059387,
+     "100%": 193.44845128059387
+    }
+   }
+  },
+  "an_li_t2": {
+   "arm": "li",
+   "leg": "refc8_anf_li_t2",
+   "verdict": "OK",
+   "span": {
+    "span_s": 193.366109973,
+    "ok": 95,
+    "n": 96,
+    "docs_per_s": 0.4912960187970115
+   },
+   "stamped_profile": false,
+   "li_timed_profile": true,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 5,
+    "total_ticks": 618723,
+    "share": 8e-06,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 2481.2,
+    "min": 2421.3,
+    "max": 2953.2,
+    "n": 40
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 40,
+    "every_s": 5.0,
+    "n_processes_max": 1,
+    "task_instances_max": null,
+    "task_instances_min": null,
+    "li_worker_processes_max": 1,
+    "max_threads_by_process": {
+     "python|python -m uvicorn ws1.service:app --host 0.0.0.0": 7
+    },
+    "definition": "every process in the service container, with thread counts"
+   },
+   "d0_models_pre": null,
+   "d0_threads_pre": {
+    "proc_threads": null,
+    "python_threads": null,
+    "asyncio_executor_threads_alive": null
+   },
+   "torch_threads_pre": null,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 1.0,
+   "cpu_s_per_doc": 2.0353,
+   "host_busy_cores": 1.004,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 193.36611008644104,
+    "last_submit_s": 176.713059425354,
+    "drain_share_of_span": 0.08612186827175958,
+    "completed_by_last_submit": 88,
+    "steady_docs_per_s": 0.49232354576912285,
+    "time_to_fraction_s": {
+     "50%": 78.60327172279358,
+     "90%": 175.31301474571228,
+     "95%": 185.9934115409851,
+     "99%": 193.36611008644104,
+     "100%": 193.36611008644104
+    }
+   }
+  },
+  "an_li_u1": {
+   "arm": "li",
+   "leg": "refc8_anf_li_u1",
+   "verdict": "OK",
+   "span": {
+    "span_s": 191.149163019,
+    "ok": 95,
+    "n": 96,
+    "docs_per_s": 0.49699406735334284
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 5,
+    "total_ticks": 611626,
+    "share": 8e-06,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 2468.0,
+    "min": 2419.9,
+    "max": 2892.3,
+    "n": 40
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 40,
+    "every_s": 5.0,
+    "n_processes_max": 1,
+    "task_instances_max": null,
+    "task_instances_min": null,
+    "li_worker_processes_max": 1,
+    "max_threads_by_process": {
+     "python|python -m uvicorn ws1.service:app --host 0.0.0.0": 7
+    },
+    "definition": "every process in the service container, with thread counts"
+   },
+   "d0_models_pre": null,
+   "d0_threads_pre": {
+    "proc_threads": null,
+    "python_threads": null,
+    "asyncio_executor_threads_alive": null
+   },
+   "torch_threads_pre": null,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 1.0,
+   "cpu_s_per_doc": 2.012,
+   "host_busy_cores": 1.004,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 191.1491630077362,
+    "last_submit_s": 173.93288707733154,
+    "drain_share_of_span": 0.09006723157719443,
+    "completed_by_last_submit": 88,
+    "steady_docs_per_s": 0.5001929276394941,
+    "time_to_fraction_s": {
+     "50%": 77.58374357223511,
+     "90%": 173.7148723602295,
+     "95%": 184.06120371818542,
+     "99%": 191.1491630077362,
+     "100%": 191.1491630077362
+    }
+   }
+  },
+  "an_li_u2": {
+   "arm": "li",
+   "leg": "refc8_anf_li_u2",
+   "verdict": "OK",
+   "span": {
+    "span_s": 192.911675434,
+    "ok": 95,
+    "n": 96,
+    "docs_per_s": 0.4924533457411287
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 6,
+    "total_ticks": 617270,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 2471.0,
+    "min": 2421.1,
+    "max": 2891.3,
+    "n": 40
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 40,
+    "every_s": 5.0,
+    "n_processes_max": 1,
+    "task_instances_max": null,
+    "task_instances_min": null,
+    "li_worker_processes_max": 1,
+    "max_threads_by_process": {
+     "python|python -m uvicorn ws1.service:app --host 0.0.0.0": 7
+    },
+    "definition": "every process in the service container, with thread counts"
+   },
+   "d0_models_pre": null,
+   "d0_threads_pre": {
+    "proc_threads": null,
+    "python_threads": null,
+    "asyncio_executor_threads_alive": null
+   },
+   "torch_threads_pre": null,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 1.0,
+   "cpu_s_per_doc": 2.0305,
+   "host_busy_cores": 1.004,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 192.91167545318604,
+    "last_submit_s": 175.29876947402954,
+    "drain_share_of_span": 0.09130036291365178,
+    "completed_by_last_submit": 88,
+    "steady_docs_per_s": 0.4962955545041006,
+    "time_to_fraction_s": {
+     "50%": 78.39682531356812,
+     "90%": 175.29363536834717,
+     "95%": 185.56633877754211,
+     "99%": 192.91167545318604,
+     "100%": 192.91167545318604
+    }
+   }
+  },
+  "an_rr_s1": {
+   "arm": "rr",
+   "leg": "refc8_anf_rr_s1",
+   "verdict": "OK",
+   "span": {
+    "span_s": 51.621067345,
+    "ok": 96,
+    "n": 96,
+    "docs_per_s": 1.8597058320859872
+   },
+   "stamped_profile": true,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 2,
+    "total_ticks": 164387,
+    "share": 1.2e-05,
+    "cores": 0.0004,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 2992.0,
+    "min": 2595.3,
+    "max": 3366.0,
+    "n": 12
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 12,
+    "every_s": 5.0,
+    "n_processes_max": 4,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 275,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|env": 1,
+     "jspawnhelper|env": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 265,
+    "python_threads": 13,
+    "asyncio_executor_threads_alive": 0
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 7.551,
+   "cpu_s_per_doc": 4.0605,
+   "host_busy_cores": 7.65,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 51.62106728553772,
+    "last_submit_s": 29.8051118850708,
+    "drain_share_of_span": 0.4226172868490638,
+    "completed_by_last_submit": 88,
+    "steady_docs_per_s": 2.9525136607213565,
+    "time_to_fraction_s": {
+     "50%": 14.654908657073975,
+     "90%": 29.334775924682617,
+     "95%": 35.23816919326782,
+     "99%": 51.62106728553772,
+     "100%": 51.62106728553772
+    }
+   }
+  },
+  "an_rr_s2": {
+   "arm": "rr",
+   "leg": "refc8_anf_rr_s2",
+   "verdict": "OK",
+   "span": {
+    "span_s": 52.576658155,
+    "ok": 96,
+    "n": 96,
+    "docs_per_s": 1.8259053231756321
+   },
+   "stamped_profile": true,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 1,
+    "total_ticks": 167436,
+    "share": 6e-06,
+    "cores": 0.0002,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 2946.7,
+    "min": 2579.9,
+    "max": 3327.4,
+    "n": 12
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 12,
+    "every_s": 5.0,
+    "n_processes_max": 3,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 278,
+     "env|env": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 269,
+    "python_threads": 17,
+    "asyncio_executor_threads_alive": 0
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 7.478,
+   "cpu_s_per_doc": 4.0958,
+   "host_busy_cores": 7.57,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 52.57665824890137,
+    "last_submit_s": 29.993220567703247,
+    "drain_share_of_span": 0.42953353129228256,
+    "completed_by_last_submit": 88,
+    "steady_docs_per_s": 2.9339963609896085,
+    "time_to_fraction_s": {
+     "50%": 14.73874306678772,
+     "90%": 29.525609016418457,
+     "95%": 35.84489679336548,
+     "99%": 52.57665824890137,
+     "100%": 52.57665824890137
+    }
+   }
+  },
+  "an_rr_u1": {
+   "arm": "rr",
+   "leg": "refc8_anf_rr_u1",
+   "verdict": "OK",
+   "span": {
+    "span_s": 52.176331811,
+    "ok": 96,
+    "n": 96,
+    "docs_per_s": 1.8399147020864535
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 2,
+    "total_ticks": 166112,
+    "share": 1.2e-05,
+    "cores": 0.0004,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 2953.7,
+    "min": 2539.9,
+    "max": 3311.0,
+    "n": 12
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 12,
+    "every_s": 5.0,
+    "n_processes_max": 3,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 276,
+     "env|env": 1,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 266,
+    "python_threads": 14,
+    "asyncio_executor_threads_alive": 0
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 7.508,
+   "cpu_s_per_doc": 4.081,
+   "host_busy_cores": 7.554,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 52.176331758499146,
+    "last_submit_s": 30.29593539237976,
+    "drain_share_of_span": 0.41935482293760956,
+    "completed_by_last_submit": 88,
+    "steady_docs_per_s": 2.9046800787056855,
+    "time_to_fraction_s": {
+     "50%": 14.78154182434082,
+     "90%": 29.7934410572052,
+     "95%": 35.63516807556152,
+     "99%": 52.176331758499146,
+     "100%": 52.176331758499146
+    }
+   }
+  },
+  "an_rr_u2": {
+   "arm": "rr",
+   "leg": "refc8_anf_rr_u2",
+   "verdict": "OK",
+   "span": {
+    "span_s": 52.136798221,
+    "ok": 96,
+    "n": 96,
+    "docs_per_s": 1.8413098478558374
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 1,
+    "total_ticks": 166011,
+    "share": 6e-06,
+    "cores": 0.0002,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 2948.2,
+    "min": 2543.2,
+    "max": 3424.7,
+    "n": 12
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 12,
+    "every_s": 5.0,
+    "n_processes_max": 3,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 277,
+     "jspawnhelper|": 1,
+     "env|env": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 267,
+    "python_threads": 15,
+    "asyncio_executor_threads_alive": 1
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 7.542,
+   "cpu_s_per_doc": 4.0962,
+   "host_busy_cores": 7.587,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 52.13679814338684,
+    "last_submit_s": 30.044559955596924,
+    "drain_share_of_span": 0.42373599788448363,
+    "completed_by_last_submit": 88,
+    "steady_docs_per_s": 2.928982821850473,
+    "time_to_fraction_s": {
+     "50%": 14.90012526512146,
+     "90%": 29.57420253753662,
+     "95%": 35.92305397987366,
+     "99%": 52.13679814338684,
+     "100%": 52.13679814338684
+    }
+   }
+  },
+  "d1_rr_s1": {
+   "arm": "rr",
+   "leg": "refc32_d1f_rr_s1",
+   "verdict": "OK",
+   "span": {
+    "span_s": 130.435524044,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.928650019232026
+   },
+   "stamped_profile": true,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 414784,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3103.4,
+    "min": 2511.1,
+    "max": 3570.9,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 6,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 331,
+     "env|env": 1,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "scanner-0|/opt/rocketride/engine/engine /opt/rocketride/en": 1,
+     "jspawnhelper|": 1,
+     "env|": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 303,
+    "python_threads": 36,
+    "asyncio_executor_threads_alive": 2
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 16.095,
+   "cpu_s_per_doc": 5.4959,
+   "host_busy_cores": 16.282,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 130.43552374839783,
+    "last_submit_s": 57.02371954917908,
+    "drain_share_of_span": 0.5628206342071784,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.13779674084832,
+    "time_to_fraction_s": {
+     "50%": 30.086464166641235,
+     "90%": 55.84739661216736,
+     "95%": 59.155375242233276,
+     "99%": 80.95708894729614,
+     "100%": 130.43552374839783
+    }
+   }
+  },
+  "d1_rr_s2": {
+   "arm": "rr",
+   "leg": "refc32_d1f_rr_s2",
+   "verdict": "OK",
+   "span": {
+    "span_s": 130.862396867,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.9190967699318535
+   },
+   "stamped_profile": true,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 416188,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3119.4,
+    "min": 2622.1,
+    "max": 3419.6,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 6,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 328,
+     "scanner-0|/opt/rocketride/engine/engine /opt/rocketride/en": 1,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|": 1,
+     "env|env": 1,
+     "jspawnhelper|": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 307,
+    "python_threads": 37,
+    "asyncio_executor_threads_alive": 1
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 15.945,
+   "cpu_s_per_doc": 5.4625,
+   "host_busy_cores": 16.16,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 130.86239671707153,
+    "last_submit_s": 56.452316999435425,
+    "drain_share_of_span": 0.5686131507931416,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.199922671083639,
+    "time_to_fraction_s": {
+     "50%": 29.461276531219482,
+     "90%": 55.71536207199097,
+     "95%": 58.492093563079834,
+     "99%": 78.11375999450684,
+     "100%": 130.86239671707153
+    }
+   }
+  },
+  "d1_rr_u1": {
+   "arm": "rr",
+   "leg": "refc32_d1f_rr_u1",
+   "verdict": "OK",
+   "span": {
+    "span_s": 130.59546573,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.9250632697291885
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 415332,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3125.2,
+    "min": 2628.4,
+    "max": 3429.1,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 6,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 329,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|env": 1,
+     "jspawnhelper|": 1,
+     "env|": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 306,
+    "python_threads": 37,
+    "asyncio_executor_threads_alive": 4
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 16.051,
+   "cpu_s_per_doc": 5.4876,
+   "host_busy_cores": 16.229,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 130.59546566009521,
+    "last_submit_s": 56.68722438812256,
+    "drain_share_of_span": 0.5659326753681929,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.174230680331812,
+    "time_to_fraction_s": {
+     "50%": 29.9366717338562,
+     "90%": 56.15225887298584,
+     "95%": 58.84585928916931,
+     "99%": 80.19930696487427,
+     "100%": 130.59546566009521
+    }
+   }
+  },
+  "d1_rr_u2": {
+   "arm": "rr",
+   "leg": "refc32_d1f_rr_u2",
+   "verdict": "OK",
+   "span": {
+    "span_s": 130.851748287,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.919334323009205
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 416182,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3093.8,
+    "min": 2598.8,
+    "max": 3328.9,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 4,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 325,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|": 1,
+     "env|env": 1,
+     "scanner-0|/opt/rocketride/engine/engine /opt/rocketride/en": 1,
+     "jspawnhelper|": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 303,
+    "python_threads": 36,
+    "asyncio_executor_threads_alive": 5
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 15.964,
+   "cpu_s_per_doc": 5.4686,
+   "host_busy_cores": 16.187,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 130.85174822807312,
+    "last_submit_s": 56.73834490776062,
+    "drain_share_of_span": 0.5663921523702815,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.168667777831625,
+    "time_to_fraction_s": {
+     "50%": 29.51809525489807,
+     "90%": 55.52061462402344,
+     "95%": 59.000160455703735,
+     "99%": 79.15706419944763,
+     "100%": 130.85174822807312
+    }
+   }
+  },
+  "h1_c32_a": {
+   "arm": "rr",
+   "leg": "refc32_h1f_c32_a",
+   "verdict": "OK",
+   "span": {
+    "span_s": 131.478647818,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.905414729612868
+   },
+   "stamped_profile": true,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 418113,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3062.8,
+    "min": 2536.8,
+    "max": 3485.8,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 6,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 325,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|env": 1,
+     "env|": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 300,
+    "python_threads": 33,
+    "asyncio_executor_threads_alive": 2
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 15.922,
+   "cpu_s_per_doc": 5.4803,
+   "host_busy_cores": 16.099,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 131.4786479473114,
+    "last_submit_s": 56.699530839920044,
+    "drain_share_of_span": 0.5687548379517734,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.172890583312868,
+    "time_to_fraction_s": {
+     "50%": 29.756787538528442,
+     "90%": 55.39840030670166,
+     "95%": 58.95540714263916,
+     "99%": 80.55975365638733,
+     "100%": 131.4786479473114
+    }
+   }
+  },
+  "h1_c32_b": {
+   "arm": "rr",
+   "leg": "refc32_h1f_c32_b",
+   "verdict": "OK",
+   "span": {
+    "span_s": 130.981639303,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.9164392966278188
+   },
+   "stamped_profile": true,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 3,
+    "total_ticks": 416542,
+    "share": 7e-06,
+    "cores": 0.0002,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3084.9,
+    "min": 2564.8,
+    "max": 3347.2,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 5,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 338,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|": 1,
+     "env|env": 1,
+     "jspawnhelper|": 1,
+     "scanner-50|/opt/rocketride/engine/engine /opt/rocketride/en": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 310,
+    "python_threads": 37,
+    "asyncio_executor_threads_alive": 3
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 16.032,
+   "cpu_s_per_doc": 5.4972,
+   "host_busy_cores": 16.264,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 130.9816391468048,
+    "last_submit_s": 56.73907256126404,
+    "drain_share_of_span": 0.5668165940596405,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.168588667396482,
+    "time_to_fraction_s": {
+     "50%": 30.131174087524414,
+     "90%": 56.14213824272156,
+     "95%": 59.03135275840759,
+     "99%": 81.65270137786865,
+     "100%": 130.9816391468048
+    }
+   }
+  },
+  "h1_c64_a": {
+   "arm": "rr",
+   "leg": "refc64_h1f_c64_a",
+   "verdict": "OK",
+   "span": {
+    "span_s": 131.380692304,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.907580964150313
+   },
+   "stamped_profile": true,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 417727,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3096.0,
+    "min": 2602.0,
+    "max": 3434.1,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 5,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 362,
+     "env|env": 1,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|": 1,
+     "jspawnhelper|": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 302,
+    "python_threads": 34,
+    "asyncio_executor_threads_alive": 3
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 16.089,
+   "cpu_s_per_doc": 5.5337,
+   "host_busy_cores": 16.264,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 131.38069224357605,
+    "last_submit_s": 54.14624071121216,
+    "drain_share_of_span": 0.5878675946475714,
+    "completed_by_last_submit": 320,
+    "steady_docs_per_s": 5.872983901062427,
+    "time_to_fraction_s": {
+     "50%": 32.07026505470276,
+     "90%": 57.08856678009033,
+     "95%": 59.77850151062012,
+     "99%": 79.16425776481628,
+     "100%": 131.38069224357605
+    }
+   }
+  },
+  "h1_c64_b": {
+   "arm": "rr",
+   "leg": "refc64_h1f_c64_b",
+   "verdict": "OK",
+   "span": {
+    "span_s": 131.719765216,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.9000962716079792
+   },
+   "stamped_profile": true,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 418931,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3131.1,
+    "min": 2616.6,
+    "max": 3599.0,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 4,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 366,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|": 1,
+     "jspawnhelper|": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 313,
+    "python_threads": 37,
+    "asyncio_executor_threads_alive": 3
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 16.013,
+   "cpu_s_per_doc": 5.5218,
+   "host_busy_cores": 16.218,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 131.71976518630981,
+    "last_submit_s": 52.14335656166077,
+    "drain_share_of_span": 0.6041341518647025,
+    "completed_by_last_submit": 320,
+    "steady_docs_per_s": 6.098571725507494,
+    "time_to_fraction_s": {
+     "50%": 32.26860427856445,
+     "90%": 57.100208044052124,
+     "95%": 59.33214545249939,
+     "99%": 79.02723693847656,
+     "100%": 131.71976518630981
+    }
+   }
+  },
+  "h7_dbg_a": {
+   "arm": "rr",
+   "leg": "refc32_h7f_dbg_a",
+   "verdict": "OK",
+   "span": {
+    "span_s": 131.248769638,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.9105034740790505
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 417391,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3100.9,
+    "min": 2600.6,
+    "max": 3429.0,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 6,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 341,
+     "env|": 1,
+     "env|env": 1,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "jspawnhelper|": 1,
+     "scanner-0|/opt/rocketride/engine/engine /opt/rocketride/en": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 314,
+    "python_threads": 37,
+    "asyncio_executor_threads_alive": 5
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 16.021,
+   "cpu_s_per_doc": 5.5047,
+   "host_busy_cores": 16.183,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 131.24876976013184,
+    "last_submit_s": 57.14482045173645,
+    "drain_share_of_span": 0.5646068107444099,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.124789565059603,
+    "time_to_fraction_s": {
+     "50%": 30.188199281692505,
+     "90%": 55.87833786010742,
+     "95%": 59.53083395957947,
+     "99%": 79.46674060821533,
+     "100%": 131.24876976013184
+    }
+   }
+  },
+  "h7_dbg_b": {
+   "arm": "rr",
+   "leg": "refc32_h7f_dbg_b",
+   "verdict": "OK",
+   "span": {
+    "span_s": 130.90231898,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.918206514419077
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 416324,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3095.0,
+    "min": 2619.5,
+    "max": 3374.9,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 6,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 330,
+     "scanner-0|/opt/rocketride/engine/engine /opt/rocketride/en": 1,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|": 1,
+     "env|env": 1,
+     "jspawnhelper|": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 304,
+    "python_threads": 37,
+    "asyncio_executor_threads_alive": 3
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 16.011,
+   "cpu_s_per_doc": 5.4869,
+   "host_busy_cores": 16.24,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 130.90231919288635,
+    "last_submit_s": 56.75287938117981,
+    "drain_share_of_span": 0.5664486333694847,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.167087975382369,
+    "time_to_fraction_s": {
+     "50%": 29.712539434432983,
+     "90%": 56.061158657073975,
+     "95%": 58.738325119018555,
+     "99%": 79.88818430900574,
+     "100%": 130.90231919288635
+    }
+   }
+  },
+  "h7_nodbg_a": {
+   "arm": "rr",
+   "leg": "refc32_h7f_nodbg_a",
+   "verdict": "OK",
+   "span": {
+    "span_s": 130.685459007,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.9230489979725953
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 4,
+    "total_ticks": 415604,
+    "share": 1e-05,
+    "cores": 0.0003,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3064.5,
+    "min": 2605.8,
+    "max": 3355.5,
+    "n": 28
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 28,
+    "every_s": 5.0,
+    "n_processes_max": 5,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 323,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|env": 1,
+     "scanner-51|/opt/rocketride/engine/engine /opt/rocketride/en": 1,
+     "env|": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 301,
+    "python_threads": 37,
+    "asyncio_executor_threads_alive": 3
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 16.004,
+   "cpu_s_per_doc": 5.4754,
+   "host_busy_cores": 16.215,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 130.6854591369629,
+    "last_submit_s": 56.781421422958374,
+    "drain_share_of_span": 0.5655107936419348,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.163987995173451,
+    "time_to_fraction_s": {
+     "50%": 29.790979623794556,
+     "90%": 55.3733971118927,
+     "95%": 58.435997009277344,
+     "99%": 80.66623425483704,
+     "100%": 130.6854591369629
+    }
+   }
+  },
+  "h7_nodbg_b": {
+   "arm": "rr",
+   "leg": "refc32_h7f_nodbg_b",
+   "verdict": "OK",
+   "span": {
+    "span_s": 129.718404137,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.944840422154414
+   },
+   "stamped_profile": false,
+   "li_timed_profile": false,
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "steal": {
+    "ticks": 3,
+    "total_ticks": 412494,
+    "share": 7e-06,
+    "cores": 0.0002,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz": {
+    "mean_of_samples": 3128.2,
+    "min": 2604.0,
+    "max": 3426.5,
+    "n": 27
+   },
+   "cpu_model": [
+    "Intel(R) Xeon(R) Platinum 8488C"
+   ],
+   "d0_external": {
+    "samples": 27,
+    "every_s": 5.0,
+    "n_processes_max": 4,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 326,
+     "jspawnhelper|/opt/rocketride/engine/java/jre/lib/jspawnhelper": 1,
+     "env|": 1,
+     "scanner-1|": 1,
+     "jspawnhelper|": 1,
+     "env|env": 1
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "d0_models_pre": {
+    "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+     "count": 1,
+     "distinct_weights": 1,
+     "params": [
+      22713216
+     ]
+    }
+   },
+   "d0_threads_pre": {
+    "proc_threads": 301,
+    "python_threads": 37,
+    "asyncio_executor_threads_alive": 2
+   },
+   "torch_threads_pre": 1,
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 16.04,
+   "cpu_s_per_doc": 5.447,
+   "host_busy_cores": 16.256,
+   "drain_posthoc": {
+    "label": "POST-HOC DIAGNOSTIC",
+    "span_s": 129.71840405464172,
+    "last_submit_s": 56.299668073654175,
+    "drain_share_of_span": 0.5659855015643048,
+    "completed_by_last_submit": 352,
+    "steady_docs_per_s": 6.216732921801807,
+    "time_to_fraction_s": {
+     "50%": 29.932783842086792,
+     "90%": 55.64130425453186,
+     "95%": 58.202282667160034,
+     "99%": 79.70300483703613,
+     "100%": 129.71840405464172
+    }
+   }
+  }
+ },
+ "sessions": [
+  "a58bf81c-644d-4573-9b8f-f29f6f936437"
+ ],
+ "d1_overhead": {
+  "rr_384_c32": {
+   "cell_a": [
+    "d1f_rr_u1",
+    "d1f_rr_u2"
+   ],
+   "cell_b": [
+    "d1f_rr_s1",
+    "d1f_rr_s2"
+   ],
+   "a_docs_per_s": [
+    2.9250632697291885,
+    2.919334323009205
+   ],
+   "b_docs_per_s": [
+    2.928650019232026,
+    2.9190967699318535
+   ],
+   "a_mean": 2.9221987963691967,
+   "b_mean": 2.92387339458194,
+   "a_spread": 0.001960491780060226,
+   "b_spread": 0.0032673265941935105,
+   "floor": 0.0082,
+   "threshold": 0.0082,
+   "delta_b_vs_a": 0.0005730610165276799,
+   "readable": false,
+   "same_session": true,
+   "overhead": -0.0005730610165276799
+  },
+  "rr_96_c8": {
+   "cell_a": [
+    "anf_rr_u1",
+    "anf_rr_u2"
+   ],
+   "cell_b": [
+    "anf_rr_s1",
+    "anf_rr_s2"
+   ],
+   "a_docs_per_s": [
+    1.8399147020864535,
+    1.8413098478558374
+   ],
+   "b_docs_per_s": [
+    1.8597058320859872,
+    1.8259053231756321
+   ],
+   "a_mean": 1.8406122749711455,
+   "b_mean": 1.8428055776308097,
+   "a_spread": 0.0007579791726673142,
+   "b_spread": 0.018341874650613123,
+   "floor": 0.0082,
+   "threshold": 0.018341874650613123,
+   "delta_b_vs_a": 0.0011916157951834222,
+   "readable": false,
+   "same_session": true,
+   "overhead": -0.0011916157951834222
+  },
+  "li_96_c8_one_worker": {
+   "cell_a": [
+    "anf_li_u1",
+    "anf_li_u2"
+   ],
+   "cell_b": [
+    "anf_li_t1",
+    "anf_li_t2"
+   ],
+   "a_docs_per_s": [
+    0.49699406735334284,
+    0.4924533457411287
+   ],
+   "b_docs_per_s": [
+    0.4910868989545381,
+    0.4912960187970115
+   ],
+   "a_mean": 0.49472370654723574,
+   "b_mean": 0.4911914588757748,
+   "a_spread": 0.00917829801184309,
+   "b_spread": 0.00042573998121227887,
+   "floor": 0.0987,
+   "threshold": 0.0987,
+   "delta_b_vs_a": -0.0071398391156815835,
+   "readable": false,
+   "same_session": true,
+   "overhead": 0.0071398391156815835
+  }
+ },
+ "d1_null_control_chunk_identity": {
+  "pairs": [
+   {
+    "kind": "instrument",
+    "a": "d1f_rr_u1",
+    "b": "d1f_rr_s1",
+    "compared": 382,
+    "identical": 382,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   },
+   {
+    "kind": "instrument",
+    "a": "d1f_rr_u2",
+    "b": "d1f_rr_s2",
+    "compared": 382,
+    "identical": 382,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   },
+   {
+    "kind": "instrument",
+    "a": "anf_rr_u1",
+    "b": "anf_rr_s1",
+    "compared": 96,
+    "identical": 96,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   },
+   {
+    "kind": "instrument",
+    "a": "anf_rr_u2",
+    "b": "anf_rr_s2",
+    "compared": 96,
+    "identical": 96,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   },
+   {
+    "kind": "instrument",
+    "a": "anf_li_u1",
+    "b": "anf_li_t1",
+    "compared": 95,
+    "identical": 95,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   },
+   {
+    "kind": "instrument",
+    "a": "anf_li_u2",
+    "b": "anf_li_t2",
+    "compared": 95,
+    "identical": 95,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   },
+   {
+    "kind": "determinism",
+    "a": "d1f_rr_u1",
+    "b": "d1f_rr_u2",
+    "compared": 382,
+    "identical": 382,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   },
+   {
+    "kind": "determinism",
+    "a": "anf_rr_u1",
+    "b": "anf_rr_u2",
+    "compared": 96,
+    "identical": 96,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   },
+   {
+    "kind": "determinism",
+    "a": "anf_li_u1",
+    "b": "anf_li_u2",
+    "compared": 95,
+    "identical": 95,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   }
+  ],
+  "pass": true,
+  "rule": "stamped (timed) output equals unstamped (untimed) output chunk for chunk on every document both completed; a difference on a document whose two unstamped legs agree is attributed to the instrument (a correctness failure). Determinism pairs (unstamped vs unstamped) say whether the arm's own output is reproducible"
+ },
+ "d1_stages": {
+  "d1_rr_s1": {
+   "arm": "rr",
+   "docs_with_complete_stamps": 382,
+   "docs_incomplete_stamps": 2,
+   "run_total_s": 2172.2790207862854,
+   "stages": {
+    "admission": {
+     "count": 382,
+     "sum": 5.111883878707886,
+     "share_of_run_total": 0.0023532353946214384,
+     "min": 0.0012352466583251953,
+     "mean": 0.013381894970439491,
+     "sd": 0.042106551478765415,
+     "p50": 0.004466056823730469,
+     "p90": 0.025199413299560547,
+     "p95": 0.03640437126159668,
+     "p99": 0.11732840538024902,
+     "max": 0.46751856803894043,
+     "mean_over_p50": 2.996355733615964,
+     "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+     "occupancy": {
+      "max": 30,
+      "mean": 0.03919042701250931,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 130.43705487251282
+     }
+    },
+    "parse_bracket": {
+     "count": 382,
+     "sum": 791.7934865951538,
+     "share_of_run_total": 0.36449897965158895,
+     "min": 0.016274452209472656,
+     "mean": 2.072757818311921,
+     "sd": 8.231914306182377,
+     "p50": 0.3156205415725708,
+     "p90": 3.3014566898345947,
+     "p95": 6.945124626159668,
+     "p99": 47.38044023513794,
+     "max": 110.98863077163696,
+     "mean_over_p50": 6.567246250780958,
+     "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+     "occupancy": {
+      "max": 32,
+      "mean": 6.070310981561494,
+      "p50": 5,
+      "p95": 14,
+      "window_s": 130.43705487251282
+     }
+    },
+    "split": {
+     "count": 382,
+     "sum": 1.5869414806365967,
+     "share_of_run_total": 0.0007305421934527463,
+     "min": 0.0004086494445800781,
+     "mean": 0.00415429706972931,
+     "sd": 0.006239676110436039,
+     "p50": 0.0020134449005126953,
+     "p90": 0.009834766387939453,
+     "p95": 0.013317346572875977,
+     "p99": 0.03670001029968262,
+     "max": 0.06351137161254883,
+     "mean_over_p50": 2.063278249467605,
+     "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+     "occupancy": {
+      "max": 2,
+      "mean": 0.012166339405528966,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 130.43705487251282
+     }
+    },
+    "embed": {
+     "count": 382,
+     "sum": 1345.993545293808,
+     "share_of_run_total": 0.6196227705622308,
+     "min": 0.055864810943603516,
+     "mean": 3.5235433122874555,
+     "sd": 6.876293187270559,
+     "p50": 1.5460186004638672,
+     "p90": 7.739109992980957,
+     "p95": 11.379964590072632,
+     "p99": 27.188268184661865,
+     "max": 98.66360473632812,
+     "mean_over_p50": 2.2791079688370193,
+     "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+     "occupancy": {
+      "max": 26,
+      "mean": 10.319104081346834,
+      "p50": 5,
+      "p95": 23,
+      "window_s": 130.43705487251282
+     }
+    },
+    "return": {
+     "count": 382,
+     "sum": 27.793163537979126,
+     "share_of_run_total": 0.012794472198106033,
+     "min": 0.005427360534667969,
+     "mean": 0.0727569726125108,
+     "sd": 0.09853020898341765,
+     "p50": 0.04507851600646973,
+     "p90": 0.1501750946044922,
+     "p95": 0.21406102180480957,
+     "p99": 0.4439387321472168,
+     "max": 1.2397818565368652,
+     "mean_over_p50": 1.6140054965888544,
+     "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+     "occupancy": {
+      "max": 5,
+      "mean": 0.21307720850600115,
+      "p50": 0,
+      "p95": 1,
+      "window_s": 130.43705487251282
+     }
+    }
+   },
+   "end_to_end": {
+    "count": 382,
+    "sum": 2172.2790207862854,
+    "share_of_run_total": 1.0,
+    "min": 0.08476901054382324,
+    "mean": 5.686594295252056,
+    "sd": 10.920052575118541,
+    "p50": 2.4594005346298218,
+    "p90": 11.60227918624878,
+    "p95": 17.856964588165283,
+    "p99": 54.95220470428467,
+    "max": 113.38163566589355,
+    "mean_over_p50": 2.3121871428347793
+   }
+  },
+  "d1_rr_s2": {
+   "arm": "rr",
+   "docs_with_complete_stamps": 382,
+   "docs_incomplete_stamps": 2,
+   "run_total_s": 2152.1692395210266,
+   "stages": {
+    "admission": {
+     "count": 382,
+     "sum": 4.158426761627197,
+     "share_of_run_total": 0.001932202489127979,
+     "min": 0.001184225082397461,
+     "mean": 0.01088593393096125,
+     "sd": 0.029908708040749136,
+     "p50": 0.004019498825073242,
+     "p90": 0.02103590965270996,
+     "p95": 0.038282155990600586,
+     "p99": 0.08242177963256836,
+     "max": 0.38801145553588867,
+     "mean_over_p50": 2.7082814063922234,
+     "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+     "occupancy": {
+      "max": 31,
+      "mean": 0.03177582294610896,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 130.86763381958008
+     }
+    },
+    "parse_bracket": {
+     "count": 382,
+     "sum": 774.6410784721375,
+     "share_of_run_total": 0.3599350200937435,
+     "min": 0.017795324325561523,
+     "mean": 2.027856226366852,
+     "sd": 8.119347144258517,
+     "p50": 0.3046320676803589,
+     "p90": 3.4315621852874756,
+     "p95": 6.882615566253662,
+     "p99": 45.98276448249817,
+     "max": 110.33274006843567,
+     "mean_over_p50": 6.656739199546843,
+     "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+     "occupancy": {
+      "max": 32,
+      "mean": 5.919271678282898,
+      "p50": 5,
+      "p95": 14,
+      "window_s": 130.86763381958008
+     }
+    },
+    "split": {
+     "count": 382,
+     "sum": 1.3984606266021729,
+     "share_of_run_total": 0.0006497911971427515,
+     "min": 0.0004253387451171875,
+     "mean": 0.003660891692675845,
+     "sd": 0.004412509649522271,
+     "p50": 0.0018720626831054688,
+     "p90": 0.009181022644042969,
+     "p95": 0.012814521789550781,
+     "p99": 0.020215272903442383,
+     "max": 0.04056358337402344,
+     "mean_over_p50": 1.9555390563113941,
+     "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+     "occupancy": {
+      "max": 3,
+      "mean": 0.010686069471769869,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 130.86763381958008
+     }
+    },
+    "embed": {
+     "count": 382,
+     "sum": 1343.9849469661713,
+     "share_of_run_total": 0.624479210224787,
+     "min": 0.05086398124694824,
+     "mean": 3.5182852014821235,
+     "sd": 6.871706635843936,
+     "p50": 1.6338646411895752,
+     "p90": 7.634395122528076,
+     "p95": 10.891122817993164,
+     "p99": 27.2319757938385,
+     "max": 99.4132764339447,
+     "mean_over_p50": 2.1533516992696224,
+     "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+     "occupancy": {
+      "max": 27,
+      "mean": 10.26980398238917,
+      "p50": 5,
+      "p95": 23,
+      "window_s": 130.86763381958008
+     }
+    },
+    "return": {
+     "count": 382,
+     "sum": 27.986326694488525,
+     "share_of_run_total": 0.01300377599519868,
+     "min": 0.005914926528930664,
+     "mean": 0.07326263532588619,
+     "sd": 0.09829744099417859,
+     "p50": 0.042740464210510254,
+     "p90": 0.1596534252166748,
+     "p95": 0.23818421363830566,
+     "p99": 0.4077565670013428,
+     "max": 1.2282702922821045,
+     "mean_over_p50": 1.7141282079914861,
+     "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+     "occupancy": {
+      "max": 8,
+      "mean": 0.21385216403523974,
+      "p50": 0,
+      "p95": 1,
+      "window_s": 130.86763381958008
+     }
+    }
+   },
+   "end_to_end": {
+    "count": 382,
+    "sum": 2152.1692395210266,
+    "share_of_run_total": 1.0,
+    "min": 0.07869338989257812,
+    "mean": 5.633950888798499,
+    "sd": 10.820206040298894,
+    "p50": 2.4430291652679443,
+    "p90": 11.292029857635498,
+    "p95": 17.685019493103027,
+    "p99": 54.82216501235962,
+    "max": 111.86105060577393,
+    "mean_over_p50": 2.306133290955036
+   }
+  },
+  "an_rr_s1": {
+   "arm": "rr",
+   "docs_with_complete_stamps": 96,
+   "docs_incomplete_stamps": 0,
+   "run_total_s": 304.24107336997986,
+   "stages": {
+    "admission": {
+     "count": 96,
+     "sum": 0.19244170188903809,
+     "share_of_run_total": 0.0006325303147186002,
+     "min": 0.0009722709655761719,
+     "mean": 0.0020046010613441467,
+     "sd": 0.0021422962570757684,
+     "p50": 0.0014958381652832031,
+     "p90": 0.002180337905883789,
+     "p95": 0.005921602249145508,
+     "p99": 0.018314361572265625,
+     "max": 0.018314361572265625,
+     "mean_over_p50": 1.3401189432578897,
+     "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+     "occupancy": {
+      "max": 8,
+      "mean": 0.0037278158634399543,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 51.623178005218506
+     }
+    },
+    "parse_bracket": {
+     "count": 96,
+     "sum": 96.9452760219574,
+     "share_of_run_total": 0.3186462463733971,
+     "min": 0.014928817749023438,
+     "mean": 1.0098466252287228,
+     "sd": 3.503510437181415,
+     "p50": 0.1592329740524292,
+     "p90": 2.2654922008514404,
+     "p95": 4.436387300491333,
+     "p99": 32.954094648361206,
+     "max": 32.954094648361206,
+     "mean_over_p50": 6.341944130844531,
+     "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+     "occupancy": {
+      "max": 8,
+      "mean": 1.8779408740034826,
+      "p50": 2,
+      "p95": 4,
+      "window_s": 51.623178005218506
+     }
+    },
+    "split": {
+     "count": 96,
+     "sum": 0.11996030807495117,
+     "share_of_run_total": 0.00039429359996068144,
+     "min": 0.0002880096435546875,
+     "mean": 0.001249586542447408,
+     "sd": 0.0012341732925407918,
+     "p50": 0.0007966756820678711,
+     "p90": 0.002314329147338867,
+     "p95": 0.003268003463745117,
+     "p99": 0.007227897644042969,
+     "max": 0.007227897644042969,
+     "mean_over_p50": 1.5685009227392888,
+     "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+     "occupancy": {
+      "max": 1,
+      "mean": 0.0023237683674341898,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 51.623178005218506
+     }
+    },
+    "embed": {
+     "count": 96,
+     "sum": 203.38349628448486,
+     "share_of_run_total": 0.6684945396480223,
+     "min": 0.01522970199584961,
+     "mean": 2.118578086296717,
+     "sd": 3.7657454315788854,
+     "p50": 1.0163896083831787,
+     "p90": 4.612025260925293,
+     "p95": 7.43675971031189,
+     "p99": 29.254275798797607,
+     "max": 29.254275798797607,
+     "mean_over_p50": 2.084415335244173,
+     "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+     "occupancy": {
+      "max": 8,
+      "mean": 3.9397709351393506,
+      "p50": 4,
+      "p95": 7,
+      "window_s": 51.623178005218506
+     }
+    },
+    "return": {
+     "count": 96,
+     "sum": 3.5998990535736084,
+     "share_of_run_total": 0.011832390063901275,
+     "min": 0.0039014816284179688,
+     "mean": 0.03749894847472509,
+     "sd": 0.052810459931783925,
+     "p50": 0.02128124237060547,
+     "p90": 0.07710385322570801,
+     "p95": 0.12064075469970703,
+     "p99": 0.3863856792449951,
+     "max": 0.3863856792449951,
+     "mean_over_p50": 1.7620657582717156,
+     "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+     "occupancy": {
+      "max": 1,
+      "mean": 0.06973416191482246,
+      "p50": 0,
+      "p95": 1,
+      "window_s": 51.623178005218506
+     }
+    }
+   },
+   "end_to_end": {
+    "count": 96,
+    "sum": 304.24107336997986,
+    "share_of_run_total": 1.0,
+    "min": 0.06466150283813477,
+    "mean": 3.1691778476039567,
+    "sd": 5.217291209926227,
+    "p50": 1.5425621271133423,
+    "p90": 6.461522579193115,
+    "p95": 13.529045343399048,
+    "p99": 33.5725953578949,
+    "max": 33.5725953578949,
+    "mean_over_p50": 2.0544896000620505
+   }
+  },
+  "an_rr_s2": {
+   "arm": "rr",
+   "docs_with_complete_stamps": 96,
+   "docs_incomplete_stamps": 0,
+   "run_total_s": 307.04339623451233,
+   "stages": {
+    "admission": {
+     "count": 96,
+     "sum": 0.19161725044250488,
+     "share_of_run_total": 0.0006240722086598868,
+     "min": 0.0007338523864746094,
+     "mean": 0.001996013025442759,
+     "sd": 0.0016203333872276994,
+     "p50": 0.001501321792602539,
+     "p90": 0.002906322479248047,
+     "p95": 0.005840778350830078,
+     "p99": 0.011276006698608398,
+     "max": 0.011276006698608398,
+     "mean_over_p50": 1.3295037981049176,
+     "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+     "occupancy": {
+      "max": 8,
+      "mean": 0.00364437216793763,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 52.57894682884216
+     }
+    },
+    "parse_bracket": {
+     "count": 96,
+     "sum": 98.05883264541626,
+     "share_of_run_total": 0.31936473426225814,
+     "min": 0.012335777282714844,
+     "mean": 1.0214461733897526,
+     "sd": 3.4986154888896643,
+     "p50": 0.15492260456085205,
+     "p90": 2.2536251544952393,
+     "p95": 4.614914655685425,
+     "p99": 32.81034588813782,
+     "max": 32.81034588813782,
+     "mean_over_p50": 6.593267498214173,
+     "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+     "occupancy": {
+      "max": 8,
+      "mean": 1.8649828222049156,
+      "p50": 2,
+      "p95": 5,
+      "window_s": 52.57894682884216
+     }
+    },
+    "split": {
+     "count": 96,
+     "sum": 0.1264045238494873,
+     "share_of_run_total": 0.0004116829262562696,
+     "min": 0.0003058910369873047,
+     "mean": 0.0013167137900988262,
+     "sd": 0.001365579012762877,
+     "p50": 0.0008220672607421875,
+     "p90": 0.0026063919067382812,
+     "p95": 0.005106925964355469,
+     "p99": 0.007158756256103516,
+     "max": 0.007158756256103516,
+     "mean_over_p50": 1.6017105326759475,
+     "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+     "occupancy": {
+      "max": 1,
+      "mean": 0.002404090067854842,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 52.57894682884216
+     }
+    },
+    "embed": {
+     "count": 96,
+     "sum": 204.70458245277405,
+     "share_of_run_total": 0.6666959295109726,
+     "min": 0.01743006706237793,
+     "mean": 2.13233940054973,
+     "sd": 3.8186349279867624,
+     "p50": 0.992997407913208,
+     "p90": 4.558810472488403,
+     "p95": 7.508044481277466,
+     "p99": 29.899693489074707,
+     "max": 29.899693489074707,
+     "mean_over_p50": 2.1473766029569585,
+     "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+     "occupancy": {
+      "max": 8,
+      "mean": 3.8932803869035166,
+      "p50": 4,
+      "p95": 7,
+      "window_s": 52.57894682884216
+     }
+    },
+    "return": {
+     "count": 96,
+     "sum": 3.9619593620300293,
+     "share_of_run_total": 0.012903581091853154,
+     "min": 0.0033388137817382812,
+     "mean": 0.04127041002114614,
+     "sd": 0.061072130558673506,
+     "p50": 0.02169477939605713,
+     "p90": 0.08511829376220703,
+     "p95": 0.13394522666931152,
+     "p99": 0.42705607414245605,
+     "max": 0.42705607414245605,
+     "mean_over_p50": 1.9023198746444383,
+     "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+     "occupancy": {
+      "max": 2,
+      "mean": 0.07535258123231746,
+      "p50": 0,
+      "p95": 1,
+      "window_s": 52.57894682884216
+     }
+    }
+   },
+   "end_to_end": {
+    "count": 96,
+    "sum": 307.04339623451233,
+    "share_of_run_total": 1.0,
+    "min": 0.06484723091125488,
+    "mean": 3.1983687107761702,
+    "sd": 5.259551134218761,
+    "p50": 1.5307167768478394,
+    "p90": 6.510059833526611,
+    "p95": 13.71829080581665,
+    "p99": 33.49345588684082,
+    "max": 33.49345588684082,
+    "mean_over_p50": 2.0894581931495377
+   }
+  },
+  "h1_c32_a": {
+   "arm": "rr",
+   "docs_with_complete_stamps": 382,
+   "docs_incomplete_stamps": 2,
+   "run_total_s": 2161.8332664966583,
+   "stages": {
+    "admission": {
+     "count": 382,
+     "sum": 5.240961074829102,
+     "share_of_run_total": 0.0024243132696918387,
+     "min": 0.0011603832244873047,
+     "mean": 0.013719793389604978,
+     "sd": 0.04908654056916877,
+     "p50": 0.0039528608322143555,
+     "p90": 0.022056102752685547,
+     "p95": 0.03590035438537598,
+     "p99": 0.4592630863189697,
+     "max": 0.4928712844848633,
+     "mean_over_p50": 3.4708516115198718,
+     "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+     "occupancy": {
+      "max": 32,
+      "mean": 0.039860023691800466,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 131.4841434955597
+     }
+    },
+    "parse_bracket": {
+     "count": 382,
+     "sum": 783.0635342597961,
+     "share_of_run_total": 0.36222198371883857,
+     "min": 0.018803119659423828,
+     "mean": 2.0499045399471103,
+     "sd": 8.187429885692811,
+     "p50": 0.31472837924957275,
+     "p90": 3.2288825511932373,
+     "p95": 7.1574037075042725,
+     "p99": 47.47024631500244,
+     "max": 110.36119270324707,
+     "mean_over_p50": 6.513249757885928,
+     "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+     "occupancy": {
+      "max": 32,
+      "mean": 5.95557390755822,
+      "p50": 5,
+      "p95": 14,
+      "window_s": 131.4841434955597
+     }
+    },
+    "split": {
+     "count": 382,
+     "sum": 1.6738362312316895,
+     "share_of_run_total": 0.000774267033990189,
+     "min": 0.0003485679626464844,
+     "mean": 0.004381770238826412,
+     "sd": 0.014596815908441113,
+     "p50": 0.0016998052597045898,
+     "p90": 0.0082550048828125,
+     "p95": 0.012696504592895508,
+     "p99": 0.027215957641601562,
+     "max": 0.2710561752319336,
+     "mean_over_p50": 2.577807201036619,
+     "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+     "occupancy": {
+      "max": 4,
+      "mean": 0.012730327678547915,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 131.4841434955597
+     }
+    },
+    "embed": {
+     "count": 382,
+     "sum": 1342.729325056076,
+     "share_of_run_total": 0.6211067920293526,
+     "min": 0.03503990173339844,
+     "mean": 3.514998233131089,
+     "sd": 6.912138129901786,
+     "p50": 1.6231554746627808,
+     "p90": 7.682458162307739,
+     "p95": 11.19455885887146,
+     "p99": 27.69935393333435,
+     "max": 100.25965619087219,
+     "mean_over_p50": 2.165533917113731,
+     "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+     "occupancy": {
+      "max": 26,
+      "mean": 10.212100785380413,
+      "p50": 5,
+      "p95": 23,
+      "window_s": 131.4841434955597
+     }
+    },
+    "return": {
+     "count": 382,
+     "sum": 29.125609874725342,
+     "share_of_run_total": 0.013472643948126774,
+     "min": 0.005291461944580078,
+     "mean": 0.07624505202807681,
+     "sd": 0.10442935231339437,
+     "p50": 0.04451394081115723,
+     "p90": 0.16469645500183105,
+     "p95": 0.22898507118225098,
+     "p99": 0.46477794647216797,
+     "max": 1.2581102848052979,
+     "mean_over_p50": 1.7128353643532348,
+     "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+     "occupancy": {
+      "max": 4,
+      "mean": 0.22151423814620608,
+      "p50": 0,
+      "p95": 1,
+      "window_s": 131.4841434955597
+     }
+    }
+   },
+   "end_to_end": {
+    "count": 382,
+    "sum": 2161.8332664966583,
+    "share_of_run_total": 1.0,
+    "min": 0.12488198280334473,
+    "mean": 5.6592493887347075,
+    "sd": 10.892974985886715,
+    "p50": 2.4345983266830444,
+    "p90": 11.465415477752686,
+    "p95": 17.12189531326294,
+    "p99": 54.88278007507324,
+    "max": 111.88250589370728,
+    "mean_over_p50": 2.3245105061930302
+   }
+  },
+  "h1_c32_b": {
+   "arm": "rr",
+   "docs_with_complete_stamps": 382,
+   "docs_incomplete_stamps": 2,
+   "run_total_s": 2172.9477863311768,
+   "stages": {
+    "admission": {
+     "count": 382,
+     "sum": 6.146536588668823,
+     "share_of_run_total": 0.0028286628088043876,
+     "min": 0.0010890960693359375,
+     "mean": 0.016090409917981212,
+     "sd": 0.06698900457311482,
+     "p50": 0.004088759422302246,
+     "p90": 0.023571491241455078,
+     "p95": 0.03790116310119629,
+     "p99": 0.3876659870147705,
+     "max": 1.0553069114685059,
+     "mean_over_p50": 3.93527920234574,
+     "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+     "occupancy": {
+      "max": 31,
+      "mean": 0.046924830183768765,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 130.98686909675598
+     }
+    },
+    "parse_bracket": {
+     "count": 382,
+     "sum": 791.2604320049286,
+     "share_of_run_total": 0.36414148420054737,
+     "min": 0.019609689712524414,
+     "mean": 2.071362387447457,
+     "sd": 8.251462744296925,
+     "p50": 0.29342079162597656,
+     "p90": 3.287508249282837,
+     "p95": 6.935373544692993,
+     "p99": 47.95877814292908,
+     "max": 110.71114587783813,
+     "mean_over_p50": 7.059357913831213,
+     "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+     "occupancy": {
+      "max": 32,
+      "mean": 6.040761470681835,
+      "p50": 5,
+      "p95": 14,
+      "window_s": 130.98686909675598
+     }
+    },
+    "split": {
+     "count": 382,
+     "sum": 1.759723424911499,
+     "share_of_run_total": 0.0008098323558352181,
+     "min": 0.00037360191345214844,
+     "mean": 0.004606605824375652,
+     "sd": 0.015894206014875133,
+     "p50": 0.0016438961029052734,
+     "p90": 0.009331703186035156,
+     "p95": 0.013155937194824219,
+     "p99": 0.0308382511138916,
+     "max": 0.29576659202575684,
+     "mean_over_p50": 2.802248765134459,
+     "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+     "occupancy": {
+      "max": 4,
+      "mean": 0.013434349847782417,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 130.98686909675598
+     }
+    },
+    "embed": {
+     "count": 382,
+     "sum": 1345.7804901599884,
+     "share_of_run_total": 0.6193340211051346,
+     "min": 0.04731154441833496,
+     "mean": 3.5229855763350484,
+     "sd": 6.883944408873127,
+     "p50": 1.6150964498519897,
+     "p90": 7.684661865234375,
+     "p95": 11.091328859329224,
+     "p99": 28.088653802871704,
+     "max": 99.15852856636047,
+     "mean_over_p50": 2.1812849484363,
+     "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+     "occupancy": {
+      "max": 26,
+      "mean": 10.274163352709055,
+      "p50": 5,
+      "p95": 23,
+      "window_s": 130.98686909675598
+     }
+    },
+    "return": {
+     "count": 382,
+     "sum": 28.000604152679443,
+     "share_of_run_total": 0.012885999529678482,
+     "min": 0.0057637691497802734,
+     "mean": 0.0733000108708886,
+     "sd": 0.100758016086309,
+     "p50": 0.04273855686187744,
+     "p90": 0.15692973136901855,
+     "p95": 0.23605608940124512,
+     "p99": 0.4398655891418457,
+     "max": 1.2484614849090576,
+     "mean_over_p50": 1.7150792224402833,
+     "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+     "occupancy": {
+      "max": 7,
+      "mean": 0.21376649694555458,
+      "p50": 0,
+      "p95": 1,
+      "window_s": 130.98686909675598
+     }
+    }
+   },
+   "end_to_end": {
+    "count": 382,
+    "sum": 2172.9477863311768,
+    "share_of_run_total": 1.0,
+    "min": 0.07697319984436035,
+    "mean": 5.688344990395751,
+    "sd": 10.933592318495963,
+    "p50": 2.397225499153137,
+    "p90": 11.430216073989868,
+    "p95": 17.838844776153564,
+    "p99": 54.95239734649658,
+    "max": 112.28485631942749,
+    "mean_over_p50": 2.372886902965641
+   }
+  },
+  "h1_c64_a": {
+   "arm": "rr",
+   "docs_with_complete_stamps": 382,
+   "docs_incomplete_stamps": 2,
+   "run_total_s": 3973.66348528862,
+   "stages": {
+    "admission": {
+     "count": 382,
+     "sum": 329.1377217769623,
+     "share_of_run_total": 0.08282979245613094,
+     "min": 0.003933429718017578,
+     "mean": 0.8616170727145609,
+     "sd": 0.8654490001656101,
+     "p50": 0.5450153350830078,
+     "p90": 1.960364580154419,
+     "p95": 2.381317615509033,
+     "p99": 3.6384682655334473,
+     "max": 3.681565284729004,
+     "mean_over_p50": 1.580904274158329,
+     "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+     "occupancy": {
+      "max": 51,
+      "mean": 2.5051897358346222,
+      "p50": 0,
+      "p95": 14,
+      "window_s": 131.3823528289795
+     }
+    },
+    "parse_bracket": {
+     "count": 382,
+     "sum": 1747.9034261703491,
+     "share_of_run_total": 0.43987203059380187,
+     "min": 0.5784471035003662,
+     "mean": 4.5756634192941075,
+     "sd": 8.288382071383761,
+     "p50": 3.218076467514038,
+     "p90": 6.68056845664978,
+     "p95": 10.006058692932129,
+     "p99": 49.54370141029358,
+     "max": 113.56895923614502,
+     "mean_over_p50": 1.4218628629508,
+     "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+     "occupancy": {
+      "max": 64,
+      "mean": 13.303943707307452,
+      "p50": 5,
+      "p95": 39,
+      "window_s": 131.3823528289795
+     }
+    },
+    "split": {
+     "count": 382,
+     "sum": 2.1691925525665283,
+     "share_of_run_total": 0.0005458923637085421,
+     "min": 0.00037980079650878906,
+     "mean": 0.005678514535514472,
+     "sd": 0.017014091911847214,
+     "p50": 0.002118825912475586,
+     "p90": 0.012223958969116211,
+     "p95": 0.02094244956970215,
+     "p99": 0.05042886734008789,
+     "max": 0.3047513961791992,
+     "mean_over_p50": 2.6800288320430394,
+     "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+     "occupancy": {
+      "max": 2,
+      "mean": 0.016510532090943508,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 131.3823528289795
+     }
+    },
+    "embed": {
+     "count": 382,
+     "sum": 1360.2321898937225,
+     "share_of_run_total": 0.34231187289250903,
+     "min": 0.06124567985534668,
+     "mean": 3.5608172510306875,
+     "sd": 6.939829243066892,
+     "p50": 1.6555076837539673,
+     "p90": 7.7361228466033936,
+     "p95": 11.861945867538452,
+     "p99": 28.65696668624878,
+     "max": 99.26083827018738,
+     "mean_over_p50": 2.1508914068923626,
+     "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+     "occupancy": {
+      "max": 27,
+      "mean": 10.353233601047911,
+      "p50": 5,
+      "p95": 23,
+      "window_s": 131.3823528289795
+     }
+    },
+    "return": {
+     "count": 382,
+     "sum": 534.2209548950195,
+     "share_of_run_total": 0.13444041169384965,
+     "min": 0.012137651443481445,
+     "mean": 1.3984841751178523,
+     "sd": 0.9619751242521405,
+     "p50": 1.2409077882766724,
+     "p90": 2.8357491493225098,
+     "p95": 3.315655469894409,
+     "p99": 4.097925424575806,
+     "max": 4.201739311218262,
+     "mean_over_p50": 1.1269847673855091,
+     "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+     "occupancy": {
+      "max": 33,
+      "mean": 4.06615457397399,
+      "p50": 0,
+      "p95": 16,
+      "window_s": 131.3823528289795
+     }
+    }
+   },
+   "end_to_end": {
+    "count": 382,
+    "sum": 3973.66348528862,
+    "share_of_run_total": 1.0,
+    "min": 4.052050828933716,
+    "mean": 10.402260432692723,
+    "sd": 10.795417480824591,
+    "p50": 7.42148220539093,
+    "p90": 16.218271255493164,
+    "p95": 22.666283130645752,
+    "p99": 59.93117380142212,
+    "max": 116.42960357666016,
+    "mean_over_p50": 1.401641901820713
+   }
+  },
+  "h1_c64_b": {
+   "arm": "rr",
+   "docs_with_complete_stamps": 382,
+   "docs_incomplete_stamps": 2,
+   "run_total_s": 3961.2542583942413,
+   "stages": {
+    "admission": {
+     "count": 382,
+     "sum": 339.160035610199,
+     "share_of_run_total": 0.08561935525635332,
+     "min": 0.004778623580932617,
+     "mean": 0.8878534963617775,
+     "sd": 0.8614204965970892,
+     "p50": 0.7369400262832642,
+     "p90": 2.118832588195801,
+     "p95": 2.4633288383483887,
+     "p99": 3.6806252002716064,
+     "max": 3.770975351333618,
+     "mean_over_p50": 1.204783923652025,
+     "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+     "occupancy": {
+      "max": 53,
+      "mean": 2.5747553967946315,
+      "p50": 0,
+      "p95": 15,
+      "window_s": 131.7251479625702
+     }
+    },
+    "parse_bracket": {
+     "count": 382,
+     "sum": 1735.8027670383453,
+     "share_of_run_total": 0.43819524166115537,
+     "min": 0.6384284496307373,
+     "mean": 4.543986301147501,
+     "sd": 8.222958317132672,
+     "p50": 3.1443363428115845,
+     "p90": 6.581505298614502,
+     "p95": 9.939523220062256,
+     "p99": 49.21048045158386,
+     "max": 112.9276716709137,
+     "mean_over_p50": 1.4451336643854027,
+     "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+     "occupancy": {
+      "max": 64,
+      "mean": 13.177459231486877,
+      "p50": 5,
+      "p95": 38,
+      "window_s": 131.7251479625702
+     }
+    },
+    "split": {
+     "count": 382,
+     "sum": 2.1281533241271973,
+     "share_of_run_total": 0.0005372422938056692,
+     "min": 0.00041222572326660156,
+     "mean": 0.005571082000332977,
+     "sd": 0.01639859406892165,
+     "p50": 0.0018668174743652344,
+     "p90": 0.01148843765258789,
+     "p95": 0.01599860191345215,
+     "p99": 0.05231881141662598,
+     "max": 0.27310776710510254,
+     "mean_over_p50": 2.984267116005697,
+     "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+     "occupancy": {
+      "max": 2,
+      "mean": 0.016156013920226635,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 131.7251479625702
+     }
+    },
+    "embed": {
+     "count": 382,
+     "sum": 1362.7364358901978,
+     "share_of_run_total": 0.3440164016239152,
+     "min": 0.05521798133850098,
+     "mean": 3.567372868822507,
+     "sd": 6.958822717232433,
+     "p50": 1.659798264503479,
+     "p90": 7.487462043762207,
+     "p95": 11.758154392242432,
+     "p99": 28.91353726387024,
+     "max": 99.7768120765686,
+     "mean_over_p50": 2.149280997043138,
+     "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+     "occupancy": {
+      "max": 27,
+      "mean": 10.345301994099263,
+      "p50": 5,
+      "p95": 23,
+      "window_s": 131.7251479625702
+     }
+    },
+    "return": {
+     "count": 382,
+     "sum": 521.4268665313721,
+     "share_of_run_total": 0.13163175916477043,
+     "min": 0.007695674896240234,
+     "mean": 1.3649917972025447,
+     "sd": 0.8859374930636496,
+     "p50": 1.3111047744750977,
+     "p90": 2.5162665843963623,
+     "p95": 2.9403982162475586,
+     "p99": 3.8142411708831787,
+     "max": 4.024124383926392,
+     "mean_over_p50": 1.0411004702114832,
+     "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+     "occupancy": {
+      "max": 33,
+      "mean": 3.9584458594006358,
+      "p50": 0,
+      "p95": 15,
+      "window_s": 131.7251479625702
+     }
+    }
+   },
+   "end_to_end": {
+    "count": 382,
+    "sum": 3961.2542583942413,
+    "share_of_run_total": 1.0,
+    "min": 4.49455451965332,
+    "mean": 10.369775545534663,
+    "sd": 10.740864180365909,
+    "p50": 7.215088605880737,
+    "p90": 16.283209562301636,
+    "p95": 22.682422399520874,
+    "p99": 59.56853699684143,
+    "max": 115.1494824886322,
+    "mean_over_p50": 1.4372346774899845
+   }
+  },
+  "an_li_t1": {
+   "arm": "li",
+   "docs_with_service_stamps": 95,
+   "docs_without": 1,
+   "run_total_s": 1507.535345969,
+   "stages": {
+    "queue": {
+     "count": 95,
+     "sum": 1315.086945969,
+     "share_of_run_total": 0.8723423629737187,
+     "min": 0.01612853999999997,
+     "mean": 13.84302048388421,
+     "sd": 9.853549640800583,
+     "p50": 12.617783965,
+     "p90": 22.918763675,
+     "p95": 32.884940795,
+     "p99": 61.723395511999996,
+     "max": 61.723395511999996,
+     "mean_over_p50": 1.097103938558692,
+     "timed_from": "OUTSIDE (client latency - service total)"
+    },
+    "extract": {
+     "count": 95,
+     "sum": 43.500025,
+     "share_of_run_total": 0.028855061419498226,
+     "min": 0.003156,
+     "mean": 0.457895,
+     "sd": 1.0525395741193821,
+     "p50": 0.142821,
+     "p90": 0.900072,
+     "p95": 2.158953,
+     "p99": 8.428156999999999,
+     "max": 8.428156999999999,
+     "mean_over_p50": 3.2060761372627273,
+     "timed_from": "INSIDE the service (pypdf)",
+     "occupancy": {
+      "max": 1,
+      "mean": 0.22486215149506236,
+      "p50": 0,
+      "p95": 1,
+      "window_s": 193.4519670009613
+     }
+    },
+    "svc_split": {
+     "count": 95,
+     "sum": 0.188986,
+     "share_of_run_total": 0.00012536090812419743,
+     "min": 0.000364,
+     "mean": 0.0019893263157894736,
+     "sd": 0.0022348423725981463,
+     "p50": 0.00114,
+     "p90": 0.004911,
+     "p95": 0.006927,
+     "p99": 0.012927,
+     "max": 0.012927,
+     "mean_over_p50": 1.745023084025854,
+     "timed_from": "INSIDE the service",
+     "occupancy": {
+      "max": 1,
+      "mean": 0.0009769121973592686,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 193.4519670009613
+     }
+    },
+    "svc_embed": {
+     "count": 95,
+     "sum": 148.75686,
+     "share_of_run_total": 0.09867553712605219,
+     "min": 0.013125999999999999,
+     "mean": 1.5658616842105262,
+     "sd": 2.3713248980720962,
+     "p50": 0.8273579999999999,
+     "p90": 3.602741,
+     "p95": 5.249899999999999,
+     "p99": 15.323616,
+     "max": 15.323616,
+     "mean_over_p50": 1.8926047541820183,
+     "timed_from": "INSIDE the service",
+     "occupancy": {
+      "max": 1,
+      "mean": 0.7689601858319406,
+      "p50": 1,
+      "p95": 1,
+      "window_s": 193.4519670009613
+     }
+    }
+   },
+   "note": "only documents the service answered ok carry stage stamps (an error class returns before the stamps are added)"
+  },
+  "an_li_t2": {
+   "arm": "li",
+   "docs_with_service_stamps": 95,
+   "docs_without": 1,
+   "run_total_s": 1508.199878498,
+   "stages": {
+    "queue": {
+     "count": 95,
+     "sum": 1315.824611498,
+     "share_of_run_total": 0.8724471008500647,
+     "min": 0.005791086000000001,
+     "mean": 13.850785384189473,
+     "sd": 9.880545580319126,
+     "p50": 11.973991205999999,
+     "p90": 21.879557026999997,
+     "p95": 33.167173651000006,
+     "p99": 61.54398943700001,
+     "max": 61.54398943700001,
+     "mean_over_p50": 1.156739231380848,
+     "timed_from": "OUTSIDE (client latency - service total)"
+    },
+    "extract": {
+     "count": 95,
+     "sum": 43.437146999999996,
+     "share_of_run_total": 0.028800656742698175,
+     "min": 0.0033039999999999996,
+     "mean": 0.45723312631578944,
+     "sd": 1.0533360644762628,
+     "p50": 0.143066,
+     "p90": 1.012832,
+     "p95": 2.176494,
+     "p99": 8.431998,
+     "max": 8.431998,
+     "mean_over_p50": 3.195959391580036,
+     "timed_from": "INSIDE the service (pypdf)",
+     "occupancy": {
+      "max": 1,
+      "mean": 0.22463327500319702,
+      "p50": 0,
+      "p95": 1,
+      "window_s": 193.3691554069519
+     }
+    },
+    "svc_split": {
+     "count": 95,
+     "sum": 0.191248,
+     "share_of_run_total": 0.0001268054736819511,
+     "min": 0.00041999999999999996,
+     "mean": 0.002013136842105263,
+     "sd": 0.0022774559703897046,
+     "p50": 0.0011259999999999998,
+     "p90": 0.004889,
+     "p95": 0.007123999999999999,
+     "p99": 0.012908,
+     "max": 0.012908,
+     "mean_over_p50": 1.7878657567542304,
+     "timed_from": "INSIDE the service",
+     "occupancy": {
+      "max": 1,
+      "mean": 0.0009890326949928805,
+      "p50": 0,
+      "p95": 0,
+      "window_s": 193.3691554069519
+     }
+    },
+    "svc_embed": {
+     "count": 95,
+     "sum": 148.744357,
+     "share_of_run_total": 0.09862376938269807,
+     "min": 0.014486,
+     "mean": 1.5657300736842106,
+     "sd": 2.3827965757831757,
+     "p50": 0.8297530000000001,
+     "p90": 3.52973,
+     "p95": 5.349769,
+     "p99": 15.43834,
+     "max": 15.43834,
+     "mean_over_p50": 1.8869833235724491,
+     "timed_from": "INSIDE the service",
+     "occupancy": {
+      "max": 1,
+      "mean": 0.7692248323801073,
+      "p50": 1,
+      "p95": 1,
+      "window_s": 193.3691554069519
+     }
+    }
+   },
+   "note": "only documents the service answered ok carry stage stamps (an error class returns before the stamps are added)"
+  }
+ },
+ "d1_labels": {
+  "profile": "every stage table is from a PROFILE leg: shares, rankings and distributions only; its absolute times never sit beside a baseline figure",
+  "timed_from": {
+   "admission": "OUTSIDE (client submit -> engine pipe open)",
+   "parse_bracket": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+   "split": "INSIDE at node boundaries (LangChain splitter, Python)",
+   "embed": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+   "return": "OUTSIDE (embed's last documents -> client completion)",
+   "extract": "INSIDE the service (pypdf)",
+   "svc_split": "INSIDE the service",
+   "svc_embed": "INSIDE the service",
+   "queue": "OUTSIDE (client latency - service total)"
+  }
+ },
+ "parity_anchor_same_session": {
+  "cell_a": [
+   "anf_li_u1",
+   "anf_li_u2"
+  ],
+  "cell_b": [
+   "anf_rr_u1",
+   "anf_rr_u2"
+  ],
+  "a_docs_per_s": [
+   0.49699406735334284,
+   0.4924533457411287
+  ],
+  "b_docs_per_s": [
+   1.8399147020864535,
+   1.8413098478558374
+  ],
+  "a_mean": 0.49472370654723574,
+  "b_mean": 1.8406122749711455,
+  "a_spread": 0.00917829801184309,
+  "b_spread": 0.0007579791726673142,
+  "floor": 0.0987,
+  "threshold": 0.0987,
+  "delta_b_vs_a": 2.720485294341571,
+  "readable": true,
+  "same_session": true,
+  "reading": "delta_b_vs_a = RocketRide one token / LlamaIndex one worker - 1, span docs/s, 96-document anchor slice, C=8, six thread vars = 1 on both (RocketRide read back in-process; LlamaIndex as its harness sets them, not read back); the floor is the larger of the two arms' (9.87%)"
+ },
+ "h1": {
+  "h1_c32_a": {
+   "span": {
+    "span_s": 131.478647818,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.905414729612868
+   },
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "executor_threads_seen": 32,
+   "thread_names_seen": [
+    "External"
+   ],
+   "asyncio_executor_max_index": null,
+   "executing_concurrency": {
+    "max": 26,
+    "mean": 10.24510687716212,
+    "p50": 5,
+    "p95": 23,
+    "window_s": 131.4841434955597
+   },
+   "engine_open_concurrency": {
+    "max": 32,
+    "mean": 16.20935182491966,
+    "p50": 10,
+    "p95": 32,
+    "window_s": 131.4841434955597
+   }
+  },
+  "h1_c64_a": {
+   "span": {
+    "span_s": 131.380692304,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.907580964150313
+   },
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "executor_threads_seen": 32,
+   "thread_names_seen": [
+    "External"
+   ],
+   "asyncio_executor_max_index": null,
+   "executing_concurrency": {
+    "max": 27,
+    "mean": 10.390482459755091,
+    "p50": 5,
+    "p95": 23,
+    "window_s": 131.3823528289795
+   },
+   "engine_open_concurrency": {
+    "max": 64,
+    "mean": 23.731273659326543,
+    "p50": 10,
+    "p95": 58,
+    "window_s": 131.3823528289795
+   }
+  },
+  "h1_c32_b": {
+   "span": {
+    "span_s": 130.981639303,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.9164392966278188
+   },
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "executor_threads_seen": 32,
+   "thread_names_seen": [
+    "External"
+   ],
+   "asyncio_executor_max_index": null,
+   "executing_concurrency": {
+    "max": 26,
+    "mean": 10.307941119829525,
+    "p50": 5,
+    "p95": 23,
+    "window_s": 130.98686909675598
+   },
+   "engine_open_concurrency": {
+    "max": 32,
+    "mean": 16.358841346761057,
+    "p50": 10,
+    "p95": 32,
+    "window_s": 130.98686909675598
+   }
+  },
+  "h1_c64_b": {
+   "span": {
+    "span_s": 131.719765216,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.9000962716079792
+   },
+   "boot_id": "a58bf81c-644d-4573-9b8f-f29f6f936437",
+   "executor_threads_seen": 32,
+   "thread_names_seen": [
+    "External"
+   ],
+   "asyncio_executor_max_index": null,
+   "executing_concurrency": {
+    "max": 27,
+    "mean": 10.38169514613893,
+    "p50": 5,
+    "p95": 23,
+    "window_s": 131.7251479625702
+   },
+   "engine_open_concurrency": {
+    "max": 64,
+    "mean": 23.605707818535983,
+    "p50": 10,
+    "p95": 58,
+    "window_s": 131.7251479625702
+   }
+  },
+  "verdict": {
+   "h1": "HOLDS",
+   "rule": "HOLDS if at C=64 the executor width seen is <= 32 and the executing concurrency never exceeds 32; REFUTED if any C=64 leg shows more than 32 executing at once",
+   "c64_vs_c32_throughput": {
+    "cell_a": [
+     "h1f_c32_a",
+     "h1f_c32_b"
+    ],
+    "cell_b": [
+     "h1f_c64_a",
+     "h1f_c64_b"
+    ],
+    "a_docs_per_s": [
+     2.905414729612868,
+     2.9164392966278188
+    ],
+    "b_docs_per_s": [
+     2.907580964150313,
+     2.9000962716079792
+    ],
+    "a_mean": 2.910927013120343,
+    "b_mean": 2.9038386178791464,
+    "a_spread": 0.003787304513393905,
+    "b_spread": 0.0025775167036660275,
+    "floor": 0.0082,
+    "threshold": 0.0082,
+    "delta_b_vs_a": -0.002435098925272709,
+    "readable": false,
+    "same_session": true
+   }
+  }
+ },
+ "h7": {
+  "nodebug_vs_debug": {
+   "cell_a": [
+    "h7f_dbg_a",
+    "h7f_dbg_b"
+   ],
+   "cell_b": [
+    "h7f_nodbg_a",
+    "h7f_nodbg_b"
+   ],
+   "a_docs_per_s": [
+    2.9105034740790505,
+    2.918206514419077
+   ],
+   "b_docs_per_s": [
+    2.9230489979725953,
+    2.944840422154414
+   ],
+   "a_mean": 2.914354994249064,
+   "b_mean": 2.9339447100635048,
+   "a_spread": 0.002643137282598442,
+   "b_spread": 0.007427346571008567,
+   "floor": 0.0082,
+   "threshold": 0.0082,
+   "delta_b_vs_a": 0.006721801514605312,
+   "readable": false,
+   "same_session": true
+  },
+  "cpu_s_per_doc": {
+   "h7_dbg_a": 5.5047,
+   "h7_dbg_b": 5.4869,
+   "h7_nodbg_a": 5.4754,
+   "h7_nodbg_b": 5.447
+  },
+  "task_cmdlines": {
+   "h7_dbg_a": [
+    "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-8f4fb901.webhook_1-7l96xbkl.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+   ],
+   "h7_dbg_b": [
+    "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-a43f4526.webhook_1-6rmyr9nw.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+   ],
+   "h7_nodbg_a": [
+    "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-eb4b69d2.webhook_1-10zlk9r9.json --autoterm --monitor=app --data_port=20000 --data_hos"
+   ],
+   "h7_nodbg_b": [
+    "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-adc7b6d2.webhook_1-ozan8n2q.json --autoterm --monitor=app --data_port=20000 --data_hos"
+   ]
+  },
+  "trace_readback": {
+   "h7_dbg_a": {
+    "sys_gettrace_this_thread": "None",
+    "threading_trace_hook": "None",
+    "threading_profile_hook": "None",
+    "sys_getprofile_this_thread": "None",
+    "pydevd_loaded": true,
+    "debugpy_loaded": true,
+    "sys_monitoring_tools": {
+     "0": "pydevd"
+    }
+   },
+   "h7_dbg_b": {
+    "sys_gettrace_this_thread": "None",
+    "threading_trace_hook": "None",
+    "threading_profile_hook": "None",
+    "sys_getprofile_this_thread": "None",
+    "pydevd_loaded": true,
+    "debugpy_loaded": true,
+    "sys_monitoring_tools": {
+     "0": "pydevd"
+    }
+   },
+   "h7_nodbg_a": {
+    "sys_gettrace_this_thread": "None",
+    "threading_trace_hook": "None",
+    "threading_profile_hook": "None",
+    "sys_getprofile_this_thread": "None",
+    "pydevd_loaded": false,
+    "debugpy_loaded": false,
+    "sys_monitoring_tools": {}
+   },
+   "h7_nodbg_b": {
+    "sys_gettrace_this_thread": "None",
+    "threading_trace_hook": "None",
+    "threading_profile_hook": "None",
+    "sys_getprofile_this_thread": "None",
+    "pydevd_loaded": false,
+    "debugpy_loaded": false,
+    "sys_monitoring_tools": {}
+   }
+  },
+  "null_control_chunk_identity": [
+   {
+    "a": "h7f_dbg_a",
+    "b": "h7f_nodbg_a",
+    "compared": 382,
+    "identical": 382,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   },
+   {
+    "a": "h7f_dbg_b",
+    "b": "h7f_nodbg_b",
+    "compared": 382,
+    "identical": 382,
+    "differing": [],
+    "n_differing": 0,
+    "differing_where_unstamped_legs_also_disagree": [],
+    "differing_attributable_to_instrument": [],
+    "only_in_a": [],
+    "only_in_b": []
+   }
+  ],
+  "null_control_pass": true,
+  "verdict": "NOT SUPPORTED (unreadable)"
+ }
+}

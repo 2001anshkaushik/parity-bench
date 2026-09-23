@@ -1,0 +1,1494 @@
+{
+ "verifier": "B",
+ "report": "P0_verify_copy.md",
+ "figures_checked": 186,
+ "matches": 185,
+ "mismatches": [
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "noDebug launch mean",
+   "report": "2.9393",
+   "recomputed_display": "2.9339",
+   "status": "MISMATCH",
+   "recomputed_raw": 2.9339447100635048,
+   "note": "the report's 2.9393 is not the mean of its own legs (2.9230, 2.9448 -> 2.9339); digits transposed. The +0.67% delta is consistent with 2.9339, not with 2.9393 (2.9393/2.9144-1 = +0.85%)"
+  }
+ ],
+ "unverifiable": [
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "six thread variables = 1 (LlamaIndex side)",
+   "report": "= 1 on both",
+   "reason": "the LlamaIndex leg exports (anf_li_u1/u2) carry no env block (d0_in_process pre/post are null) and no listed file records the service container environment"
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "pipe semaphore threadCount = 64 (data_conn.py:138)",
+   "report": "64",
+   "reason": "SOURCE claim about engine code; no listed raw file records it"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "rocketride 1.3.0 SDK use() has no noDebug parameter",
+   "report": "1.3.0",
+   "reason": "SOURCE claim about the SDK; no listed raw file records it"
+  }
+ ],
+ "skipped": "prose-only sentences, SOURCE file:line references, the note column of the first-generation table, the dagger footnote marker",
+ "checks": [
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "d1_rr_u1 span docs/s",
+   "report": "2.4254",
+   "recomputed_display": "2.4254",
+   "status": "MATCH",
+   "recomputed_raw": 2.42542969480465
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "d1f_rr_u1 span docs/s",
+   "report": "2.9251",
+   "recomputed_display": "2.9251",
+   "status": "MATCH",
+   "recomputed_raw": 2.9250632697291885
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "d1_rr_u1->d1f_rr_u1 f/first-1",
+   "report": "+20.6%",
+   "recomputed_display": "+20.6%",
+   "status": "MATCH",
+   "recomputed_raw": 20.599796233828993
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "d1_rr_u2 span docs/s",
+   "report": "2.4318",
+   "recomputed_display": "2.4318",
+   "status": "MATCH",
+   "recomputed_raw": 2.431760604388514
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "d1f_rr_u2 span docs/s",
+   "report": "2.9193",
+   "recomputed_display": "2.9193",
+   "status": "MATCH",
+   "recomputed_raw": 2.919334323009205
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "d1_rr_u2->d1f_rr_u2 f/first-1",
+   "report": "+20.1%",
+   "recomputed_display": "+20.1%",
+   "status": "MATCH",
+   "recomputed_raw": 20.050235115281634,
+   "note": "computed from unrounded spans; from the displayed 4-dp spans d1_rr_u2 would give +20.0%"
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "an_rr_u1 span docs/s",
+   "report": "1.6948",
+   "recomputed_display": "1.6948",
+   "status": "MATCH",
+   "recomputed_raw": 1.6948054602871159
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "anf_rr_u1 span docs/s",
+   "report": "1.8399",
+   "recomputed_display": "1.8399",
+   "status": "MATCH",
+   "recomputed_raw": 1.8399147020864535
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "an_rr_u1->anf_rr_u1 f/first-1",
+   "report": "+8.6%",
+   "recomputed_display": "+8.6%",
+   "status": "MATCH",
+   "recomputed_raw": 8.5619998990772
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "an_rr_u2 span docs/s",
+   "report": "1.6825",
+   "recomputed_display": "1.6825",
+   "status": "MATCH",
+   "recomputed_raw": 1.682475736062912
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "anf_rr_u2 span docs/s",
+   "report": "1.8413",
+   "recomputed_display": "1.8413",
+   "status": "MATCH",
+   "recomputed_raw": 1.8413098478558374
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "an_rr_u2->anf_rr_u2 f/first-1",
+   "report": "+9.4%",
+   "recomputed_display": "+9.4%",
+   "status": "MATCH",
+   "recomputed_raw": 9.44049940147169
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "an_li_u1 span docs/s",
+   "report": "0.5006",
+   "recomputed_display": "0.5006",
+   "status": "MATCH",
+   "recomputed_raw": 0.5005731063233129
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "anf_li_u1 span docs/s",
+   "report": "0.4970",
+   "recomputed_display": "0.4970",
+   "status": "MATCH",
+   "recomputed_raw": 0.49699406735334284
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "an_li_u1->anf_li_u1 f/first-1",
+   "report": "-0.7%",
+   "recomputed_display": "-0.7%",
+   "status": "MATCH",
+   "recomputed_raw": -0.7149882654020168
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "an_li_u2 span docs/s",
+   "report": "0.4939",
+   "recomputed_display": "0.4939",
+   "status": "MATCH",
+   "recomputed_raw": 0.4939496043138718
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "anf_li_u2 span docs/s",
+   "report": "0.4925",
+   "recomputed_display": "0.4925",
+   "status": "MATCH",
+   "recomputed_raw": 0.4924533457411287
+  },
+  {
+   "section": "The first generation, PERTURBED by my own instrument (amendment 4)",
+   "figure": "an_li_u2->anf_li_u2 f/first-1",
+   "report": "-0.3%",
+   "recomputed_display": "-0.3%",
+   "status": "MATCH",
+   "recomputed_raw": -0.302917253030599
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "anf_li_u1 span docs/s",
+   "report": "0.4970",
+   "recomputed_display": "0.4970",
+   "status": "MATCH",
+   "recomputed_raw": 0.49699406735334284
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "anf_li_u2 span docs/s",
+   "report": "0.4925",
+   "recomputed_display": "0.4925",
+   "status": "MATCH",
+   "recomputed_raw": 0.4924533457411287
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "LlamaIndex mean",
+   "report": "0.4947",
+   "recomputed_display": "0.4947",
+   "status": "MATCH",
+   "recomputed_raw": 0.49472370654723574
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "LlamaIndex spread",
+   "report": "0.92%",
+   "recomputed_display": "0.92%",
+   "status": "MATCH",
+   "recomputed_raw": 0.917829801184309
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "anf_rr_u1 span docs/s",
+   "report": "1.8399",
+   "recomputed_display": "1.8399",
+   "status": "MATCH",
+   "recomputed_raw": 1.8399147020864535
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "anf_rr_u2 span docs/s",
+   "report": "1.8413",
+   "recomputed_display": "1.8413",
+   "status": "MATCH",
+   "recomputed_raw": 1.8413098478558374
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "RocketRide mean",
+   "report": "1.8406",
+   "recomputed_display": "1.8406",
+   "status": "MATCH",
+   "recomputed_raw": 1.8406122749711455
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "RocketRide spread",
+   "report": "0.08%",
+   "recomputed_display": "0.08%",
+   "status": "MATCH",
+   "recomputed_raw": 0.07579791726673142
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "RocketRide / LlamaIndex - 1",
+   "report": "+272.0%",
+   "recomputed_display": "+272.0%",
+   "status": "MATCH",
+   "recomputed_raw": 272.0485294341571
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "threshold (larger arm floor)",
+   "report": "9.87%",
+   "recomputed_display": "9.87%",
+   "status": "MATCH",
+   "recomputed_raw": 9.87
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "readable",
+   "report": "readable",
+   "recomputed_display": "readable",
+   "status": "MATCH"
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "96-document anchor slice",
+   "report": "96",
+   "recomputed_display": "96",
+   "status": "MATCH"
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "C=8",
+   "report": "8",
+   "recomputed_display": "8",
+   "status": "MATCH"
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "six thread variables = 1 (RocketRide side)",
+   "report": "1",
+   "recomputed_display": "1",
+   "status": "MATCH",
+   "note": "env_probe pre/post env block of anf_rr_u1/u2: OMP/MKL/OPENBLAS/VECLIB/NUMEXPR/TORCH_NUM_THREADS all \"1\""
+  },
+  {
+   "section": "Same-session single-instance docs cell (context for the parity target)",
+   "figure": "same box session",
+   "report": "same",
+   "recomputed_display": "same",
+   "status": "MATCH"
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u1 span docs/s",
+   "report": "2.9251",
+   "recomputed_display": "2.9251",
+   "status": "MATCH",
+   "recomputed_raw": 2.9250632697291885
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u1 drain share of span",
+   "report": "56.6%",
+   "recomputed_display": "56.6%",
+   "status": "MATCH",
+   "recomputed_raw": 56.59326761681132
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u1 steady-phase docs/s",
+   "report": "6.174",
+   "recomputed_display": "6.174",
+   "status": "MATCH",
+   "recomputed_raw": 6.174230688405055
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u1 seconds to 50% done",
+   "report": "29.9",
+   "recomputed_display": "29.9",
+   "status": "MATCH",
+   "recomputed_raw": 29.936671675
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u1 seconds to 90% done",
+   "report": "56.2",
+   "recomputed_display": "56.2",
+   "status": "MATCH",
+   "recomputed_raw": 56.152258941
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u1 seconds to 99% done",
+   "report": "80.2",
+   "recomputed_display": "80.2",
+   "status": "MATCH",
+   "recomputed_raw": 80.199307063
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u1 seconds to 100% done",
+   "report": "130.6",
+   "recomputed_display": "130.6",
+   "status": "MATCH",
+   "recomputed_raw": 130.59546573
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u1 CPU-s per document (cost.cpu_s_per_doc)",
+   "report": "5.488",
+   "recomputed_display": "5.488",
+   "status": "MATCH",
+   "recomputed_raw": 5.4876
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u1 engine cores (cost.engine_container_cores)",
+   "report": "16.05",
+   "recomputed_display": "16.05",
+   "status": "MATCH",
+   "recomputed_raw": 16.051
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u2 span docs/s",
+   "report": "2.9193",
+   "recomputed_display": "2.9193",
+   "status": "MATCH",
+   "recomputed_raw": 2.919334323009205
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u2 drain share of span",
+   "report": "56.6%",
+   "recomputed_display": "56.6%",
+   "status": "MATCH",
+   "recomputed_raw": 56.6392153465504
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u2 steady-phase docs/s",
+   "report": "6.169",
+   "recomputed_display": "6.169",
+   "status": "MATCH",
+   "recomputed_raw": 6.168667790634715
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u2 seconds to 50% done",
+   "report": "29.5",
+   "recomputed_display": "29.5",
+   "status": "MATCH",
+   "recomputed_raw": 29.518095149
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u2 seconds to 90% done",
+   "report": "55.5",
+   "recomputed_display": "55.5",
+   "status": "MATCH",
+   "recomputed_raw": 55.52061455
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u2 seconds to 99% done",
+   "report": "79.2",
+   "recomputed_display": "79.2",
+   "status": "MATCH",
+   "recomputed_raw": 79.157064109
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u2 seconds to 100% done",
+   "report": "130.9",
+   "recomputed_display": "130.9",
+   "status": "MATCH",
+   "recomputed_raw": 130.851748287
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u2 CPU-s per document (cost.cpu_s_per_doc)",
+   "report": "5.469",
+   "recomputed_display": "5.469",
+   "status": "MATCH",
+   "recomputed_raw": 5.4686
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "d1f_rr_u2 engine cores (cost.engine_container_cores)",
+   "report": "15.96",
+   "recomputed_display": "15.96",
+   "status": "MATCH",
+   "recomputed_raw": 15.964
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u1 span docs/s",
+   "report": "1.8399",
+   "recomputed_display": "1.8399",
+   "status": "MATCH",
+   "recomputed_raw": 1.8399147020864535
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u1 drain share of span",
+   "report": "41.9%",
+   "recomputed_display": "41.9%",
+   "status": "MATCH",
+   "recomputed_raw": 41.93548257523748
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u1 steady-phase docs/s",
+   "report": "2.905",
+   "recomputed_display": "2.905",
+   "status": "MATCH",
+   "recomputed_raw": 2.9046800898638145
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u1 seconds to 50% done",
+   "report": "14.8",
+   "recomputed_display": "14.8",
+   "status": "MATCH",
+   "recomputed_raw": 14.781541614
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u1 seconds to 90% done",
+   "report": "29.8",
+   "recomputed_display": "29.8",
+   "status": "MATCH",
+   "recomputed_raw": 29.793441071
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u1 seconds to 99% done",
+   "report": "52.2",
+   "recomputed_display": "52.2",
+   "status": "MATCH",
+   "recomputed_raw": 52.176331811
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u1 seconds to 100% done",
+   "report": "52.2",
+   "recomputed_display": "52.2",
+   "status": "MATCH",
+   "recomputed_raw": 52.176331811
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u1 CPU-s per document (cost.cpu_s_per_doc)",
+   "report": "4.081",
+   "recomputed_display": "4.081",
+   "status": "MATCH",
+   "recomputed_raw": 4.081
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u1 engine cores (cost.engine_container_cores)",
+   "report": "7.51",
+   "recomputed_display": "7.51",
+   "status": "MATCH",
+   "recomputed_raw": 7.508
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u2 span docs/s",
+   "report": "1.8413",
+   "recomputed_display": "1.8413",
+   "status": "MATCH",
+   "recomputed_raw": 1.8413098478558374
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u2 drain share of span",
+   "report": "42.4%",
+   "recomputed_display": "42.4%",
+   "status": "MATCH",
+   "recomputed_raw": 42.373599894558815
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u2 steady-phase docs/s",
+   "report": "2.929",
+   "recomputed_display": "2.929",
+   "status": "MATCH",
+   "recomputed_raw": 2.9289828228835457
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u2 seconds to 50% done",
+   "report": "14.9",
+   "recomputed_display": "14.9",
+   "status": "MATCH",
+   "recomputed_raw": 14.900125201
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u2 seconds to 90% done",
+   "report": "29.6",
+   "recomputed_display": "29.6",
+   "status": "MATCH",
+   "recomputed_raw": 29.574202697
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u2 seconds to 99% done",
+   "report": "52.1",
+   "recomputed_display": "52.1",
+   "status": "MATCH",
+   "recomputed_raw": 52.136798221
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u2 seconds to 100% done",
+   "report": "52.1",
+   "recomputed_display": "52.1",
+   "status": "MATCH",
+   "recomputed_raw": 52.136798221
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u2 CPU-s per document (cost.cpu_s_per_doc)",
+   "report": "4.096",
+   "recomputed_display": "4.096",
+   "status": "MATCH",
+   "recomputed_raw": 4.0962
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_rr_u2 engine cores (cost.engine_container_cores)",
+   "report": "7.54",
+   "recomputed_display": "7.54",
+   "status": "MATCH",
+   "recomputed_raw": 7.542
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u1 span docs/s",
+   "report": "0.4970",
+   "recomputed_display": "0.4970",
+   "status": "MATCH",
+   "recomputed_raw": 0.49699406735334284
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u1 drain share of span",
+   "report": "9.0%",
+   "recomputed_display": "9.0%",
+   "status": "MATCH",
+   "recomputed_raw": 9.00672329247329
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u1 steady-phase docs/s",
+   "report": "0.500",
+   "recomputed_display": "0.500",
+   "status": "MATCH",
+   "recomputed_raw": 0.5001929283507656
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u1 seconds to 50% done",
+   "report": "77.6",
+   "recomputed_display": "77.6",
+   "status": "MATCH",
+   "recomputed_raw": 77.583743466
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u1 seconds to 90% done",
+   "report": "173.7",
+   "recomputed_display": "173.7",
+   "status": "MATCH",
+   "recomputed_raw": 173.714872152
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u1 seconds to 99% done",
+   "report": "191.1",
+   "recomputed_display": "191.1",
+   "status": "MATCH",
+   "recomputed_raw": 191.149163019
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u1 seconds to 100% done",
+   "report": "191.1",
+   "recomputed_display": "191.1",
+   "status": "MATCH",
+   "recomputed_raw": 191.149163019
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u1 CPU-s per document (cost.cpu_s_per_doc)",
+   "report": "2.012",
+   "recomputed_display": "2.012",
+   "status": "MATCH",
+   "recomputed_raw": 2.012
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u1 engine cores (cost.engine_container_cores)",
+   "report": "1.00",
+   "recomputed_display": "1.00",
+   "status": "MATCH",
+   "recomputed_raw": 1.0
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u2 span docs/s",
+   "report": "0.4925",
+   "recomputed_display": "0.4925",
+   "status": "MATCH",
+   "recomputed_raw": 0.4924533457411287
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u2 drain share of span",
+   "report": "9.1%",
+   "recomputed_display": "9.1%",
+   "status": "MATCH",
+   "recomputed_raw": 9.130036422821805
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u2 steady-phase docs/s",
+   "report": "0.496",
+   "recomputed_display": "0.496",
+   "status": "MATCH",
+   "recomputed_raw": 0.4962955552714235
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u2 seconds to 50% done",
+   "report": "78.4",
+   "recomputed_display": "78.4",
+   "status": "MATCH",
+   "recomputed_raw": 78.396825138
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u2 seconds to 90% done",
+   "report": "175.3",
+   "recomputed_display": "175.3",
+   "status": "MATCH",
+   "recomputed_raw": 175.293635341
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u2 seconds to 99% done",
+   "report": "192.9",
+   "recomputed_display": "192.9",
+   "status": "MATCH",
+   "recomputed_raw": 192.911675434
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u2 seconds to 100% done",
+   "report": "192.9",
+   "recomputed_display": "192.9",
+   "status": "MATCH",
+   "recomputed_raw": 192.911675434
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u2 CPU-s per document (cost.cpu_s_per_doc)",
+   "report": "2.030",
+   "recomputed_display": "2.030",
+   "status": "MATCH",
+   "recomputed_raw": 2.0305,
+   "note": "export field is 2.0305, a tie at 3 dp; binary-float/half-even rounding gives 2.030 (report), decimal half-up would give 2.031"
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "anf_li_u2 engine cores (cost.engine_container_cores)",
+   "report": "1.00",
+   "recomputed_display": "1.00",
+   "status": "MATCH",
+   "recomputed_raw": 1.0
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_a steady documents in flight",
+   "report": "32.0",
+   "recomputed_display": "32.0",
+   "status": "MATCH",
+   "recomputed_raw": 31.992753623188406,
+   "note": "276 threadstate rows in phase; 36 Python threads (@takes keys)"
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_a steady Python threads in R",
+   "report": "18.5",
+   "recomputed_display": "18.5",
+   "status": "MATCH",
+   "recomputed_raw": 18.452898550724637
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_a steady all task threads in R",
+   "report": "26.6",
+   "recomputed_display": "26.6",
+   "status": "MATCH",
+   "recomputed_raw": 26.641304347826086
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_a drain documents in flight",
+   "report": "4.4",
+   "recomputed_display": "4.4",
+   "status": "MATCH",
+   "recomputed_raw": 4.426966292134831,
+   "note": "356 threadstate rows in phase; 36 Python threads (@takes keys)"
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_a drain Python threads in R",
+   "report": "2.6",
+   "recomputed_display": "2.6",
+   "status": "MATCH",
+   "recomputed_raw": 2.5646067415730336
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_a drain all task threads in R",
+   "report": "4.1",
+   "recomputed_display": "4.1",
+   "status": "MATCH",
+   "recomputed_raw": 4.084269662921348
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_b steady documents in flight",
+   "report": "32.0",
+   "recomputed_display": "32.0",
+   "status": "MATCH",
+   "recomputed_raw": 32.0,
+   "note": "279 threadstate rows in phase; 36 Python threads (@takes keys)"
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_b steady Python threads in R",
+   "report": "18.4",
+   "recomputed_display": "18.4",
+   "status": "MATCH",
+   "recomputed_raw": 18.387096774193548
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_b steady all task threads in R",
+   "report": "26.9",
+   "recomputed_display": "26.9",
+   "status": "MATCH",
+   "recomputed_raw": 26.92831541218638
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_b drain documents in flight",
+   "report": "4.5",
+   "recomputed_display": "4.5",
+   "status": "MATCH",
+   "recomputed_raw": 4.473389355742297,
+   "note": "357 threadstate rows in phase; 36 Python threads (@takes keys)"
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_b drain Python threads in R",
+   "report": "2.6",
+   "recomputed_display": "2.6",
+   "status": "MATCH",
+   "recomputed_raw": 2.5518207282913163
+  },
+  {
+   "section": "POST-HOC DIAGNOSTICS (not pre-registered; never used by a gate)",
+   "figure": "h2f_c32_b drain all task threads in R",
+   "report": "4.1",
+   "recomputed_display": "4.1",
+   "status": "MATCH",
+   "recomputed_raw": 4.064425770308123
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_a executor threads that ran a document",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH",
+   "recomputed_raw": 32
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_a executing at once max",
+   "report": "26",
+   "recomputed_display": "26",
+   "status": "MATCH",
+   "recomputed_raw": 26
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_a executing at once p95",
+   "report": "23",
+   "recomputed_display": "23",
+   "status": "MATCH",
+   "recomputed_raw": 23
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_a admitted at once max",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH",
+   "recomputed_raw": 32
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_a admitted at once p95",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH",
+   "recomputed_raw": 32
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_a span docs/s",
+   "report": "2.9054",
+   "recomputed_display": "2.9054",
+   "status": "MATCH",
+   "recomputed_raw": 2.905414729612868
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_a thread names",
+   "report": "External",
+   "recomputed_display": "External",
+   "status": "MATCH"
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_a executor threads that ran a document",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH",
+   "recomputed_raw": 32
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_a executing at once max",
+   "report": "27",
+   "recomputed_display": "27",
+   "status": "MATCH",
+   "recomputed_raw": 27
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_a executing at once p95",
+   "report": "23",
+   "recomputed_display": "23",
+   "status": "MATCH",
+   "recomputed_raw": 23
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_a admitted at once max",
+   "report": "64",
+   "recomputed_display": "64",
+   "status": "MATCH",
+   "recomputed_raw": 64
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_a admitted at once p95",
+   "report": "58",
+   "recomputed_display": "58",
+   "status": "MATCH",
+   "recomputed_raw": 58
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_a span docs/s",
+   "report": "2.9076",
+   "recomputed_display": "2.9076",
+   "status": "MATCH",
+   "recomputed_raw": 2.907580964150313
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_a thread names",
+   "report": "External",
+   "recomputed_display": "External",
+   "status": "MATCH"
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_b executor threads that ran a document",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH",
+   "recomputed_raw": 32
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_b executing at once max",
+   "report": "26",
+   "recomputed_display": "26",
+   "status": "MATCH",
+   "recomputed_raw": 26
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_b executing at once p95",
+   "report": "23",
+   "recomputed_display": "23",
+   "status": "MATCH",
+   "recomputed_raw": 23
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_b admitted at once max",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH",
+   "recomputed_raw": 32
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_b admitted at once p95",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH",
+   "recomputed_raw": 32
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_b span docs/s",
+   "report": "2.9164",
+   "recomputed_display": "2.9164",
+   "status": "MATCH",
+   "recomputed_raw": 2.9164392966278188
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c32_b thread names",
+   "report": "External",
+   "recomputed_display": "External",
+   "status": "MATCH"
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_b executor threads that ran a document",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH",
+   "recomputed_raw": 32
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_b executing at once max",
+   "report": "27",
+   "recomputed_display": "27",
+   "status": "MATCH",
+   "recomputed_raw": 27
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_b executing at once p95",
+   "report": "23",
+   "recomputed_display": "23",
+   "status": "MATCH",
+   "recomputed_raw": 23
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_b admitted at once max",
+   "report": "64",
+   "recomputed_display": "64",
+   "status": "MATCH",
+   "recomputed_raw": 64
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_b admitted at once p95",
+   "report": "58",
+   "recomputed_display": "58",
+   "status": "MATCH",
+   "recomputed_raw": 58
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_b span docs/s",
+   "report": "2.9001",
+   "recomputed_display": "2.9001",
+   "status": "MATCH",
+   "recomputed_raw": 2.9000962716079792
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "h1f_c64_b thread names",
+   "report": "External",
+   "recomputed_display": "External",
+   "status": "MATCH"
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "C=64 vs C=32 span docs/s",
+   "report": "-0.24%",
+   "recomputed_display": "-0.24%",
+   "status": "MATCH",
+   "recomputed_raw": -0.24350989252727162
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "threshold",
+   "report": "0.82%",
+   "recomputed_display": "0.82%",
+   "status": "MATCH",
+   "recomputed_raw": 0.82,
+   "note": "max(0.82%, spread c32 0.38%, spread c64 0.26%)"
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "readability",
+   "report": "unreadable",
+   "recomputed_display": "unreadable",
+   "status": "MATCH"
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "H1 verdict",
+   "report": "HOLDS",
+   "recomputed_display": "HOLDS",
+   "status": "MATCH"
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "max_workers = min(32, cpu_count + 4) with 32 vCPUs visible",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH",
+   "recomputed_raw": 32,
+   "note": "os_cpu_count from env_probe in all H1 legs: [32]; the formula itself is a SOURCE claim"
+  },
+  {
+   "section": "H1 \u2014 per-process ceiling (executor width)",
+   "figure": "32 vCPUs (What binds next)",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_a span docs/s",
+   "report": "2.9105",
+   "recomputed_display": "2.9105",
+   "status": "MATCH",
+   "recomputed_raw": 2.9105034740790505
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_b span docs/s",
+   "report": "2.9182",
+   "recomputed_display": "2.9182",
+   "status": "MATCH",
+   "recomputed_raw": 2.918206514419077
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "debugger attached mean",
+   "report": "2.9144",
+   "recomputed_display": "2.9144",
+   "status": "MATCH",
+   "recomputed_raw": 2.914354994249064
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "debugger attached spread",
+   "report": "0.26%",
+   "recomputed_display": "0.26%",
+   "status": "MATCH",
+   "recomputed_raw": 0.26431372825984417
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_a CPU-s/doc",
+   "report": "5.5047",
+   "recomputed_display": "5.5047",
+   "status": "MATCH",
+   "recomputed_raw": 5.5047
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_b CPU-s/doc",
+   "report": "5.4869",
+   "recomputed_display": "5.4869",
+   "status": "MATCH",
+   "recomputed_raw": 5.4869
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_a span docs/s",
+   "report": "2.9230",
+   "recomputed_display": "2.9230",
+   "status": "MATCH",
+   "recomputed_raw": 2.9230489979725953
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_b span docs/s",
+   "report": "2.9448",
+   "recomputed_display": "2.9448",
+   "status": "MATCH",
+   "recomputed_raw": 2.944840422154414
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "noDebug launch mean",
+   "report": "2.9393",
+   "recomputed_display": "2.9339",
+   "status": "MISMATCH",
+   "recomputed_raw": 2.9339447100635048,
+   "note": "the report's 2.9393 is not the mean of its own legs (2.9230, 2.9448 -> 2.9339); digits transposed. The +0.67% delta is consistent with 2.9339, not with 2.9393 (2.9393/2.9144-1 = +0.85%)"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "noDebug launch spread",
+   "report": "0.74%",
+   "recomputed_display": "0.74%",
+   "status": "MATCH",
+   "recomputed_raw": 0.7427346571008567
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_a CPU-s/doc",
+   "report": "5.4754",
+   "recomputed_display": "5.4754",
+   "status": "MATCH",
+   "recomputed_raw": 5.4754
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_b CPU-s/doc",
+   "report": "5.4470",
+   "recomputed_display": "5.4470",
+   "status": "MATCH",
+   "recomputed_raw": 5.447
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "noDebug / default - 1",
+   "report": "+0.67%",
+   "recomputed_display": "+0.67%",
+   "status": "MATCH",
+   "recomputed_raw": 0.672180151460533
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "threshold",
+   "report": "0.82%",
+   "recomputed_display": "0.82%",
+   "status": "MATCH",
+   "recomputed_raw": 0.82
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "H7 verdict",
+   "report": "NOT SUPPORTED (unreadable)",
+   "recomputed_display": "NOT SUPPORTED (unreadable)",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "Output identity (null control)",
+   "report": "PASS",
+   "recomputed_display": "PASS",
+   "status": "MATCH",
+   "note": "pairs (docs ok in both, differing): [('h7f_dbg_a', 'h7f_nodbg_a', 382, 0), ('h7f_dbg_b', 'h7f_nodbg_b', 382, 0)]; the cross pairs and within-cell pairs are also identical"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_a task command line",
+   "report": "--debug_port present",
+   "recomputed_display": "--debug_port present",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_a tracer read-back (pre) gettrace",
+   "report": "None",
+   "recomputed_display": "None",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_a tracer read-back (pre) monitoring",
+   "report": "{'0': 'pydevd'}",
+   "recomputed_display": "{'0': 'pydevd'}",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_a tracer read-back (pre) debugpy loaded",
+   "report": "True",
+   "recomputed_display": "True",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_a tracer read-back (post) gettrace",
+   "report": "None",
+   "recomputed_display": "None",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_a tracer read-back (post) monitoring",
+   "report": "{'0': 'pydevd'}",
+   "recomputed_display": "{'0': 'pydevd'}",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_a tracer read-back (post) debugpy loaded",
+   "report": "True",
+   "recomputed_display": "True",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_b task command line",
+   "report": "--debug_port present",
+   "recomputed_display": "--debug_port present",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_b tracer read-back (pre) gettrace",
+   "report": "None",
+   "recomputed_display": "None",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_b tracer read-back (pre) monitoring",
+   "report": "{'0': 'pydevd'}",
+   "recomputed_display": "{'0': 'pydevd'}",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_b tracer read-back (pre) debugpy loaded",
+   "report": "True",
+   "recomputed_display": "True",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_b tracer read-back (post) gettrace",
+   "report": "None",
+   "recomputed_display": "None",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_b tracer read-back (post) monitoring",
+   "report": "{'0': 'pydevd'}",
+   "recomputed_display": "{'0': 'pydevd'}",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_dbg_b tracer read-back (post) debugpy loaded",
+   "report": "True",
+   "recomputed_display": "True",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_a task command line",
+   "report": "no --debug_port",
+   "recomputed_display": "no --debug_port",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_a tracer read-back (pre) gettrace",
+   "report": "None",
+   "recomputed_display": "None",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_a tracer read-back (pre) monitoring",
+   "report": "{}",
+   "recomputed_display": "{}",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_a tracer read-back (pre) debugpy loaded",
+   "report": "False",
+   "recomputed_display": "False",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_a tracer read-back (post) gettrace",
+   "report": "None",
+   "recomputed_display": "None",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_a tracer read-back (post) monitoring",
+   "report": "{}",
+   "recomputed_display": "{}",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_a tracer read-back (post) debugpy loaded",
+   "report": "False",
+   "recomputed_display": "False",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_b task command line",
+   "report": "no --debug_port",
+   "recomputed_display": "no --debug_port",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_b tracer read-back (pre) gettrace",
+   "report": "None",
+   "recomputed_display": "None",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_b tracer read-back (pre) monitoring",
+   "report": "{}",
+   "recomputed_display": "{}",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_b tracer read-back (pre) debugpy loaded",
+   "report": "False",
+   "recomputed_display": "False",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_b tracer read-back (post) gettrace",
+   "report": "None",
+   "recomputed_display": "None",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_b tracer read-back (post) monitoring",
+   "report": "{}",
+   "recomputed_display": "{}",
+   "status": "MATCH"
+  },
+  {
+   "section": "H7 \u2014 the debugger attached to every production task (preregistration_amendment_2.json)",
+   "figure": "h7f_nodbg_b tracer read-back (post) debugpy loaded",
+   "report": "False",
+   "recomputed_display": "False",
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts table rows H1 and H7",
+   "figure": "H1 executor threads at C=64",
+   "report": "32",
+   "recomputed_display": "32",
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts table rows H1 and H7",
+   "figure": "H1 executing at once max (c64_a)",
+   "report": "27",
+   "recomputed_display": "27",
+   "status": "MATCH",
+   "recomputed_raw": 27
+  },
+  {
+   "section": "Verdicts table rows H1 and H7",
+   "figure": "H1 executing at once max (c64_b)",
+   "report": "27",
+   "recomputed_display": "27",
+   "status": "MATCH",
+   "recomputed_raw": 27
+  },
+  {
+   "section": "Verdicts table rows H1 and H7",
+   "figure": "H1 C=64 vs C=32",
+   "report": "-0.24%",
+   "recomputed_display": "-0.24%",
+   "status": "MATCH",
+   "recomputed_raw": -0.24350989252727162
+  },
+  {
+   "section": "Verdicts table rows H1 and H7",
+   "figure": "H1 threshold",
+   "report": "0.82%",
+   "recomputed_display": "0.82%",
+   "status": "MATCH",
+   "recomputed_raw": 0.82
+  },
+  {
+   "section": "Verdicts table rows H1 and H7",
+   "figure": "H1 verdict",
+   "report": "HOLDS",
+   "recomputed_display": "HOLDS",
+   "status": "MATCH"
+  },
+  {
+   "section": "Verdicts table rows H1 and H7",
+   "figure": "H7 noDebug vs default",
+   "report": "+0.67%",
+   "recomputed_display": "+0.67%",
+   "status": "MATCH",
+   "recomputed_raw": 0.672180151460533
+  },
+  {
+   "section": "Verdicts table rows H1 and H7",
+   "figure": "H7 threshold",
+   "report": "0.82%",
+   "recomputed_display": "0.82%",
+   "status": "MATCH",
+   "recomputed_raw": 0.82
+  },
+  {
+   "section": "Verdicts table rows H1 and H7",
+   "figure": "H7 verdict",
+   "report": "NOT SUPPORTED (unreadable)",
+   "recomputed_display": "NOT SUPPORTED (unreadable)",
+   "status": "MATCH"
+  }
+ ]
+}
