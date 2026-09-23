@@ -1797,3 +1797,22 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   the figure as a cold-start cost.
 > - **A smoke that runs one item per worker measures start-up.** Size the smoke so each worker
 >   parses many documents, or put the tail documents after a warm-up batch.
+
+## 53. The tracer that could not stop, and the rule broken twice (added 2026-09-23)
+
+> P1-A's first tracer used bpftrace's count() and sum() aggregations at a raised key limit
+> (BPFTRACE_MAP_KEYS_MAX=4000000), so its time buckets would fit. Those aggregations are per-CPU
+> maps, and bpftrace preallocates every map to the key limit: several million keys times 32 CPUs,
+> for each of about a dozen maps. Both tooling tracers attached, then ignored SIGINT. One ran ten
+> minutes past its signal until it was killed by pid. The fix: plain hash maps updated by explicit
+> addition (each key is a thread id updated only in that thread's own context, so nothing races), a
+> bounded key limit, coarser GIL buckets (amendment 1, before any measured leg), and SIGKILL to the
+> tool itself when it outlives its stop wait. The same afternoon I ran `sudo -n true` inside a
+> one-shot `box.sh run` — exactly what entry 50 forbids — and that session hung and leaked.
+>
+> Rules:
+>
+> - **A tracer's memory is part of its design.** Before raising a key limit, count the maps and ask
+>   whether each is per-CPU. Prove on a tooling leg that the tracer stops on its signal.
+> - **Entry 50 applies to one-word checks too.** `sudo` goes through `launch`, even to test whether
+>   sudo works.

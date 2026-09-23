@@ -127,8 +127,36 @@ def pyspy_top(d: Path, leg: str, k: int = 10) -> Dict[str, Any]:
     return {"samples": tot, "top": [{"function": a, "share": b / tot} for a, b in c.most_common(k)]}
 
 
+def ns_to_host(d: Path, leg: str, fr: List[Dict[str, Any]], m: Dict[str, Dict[str, int]]) -> Dict[str, Any]:
+    """The stamps carry thread ids in the CONTAINER's pid namespace (threading.get_native_id() inside
+    it); bpftrace and the /proc sampler carry HOST ids. Ids are handed out in creation order in both
+    namespaces, so host = container + k, where k can only grow (by ids other host processes take
+    between thread creations). The N forward callers (N = distinct stamp tids) are the process's N
+    busiest GIL re-acquirers (every forward pass releases and re-takes the GIL at each torch op), so the
+    sorted callers are paired with those N host threads sorted by id — ACCEPTED only if the offsets never
+    decrease and drift by at most 50 in total; the offsets are reported."""
+    callers = sorted({r["tid"] for r in fr if r.get("tid") is not None})
+    rtn = {int(k): v for k, v in (m.get("@rt_n") or {}).items() if v > 0}
+    heavy = sorted(sorted(rtn, key=lambda h: -rtn[h])[:len(callers)])
+    if len(heavy) != len(callers):
+        return {"map": {}, "error": f"{len(heavy)} host Python threads for {len(callers)} callers"}
+    ks = [h - c for c, h in zip(callers, heavy)]
+    ok = all(b >= a for a, b in zip(ks, ks[1:])) and ks[-1] - ks[0] <= 50 and ks[0] >= 0
+    out = {"offsets": ks, "offset_min": min(ks), "offset_max": max(ks), "accepted": ok,
+           "gil_reacquisitions_mapped": sum(rtn[h] for h in heavy), "gil_reacquisitions_all": sum(rtn.values()),
+           "next_busiest_after_callers": sorted(rtn.values(), reverse=True)[len(callers)] if len(rtn) > len(callers) else None,
+           "least_busy_caller": min(rtn[h] for h in heavy)}
+    out["map"] = {str(c): h for c, h in zip(callers, heavy)} if ok else {}
+    if not ok:
+        out["error"] = "offsets decrease or drift beyond 50: mapping refused"
+    return out
+
+
 def on_leg(d: Path, leg: str, fr: List[Dict[str, Any]], window_s: Optional[float]) -> Dict[str, Any]:
     m = bpf(d, leg)
+    idmap = ns_to_host(d, leg, fr, m)
+    mp = {int(a): b for a, b in (idmap.get("map") or {}).items()}
+    fr = [dict(r, tid=mp.get(r["tid"])) for r in fr]
     callers = sorted({r["tid"] for r in fr if r.get("tid") is not None})
     on = {int(k): v for k, v in (m.get("@oncpu_ns") or {}).items()}
     rq = {int(k): v for k, v in (m.get("@runq_ns") or {}).items()}
@@ -139,7 +167,20 @@ def on_leg(d: Path, leg: str, fr: List[Dict[str, Any]], window_s: Optional[float
     names = thread_names(d, leg)
     busy = [t for t in workers if window_s and on.get(t, 0) / 1e9 >= 0.5 * window_s]
     rt = {int(k): v for k, v in (m.get("@rt_ns") or {}).items()}
-    return {"window_s": window_s,
+    # POST-HOC (not pre-registered; never used by a reading): threads by class. Callers = the mapped
+    # forward callers; native = threads that never re-took the GIL (the OMP worker pools live here);
+    # other Python = the rest. Per class: count, and on-CPU / run-queue / sleep seconds per frame.
+    rtn = {int(k2): v for k2, v in (m.get("@rt_n") or {}).items() if v > 0}
+    classes: Dict[str, List[int]] = {"callers": callers,
+                                     "native_busy": [t for t in on if t not in rtn and t not in callers and on[t] > 1e9],
+                                     "other_python": [t for t in rtn if t not in callers]}
+    posthoc = {cls: {"threads": len(ts), "oncpu_per_frame_s": sum(on.get(t, 0) for t in ts) / 1e9 / nfr,
+                     "runq_per_frame_s": sum(rq.get(t, 0) for t in ts) / 1e9 / nfr,
+                     "sleep_per_frame_s": sum(sl.get(t, 0) for t in ts) / 1e9 / nfr,
+                     "top": sorted(((t, names.get(t), round(on.get(t, 0) / 1e9, 1)) for t in ts), key=lambda x: -x[2])[:5]}
+               for cls, ts in classes.items()}
+    return {"window_s": window_s, "tid_map_container_to_host": idmap,
+            "posthoc_thread_classes": posthoc,
             "callers": callers, "omp_workers": [{"tid": t, "name": names.get(t), "oncpu_s": on.get(t, 0) / 1e9,
                                                  "runq_s": rq.get(t, 0) / 1e9, "sleep_s": sl.get(t, 0) / 1e9}
                                                 for t in workers],
