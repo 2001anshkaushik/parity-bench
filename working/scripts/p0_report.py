@@ -873,6 +873,14 @@ def main() -> int:
             f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())} from committed analysis files; every figure is "
             "computed from raw per-document / per-frame / per-parse records and rounded only here.", "",
             f"{DAG} on every RocketRide docs throughput figure: {CAVEAT}.", ""]
+    bv = load(c, "P0_BLIND_VERIFICATION.json")
+    if bv:
+        vs = (bv.get("verifiers") or {}).values()
+        head += [f"**Blind recomputation (P0_BLIND_VERIFICATION.json):** {bv.get('outcome')} — "
+                 f"{n(sum(v.get('figures_checked') or 0 for v in vs))} figures checked by {len(vs)} independent "
+                 f"verifiers from the raw files; planted figures caught {sum(1 for v in vs if v.get('plant_caught'))} "
+                 f"of {len(vs)}; other mismatches {sum(len(v.get('other_mismatches') or []) for v in vs)}. "
+                 "Unverifiable items are listed per verifier in that file.", ""]
     summ = A["summary"] or {}
     head += sec_verdicts(A, summ)
     head += sec_gates(F)
