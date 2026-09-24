@@ -1,0 +1,37 @@
+{
+ "gate": "G_smoke_A",
+ "decided_utc": "2026-09-24T16:44:22Z",
+ "rule": "FIRES iff mean(RR span docs/s, p2a_rr_a/b) >= 0.85 x mean(LI span docs/s, p2a_li_a/b)",
+ "threshold": 0.85,
+ "legs": {
+  "rr": [
+   "p2a_rr_a",
+   "p2a_rr_b"
+  ],
+  "li": [
+   "p2a_li_a",
+   "p2a_li_b"
+  ]
+ },
+ "rr_docs_per_s": [
+  2.6313513599475704,
+  2.5835487401514574
+ ],
+ "li_docs_per_s": [
+  3.0267821605366088,
+  3.2853823304594165
+ ],
+ "rr_mean": 2.607450050049514,
+ "li_mean": 3.1560822454980126,
+ "ratio_rr_over_li": 0.8261666988459841,
+ "spreads": {
+  "rr": 0.018333091287867722,
+  "li": 0.0819370820553512
+ },
+ "floors": {
+  "rr": 0.0082,
+  "li": 0.0987
+ },
+ "known_bias": "none of the eleven pathological PDFs is in the 384 slice; P1-B gained +12.6% on the 384 slice vs +128% on the full corpus, so this gate understates RocketRide (recorded; the gate stands as written)",
+ "outcome": "NOT FIRED"
+}

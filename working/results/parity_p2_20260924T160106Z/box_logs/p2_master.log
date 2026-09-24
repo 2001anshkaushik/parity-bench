@@ -1,0 +1,457 @@
+nohup: ignoring input
+p2_master.sh sha256: bef6cacbf1aade1cb21fc8fc2074619368a75e7cf596182aac542a72b349aded
+master start 2026-09-24T16:13:15Z head 260f0d03ddf1 boot dc407ed6-d6b2-4cde-9dc9-3b3a2608066d
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+rr:p2-pdfium 
+GATE BUDGET: SET (exit 0) 8 h from the first leg: deadline 2026-09-25T00:13:15Z (epoch 1790295195)
+p2_docs_chain.sh sha256: 17965413e12bbfa99b3a6945442fafe67840450848401807f8973fb33b186497
+boot_id dc407ed6-d6b2-4cde-9dc9-3b3a2608066d  stage a_smoke  head 260f0d03ddf1  deadline 1790295195
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+image rr:p2-pdfium 
+===== LEG p2a_rr_a (rr, slice_docs_n384_w25.json, BSZ_RR_IMAGE=rr:p1-tikafix BSZ_STAMP=1 BSZ_CONTINUOUS=32) 16:13:17Z =====
+batchsize_docs_run.sh sha256: 5bc40e2e4af05a00fc88fac37388690d077f6a2d39a52ff40c6ac338436eb91f
+worktree: /home/ssm-user/parity-bench-p2  branch: feat/parity-p2  head: 260f0d0  dirty: 1
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 260f0d03ddf1
+rr image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+started rr container 482c913faf9dda42fe1ded68ceb1a4896cbaa1c3e99bc8a153d6d2d07163411e
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:35d4b4774784…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p2a_rr_a — 384 documents, warm 25 ===
+  quiet box: host busy 1.025  arm idle 1.002  foreign 0.023 (max 2.0)  load1 0.75  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.6312  ok=382/384 (empty 2, hard 0)  span=145.18s  eff_cores=13.461  util=0.4207 of 32  engine/driver/host cores=13.461/0.039/13.588  spin=1.24  idle: count 16.72 / equiv 18.412 (net of spin 19.652)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_rr__20260924T161854Z__9242eb5c7abc.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_rr__20260924T161854Z__9242eb5c7abc.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/
+
+Total Objects: 12
+   Total Size: 1086089
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 482c913faf9dda42fe1ded68ceb1a4896cbaa1c3e99bc8a153d6d2d07163411e
+===== LEG p2a_rr_a rc=0 16:19:02Z =====
+{"gate": "G_memstat_p2a_rr_a", "decided_utc": "2026-09-24T16:19:02Z", "leg": "p2a_rr_a", "file": "memstat.jsonl", "exists": true, "rows": 316, "rule": "the first leg's memstat.jsonl has >= 1 row (register 55)", "outcome": "PASS"}
+===== LEG p2a_li_a (li, slice_docs_n384_w25.json, BSZ_LI_WORKERS=24 BSZ_CONTINUOUS=32) 16:19:03Z =====
+batchsize_docs_run.sh sha256: 5bc40e2e4af05a00fc88fac37388690d077f6a2d39a52ff40c6ac338436eb91f
+worktree: /home/ssm-user/parity-bench-p2  branch: feat/parity-p2  head: 260f0d0  dirty: 4
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 260f0d03ddf1
+started li container bb730fc0e3494351c8012eefb0847288c3ba3c8609585b20cd7f34072d8ba41a
+service answered after ~25s: {"status":"ok","service":"llamaindex","model_loaded":true,"worker_pid":26,"declared_workers":24,"warm_workers":24,"warm_count_valid":true,"warm_key":"1-17902667
+warm_workers=24/24
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:3d2f1f436a46…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=1  six vars={'OMP_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'VECLIB_MAXIMUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1', 'TORCH_NUM_THREADS': '1'}  workers read=27 agree=True
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== li refc32_p2a_li_a — 384 documents, warm 25 ===
+  quiet box: host busy 0.038  arm idle 0.038  foreign -0.0 (max 2.0)  load1 9.05  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=3.0265  ok=381/384 (empty 0, hard 0)  span=125.888s  eff_cores=12.46  util=0.3894 of 32  engine/driver/host cores=12.46/0.022/12.562  spin=0.041  idle: count 18.93 / equiv 19.438 (net of spin 19.479)
+
+RANKING (li): 
+export: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_li__20260924T162159Z__962951198240.json
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_li__20260924T162159Z__962951198240.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/
+
+Total Objects: 23
+   Total Size: 1904582
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/ ./run --recursive --profile <yours>
+DONE arm=li rc=0
+removing our container bb730fc0e3494351c8012eefb0847288c3ba3c8609585b20cd7f34072d8ba41a
+===== LEG p2a_li_a rc=0 16:22:05Z =====
+===== LEG p2a_rr_b (rr, slice_docs_n384_w25.json, BSZ_RR_IMAGE=rr:p1-tikafix BSZ_STAMP=1 BSZ_CONTINUOUS=32) 16:22:05Z =====
+batchsize_docs_run.sh sha256: 5bc40e2e4af05a00fc88fac37388690d077f6a2d39a52ff40c6ac338436eb91f
+worktree: /home/ssm-user/parity-bench-p2  branch: feat/parity-p2  head: 260f0d0  dirty: 6
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 260f0d03ddf1
+rr image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+started rr container b2a2b5408e5e580673a2f0b8acabadbc295a002c53de1b6f645af30ed0168034
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:35d4b4774784…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p2a_rr_b — 384 documents, warm 25 ===
+  quiet box: host busy 1.012  arm idle 1.003  foreign 0.01 (max 2.0)  load1 4.53  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.5834  ok=382/384 (empty 2, hard 0)  span=147.866s  eff_cores=13.384  util=0.4182 of 32  engine/driver/host cores=13.384/0.037/13.491  spin=1.238  idle: count 16.84 / equiv 18.509 (net of spin 19.747)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_rr__20260924T162557Z__16cdf85f0b26.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_rr__20260924T162557Z__16cdf85f0b26.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/
+
+Total Objects: 34
+   Total Size: 2980033
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container b2a2b5408e5e580673a2f0b8acabadbc295a002c53de1b6f645af30ed0168034
+===== LEG p2a_rr_b rc=0 16:26:05Z =====
+===== LEG p2a_li_b (li, slice_docs_n384_w25.json, BSZ_LI_WORKERS=24 BSZ_CONTINUOUS=32) 16:26:05Z =====
+batchsize_docs_run.sh sha256: 5bc40e2e4af05a00fc88fac37388690d077f6a2d39a52ff40c6ac338436eb91f
+worktree: /home/ssm-user/parity-bench-p2  branch: feat/parity-p2  head: 260f0d0  dirty: 8
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 260f0d03ddf1
+started li container a222907f6a0feddf52d39f30db89bc8caa2a570ad962ee67a577e6bca82c5ce1
+service answered after ~15s: {"status":"ok","service":"llamaindex","model_loaded":true,"worker_pid":20,"declared_workers":24,"warm_workers":10,"warm_count_valid":true,"warm_key":"1-17902671
+warm_workers=10/24
+warm_workers=24/24
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:3d2f1f436a46…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=1  six vars={'OMP_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'VECLIB_MAXIMUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1', 'TORCH_NUM_THREADS': '1'}  workers read=27 agree=True
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== li refc32_p2a_li_b — 384 documents, warm 25 ===
+  quiet box: host busy 0.043  arm idle 0.041  foreign 0.001 (max 2.0)  load1 6.82  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=3.285  ok=381/384 (empty 0, hard 0)  span=115.981s  eff_cores=13.785  util=0.4308 of 32  engine/driver/host cores=13.785/0.024/13.915  spin=0.041  idle: count 17.46 / equiv 18.085 (net of spin 18.126)
+
+RANKING (li): 
+export: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_li__20260924T162846Z__f18bf7fef59f.json
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_li__20260924T162846Z__f18bf7fef59f.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/
+
+Total Objects: 44
+   Total Size: 3783215
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/ ./run --recursive --profile <yours>
+DONE arm=li rc=0
+removing our container a222907f6a0feddf52d39f30db89bc8caa2a570ad962ee67a577e6bca82c5ce1
+===== LEG p2a_li_b rc=0 16:28:53Z =====
+===== LEG p2a_an_rr_a (rr, slice_docs_n96_w25.json, BSZ_RR_IMAGE=rr:p1-tikafix BSZ_STAMP=1 BSZ_CONTINUOUS=8) 16:28:53Z =====
+batchsize_docs_run.sh sha256: 5bc40e2e4af05a00fc88fac37388690d077f6a2d39a52ff40c6ac338436eb91f
+worktree: /home/ssm-user/parity-bench-p2  branch: feat/parity-p2  head: 260f0d0  dirty: 10
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 260f0d03ddf1
+rr image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+started rr container 020b9294e8029e39ee3cd1869f88e3597305a51a385439b9e2bde1a1604bb6f3
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:35d4b4774784…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice a4764c0dab96bc40  n=96  warm=25  manifest-verified
+
+=== rr refc8_p2a_an_rr_a — 96 documents, warm 25 ===
+  quiet box: host busy 1.01  arm idle 1.003  foreign 0.008 (max 2.0)  load1 5.16  other containers none  strays none
+  corpus prewarmed: 121 files in 0.02s
+  docs/s=1.7383  ok=96/96 (empty 0, hard 0)  span=55.227s  eff_cores=6.101  util=0.1906 of 32  engine/driver/host cores=6.101/0.015/6.147  spin=1.224  idle: count 23.09 / equiv 25.853 (net of spin 27.077)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_rr__20260924T163111Z__84eb76b3dbdb.json
+stamps copied out: 369 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_rr__20260924T163111Z__84eb76b3dbdb.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/
+
+Total Objects: 55
+   Total Size: 4101492
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 020b9294e8029e39ee3cd1869f88e3597305a51a385439b9e2bde1a1604bb6f3
+===== LEG p2a_an_rr_a rc=0 16:31:19Z =====
+===== LEG p2a_an_li_a (li, slice_docs_n96_w25.json, BSZ_LI_WORKERS=1 BSZ_CONTINUOUS=8) 16:31:19Z =====
+batchsize_docs_run.sh sha256: 5bc40e2e4af05a00fc88fac37388690d077f6a2d39a52ff40c6ac338436eb91f
+worktree: /home/ssm-user/parity-bench-p2  branch: feat/parity-p2  head: 260f0d0  dirty: 12
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 260f0d03ddf1
+started li container dd7a3675fbe197bf3bd8292aae30428f7c2d3a707ed89d379b5036dc49afcde9
+service answered after ~15s: {"status":"ok","service":"llamaindex","model_loaded":true,"worker_pid":1,"declared_workers":1,"warm_workers":1,"warm_count_valid":true,"warm_key":"0","torch_thr
+warm_workers=1/1
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:3d2f1f436a46…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=1  six vars={'OMP_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'VECLIB_MAXIMUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1', 'TORCH_NUM_THREADS': '1'}  workers read=2 agree=True
+  slice a4764c0dab96bc40  n=96  warm=25  manifest-verified
+
+=== li refc8_p2a_an_li_a — 96 documents, warm 25 ===
+  quiet box: host busy 0.005  arm idle 0.002  foreign 0.003 (max 2.0)  load1 3.42  other containers none  strays none
+  corpus prewarmed: 121 files in 0.02s
+  docs/s=0.4085  ok=95/96 (empty 0, hard 0)  span=232.584s  eff_cores=1.0  util=0.0312 of 32  engine/driver/host cores=1.0/0.002/1.006  spin=0.002  idle: count 30.98 / equiv 30.994 (net of spin 30.996)
+
+RANKING (li): 
+export: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_li__20260924T163626Z__ff00da895607.json
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_li__20260924T163626Z__ff00da895607.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/
+
+Total Objects: 65
+   Total Size: 4391804
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/ ./run --recursive --profile <yours>
+DONE arm=li rc=0
+removing our container dd7a3675fbe197bf3bd8292aae30428f7c2d3a707ed89d379b5036dc49afcde9
+===== LEG p2a_an_li_a rc=0 16:36:35Z =====
+===== LEG p2a_an_rr_b (rr, slice_docs_n96_w25.json, BSZ_RR_IMAGE=rr:p1-tikafix BSZ_STAMP=1 BSZ_CONTINUOUS=8) 16:36:35Z =====
+batchsize_docs_run.sh sha256: 5bc40e2e4af05a00fc88fac37388690d077f6a2d39a52ff40c6ac338436eb91f
+worktree: /home/ssm-user/parity-bench-p2  branch: feat/parity-p2  head: 260f0d0  dirty: 14
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 260f0d03ddf1
+rr image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+started rr container d569910fa7c7aafac872473c5d82b192ae1645a3610cf5c668641acb2a28d1bf
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:35d4b4774784…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice a4764c0dab96bc40  n=96  warm=25  manifest-verified
+
+=== rr refc8_p2a_an_rr_b — 96 documents, warm 25 ===
+  quiet box: host busy 1.013  arm idle 1.002  foreign 0.01 (max 2.0)  load1 1.06  other containers none  strays none
+  corpus prewarmed: 121 files in 0.02s
+  docs/s=1.7535  ok=96/96 (empty 0, hard 0)  span=54.749s  eff_cores=6.131  util=0.1916 of 32  engine/driver/host cores=6.131/0.014/6.213  spin=1.232  idle: count 22.67 / equiv 25.787 (net of spin 27.019)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_rr__20260924T163857Z__9a983f4770dc.json
+stamps copied out: 369 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_rr__20260924T163857Z__9a983f4770dc.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/
+
+Total Objects: 76
+   Total Size: 4709711
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container d569910fa7c7aafac872473c5d82b192ae1645a3610cf5c668641acb2a28d1bf
+===== LEG p2a_an_rr_b rc=0 16:39:05Z =====
+===== LEG p2a_an_li_b (li, slice_docs_n96_w25.json, BSZ_LI_WORKERS=1 BSZ_CONTINUOUS=8) 16:39:05Z =====
+batchsize_docs_run.sh sha256: 5bc40e2e4af05a00fc88fac37388690d077f6a2d39a52ff40c6ac338436eb91f
+worktree: /home/ssm-user/parity-bench-p2  branch: feat/parity-p2  head: 260f0d0  dirty: 16
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 260f0d03ddf1
+started li container 8fd07771fbf0463d44867dc0f95dbea8328c474d1195e3b74ed7da8bf1e8bc61
+service answered after ~15s: {"status":"ok","service":"llamaindex","model_loaded":true,"worker_pid":1,"declared_workers":1,"warm_workers":1,"warm_count_valid":true,"warm_key":"0","torch_thr
+warm_workers=1/1
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:3d2f1f436a46…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=1  six vars={'OMP_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1', 'OPENBLAS_NUM_THREADS': '1', 'VECLIB_MAXIMUM_THREADS': '1', 'NUMEXPR_NUM_THREADS': '1', 'TORCH_NUM_THREADS': '1'}  workers read=2 agree=True
+  slice a4764c0dab96bc40  n=96  warm=25  manifest-verified
+
+=== li refc8_p2a_an_li_b — 96 documents, warm 25 ===
+  quiet box: host busy 0.007  arm idle 0.002  foreign 0.006 (max 2.0)  load1 3.12  other containers none  strays none
+  corpus prewarmed: 121 files in 0.02s
+  docs/s=0.4079  ok=95/96 (empty 0, hard 0)  span=232.922s  eff_cores=1.0  util=0.0312 of 32  engine/driver/host cores=1.0/0.002/1.006  spin=0.002  idle: count 31.0 / equiv 30.994 (net of spin 30.996)
+
+RANKING (li): 
+export: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_li__20260924T164412Z__baf6d3967d2a.json
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p2/working/results/exp_batchsize_sweep_li__20260924T164412Z__baf6d3967d2a.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/
+
+Total Objects: 86
+   Total Size: 4999384
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/ ./run --recursive --profile <yours>
+DONE arm=li rc=0
+removing our container 8fd07771fbf0463d44867dc0f95dbea8328c474d1195e3b74ed7da8bf1e8bc61
+===== LEG p2a_an_li_b rc=0 16:44:20Z =====
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+image rr:p2-pdfium 
+CHAIN RESULTS: p2a_rr_a:rc=0 p2a_li_a:rc=0 p2a_rr_b:rc=0 p2a_li_b:rc=0 p2a_an_rr_a:rc=0 p2a_an_li_a:rc=0 p2a_an_rr_b:rc=0 p2a_an_li_b:rc=0
+CHAIN_DONE complete
+GATE A_SMOKE_CHAIN: complete (exit 0) p2_docs_chain a_smoke
+{"gate": "G_smoke_A", "decided_utc": "2026-09-24T16:44:22Z", "rule": "FIRES iff mean(RR span docs/s, p2a_rr_a/b) >= 0.85 x mean(LI span docs/s, p2a_li_a/b)", "threshold": 0.85, "legs": "\u2026", "rr_docs_per_s": "\u2026", "li_docs_per_s": "\u2026", "rr_mean": 2.607450050049514, "li_mean": 3.1560822454980126, "ratio_rr_over_li": 0.8261666988459841, "spreads": "\u2026", "floors": "\u2026", "known_bias": "none of the eleven pathological PDFs is in the 384 slice; P1-B gained +12.6% on the 384 slice vs +128% on the full corpus, so this gate understates RocketRide (recorded; the gate stands as written)", "outcome": "NOT FIRED"}
+GATE G_smoke_A: NOT FIRED (exit 1) gates/G_smoke_A.json
+p2_pdfium_build.sh sha256: b5f48e18e199715a9e3ed13683bb9bf211b239efaebccb4bd5d3b18eea8428b8
+images before:
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+engine site-packages: /opt/rocketride/engine/lib/python3.12/site-packages
+generated /tmp/tmp.deGIyqYjJG/nodes/pdfium_pure (hybrid=False, stub=None)
+generated /tmp/tmp.deGIyqYjJG/nodes/pdfium_hybrid (hybrid=True, stub=None)
+RECORD top-level entries:
+  pypdfium2
+  pypdfium2-5.13.0.dist-info
+  pypdfium2_cfg
+  pypdfium2_cli
+  pypdfium2_raw
+sha256:e75222cffc22ba23b77430e62f184efa9b74a1ff9d314651735d8c6d250c143f
+images after:
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+P2_PDFIUM_CHECK {"python": "3.12.13", "ok": false, "pypdfium2_cfg": "/opt/rocketride/engine/lib/python3.12/site-packages/pypdfium2_cfg/__init__.py", "pypdfium2": "5.13.0", "pages": 1, "chars": 10314, "error": "UnicodeDecodeError: 'ascii' codec can't decode byte 0xe2 in position 267: ordinal not in range(128)"}
+{
+ "built_utc": "2026-09-24T16:44:28Z",
+ "image": "rr:p2-pdfium",
+ "image_id": "sha256:e75222cffc22ba23b77430e62f184efa9b74a1ff9d314651735d8c6d250c143f",
+ "from": "rr:p1-tikafix",
+ "base_ids_before_and_after": [
+  "rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+  "rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b"
+ ],
+ "engine_site_packages": "/opt/rocketride/engine/lib/python3.12/site-packages",
+ "wheel_record_top_level": [
+  "pypdfium2",
+  "pypdfium2-5.13.0.dist-info",
+  "pypdfium2_cfg",
+  "pypdfium2_cli",
+  "pypdfium2_raw"
+ ],
+ "in_image_check": {
+  "python": "3.12.13",
+  "ok": false,
+  "pypdfium2_cfg": "/opt/rocketride/engine/lib/python3.12/site-packages/pypdfium2_cfg/__init__.py",
+  "pypdfium2": "5.13.0",
+  "pages": 1,
+  "chars": 10314,
+  "error": "UnicodeDecodeError: 'ascii' codec can't decode byte 0xe2 in position 267: ordinal not in range(128)"
+ },
+ "in_image_check_rc": 1,
+ "gate_G_build_C_pass": false
+}
+!! IN-IMAGE CHECK FAILED (G_build_C) — P2-C must not run on this image
+GATE G_build_C: FAIL — P2-C smoke and full NOT RUN (exit 8) p2_pdfium_build.sh; p2c_build.json
+p2_video_chain.sh sha256: 8cda05cb8362cd3f8f592fc41d5301c16b5ad6d4da5e8f6fe44fef283a656524
+boot_id dc407ed6-d6b2-4cde-9dc9-3b3a2608066d  stage b  head 260f0d03ddf1  manifest f5a2255cc5c9ad87
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+===== LEG p2b_rr_base_a (rr T=4 n=16 stamped=1 traced=0 comb=0) 16:44:30Z =====
+P1 stamps installed in rr:/opt/rocketride/engine/nodes/detect/IInstance.py (base md5 984d80e45e885b5ae21e987664850b4c; stamped md5 ceac2d61fda3d025b4d0adc82717dfec)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P1 stamps collected: 3526 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 593.2 GiB | frag avg-extent 34925.2 KiB, >=4MiB share 0.9928 | rr: spool du 2568 KiB/5 files, layer 2.95MB (virtual 9.67GB), cg anon 4.57 GiB, procs 2 rss 5.07 GiB
+[driver] export: /home/ssm-user/parity-bench-p2/working/results/parity_p2_20260924T160106Z/p2b_rr_base_a/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 2.439 frames/s (36.58x realtime), steady window undefined | SERVICE CPU 3.688 cores = 11.5% of 32 | IDLE BURDEN 1.232 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/p2b_rr_base_a/
+{"gate": "G_memstat_p2b_rr_base_a", "decided_utc": "2026-09-24T17:09:18Z", "leg": "p2b_rr_base_a", "file": "memstat.jsonl", "exists": true, "rows": 1469, "rule": "the first leg's memstat.jsonl has >= 1 row (register 55)", "outcome": "PASS"}
+{"gate": "G_manip_B_p2b_rr_base_a", "decided_utc": "2026-09-24T17:09:20Z", "leg": "p2b_rr_base_a", "cell": "base", "rule": "baseline must show the debugger loaded and no MALLOC_ARENA_MAX", "debugger": "\u2026", "debugger_loaded": true, "debugger_absent": false, "malloc_arena_max_in_detector_process": null, "detector_process_os_threads": 182, "outcome": "PASS"}
+===== LEG p2b_rr_comb_a (rr T=4 n=16 stamped=1 traced=0 comb=1) 17:09:23Z =====
+P1 stamps installed in rr:/opt/rocketride/engine/nodes/detect/IInstance.py (base md5 984d80e45e885b5ae21e987664850b4c; stamped md5 ceac2d61fda3d025b4d0adc82717dfec)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P1 stamps collected: 3526 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 593.2 GiB | frag avg-extent 34928.9 KiB, >=4MiB share 0.9928 | rr: spool du 2568 KiB/5 files, layer 2.95MB (virtual 9.67GB), cg anon 1.87 GiB, procs 2 rss 2.37 GiB
+[driver] export: /home/ssm-user/parity-bench-p2/working/results/parity_p2_20260924T160106Z/p2b_rr_comb_a/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 2.779 frames/s (41.68x realtime), steady window undefined | SERVICE CPU 3.815 cores = 11.9% of 32 | IDLE BURDEN 1.234 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/p2b_rr_comb_a/
+{"gate": "G_manip_B_p2b_rr_comb_a", "decided_utc": "2026-09-24T17:30:49Z", "leg": "p2b_rr_comb_a", "cell": "comb", "rule": "COMBINED must show no debugger (pydevd_loaded false, no sys.monitoring tool) and MALLOC_ARENA_MAX=2", "debugger": "\u2026", "debugger_loaded": false, "debugger_absent": true, "malloc_arena_max_in_detector_process": "2", "detector_process_os_threads": 179, "outcome": "PASS"}
+===== LEG p2b_li_a (li T=4 n=16 stamped=1 traced=0 comb=0) 17:30:53Z =====
+P1 stamps installed in li_bal_0:/app/li_video/pipeline.py (base md5 2eff189a5bdba7e353194f1b9ef8d1e7; stamped md5 95cc7927c49e666923626adbd5a36f99)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8802,
+ "wall_s": 15.0,
+ "attempts": 4,
+ "warm_workers": 1,
+ "pid": 1
+}
+P1 stamps collected: 5819 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 593.2 GiB | frag avg-extent 34951.9 KiB, >=4MiB share 0.9928 | li_bal_0: spool du 2932 KiB/5 files, layer 3.04MB (virtual 9.09GB), cg anon 1.32 GiB, procs 1 rss 1.77 GiB
+[driver] export: /home/ssm-user/parity-bench-p2/working/results/parity_p2_20260924T160106Z/p2b_li_a/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.316 frames/s (49.74x realtime), steady window undefined | SERVICE CPU 2.984 cores = 9.3% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/p2b_li_a/
+===== LEG p2b_rr_base_b (rr T=4 n=16 stamped=1 traced=0 comb=0) 18:01:31Z =====
+P1 stamps installed in rr:/opt/rocketride/engine/nodes/detect/IInstance.py (base md5 984d80e45e885b5ae21e987664850b4c; stamped md5 ceac2d61fda3d025b4d0adc82717dfec)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P1 stamps collected: 3526 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 593.2 GiB | frag avg-extent 34797.0 KiB, >=4MiB share 0.9928 | rr: spool du 2568 KiB/5 files, layer 2.95MB (virtual 9.67GB), cg anon 4.76 GiB, procs 2 rss 5.26 GiB
+[driver] export: /home/ssm-user/parity-bench-p2/working/results/parity_p2_20260924T160106Z/p2b_rr_base_b/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 2.565 frames/s (38.47x realtime), steady window undefined | SERVICE CPU 3.65 cores = 11.4% of 32 | IDLE BURDEN 1.232 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/p2b_rr_base_b/
+===== LEG p2b_rr_comb_b (rr T=4 n=16 stamped=1 traced=0 comb=1) 18:24:34Z =====
+P1 stamps installed in rr:/opt/rocketride/engine/nodes/detect/IInstance.py (base md5 984d80e45e885b5ae21e987664850b4c; stamped md5 ceac2d61fda3d025b4d0adc82717dfec)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P1 stamps collected: 3526 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 593.2 GiB | frag avg-extent 34794.8 KiB, >=4MiB share 0.9928 | rr: spool du 2568 KiB/5 files, layer 2.95MB (virtual 9.67GB), cg anon 1.88 GiB, procs 2 rss 2.38 GiB
+[driver] export: /home/ssm-user/parity-bench-p2/working/results/parity_p2_20260924T160106Z/p2b_rr_comb_b/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 2.653 frames/s (39.79x realtime), steady window undefined | SERVICE CPU 3.755 cores = 11.7% of 32 | IDLE BURDEN 1.238 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/p2b_rr_comb_b/
+===== LEG p2b_li_b (li T=4 n=16 stamped=1 traced=0 comb=0) 18:46:55Z =====
+P1 stamps installed in li_bal_0:/app/li_video/pipeline.py (base md5 2eff189a5bdba7e353194f1b9ef8d1e7; stamped md5 95cc7927c49e666923626adbd5a36f99)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8802,
+ "wall_s": 10.0,
+ "attempts": 3,
+ "warm_workers": 1,
+ "pid": 1
+}
+P1 stamps collected: 5819 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 593.1 GiB | frag avg-extent 34864.8 KiB, >=4MiB share 0.9927 | li_bal_0: spool du 2956 KiB/5 files, layer 3.06MB (virtual 9.09GB), cg anon 1.32 GiB, procs 1 rss 1.77 GiB
+[driver] export: /home/ssm-user/parity-bench-p2/working/results/parity_p2_20260924T160106Z/p2b_li_b/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.389 frames/s (50.83x realtime), steady window undefined | SERVICE CPU 3.021 cores = 9.4% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p2/parity_p2_20260924T160106Z/p2b_li_b/
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+CHAIN RESULTS: p2b_rr_base_a:rc=0 p2b_rr_comb_a:rc=0 p2b_li_a:rc=0 p2b_rr_base_b:rc=0 p2b_rr_comb_b:rc=0 p2b_li_b:rc=0
+CHAIN_DONE complete
+GATE B_CHAIN: complete (exit 0) p2_video_chain b
+GATE A_FULL: NOT RUN (G_smoke_A not fired) (exit 0) gates/G_smoke_A.json
+GATE C_FULL: NOT RUN (G_build_C failed) (exit 0) 
+GATE PROTECTED_IDS: UNCHANGED (exit 0) start: sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90 sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de  end: sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90 sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de 
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+rr:p2-pdfium sha256:e75222cffc22ba23b77430e62f184efa9b74a1ff9d314651735d8c6d250c143f
+CHAIN_DONE master complete 2026-09-24T19:16:55Z

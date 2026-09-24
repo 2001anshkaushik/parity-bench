@@ -1,0 +1,261 @@
+{
+ "pid": 1,
+ "t_wall": 1790275674.8149965,
+ "t_mono": 10114.865875675,
+ "forward_mode": {
+  "grad_enabled": false,
+  "inference_mode": false
+ },
+ "torch": {
+  "version": "2.10.0+cu128",
+  "num_threads": 4,
+  "num_interop_threads": 16,
+  "parallel_info": "ATen/Parallel:\n\tat::get_num_threads() : 4\n\tat::get_num_interop_threads() : 16\nOpenMP 201511 (a.k.a. OpenMP 4.5)\n\tomp_get_max_threads() : 4\nIntel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n\tmkl_get_max_threads() : 4\nIntel(R) MKL-DNN v3.7.1 (Git Hash 8d263e693366ef8db40acc569cc7d8edf644556d)\nstd::thread::hardware_concurrency() : 32\nEnvironment variables:\n\tOMP_NUM_THREADS : 4\n\tMKL_NUM_THREADS : 4\nATen parallel backend: OpenMP\n",
+  "cpu_capability": "AVX512",
+  "mkldnn_enabled": true,
+  "default_dtype": "torch.float32",
+  "float32_matmul_precision": "high"
+ },
+ "env": {
+  "OPENBLAS_NUM_THREADS": "4",
+  "VECLIB_MAXIMUM_THREADS": "4",
+  "TORCH_NUM_THREADS": "4",
+  "NUMEXPR_NUM_THREADS": "4",
+  "MALLOC_ARENA_MAX": "2",
+  "MKL_NUM_THREADS": "4",
+  "OMP_NUM_THREADS": "4",
+  "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+  "KMP_DUPLICATE_LIB_OK": "True",
+  "KMP_INIT_AT_FORK": "FALSE"
+ },
+ "process_affinity": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30,
+  31
+ ],
+ "os_threads": [
+  [
+   1,
+   "python",
+   "0-31"
+  ],
+  [
+   9,
+   "python",
+   "0-31"
+  ],
+  [
+   10,
+   "python",
+   "0-31"
+  ],
+  [
+   11,
+   "python",
+   "0-31"
+  ],
+  [
+   12,
+   "python",
+   "0-31"
+  ],
+  [
+   13,
+   "python",
+   "0-31"
+  ],
+  [
+   14,
+   "python",
+   "0-31"
+  ],
+  [
+   15,
+   "python",
+   "0-31"
+  ],
+  [
+   16,
+   "python",
+   "0-31"
+  ],
+  [
+   17,
+   "python",
+   "0-31"
+  ],
+  [
+   18,
+   "python",
+   "0-31"
+  ],
+  [
+   19,
+   "python",
+   "0-31"
+  ],
+  [
+   20,
+   "python",
+   "0-31"
+  ],
+  [
+   21,
+   "python",
+   "0-31"
+  ],
+  [
+   22,
+   "python",
+   "0-31"
+  ],
+  [
+   57,
+   "python",
+   "0-31"
+  ],
+  [
+   142,
+   "python",
+   "0-31"
+  ],
+  [
+   144,
+   "python",
+   "0-31"
+  ],
+  [
+   312,
+   "python",
+   "0-31"
+  ],
+  [
+   397,
+   "python",
+   "0-31"
+  ],
+  [
+   482,
+   "python",
+   "0-31"
+  ],
+  [
+   567,
+   "python",
+   "0-31"
+  ],
+  [
+   602,
+   "python",
+   "0-31"
+  ],
+  [
+   605,
+   "python",
+   "0-31"
+  ],
+  [
+   607,
+   "python",
+   "0-31"
+  ],
+  [
+   615,
+   "python",
+   "0-31"
+  ],
+  [
+   623,
+   "python",
+   "0-31"
+  ],
+  [
+   624,
+   "python",
+   "0-31"
+  ],
+  [
+   628,
+   "python",
+   "0-31"
+  ],
+  [
+   1247,
+   "python",
+   "0-31"
+  ],
+  [
+   1248,
+   "python",
+   "0-31"
+  ],
+  [
+   1417,
+   "python",
+   "0-31"
+  ],
+  [
+   1418,
+   "python",
+   "0-31"
+  ],
+  [
+   1419,
+   "python",
+   "0-31"
+  ]
+ ],
+ "switch_interval_s": 0.005,
+ "monitoring_tools": {},
+ "gettrace": "None",
+ "getprofile": "None",
+ "python_threads": [
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "AnyIO worker thread",
+  "MainThread",
+  "tqdm_monitor"
+ ]
+}

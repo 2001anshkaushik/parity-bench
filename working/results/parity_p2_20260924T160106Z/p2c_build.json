@@ -1,0 +1,30 @@
+{
+ "built_utc": "2026-09-24T16:44:28Z",
+ "image": "rr:p2-pdfium",
+ "image_id": "sha256:e75222cffc22ba23b77430e62f184efa9b74a1ff9d314651735d8c6d250c143f",
+ "from": "rr:p1-tikafix",
+ "base_ids_before_and_after": [
+  "rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+  "rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b"
+ ],
+ "engine_site_packages": "/opt/rocketride/engine/lib/python3.12/site-packages",
+ "wheel_record_top_level": [
+  "pypdfium2",
+  "pypdfium2-5.13.0.dist-info",
+  "pypdfium2_cfg",
+  "pypdfium2_cli",
+  "pypdfium2_raw"
+ ],
+ "in_image_check": {
+  "python": "3.12.13",
+  "ok": false,
+  "pypdfium2_cfg": "/opt/rocketride/engine/lib/python3.12/site-packages/pypdfium2_cfg/__init__.py",
+  "pypdfium2": "5.13.0",
+  "pages": 1,
+  "chars": 10314,
+  "error": "UnicodeDecodeError: 'ascii' codec can't decode byte 0xe2 in position 267: ordinal not in range(128)"
+ },
+ "in_image_check_rc": 1,
+ "gate_G_build_C_pass": false
+}

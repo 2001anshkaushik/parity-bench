@@ -1,0 +1,71 @@
+{
+ "master_complete_utc": "2026-09-24T19:16:55Z",
+ "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+ "outcome": "complete",
+ "protected_ids_start": [
+  "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+ ],
+ "protected_ids_end": [
+  "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+ ],
+ "gates": [
+  {
+   "utc": "2026-09-24T16:13:15Z",
+   "gate": "BUDGET",
+   "status": "SET",
+   "exit_code": "0",
+   "detail": "8 h from the first leg: deadline 2026-09-25T00:13:15Z (epoch 1790295195)"
+  },
+  {
+   "utc": "2026-09-24T16:44:21Z",
+   "gate": "A_SMOKE_CHAIN",
+   "status": "complete",
+   "exit_code": "0",
+   "detail": "p2_docs_chain a_smoke"
+  },
+  {
+   "utc": "2026-09-24T16:44:23Z",
+   "gate": "G_smoke_A",
+   "status": "NOT FIRED",
+   "exit_code": "1",
+   "detail": "gates/G_smoke_A.json"
+  },
+  {
+   "utc": "2026-09-24T16:44:29Z",
+   "gate": "G_build_C",
+   "status": "FAIL \u2014 P2-C smoke and full NOT RUN",
+   "exit_code": "8",
+   "detail": "p2_pdfium_build.sh; p2c_build.json"
+  },
+  {
+   "utc": "2026-09-24T19:16:51Z",
+   "gate": "B_CHAIN",
+   "status": "complete",
+   "exit_code": "0",
+   "detail": "p2_video_chain b"
+  },
+  {
+   "utc": "2026-09-24T19:16:52Z",
+   "gate": "A_FULL",
+   "status": "NOT RUN (G_smoke_A not fired)",
+   "exit_code": "0",
+   "detail": "gates/G_smoke_A.json"
+  },
+  {
+   "utc": "2026-09-24T19:16:53Z",
+   "gate": "C_FULL",
+   "status": "NOT RUN (G_build_C failed)",
+   "exit_code": "0",
+   "detail": ""
+  },
+  {
+   "utc": "2026-09-24T19:16:54Z",
+   "gate": "PROTECTED_IDS",
+   "status": "UNCHANGED",
+   "exit_code": "0",
+   "detail": "start: sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90 sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de  end: sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90 sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de "
+  }
+ ]
+}

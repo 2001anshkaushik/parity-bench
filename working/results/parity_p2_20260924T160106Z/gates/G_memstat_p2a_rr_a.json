@@ -1,0 +1,10 @@
+{
+ "gate": "G_memstat_p2a_rr_a",
+ "decided_utc": "2026-09-24T16:19:02Z",
+ "leg": "p2a_rr_a",
+ "file": "memstat.jsonl",
+ "exists": true,
+ "rows": 316,
+ "rule": "the first leg's memstat.jsonl has >= 1 row (register 55)",
+ "outcome": "PASS"
+}

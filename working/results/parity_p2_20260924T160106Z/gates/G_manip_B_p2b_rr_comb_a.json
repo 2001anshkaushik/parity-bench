@@ -1,0 +1,22 @@
+{
+ "gate": "G_manip_B_p2b_rr_comb_a",
+ "decided_utc": "2026-09-24T17:30:49Z",
+ "leg": "p2b_rr_comb_a",
+ "cell": "comb",
+ "rule": "COMBINED must show no debugger (pydevd_loaded false, no sys.monitoring tool) and MALLOC_ARENA_MAX=2",
+ "debugger": {
+  "env_probe_pydevd_loaded": [
+   false
+  ],
+  "env_probe_sys_monitoring_tools": [
+   {}
+  ],
+  "readback_monitoring_tools": {},
+  "readback_gettrace": "None"
+ },
+ "debugger_loaded": false,
+ "debugger_absent": true,
+ "malloc_arena_max_in_detector_process": "2",
+ "detector_process_os_threads": 179,
+ "outcome": "PASS"
+}

@@ -1,0 +1,26 @@
+{
+ "gate": "G_manip_B_p2b_rr_base_a",
+ "decided_utc": "2026-09-24T17:09:20Z",
+ "leg": "p2b_rr_base_a",
+ "cell": "base",
+ "rule": "baseline must show the debugger loaded and no MALLOC_ARENA_MAX",
+ "debugger": {
+  "env_probe_pydevd_loaded": [
+   true
+  ],
+  "env_probe_sys_monitoring_tools": [
+   {
+    "0": "pydevd"
+   }
+  ],
+  "readback_monitoring_tools": {
+   "0": "pydevd"
+  },
+  "readback_gettrace": "None"
+ },
+ "debugger_loaded": true,
+ "debugger_absent": false,
+ "malloc_arena_max_in_detector_process": null,
+ "detector_process_os_threads": 182,
+ "outcome": "PASS"
+}

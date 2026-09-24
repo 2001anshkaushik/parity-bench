@@ -1,0 +1,3 @@
+{"utc": "2026-09-24T16:13:15Z", "gate": "BUDGET", "status": "SET", "exit_code": "0", "detail": "8 h from the first leg: deadline 2026-09-25T00:13:15Z (epoch 1790295195)"}
+{"utc": "2026-09-24T16:44:21Z", "gate": "A_SMOKE_CHAIN", "status": "complete", "exit_code": "0", "detail": "p2_docs_chain a_smoke"}
+{"utc": "2026-09-24T16:44:23Z", "gate": "G_smoke_A", "status": "NOT FIRED", "exit_code": "1", "detail": "gates/G_smoke_A.json"}

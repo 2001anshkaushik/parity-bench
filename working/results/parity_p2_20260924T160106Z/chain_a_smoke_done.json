@@ -1,0 +1,21 @@
+{
+ "stage_complete_utc": "2026-09-24T16:44:20Z",
+ "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+ "outcome": "complete",
+ "legs": [
+  "p2a_rr_a:rc=0",
+  "p2a_li_a:rc=0",
+  "p2a_rr_b:rc=0",
+  "p2a_li_b:rc=0",
+  "p2a_an_rr_a:rc=0",
+  "p2a_an_li_a:rc=0",
+  "p2a_an_rr_b:rc=0",
+  "p2a_an_li_b:rc=0"
+ ],
+ "image_ids_at_end": {
+  "rr:patched": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+  "rr:p1-tikafix": "sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b",
+  "rr:p2-pdfium": ""
+ }
+}
