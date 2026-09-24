@@ -1,0 +1,9 @@
+{
+ "label": "P2 pre-registration AMENDMENT 1 \u2014 written 16:25Z, BEFORE any P2-B leg (the master was on P2-A smoke leg 1; P2-B runs third); corrects a definition's wording to the function it names; no threshold or rule changes",
+ "what": "P2_B_video_configuration_suspects_untraced.metrics.PRIMARY",
+ "as_written": "frames/s = total frames / (last done - first admit) over the measured videos (p0_analyse_video.load; the P0 V1 / P1-D definition)",
+ "problem": "the words describe the RECORDS span, but the function named (p0_analyse_video.load, field frames_per_s) and the P0 V1 / P1-D / P1-A E2 definition is the export's total_frames / total_span_s (the driver's leg wall); the records' admit->done rate is that function's records_frames_per_s, reported beside, never substituted",
+ "corrected": "PRIMARY frames/s = the export's throughput.total_frames / throughput.total_span_s (p0_analyse_video.load frames_per_s), exactly as P0 V1, P1-D and P1-A E2 computed it; records_frames_per_s is reported beside as context",
+ "also_clarified": "SECONDARY F: the measured frames are the last N frame stamps by wall time with N = the records' frame count (p1_analyse_e2.measured_frames(d, load(d)['frames'])); load() reports frames_match_export, and a mismatch is reported, not corrected",
+ "unchanged": "every threshold, gate and reading rule of the pre-registration"
+}
