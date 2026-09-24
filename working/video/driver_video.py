@@ -441,7 +441,10 @@ class RRArm:
                 kwargs: Dict[str, Any] = dict(filepath=str(path), ttl=0)
                 if self.posture.threads is not None:
                     kwargs['threads'] = self.posture.threads
-                started = await self.client.use(**kwargs)
+                if P2_NODEBUG:
+                    started = await _use_nodebug(self.client, kwargs)
+                else:
+                    started = await self.client.use(**kwargs)
                 self.tokens.append(started['token'])
                 self.project_ids.append(project_id)
             sdk_identity.assert_unique_project_ids(
@@ -648,6 +651,27 @@ class LIArm:
 # and again after the leg. Same assertions, same thread-pin gate, same place in
 # the export; plus env_probe schema 3's instance accounting (D0).
 P0_ONTOKEN = os.environ.get('P0_ONTOKEN', '') not in ('', '0')
+
+# P2-B (2026-09-24, preregistration.json P2_B): launch the task WITHOUT the debugger — the P0 H7
+# method, exactly as the docs driver does it (exp_batchsize_sweep.py BSZ_NODEBUG): the engine attaches
+# debugpy to every task process unless the execute request carries noDebug (task_engine.py:296,
+# 1494-1507); SDK use() has no such parameter, so this adds that ONE field to the execute call use()
+# itself builds and sends, for that call only. OFF unless P2_NODEBUG=1; recorded in the export.
+P2_NODEBUG = os.environ.get('P2_NODEBUG', '') not in ('', '0')
+
+
+async def _use_nodebug(client, kwargs: Dict[str, Any]) -> Dict[str, Any]:
+    orig_call = client.call
+
+    async def call_nodebug(method, **a):
+        if method == 'execute':
+            a['noDebug'] = True
+        return await orig_call(method, **a)
+    client.call = call_nodebug
+    try:
+        return await client.use(**kwargs)
+    finally:
+        client.call = orig_call
 
 
 def generate_task_pipe(tag: str) -> tuple[Path, str]:
@@ -2708,6 +2732,7 @@ async def amain() -> int:
             'task_census': pf.get('task_census'),
             'p0': pf.get('p0'),
             'p1_sync': p1_sync_meta or None,
+            'p2_nodebug_launch': P2_NODEBUG,
             'network_mode': pf.get('network_mode'),
             'image': image_provenance(svc_container, args.image_lineage),
             'container_lifetime': (json.loads(args.container_lifetime)

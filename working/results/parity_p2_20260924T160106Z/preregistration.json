@@ -1,0 +1,140 @@
+{
+ "label": "P2 pre-registration — written before the first P2 leg; every hypothesis, verdict rule and SMOKE-GATE THRESHOLD below is fixed before data. Nothing here is adjusted after a smoke result; a known bias is recorded, never corrected after the fact.",
+ "written_utc": "2026-09-24T16:15Z (see the commit time)",
+ "branch": "feat/parity-p2, cut from feat/parity-p1 at d367c99e082c (the P1 deliverable), confirmed against origin (ls-remote d367c99e082c038e082643231c5552e045d43f77); autoland self-test on the new branch: 71 pass, 0 fail",
+ "step0": {
+  "sso": "valid at 15:52Z (identity read back; role credentials refresh to 23:16Z; the SSO session was approved 15:16Z and has lasted ~15.5 h before) -> not expired and not within 2 h -> no login",
+  "cloudtrail_stop_0818": "READ-ONLY lookup of the StopInstances event for i-0775f33f3dc16f6af around 2026-09-24 08:18Z: cloudtrail:LookupEvents and cloudtrail:DescribeTrails are DENIED to the BenchmarkBoxOperator role (AccessDeniedException), and ec2:DescribeTags is denied too. What the role CAN read: the SSM session history shows NO session on the box between 23:31:39Z (2026-09-23) and 15:18:56Z (2026-09-24), so the 08:18:37Z stop was not issued from inside the OS by any SSM session; the P1 chain record read 'User initiated (2026-09-24 08:18:37 GMT)', which is EC2's wording for an API/console StopInstances (an OS shutdown reads Client.InstanceInitiatedShutdown). THE PRINCIPAL IS NOT READABLE with this role. P1's progress log and report attributed the stop to 'the operator' without evidence; that attribution is withdrawn here (the P1 files are landed and are not edited). Nothing was changed."
+ },
+ "session": {
+  "box_boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d (the P2 box session, started 15:5xZ 2026-09-24; every P2 comparison is interleaved ABAB inside it; banked P0/P1/Stage-4 figures are context and cross-session evidence only)",
+  "protected_images_read_back_at_start": {
+   "rr:patched": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+   "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+  },
+  "images": "new tags only: rr:p2-pdfium (P2-C) is the only image P2 builds. rr:patched and rr:patched-video are never modified, retagged or removed; their IDs are read back before and after the build and at every chain start and end. rr:p1-tikafix (sha256:35d4b477…, P1-B) and li:video / ws1-llamaindex:x86_64 are used as built.",
+  "per_leg": "steal (/proc/stat at open and close), CPU model, MHz, boot id (the docs driver's P0 session block; the video chain's own files), the percore sampler, and the 1 Hz memory.stat sampler (working/harness/memstat_sampler.py) on the service container, started AFTER the run directory exists; the master verifies the FIRST leg's memstat.jsonl is non-empty and stops everything if it is not (register 55). The memory figure is the SAMPLED peak inside the leg's window.",
+  "D0": "every cell reads back its instances. RocketRide: one task process and one loaded instance per model (P0_ONTOKEN on-token env_probe, pre and post the window) — a violation stops the chain and the master. LlamaIndex: the runner reads warm_workers back and refuses unless it equals the declared worker count (24 in P2-A (1) and the P2-A full run, 1 in the anchor (2)); the container's processes are censused by the driver. The mandate constrains RocketRide; LlamaIndex at 24 workers is the comparator P2-A names, LlamaIndex at one worker / one instance is the single-instance parity target.",
+  "rulings": "A (32 vCPU unconstrained) and C (one workload at a time)",
+  "retries": "a leg that did not complete (non-zero rc without every row recorded) is retried at most twice, then recorded FAILED; a docs leg whose driver verdict is DEGRADED with every row recorded (a document lost to its timeout) is a RESULT and is NOT retried (register 55); the analysis names the lost documents",
+  "launch": "every chain runs detached (box.sh launch); the laptop polls S3 and the log; nothing waits in a session",
+  "progress_log": "PROGRESS_LOG_<n>.md files in this campaign directory, a NEW file per landing; a landed file is never appended to",
+  "correctness_first": "on every changed cell, correctness is decided before any speed figure is reported",
+  "floors": {
+   "rr_docs": 0.0082,
+   "li_docs": 0.0987,
+   "video_frames_per_s": 0.0082,
+   "rule": "an ABAB comparison is readable iff |delta| > max(floor, the spread of each pair); a one-run-each comparison is readable iff |delta| > the floor; spread = |a-b|/mean(a,b)"
+  },
+  "instrumentation": "RocketRide docs legs carry the stamp_probe PROFILE stamps (P0 D1: overhead unreadable, +0.15% vs 0.82%; if anything it costs RocketRide) — the P1-B evidence (5.34 docs/s) was measured stamped; LlamaIndex docs legs run the image's own service (untimed), as Stage 4's 5.10 docs/s did. Video legs carry the P1 stamped detect copies on both arms (as P1-A's untraced legs did) and NO tracer.",
+  "mandate": "ONE engine process, ONE pipeline (one token), ONE instance per model; threads unrestricted; anything needing more is OUT OF BOUNDS"
+ },
+ "hard_dependency_gates": {
+  "rule": "register 55 / P1 lesson 54: any failed build, in-image check or correctness gate STOPS every stage that depends on that image or result; independent stages continue. The master (working/scripts/p2_master.sh) checks each gate's exit status explicitly and records it, one JSON line per gate, in master_gates.jsonl (uploaded after every gate).",
+  "gates": {
+   "G_memstat": "after the first leg: its memstat.jsonl exists and has >= 1 row -> else the master STOPS (every later leg depends on the sampler)",
+   "G_mandate": "any chain exit 9 (a D0 violation) -> the master STOPS",
+   "G_build_C": "p2_pdfium_build.sh exit 0 (built, base and protected ids unchanged, in-image import-and-parse check passed) -> else P2-C smoke and P2-C full are NOT RUN (reason recorded)",
+   "G_node_C": "after the first HYBRID and the first PURE leg: the prototype node's own counters (docs, text, fallback, errors, last_error) show docs >= 1 and text >= 1 for that variant -> else P2-C stops (the prototype did not run; P1's failure mode)",
+   "G_smoke_A": "P2-A smoke gate (below) -> fired queues the P2-A full run; not fired skips only that full run",
+   "G_smoke_C_<variant>": "P2-C smoke gate per variant (below) -> fired queues that variant's full run",
+   "G_manip_B": "after the first RR baseline and the first RR COMBINED leg: the in-process read-back shows the manipulation — baseline: debugger loaded (env_probe d0 trace pydevd_loaded true or sys.monitoring tool 'pydevd') and no MALLOC_ARENA_MAX in the task process; COMBINED: debugger NOT loaded (pydevd_loaded false and no sys.monitoring tool) AND MALLOC_ARENA_MAX=2 in the detector process's environment (p1_readback.json env) -> else P2-B stops (remaining legs NOT RUN; P2-B UNREADABLE: the cells were not the cells described)"
+  }
+ },
+ "smoke_gate_protocol": "every experiment with a full-corpus form runs its smoke stage first; its numeric threshold is fixed HERE; a fired gate queues its full run automatically; a gate that does not fire skips only that full run, records the threshold and the measured value, and the chain continues",
+ "budget_and_order": {
+  "budget": "8 hours from the start of the first leg (the master records P2_DEADLINE_EPOCH = start + 28,800 s in master_gates.jsonl before leg 1). Before every leg the chains check it: a leg in flight finishes; a leg not yet started is recorded NOT_RUN_budget; then the report is written and the box stopped",
+  "order": [
+   "1 P2-A smoke (384 ABAB + 96 anchor)",
+   "2 P2-C build + smoke (11 stragglers + 384 slice)",
+   "3 P2-B video (no full-run form)",
+   "4 P2-A full run, only if G_smoke_A fired",
+   "5 P2-C full run(s), only for variants whose gate fired"
+  ],
+  "laptop": "P2-D runs on the laptop from source while the box measures (no box time)"
+ },
+ "P2_A_docs_headline": {
+  "hypothesis": "with the P1-B wrapper fix, ONE RocketRide token approaches LlamaIndex's 24-worker optimum on docs/s",
+  "evidence_before": "CROSS-SESSION, therefore HYPOTHESIS only: rr:p1-tikafix full corpus 5.34 docs/s (P1-B, p1b_fix_full) vs LlamaIndex 24 workers C=32 5.10 docs/s (Stage 4)",
+  "smoke": {
+   "(1)": "the 384 slice (working/results/batchsize_smoke_20260920T113000Z/slice_docs_n384_w25.json; 384 measured + 25 warm-up), ABAB two runs each, in this order: p2a_rr_a (rr:p1-tikafix, ONE token, C=32 continuous), p2a_li_a (LlamaIndex 24 workers, C=32 continuous), p2a_rr_b, p2a_li_b",
+   "(2)": "per-unit anchor, the 96 slice (working/results/batchsize_main_20260920T160920Z/slice_docs_n96_w25.json), ABAB two runs each: p2a_an_rr_a (rr:p1-tikafix one token, C=8), p2a_an_li_a (LlamaIndex ONE worker, C=8), p2a_an_rr_b, p2a_an_li_b. No full-run form; always runs; reported as a ratio beside max(9.87%, its four spreads), no gate"
+  },
+  "metric": "span docs/s = documents answered ok / (max completion - min submit) over the MEASURED rows of the leg (warm-up excluded) — p0_analyse_docs.span_raw, the P0/P1 definition, on both arms",
+  "SMOKE_GATE_P2_A": {
+   "threshold": 0.85,
+   "rule": "FIRES iff mean(RR span docs/s over p2a_rr_a, p2a_rr_b) >= 0.85 x mean(LI span docs/s over p2a_li_a, p2a_li_b)",
+   "reported_beside": "the ratio, both arms' noise floors (RR 0.82%, LI 9.87%) and the two within-session replicate spreads"
+  },
+  "KNOWN_BIAS": "none of the eleven pathological PDFs is in the 384 slice, and P1-B gained +12.6% on the 384 slice vs +128% on the full corpus, so this gate UNDERSTATES RocketRide. The gate stands as written.",
+  "full_run": {
+   "design": "only if the gate fired: ONE full 9,975 run each (slice_docs_n9975_w25.json; 9,975 measured + 25 warm-up), same two arms, same session, RR first: p2a_rr_full (rr:p1-tikafix, one token, C=32, stamped, chunk texts captured — P2-C's full-scale comparator), p2a_li_full (LlamaIndex 24 workers, C=32)",
+   "report": "span docs/s; the excluded-straggler view (the same over the documents that are not the eleven); CPU-s/doc; utilisation (engine/service container cores over the window, and host); idle cores (32 - host); idle spin (the driver's measured spin, never added back); the SAMPLED memory peak; lost documents (rows not ok, named); the empty-document set difference both ways (a document is empty on an arm if it is not ok or returns zero chunks; named)",
+   "verdict": "delta = RR span docs/s / LI span docs/s - 1 (one run each; readability bar = the larger arm floor, 9.87%). ONE TOKEN EXCEEDS the 24-worker optimum iff delta > +9.87%; MATCHES it within noise iff |delta| <= 9.87%; FALLS SHORT iff delta < -9.87%. 'Matches at full scale' is stated YES iff delta >= -9.87%, else NO — said plainly in the report"
+  },
+  "if_not_fired": "the full run is NOT RUN (gate not fired); the report states the measured ratio against 0.85 and the recorded bias"
+ },
+ "P2_C_parser_rerun": {
+  "build": "rr:p2-pdfium FROM rr:p1-tikafix (a NEW tag; rr:p1-pdfium from P1 is left as it is). pypdfium2 5.13.0 is installed from ~/p0venv (the wheel H6 used; no download) by its dist-info RECORD — every file the wheel installed, including the top-level pypdfium2_cfg module whose absence broke P1 — plus the prototype nodes generated from working/nodes/p2_pdfium_src (P1's template; P2 adds per-document counters with the last error, written after every document). HARD GATE (G_build_C): the build exits 0 only if the engine's own Python inside the image imports pypdfium2 AND pypdfium2_cfg, parses 002_002489.pdf to > 0 characters, and imports both node modules with the right HYBRID flag, and the base and protected image ids are unchanged; otherwise P2-C stops and is reported NOT RUN",
+  "hypothesis": "with the wrapper fixed, a native parser gains little, because parse is now ~5.5% of document time (P1-B: parse share 0.0551 on the 384 slice, p1b_fix_a/b) and warm pypdfium2 was only 1.06x Tika on the eleven stragglers (H6)",
+  "variants": {
+   "PURE": "pypdfium2 only (the pdfium_pure node replaces the Tika parse node)",
+   "HYBRID": "pypdfium2 first; P1-B's fixed Tika as fallback on empty text or error (the pdfium_hybrid node replays the document's buffered tags to the Tika parse node)"
+  },
+  "smoke": {
+   "(i)": "the eleven stragglers through the pipeline at C=1, stamped (slice_docs_n11_stragglers_w25.json: the eleven in name order + the 384 slice's 25 warm-up documents), ABAB two runs each, in this order: p2c_s_fix_a (rr:p1-tikafix), p2c_s_hyb_a, p2c_s_pure_a (rr:p2-pdfium), p2c_s_fix_b, p2c_s_hyb_b, p2c_s_pure_b. Metric: per-document parse-stage bracket (p0_analyse_docs: engine pipe open -> the parse boundary stamp's last text, the boundary following every parser node), p50 (the true median) over the eleven documents answered ok with all three stamps",
+   "(ii)": "the 384 slice, C=32, stamped, chunk texts captured, ABAB two runs each: p2c_fix_a, p2c_hyb_a, p2c_pure_a, p2c_fix_b, p2c_hyb_b, p2c_pure_b"
+  },
+  "SMOKE_GATE_P2_C": {
+   "per_variant": "the variant's full run is queued iff BOTH (a) and (b) hold",
+   "(a)_SPEED": {
+    "rule": "T = mean over p2c_s_fix_a/b of the leg's p50 parse bracket over the eleven; spread_T = |T_a - T_b| / mean(T_a, T_b); V = the same mean for the variant. (a) HOLDS iff (T - V) / T > spread_T, i.e. the variant's p50 is lower than fixed Tika's by more than fixed Tika's own within-session replicate spread on that metric",
+    "threshold": "spread_T (measured in session; fixed by this rule, not by a number chosen after the data)",
+    "degenerate": "if any of the six legs has fewer than 6 of the eleven with all stamps, (a) is NOT EVALUABLE and does not hold (recorded)"
+   },
+   "(b)_COVERAGE": {
+    "rule": "on the 384 slice, over the measured documents: L_V = {documents with non-whitespace joined chunk text in at least one of p2c_fix_a/b} INTERSECT {documents that, in at least one of the variant's two runs, are not ok, return zero chunks, or return whitespace-only joined text}. (b) HOLDS iff L_V is empty (named if not)",
+    "threshold": "zero documents"
+   },
+   "EXPECTED_recorded_not_assumed": "PURE likely fails (b) on H6's evidence (empty on 5 documents Tika extracts); HYBRID passes (b) by construction and may fail (a)",
+   "KNOWN_BIAS": "(a) is measured on the eleven tail documents at C=1 — the documents where P1-B already removed the pathology — so it ranks the parse bracket on the tail, not on typical documents (the 384 ABAB reports typical-document speed, ungated); HYBRID pays PDFium AND Tika on every fallback document, which (a) includes. (b) is decided on the 384 slice, which holds none of the eleven. Recorded; the gate stands as written."
+  },
+  "full_run": {
+   "design": "per variant whose gate fired, ONE full 9,975 run (stamped, texts captured): p2c_hyb_full / p2c_pure_full. The comparator is P2-A's RR full leg (p2a_rr_full, same image rr:p1-tikafix, stamped, texts) if it ran; otherwise ONE fixed-Tika full leg p2c_fix_full runs first in this session",
+   "correctness_first": "against fixed Tika at full scale, P1-C's definitions unchanged: text = a document's chunk texts as returned, joined in order; empty = not ok or zero chunks or whitespace-only; empty documents and the named set difference both ways; per-document character ratio and Sorensen-Dice similarity of whitespace-token multisets (after collapsing whitespace) as distributions (min, p5, p25, p50, p75, p95); failures named. A variant is ADOPTABLE iff it is empty on no document the fixed-Tika run recovers",
+   "then": "speed (span docs/s, one run each: readable iff |delta| > 0.82%), the excluded-straggler view, the SAMPLED memory peak, the parse stage's share of run total"
+  },
+  "verdict": "the hypothesis 'a native parser gains little' is judged against LITTLE = a full-corpus docs/s gain no larger than +5.83% (1/(1-0.0551) - 1: the Amdahl bound of P1-B's fixed parse share on the 384 slice, fixed here). SUPPORTED iff no variant is both ADOPTABLE and faster than fixed Tika at full scale by more than 5.83% (readable beyond 0.82%) — including the case where no variant's smoke gate fires; NOT SUPPORTED iff some ADOPTABLE variant is faster by more than 5.83%. Per variant the report states: gate (a) value vs threshold, gate (b) set, full-run correctness, then speed",
+  "if_build_fails": "P2-C NOT RUN (build or in-image check failed) — reported with the check's output; no leg runs on the image"
+ },
+ "P2_B_video_configuration_suspects_untraced": {
+  "hypothesis": "the per-instance video gap is caused by process configuration, not the model",
+  "evidence_before": "P1-A untraced legs (e2_*_off_*): forward pass 0.382 vs 0.283 s/frame at T=4, caller on-CPU 60% vs 75%, identical pool/affinity read-backs; the read-backs differ only in: debugger attached in RocketRide only (pydevd), MALLOC_ARENA_MAX=2 in LlamaIndex only, RocketRide's detector process 182 OS threads vs 34",
+  "design": "the 16-video AMI slice (the first 16 rows of ~/parity-bench-video/working/video/ami_video_manifest.jsonl), K=16, T=4 (six thread variables = 4), the P1 stamped detect copies on every leg, NO tracer; interleaved ABAB two runs each, in this order: p2b_rr_base_a, p2b_rr_comb_a, p2b_li_a, p2b_rr_base_b, p2b_rr_comb_b, p2b_li_b",
+  "cells": {
+   "rr_base": "rr:patched-video, one token (P0_ONTOKEN), exactly the P1-A untraced RocketRide leg",
+   "rr_comb": "COMBINED: the same image and token, launched without the debugger by the H7 method (noDebug=True added to the SDK's execute call — driver_video.py P2_NODEBUG=1, the docs driver's BSZ_NODEBUG mechanism, proven in P0 H7 legs: pydevd_loaded false) AND MALLOC_ARENA_MAX=2 in the container's environment (docker run -e)",
+   "li_ref": "li:video, ONE instance, one worker (the P1-A LlamaIndex leg)"
+  },
+  "readback_per_leg": "in-process: debugger present (env_probe d0 trace: pydevd_loaded / debugpy_loaded / sys.monitoring tools, pre and post; the stamped copy's p1_readback.json monitoring_tools and gettrace), the malloc environment (p1_readback.json env MALLOC_*), and the detector process's OS thread count (p1_readback.json os_threads; env_probe proc_threads)",
+  "CORRECTNESS_GATE": "RR COMBINED must be chunk-identical to RR baseline on 16/16 videos in BOTH pairs (p2b_rr_comb_a vs p2b_rr_base_a, p2b_rr_comb_b vs p2b_rr_base_b; per-video chunk hashes AND frame scores, p0_analyse_video.identity). If not: P2-B is reported OUTPUT-CHANGING and NO speed verdict is given",
+  "metrics": {
+   "PRIMARY": "frames/s = total frames / (last done - first admit) over the measured videos (p0_analyse_video.load; the P0 V1 / P1-D definition)",
+   "SECONDARY_mechanism": "F = mean forward wall per frame over the measured frames (the last N stamp rows by wall time, N = the export's frames; p1_analyse_e2), and the caller on-CPU share (sum thread CPU / sum forward wall)"
+  },
+  "reading": {
+   "definitions": "per cell, the mean of its two legs and its spread; gap = fps(li_ref) - fps(rr_base); closure = (fps(rr_comb) - fps(rr_base)) / gap",
+   "precondition": "the gap is readable in this session iff (fps(li_ref) / fps(rr_base) - 1) > max(0.82%, spread(li_ref), spread(rr_base)); otherwise 'the gap did not reproduce in session' and no reading",
+   "CONFIGURATION_EXPLAINS_THE_GAP": "iff the correctness gate passes AND closure >= 0.5 AND (fps(rr_comb) / fps(rr_base) - 1) > max(0.82%, spread(rr_base), spread(rr_comb)) -> record it and design the single-knob decomposition (noDebug alone, MALLOC_ARENA_MAX alone) for P3",
+   "otherwise": "record which differences are ruled out at this strength (the debugger and the malloc arena setting, jointly) and name the next suspects from the read-backs (e.g. the detector process's thread population, env and pool fields that still differ)",
+   "secondary": "the same closure computed on F (forward per frame) is reported beside, labelled mechanism; the verdict follows the PRIMARY metric"
+  },
+  "not_in_P2": "the 168-video confirmation is deferred to P3 with its own gate"
+ },
+ "P2_D_laptop_source_only": {
+  "(1)_embedding": "trace how RocketRide's embedding node batches and schedules work across the 32 executor threads vs LlamaIndex's worker, file:line on both: batch size, whether batches span documents, locks, thread settings, model call shape; list in-bounds single-instance fixes with P0's three-column ROI ((a) the share of run total it acts on, (b) the bound 1/(1-share), (c) scope CONFIG/THREADING/PATCH/PYTHON/CPP)",
+  "(2)_wrapper_ticket_draft": "design the source-level fix for P1-B's patch (extract inline images only when a downstream node subscribes to the image lane; probe exiftool/ffmpeg/sox once per process); name the files and functions and the test that proves image pipelines still work; written as a ticket DRAFT in this campaign directory. NOT filed, posted or sent anywhere",
+  "evidence": "SOURCE (file:line read) vs UNVERIFIED (inference), labelled per claim"
+ },
+ "deliverable": "one P2 report: a gate table (threshold, measured value, fired or not, known bias); correctness before speed for every changed cell; the P2-A verdict stated plainly; the P2-B and P2-C verdicts; the embedding trace and the ticket draft; everything NOT RUN with its reason; the CloudTrail finding. Blind recompute with planted figures (verifiers read only the report copy and the listed raw files, one plant each). Then the box is stopped with box.sh stop and its state read back"
+}

@@ -1852,3 +1852,24 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   tooling leg that uses the real runner, not a stand-alone test.
 > - **Separate "the leg failed" from "the leg measured a loss".** A driver verdict of DEGRADED with
 >   every row present is a result; the retry rule is for runs that did not complete.
+
+## 56. An attribution nobody could read, and a check that could never have passed (added 2026-09-24)
+
+> P1's progress log and report said the box was stopped at 08:18Z "by the operator". Nobody had read
+> that: the instance's state reason said only "User initiated", which is EC2's wording for an API or
+> console StopInstances. When P2 asked for the principal, CloudTrail (LookupEvents, DescribeTrails)
+> turned out to be denied to the role this campaign runs as. What the role can read is the SSM session
+> history, which shows no session on the box between 23:31Z and 15:18Z, so the stop did not come from
+> inside the OS through us. Who issued it is unknown. Separately, while rebuilding P1-C's image, the
+> in-image check was run by hand against the existing image. Importing the prototype node outside the
+> engine runtime fails on rocketlib's own dependency (pydantic), which the engine adds to its path only
+> at run time. P1's check imported the node that way, so it would have failed even with pypdfium2
+> complete. P2's check reads the node's variant flags from source, and the node's load inside the
+> engine is proven by its own counters after the first leg.
+>
+> Rules:
+>
+> - **An actor is a fact like any other.** Name who did something only when a record names them;
+>   otherwise write what the record says ("User initiated") and that the principal was not read.
+> - **Run a new check against a known-good case before trusting its failure.** A check that cannot
+>   pass hides the fault it was written to find.

@@ -1,0 +1,51 @@
+{
+ "kind": "batchsize_slice",
+ "derivation": "P2-C smoke (i): the eleven RocketRide stragglers (P0 E1, analysis_e1.json) in name order as the measured documents; the warm-up documents are the 384 smoke slice's 25 (slice_docs_n384_w25.json, disjoint from the eleven), so the warm-up is the one every 384 leg uses",
+ "manifest_sha256": "309749a593dd44675bbcf622465b672ca40faac16db90dbdebc7005cf08f3ecf",
+ "n": 11,
+ "warm": 25,
+ "measured": [
+  "000_000344.pdf",
+  "002_002489.pdf",
+  "008_008871.pdf",
+  "011_011464.pdf",
+  "011_011730.pdf",
+  "014_014261.pdf",
+  "014_014969.pdf",
+  "031_031239.pdf",
+  "033_033172.pdf",
+  "034_034697.pdf",
+  "039_039660.pdf"
+ ],
+ "warm_docs": [
+  "030_030356.pdf",
+  "034_034224.pdf",
+  "016_016116.pdf",
+  "039_039397.pdf",
+  "013_013775.pdf",
+  "006_006635.pdf",
+  "016_016472.pdf",
+  "022_022636.pdf",
+  "023_023633.pdf",
+  "022_022819.pdf",
+  "026_026822.pdf",
+  "005_005934.pdf",
+  "010_010258.pdf",
+  "017_017626.pdf",
+  "010_010606.pdf",
+  "013_013586.pdf",
+  "033_033022.pdf",
+  "017_017618.pdf",
+  "024_024766.pdf",
+  "015_015459.pdf",
+  "032_032658.pdf",
+  "018_018255.pdf",
+  "015_015138.pdf",
+  "015_015383.pdf",
+  "016_016154.pdf"
+ ],
+ "source_slices": {
+  "warm_docs_from": "working/results/batchsize_smoke_20260920T113000Z/slice_docs_n384_w25.json (slice_sha256 411f96f117512f9cdf6d833796a532c0cae8ca42cefdc3c3077671c882a3fb24)"
+ },
+ "slice_sha256": "c5e55af8348ca78cae72e9efbcaa57e1c32f8d2ef327ca0ae785bc064126db32"
+}
