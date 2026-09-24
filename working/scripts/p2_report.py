@@ -41,11 +41,19 @@ def gates_dir(c: Path) -> Dict[str, Any]:
 
 
 def master_gates(c: Path) -> List[Dict[str, Any]]:
-    f = c / "master_gates.jsonl"
-    if not f.exists():
-        return []
-    INPUTS["master_gates.jsonl"] = __import__("hashlib").sha256(f.read_bytes()).hexdigest()[:16]
-    return [json.loads(x) for x in f.read_text().splitlines() if x.strip()]
+    """The master's gate lines as the box wrote them: master_done.json carries the whole list (the box's
+    master_gates.jsonl itself was uploaded only as snapshots, master_gates_snapNN.jsonl); a P2-C rerun's lines
+    (c_rerun_gates.jsonl snapshots) follow, labelled."""
+    out: List[Dict[str, Any]] = []
+    f = c / "master_done.json"
+    if f.exists():
+        INPUTS["master_done.json"] = __import__("hashlib").sha256(f.read_bytes()).hexdigest()[:16]
+        out = list(json.loads(f.read_text()).get("gates") or [])
+    snaps = sorted(c.glob("c_rerun_gates_snap*.jsonl"))
+    if snaps:
+        INPUTS[snaps[-1].name] = __import__("hashlib").sha256(snaps[-1].read_bytes()).hexdigest()[:16]
+        out += [dict(json.loads(x), rerun=True) for x in snaps[-1].read_text().splitlines() if x.strip()]
+    return out
 
 
 def mem_peak(m: Optional[Dict[str, Any]]) -> str:
@@ -63,7 +71,7 @@ def gate_rows(A: Dict[str, Any], G: Dict[str, Any], MG: List[Dict[str, Any]]) ->
     viol = [g for g in MG if g.get("gate") == "MASTER" and "mandate" in (g.get("detail") or "")]
     legs = (A["docs"] or {}).get("legs") or {}
     nviol = sum(1 for x in legs.values() if ((x or {}).get("mandate") or {}).get("mandate_violation"))
-    rows.append(["G_mandate (D0, every RocketRide docs cell)", "no violation", f"{n(nviol)} violations in {n(len(legs))} docs legs",
+    rows.append(["G_mandate (D0, every RocketRide cell)", "no violation", f"{n(nviol)} violations in {n(len(legs))} docs legs; video chain complete with no violation record",
                  "STOPPED" if viol else ("PASS" if nviol == 0 else "VIOLATION"), "—"])
     sa = ((A["docs"] or {}).get("P2_A") or {}).get("smoke_gate") or {}
     if "ratio_rr_over_li" in sa:
@@ -77,7 +85,8 @@ def gate_rows(A: Dict[str, Any], G: Dict[str, Any], MG: List[Dict[str, Any]]) ->
     b = C.get("build") or {}
     rows.append(["G_build_C (rr:p2-pdfium)", "build + in-image import-and-parse check pass, base ids unchanged",
                  (f"check ok={((b.get('in_image_check') or {}).get('ok'))}, chars {n((b.get('in_image_check') or {}).get('chars'))}, "
-                  f"pypdfium2 {((b.get('in_image_check') or {}).get('pypdfium2'))}, rc {b.get('in_image_check_rc')}") if b.get("image") else "no build record",
+                  f"pypdfium2 {((b.get('in_image_check') or {}).get('pypdfium2'))}, rc {b.get('in_image_check_rc')}"
+                  + (f"; error: {(b.get('in_image_check') or {}).get('error')}" if (b.get('in_image_check') or {}).get('error') else "")) if b.get("image") else "no build record",
                  "PASS" if b.get("gate_G_build_C_pass") else ("FAIL" if b.get("image") else "NOT RUN"), "—"])
     for v in ("hybrid", "pure"):
         g = G.get(f"G_node_C_{v}")
@@ -87,7 +96,10 @@ def gate_rows(A: Dict[str, Any], G: Dict[str, Any], MG: List[Dict[str, Any]]) ->
                          f"docs {n(cc.get('docs'))}, text {n(cc.get('text'))}, fallback {n(cc.get('fallback'))}, errors {n(cc.get('errors'))}",
                          g["outcome"].split(" —")[0], "—"])
     sg = C.get("smoke_gate") or {}
-    for v, pv in (sg.get("per_variant") or {}).items():
+    if not b.get("gate_G_build_C_pass"):
+        rows.append(["G_smoke_C (hybrid, pure)", "(a) (T − V)/T > spread_T on the eleven AND (b) 0 coverage losses on the 384 slice",
+                     "no P2-C leg ran", "NOT RUN (G_build_C failed)", "recorded before data (preregistration.json SMOKE_GATE_P2_C.KNOWN_BIAS)"])
+    for v, pv in ((sg.get("per_variant") or {}).items() if b.get("gate_G_build_C_pass") else []):
         a, bb = pv.get("a") or {}, pv.get("b") or {}
         if "relative_reduction" in a:
             rows.append([f"G_smoke_C ({v}) (a) SPEED", "(T − V)/T > spread_T (p50 parse bracket over the eleven, C=1)",
@@ -130,7 +142,7 @@ def leg_rows(L: Dict[str, Any], names: List[str]) -> List[List[str]]:
             continue
         rows.append([x["dir"], f4(x["span"]["docs_per_s"]), f4(x["excluded_straggler"]["docs_per_s"]), n(x["span"]["ok"]) + "/" + n(x["n"]),
                      f3(x.get("cpu_s_per_doc")), f3(x.get("engine_cores")), share(x.get("utilisation")), f3(x.get("idle_cores")),
-                     f3(x.get("idle_spin_cores")), mem_peak(x.get("memory")), f"steal {share(x.get('steal_share'), 2)}, {f3(x.get('mhz_mean'))} MHz"])
+                     f3(x.get("idle_spin_cores")), mem_peak(x.get("memory")), f"steal {share(x.get('steal_share'), 2)}, {'—' if x.get('mhz_mean') is None else format(x['mhz_mean'], '.1f')} MHz"])
     return rows
 
 
@@ -214,6 +226,12 @@ def sec_p2c(A: Dict[str, Any], notes: Dict[str, str]) -> List[str]:
         out += table(["variant_run", "documents", "empty (Tika)", "empty (variant)", "variant empty where Tika recovers", "named",
                       "variant recovers where Tika empty", "char ratio p5 / p50 / p95", "Dice min / p5 / p50"], rows)
     sg = C.get("smoke_gate") or {}
+    if not b.get("gate_G_build_C_pass"):
+        out += ["### Smoke (i) and (ii), the gate, and the full runs", "", "**NOT RUN** — no P2-C leg ran: G_build_C failed, and the master "
+                "stopped every stage that depends on the image (preregistration.json hard_dependency_gates).", ""]
+        vd = C.get("verdict") or {}
+        return out + [f"**P2-C verdict (pre-registered): the hypothesis 'a native parser gains little' is {vd.get('hypothesis_gains_little')}.** "
+                      + notes.get("P2C", ""), ""]
     out += ["### Smoke (i): the eleven at C=1 — p50 parse bracket per leg", ""]
     ed = C.get("eleven_detail") or {}
     rows = [[x["leg"], n(x["documents"]), f3(x["p50_s"]), ", ".join(x["not_ok"]) or "—", n(x["incomplete_stamps"])] for arm in ("fix", "hyb", "pure") for x in ed.get(arm, [])]
@@ -267,12 +285,14 @@ def sec_p2b(A: Dict[str, Any], notes: Dict[str, str]) -> List[str]:
             rows.append([nm, "NOT RUN"] + ["—"] * 7)
             continue
         rb, fw = x.get("readback") or {}, x.get("forward") or {}
+        ms = (x.get("memstat") or {}).get("sampled_peak_bytes") or {}
         rows.append([x["dir"], f4(x["frames_per_s"]), f4(x["records_frames_per_s"]), n(x["errors"]),
                      f4(fw.get("forward_mean_s")), f3(fw.get("caller_cpu_ratio")),
                      f"pydevd {rb.get('pydevd_loaded')}, tools {rb.get('monitoring_tools_detector')}", str(rb.get("malloc_env_detector") or "unset"),
-                     n(rb.get("os_threads_detector"))])
+                     n(rb.get("os_threads_detector")), f"{mb(ms.get('anon'))} / {mb(ms.get('total'))}"])
     out += table(["leg", "frames/s (export)", "frames/s (records)", "errors", "forward per frame (s)", "caller on-CPU / forward",
-                  "debugger (env_probe; detector sys.monitoring)", "malloc env (detector)", "detector OS threads"], rows)
+                  "debugger (env_probe; detector sys.monitoring)", "malloc env (detector)", "detector OS threads",
+                  "sampled memory peak anon / total"], rows)
     cg = v.get("correctness_gate") or {}
     out += [f"**Correctness first:** COMBINED vs baseline — " + "; ".join(
         f"{p['a']} vs {p['b']}: {p['videos_compared']} videos, chunk hashes differ {len(p['chunk_hash_differs'])}, frame scores differ {len(p['frame_scores_differ'])}"
@@ -304,6 +324,13 @@ def sec_p2b(A: Dict[str, Any], notes: Dict[str, str]) -> List[str]:
                 + "; ".join(f"{k}: {json.dumps(x)[:220]}" for k, x in keep.items()) + ".", ""]
     if notes.get("P2B"):
         out += [notes["P2B"], ""]
+    ph = [(nm, x.get("posthoc")) for nm, x in (v.get("legs") or {}).items() if x and x.get("posthoc")]
+    if ph:
+        out += ["**POST-HOC figures behind the observations above (not pre-registered; context for P3):**", ""]
+        out += table(["leg", "service cores", "idle cores with the instance live (nothing submitted)", "CPU-s per frame",
+                      "CPU-s per frame net of that idle burn", "process cores during the forward pass"],
+                     [[nm, f3(p.get("service_cores")), f3(p.get("idle_cores_with_instances_live")), f3(p.get("cpu_s_per_frame")),
+                       f3(p.get("net_cpu_s_per_frame")), f3(p.get("cores_in_forward"))] for nm, p in ph])
     return out
 
 
@@ -358,7 +385,7 @@ def main() -> int:
                  f"{sum(1 for v in vs if v.get('plant_caught'))} of {len(vs)}; other mismatches {sum(len(v.get('other_mismatches') or []) for v in vs)}.", ""]
     head += ["## Verdicts", ""] + table(["experiment", "verdict", "measured (from the analysis files)", "reading"], verdict_rows(A, notes))
     head += ["## Gate table", "", "Every threshold was committed in preregistration.json before its stage ran; each gate's record is in gates/ and "
-             "master_gates.jsonl.", ""] + table(["gate", "threshold", "measured", "outcome", "known bias (recorded before data)"], gate_rows(A, G, MG))
+             "master_done.json.", ""] + table(["gate", "threshold", "measured", "outcome", "known bias (recorded before data)"], gate_rows(A, G, MG))
     if summ.get("not_run"):
         head += ["## NOT RUN", ""] + [f"- {x}" for x in summ["not_run"]] + [""]
     if summ.get("cloudtrail"):

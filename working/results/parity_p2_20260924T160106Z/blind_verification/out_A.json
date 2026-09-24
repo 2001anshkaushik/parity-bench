@@ -1,0 +1,18 @@
+{
+  "figures_checked": 125,
+  "mismatches": [
+    {
+      "where": "## P2-A section, Smoke (1) table, row p2a_li_b, column 'span docs/s'",
+      "figure": "p2a_li_b span docs/s (ok rows / (max completion_ns - min submit_ns)/1e9 over all 384 rows)",
+      "report": "3.2584",
+      "recomputed": "3.2854 (381 ok / 115.968 s = 3.28538); equals the leg's own 'excl. eleven' cell, as it must since none of the eleven is in the slice; the report's own LI mean 3.1561 and ratio 0.8262 are consistent with 3.2854, not 3.2584 (3.2584 would give LI mean 3.1426, ratio 0.8297)"
+    }
+  ],
+  "unverifiable": [
+    "G_smoke_A noise floors 'RR 0.82%' and 'LI 9.87%' (Gate table row and gate paragraph): pre-registered constants, not present in any listed raw file (9.87% is consistent with the value my instructions give for the anchor threshold, but it is not recomputable)",
+    "Known bias 'P1-B +12.6% on the 384 slice vs +128% full' (Gate table row and gate paragraph): P1-B data are not among the listed files",
+    "'agrees with the chain's record: yes' (gate paragraph): the chain's numeric record is gates/G_smoke_A.json, which I may not open; master_done.json gates entry G_smoke_A has status 'NOT FIRED', which agrees with the recomputed outcome (ratio 0.8262 < 0.85), but the record's numbers could not be compared",
+    "'24-worker optimum' (section title, Verdicts reading): no listed field defines the LlamaIndex worker count; p0.session.d0_external.li_worker_processes_max is 26 on both 384-slice LI legs, which may count non-worker processes, so the 24 can be neither confirmed nor refuted",
+    "'Full run (9,975, one run each)': the full corpus size is not in any listed file (the full run did not happen; the NOT RUN status agrees with master_done.json A_FULL 'NOT RUN (G_smoke_A not fired)')"
+  ]
+}

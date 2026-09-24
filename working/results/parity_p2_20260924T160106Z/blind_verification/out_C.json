@@ -1,0 +1,16 @@
+{
+ "figures_checked": 31,
+ "mismatches": [
+  {
+   "where": "Gate table, row 'G_memstat (p2b_rr_base_a)', measured column",
+   "figure": "non-empty lines in p2b_rr_base_a/memstat.jsonl",
+   "report": "1,496",
+   "recomputed": "1,469"
+  }
+ ],
+ "unverifiable": [
+  "Gate table row 'G_smoke_C (hybrid, pure)', threshold column: '(a) (T - V)/T > spread_T on the eleven AND (b) 0 coverage losses on the 384 slice' comes from preregistration.json, which is not a listed file. The measured 'no P2-C leg ran' and the outcome 'NOT RUN (G_build_C failed)' were verified against master_done.json (G_build_C FAIL; C_FULL 'NOT RUN (G_build_C failed)'; no G_smoke_C entry) and the absence of any P2-C leg among the listed legs.",
+  "Session: the boot ids of the six video legs (p2b_*) cannot be read from the listed files. Their export_*.json, preflight_*.json, p1_readback.json and memstat.jsonl.summary.json carry no boot id, and boot_id.txt is not a listed file. The part that can be checked matches: all 8 docs legs' p0.session.boot_id and boot_id_close, and master_done.json boot_id, are all dc407ed6-d6b2-4cde-9dc9-3b3a2608066d (one session).",
+  "Verdicts row 'P2-C native parser' and the P2-C paragraph: the 'register 57' cross-reference cannot be checked because the methodology register is not a listed file."
+ ]
+}

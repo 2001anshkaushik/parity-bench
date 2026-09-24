@@ -24,7 +24,7 @@ try:
         raise RuntimeError(f"parsed {sys.argv[1]} to zero characters")
     import ast
     for m, want in (("pdfium_pure", False), ("pdfium_hybrid", True)):
-        src = open(f"/opt/rocketride/engine/nodes/{m}/IInstance.py").read()
+        src = open(f"/opt/rocketride/engine/nodes/{m}/IInstance.py", encoding="utf-8").read()  # the engine's Python defaults to ASCII (register 57)
         flags = {t.id: ast.literal_eval(n.value) for n in ast.parse(src).body if isinstance(n, ast.Assign)
                  for t in n.targets if isinstance(t, ast.Name) and t.id in ("HYBRID", "STUB")}
         out[m] = flags

@@ -67,7 +67,14 @@ def leg(camp: Path, name: str) -> Optional[Dict[str, Any]]:
     g = load(d)
     fr = measured_frames(d, g["frames"]) if (d / "p1_stamps.jsonl").exists() else []
     ms = d / "memstat.jsonl.summary.json"
+    # POST-HOC (not pre-registered; labelled in the report): CPU per frame net of the measured idle burden
+    # (service CPU minus idle_cores_with_instances_live x the leg's span, over its frames)
+    idle = (g.get("idle_burden") or {}).get("idle_cores_with_instances_live")
+    net = ((g["service_cpu_s"] - idle * g["span_s"]) / g["frames"]) if (idle is not None and g.get("service_cpu_s") and g.get("span_s") and g.get("frames")) else None
     return {"name": name, "dir": d.name, "summary": g, "frames_per_s": g["frames_per_s"],
+            "posthoc": {"idle_cores_with_instances_live": idle, "cpu_s_per_frame": g.get("cpu_s_per_frame"),
+                        "net_cpu_s_per_frame": net, "service_cores": g.get("engine_cores"),
+                        "cores_in_forward": (forward_block(fr) or {}).get("cores_in_forward") if fr else None},
             "records_frames_per_s": g["records_frames_per_s"], "errors": g["errors"], "videos": g["videos"],
             "frames_match_export": g["frames_match_export"], "forward": forward_block(fr) if fr else None,
             "readback": readback(d), "memstat": json.loads(ms.read_text()) if ms.exists() else None,

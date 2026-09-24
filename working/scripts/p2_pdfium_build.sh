@@ -2,7 +2,8 @@
 # p2_pdfium_build.sh — build rr:p2-pdfium FROM rr:p1-tikafix (P2-C, preregistration.json P2_C build). Neither
 # base is modified; rr:p1-pdfium (P1's broken build) is left as it is.
 #
-#   bash working/scripts/p2_pdfium_build.sh <campaign_dir_abs>
+#   bash working/scripts/p2_pdfium_build.sh <campaign_dir_abs> [tag] [record]
+#   (defaults rr:p2-pdfium and p2c_build.json; amendment 2 builds rr:p2-pdfium-b -> p2c_build_b.json)
 #
 # Exit 0 ONLY when everything below holds (gate G_build_C; the master stops P2-C on any other status):
 #   * pypdfium2 5.13.0 is installed from ~/p0venv (the wheel H6 used; no download) by its dist-info RECORD:
@@ -14,11 +15,12 @@
 # The record p2c_build.json is written in every case that reaches the check (pass or fail).
 set -uo pipefail
 echo "p2_pdfium_build.sh sha256: $(sha256sum "$0" | cut -d' ' -f1)"
-[ "$#" -eq 1 ] || { echo "usage: $0 <campaign_dir_abs>" >&2; exit 2; }
-D="$1"; cd "$(dirname "$0")/../.." || exit 2
+[ "$#" -ge 1 ] && [ "$#" -le 3 ] || { echo "usage: $0 <campaign_dir_abs> [tag] [record]" >&2; exit 2; }
+D="$1"; TAG="${2:-rr:p2-pdfium}"; RECF="${3:-p2c_build.json}"; cd "$(dirname "$0")/../.." || exit 2
 PY="$HOME/.venv/bin/python"; PV="$HOME/p0venv/lib/python3.12/site-packages"
 DI="$PV/pypdfium2-5.13.0.dist-info"
-docker image inspect rr:p2-pdfium >/dev/null 2>&1 && { echo "REFUSED: rr:p2-pdfium exists (never overwritten)"; exit 3; }
+docker image inspect "$TAG" >/dev/null 2>&1 && { echo "REFUSED: $TAG exists (never overwritten)"; exit 3; }
+[ -e "$D/$RECF" ] && { echo "REFUSED: $D/$RECF exists (append-only)"; exit 3; }
 docker image inspect rr:p1-tikafix >/dev/null 2>&1 || { echo "REFUSED: rr:p1-tikafix absent"; exit 3; }
 [ -f "$DI/RECORD" ] || { echo "REFUSED: $DI/RECORD absent"; exit 3; }
 ids() { for i in rr:patched rr:patched-video rr:p1-tikafix; do echo "$i $(docker image inspect -f '{{.Id}}' "$i")"; done; }
@@ -45,20 +47,21 @@ while IFS= read -r t; do
 done <<< "$TOPS"
 cp working/nodes/p2_pdfium_src/check_in_image.py "$B/"
 printf 'FROM rr:p1-tikafix\nCOPY nodes/pdfium_pure /opt/rocketride/engine/nodes/pdfium_pure\nCOPY nodes/pdfium_hybrid /opt/rocketride/engine/nodes/pdfium_hybrid\nCOPY site/ %s/\nCOPY check_in_image.py /opt/rocketride/p2_check_in_image.py\n' "$SITE" > "$B/Dockerfile"
-docker build -q -t rr:p2-pdfium "$B" || exit 6
+docker build -q -t "$TAG" "$B" || exit 6
 AFTER="$(ids)"; echo "images after:"; echo "$AFTER"
 [ "$BEFORE" = "$AFTER" ] || { echo "!! A BASE OR PROTECTED IMAGE ID CHANGED"; exit 7; }
 CORPUS="$HOME/parity-bench/corpus/govdocs1/pdfs"
-OUT="$(docker run --rm -v "$CORPUS:/corpus:ro" --workdir /opt/rocketride/engine --entrypoint /opt/rocketride/engine/engine rr:p2-pdfium /opt/rocketride/p2_check_in_image.py /corpus/002_002489.pdf 2>&1)"
+OUT="$(docker run --rm -v "$CORPUS:/corpus:ro" --workdir /opt/rocketride/engine --entrypoint /opt/rocketride/engine/engine "$TAG" /opt/rocketride/p2_check_in_image.py /corpus/002_002489.pdf 2>&1)"
 CRC=$?
 echo "$OUT" | tail -20
 CHECK="$(echo "$OUT" | grep '^P2_PDFIUM_CHECK ' | tail -1)"
-"$PY" - "$D/p2c_build.json" "$(docker image inspect -f '{{.Id}}' rr:p2-pdfium)" "$BEFORE" "${CHECK:-}" "$SITE" "$CRC" "$TOPS" <<'PYREC'
+"$PY" - "$D/$RECF" "$(docker image inspect -f '{{.Id}}' "$TAG")" "$TAG" "$BEFORE" "${CHECK:-}" "$SITE" "$CRC" "$TOPS" <<'PYREC'
 import json, sys, time
+tag = sys.argv.pop(3)
 chk = sys.argv[4]
 parsed = json.loads(chk.split("P2_PDFIUM_CHECK ", 1)[1]) if chk.startswith("P2_PDFIUM_CHECK ") else None
 ok = bool(parsed and parsed.get("ok") is True and sys.argv[6] == "0")
-json.dump({"built_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "image": "rr:p2-pdfium",
+json.dump({"built_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "image": tag,
            "image_id": sys.argv[2], "from": "rr:p1-tikafix", "base_ids_before_and_after": sys.argv[3].splitlines(),
            "engine_site_packages": sys.argv[5], "wheel_record_top_level": sys.argv[7].splitlines(),
            "in_image_check": parsed, "in_image_check_rc": int(sys.argv[6]), "gate_G_build_C_pass": ok},

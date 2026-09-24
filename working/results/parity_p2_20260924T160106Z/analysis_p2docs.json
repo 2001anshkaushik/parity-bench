@@ -1,0 +1,1328 @@
+{
+ "label": "P2 docs analysis (P2-A, P2-C), from raw leg files; gates recomputed and compared with the chain's records",
+ "session": {
+  "boot_ids": [
+   "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d"
+  ],
+  "one_session": true
+ },
+ "legs": {
+  "p2a_rr_a": {
+   "dir": "p2a_rr_a",
+   "n": 384,
+   "span": {
+    "span_s": 145.17255499,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.6313513599475704
+   },
+   "excluded_straggler": {
+    "span_s": 145.17255499,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.6313513599475704
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "steal_share": 3.9e-05,
+   "mhz_mean": 2537.4,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 13.461,
+   "idle_spin_cores": 1.24,
+   "cpu_s_per_doc": 5.116,
+   "memory": {
+    "samples_in_window": 145,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 11299352576,
+     "file": 7835611136,
+     "total": 19471327232
+    },
+    "peak_anon_plus_file_bytes": 19109089280
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1995.075576543808,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 7.3494696617126465,
+      "share_of_run_total": 0.0036838051390737712,
+      "min": 0.0017576217651367188,
+      "mean": 0.019239449376211117,
+      "sd": 0.04122136433140109,
+      "p50": 0.008213996887207031,
+      "p90": 0.03650474548339844,
+      "p95": 0.055904388427734375,
+      "p99": 0.3318605422973633,
+      "max": 0.4003260135650635,
+      "mean_over_p50": 2.342276195182857,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 30,
+       "mean": 0.05062311570047049,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 145.1801130771637
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 113.33392524719238,
+      "share_of_run_total": 0.05680683307422755,
+      "min": 0.02604842185974121,
+      "mean": 0.2966856681863675,
+      "sd": 0.32789231810489683,
+      "p50": 0.19549834728240967,
+      "p90": 0.629997968673706,
+      "p95": 0.8763644695281982,
+      "p99": 2.0108840465545654,
+      "max": 2.3517260551452637,
+      "mean_over_p50": 1.5175865796849237,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.7806435939814638,
+       "p50": 0,
+       "p95": 3,
+       "window_s": 145.1801130771637
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 2.735590696334839,
+      "share_of_run_total": 0.0013711714626239227,
+      "min": 0.0005028247833251953,
+      "mean": 0.007161232189358217,
+      "sd": 0.017264004808479446,
+      "p50": 0.004085183143615723,
+      "p90": 0.014930486679077148,
+      "p95": 0.023047208786010742,
+      "p99": 0.04932808876037598,
+      "max": 0.3070387840270996,
+      "mean_over_p50": 1.7529770239431512,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.018842737055045987,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 145.1801130771637
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1834.9159529209137,
+      "share_of_run_total": 0.9197225280556295,
+      "min": 0.11697864532470703,
+      "mean": 4.803444902934329,
+      "sd": 8.341763979591288,
+      "p50": 2.4232115745544434,
+      "p90": 10.137771844863892,
+      "p95": 15.373037338256836,
+      "p99": 35.91895532608032,
+      "max": 115.00831198692322,
+      "mean_over_p50": 1.9822639316245176,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.638893261817822,
+       "p50": 4,
+       "p95": 31,
+       "window_s": 145.1801130771637
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 36.74063801765442,
+      "share_of_run_total": 0.01841566226844523,
+      "min": 0.0072977542877197266,
+      "mean": 0.09617968067448801,
+      "sd": 0.11261935023175798,
+      "p50": 0.0643618106842041,
+      "p90": 0.19086575508117676,
+      "p95": 0.2886085510253906,
+      "p99": 0.5747008323669434,
+      "max": 1.356353759765625,
+      "mean_over_p50": 1.4943594602457753,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.25306935804717723,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 145.1801130771637
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1995.075576543808,
+     "share_of_run_total": 1.0,
+     "min": 0.21288251876831055,
+     "mean": 5.222710933360754,
+     "sd": 8.618245237842455,
+     "p50": 2.72500216960907,
+     "p90": 11.01768946647644,
+     "p95": 16.014668703079224,
+     "p99": 37.035072326660156,
+     "max": 118.95759296417236,
+     "mean_over_p50": 1.9165896422423792
+    }
+   },
+   "parse_share": 0.05680683307422755,
+   "utilisation": 0.4207,
+   "host_busy_cores": 13.588,
+   "idle_cores": 18.412,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p2a_rr_a",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p2a_li_a": {
+   "dir": "p2a_li_a",
+   "n": 384,
+   "span": {
+    "span_s": 125.876253986,
+    "ok": 381,
+    "n": 384,
+    "docs_per_s": 3.0267821605366088
+   },
+   "excluded_straggler": {
+    "span_s": 125.876253986,
+    "ok": 381,
+    "n": 384,
+    "docs_per_s": 3.0267821605366088
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "steal_share": 4.5e-05,
+   "mhz_mean": 2585.1,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 12.46,
+   "idle_spin_cores": 0.041,
+   "cpu_s_per_doc": 4.1169,
+   "memory": {
+    "samples_in_window": 125,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 17085485056,
+     "file": 754765824,
+     "total": 18011140096
+    },
+    "peak_anon_plus_file_bytes": 17840250880
+   },
+   "lost_documents": {
+    "n": 3,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf",
+     "040_040669.pdf"
+    ]
+   },
+   "d1": null,
+   "parse_share": null,
+   "utilisation": 0.3894,
+   "host_busy_cores": 12.562,
+   "idle_cores": 19.438,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 381,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p2a_li_a",
+   "empty_documents": {
+    "n": 3,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf",
+     "040_040669.pdf"
+    ]
+   }
+  },
+  "p2a_rr_b": {
+   "dir": "p2a_rr_b",
+   "n": 384,
+   "span": {
+    "span_s": 147.858638803,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.5835487401514574
+   },
+   "excluded_straggler": {
+    "span_s": 147.858638803,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 2.5835487401514574
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "steal_share": 3.8e-05,
+   "mhz_mean": 2540.6,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 13.384,
+   "idle_spin_cores": 1.238,
+   "cpu_s_per_doc": 5.1806,
+   "memory": {
+    "samples_in_window": 148,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 11794395136,
+     "file": 7729823744,
+     "total": 19907256320
+    },
+    "peak_anon_plus_file_bytes": 19524108288
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 2022.3993647098541,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 8.401808023452759,
+      "share_of_run_total": 0.004154376316597654,
+      "min": 0.0016071796417236328,
+      "mean": 0.021994261841499368,
+      "sd": 0.051767702276453186,
+      "p50": 0.00854182243347168,
+      "p90": 0.04124617576599121,
+      "p95": 0.06433510780334473,
+      "p99": 0.38347673416137695,
+      "max": 0.4509289264678955,
+      "mean_over_p50": 2.5748910156822555,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 31,
+       "mean": 0.05682044331479486,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 147.86593580245972
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 124.55287718772888,
+      "share_of_run_total": 0.0615866872592684,
+      "min": 0.03880715370178223,
+      "mean": 0.3260546523238976,
+      "sd": 0.36604930317414164,
+      "p50": 0.20251715183258057,
+      "p90": 0.693584680557251,
+      "p95": 1.050523042678833,
+      "p99": 2.018092393875122,
+      "max": 3.0209290981292725,
+      "mean_over_p50": 1.610010062720241,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.8423365159242916,
+       "p50": 0,
+       "p95": 4,
+       "window_s": 147.86593580245972
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 2.5445878505706787,
+      "share_of_run_total": 0.0012582024574240018,
+      "min": 0.00040721893310546875,
+      "mean": 0.006661224739713818,
+      "sd": 0.00789987575267212,
+      "p50": 0.0039942264556884766,
+      "p90": 0.01607680320739746,
+      "p95": 0.02347087860107422,
+      "p99": 0.04040050506591797,
+      "max": 0.053175926208496094,
+      "mean_over_p50": 1.6677133391440713,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.017208749511923423,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 147.86593580245972
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1849.8829126358032,
+      "share_of_run_total": 0.9146971389111362,
+      "min": 0.13278627395629883,
+      "mean": 4.842625425748176,
+      "sd": 8.448473766514047,
+      "p50": 2.431364893913269,
+      "p90": 10.607748746871948,
+      "p95": 15.229185104370117,
+      "p99": 35.85256910324097,
+      "max": 116.50728750228882,
+      "mean_over_p50": 1.991731244401574,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.510541407637923,
+       "p50": 3,
+       "p95": 31,
+       "window_s": 147.86593580245972
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 37.017179012298584,
+      "share_of_run_total": 0.018303595055573652,
+      "min": 0.008336782455444336,
+      "mean": 0.09690360997983923,
+      "sd": 0.1118695011121096,
+      "p50": 0.06323754787445068,
+      "p90": 0.21082139015197754,
+      "p95": 0.2776038646697998,
+      "p99": 0.5224676132202148,
+      "max": 1.3622288703918457,
+      "mean_over_p50": 1.5323745660130246,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 6,
+       "mean": 0.25034284476278146,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 147.86593580245972
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 2022.3993647098541,
+     "share_of_run_total": 1.0,
+     "min": 0.22134041786193848,
+     "mean": 5.294239174633126,
+     "sd": 8.75677064194042,
+     "p50": 2.8009352684020996,
+     "p90": 11.203343629837036,
+     "p95": 15.7532217502594,
+     "p99": 37.30454111099243,
+     "max": 120.98908400535583,
+     "mean_over_p50": 1.8901683428240834
+    }
+   },
+   "parse_share": 0.0615866872592684,
+   "utilisation": 0.4182,
+   "host_busy_cores": 13.491,
+   "idle_cores": 18.509,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p2a_rr_b",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p2a_li_b": {
+   "dir": "p2a_li_b",
+   "n": 384,
+   "span": {
+    "span_s": 115.968237994,
+    "ok": 381,
+    "n": 384,
+    "docs_per_s": 3.2853823304594165
+   },
+   "excluded_straggler": {
+    "span_s": 115.968237994,
+    "ok": 381,
+    "n": 384,
+    "docs_per_s": 3.2853823304594165
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "steal_share": 4.9e-05,
+   "mhz_mean": 2555.4,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 13.785,
+   "idle_spin_cores": 0.041,
+   "cpu_s_per_doc": 4.1962,
+   "memory": {
+    "samples_in_window": 116,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 17429491712,
+     "file": 196608,
+     "total": 17565491200
+    },
+    "peak_anon_plus_file_bytes": 17429688320
+   },
+   "lost_documents": {
+    "n": 3,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf",
+     "040_040669.pdf"
+    ]
+   },
+   "d1": null,
+   "parse_share": null,
+   "utilisation": 0.4308,
+   "host_busy_cores": 13.915,
+   "idle_cores": 18.085,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 381,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p2a_li_b",
+   "empty_documents": {
+    "n": 3,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf",
+     "040_040669.pdf"
+    ]
+   }
+  },
+  "p2a_an_rr_a": {
+   "dir": "p2a_an_rr_a",
+   "n": 96,
+   "span": {
+    "span_s": 55.224385885,
+    "ok": 96,
+    "n": 96,
+    "docs_per_s": 1.7383624726929818
+   },
+   "excluded_straggler": {
+    "span_s": 55.224385885,
+    "ok": 96,
+    "n": 96,
+    "docs_per_s": 1.7383624726929818
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "steal_share": 4.5e-05,
+   "mhz_mean": 2588.6,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 6.101,
+   "idle_spin_cores": 1.224,
+   "cpu_s_per_doc": 3.5097,
+   "memory": {
+    "samples_in_window": 55,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 4991549440,
+     "file": 7714136064,
+     "total": 13049675776
+    },
+    "peak_anon_plus_file_bytes": 12705685504
+   },
+   "lost_documents": {
+    "n": 0,
+    "docs": []
+   },
+   "d1": {
+    "docs_with_complete_stamps": 96,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 264.4970920085907,
+    "stages": {
+     "admission": {
+      "count": 96,
+      "sum": 0.2921576499938965,
+      "share_of_run_total": 0.0011045779285331703,
+      "min": 0.0011415481567382812,
+      "mean": 0.0030433088541030884,
+      "sd": 0.0027820137218987273,
+      "p50": 0.0021202564239501953,
+      "p90": 0.006398200988769531,
+      "p95": 0.008346319198608398,
+      "p99": 0.02226424217224121,
+      "max": 0.02226424217224121,
+      "mean_over_p50": 1.4353494321376363,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 8,
+       "mean": 0.0052900973869060685,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 55.227272510528564
+      }
+     },
+     "parse_bracket": {
+      "count": 96,
+      "sum": 9.809006690979004,
+      "share_of_run_total": 0.03708549918824973,
+      "min": 0.016834259033203125,
+      "mean": 0.1021771530310313,
+      "sd": 0.10983766975525086,
+      "p50": 0.07150578498840332,
+      "p90": 0.21024513244628906,
+      "p95": 0.25446033477783203,
+      "p99": 0.8371157646179199,
+      "max": 0.8371157646179199,
+      "mean_over_p50": 1.4289354777043872,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 8,
+       "mean": 0.17761164448432626,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 55.227272510528564
+      }
+     },
+     "split": {
+      "count": 96,
+      "sum": 0.1432206630706787,
+      "share_of_run_total": 0.0005414829402586664,
+      "min": 0.00034165382385253906,
+      "mean": 0.0014918819069862366,
+      "sd": 0.001496592856066021,
+      "p50": 0.0009949207305908203,
+      "p90": 0.0034286975860595703,
+      "p95": 0.005570173263549805,
+      "p99": 0.008697271347045898,
+      "max": 0.008697271347045898,
+      "mean_over_p50": 1.499498262640786,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 2,
+       "mean": 0.002593295967012947,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 55.227272510528564
+      }
+     },
+     "embed": {
+      "count": 96,
+      "sum": 250.38171458244324,
+      "share_of_run_total": 0.9466331470075708,
+      "min": 0.018276453018188477,
+      "mean": 2.6081428602337837,
+      "sd": 4.568596484750171,
+      "p50": 1.305763840675354,
+      "p90": 5.5173499584198,
+      "p95": 9.178009748458862,
+      "p99": 35.785990715026855,
+      "max": 35.785990715026855,
+      "mean_over_p50": 1.997407784615039,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 8,
+       "mean": 4.5336606933596135,
+       "p50": 4,
+       "p95": 8,
+       "window_s": 55.227272510528564
+      }
+     },
+     "return": {
+      "count": 96,
+      "sum": 3.870992422103882,
+      "share_of_run_total": 0.014635292935387564,
+      "min": 0.004726886749267578,
+      "mean": 0.04032283773024877,
+      "sd": 0.05745107804647181,
+      "p50": 0.022202372550964355,
+      "p90": 0.09076857566833496,
+      "p95": 0.13360810279846191,
+      "p99": 0.4316990375518799,
+      "max": 0.4316990375518799,
+      "mean_over_p50": 1.8161499469342683,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 2,
+       "mean": 0.07009204413210725,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 55.227272510528564
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 96,
+     "sum": 264.4970920085907,
+     "share_of_run_total": 1.0,
+     "min": 0.05228018760681152,
+     "mean": 2.755178041756153,
+     "sd": 4.683891803832637,
+     "p50": 1.4284698963165283,
+     "p90": 5.712174654006958,
+     "p95": 9.546483993530273,
+     "p99": 36.45087194442749,
+     "max": 36.45087194442749,
+     "mean_over_p50": 1.9287617112973066
+    }
+   },
+   "parse_share": 0.03708549918824973,
+   "utilisation": 0.1906,
+   "host_busy_cores": 6.147,
+   "idle_cores": 25.853,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 96,
+    "recorded": 96,
+    "ok": 96,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p2a_an_rr_a",
+   "empty_documents": {
+    "n": 0,
+    "docs": []
+   }
+  },
+  "p2a_an_li_a": {
+   "dir": "p2a_an_li_a",
+   "n": 96,
+   "span": {
+    "span_s": 232.580534504,
+    "ok": 95,
+    "n": 96,
+    "docs_per_s": 0.4084606659048079
+   },
+   "excluded_straggler": {
+    "span_s": 232.580534504,
+    "ok": 95,
+    "n": 96,
+    "docs_per_s": 0.4084606659048079
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "steal_share": 5.6e-05,
+   "mhz_mean": 2462.1,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 1.0,
+   "idle_spin_cores": 0.002,
+   "cpu_s_per_doc": 2.4481,
+   "memory": {
+    "samples_in_window": 233,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 782110720,
+     "file": 176128,
+     "total": 808116224
+    },
+    "peak_anon_plus_file_bytes": 782286848
+   },
+   "lost_documents": {
+    "n": 1,
+    "docs": [
+     "040_040669.pdf"
+    ]
+   },
+   "d1": null,
+   "parse_share": null,
+   "utilisation": 0.0312,
+   "host_busy_cores": 1.006,
+   "idle_cores": 30.994,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 96,
+    "recorded": 96,
+    "ok": 95,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p2a_an_li_a",
+   "empty_documents": {
+    "n": 1,
+    "docs": [
+     "040_040669.pdf"
+    ]
+   }
+  },
+  "p2a_an_rr_b": {
+   "dir": "p2a_an_rr_b",
+   "n": 96,
+   "span": {
+    "span_s": 54.74612421,
+    "ok": 96,
+    "n": 96,
+    "docs_per_s": 1.7535487924543254
+   },
+   "excluded_straggler": {
+    "span_s": 54.74612421,
+    "ok": 96,
+    "n": 96,
+    "docs_per_s": 1.7535487924543254
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "steal_share": 5.1e-05,
+   "mhz_mean": 2592.1,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 6.131,
+   "idle_spin_cores": 1.232,
+   "cpu_s_per_doc": 3.4966,
+   "memory": {
+    "samples_in_window": 54,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 4747448320,
+     "file": 7714217984,
+     "total": 12804923392
+    },
+    "peak_anon_plus_file_bytes": 12461608960
+   },
+   "lost_documents": {
+    "n": 0,
+    "docs": []
+   },
+   "d1": {
+    "docs_with_complete_stamps": 96,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 264.4181532859802,
+    "stages": {
+     "admission": {
+      "count": 96,
+      "sum": 0.26366162300109863,
+      "share_of_run_total": 0.0009971388867387506,
+      "min": 0.0010483264923095703,
+      "mean": 0.0027464752395947776,
+      "sd": 0.0020636979724857037,
+      "p50": 0.002048969268798828,
+      "p90": 0.005114078521728516,
+      "p95": 0.0066852569580078125,
+      "p99": 0.014770984649658203,
+      "max": 0.014770984649658203,
+      "mean_over_p50": 1.3404179757194943,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 8,
+       "mean": 0.0048158319244841295,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 54.74892544746399
+      }
+     },
+     "parse_bracket": {
+      "count": 96,
+      "sum": 9.687522411346436,
+      "share_of_run_total": 0.03663713058637446,
+      "min": 0.015136003494262695,
+      "mean": 0.1009116917848587,
+      "sd": 0.1059333654404326,
+      "p50": 0.07191896438598633,
+      "p90": 0.22665715217590332,
+      "p95": 0.260051965713501,
+      "p99": 0.7514331340789795,
+      "max": 0.7514331340789795,
+      "mean_over_p50": 1.4031304906348416,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 8,
+       "mean": 0.17694452141608505,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 54.74892544746399
+      }
+     },
+     "split": {
+      "count": 96,
+      "sum": 0.1385352611541748,
+      "share_of_run_total": 0.0005239249250952246,
+      "min": 0.0003387928009033203,
+      "mean": 0.0014430756370226543,
+      "sd": 0.0014998416710075195,
+      "p50": 0.000952601432800293,
+      "p90": 0.0030798912048339844,
+      "p95": 0.005373716354370117,
+      "p99": 0.008645772933959961,
+      "max": 0.008645772933959961,
+      "mean_over_p50": 1.5148787177241063,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.002530374067105857,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 54.74892544746399
+      }
+     },
+     "embed": {
+      "count": 96,
+      "sum": 250.4100308418274,
+      "share_of_run_total": 0.9470228413969656,
+      "min": 0.018186569213867188,
+      "mean": 2.6084378212690353,
+      "sd": 4.564843252321495,
+      "p50": 1.2828822135925293,
+      "p90": 5.401220798492432,
+      "p95": 9.05240535736084,
+      "p99": 35.492897748947144,
+      "max": 35.492897748947144,
+      "mean_over_p50": 2.0332636883042254,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 8,
+       "mean": 4.573788961065839,
+       "p50": 4,
+       "p95": 8,
+       "window_s": 54.74892544746399
+      }
+     },
+     "return": {
+      "count": 96,
+      "sum": 3.918403148651123,
+      "share_of_run_total": 0.014818964204825954,
+      "min": 0.00446319580078125,
+      "mean": 0.04081669946511587,
+      "sd": 0.058773399520223465,
+      "p50": 0.02432417869567871,
+      "p90": 0.08307600021362305,
+      "p95": 0.12763285636901855,
+      "p99": 0.43006324768066406,
+      "max": 0.43006324768066406,
+      "mean_over_p50": 1.6780299131895096,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 3,
+       "mean": 0.0715704119601607,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 54.74892544746399
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 96,
+     "sum": 264.4181532859802,
+     "share_of_run_total": 1.0,
+     "min": 0.05187654495239258,
+     "mean": 2.7543557633956275,
+     "sd": 4.67778271511842,
+     "p50": 1.3730335235595703,
+     "p90": 5.7150349617004395,
+     "p95": 9.41605257987976,
+     "p99": 36.159717082977295,
+     "max": 36.159717082977295,
+     "mean_over_p50": 2.0060367908971357
+    }
+   },
+   "parse_share": 0.03663713058637446,
+   "utilisation": 0.1916,
+   "host_busy_cores": 6.213,
+   "idle_cores": 25.787,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 96,
+    "recorded": 96,
+    "ok": 96,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p2a_an_rr_b",
+   "empty_documents": {
+    "n": 0,
+    "docs": []
+   }
+  },
+  "p2a_an_li_b": {
+   "dir": "p2a_an_li_b",
+   "n": 96,
+   "span": {
+    "span_s": 232.918842538,
+    "ok": 95,
+    "n": 96,
+    "docs_per_s": 0.4078673883350637
+   },
+   "excluded_straggler": {
+    "span_s": 232.918842538,
+    "ok": 95,
+    "n": 96,
+    "docs_per_s": 0.4078673883350637
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "steal_share": 4.6e-05,
+   "mhz_mean": 2463.0,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 1.0,
+   "idle_spin_cores": 0.002,
+   "cpu_s_per_doc": 2.4516,
+   "memory": {
+    "samples_in_window": 233,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 770142208,
+     "file": 8192,
+     "total": 797237248
+    },
+    "peak_anon_plus_file_bytes": 770150400
+   },
+   "lost_documents": {
+    "n": 1,
+    "docs": [
+     "040_040669.pdf"
+    ]
+   },
+   "d1": null,
+   "parse_share": null,
+   "utilisation": 0.0312,
+   "host_busy_cores": 1.006,
+   "idle_cores": 30.994,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 96,
+    "recorded": 96,
+    "ok": 95,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p2a_an_li_b",
+   "empty_documents": {
+    "n": 1,
+    "docs": [
+     "040_040669.pdf"
+    ]
+   }
+  }
+ },
+ "legs_absent": [
+  "p2c_s_fix_a",
+  "p2c_s_hyb_a",
+  "p2c_s_pure_a",
+  "p2c_s_fix_b",
+  "p2c_s_hyb_b",
+  "p2c_s_pure_b",
+  "p2c_fix_a",
+  "p2c_hyb_a",
+  "p2c_pure_a",
+  "p2c_fix_b",
+  "p2c_hyb_b",
+  "p2c_pure_b",
+  "p2a_rr_full",
+  "p2a_li_full",
+  "p2c_fix_full",
+  "p2c_hyb_full",
+  "p2c_pure_full"
+ ],
+ "P2_A": {
+  "smoke_gate": {
+   "threshold": 0.85,
+   "rr_docs_per_s": [
+    2.6313513599475704,
+    2.5835487401514574
+   ],
+   "li_docs_per_s": [
+    3.0267821605366088,
+    3.2853823304594165
+   ],
+   "rr_mean": 2.607450050049514,
+   "li_mean": 3.1560822454980126,
+   "ratio_rr_over_li": 0.8261666988459841,
+   "fired": false,
+   "spreads": {
+    "rr": 0.018333091287867722,
+    "li": 0.0819370820553512
+   },
+   "floors": {
+    "rr": 0.0082,
+    "li": 0.0987
+   },
+   "known_bias": "none of the eleven is in the 384 slice; P1-B +12.6% on the 384 slice vs +128% full: the gate understates RocketRide",
+   "chain_record": {
+    "outcome": "NOT FIRED",
+    "ratio": 0.8261666988459841
+   },
+   "agrees_with_chain_record": true
+  },
+  "smoke_side_by_side": {
+   "rr": {
+    "p2a_rr_a": {
+     "cpu_s_per_doc": 5.116,
+     "engine_cores": 13.461,
+     "utilisation": 0.4207,
+     "idle_cores": 18.412,
+     "idle_spin_cores": 1.24,
+     "memory": {
+      "samples_in_window": 145,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 11299352576,
+       "file": 7835611136,
+       "total": 19471327232
+      },
+      "peak_anon_plus_file_bytes": 19109089280
+     }
+    },
+    "p2a_rr_b": {
+     "cpu_s_per_doc": 5.1806,
+     "engine_cores": 13.384,
+     "utilisation": 0.4182,
+     "idle_cores": 18.509,
+     "idle_spin_cores": 1.238,
+     "memory": {
+      "samples_in_window": 148,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 11794395136,
+       "file": 7729823744,
+       "total": 19907256320
+      },
+      "peak_anon_plus_file_bytes": 19524108288
+     }
+    }
+   },
+   "li": {
+    "p2a_li_a": {
+     "cpu_s_per_doc": 4.1169,
+     "engine_cores": 12.46,
+     "utilisation": 0.3894,
+     "idle_cores": 19.438,
+     "idle_spin_cores": 0.041,
+     "memory": {
+      "samples_in_window": 125,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 17085485056,
+       "file": 754765824,
+       "total": 18011140096
+      },
+      "peak_anon_plus_file_bytes": 17840250880
+     }
+    },
+    "p2a_li_b": {
+     "cpu_s_per_doc": 4.1962,
+     "engine_cores": 13.785,
+     "utilisation": 0.4308,
+     "idle_cores": 18.085,
+     "idle_spin_cores": 0.041,
+     "memory": {
+      "samples_in_window": 116,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 17429491712,
+       "file": 196608,
+       "total": 17565491200
+      },
+      "peak_anon_plus_file_bytes": 17429688320
+     }
+    }
+   }
+  },
+  "rr_within_session_determinism": {
+   "a": "p2a_rr_a",
+   "b": "p2a_rr_b",
+   "documents_ok_in_both": 382,
+   "chunk_lists_differ": [],
+   "lost_by_b": [],
+   "gained_by_b": [],
+   "pass": true
+  },
+  "anchor_96_c8": {
+   "rr_one_token_vs_li_one_worker": {
+    "a_legs": [
+     "p2a_an_li_a",
+     "p2a_an_li_b"
+    ],
+    "b_legs": [
+     "p2a_an_rr_a",
+     "p2a_an_rr_b"
+    ],
+    "a_docs_per_s": [
+     0.4084606659048079,
+     0.4078673883350637
+    ],
+    "b_docs_per_s": [
+     1.7383624726929818,
+     1.7535487924543254
+    ],
+    "a_mean": 0.4081640271199358,
+    "b_mean": 1.7459556325736536,
+    "a_spread": 0.0014535273329461477,
+    "b_spread": 0.008697998665039335,
+    "delta_b_vs_a": 3.2775833159364094,
+    "threshold": 0.0987,
+    "readable": true
+   },
+   "ratio_rr_over_li": 4.277583315936409,
+   "rule": "ratio reported beside max(9.87%, the four spreads); no gate",
+   "cpu_s_per_doc": {
+    "p2a_an_rr_a": 3.5097,
+    "p2a_an_rr_b": 3.4966,
+    "p2a_an_li_a": 2.4481,
+    "p2a_an_li_b": 2.4516
+   }
+  },
+  "full": {
+   "status": "NOT RUN",
+   "reason": "see master_gates.jsonl (A_FULL)"
+  }
+ },
+ "P2_C": {
+  "build": {
+   "built_utc": "2026-09-24T16:44:28Z",
+   "image": "rr:p2-pdfium",
+   "image_id": "sha256:e75222cffc22ba23b77430e62f184efa9b74a1ff9d314651735d8c6d250c143f",
+   "from": "rr:p1-tikafix",
+   "base_ids_before_and_after": [
+    "rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+    "rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+    "rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b"
+   ],
+   "engine_site_packages": "/opt/rocketride/engine/lib/python3.12/site-packages",
+   "wheel_record_top_level": [
+    "pypdfium2",
+    "pypdfium2-5.13.0.dist-info",
+    "pypdfium2_cfg",
+    "pypdfium2_cli",
+    "pypdfium2_raw"
+   ],
+   "in_image_check": {
+    "python": "3.12.13",
+    "ok": false,
+    "pypdfium2_cfg": "/opt/rocketride/engine/lib/python3.12/site-packages/pypdfium2_cfg/__init__.py",
+    "pypdfium2": "5.13.0",
+    "pages": 1,
+    "chars": 10314,
+    "error": "UnicodeDecodeError: 'ascii' codec can't decode byte 0xe2 in position 267: ordinal not in range(128)"
+   },
+   "in_image_check_rc": 1,
+   "gate_G_build_C_pass": false
+  },
+  "node_gates": {
+   "hybrid": null,
+   "pure": null
+  },
+  "eleven_detail": {
+   "fix": [],
+   "hyb": [],
+   "pure": []
+  },
+  "smoke_gate": {
+   "per_variant": {
+    "hybrid": {
+     "a": {
+      "holds": false,
+      "status": "NOT EVALUABLE"
+     },
+     "b": {
+      "holds": false,
+      "status": "NOT EVALUABLE"
+     },
+     "fired": false
+    },
+    "pure": {
+     "a": {
+      "holds": false,
+      "status": "NOT EVALUABLE"
+     },
+     "b": {
+      "holds": false,
+      "status": "NOT EVALUABLE"
+     },
+     "fired": false
+    }
+   },
+   "fired_variants": [],
+   "chain_record_fired": null,
+   "agrees_with_chain_record": false,
+   "known_bias": "(a) ranks the parse bracket on the eleven tail documents at C=1; HYBRID pays PDFium and Tika on every fallback; (b) is decided on the 384 slice, which holds none of the eleven"
+  },
+  "correctness_384": {},
+  "speed_384": {},
+  "full": {
+   "hybrid": {
+    "status": "NOT RUN",
+    "reason": "see master_gates.jsonl (C_FULL)"
+   },
+   "pure": {
+    "status": "NOT RUN",
+    "reason": "see master_gates.jsonl (C_FULL)"
+   }
+  },
+  "verdict": {
+   "little_bar": 0.0583130489998942,
+   "variants_adoptable_and_faster_than_bar": [],
+   "hypothesis_gains_little": "NOT RUN (G_build_C: the image or its in-image check failed or never ran)",
+   "rule": "SUPPORTED iff no variant is both ADOPTABLE and faster than fixed Tika at full scale by more than 5.83% (readable beyond 0.82%), including the case where no variant's smoke gate fires"
+  }
+ }
+}

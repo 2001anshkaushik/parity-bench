@@ -36,7 +36,8 @@ export BSZ_EXPECT_HEAD="$H" BSZ_PREWARM=1 BSZ_P0=1 BSZ_S3_ROOT=parity-p2 BSZ_MEM
 PY="$HOME/.venv/bin/python"
 S3="s3://rocketride-benchmark-data/ansh/parity-p2/$REL"
 echo "boot_id $(cat /proc/sys/kernel/random/boot_id)  stage $STAGE  head $HAVE  deadline ${P2_DEADLINE_EPOCH:-unset}"
-ids() { for i in rr:patched rr:patched-video rr:p1-tikafix rr:p2-pdfium; do echo "image $i $(docker image inspect -f '{{.Id}}' "$i" 2>/dev/null)"; done; }
+P2C_IMAGE="${P2C_IMAGE:-rr:p2-pdfium}"   # amendment 2: rr:p2-pdfium-b
+ids() { for i in rr:patched rr:patched-video rr:p1-tikafix "$P2C_IMAGE"; do echo "image $i $(docker image inspect -f '{{.Id}}' "$i" 2>/dev/null)"; done; }
 ids
 R=()
 LAST=""
@@ -94,7 +95,7 @@ finish() {
   "$PY" - "$D/chain_${STAGE}_done.json" "$1" "${R[*]}" <<'PYDONE'
 import json, subprocess, sys, time
 ids = {i: subprocess.run(["docker", "image", "inspect", "-f", "{{.Id}}", i], capture_output=True, text=True).stdout.strip()
-       for i in ("rr:patched", "rr:patched-video", "rr:p1-tikafix", "rr:p2-pdfium")}
+       for i in ("rr:patched", "rr:patched-video", "rr:p1-tikafix", __import__("os").environ.get("P2C_IMAGE", "rr:p2-pdfium"))}
 json.dump({"stage_complete_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
            "boot_id": open("/proc/sys/kernel/random/boot_id").read().strip(),
            "outcome": sys.argv[2], "legs": sys.argv[3].split(), "image_ids_at_end": ids}, open(sys.argv[1], "x"), indent=1)
@@ -122,8 +123,8 @@ case "$STAGE" in
     leg p2a_an_li_b li "$S96" BSZ_LI_WORKERS=1 BSZ_CONTINUOUS=8
     ;;
   c_smoke)
-    docker image inspect rr:p2-pdfium >/dev/null 2>&1 || { echo "REFUSED: rr:p2-pdfium absent" >&2; exit 5; }
-    PDF=(BSZ_RR_IMAGE=rr:p2-pdfium BSZ_STAMP=1)
+    docker image inspect "$P2C_IMAGE" >/dev/null 2>&1 || { echo "REFUSED: $P2C_IMAGE absent" >&2; exit 5; }
+    PDF=(BSZ_RR_IMAGE="$P2C_IMAGE" BSZ_STAMP=1)
     leg p2c_s_fix_a rr "$S11" "${RRT[@]}" BSZ_CONTINUOUS=1
     leg p2c_s_hyb_a rr "$S11" "${PDF[@]}" P1C_VARIANT=hybrid BSZ_CONTINUOUS=1
     "$PY" working/scripts/p2_gates.py node_c "$D" "${LAST:-p2c_s_hyb_a}" hybrid; NH=$?; up_gate G_node_C_hybrid
@@ -147,7 +148,7 @@ case "$STAGE" in
     leg p2a_li_full li "$S9975" BSZ_LI_WORKERS=24 BSZ_CONTINUOUS=32
     ;;
   c_full)
-    docker image inspect rr:p2-pdfium >/dev/null 2>&1 || { echo "REFUSED: rr:p2-pdfium absent" >&2; exit 5; }
+    docker image inspect "$P2C_IMAGE" >/dev/null 2>&1 || { echo "REFUSED: $P2C_IMAGE absent" >&2; exit 5; }
     [ -n "${P2C_VARIANTS:-}" ] || { echo "REFUSED: P2C_VARIANTS empty — no variant's gate fired" >&2; exit 5; }
     if [ -z "${P2C_COMPARATOR:-}" ]; then
       echo "comparator: P2-A's RR full leg did not run -> p2c_fix_full first (preregistration P2_C full_run)"
@@ -157,7 +158,7 @@ case "$STAGE" in
     fi
     for v in $P2C_VARIANTS; do
       case "$v" in hybrid) n=p2c_hyb_full ;; pure) n=p2c_pure_full ;; *) echo "unknown variant $v"; continue ;; esac
-      leg "$n" rr "$S9975" BSZ_RR_IMAGE=rr:p2-pdfium BSZ_STAMP=1 P1C_VARIANT="$v" BSZ_CONTINUOUS=32 TEXTS=1
+      leg "$n" rr "$S9975" BSZ_RR_IMAGE="$P2C_IMAGE" BSZ_STAMP=1 P1C_VARIANT="$v" BSZ_CONTINUOUS=32 TEXTS=1
     done
     ;;
   *) echo "unknown stage $STAGE" >&2; exit 2 ;;

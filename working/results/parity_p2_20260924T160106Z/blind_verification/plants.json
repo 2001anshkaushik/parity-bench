@@ -1,0 +1,17 @@
+{
+ "A": {
+  "where": "P2-A smoke (1) table, row p2a_li_b, span docs/s",
+  "true": "| p2a_li_b | 3.2854 | 3.2854 |",
+  "planted": "| p2a_li_b | 3.2584 | 3.2854 |"
+ },
+ "B": {
+  "where": "P2-B cell table, row rr_comb, spread",
+  "true": "| 2.7158 | 4.65% |",
+  "planted": "| 2.7158 | 4.56% |"
+ },
+ "C": {
+  "where": "Gate table, row G_memstat (p2b_rr_base_a), measured rows",
+  "true": "| \u2265 1 row in the first leg's memstat.jsonl | 1,469 |",
+  "planted": "| \u2265 1 row in the first leg's memstat.jsonl | 1,496 |"
+ }
+}

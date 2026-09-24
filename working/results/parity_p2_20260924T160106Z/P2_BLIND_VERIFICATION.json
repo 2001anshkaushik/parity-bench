@@ -1,0 +1,60 @@
+{
+ "label": "P2 blind recomputation: 3 verifiers, each given only its prompt, a copy of P2_REPORT.md carrying ONE planted figure, and the raw leg files; the plant key (plants.json) was kept outside their directory",
+ "run_utc": "2026-09-24T19:25:39Z",
+ "outcome": "PASS",
+ "rule": "PASS iff every verifier catches its plant and reports no other mismatch; unverifiable items are listed, not mismatches",
+ "verifiers": {
+  "A": {
+   "figures_checked": 125,
+   "plant": "P2-A smoke (1) table, row p2a_li_b, span docs/s",
+   "plant_value": {
+    "planted": "3.2584",
+    "true": "3.2854"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    "G_smoke_A noise floors 'RR 0.82%' and 'LI 9.87%' (Gate table row and gate paragraph): pre-registered constants, not present in any listed raw file (9.87% is consistent with the value my instructions give for the anchor threshold, but it is not recomputable)",
+    "Known bias 'P1-B +12.6% on the 384 slice vs +128% full' (Gate table row and gate paragraph): P1-B data are not among the listed files",
+    "'agrees with the chain's record: yes' (gate paragraph): the chain's numeric record is gates/G_smoke_A.json, which I may not open; master_done.json gates entry G_smoke_A has status 'NOT FIRED', which agrees with the recomputed outcome (ratio 0.8262 < 0.85), but the record's numbers could not be compared",
+    "'24-worker optimum' (section title, Verdicts reading): no listed field defines the LlamaIndex worker count; p0.session.d0_external.li_worker_processes_max is 26 on both 384-slice LI legs, which may count non-worker processes, so the 24 can be neither confirmed nor refuted",
+    "'Full run (9,975, one run each)': the full corpus size is not in any listed file (the full run did not happen; the NOT RUN status agrees with master_done.json A_FULL 'NOT RUN (G_smoke_A not fired)')"
+   ],
+   "prompt": "blind_verification/prompt_A.md",
+   "findings": "blind_verification/out_A.json"
+  },
+  "B": {
+   "figures_checked": 170,
+   "plant": "P2-B cell table, row rr_comb, spread",
+   "plant_value": {
+    "planted": "4.56",
+    "true": "4.65"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    "Section heading 'K=16': no listed field gives the submission concurrency K (export posture reads 'parity[tokens=1,threads=unset(engine-default-64)]' / 'workers[declared_workers=1]'). Consistent with the raw data: every leg's measured frames come from exactly 16 distinct forward-calling tids.",
+    "Reading 'closure 0.252 of the gap (bar 0.5)' and Verdicts '(bar: half)': the 0.5 bar is a pre-registered threshold; preregistration.json is not among the listed files. The recomputed closure 0.2516 is below 0.5, so the stated verdict follows if the bar is 0.5."
+   ],
+   "prompt": "blind_verification/prompt_B.md",
+   "findings": "blind_verification/out_B.json"
+  },
+  "C": {
+   "figures_checked": 31,
+   "plant": "Gate table, row G_memstat (p2b_rr_base_a), measured rows",
+   "plant_value": {
+    "planted": "1496",
+    "true": "1469"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    "Gate table row 'G_smoke_C (hybrid, pure)', threshold column: '(a) (T - V)/T > spread_T on the eleven AND (b) 0 coverage losses on the 384 slice' comes from preregistration.json, which is not a listed file. The measured 'no P2-C leg ran' and the outcome 'NOT RUN (G_build_C failed)' were verified against master_done.json (G_build_C FAIL; C_FULL 'NOT RUN (G_build_C failed)'; no G_smoke_C entry) and the absence of any P2-C leg among the listed legs.",
+    "Session: the boot ids of the six video legs (p2b_*) cannot be read from the listed files. Their export_*.json, preflight_*.json, p1_readback.json and memstat.jsonl.summary.json carry no boot id, and boot_id.txt is not a listed file. The part that can be checked matches: all 8 docs legs' p0.session.boot_id and boot_id_close, and master_done.json boot_id, are all dc407ed6-d6b2-4cde-9dc9-3b3a2608066d (one session).",
+    "Verdicts row 'P2-C native parser' and the P2-C paragraph: the 'register 57' cross-reference cannot be checked because the methodology register is not a listed file."
+   ],
+   "prompt": "blind_verification/prompt_C.md",
+   "findings": "blind_verification/out_C.json"
+  }
+ }
+}

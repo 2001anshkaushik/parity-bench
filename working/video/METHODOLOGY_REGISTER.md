@@ -1873,3 +1873,22 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   otherwise write what the record says ("User initiated") and that the principal was not read.
 > - **Run a new check against a known-good case before trusting its failure.** A check that cannot
 >   pass hides the fault it was written to find.
+
+## 57. The check tested in pieces and never whole (added 2026-09-24)
+
+> P2 rebuilt P1-C's image with pypdfium2 complete and a new in-image check. The check was tested
+> before launch in three pieces: its node-flag reader on the laptop, its parse path under the box's
+> side virtualenv, and its failure path against P1's broken image. Each piece passed, or failed where
+> it should. The build then ran the whole check under the engine's own Python inside the new image.
+> The pypdfium2 half passed: pypdfium2_cfg imported and 002_002489.pdf parsed to 10,314 characters.
+> The node-flag half raised UnicodeDecodeError. That interpreter's default text encoding is ASCII, and
+> the check read the node's source with a bare open(); byte 267 of that file is the UTF-8 em dash in
+> its header comment. The engine imports modules as UTF-8, so the node itself was never at fault.
+> The master's hard gate did what it was written to do: it stopped P2-C on a check that was wrong.
+>
+> Rules:
+>
+> - **Test a check whole, in the interpreter and container it will run in.** A laptop Python and a
+>   side virtualenv default to UTF-8; an engine's embedded Python in a minimal container may not.
+> - **Name the encoding on every read of a source file.** `open(p, encoding="utf-8")`, never the
+>   locale's default.

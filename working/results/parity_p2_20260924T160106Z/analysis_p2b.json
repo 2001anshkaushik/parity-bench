@@ -1,0 +1,2499 @@
+{
+ "label": "P2-B video configuration suspects, untraced (preregistration.json P2_B + amendment 1)",
+ "legs": {
+  "p2b_rr_base_a": {
+   "name": "p2b_rr_base_a",
+   "dir": "p2b_rr_base_a",
+   "frames_per_s": 2.438708694990102,
+   "posthoc": {
+    "idle_cores_with_instances_live": 1.232,
+    "cpu_s_per_frame": 1.512488292226038,
+    "net_cpu_s_per_frame": 1.0073029035279426,
+    "service_cores": 3.688,
+    "cores_in_forward": 2.4622902956134407
+   },
+   "records_frames_per_s": 2.461077840903065,
+   "errors": 0,
+   "videos": 16,
+   "frames_match_export": true,
+   "forward": {
+    "frames": 3203,
+    "forward": {
+     "count": 3203,
+     "sum": 1271.5485396940085,
+     "share_of_run_total": null,
+     "min": 0.24416099799964286,
+     "mean": 0.39698674358226926,
+     "sd": 0.05453080331226787,
+     "p50": 0.3885363519998464,
+     "p90": 0.4568544510002539,
+     "p95": 0.46462776899988967,
+     "p99": 0.6169161510001686,
+     "max": 0.7734098930000073,
+     "mean_over_p50": 1.02174929459992
+    },
+    "forward_mean_s": 0.39698674358226926,
+    "caller_cpu_ratio": 0.6074022200763645,
+    "cores_in_forward": 2.4622902956134407,
+    "callers": [
+     566,
+     658,
+     748,
+     840,
+     931,
+     1022,
+     1113,
+     1200,
+     1289,
+     1381,
+     1469,
+     1557,
+     1647,
+     1735,
+     1826,
+     1913
+    ]
+   },
+   "readback": {
+    "pydevd_loaded": {
+     "d0_pre": true
+    },
+    "debugpy_loaded": {
+     "d0_pre": true
+    },
+    "sys_monitoring_tools_env_probe": {
+     "d0_pre": {
+      "0": "pydevd"
+     }
+    },
+    "monitoring_tools_detector": {
+     "0": "pydevd"
+    },
+    "gettrace_detector": "None",
+    "malloc_env_detector": {},
+    "os_threads_detector": 182,
+    "proc_threads_env_probe": {
+     "d0_pre": 176
+    },
+    "python_threads_detector": 8,
+    "torch": {
+     "num_threads": 4,
+     "num_interop_threads": 16,
+     "cpu_capability": "AVX512"
+    },
+    "env_detector": {
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "MKL_NUM_THREADS": "4",
+     "OMP_NUM_THREADS": "4",
+     "TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD": "1",
+     "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+     "KMP_DUPLICATE_LIB_OK": "True",
+     "KMP_INIT_AT_FORK": "FALSE"
+    },
+    "python_thread_names": [
+     "External",
+     "External",
+     "GlobalEventLoop",
+     "GlobalEventLoop",
+     "Main",
+     "avi_reader_info",
+     "avi_reader_terminate",
+     "scanner-1"
+    ],
+    "thread_name_counts": {
+     "engine": 19,
+     "scanner-1": 8,
+     "Signal Listener": 1,
+     "Work #0": 1,
+     "Work #1": 1,
+     "Work #2": 1,
+     "Work #3": 1,
+     "Work #4": 1,
+     "Work #5": 1,
+     "Work #6": 1,
+     "Work #7": 1,
+     "Work #8": 1,
+     "Work #9": 1,
+     "Status": 1,
+     "AwsEventLoop1": 1,
+     "AwsEventLoop2": 1,
+     "AwsEventLoop3": 1,
+     "AwsEventLoop4": 1,
+     "AwsEventLoop5": 1,
+     "AwsEventLoop6": 1,
+     "AwsEventLoop7": 1,
+     "AwsEventLoop8": 1,
+     "AwsEventLoop9": 1,
+     "AwsEventLoop10": 1,
+     "AwsEventLoop11": 1,
+     "AwsEventLoop12": 1,
+     "AwsEventLoop13": 1,
+     "AwsEventLoop14": 1,
+     "AwsEventLoop15": 1,
+     "AwsEventLoop16": 1,
+     "pipeline-0": 1,
+     "pipeline-1": 1,
+     "pipeline-2": 1,
+     "pipeline-3": 1,
+     "pipeline-4": 1,
+     "pipeline-5": 1,
+     "pipeline-6": 1,
+     "pipeline-7": 1,
+     "pipeline-8": 1,
+     "pipeline-9": 1,
+     "pipeline-10": 1,
+     "pipeline-11": 1,
+     "pipeline-12": 1,
+     "pipeline-13": 1,
+     "pipeline-14": 1,
+     "pipeline-15": 1,
+     "pipeline-16": 1,
+     "pipeline-17": 1,
+     "pipeline-18": 1,
+     "pipeline-19": 1,
+     "pipeline-20": 1,
+     "pipeline-21": 1,
+     "pipeline-22": 1,
+     "pipeline-23": 1,
+     "pipeline-24": 1,
+     "pipeline-25": 1,
+     "pipeline-26": 1,
+     "pipeline-27": 1,
+     "pipeline-28": 1,
+     "pipeline-29": 1,
+     "pipeline-30": 1,
+     "pipeline-31": 1,
+     "pipeline-32": 1,
+     "pipeline-33": 1,
+     "pipeline-34": 1,
+     "pipeline-35": 1,
+     "pipeline-36": 1,
+     "pipeline-37": 1,
+     "pipeline-38": 1,
+     "pipeline-39": 1,
+     "pipeline-40": 1,
+     "pipeline-41": 1,
+     "pipeline-42": 1,
+     "pipeline-43": 1,
+     "pipeline-44": 1,
+     "pipeline-45": 1,
+     "pipeline-46": 1,
+     "pipeline-47": 1,
+     "pipeline-48": 1,
+     "pipeline-49": 1,
+     "pipeline-50": 1,
+     "pipeline-51": 1,
+     "pipeline-52": 1,
+     "pipeline-53": 1,
+     "pipeline-54": 1,
+     "pipeline-55": 1,
+     "pipeline-56": 1,
+     "pipeline-57": 1,
+     "pipeline-58": 1,
+     "pipeline-59": 1,
+     "pipeline-60": 1,
+     "pipeline-61": 1,
+     "pipeline-62": 1,
+     "pipeline-63": 1,
+     "scanner-0": 1,
+     "scanner-2": 1,
+     "scanner-3": 1,
+     "scanner-4": 1,
+     "scanner-5": 1,
+     "scanner-6": 1,
+     "scanner-7": 1,
+     "scanner-8": 1,
+     "scanner-9": 1,
+     "scanner-10": 1,
+     "scanner-11": 1,
+     "scanner-12": 1,
+     "scanner-13": 1,
+     "scanner-14": 1,
+     "scanner-15": 1,
+     "scanner-16": 1,
+     "scanner-17": 1,
+     "scanner-18": 1,
+     "scanner-19": 1,
+     "scanner-20": 1,
+     "scanner-21": 1,
+     "scanner-22": 1,
+     "scanner-23": 1,
+     "scanner-24": 1,
+     "scanner-25": 1,
+     "scanner-26": 1,
+     "scanner-27": 1,
+     "scanner-28": 1,
+     "scanner-29": 1,
+     "scanner-30": 1,
+     "scanner-31": 1,
+     "scanner-32": 1,
+     "scanner-33": 1,
+     "scanner-34": 1,
+     "scanner-35": 1,
+     "scanner-36": 1,
+     "scanner-37": 1,
+     "scanner-38": 1,
+     "scanner-39": 1,
+     "scanner-40": 1,
+     "scanner-41": 1,
+     "scanner-42": 1,
+     "scanner-43": 1,
+     "scanner-44": 1,
+     "scanner-45": 1,
+     "scanner-46": 1,
+     "scanner-47": 1,
+     "scanner-48": 1,
+     "scanner-49": 1,
+     "scanner-50": 1,
+     "scanner-51": 1,
+     "scanner-52": 1,
+     "scanner-53": 1,
+     "scanner-54": 1,
+     "scanner-55": 1,
+     "scanner-56": 1,
+     "scanner-57": 1,
+     "scanner-58": 1,
+     "scanner-59": 1,
+     "scanner-60": 1,
+     "scanner-61": 1,
+     "scanner-62": 1,
+     "scanner-63": 1
+    }
+   },
+   "memstat": {
+    "container": "rr",
+    "cgroup": "/sys/fs/cgroup/system.slice/docker-27597a7502cace8fb3ee4f610f39e1a26f29279d0307a5e5d129597adb100ba6.scope",
+    "hz": 1.0,
+    "samples": 1469,
+    "sampled_peak_bytes": {
+     "anon": 5209194496,
+     "file": 4383850496,
+     "total": 8540106752,
+     "anon_plus_file": 8326492160
+    },
+    "memory_peak_lifetime_context_only": 8647618560,
+    "note": "sampled peaks are the P1 figure; memory.peak spans the container's whole lifetime (warm-up included) and is context only"
+   },
+   "session": {
+    "steal_share": 4.7709730591244966e-05,
+    "mhz_open_mean": 2668.9151875,
+    "mhz_close_mean": 2671.4775625,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "summary": {
+    "dir": "p2b_rr_base_a",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "frames_match_export": true,
+    "span_s": 1313.4,
+    "frames_per_s": 2.438708694990102,
+    "records_span_s": 1301.462288907,
+    "records_frames_per_s": 2.461077840903065,
+    "export_frames_per_s": 2.439,
+    "export_total_frames": 3203,
+    "cpu_s_per_frame": 1.512488292226038,
+    "engine_cores": 3.688,
+    "service_cpu_s": 4844.5,
+    "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+    "p0": {
+     "d0_pre": {
+      "d0_schema": 2,
+      "pid": 90,
+      "ppid": 1,
+      "trace": {
+       "sys_gettrace_this_thread": "None",
+       "threading_trace_hook": "None",
+       "threading_profile_hook": "None",
+       "sys_getprofile_this_thread": "None",
+       "pydevd_loaded": true,
+       "debugpy_loaded": true,
+       "sys_monitoring_tools": {
+        "0": "pydevd"
+       }
+      },
+      "proc_threads": 176,
+      "python_threads": 5,
+      "python_threads_by_prefix": {
+       "Main": 1,
+       "GlobalEventLoop": 2,
+       "scanner": 1,
+       "External": 1
+      },
+      "asyncio_executor_threads_alive": 0,
+      "asyncio_executor_max_index": null,
+      "root_modules_with_params": {
+       "rfdetr.models.lwdetr.LWDETR": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         32174530
+        ]
+       },
+       "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         22713216
+        ]
+       }
+      },
+      "model_instances_total": 2
+     },
+     "probe_pid": 90,
+     "torch_num_threads": 4,
+     "env": {
+      "OMP_NUM_THREADS": "4",
+      "MKL_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "4",
+      "VECLIB_MAXIMUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "TORCH_NUM_THREADS": "4"
+     },
+     "mandate": {
+      "mandate_violation": false,
+      "violations": []
+     },
+     "d0_post": {
+      "d0_schema": 2,
+      "pid": 90,
+      "ppid": 1,
+      "trace": {
+       "sys_gettrace_this_thread": "None",
+       "threading_trace_hook": "None",
+       "threading_profile_hook": "None",
+       "sys_getprofile_this_thread": "None",
+       "pydevd_loaded": true,
+       "debugpy_loaded": true,
+       "sys_monitoring_tools": {
+        "0": "pydevd"
+       }
+      },
+      "proc_threads": 240,
+      "python_threads": 21,
+      "python_threads_by_prefix": {
+       "Main": 1,
+       "GlobalEventLoop": 2,
+       "scanner": 1,
+       "External": 17
+      },
+      "asyncio_executor_threads_alive": 0,
+      "asyncio_executor_max_index": null,
+      "root_modules_with_params": {
+       "rfdetr.models.lwdetr.LWDETR": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         32174530
+        ]
+       },
+       "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         22713216
+        ]
+       }
+      },
+      "model_instances_total": 2
+     },
+     "post_pid": 90
+    },
+    "task_census": {
+     "declared_tokens": 1,
+     "census_before": 0,
+     "census_after": 1,
+     "new_task_pids": [
+      90
+     ],
+     "project_ids": [
+      "c60514bb-a083-540f-b081-79fe3a6fdd4f"
+     ]
+    },
+    "session": {
+     "steal_share": 4.7709730591244966e-05,
+     "mhz_open_mean": 2668.9151875,
+     "mhz_close_mean": 2671.4775625,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "container_procs": {
+     "containers": {
+      "rr": {
+       "leg_start": {
+        "n": 2,
+        "state": "measured",
+        "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-8c1f5fd4.webhook_1-1a152k0s.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+       },
+       "leg_end": {
+        "n": 2,
+        "state": "measured",
+        "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-8c1f5fd4.webhook_1-1a152k0s.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+       }
+      }
+     },
+     "service_peak_process_count": 18,
+     "service_distinct_pids_seen": 18
+    },
+    "idle_burden": {
+     "instance_kind": "rr_tokens",
+     "idle_cores_before_instances": 1.008,
+     "idle_cores_with_instances_live": 1.232
+    },
+    "thread_pins": null
+   }
+  },
+  "p2b_rr_base_b": {
+   "name": "p2b_rr_base_b",
+   "dir": "p2b_rr_base_b",
+   "frames_per_s": 2.564862267777066,
+   "posthoc": {
+    "idle_cores_with_instances_live": 1.232,
+    "cpu_s_per_frame": 1.4230721198876055,
+    "net_cpu_s_per_frame": 0.9427344364658135,
+    "service_cores": 3.65,
+    "cores_in_forward": 2.424514785862213
+   },
+   "records_frames_per_s": 2.5897343895971203,
+   "errors": 0,
+   "videos": 16,
+   "frames_match_export": true,
+   "forward": {
+    "frames": 3203,
+    "forward": {
+     "count": 3203,
+     "sum": 1208.337269282999,
+     "share_of_run_total": null,
+     "min": 0.26521159500043723,
+     "mean": 0.37725172316047423,
+     "sd": 0.031168655276277622,
+     "p50": 0.381540519999362,
+     "p90": 0.3957122480005637,
+     "p95": 0.4052533340000082,
+     "p99": 0.5012708869999187,
+     "max": 0.7000077390002843,
+     "mean_over_p50": 0.9887592624791334
+    },
+    "forward_mean_s": 0.37725172316047423,
+    "caller_cpu_ratio": 0.6018111303680133,
+    "cores_in_forward": 2.424514785862213,
+    "callers": [
+     567,
+     659,
+     746,
+     840,
+     931,
+     1022,
+     1113,
+     1204,
+     1292,
+     1380,
+     1470,
+     1560,
+     1651,
+     1739,
+     1827,
+     1914
+    ]
+   },
+   "readback": {
+    "pydevd_loaded": {
+     "d0_pre": true
+    },
+    "debugpy_loaded": {
+     "d0_pre": true
+    },
+    "sys_monitoring_tools_env_probe": {
+     "d0_pre": {
+      "0": "pydevd"
+     }
+    },
+    "monitoring_tools_detector": {
+     "0": "pydevd"
+    },
+    "gettrace_detector": "None",
+    "malloc_env_detector": {},
+    "os_threads_detector": 182,
+    "proc_threads_env_probe": {
+     "d0_pre": 176
+    },
+    "python_threads_detector": 8,
+    "torch": {
+     "num_threads": 4,
+     "num_interop_threads": 16,
+     "cpu_capability": "AVX512"
+    },
+    "env_detector": {
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "MKL_NUM_THREADS": "4",
+     "OMP_NUM_THREADS": "4",
+     "TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD": "1",
+     "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+     "KMP_DUPLICATE_LIB_OK": "True",
+     "KMP_INIT_AT_FORK": "FALSE"
+    },
+    "python_thread_names": [
+     "External",
+     "External",
+     "GlobalEventLoop",
+     "GlobalEventLoop",
+     "Main",
+     "avi_reader_info",
+     "avi_reader_terminate",
+     "scanner-0"
+    ],
+    "thread_name_counts": {
+     "engine": 19,
+     "scanner-0": 8,
+     "Signal Listener": 1,
+     "Work #0": 1,
+     "Work #1": 1,
+     "Work #2": 1,
+     "Work #3": 1,
+     "Work #4": 1,
+     "Work #5": 1,
+     "Work #6": 1,
+     "Work #7": 1,
+     "Work #8": 1,
+     "Work #9": 1,
+     "Status": 1,
+     "AwsEventLoop1": 1,
+     "AwsEventLoop2": 1,
+     "AwsEventLoop3": 1,
+     "AwsEventLoop4": 1,
+     "AwsEventLoop5": 1,
+     "AwsEventLoop6": 1,
+     "AwsEventLoop7": 1,
+     "AwsEventLoop8": 1,
+     "AwsEventLoop9": 1,
+     "AwsEventLoop10": 1,
+     "AwsEventLoop11": 1,
+     "AwsEventLoop12": 1,
+     "AwsEventLoop13": 1,
+     "AwsEventLoop14": 1,
+     "AwsEventLoop15": 1,
+     "AwsEventLoop16": 1,
+     "pipeline-0": 1,
+     "pipeline-1": 1,
+     "pipeline-2": 1,
+     "pipeline-3": 1,
+     "pipeline-4": 1,
+     "pipeline-5": 1,
+     "pipeline-6": 1,
+     "pipeline-7": 1,
+     "pipeline-8": 1,
+     "pipeline-9": 1,
+     "pipeline-10": 1,
+     "pipeline-11": 1,
+     "pipeline-12": 1,
+     "pipeline-13": 1,
+     "pipeline-14": 1,
+     "pipeline-15": 1,
+     "pipeline-16": 1,
+     "pipeline-17": 1,
+     "pipeline-18": 1,
+     "pipeline-19": 1,
+     "pipeline-20": 1,
+     "pipeline-21": 1,
+     "pipeline-22": 1,
+     "pipeline-23": 1,
+     "pipeline-24": 1,
+     "pipeline-25": 1,
+     "pipeline-26": 1,
+     "pipeline-27": 1,
+     "pipeline-28": 1,
+     "pipeline-29": 1,
+     "pipeline-30": 1,
+     "pipeline-31": 1,
+     "pipeline-32": 1,
+     "pipeline-33": 1,
+     "pipeline-34": 1,
+     "pipeline-35": 1,
+     "pipeline-36": 1,
+     "pipeline-37": 1,
+     "pipeline-38": 1,
+     "pipeline-39": 1,
+     "pipeline-40": 1,
+     "pipeline-41": 1,
+     "pipeline-42": 1,
+     "pipeline-43": 1,
+     "pipeline-44": 1,
+     "pipeline-45": 1,
+     "pipeline-46": 1,
+     "pipeline-47": 1,
+     "pipeline-48": 1,
+     "pipeline-49": 1,
+     "pipeline-50": 1,
+     "pipeline-51": 1,
+     "pipeline-52": 1,
+     "pipeline-53": 1,
+     "pipeline-54": 1,
+     "pipeline-55": 1,
+     "pipeline-56": 1,
+     "pipeline-57": 1,
+     "pipeline-58": 1,
+     "pipeline-59": 1,
+     "pipeline-60": 1,
+     "pipeline-61": 1,
+     "pipeline-62": 1,
+     "pipeline-63": 1,
+     "scanner-1": 1,
+     "scanner-2": 1,
+     "scanner-3": 1,
+     "scanner-4": 1,
+     "scanner-5": 1,
+     "scanner-6": 1,
+     "scanner-7": 1,
+     "scanner-8": 1,
+     "scanner-9": 1,
+     "scanner-10": 1,
+     "scanner-11": 1,
+     "scanner-12": 1,
+     "scanner-13": 1,
+     "scanner-14": 1,
+     "scanner-15": 1,
+     "scanner-16": 1,
+     "scanner-17": 1,
+     "scanner-18": 1,
+     "scanner-19": 1,
+     "scanner-20": 1,
+     "scanner-21": 1,
+     "scanner-22": 1,
+     "scanner-23": 1,
+     "scanner-24": 1,
+     "scanner-25": 1,
+     "scanner-26": 1,
+     "scanner-27": 1,
+     "scanner-28": 1,
+     "scanner-29": 1,
+     "scanner-30": 1,
+     "scanner-31": 1,
+     "scanner-32": 1,
+     "scanner-33": 1,
+     "scanner-34": 1,
+     "scanner-35": 1,
+     "scanner-36": 1,
+     "scanner-37": 1,
+     "scanner-38": 1,
+     "scanner-39": 1,
+     "scanner-40": 1,
+     "scanner-41": 1,
+     "scanner-42": 1,
+     "scanner-43": 1,
+     "scanner-44": 1,
+     "scanner-45": 1,
+     "scanner-46": 1,
+     "scanner-47": 1,
+     "scanner-48": 1,
+     "scanner-49": 1,
+     "scanner-50": 1,
+     "scanner-51": 1,
+     "scanner-52": 1,
+     "scanner-53": 1,
+     "scanner-54": 1,
+     "scanner-55": 1,
+     "scanner-56": 1,
+     "scanner-57": 1,
+     "scanner-58": 1,
+     "scanner-59": 1,
+     "scanner-60": 1,
+     "scanner-61": 1,
+     "scanner-62": 1,
+     "scanner-63": 1
+    }
+   },
+   "memstat": {
+    "container": "rr",
+    "cgroup": "/sys/fs/cgroup/system.slice/docker-31ec04570a63d4a19222fb9bba4dead486f496d552cb7be49427b12557083f20.scope",
+    "hz": 1.0,
+    "samples": 1364,
+    "sampled_peak_bytes": {
+     "anon": 5584658432,
+     "file": 3218137088,
+     "total": 7512297472,
+     "anon_plus_file": 7323754496
+    },
+    "memory_peak_lifetime_context_only": 7660867584,
+    "note": "sampled peaks are the P1 figure; memory.peak spans the container's whole lifetime (warm-up included) and is context only"
+   },
+   "session": {
+    "steal_share": 5.16300170034856e-05,
+    "mhz_open_mean": 2836.62740625,
+    "mhz_close_mean": 2685.37221875,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "summary": {
+    "dir": "p2b_rr_base_b",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "frames_match_export": true,
+    "span_s": 1248.8,
+    "frames_per_s": 2.564862267777066,
+    "records_span_s": 1236.806373992,
+    "records_frames_per_s": 2.5897343895971203,
+    "export_frames_per_s": 2.565,
+    "export_total_frames": 3203,
+    "cpu_s_per_frame": 1.4230721198876055,
+    "engine_cores": 3.65,
+    "service_cpu_s": 4558.1,
+    "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+    "p0": {
+     "d0_pre": {
+      "d0_schema": 2,
+      "pid": 89,
+      "ppid": 1,
+      "trace": {
+       "sys_gettrace_this_thread": "None",
+       "threading_trace_hook": "None",
+       "threading_profile_hook": "None",
+       "sys_getprofile_this_thread": "None",
+       "pydevd_loaded": true,
+       "debugpy_loaded": true,
+       "sys_monitoring_tools": {
+        "0": "pydevd"
+       }
+      },
+      "proc_threads": 176,
+      "python_threads": 5,
+      "python_threads_by_prefix": {
+       "Main": 1,
+       "GlobalEventLoop": 2,
+       "scanner": 1,
+       "External": 1
+      },
+      "asyncio_executor_threads_alive": 0,
+      "asyncio_executor_max_index": null,
+      "root_modules_with_params": {
+       "rfdetr.models.lwdetr.LWDETR": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         32174530
+        ]
+       },
+       "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         22713216
+        ]
+       }
+      },
+      "model_instances_total": 2
+     },
+     "probe_pid": 89,
+     "torch_num_threads": 4,
+     "env": {
+      "OMP_NUM_THREADS": "4",
+      "MKL_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "4",
+      "VECLIB_MAXIMUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "TORCH_NUM_THREADS": "4"
+     },
+     "mandate": {
+      "mandate_violation": false,
+      "violations": []
+     },
+     "d0_post": {
+      "d0_schema": 2,
+      "pid": 89,
+      "ppid": 1,
+      "trace": {
+       "sys_gettrace_this_thread": "None",
+       "threading_trace_hook": "None",
+       "threading_profile_hook": "None",
+       "sys_getprofile_this_thread": "None",
+       "pydevd_loaded": true,
+       "debugpy_loaded": true,
+       "sys_monitoring_tools": {
+        "0": "pydevd"
+       }
+      },
+      "proc_threads": 240,
+      "python_threads": 21,
+      "python_threads_by_prefix": {
+       "Main": 1,
+       "GlobalEventLoop": 2,
+       "scanner": 1,
+       "External": 17
+      },
+      "asyncio_executor_threads_alive": 0,
+      "asyncio_executor_max_index": null,
+      "root_modules_with_params": {
+       "rfdetr.models.lwdetr.LWDETR": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         32174530
+        ]
+       },
+       "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         22713216
+        ]
+       }
+      },
+      "model_instances_total": 2
+     },
+     "post_pid": 89
+    },
+    "task_census": {
+     "declared_tokens": 1,
+     "census_before": 0,
+     "census_after": 1,
+     "new_task_pids": [
+      89
+     ],
+     "project_ids": [
+      "c28f44b0-ae32-51a0-86d4-577930530d7a"
+     ]
+    },
+    "session": {
+     "steal_share": 5.16300170034856e-05,
+     "mhz_open_mean": 2836.62740625,
+     "mhz_close_mean": 2685.37221875,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "container_procs": {
+     "containers": {
+      "rr": {
+       "leg_start": {
+        "n": 2,
+        "state": "measured",
+        "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-d363df10.webhook_1-pgunxlf8.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+       },
+       "leg_end": {
+        "n": 2,
+        "state": "measured",
+        "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-d363df10.webhook_1-pgunxlf8.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+       }
+      }
+     },
+     "service_peak_process_count": 18,
+     "service_distinct_pids_seen": 18
+    },
+    "idle_burden": {
+     "instance_kind": "rr_tokens",
+     "idle_cores_before_instances": 1.007,
+     "idle_cores_with_instances_live": 1.232
+    },
+    "thread_pins": null
+   }
+  },
+  "p2b_rr_comb_a": {
+   "name": "p2b_rr_comb_a",
+   "dir": "p2b_rr_comb_a",
+   "frames_per_s": 2.7789345826826306,
+   "posthoc": {
+    "idle_cores_with_instances_live": 1.234,
+    "cpu_s_per_frame": 1.3728691851389323,
+    "net_cpu_s_per_frame": 0.9288141117702156,
+    "service_cores": 3.815,
+    "cores_in_forward": 2.569103093798018
+   },
+   "records_frames_per_s": 2.8080545292199526,
+   "errors": 0,
+   "videos": 16,
+   "frames_match_export": true,
+   "forward": {
+    "frames": 3203,
+    "forward": {
+     "count": 3203,
+     "sum": 1112.2580931859884,
+     "share_of_run_total": null,
+     "min": 0.2432597609995355,
+     "mean": 0.3472551024620632,
+     "sd": 0.04104531433086727,
+     "p50": 0.3427790699997786,
+     "p90": 0.39199504499993054,
+     "p95": 0.41657385300004535,
+     "p99": 0.48142634099986026,
+     "max": 0.6923194720002357,
+     "mean_over_p50": 1.0130580681670194
+    },
+    "forward_mean_s": 0.3472551024620632,
+    "caller_cpu_ratio": 0.6252301720763603,
+    "cores_in_forward": 2.569103093798018,
+    "callers": [
+     561,
+     654,
+     742,
+     837,
+     927,
+     1017,
+     1108,
+     1200,
+     1290,
+     1377,
+     1465,
+     1556,
+     1646,
+     1734,
+     1821,
+     1908
+    ]
+   },
+   "readback": {
+    "pydevd_loaded": {
+     "d0_pre": false
+    },
+    "debugpy_loaded": {
+     "d0_pre": false
+    },
+    "sys_monitoring_tools_env_probe": {
+     "d0_pre": {}
+    },
+    "monitoring_tools_detector": {},
+    "gettrace_detector": "None",
+    "malloc_env_detector": {
+     "MALLOC_ARENA_MAX": "2"
+    },
+    "os_threads_detector": 179,
+    "proc_threads_env_probe": {
+     "d0_pre": 173
+    },
+    "python_threads_detector": 8,
+    "torch": {
+     "num_threads": 4,
+     "num_interop_threads": 16,
+     "cpu_capability": "AVX512"
+    },
+    "env_detector": {
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "MALLOC_ARENA_MAX": "2",
+     "MKL_NUM_THREADS": "4",
+     "OMP_NUM_THREADS": "4",
+     "TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD": "1",
+     "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+     "KMP_DUPLICATE_LIB_OK": "True",
+     "KMP_INIT_AT_FORK": "FALSE"
+    },
+    "python_thread_names": [
+     "External",
+     "External",
+     "GlobalEventLoop",
+     "GlobalEventLoop",
+     "Main",
+     "avi_reader_info",
+     "avi_reader_terminate",
+     "scanner-59"
+    ],
+    "thread_name_counts": {
+     "engine": 16,
+     "scanner-59": 8,
+     "Signal Listener": 1,
+     "Work #0": 1,
+     "Work #1": 1,
+     "Work #2": 1,
+     "Work #3": 1,
+     "Work #4": 1,
+     "Work #5": 1,
+     "Work #6": 1,
+     "Work #7": 1,
+     "Work #8": 1,
+     "Work #9": 1,
+     "Status": 1,
+     "AwsEventLoop1": 1,
+     "AwsEventLoop2": 1,
+     "AwsEventLoop3": 1,
+     "AwsEventLoop4": 1,
+     "AwsEventLoop5": 1,
+     "AwsEventLoop6": 1,
+     "AwsEventLoop7": 1,
+     "AwsEventLoop8": 1,
+     "AwsEventLoop9": 1,
+     "AwsEventLoop10": 1,
+     "AwsEventLoop11": 1,
+     "AwsEventLoop12": 1,
+     "AwsEventLoop13": 1,
+     "AwsEventLoop14": 1,
+     "AwsEventLoop15": 1,
+     "AwsEventLoop16": 1,
+     "pipeline-0": 1,
+     "pipeline-1": 1,
+     "pipeline-2": 1,
+     "pipeline-3": 1,
+     "pipeline-4": 1,
+     "pipeline-5": 1,
+     "pipeline-6": 1,
+     "pipeline-7": 1,
+     "pipeline-8": 1,
+     "pipeline-9": 1,
+     "pipeline-10": 1,
+     "pipeline-11": 1,
+     "pipeline-12": 1,
+     "pipeline-13": 1,
+     "pipeline-14": 1,
+     "pipeline-15": 1,
+     "pipeline-16": 1,
+     "pipeline-17": 1,
+     "pipeline-18": 1,
+     "pipeline-19": 1,
+     "pipeline-20": 1,
+     "pipeline-21": 1,
+     "pipeline-22": 1,
+     "pipeline-23": 1,
+     "pipeline-24": 1,
+     "pipeline-25": 1,
+     "pipeline-26": 1,
+     "pipeline-27": 1,
+     "pipeline-28": 1,
+     "pipeline-29": 1,
+     "pipeline-30": 1,
+     "pipeline-31": 1,
+     "pipeline-32": 1,
+     "pipeline-33": 1,
+     "pipeline-34": 1,
+     "pipeline-35": 1,
+     "pipeline-36": 1,
+     "pipeline-37": 1,
+     "pipeline-38": 1,
+     "pipeline-39": 1,
+     "pipeline-40": 1,
+     "pipeline-41": 1,
+     "pipeline-42": 1,
+     "pipeline-43": 1,
+     "pipeline-44": 1,
+     "pipeline-45": 1,
+     "pipeline-46": 1,
+     "pipeline-47": 1,
+     "pipeline-48": 1,
+     "pipeline-49": 1,
+     "pipeline-50": 1,
+     "pipeline-51": 1,
+     "pipeline-52": 1,
+     "pipeline-53": 1,
+     "pipeline-54": 1,
+     "pipeline-55": 1,
+     "pipeline-56": 1,
+     "pipeline-57": 1,
+     "pipeline-58": 1,
+     "pipeline-59": 1,
+     "pipeline-60": 1,
+     "pipeline-61": 1,
+     "pipeline-62": 1,
+     "pipeline-63": 1,
+     "scanner-0": 1,
+     "scanner-1": 1,
+     "scanner-2": 1,
+     "scanner-3": 1,
+     "scanner-4": 1,
+     "scanner-5": 1,
+     "scanner-6": 1,
+     "scanner-7": 1,
+     "scanner-8": 1,
+     "scanner-9": 1,
+     "scanner-10": 1,
+     "scanner-11": 1,
+     "scanner-12": 1,
+     "scanner-13": 1,
+     "scanner-14": 1,
+     "scanner-15": 1,
+     "scanner-16": 1,
+     "scanner-17": 1,
+     "scanner-18": 1,
+     "scanner-19": 1,
+     "scanner-20": 1,
+     "scanner-21": 1,
+     "scanner-22": 1,
+     "scanner-23": 1,
+     "scanner-24": 1,
+     "scanner-25": 1,
+     "scanner-26": 1,
+     "scanner-27": 1,
+     "scanner-28": 1,
+     "scanner-29": 1,
+     "scanner-30": 1,
+     "scanner-31": 1,
+     "scanner-32": 1,
+     "scanner-33": 1,
+     "scanner-34": 1,
+     "scanner-35": 1,
+     "scanner-36": 1,
+     "scanner-37": 1,
+     "scanner-38": 1,
+     "scanner-39": 1,
+     "scanner-40": 1,
+     "scanner-41": 1,
+     "scanner-42": 1,
+     "scanner-43": 1,
+     "scanner-44": 1,
+     "scanner-45": 1,
+     "scanner-46": 1,
+     "scanner-47": 1,
+     "scanner-48": 1,
+     "scanner-49": 1,
+     "scanner-50": 1,
+     "scanner-51": 1,
+     "scanner-52": 1,
+     "scanner-53": 1,
+     "scanner-54": 1,
+     "scanner-55": 1,
+     "scanner-56": 1,
+     "scanner-57": 1,
+     "scanner-58": 1,
+     "scanner-60": 1,
+     "scanner-61": 1,
+     "scanner-62": 1,
+     "scanner-63": 1
+    }
+   },
+   "memstat": {
+    "container": "rr",
+    "cgroup": "/sys/fs/cgroup/system.slice/docker-9b514c5e65734c575eb6f0e53ca601478b0783fdaf5ab897d378efc6a8e7a8d1.scope",
+    "hz": 1.0,
+    "samples": 1267,
+    "sampled_peak_bytes": {
+     "anon": 2427752448,
+     "file": 3218141184,
+     "total": 5664256000,
+     "anon_plus_file": 5493280768
+    },
+    "memory_peak_lifetime_context_only": 5743296512,
+    "note": "sampled peaks are the P1 figure; memory.peak spans the container's whole lifetime (warm-up included) and is context only"
+   },
+   "session": {
+    "steal_share": 4.224010908322907e-05,
+    "mhz_open_mean": 2969.41184375,
+    "mhz_close_mean": 2710.22271875,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "summary": {
+    "dir": "p2b_rr_comb_a",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "frames_match_export": true,
+    "span_s": 1152.6,
+    "frames_per_s": 2.7789345826826306,
+    "records_span_s": 1140.647365167,
+    "records_frames_per_s": 2.8080545292199526,
+    "export_frames_per_s": 2.779,
+    "export_total_frames": 3203,
+    "cpu_s_per_frame": 1.3728691851389323,
+    "engine_cores": 3.815,
+    "service_cpu_s": 4397.3,
+    "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+    "p0": {
+     "d0_pre": {
+      "d0_schema": 2,
+      "pid": 89,
+      "ppid": 1,
+      "trace": {
+       "sys_gettrace_this_thread": "None",
+       "threading_trace_hook": "None",
+       "threading_profile_hook": "None",
+       "sys_getprofile_this_thread": "None",
+       "pydevd_loaded": false,
+       "debugpy_loaded": false,
+       "sys_monitoring_tools": {}
+      },
+      "proc_threads": 173,
+      "python_threads": 5,
+      "python_threads_by_prefix": {
+       "Main": 1,
+       "GlobalEventLoop": 2,
+       "scanner": 1,
+       "External": 1
+      },
+      "asyncio_executor_threads_alive": 0,
+      "asyncio_executor_max_index": null,
+      "root_modules_with_params": {
+       "rfdetr.models.lwdetr.LWDETR": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         32174530
+        ]
+       },
+       "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         22713216
+        ]
+       }
+      },
+      "model_instances_total": 2
+     },
+     "probe_pid": 89,
+     "torch_num_threads": 4,
+     "env": {
+      "OMP_NUM_THREADS": "4",
+      "MKL_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "4",
+      "VECLIB_MAXIMUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "TORCH_NUM_THREADS": "4"
+     },
+     "mandate": {
+      "mandate_violation": false,
+      "violations": []
+     },
+     "d0_post": {
+      "d0_schema": 2,
+      "pid": 89,
+      "ppid": 1,
+      "trace": {
+       "sys_gettrace_this_thread": "None",
+       "threading_trace_hook": "None",
+       "threading_profile_hook": "None",
+       "sys_getprofile_this_thread": "None",
+       "pydevd_loaded": false,
+       "debugpy_loaded": false,
+       "sys_monitoring_tools": {}
+      },
+      "proc_threads": 236,
+      "python_threads": 20,
+      "python_threads_by_prefix": {
+       "Main": 1,
+       "GlobalEventLoop": 2,
+       "scanner": 1,
+       "External": 16
+      },
+      "asyncio_executor_threads_alive": 0,
+      "asyncio_executor_max_index": null,
+      "root_modules_with_params": {
+       "rfdetr.models.lwdetr.LWDETR": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         32174530
+        ]
+       },
+       "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         22713216
+        ]
+       }
+      },
+      "model_instances_total": 2
+     },
+     "post_pid": 89
+    },
+    "task_census": {
+     "declared_tokens": 1,
+     "census_before": 0,
+     "census_after": 1,
+     "new_task_pids": [
+      89
+     ],
+     "project_ids": [
+      "36b12c35-992a-5c67-b071-89b7d96469af"
+     ]
+    },
+    "session": {
+     "steal_share": 4.224010908322907e-05,
+     "mhz_open_mean": 2969.41184375,
+     "mhz_close_mean": 2710.22271875,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "container_procs": {
+     "containers": {
+      "rr": {
+       "leg_start": {
+        "n": 2,
+        "state": "measured",
+        "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-507ceb45.webhook_1-5yadnm7l.json --autoterm --monitor=app --data_port=20000 --data_hos"
+       },
+       "leg_end": {
+        "n": 2,
+        "state": "measured",
+        "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-507ceb45.webhook_1-5yadnm7l.json --autoterm --monitor=app --data_port=20000 --data_hos"
+       }
+      }
+     },
+     "service_peak_process_count": 18,
+     "service_distinct_pids_seen": 18
+    },
+    "idle_burden": {
+     "instance_kind": "rr_tokens",
+     "idle_cores_before_instances": 1.008,
+     "idle_cores_with_instances_live": 1.234
+    },
+    "thread_pins": null
+   }
+  },
+  "p2b_rr_comb_b": {
+   "name": "p2b_rr_comb_b",
+   "dir": "p2b_rr_comb_b",
+   "frames_per_s": 2.6525879917184265,
+   "posthoc": {
+    "idle_cores_with_instances_live": 1.238,
+    "cpu_s_per_frame": 1.4155479238214175,
+    "net_cpu_s_per_frame": 0.9488339057133937,
+    "service_cores": 3.755,
+    "cores_in_forward": 2.509259632275554
+   },
+   "records_frames_per_s": 2.678959939804233,
+   "errors": 0,
+   "videos": 16,
+   "frames_match_export": true,
+   "forward": {
+    "frames": 3203,
+    "forward": {
+     "count": 3203,
+     "sum": 1166.692407599976,
+     "share_of_run_total": null,
+     "min": 0.2671533319989976,
+     "mean": 0.36424989310021105,
+     "sd": 0.03425601246590719,
+     "p50": 0.36392294600045716,
+     "p90": 0.3917535880009382,
+     "p95": 0.39789874000052805,
+     "p99": 0.5117643249996036,
+     "max": 0.6845930840008805,
+     "mean_over_p50": 1.0008983964966955
+    },
+    "forward_mean_s": 0.36424989310021105,
+    "caller_cpu_ratio": 0.6219509109780678,
+    "cores_in_forward": 2.509259632275554,
+    "callers": [
+     560,
+     651,
+     743,
+     834,
+     925,
+     1016,
+     1106,
+     1197,
+     1285,
+     1373,
+     1461,
+     1552,
+     1640,
+     1728,
+     1819,
+     1906
+    ]
+   },
+   "readback": {
+    "pydevd_loaded": {
+     "d0_pre": false
+    },
+    "debugpy_loaded": {
+     "d0_pre": false
+    },
+    "sys_monitoring_tools_env_probe": {
+     "d0_pre": {}
+    },
+    "monitoring_tools_detector": {},
+    "gettrace_detector": "None",
+    "malloc_env_detector": {
+     "MALLOC_ARENA_MAX": "2"
+    },
+    "os_threads_detector": 179,
+    "proc_threads_env_probe": {
+     "d0_pre": 173
+    },
+    "python_threads_detector": 8,
+    "torch": {
+     "num_threads": 4,
+     "num_interop_threads": 16,
+     "cpu_capability": "AVX512"
+    },
+    "env_detector": {
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "MALLOC_ARENA_MAX": "2",
+     "MKL_NUM_THREADS": "4",
+     "OMP_NUM_THREADS": "4",
+     "TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD": "1",
+     "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+     "KMP_DUPLICATE_LIB_OK": "True",
+     "KMP_INIT_AT_FORK": "FALSE"
+    },
+    "python_thread_names": [
+     "External",
+     "External",
+     "GlobalEventLoop",
+     "GlobalEventLoop",
+     "Main",
+     "avi_reader_info",
+     "avi_reader_terminate",
+     "scanner-60"
+    ],
+    "thread_name_counts": {
+     "engine": 16,
+     "scanner-60": 8,
+     "Signal Listener": 1,
+     "Work #0": 1,
+     "Work #1": 1,
+     "Work #2": 1,
+     "Work #3": 1,
+     "Work #4": 1,
+     "Work #5": 1,
+     "Work #6": 1,
+     "Work #7": 1,
+     "Work #8": 1,
+     "Work #9": 1,
+     "Status": 1,
+     "AwsEventLoop1": 1,
+     "AwsEventLoop2": 1,
+     "AwsEventLoop3": 1,
+     "AwsEventLoop4": 1,
+     "AwsEventLoop5": 1,
+     "AwsEventLoop6": 1,
+     "AwsEventLoop7": 1,
+     "AwsEventLoop8": 1,
+     "AwsEventLoop9": 1,
+     "AwsEventLoop10": 1,
+     "AwsEventLoop11": 1,
+     "AwsEventLoop12": 1,
+     "AwsEventLoop13": 1,
+     "AwsEventLoop14": 1,
+     "AwsEventLoop15": 1,
+     "AwsEventLoop16": 1,
+     "pipeline-0": 1,
+     "pipeline-1": 1,
+     "pipeline-2": 1,
+     "pipeline-3": 1,
+     "pipeline-4": 1,
+     "pipeline-5": 1,
+     "pipeline-6": 1,
+     "pipeline-7": 1,
+     "pipeline-8": 1,
+     "pipeline-9": 1,
+     "pipeline-10": 1,
+     "pipeline-11": 1,
+     "pipeline-12": 1,
+     "pipeline-13": 1,
+     "pipeline-14": 1,
+     "pipeline-15": 1,
+     "pipeline-16": 1,
+     "pipeline-17": 1,
+     "pipeline-18": 1,
+     "pipeline-19": 1,
+     "pipeline-20": 1,
+     "pipeline-21": 1,
+     "pipeline-22": 1,
+     "pipeline-23": 1,
+     "pipeline-24": 1,
+     "pipeline-25": 1,
+     "pipeline-26": 1,
+     "pipeline-27": 1,
+     "pipeline-28": 1,
+     "pipeline-29": 1,
+     "pipeline-30": 1,
+     "pipeline-31": 1,
+     "pipeline-32": 1,
+     "pipeline-33": 1,
+     "pipeline-34": 1,
+     "pipeline-35": 1,
+     "pipeline-36": 1,
+     "pipeline-37": 1,
+     "pipeline-38": 1,
+     "pipeline-39": 1,
+     "pipeline-40": 1,
+     "pipeline-41": 1,
+     "pipeline-42": 1,
+     "pipeline-43": 1,
+     "pipeline-44": 1,
+     "pipeline-45": 1,
+     "pipeline-46": 1,
+     "pipeline-47": 1,
+     "pipeline-48": 1,
+     "pipeline-49": 1,
+     "pipeline-50": 1,
+     "pipeline-51": 1,
+     "pipeline-52": 1,
+     "pipeline-53": 1,
+     "pipeline-54": 1,
+     "pipeline-55": 1,
+     "pipeline-56": 1,
+     "pipeline-57": 1,
+     "pipeline-58": 1,
+     "pipeline-59": 1,
+     "pipeline-60": 1,
+     "pipeline-61": 1,
+     "pipeline-62": 1,
+     "pipeline-63": 1,
+     "scanner-0": 1,
+     "scanner-1": 1,
+     "scanner-2": 1,
+     "scanner-3": 1,
+     "scanner-4": 1,
+     "scanner-5": 1,
+     "scanner-6": 1,
+     "scanner-7": 1,
+     "scanner-8": 1,
+     "scanner-9": 1,
+     "scanner-10": 1,
+     "scanner-11": 1,
+     "scanner-12": 1,
+     "scanner-13": 1,
+     "scanner-14": 1,
+     "scanner-15": 1,
+     "scanner-16": 1,
+     "scanner-17": 1,
+     "scanner-18": 1,
+     "scanner-19": 1,
+     "scanner-20": 1,
+     "scanner-21": 1,
+     "scanner-22": 1,
+     "scanner-23": 1,
+     "scanner-24": 1,
+     "scanner-25": 1,
+     "scanner-26": 1,
+     "scanner-27": 1,
+     "scanner-28": 1,
+     "scanner-29": 1,
+     "scanner-30": 1,
+     "scanner-31": 1,
+     "scanner-32": 1,
+     "scanner-33": 1,
+     "scanner-34": 1,
+     "scanner-35": 1,
+     "scanner-36": 1,
+     "scanner-37": 1,
+     "scanner-38": 1,
+     "scanner-39": 1,
+     "scanner-40": 1,
+     "scanner-41": 1,
+     "scanner-42": 1,
+     "scanner-43": 1,
+     "scanner-44": 1,
+     "scanner-45": 1,
+     "scanner-46": 1,
+     "scanner-47": 1,
+     "scanner-48": 1,
+     "scanner-49": 1,
+     "scanner-50": 1,
+     "scanner-51": 1,
+     "scanner-52": 1,
+     "scanner-53": 1,
+     "scanner-54": 1,
+     "scanner-55": 1,
+     "scanner-56": 1,
+     "scanner-57": 1,
+     "scanner-58": 1,
+     "scanner-59": 1,
+     "scanner-61": 1,
+     "scanner-62": 1,
+     "scanner-63": 1
+    }
+   },
+   "memstat": {
+    "container": "rr",
+    "cgroup": "/sys/fs/cgroup/system.slice/docker-c0b6eea608e7df7f0cc9a612c014d88e3364b9c40d5cf938a979258991511ce0.scope",
+    "hz": 1.0,
+    "samples": 1322,
+    "sampled_peak_bytes": {
+     "anon": 2401255424,
+     "file": 3218137088,
+     "total": 5718523904,
+     "anon_plus_file": 5537107968
+    },
+    "memory_peak_lifetime_context_only": 5805346816,
+    "note": "sampled peaks are the P1 figure; memory.peak spans the container's whole lifetime (warm-up included) and is context only"
+   },
+   "session": {
+    "steal_share": 5.2768038564680956e-05,
+    "mhz_open_mean": 2762.39071875,
+    "mhz_close_mean": 2716.51203125,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "summary": {
+    "dir": "p2b_rr_comb_b",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "frames_match_export": true,
+    "span_s": 1207.5,
+    "frames_per_s": 2.6525879917184265,
+    "records_span_s": 1195.613249907,
+    "records_frames_per_s": 2.678959939804233,
+    "export_frames_per_s": 2.653,
+    "export_total_frames": 3203,
+    "cpu_s_per_frame": 1.4155479238214175,
+    "engine_cores": 3.755,
+    "service_cpu_s": 4534.0,
+    "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+    "p0": {
+     "d0_pre": {
+      "d0_schema": 2,
+      "pid": 90,
+      "ppid": 1,
+      "trace": {
+       "sys_gettrace_this_thread": "None",
+       "threading_trace_hook": "None",
+       "threading_profile_hook": "None",
+       "sys_getprofile_this_thread": "None",
+       "pydevd_loaded": false,
+       "debugpy_loaded": false,
+       "sys_monitoring_tools": {}
+      },
+      "proc_threads": 173,
+      "python_threads": 5,
+      "python_threads_by_prefix": {
+       "Main": 1,
+       "GlobalEventLoop": 2,
+       "scanner": 1,
+       "External": 1
+      },
+      "asyncio_executor_threads_alive": 0,
+      "asyncio_executor_max_index": null,
+      "root_modules_with_params": {
+       "rfdetr.models.lwdetr.LWDETR": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         32174530
+        ]
+       },
+       "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         22713216
+        ]
+       }
+      },
+      "model_instances_total": 2
+     },
+     "probe_pid": 90,
+     "torch_num_threads": 4,
+     "env": {
+      "OMP_NUM_THREADS": "4",
+      "MKL_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "4",
+      "VECLIB_MAXIMUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "TORCH_NUM_THREADS": "4"
+     },
+     "mandate": {
+      "mandate_violation": false,
+      "violations": []
+     },
+     "d0_post": {
+      "d0_schema": 2,
+      "pid": 90,
+      "ppid": 1,
+      "trace": {
+       "sys_gettrace_this_thread": "None",
+       "threading_trace_hook": "None",
+       "threading_profile_hook": "None",
+       "sys_getprofile_this_thread": "None",
+       "pydevd_loaded": false,
+       "debugpy_loaded": false,
+       "sys_monitoring_tools": {}
+      },
+      "proc_threads": 236,
+      "python_threads": 20,
+      "python_threads_by_prefix": {
+       "Main": 1,
+       "GlobalEventLoop": 2,
+       "scanner": 1,
+       "External": 16
+      },
+      "asyncio_executor_threads_alive": 0,
+      "asyncio_executor_max_index": null,
+      "root_modules_with_params": {
+       "rfdetr.models.lwdetr.LWDETR": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         32174530
+        ]
+       },
+       "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+        "count": 1,
+        "distinct_weights": 1,
+        "params": [
+         22713216
+        ]
+       }
+      },
+      "model_instances_total": 2
+     },
+     "post_pid": 90
+    },
+    "task_census": {
+     "declared_tokens": 1,
+     "census_before": 0,
+     "census_after": 1,
+     "new_task_pids": [
+      90
+     ],
+     "project_ids": [
+      "172ef87c-72d3-5469-922d-eb62d59d9d93"
+     ]
+    },
+    "session": {
+     "steal_share": 5.2768038564680956e-05,
+     "mhz_open_mean": 2762.39071875,
+     "mhz_close_mean": 2716.51203125,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "container_procs": {
+     "containers": {
+      "rr": {
+       "leg_start": {
+        "n": 2,
+        "state": "measured",
+        "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-635a7058.webhook_1-o4fbohn2.json --autoterm --monitor=app --data_port=20000 --data_hos"
+       },
+       "leg_end": {
+        "n": 2,
+        "state": "measured",
+        "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-635a7058.webhook_1-o4fbohn2.json --autoterm --monitor=app --data_port=20000 --data_hos"
+       }
+      }
+     },
+     "service_peak_process_count": 18,
+     "service_distinct_pids_seen": 18
+    },
+    "idle_burden": {
+     "instance_kind": "rr_tokens",
+     "idle_cores_before_instances": 1.008,
+     "idle_cores_with_instances_live": 1.238
+    },
+    "thread_pins": null
+   }
+  },
+  "p2b_li_a": {
+   "name": "p2b_li_a",
+   "dir": "p2b_li_a",
+   "frames_per_s": 3.3160782689719435,
+   "posthoc": {
+    "idle_cores_with_instances_live": 0.005,
+    "cpu_s_per_frame": 0.8998126756166094,
+    "net_cpu_s_per_frame": 0.8983048704339682,
+    "service_cores": 2.984,
+    "cores_in_forward": 2.755646285299652
+   },
+   "records_frames_per_s": 3.3568383554645562,
+   "errors": 0,
+   "videos": 16,
+   "frames_match_export": true,
+   "forward": {
+    "frames": 3203,
+    "forward": {
+     "count": 3203,
+     "sum": 900.259333282047,
+     "share_of_run_total": null,
+     "min": 0.18868096200003492,
+     "mean": 0.2810675408311105,
+     "sd": 0.08573692910509098,
+     "p50": 0.3023420109993822,
+     "p90": 0.38023773999975674,
+     "p95": 0.38314127100056794,
+     "p99": 0.3876007930002743,
+     "max": 0.5673999460004779,
+     "mean_over_p50": 0.9296344226263841
+    },
+    "forward_mean_s": 0.2810675408311105,
+    "caller_cpu_ratio": 0.7381033683266687,
+    "cores_in_forward": 2.755646285299652,
+    "callers": [
+     1128,
+     1575,
+     1660,
+     1745,
+     1830,
+     1915,
+     2000,
+     2088,
+     2173,
+     2258,
+     2343,
+     2428,
+     2513,
+     2598,
+     2683,
+     2768
+    ]
+   },
+   "readback": {
+    "pydevd_loaded": {},
+    "debugpy_loaded": {},
+    "sys_monitoring_tools_env_probe": {},
+    "monitoring_tools_detector": {},
+    "gettrace_detector": "None",
+    "malloc_env_detector": {
+     "MALLOC_ARENA_MAX": "2"
+    },
+    "os_threads_detector": 34,
+    "proc_threads_env_probe": {},
+    "python_threads_detector": 18,
+    "torch": {
+     "num_threads": 4,
+     "num_interop_threads": 16,
+     "cpu_capability": "AVX512"
+    },
+    "env_detector": {
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "MALLOC_ARENA_MAX": "2",
+     "MKL_NUM_THREADS": "4",
+     "OMP_NUM_THREADS": "4",
+     "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+     "KMP_DUPLICATE_LIB_OK": "True",
+     "KMP_INIT_AT_FORK": "FALSE"
+    },
+    "python_thread_names": [
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "MainThread",
+     "tqdm_monitor"
+    ],
+    "thread_name_counts": {
+     "python": 34
+    }
+   },
+   "memstat": {
+    "container": "li_bal_0",
+    "cgroup": "/sys/fs/cgroup/system.slice/docker-0fc4cb69d7b818b71e45a2489b339b6c8c437a10153b9f4d19c1d567aa37611f.scope",
+    "hz": 1.0,
+    "samples": 1806,
+    "sampled_peak_bytes": {
+     "anon": 1644699648,
+     "file": 4315897856,
+     "total": 5991538688,
+     "anon_plus_file": 5815074816
+    },
+    "memory_peak_lifetime_context_only": 6001598464,
+    "note": "sampled peaks are the P1 figure; memory.peak spans the container's whole lifetime (warm-up included) and is context only"
+   },
+   "session": {
+    "steal_share": 5.7503974182794046e-05,
+    "mhz_open_mean": 2785.96825,
+    "mhz_close_mean": 2655.286125,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "summary": {
+    "dir": "p2b_li_a",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "frames_match_export": true,
+    "span_s": 965.9,
+    "frames_per_s": 3.3160782689719435,
+    "records_span_s": 954.171652259,
+    "records_frames_per_s": 3.3568383554645562,
+    "export_frames_per_s": 3.316,
+    "export_total_frames": 3203,
+    "cpu_s_per_frame": 0.8998126756166094,
+    "engine_cores": 2.984,
+    "service_cpu_s": 2882.1,
+    "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+    "p0": null,
+    "task_census": null,
+    "session": {
+     "steal_share": 5.7503974182794046e-05,
+     "mhz_open_mean": 2785.96825,
+     "mhz_close_mean": 2655.286125,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "container_procs": {
+     "containers": {
+      "li_bal_0": {
+       "leg_start": {
+        "n": 1,
+        "state": "measured",
+        "top_cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       },
+       "leg_end": {
+        "n": 1,
+        "state": "measured",
+        "top_cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      }
+     },
+     "service_peak_process_count": 11,
+     "service_distinct_pids_seen": 17
+    },
+    "idle_burden": {
+     "instance_kind": "li_workers",
+     "idle_cores_before_instances": 0.007,
+     "idle_cores_with_instances_live": 0.005
+    },
+    "thread_pins": null
+   }
+  },
+  "p2b_li_b": {
+   "name": "p2b_li_b",
+   "dir": "p2b_li_b",
+   "frames_per_s": 3.388700804062632,
+   "posthoc": {
+    "idle_cores_with_instances_live": 0.005,
+    "cpu_s_per_frame": 0.8913206369029035,
+    "net_cpu_s_per_frame": 0.8898451451763971,
+    "service_cores": 3.021,
+    "cores_in_forward": 2.7844695660869396
+   },
+   "records_frames_per_s": 3.4321331799027184,
+   "errors": 0,
+   "videos": 16,
+   "frames_match_export": true,
+   "forward": {
+    "frames": 3203,
+    "forward": {
+     "count": 3203,
+     "sum": 882.1325265809464,
+     "share_of_run_total": null,
+     "min": 0.18458238600032928,
+     "mean": 0.27540821935090426,
+     "sd": 0.08185946386713328,
+     "p50": 0.28640656000061426,
+     "p90": 0.3762990669983992,
+     "p95": 0.38019123999947624,
+     "p99": 0.38822577800056024,
+     "max": 0.49396063099993626,
+     "mean_over_p50": 0.9615988521712407
+    },
+    "forward_mean_s": 0.27540821935090426,
+    "caller_cpu_ratio": 0.7426132236139558,
+    "cores_in_forward": 2.7844695660869396,
+    "callers": [
+     1248,
+     1576,
+     1661,
+     1746,
+     1831,
+     1916,
+     2001,
+     2089,
+     2174,
+     2259,
+     2344,
+     2429,
+     2514,
+     2599,
+     2684,
+     2769
+    ]
+   },
+   "readback": {
+    "pydevd_loaded": {},
+    "debugpy_loaded": {},
+    "sys_monitoring_tools_env_probe": {},
+    "monitoring_tools_detector": {},
+    "gettrace_detector": "None",
+    "malloc_env_detector": {
+     "MALLOC_ARENA_MAX": "2"
+    },
+    "os_threads_detector": 34,
+    "proc_threads_env_probe": {},
+    "python_threads_detector": 18,
+    "torch": {
+     "num_threads": 4,
+     "num_interop_threads": 16,
+     "cpu_capability": "AVX512"
+    },
+    "env_detector": {
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "MALLOC_ARENA_MAX": "2",
+     "MKL_NUM_THREADS": "4",
+     "OMP_NUM_THREADS": "4",
+     "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+     "KMP_DUPLICATE_LIB_OK": "True",
+     "KMP_INIT_AT_FORK": "FALSE"
+    },
+    "python_thread_names": [
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "AnyIO worker thread",
+     "MainThread",
+     "tqdm_monitor"
+    ],
+    "thread_name_counts": {
+     "python": 34
+    }
+   },
+   "memstat": {
+    "container": "li_bal_0",
+    "cgroup": "/sys/fs/cgroup/system.slice/docker-8b2fa9b26be5c4bac3a393f2c4123f3cd6ef95625c964ded5c6d389fce300b20.scope",
+    "hz": 1.0,
+    "samples": 1771,
+    "sampled_peak_bytes": {
+     "anon": 1664618496,
+     "file": 3666505728,
+     "total": 5362917376,
+     "anon_plus_file": 5211607040
+    },
+    "memory_peak_lifetime_context_only": 5387141120,
+    "note": "sampled peaks are the P1 figure; memory.peak spans the container's whole lifetime (warm-up included) and is context only"
+   },
+   "session": {
+    "steal_share": 5.456853419380907e-05,
+    "mhz_open_mean": 2800.9714375,
+    "mhz_close_mean": 2644.88859375,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+   "summary": {
+    "dir": "p2b_li_b",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "frames_match_export": true,
+    "span_s": 945.2,
+    "frames_per_s": 3.388700804062632,
+    "records_span_s": 933.238843631,
+    "records_frames_per_s": 3.4321331799027184,
+    "export_frames_per_s": 3.389,
+    "export_total_frames": 3203,
+    "cpu_s_per_frame": 0.8913206369029035,
+    "engine_cores": 3.021,
+    "service_cpu_s": 2854.9,
+    "boot_id": "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d",
+    "p0": null,
+    "task_census": null,
+    "session": {
+     "steal_share": 5.456853419380907e-05,
+     "mhz_open_mean": 2800.9714375,
+     "mhz_close_mean": 2644.88859375,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "container_procs": {
+     "containers": {
+      "li_bal_0": {
+       "leg_start": {
+        "n": 1,
+        "state": "measured",
+        "top_cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       },
+       "leg_end": {
+        "n": 1,
+        "state": "measured",
+        "top_cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      }
+     },
+     "service_peak_process_count": 10,
+     "service_distinct_pids_seen": 17
+    },
+    "idle_burden": {
+     "instance_kind": "li_workers",
+     "idle_cores_before_instances": 0.007,
+     "idle_cores_with_instances_live": 0.005
+    },
+    "thread_pins": null
+   }
+  }
+ },
+ "boot_ids": [
+  "dc407ed6-d6b2-4cde-9dc9-3b3a2608066d"
+ ],
+ "correctness_gate": {
+  "pairs": [
+   {
+    "a": "p2b_rr_base_a",
+    "b": "p2b_rr_comb_a",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "sixteen_of_sixteen": true
+   },
+   {
+    "a": "p2b_rr_base_b",
+    "b": "p2b_rr_comb_b",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "sixteen_of_sixteen": true
+   }
+  ],
+  "rule": "COMBINED chunk-identical to baseline (chunk hashes AND frame scores) on 16/16 videos in BOTH pairs",
+  "pass": true,
+  "outcome": "PASS"
+ },
+ "determinism_context": {
+  "p2b_rr_base_a_vs_p2b_rr_base_b": {
+   "a": "p2b_rr_base_a",
+   "b": "p2b_rr_base_b",
+   "videos_compared": 16,
+   "chunk_hash_differs": [],
+   "frame_scores_differ": [],
+   "identical": true
+  },
+  "p2b_li_a_vs_p2b_li_b": {
+   "a": "p2b_li_a",
+   "b": "p2b_li_b",
+   "videos_compared": 16,
+   "chunk_hash_differs": [],
+   "frame_scores_differ": [],
+   "identical": true
+  },
+  "p2b_rr_base_a_vs_P1_e2_rr_off_a": {
+   "a": "p2b_rr_base_a",
+   "b": "e2_rr_off_a",
+   "videos_compared": 16,
+   "chunk_hash_differs": [],
+   "frame_scores_differ": [],
+   "identical": true
+  },
+  "p2b_li_a_vs_P1_e2_li_off_a": {
+   "a": "p2b_li_a",
+   "b": "e2_li_off_a",
+   "videos_compared": 16,
+   "chunk_hash_differs": [],
+   "frame_scores_differ": [],
+   "identical": true
+  }
+ },
+ "cells": {
+  "rr_base": {
+   "legs": [
+    "p2b_rr_base_a",
+    "p2b_rr_base_b"
+   ],
+   "frames_per_s": [
+    2.438708694990102,
+    2.564862267777066
+   ],
+   "mean": 2.501785481383584,
+   "spread": 0.05042541565841858,
+   "cpu_s_per_frame": [
+    1.512488292226038,
+    1.4230721198876055
+   ],
+   "engine_cores": [
+    3.688,
+    3.65
+   ]
+  },
+  "rr_comb": {
+   "legs": [
+    "p2b_rr_comb_a",
+    "p2b_rr_comb_b"
+   ],
+   "frames_per_s": [
+    2.7789345826826306,
+    2.6525879917184265
+   ],
+   "mean": 2.715761287200529,
+   "spread": 0.046523452396084915,
+   "cpu_s_per_frame": [
+    1.3728691851389323,
+    1.4155479238214175
+   ],
+   "engine_cores": [
+    3.815,
+    3.755
+   ]
+  },
+  "li_ref": {
+   "legs": [
+    "p2b_li_a",
+    "p2b_li_b"
+   ],
+   "frames_per_s": [
+    3.3160782689719435,
+    3.388700804062632
+   ],
+   "mean": 3.352389536517288,
+   "spread": 0.021662916644864104,
+   "cpu_s_per_frame": [
+    0.8998126756166094,
+    0.8913206369029035
+   ],
+   "engine_cores": [
+    2.984,
+    3.021
+   ]
+  }
+ },
+ "forward_mechanism": {
+  "rr_base": {
+   "F_legs_s": [
+    0.39698674358226926,
+    0.37725172316047423
+   ],
+   "F_mean_s": 0.3871192333713718,
+   "F_spread": 0.0509791783010244,
+   "caller_cpu_ratio_legs": [
+    0.6074022200763645,
+    0.6018111303680133
+   ],
+   "caller_cpu_ratio_mean": 0.6046066752221888
+  },
+  "rr_comb": {
+   "F_legs_s": [
+    0.3472551024620632,
+    0.36424989310021105
+   ],
+   "F_mean_s": 0.35575249778113716,
+   "F_spread": 0.04777138809747228,
+   "caller_cpu_ratio_legs": [
+    0.6252301720763603,
+    0.6219509109780678
+   ],
+   "caller_cpu_ratio_mean": 0.623590541527214
+  },
+  "li_ref": {
+   "F_legs_s": [
+    0.2810675408311105,
+    0.27540821935090426
+   ],
+   "F_mean_s": 0.27823788009100736,
+   "F_spread": 0.02033986701722706,
+   "caller_cpu_ratio_legs": [
+    0.7381033683266687,
+    0.7426132236139558
+   ],
+   "caller_cpu_ratio_mean": 0.7403582959703122
+  }
+ },
+ "reading": {
+  "floor": 0.0082,
+  "gap": {
+   "li_minus_base_frames_per_s": 0.850604055133704,
+   "li_over_base_minus_1": 0.3399987974441705,
+   "threshold": 0.05042541565841858,
+   "reproduced_in_session": true
+  },
+  "combined": {
+   "comb_over_base_minus_1": 0.08552923798191037,
+   "threshold": 0.05042541565841858,
+   "beyond_spread": true,
+   "closure": 0.2515574720406318
+  },
+  "verdict": "CONFIGURATION DOES NOT EXPLAIN THE GAP (at this strength: the debugger and MALLOC_ARENA_MAX jointly ruled out as the main cause)",
+  "secondary_F": {
+   "label": "mechanism, reported beside; the verdict follows the PRIMARY metric",
+   "F_base_s": 0.3871192333713718,
+   "F_comb_s": 0.35575249778113716,
+   "F_li_s": 0.27823788009100736,
+   "closure_on_F": 0.288081794037467,
+   "comb_over_base_minus_1": -0.08102603251475193,
+   "threshold": 0.0509791783010244
+  }
+ },
+ "readback_differences_comb_vs_li": {
+  "os_threads_detector": {
+   "rr_comb": 179,
+   "li": 34
+  },
+  "python_threads_detector": {
+   "rr_comb": 8,
+   "li": 18
+  },
+  "env_detector": {
+   "TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD": {
+    "rr_comb": "1",
+    "li": null
+   }
+  },
+  "thread_name_counts": {
+   "rr_comb": {
+    "engine": 16,
+    "scanner-59": 8,
+    "Signal Listener": 1,
+    "Work #0": 1,
+    "Work #1": 1,
+    "Work #2": 1,
+    "Work #3": 1,
+    "Work #4": 1,
+    "Work #5": 1,
+    "Work #6": 1,
+    "Work #7": 1,
+    "Work #8": 1,
+    "Work #9": 1,
+    "Status": 1,
+    "AwsEventLoop1": 1,
+    "AwsEventLoop2": 1,
+    "AwsEventLoop3": 1,
+    "AwsEventLoop4": 1,
+    "AwsEventLoop5": 1,
+    "AwsEventLoop6": 1,
+    "AwsEventLoop7": 1,
+    "AwsEventLoop8": 1,
+    "AwsEventLoop9": 1,
+    "AwsEventLoop10": 1,
+    "AwsEventLoop11": 1,
+    "AwsEventLoop12": 1,
+    "AwsEventLoop13": 1,
+    "AwsEventLoop14": 1,
+    "AwsEventLoop15": 1,
+    "AwsEventLoop16": 1,
+    "pipeline-0": 1,
+    "pipeline-1": 1,
+    "pipeline-2": 1,
+    "pipeline-3": 1,
+    "pipeline-4": 1,
+    "pipeline-5": 1,
+    "pipeline-6": 1,
+    "pipeline-7": 1,
+    "pipeline-8": 1,
+    "pipeline-9": 1,
+    "pipeline-10": 1,
+    "pipeline-11": 1,
+    "pipeline-12": 1,
+    "pipeline-13": 1,
+    "pipeline-14": 1,
+    "pipeline-15": 1,
+    "pipeline-16": 1,
+    "pipeline-17": 1,
+    "pipeline-18": 1,
+    "pipeline-19": 1,
+    "pipeline-20": 1,
+    "pipeline-21": 1,
+    "pipeline-22": 1,
+    "pipeline-23": 1,
+    "pipeline-24": 1,
+    "pipeline-25": 1,
+    "pipeline-26": 1,
+    "pipeline-27": 1,
+    "pipeline-28": 1,
+    "pipeline-29": 1,
+    "pipeline-30": 1,
+    "pipeline-31": 1,
+    "pipeline-32": 1,
+    "pipeline-33": 1,
+    "pipeline-34": 1,
+    "pipeline-35": 1,
+    "pipeline-36": 1,
+    "pipeline-37": 1,
+    "pipeline-38": 1,
+    "pipeline-39": 1,
+    "pipeline-40": 1,
+    "pipeline-41": 1,
+    "pipeline-42": 1,
+    "pipeline-43": 1,
+    "pipeline-44": 1,
+    "pipeline-45": 1,
+    "pipeline-46": 1,
+    "pipeline-47": 1,
+    "pipeline-48": 1,
+    "pipeline-49": 1,
+    "pipeline-50": 1,
+    "pipeline-51": 1,
+    "pipeline-52": 1,
+    "pipeline-53": 1,
+    "pipeline-54": 1,
+    "pipeline-55": 1,
+    "pipeline-56": 1,
+    "pipeline-57": 1,
+    "pipeline-58": 1,
+    "pipeline-59": 1,
+    "pipeline-60": 1,
+    "pipeline-61": 1,
+    "pipeline-62": 1,
+    "pipeline-63": 1,
+    "scanner-0": 1,
+    "scanner-1": 1,
+    "scanner-2": 1,
+    "scanner-3": 1,
+    "scanner-4": 1,
+    "scanner-5": 1,
+    "scanner-6": 1,
+    "scanner-7": 1,
+    "scanner-8": 1,
+    "scanner-9": 1,
+    "scanner-10": 1,
+    "scanner-11": 1,
+    "scanner-12": 1,
+    "scanner-13": 1,
+    "scanner-14": 1,
+    "scanner-15": 1,
+    "scanner-16": 1,
+    "scanner-17": 1,
+    "scanner-18": 1,
+    "scanner-19": 1,
+    "scanner-20": 1,
+    "scanner-21": 1,
+    "scanner-22": 1,
+    "scanner-23": 1,
+    "scanner-24": 1,
+    "scanner-25": 1,
+    "scanner-26": 1,
+    "scanner-27": 1,
+    "scanner-28": 1,
+    "scanner-29": 1,
+    "scanner-30": 1,
+    "scanner-31": 1,
+    "scanner-32": 1,
+    "scanner-33": 1,
+    "scanner-34": 1,
+    "scanner-35": 1,
+    "scanner-36": 1,
+    "scanner-37": 1,
+    "scanner-38": 1,
+    "scanner-39": 1,
+    "scanner-40": 1,
+    "scanner-41": 1,
+    "scanner-42": 1,
+    "scanner-43": 1,
+    "scanner-44": 1,
+    "scanner-45": 1,
+    "scanner-46": 1,
+    "scanner-47": 1,
+    "scanner-48": 1,
+    "scanner-49": 1,
+    "scanner-50": 1,
+    "scanner-51": 1,
+    "scanner-52": 1,
+    "scanner-53": 1,
+    "scanner-54": 1,
+    "scanner-55": 1,
+    "scanner-56": 1,
+    "scanner-57": 1,
+    "scanner-58": 1,
+    "scanner-60": 1,
+    "scanner-61": 1,
+    "scanner-62": 1,
+    "scanner-63": 1
+   },
+   "li": {
+    "python": 34
+   }
+  }
+ }
+}

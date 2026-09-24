@@ -1,0 +1,25 @@
+{
+  "figures_checked": 170,
+  "mismatches": [
+    {
+      "where": "## P2-B section, cell table, row 'rr_comb' (p2b_rr_comb_a, p2b_rr_comb_b), column 'spread'",
+      "figure": "spread of rr_comb export frames/s = |2.77893 - 2.65259| / mean 2.71576",
+      "report": "4.56%",
+      "recomputed": "4.65% (0.0465235)"
+    }
+  ],
+  "unverifiable": [
+    "Section heading 'K=16': no listed field gives the submission concurrency K (export posture reads 'parity[tokens=1,threads=unset(engine-default-64)]' / 'workers[declared_workers=1]'). Consistent with the raw data: every leg's measured frames come from exactly 16 distinct forward-calling tids.",
+    "Reading 'closure 0.252 of the gap (bar 0.5)' and Verdicts '(bar: half)': the 0.5 bar is a pre-registered threshold; preregistration.json is not among the listed files. The recomputed closure 0.2516 is below 0.5, so the stated verdict follows if the bar is 0.5."
+  ],
+  "notes": [
+    "Verified from raw files (all MATCH): Verdicts row P2-B (closure 0.252, COMBINED +8.55%, gap +34.00%, verdict follows from closure < 0.5, output-identical, readably faster since 8.55% > 5.04%); gate rows G_manip_B base (debugger loaded yes, MALLOC_ARENA_MAX unset, 182 OS threads, PASS), G_manip_B comb (no, 2, 179, PASS), P2-B correctness (16 compared, 0 chunk and 0 score differences in both pairs, PASS).",
+    "Leg table: all 66 cells match (export and records frames/s, errors 0, forward per frame, caller on-CPU / forward, debugger/tools, malloc env, OS threads, anon/total MB).",
+    "Determinism: all four comparisons identical over 16 videos (includes P1 e2_rr_off_a and e2_li_off_a).",
+    "Cell table: every figure except the rr_comb spread matches. The rr_comb spread feeds the COMBINED-over-baseline threshold max(0.82%, 5.04%, spread rr_comb); with the correct 4.65% the threshold is still 5.04%, so the reading's 'against 5.04%' and the verdict are unchanged.",
+    "Mechanism: F base 0.3871, COMBINED 0.3558, LI 0.2782, -8.10%, closure on F 0.288: all match.",
+    "Read-back differences (rr_comb vs li, both letters): OS threads 179 vs 34, Python threads 8 vs 18, TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD '1' vs absent: all match. These are the only read-back fields that differ apart from pid and timestamps; the torch/pool settings are identical.",
+    "POST-HOC table: all 30 figures match.",
+    "Prose figures checked and consistent: RocketRide idle burn about one core (1.232 to 1.238) vs LlamaIndex 0.005; 16 forward-calling threads per arm; LlamaIndex's 34 OS threads; 'about a quarter' (0.252); T=4 (torch num_threads 4 in every read-back); 16 videos per leg."
+  ]
+}

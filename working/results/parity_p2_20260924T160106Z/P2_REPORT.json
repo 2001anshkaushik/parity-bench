@@ -1,0 +1,15 @@
+{
+ "inputs_sha256_16": {
+  "analysis_p2docs.json": "10ac66d81fa124ce",
+  "analysis_p2b.json": "37f0c8c349add55d",
+  "p2_summary_spec.json": "b47ffb88de1e2463",
+  "preregistration.json": "82ed8bc8bf338e3a",
+  "P2_BLIND_VERIFICATION.json": "26f70194c5972966",
+  "gates/G_manip_B_p2b_rr_base_a.json": "3920aaf6a132cae0",
+  "gates/G_manip_B_p2b_rr_comb_a.json": "c401f64de05ca861",
+  "gates/G_memstat_p2a_rr_a.json": "840ec2b482d271ff",
+  "gates/G_memstat_p2b_rr_base_a.json": "f927e8e1bad72a5f",
+  "gates/G_smoke_A.json": "8f1101193593b3d8",
+  "master_done.json": "766a324ab35c6aa0"
+ }
+}
