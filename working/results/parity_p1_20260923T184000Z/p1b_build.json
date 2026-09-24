@@ -1,0 +1,26 @@
+{
+ "built_utc": "2026-09-23T19:00:17Z",
+ "image": "rr:p1-tikafix",
+ "image_id": "sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b",
+ "from": "rr:patched",
+ "protected_ids_before_and_after": [
+  "rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+ ],
+ "tika_jar_sha256": {
+  "orig": "69ae950f4872c60d9f54441e47e01a4a930511d23126e4f58db1ec5b27935f78",
+  "patched": "30d10c6a398a2e70493837f9c18879784c0a327348924b3b064ae4e4209f892d"
+ },
+ "TikaApi_class_sha256": {
+  "orig": "52cdfef94a7ad931ea269146aea7bc9d8d548d3d131cd52ae0009123f4578317",
+  "patched": "96808de6da96c75b5086441efdc4d51166e281b7528c7dcc6290241da147a3e0"
+ },
+ "tika_config_sha256": {
+  "orig": "a8d0d083f4721d5b027c0cd236a5937b715fc6d343109e7d7a9fa0761fef6677",
+  "patched": "2723c746cb2650a88cd8a25aa4750bad40969209e53a575e1352ef59718008f4"
+ },
+ "scope": {
+  "inline_image_extraction": "PATCH (TikaApi.getPdfConfig code byte 9: iconst_1 -> iconst_0)",
+  "external_tool_probes": "CONFIG (tika-config.xml parser-exclude x2; ConfigBuilder.excludeExternalParserIfUnavailable offsets 0-8)"
+ }
+}

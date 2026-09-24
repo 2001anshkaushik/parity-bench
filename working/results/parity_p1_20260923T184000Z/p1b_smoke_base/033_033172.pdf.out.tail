@@ -1,0 +1,41 @@
+   6 Gradient CORPORATION
+[791MB] Sep 23, 2026 11:05:08 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@4f3e1203
+[791MB] Sep 23, 2026 11:05:08 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@4f3e1203
+[791MB] Extracted metadata:
+[791MB] ---------------------------------------------------------
+[791MB] pdf:PDFVersion=1.4
+[791MB] xmp:CreatorTool=PScript5.dll Version 5.2
+[791MB] pdf:hasXFA=false
+[791MB] access_permission:modify_annotations=true
+[791MB] X-TIKA:Parsed-By-Full-Set=org.apache.tika.parser.CompositeParser; org.apache.tika.parser.pdf.PDFParser
+[791MB] dc:creator=ME
+[791MB] pdf:num3DAnnotations=0
+[791MB] dcterms:created=2005-09-27T21:22:24Z
+[791MB] dcterms:modified=2006-03-22T20:38:50Z
+[791MB] dc:format=application/pdf; version=1.4
+[791MB] xmpMM:DocumentID=uuid:d93d14e0-601a-4e58-95cf-416d0444c438
+[791MB] pdf:overallPercentageUnmappedUnicodeChars=0.006704393774271011
+[791MB] access_permission:fill_in_form=true
+[791MB] pdf:hasCollection=false
+[791MB] dc:title=Microsoft Word - 309-050927-1-EPA Questions_CLt
+[791MB] pdf:containsNonEmbeddedFont=true
+[791MB] xmp:CreateDate=2005-09-27T21:22:24Z
+[791MB] pdf:hasMarkedContent=false
+[791MB] pdf:ocrPageCount=0
+[791MB] Content-Type=application/pdf
+[791MB] access_permission:can_print_faithful=true
+[791MB] xmp:ModifyDate=2006-03-22T20:38:50Z
+[791MB] xmp:MetadataDate=2006-03-22T20:38:50Z
+[791MB] pdf:producer=Acrobat Distiller 6.0 (Windows)
+[791MB] xmp:pdf:Producer=Acrobat Distiller 6.0 (Windows)
+[791MB] pdf:totalUnmappedUnicodeChars=1116
+[791MB] access_permission:extract_for_accessibility=true
+[791MB] access_permission:assemble_document=true
+[791MB] xmpTPg:NPages=76
+[791MB] pdf:hasXMP=true
+[791MB] access_permission:extract_content=true
+[791MB] access_permission:can_print=true
+[791MB] access_permission:can_modify=true
+[791MB] pdf:containsDamagedFont=false

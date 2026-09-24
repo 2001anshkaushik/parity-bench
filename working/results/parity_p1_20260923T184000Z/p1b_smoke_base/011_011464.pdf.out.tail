@@ -1,0 +1,42 @@
+t
+        ? closed captioning
+        ? how to evaluate
+        ? effectiveness
+        ? manually describe needed video as was done with rushes?
+        ? usability (especially for a mobile device ? Which? In what setting? By whom?)21
+        ACM MM 2008 TRECVID BBC Rushes Summarization Workshop 21
+[747MB] Sep 23, 2026 11:13:47 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@54765bcb
+[747MB] Sep 23, 2026 11:13:47 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@54765bcb
+[747MB] Extracted metadata:
+[747MB] ---------------------------------------------------------
+[747MB] pdf:PDFVersion=1.3
+[747MB] xmp:CreatorTool=PrimoPDF http://www.primopdf.com
+[747MB] pdf:hasXFA=false
+[747MB] access_permission:modify_annotations=true
+[747MB] X-TIKA:Parsed-By-Full-Set=org.apache.tika.parser.CompositeParser; org.apache.tika.parser.pdf.PDFParser
+[747MB] dc:creator=gawad
+[747MB] pdf:num3DAnnotations=0
+[747MB] dcterms:created=2008-12-17T17:01:01Z
+[747MB] dcterms:modified=2008-12-17T17:01:01Z
+[747MB] dc:format=application/pdf; version=1.3
+[747MB] pdf:overallPercentageUnmappedUnicodeChars=4.944620304740965E-4
+[747MB] access_permission:fill_in_form=true
+[747MB] pdf:hasCollection=false
+[747MB] dc:title=Microsoft PowerPoint - tvs08.slides.for.tv8
+[747MB] pdf:containsNonEmbeddedFont=false
+[747MB] pdf:hasMarkedContent=false
+[747MB] pdf:ocrPageCount=0
+[747MB] Content-Type=application/pdf
+[747MB] access_permission:can_print_faithful=true
+[747MB] pdf:producer=PrimoPDF
+[747MB] pdf:totalUnmappedUnicodeChars=5
+[747MB] access_permission:extract_for_accessibility=true
+[747MB] access_permission:assemble_document=true
+[747MB] xmpTPg:NPages=21
+[747MB] pdf:hasXMP=false
+[747MB] access_permission:extract_content=true
+[747MB] access_permission:can_print=true
+[747MB] access_permission:can_modify=true
+[747MB] pdf:containsDamagedFont=false

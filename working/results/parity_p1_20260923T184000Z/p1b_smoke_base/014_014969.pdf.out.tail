@@ -1,0 +1,40 @@
+acted texts from the parent Input Stream : java.io.PrintWriter@3c291db8
+[690MB] Sep 23, 2026 11:03:28 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@3c291db8
+[690MB] Extracted metadata:
+[690MB] ---------------------------------------------------------
+[690MB] pdf:PDFVersion=1.2
+[690MB] xmp:CreatorTool=Parlance Publisher 5.0/(Xyvision Postscript Formatter) 3.0 3
+[690MB] pdf:hasXFA=false
+[690MB] access_permission:modify_annotations=true
+[690MB] X-TIKA:Parsed-By-Full-Set=org.apache.tika.parser.CompositeParser; org.apache.tika.parser.pdf.PDFParser
+[690MB] pdf:num3DAnnotations=0
+[690MB] dcterms:created=1999-09-16T11:12:05Z
+[690MB] dcterms:modified=2004-08-31T21:49:46Z
+[690MB] dc:format=application/pdf; version=1.2
+[690MB] xmpMM:DocumentID=uuid:87084048-fb97-11d8-a4fa-0003930af2a4
+[690MB] xmp:dc:title=Vol 82#5
+[690MB] pdf:overallPercentageUnmappedUnicodeChars=0.002667367924004793
+[690MB] access_permission:fill_in_form=true
+[690MB] pdf:hasCollection=false
+[690MB] dc:title=Vol 82#5
+[690MB] pdf:containsNonEmbeddedFont=true
+[690MB] xmp:CreateDate=1999-09-16T11:12:05Z
+[690MB] pdf:hasMarkedContent=false
+[690MB] pdf:ocrPageCount=0
+[690MB] Content-Type=application/pdf
+[690MB] access_permission:can_print_faithful=true
+[690MB] xmp:ModifyDate=2004-08-31T21:49:46Z
+[690MB] xmp:MetadataDate=2004-08-31T21:49:46Z
+[690MB] pdf:producer=Acrobat Distiller Daemon 3.02b for Solaris 2.3 and later (SPARC)
+[690MB] xmp:pdf:Producer=Acrobat Distiller Daemon 3.02b for Solaris 2.3 and later (SPARC)
+[690MB] xmp:About=uuid:acad563c-fb97-11d8-a4fa-0003930af2a4
+[690MB] pdf:totalUnmappedUnicodeChars=71
+[690MB] access_permission:extract_for_accessibility=true
+[690MB] access_permission:assemble_document=true
+[690MB] xmpTPg:NPages=8
+[690MB] pdf:hasXMP=true
+[690MB] access_permission:extract_content=true
+[690MB] access_permission:can_print=true
+[690MB] access_permission:can_modify=true
+[690MB] pdf:containsDamagedFont=false

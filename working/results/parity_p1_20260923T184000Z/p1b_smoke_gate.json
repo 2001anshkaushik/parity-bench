@@ -1,0 +1,21 @@
+{
+ "gate": "P1-B smoke (preregistration.json P1_B.smoke_gate)",
+ "base": "p1b_smoke_base",
+ "fix": "p1b_smoke_fix",
+ "p50_wall_s": {
+  "base": 342.725,
+  "fix": 5.698
+ },
+ "speed_ratio_base_over_fix": 60.14829764829765,
+ "exec_census_total": {
+  "base": 3380028,
+  "fix": 452
+ },
+ "exec_census_drop": 0.9998662732971443,
+ "threshold": "ratio >= 10 AND drop >= 90%",
+ "rc_nonzero": {
+  "base": [],
+  "fix": []
+ },
+ "fired": true
+}

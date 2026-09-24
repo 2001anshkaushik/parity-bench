@@ -1,0 +1,13 @@
+{
+ "stage_complete_utc": "2026-09-24T07:17:38Z",
+ "boot_id": "e293381c-aa59-4b05-92e2-c0e4f6167125",
+ "outcome": "complete",
+ "legs": [
+  "v1full_rr_t4:rc=0",
+  "v1full_li_t4:NOT_RUN_budget"
+ ],
+ "protected_image_ids_at_end": {
+  "rr:patched": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+ }
+}

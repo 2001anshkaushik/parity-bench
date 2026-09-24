@@ -1,0 +1,39 @@
+strument interface(s)). Send a few test data streams from each interfaced instrument.
+        Ensure that the data is being processed into ^LAH global and is verifiable.
+         
+        Reschedule your tasked and backup procedures. Ensure that LRTASK* options have the correct times and output
+        Appendix C for Upgrade Installation 232 December 1997
+[693MB] Sep 23, 2026 11:08:19 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@47f4112d
+[693MB] Sep 23, 2026 11:08:19 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@47f4112d
+[693MB] Extracted metadata:
+[693MB] ---------------------------------------------------------
+[693MB] pdf:PDFVersion=1.2
+[693MB] xmp:CreatorTool=Microsoft Word
+[693MB] pdf:hasXFA=false
+[693MB] access_permission:modify_annotations=true
+[693MB] X-TIKA:Parsed-By-Full-Set=org.apache.tika.parser.CompositeParser; org.apache.tika.parser.pdf.PDFParser
+[693MB] dc:creator=Christine Chvatal
+[693MB] pdf:num3DAnnotations=0
+[693MB] dcterms:created=1997-12-03T12:57:17Z
+[693MB] dc:format=application/pdf; version=1.2
+[693MB] pdf:overallPercentageUnmappedUnicodeChars=1.2880539543402847E-5
+[693MB] access_permission:fill_in_form=true
+[693MB] pdf:hasCollection=false
+[693MB] dc:title=lr__052i.PDF
+[693MB] pdf:containsNonEmbeddedFont=true
+[693MB] pdf:hasMarkedContent=false
+[693MB] pdf:ocrPageCount=0
+[693MB] Content-Type=application/pdf
+[693MB] access_permission:can_print_faithful=true
+[693MB] pdf:producer=Acrobat PDFWriter 3.0 for Windows
+[693MB] pdf:totalUnmappedUnicodeChars=6
+[693MB] access_permission:extract_for_accessibility=true
+[693MB] access_permission:assemble_document=true
+[693MB] xmpTPg:NPages=238
+[693MB] pdf:hasXMP=false
+[693MB] access_permission:extract_content=true
+[693MB] access_permission:can_print=true
+[693MB] access_permission:can_modify=true
+[693MB] pdf:containsDamagedFont=false

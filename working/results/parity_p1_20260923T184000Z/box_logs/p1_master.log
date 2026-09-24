@@ -1,0 +1,661 @@
+nohup: ignoring input
+781c3e6 P1 orchestration: the P1 master 
+p1_master.sh sha256: 60cd0980f2ff4d2d3c40891f72f64e0be352b584f2586b876dfa88a1b2258b76
+master start 2026-09-23T22:52:21Z head 781c3e65ba09 deadline 2026-09-24T05:31:00Z
+p1_docs_chain.sh sha256: 82ead33fc6b19734c8f5ad5ab92944375f2b78e2eefb2d254ec48a36e0e85b96
+boot_id e293381c-aa59-4b05-92e2-c0e4f6167125  stage p1b  head 781c3e65ba09
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+rr:p1-pdfium 
+===== LEG p1b_base_a (rr:patched, slice_docs_n384_w25.json) 22:52:21Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 10
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+started rr container 49f1f4efedadcdc71fd20adf16658366c8bf87a056b0aa39c184ee11b9c88303
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1b_base_a/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:073b43d8b5f9…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1b_base_a — 384 documents, warm 25 ===
+  quiet box: host busy 1.005  arm idle 1.002  foreign 0.003 (max 2.0)  load1 1.63  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.5494  ok=382/384 (empty 2, hard 0)  span=149.841s  eff_cores=16.333  util=0.5104 of 32  engine/driver/host cores=16.333/0.034/16.536  spin=1.22  idle: count 12.01 / equiv 15.464 (net of spin 16.684)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260923T225616Z__d11faec13e21.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260923T225616Z__d11faec13e21.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 254
+   Total Size: 256497277
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 49f1f4efedadcdc71fd20adf16658366c8bf87a056b0aa39c184ee11b9c88303
+===== LEG p1b_base_a rc=0 22:56:22Z =====
+===== LEG p1b_fix_a (rr:p1-tikafix, slice_docs_n384_w25.json) 22:56:22Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 12
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+started rr container b0eaac4b1f3f92768f99d197a4857a569838384d01037dac288e1472c706ba99
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1b_fix_a/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:35d4b4774784…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1b_fix_a — 384 documents, warm 25 ===
+  quiet box: host busy 1.01  arm idle 1.001  foreign 0.009 (max 2.0)  load1 5.89  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.889  ok=382/384 (empty 2, hard 0)  span=132.227s  eff_cores=13.881  util=0.4338 of 32  engine/driver/host cores=13.881/0.04/14.015  spin=1.22  idle: count 16.28 / equiv 17.985 (net of spin 19.205)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260923T225955Z__60b0e4bad0df.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260923T225955Z__60b0e4bad0df.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 262
+   Total Size: 257540244
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container b0eaac4b1f3f92768f99d197a4857a569838384d01037dac288e1472c706ba99
+===== LEG p1b_fix_a rc=0 23:00:02Z =====
+{"gate": "P1-B correctness (preregistration.json P1_B.correctness_gate)", "base_leg": "p1b_base_a", "fix_leg": "p1b_fix_a", "documents_ok_in_both": 382, "chunk_lists_differ": 0, "lost_by_fix": 0, "gained_by_fix": 0, "outcome": "PASS"}
+p1_engine_tika.sh sha256: 3ed0367ba8cf8d9b3b65682afe3a7dc26cc7b0ea5517a094018d91fc1bf5388f
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+boot_id e293381c-aa59-4b05-92e2-c0e4f6167125  head 781c3e65ba09
+exec census pid: 269578
+uploaded s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/p1b_smoke_base/
+CHAIN_DONE engine_tika p1b_smoke_base
+p1_engine_tika.sh sha256: 3ed0367ba8cf8d9b3b65682afe3a7dc26cc7b0ea5517a094018d91fc1bf5388f
+image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+boot_id e293381c-aa59-4b05-92e2-c0e4f6167125  head 781c3e65ba09
+exec census pid: 614102
+uploaded s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/p1b_smoke_fix/
+CHAIN_DONE engine_tika p1b_smoke_fix
+{"gate": "P1-B smoke (preregistration.json P1_B.smoke_gate)", "base": "p1b_smoke_base", "fix": "p1b_smoke_fix", "p50_wall_s": {"base": 342.725, "fix": 5.698}, "speed_ratio_base_over_fix": 60.14829764829765, "exec_census_total": {"base": 3380028, "fix": 452}, "exec_census_drop": 0.9998662732971443, "threshold": "ratio >= 10 AND drop >= 90%", "rc_nonzero": {"base": [], "fix": []}, "fired": true}
+===== LEG p1b_base_b (rr:patched, slice_docs_n384_w25.json) 23:30:26Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 18
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+started rr container c90b2af29b7bcb452a3fa951bb06d04defc28655ac0473bf663ea628ac8419dc
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1b_base_b/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:073b43d8b5f9…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1b_base_b — 384 documents, warm 25 ===
+  quiet box: host busy 1.008  arm idle 1.002  foreign 0.006 (max 2.0)  load1 2.41  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.562  ok=382/384 (empty 2, hard 0)  span=149.102s  eff_cores=16.469  util=0.5147 of 32  engine/driver/host cores=16.469/0.035/16.706  spin=1.237  idle: count 11.91 / equiv 15.294 (net of spin 16.531)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260923T233416Z__4e16487e7710.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260923T233416Z__4e16487e7710.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 344
+   Total Size: 258693703
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container c90b2af29b7bcb452a3fa951bb06d04defc28655ac0473bf663ea628ac8419dc
+===== LEG p1b_base_b rc=0 23:34:23Z =====
+===== LEG p1b_fix_b (rr:p1-tikafix, slice_docs_n384_w25.json) 23:34:23Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 20
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+started rr container 8d9e7141cce43bd055952e6924837a95f93c77a7f60794ae5941e708603128a6
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1b_fix_b/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:35d4b4774784…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1b_fix_b — 384 documents, warm 25 ===
+  quiet box: host busy 1.013  arm idle 1.001  foreign 0.011 (max 2.0)  load1 5.81  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.8667  ok=382/384 (empty 2, hard 0)  span=133.254s  eff_cores=13.785  util=0.4308 of 32  engine/driver/host cores=13.785/0.04/13.846  spin=1.218  idle: count 16.32 / equiv 18.154 (net of spin 19.372)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260923T233756Z__b56f81f27dde.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260923T233756Z__b56f81f27dde.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 352
+   Total Size: 259737755
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 8d9e7141cce43bd055952e6924837a95f93c77a7f60794ae5941e708603128a6
+===== LEG p1b_fix_b rc=0 23:38:03Z =====
+===== LEG p1b_base_full (rr:patched, slice_docs_n9975_w25.json, texts) 23:38:03Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 22
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+started rr container 4a40b6e343979fb7ca13ffad9b6005d9ccbd25f61c5c92b634a6c502c0bffc7c
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1b_base_full/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:073b43d8b5f9…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 6e476fd0db49c2e4  n=9975  warm=25  manifest-verified
+
+=== rr refc32_p1b_base_full — 9975 documents, warm 25 ===
+  quiet box: host busy 1.015  arm idle 1.002  foreign 0.013 (max 2.0)  load1 3.06  other containers none  strays none
+  corpus prewarmed: 10000 files in 1.05s
+  docs/s=2.3454  ok=9885/9975 (empty 89, hard 1)  span=4214.596s  eff_cores=18.074  util=0.5648 of 32  engine/driver/host cores=18.074/0.055/18.344  spin=1.234  idle: count 10.39 / equiv 13.656 (net of spin 14.89)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T005039Z__0c1878c35e86.json
+stamps copied out: 30006 records
+sweep rc=1
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T005039Z__0c1878c35e86.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 361
+   Total Size: 503315532
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=1
+removing our container 4a40b6e343979fb7ca13ffad9b6005d9ccbd25f61c5c92b634a6c502c0bffc7c
+===== LEG p1b_base_full rc=1 00:50:57Z =====
+===== LEG p1b_base_full_r1 (rr:patched, slice_docs_n9975_w25.json, texts) 00:50:57Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 24
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+started rr container ccd0d46d90304bedcd025bd566ff063f007992a9d30eeb350e541f5b31dceef1
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1b_base_full_r1/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:073b43d8b5f9…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 6e476fd0db49c2e4  n=9975  warm=25  manifest-verified
+
+=== rr refc32_p1b_base_full_r1 — 9975 documents, warm 25 ===
+  quiet box: host busy 1.01  arm idle 1.002  foreign 0.008 (max 2.0)  load1 1.73  other containers none  strays none
+  corpus prewarmed: 10000 files in 1.02s
+  docs/s=2.3395  ok=9885/9975 (empty 89, hard 1)  span=4225.181s  eff_cores=18.071  util=0.5647 of 32  engine/driver/host cores=18.071/0.055/18.344  spin=1.232  idle: count 10.45 / equiv 13.656 (net of spin 14.888)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T020301Z__813a8aca699c.json
+stamps copied out: 30006 records
+sweep rc=1
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T020301Z__813a8aca699c.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 370
+   Total Size: 746910965
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=1
+removing our container ccd0d46d90304bedcd025bd566ff063f007992a9d30eeb350e541f5b31dceef1
+===== LEG p1b_base_full_r1 rc=1 02:03:19Z =====
+===== LEG p1b_base_full_r2 (rr:patched, slice_docs_n9975_w25.json, texts) 02:03:20Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 26
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+started rr container 291b7ad46a3d7ccf60d4d42c832d73012132c8e7d83f20a7e29222d39d1c461a
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1b_base_full_r2/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:073b43d8b5f9…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 6e476fd0db49c2e4  n=9975  warm=25  manifest-verified
+
+=== rr refc32_p1b_base_full_r2 — 9975 documents, warm 25 ===
+  quiet box: host busy 1.008  arm idle 1.002  foreign 0.006 (max 2.0)  load1 1.83  other containers none  strays none
+  corpus prewarmed: 10000 files in 1.06s
+  docs/s=2.3429  ok=9885/9975 (empty 89, hard 1)  span=4219.092s  eff_cores=18.057  util=0.5643 of 32  engine/driver/host cores=18.057/0.055/18.324  spin=1.236  idle: count 10.45 / equiv 13.676 (net of spin 14.912)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T031519Z__789ac2a112c8.json
+stamps copied out: 30006 records
+sweep rc=1
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T031519Z__789ac2a112c8.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 379
+   Total Size: 990494229
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=1
+removing our container 291b7ad46a3d7ccf60d4d42c832d73012132c8e7d83f20a7e29222d39d1c461a
+===== LEG p1b_base_full_r2 rc=1 03:15:37Z =====
+!! p1b_base_full failed three times — recorded FAILED
+===== LEG p1b_fix_full (rr:p1-tikafix, slice_docs_n9975_w25.json, texts) 03:15:37Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 28
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+started rr container 02139a75ab9d537d50fb1c6e6ef91b27b3483a954bb2282f1ff35e992d77175b
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1b_fix_full/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:35d4b4774784…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 6e476fd0db49c2e4  n=9975  warm=25  manifest-verified
+
+=== rr refc32_p1b_fix_full — 9975 documents, warm 25 ===
+  quiet box: host busy 1.043  arm idle 1.002  foreign 0.041 (max 2.0)  load1 1.72  other containers none  strays none
+  corpus prewarmed: 10000 files in 1.07s
+  docs/s=5.3436  ok=9886/9975 (empty 89, hard 0)  span=1850.057s  eff_cores=28.399  util=0.8875 of 32  engine/driver/host cores=28.399/0.134/28.593  spin=1.231  idle: count 0.77 / equiv 3.407 (net of spin 4.638)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T034804Z__74e1df454c7f.json
+stamps copied out: 30006 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T034804Z__74e1df454c7f.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 388
+   Total Size: 1232634387
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 02139a75ab9d537d50fb1c6e6ef91b27b3483a954bb2282f1ff35e992d77175b
+===== LEG p1b_fix_full rc=0 03:48:23Z =====
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+rr:p1-pdfium 
+CHAIN RESULTS: p1b_base_a:rc=0 p1b_fix_a:rc=0 p1b_base_b:rc=0 p1b_fix_b:rc=0 p1b_base_full:rc=1 p1b_base_full_r1:rc=1 p1b_base_full_r2:rc=1 p1b_fix_full:rc=0
+CHAIN_DONE complete
+p1b rc=0
+p1_pdfium_build.sh sha256: 86c54a9d6e44b0a75e4b04a7d9cc9c4d2e96dd187dcb31a157cecdcb3a6a7585
+images before:
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+engine site-packages: /opt/rocketride/engine/lib/python3.12/site-packages
+generated /tmp/tmp.p9YGQzhsE9/nodes/pdfium_pure (hybrid=False, stub=None)
+generated /tmp/tmp.p9YGQzhsE9/nodes/pdfium_hybrid (hybrid=True, stub=None)
+sha256:2cbcf8c06660d88e75f76bcb25c5d6bc0f82554ee9d53a7f30c19c220830ee4b
+images after:
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+
+!! in-image check produced nothing
+pdfium_build rc=8
+p1_docs_chain.sh sha256: 82ead33fc6b19734c8f5ad5ab92944375f2b78e2eefb2d254ec48a36e0e85b96
+boot_id e293381c-aa59-4b05-92e2-c0e4f6167125  stage p1c  head 781c3e65ba09
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+rr:p1-pdfium sha256:2cbcf8c06660d88e75f76bcb25c5d6bc0f82554ee9d53a7f30c19c220830ee4b
+===== LEG p1c_hyb_full (rr:p1-pdfium, slice_docs_n9975_w25.json, texts, hybrid) 03:48:27Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 31
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-pdfium sha256:2cbcf8c06660d88e75f76bcb25c5d6bc0f82554ee9d53a7f30c19c220830ee4b
+started rr container d873f3cb5d60619b1e68d2ca9692f6eb705b3234424ea7b0656b7546261cfce2
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1c_hyb_full/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:2cbcf8c06660…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 6e476fd0db49c2e4  n=9975  warm=25  manifest-verified
+
+=== rr refc32_p1c_hyb_full — 9975 documents, warm 25 ===
+  quiet box: host busy 1.04  arm idle 1.001  foreign 0.039 (max 2.0)  load1 6.47  other containers none  strays none
+  corpus prewarmed: 10000 files in 1.04s
+  docs/s=5.3033  ok=9886/9975 (empty 89, hard 0)  span=1864.137s  eff_cores=28.113  util=0.8785 of 32  engine/driver/host cores=28.113/0.133/28.319  spin=1.229  idle: count 0.75 / equiv 3.681 (net of spin 4.91)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T042107Z__bb7982b6fe1a.json
+stamps copied out: 30006 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T042107Z__bb7982b6fe1a.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 399
+   Total Size: 1474798283
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container d873f3cb5d60619b1e68d2ca9692f6eb705b3234424ea7b0656b7546261cfce2
+===== LEG p1c_hyb_full rc=0 04:21:26Z =====
+===== LEG p1c_pure_full (rr:p1-pdfium, slice_docs_n9975_w25.json, texts, pure) 04:21:26Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 33
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-pdfium sha256:2cbcf8c06660d88e75f76bcb25c5d6bc0f82554ee9d53a7f30c19c220830ee4b
+started rr container 4c8972cd180e9bd513aacd40ab931d825cbd36649e278224438990d4a28fb996
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1c_pure_full/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:2cbcf8c06660…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 6e476fd0db49c2e4  n=9975  warm=25  manifest-verified
+
+=== rr refc32_p1c_pure_full — 9975 documents, warm 25 ===
+  quiet box: host busy 1.01  arm idle 1.002  foreign 0.008 (max 2.0)  load1 6.84  other containers none  strays none
+  corpus prewarmed: 10000 files in 1.03s
+  docs/s=0.0  ok=0/9975 (empty 9975, hard 0)  span=132.297s  eff_cores=2.557  util=0.0799 of 32  engine/driver/host cores=2.557/0.088/2.754  spin=1.218  idle: count 27.06 / equiv 29.246 (net of spin 30.464)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T042451Z__fa7bdee80b4e.json
+stamps copied out: 30006 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T042451Z__fa7bdee80b4e.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 409
+   Total Size: 1484897847
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 4c8972cd180e9bd513aacd40ab931d825cbd36649e278224438990d4a28fb996
+===== LEG p1c_pure_full rc=0 04:24:58Z =====
+===== LEG p1c_fix_a (rr:p1-tikafix, slice_docs_n384_w25.json) 04:24:58Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 35
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+started rr container 220aaeae52e8ac53f7f5f2a0045ed90b6d5cbeefb2c8426e92b4aa115dafb0e0
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1c_fix_a/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:35d4b4774784…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1c_fix_a — 384 documents, warm 25 ===
+  quiet box: host busy 1.012  arm idle 1.002  foreign 0.01 (max 2.0)  load1 2.15  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.871  ok=382/384 (empty 2, hard 0)  span=133.057s  eff_cores=13.92  util=0.435 of 32  engine/driver/host cores=13.92/0.04/14.07  spin=1.236  idle: count 16.23 / equiv 17.93 (net of spin 19.166)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T042907Z__0682b8efb077.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T042907Z__0682b8efb077.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 417
+   Total Size: 1485941429
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 220aaeae52e8ac53f7f5f2a0045ed90b6d5cbeefb2c8426e92b4aa115dafb0e0
+===== LEG p1c_fix_a rc=0 04:29:14Z =====
+===== LEG p1c_hyb_a (rr:p1-pdfium, slice_docs_n384_w25.json, hybrid) 04:29:14Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 37
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-pdfium sha256:2cbcf8c06660d88e75f76bcb25c5d6bc0f82554ee9d53a7f30c19c220830ee4b
+started rr container 3275e86a74cd1080b0a45d65cffffbe3fe80253896a6c64a8fadc60d53b5a626
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1c_hyb_a/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:2cbcf8c06660…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1c_hyb_a — 384 documents, warm 25 ===
+  quiet box: host busy 1.013  arm idle 1.001  foreign 0.011 (max 2.0)  load1 4.15  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.8292  ok=382/384 (empty 2, hard 0)  span=135.02s  eff_cores=13.582  util=0.4244 of 32  engine/driver/host cores=13.582/0.038/13.721  spin=1.232  idle: count 16.34 / equiv 18.279 (net of spin 19.511)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T043249Z__8b62c2dd7546.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T043249Z__8b62c2dd7546.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 426
+   Total Size: 1486986071
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 3275e86a74cd1080b0a45d65cffffbe3fe80253896a6c64a8fadc60d53b5a626
+===== LEG p1c_hyb_a rc=0 04:32:55Z =====
+===== LEG p1c_pure_a (rr:p1-pdfium, slice_docs_n384_w25.json, pure) 04:32:55Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 39
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-pdfium sha256:2cbcf8c06660d88e75f76bcb25c5d6bc0f82554ee9d53a7f30c19c220830ee4b
+started rr container 5ec6e56ab4203289e9a3fa4a7152c111db9400827569f7207e0f334b64542996
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1c_pure_a/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:2cbcf8c06660…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1c_pure_a — 384 documents, warm 25 ===
+  quiet box: host busy 1.01  arm idle 1.002  foreign 0.008 (max 2.0)  load1 4.21  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=0.0  ok=0/384 (empty 384, hard 0)  span=5.78s  eff_cores=2.577  util=0.0805 of 32  engine/driver/host cores=2.577/0.083/2.741  spin=1.228  idle: count 27.0 / equiv 29.259 (net of spin 30.487)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T043411Z__df11a1e11c29.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T043411Z__df11a1e11c29.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 435
+   Total Size: 1487420719
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 5ec6e56ab4203289e9a3fa4a7152c111db9400827569f7207e0f334b64542996
+===== LEG p1c_pure_a rc=0 04:34:35Z =====
+===== LEG p1c_fix_b (rr:p1-tikafix, slice_docs_n384_w25.json) 04:34:35Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 41
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+started rr container 9c97d6bbf1d1215b13c31fba76bc960602d3d7fec097105c7ae74c72e71d610b
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1c_fix_b/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:35d4b4774784…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1c_fix_b — 384 documents, warm 25 ===
+  quiet box: host busy 1.015  arm idle 1.002  foreign 0.013 (max 2.0)  load1 2.54  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.86  ok=382/384 (empty 2, hard 0)  span=133.566s  eff_cores=13.828  util=0.4321 of 32  engine/driver/host cores=13.828/0.039/13.924  spin=1.225  idle: count 16.23 / equiv 18.076 (net of spin 19.301)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T043807Z__d0b85d5df402.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T043807Z__d0b85d5df402.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 443
+   Total Size: 1488464843
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 9c97d6bbf1d1215b13c31fba76bc960602d3d7fec097105c7ae74c72e71d610b
+===== LEG p1c_fix_b rc=0 04:38:14Z =====
+===== LEG p1c_hyb_b (rr:p1-pdfium, slice_docs_n384_w25.json, hybrid) 04:38:14Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 43
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-pdfium sha256:2cbcf8c06660d88e75f76bcb25c5d6bc0f82554ee9d53a7f30c19c220830ee4b
+started rr container 5be3848d31660623ce63c0dfa1a57c416223b7f94e6c3efae98ab64fa5130ac7
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1c_hyb_b/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:2cbcf8c06660…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1c_hyb_b — 384 documents, warm 25 ===
+  quiet box: host busy 1.012  arm idle 1.001  foreign 0.011 (max 2.0)  load1 4.74  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=2.8689  ok=382/384 (empty 2, hard 0)  span=133.153s  eff_cores=13.727  util=0.429 of 32  engine/driver/host cores=13.727/0.039/13.797  spin=1.239  idle: count 16.16 / equiv 18.203 (net of spin 19.442)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T044147Z__68873d0566d9.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T044147Z__68873d0566d9.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 452
+   Total Size: 1489509062
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container 5be3848d31660623ce63c0dfa1a57c416223b7f94e6c3efae98ab64fa5130ac7
+===== LEG p1c_hyb_b rc=0 04:41:54Z =====
+===== LEG p1c_pure_b (rr:p1-pdfium, slice_docs_n384_w25.json, pure) 04:41:54Z =====
+batchsize_docs_run.sh sha256: 52ef34329dfe70368e6e44e89c4773348fde575423a55456d1f37ea56335a880
+worktree: /home/ssm-user/parity-bench-p1  branch: feat/parity-p1  head: 781c3e6  dirty: 45
+driver open-file limit: soft 65536 hard 65536
+worktree head matches the declared commit: 781c3e65ba09
+rr image rr:p1-pdfium sha256:2cbcf8c06660d88e75f76bcb25c5d6bc0f82554ee9d53a7f30c19c220830ee4b
+started rr container ef702a4c36dc153873e01894892f84aca101634a18ab7b02989881dc214774ad
+service answered after ~20s: {"status":"OK","data":{"version":"3.3.1.35","hash":"a0817cc6","stamp":"2026-07-07T04:45:25Z"}}
+stamp_probe copied in (S5-D instrumented leg); restart follows with env_probe's
+env_probe md5 container=cba71b3595a173132c15b22624ab3c66 repo=9d31ab8e5f3f2ae00c0e0e71fdd20b82
+env_probe in the container is STALEcba71b3595a173132c15b22624ab3c66 — copying the repo node in and restarting
+env_probe md5 after copy: 9d31ab8e5f3f2ae00c0e0e71fdd20b82 (repo 9d31ab8e5f3f2ae00c0e0e71fdd20b82)
+working/scripts/batchsize_docs_run.sh: line 171: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/p1c_pure_b/memstat_stdout.txt: No such file or directory
+exp_batchsize_sweep.py sha256: 3897627c5fa0b94f07b0e6fae299307c74a9e0c3f8bbd26013cf98cc5375ecc4
+  posture read-back: image sha256:2cbcf8c06660…  cpuset 0-31 of 32 host cpus (Ruling A: unconstrained)  cpu.max=max 100000  declared thread env 1  threads_requested=NOT PASSED
+  in-process read-back: torch intra-op=None  six vars=None
+  slice 411f96f117512f9c  n=384  warm=25  manifest-verified
+
+=== rr refc32_p1c_pure_b — 384 documents, warm 25 ===
+  quiet box: host busy 1.008  arm idle 1.002  foreign 0.005 (max 2.0)  load1 4.43  other containers none  strays none
+  corpus prewarmed: 409 files in 0.05s
+  docs/s=0.0  ok=0/384 (empty 384, hard 0)  span=5.861s  eff_cores=2.535  util=0.0792 of 32  engine/driver/host cores=2.535/0.081/2.751  spin=1.229  idle: count 26.8 / equiv 29.249 (net of spin 30.478)
+
+RANKING (rr): 
+export: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T044307Z__807989dfdbba.json
+stamps copied out: 1233 records
+sweep rc=0
+export written by this launch: /home/ssm-user/parity-bench-p1/working/results/exp_batchsize_sweep_rr__20260924T044307Z__807989dfdbba.json
+uploaded 2 path(s) -> s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/
+
+Total Objects: 461
+   Total Size: 1489943738
+verify from the laptop with:  aws s3 cp s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/ ./run --recursive --profile <yours>
+DONE arm=rr rc=0
+removing our container ef702a4c36dc153873e01894892f84aca101634a18ab7b02989881dc214774ad
+===== LEG p1c_pure_b rc=0 04:43:36Z =====
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b
+rr:p1-pdfium sha256:2cbcf8c06660d88e75f76bcb25c5d6bc0f82554ee9d53a7f30c19c220830ee4b
+CHAIN RESULTS: p1c_hyb_full:rc=0 p1c_pure_full:rc=0 p1c_fix_a:rc=0 p1c_hyb_a:rc=0 p1c_pure_a:rc=0 p1c_fix_b:rc=0 p1c_hyb_b:rc=0 p1c_pure_b:rc=0
+CHAIN_DONE complete
+p1c rc=0
+p1_video_chain.sh sha256: cd59974bd40e528b1d3bf7c022b48d64093921b9e1036596fae174e70facd071
+boot_id e293381c-aa59-4b05-92e2-c0e4f6167125  stage v1full  head 781c3e65ba09  manifest f5a2255cc5c9ad87
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+===== LEG v1full_rr_t4 (rr T=4 n=168 stamped=0 traced=0) 04:43:38Z =====
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+[driver] lifetime_state leg_end: docker_root free 594.6 GiB | frag avg-extent 35536.5 KiB, >=4MiB share 0.9928 | rr: spool du 20 KiB/3 files, layer 295kB (virtual 9.67GB), cg anon 12.32 GiB, procs 2 rss 12.82 GiB
+[driver] export: /home/ssm-user/parity-bench-p1/working/results/parity_p1_20260923T184000Z/v1full_rr_t4/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 168 (errors 0) / offered 168 | THROUGHPUT 2.532 frames/s (37.98x realtime), steady window 2.425 frames/s (n=152) | SERVICE CPU 3.833 cores = 12.0% of 32 | IDLE BURDEN 1.237 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p1/parity_p1_20260923T184000Z/v1full_rr_t4/
+!! v1full_li_t4 NOT RUN: the P1 11-hour budget (preregistration.json session.budget) has passed
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+CHAIN RESULTS: v1full_rr_t4:rc=0 v1full_li_t4:NOT_RUN_budget
+CHAIN_DONE complete
+v1full rc=0
+CHAIN_DONE master 2026-09-24T07:17:38Z

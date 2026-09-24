@@ -1,0 +1,10 @@
+{
+ "gate": "P1-B correctness (preregistration.json P1_B.correctness_gate)",
+ "base_leg": "p1b_base_a",
+ "fix_leg": "p1b_fix_a",
+ "documents_ok_in_both": 382,
+ "chunk_lists_differ": [],
+ "lost_by_fix": [],
+ "gained_by_fix": [],
+ "outcome": "PASS"
+}

@@ -1,0 +1,43 @@
+i.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@3af37506
+[308MB] Sep 23, 2026 11:30:19 PM com.rocketride.tika_api.TikaApi extractInformation
+        INFO: extracted texts from the parent Input Stream : java.io.PrintWriter@3af37506
+[308MB] Extracted metadata:
+[308MB] ---------------------------------------------------------
+[308MB] pdf:PDFVersion=1.4
+[308MB] xmp:CreatorTool=GPL Ghostscript 8.54 PDF Writer
+[308MB] pdf:hasXFA=false
+[308MB] X-TIKA:Parsed-By-Full-Set=org.apache.tika.parser.CompositeParser; org.apache.tika.parser.pdf.PDFParser
+[308MB] pdf:num3DAnnotations=0
+[308MB] dc:format=application/pdf; version=1.4
+[308MB] access_permission:fill_in_form=true
+[308MB] pdf:hasCollection=false
+[308MB] dc:title=Mills_PeerRev07FINAL
+[308MB] pdf:containsNonEmbeddedFont=true
+[308MB] xmp:CreateDate=2007-10-04T00:00:00Z
+[308MB] pdf:hasMarkedContent=false
+[308MB] pdf:ocrPageCount=0
+[308MB] access_permission:can_print_faithful=true
+[308MB] xmp:ModifyDate=2007-10-04T00:00:00Z
+[308MB] xmp:About=3bd16a10-74f2-11dc-0000-b90f3f79c82e
+[308MB] access_permission:extract_for_accessibility=true
+[308MB] xmp:dc:creator=DBorsay
+[308MB] pdf:containsDamagedFont=false
+[308MB] access_permission:modify_annotations=true
+[308MB] dc:creator=DBorsay
+[308MB] dcterms:created=2007-10-04T16:27:36Z
+[308MB] dcterms:modified=2007-10-04T12:27:36Z
+[308MB] xmpMM:DocumentID=3bd16a10-74f2-11dc-0000-b90f3f79c82e
+[308MB] xmp:dc:title=Mills_PeerRev07FINAL
+[308MB] pdf:overallPercentageUnmappedUnicodeChars=0.0026873385068029165
+[308MB] Content-Type=application/pdf
+[308MB] pdf:producer=GPL Ghostscript 8.54
+[308MB] dc:subject=Peer Review 2007 Poster
+[308MB] xmp:pdf:Producer=GPL Ghostscript 8.54
+[308MB] pdf:totalUnmappedUnicodeChars=26
+[308MB] access_permission:assemble_document=true
+[308MB] xmpTPg:NPages=1
+[308MB] pdf:hasXMP=true
+[308MB] access_permission:extract_content=true
+[308MB] access_permission:can_print=true
+[308MB] access_permission:can_modify=true
