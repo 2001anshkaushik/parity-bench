@@ -90,15 +90,23 @@ def spread(a: float, b: float) -> float:
 # ------------------------------------------------------------------ loading
 
 def leg_files(d: Path) -> Optional[Dict[str, Path]]:
+    # P1: a large leg's per-document and stamp files may be landed as lossless .gz copies (originals in S3)
     lj = sorted(d.glob("leg_*.json"))
-    pd = sorted(d.glob("perdoc_*.jsonl"))
+    pd = sorted(d.glob("perdoc_*.jsonl")) or sorted(d.glob("perdoc_*.jsonl.gz"))
     if not lj or not pd:
         return None
-    return {"leg": lj[0], "perdoc": pd[0], "stamps": d / "stamp_probe.jsonl"}
+    st = d / "stamp_probe.jsonl"
+    return {"leg": lj[0], "perdoc": pd[0], "stamps": st if st.exists() or not (d / "stamp_probe.jsonl.gz").exists()
+            else d / "stamp_probe.jsonl.gz"}
 
 
 def rows_of(p: Path) -> List[Dict[str, Any]]:
-    return [json.loads(x) for x in p.read_text().splitlines() if x.strip()]
+    if p.suffix == ".gz":
+        import gzip
+        txt = gzip.decompress(p.read_bytes()).decode("utf-8")
+    else:
+        txt = p.read_text()
+    return [json.loads(x) for x in txt.splitlines() if x.strip()]
 
 
 def span_raw(rows: List[Dict[str, Any]]) -> Dict[str, Any]:

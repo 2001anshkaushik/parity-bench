@@ -1816,3 +1816,39 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   whether each is per-CPU. Prove on a tooling leg that the tracer stops on its signal.
 > - **Entry 50 applies to one-word checks too.** `sudo` goes through `launch`, even to test whether
 >   sudo works.
+
+## 54. The build check that failed, and the orchestration that did not listen (added 2026-09-24)
+
+> P1-C's image build copied pypdfium2 5.13.0's `pypdfium2` and `pypdfium2_raw` packages into the
+> engine but not the top-level `pypdfium2_cfg` module the 5.x package imports. The build script's own
+> in-image check ran the engine's Python against the new image, printed nothing and exited 8, which
+> was correct. The master orchestrator logged `pdfium_build rc=8` and ran all eight P1-C legs on the
+> image anyway. Every PDFium call in every leg raised: PURE returned no text, and HYBRID replayed
+> every document to Tika. The prototype node's own counters show it (text 0 in every leg), and the
+> P1-C question is NOT RUN. A laptop wiring test with stub parsers had passed; that proved the lanes,
+> not the library.
+>
+> Rules:
+>
+> - **A failed prerequisite stops what depends on it.** An orchestrator reads each step's exit code
+>   and skips (records NOT RUN) everything downstream of a failed build or check.
+> - **A prototype node counts its own successes.** The counters that exposed this afterwards are
+>   cheap; check them after the first leg, before the rest run.
+> - **Copy a Python package by installing it, not by guessing its directories.** A wheel can carry
+>   top-level modules beside its package directories.
+
+## 55. The sampler with nowhere to write, and the leg retried for telling the truth (added 2026-09-24)
+
+> P1's docs runner started the 1 Hz memory sampler with its output redirected into the run directory
+> before the driver had created that directory. The redirect failed, the sampler never ran, and P1-B's
+> first two legs have no memory samples. An outside watcher covered the later legs. Separately, every
+> baseline full run lost one document to the driver's 1,800 s per-document timeout. The driver marked
+> the leg DEGRADED and returned 1, and the chain read that as a failure and retried twice, spending
+> about 2.4 hours of box time on three runs that agreed to within 0.25%.
+>
+> Rules:
+>
+> - **A redirect target must exist before the redirect.** Prove each new sampler wrote rows on a
+>   tooling leg that uses the real runner, not a stand-alone test.
+> - **Separate "the leg failed" from "the leg measured a loss".** A driver verdict of DEGRADED with
+>   every row present is a result; the retry rule is for runs that did not complete.

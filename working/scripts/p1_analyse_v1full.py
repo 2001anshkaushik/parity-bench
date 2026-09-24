@@ -41,6 +41,10 @@ def main() -> int:
                                                "engine_cores", "boot_id", "session", "memstat", "p0", "task_census",
                                                "container_procs")}
             out[arm]["determinism_vs_p0_v1"] = identity(g, p0v[ref])
+    if not (rr and li):
+        out["gap"] = {"verdict": "NOT RUN", "why": ("the LlamaIndex 168-video leg did not run: the chain's per-leg check "
+                                                    "found the P1 11-hour budget passed (chain_video_v1full_done.json: "
+                                                    "v1full_li_t4:NOT_RUN_budget); one arm has no comparison") if rr else "neither arm ran"}
     if rr and li:
         gap = li["frames_per_s"] / rr["frames_per_s"] - 1
         margin = gap - noise

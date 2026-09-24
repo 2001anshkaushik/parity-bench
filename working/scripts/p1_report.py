@@ -38,20 +38,33 @@ def verdict_rows(A: Dict[str, Any], notes: Dict[str, str]) -> List[List[str]]:
     rows.append(["P1-B Tika wrapper fix", b.get("verdict") or "NOT RUN",
                  (f"correctness {'PASS' if (b.get('correctness') or {}).get('pass') else 'FAIL'}; smoke "
                   f"{n((b.get('smoke') or {}).get('speed_ratio'), 1)}x at p50 on the 11, exec census drop "
-                  f"{share((b.get('smoke') or {}).get('exec_census_drop'), 1)}; "
-                  f"384 ABAB {pct((b.get('speed_384') or {}).get('delta_b_vs_a'))} vs {share((b.get('speed_384') or {}).get('threshold'), 2)}")
+                  f"{share((b.get('smoke') or {}).get('exec_census_drop'), 2)}; "
+                  f"384 ABAB {pct((b.get('speed_384') or {}).get('delta_b_vs_a'))} vs {share((b.get('speed_384') or {}).get('threshold'), 2)}; "
+                  f"full 9,975 {pct((b.get('full') or {}).get('delta_b_vs_a'))} (one run each)")
                  if b else "—", notes.get("P1B", "")])
     c = d.get("p1c") or {}
     ch, cp = c.get("correctness_hybrid") or {}, c.get("correctness_pure") or {}
-    rows.append(["P1-C native parser", c.get("verdict") or "NOT RUN",
+    if c.get("prototype_failed"):
+        ri = c.get("context_hybrid_replay_identity_full") or {}
+        ro = c.get("context_replay_overhead_384") or {}
+        rows.append(["P1-C native parser", "NOT RUN — the prototype's parser never ran",
+                     f"node counters: text 0 in every leg; context: HYBRID (every document replayed to fixed Tika) "
+                     f"chunk-identical to fixed Tika on {n(ri.get('documents_ok_in_both'))} documents; replay cost "
+                     f"{pct(ro.get('delta_b_vs_a'))} vs {share(ro.get('threshold'), 2)}", notes.get("P1C", "")])
+    else:
+      rows.append(["P1-C native parser", c.get("verdict") or "NOT RUN",
                  (f"HYBRID {'ADOPTABLE' if ch.get('adoptable') else 'NOT ADOPTABLE'} (loses {n(ch.get('n_loses'))}); "
                   f"PURE {'ADOPTABLE' if cp.get('adoptable') else 'NOT ADOPTABLE'} (loses {n(cp.get('n_loses'))}); "
                   f"HYBRID vs fixed Tika 384 {pct(((c.get('speed_384') or {}).get('hybrid_vs_fix') or {}).get('delta_b_vs_a'))}")
                  if c else "—", notes.get("P1C", "")])
     g = v.get("gap") or {}
+    rr = v.get("rr") or {}
     rows.append(["P1-D V1 at 168 videos", g.get("verdict") or "NOT RUN",
                  (f"LI/RR − 1 {pct(g.get('li_over_rr_minus_1'), 1)} (P0, 16 videos: {pct(g.get('p0_v1_gap_16_videos'), 1)}); "
-                  f"margin {pts(g.get('margin_pp'))} vs +10 points") if g else "—", notes.get("P1D", "")])
+                  f"margin {pts(g.get('margin_pp'))} vs +10 points") if g.get("li_over_rr_minus_1") is not None else
+                 (f"RocketRide ran: {n(rr.get('videos'))} videos, {n(rr.get('frames_per_s'))} frames/s, output identical to P0 on "
+                  f"{n((rr.get('determinism_vs_p0_v1') or {}).get('videos_compared'))} shared videos; LlamaIndex: NOT RUN (budget)" if rr else "—"),
+                 notes.get("P1D", "")])
     return rows
 
 
@@ -76,6 +89,10 @@ def gate_rows(A: Dict[str, Any]) -> List[List[str]]:
                  ("FIRED" if sm.get("fired") else "not fired") if sm else "NOT RUN"])
     for lab in ("hybrid", "pure"):
         x = c.get(f"correctness_{lab}") or {}
+        if c.get("prototype_failed"):
+            rows.append([f"P1-C {lab.upper()} adoptable", "empty on no document the fixed-Tika full run recovers",
+                         "the prototype's parser never ran", "NOT RUN"])
+            continue
         rows.append([f"P1-C {lab.upper()} adoptable", "empty on no document the fixed-Tika full run recovers",
                      f"loses {n(x.get('n_loses'))}" if x.get("adoptable") is not None else (x.get("status") or "—"),
                      ("ADOPTABLE" if x.get("adoptable") else "NOT ADOPTABLE") if x.get("adoptable") is not None else "NOT RUN"])
@@ -94,9 +111,10 @@ def docs_leg_rows(L: Dict[str, Any], names: List[str]) -> List[List[str]]:
             continue
         m = x.get("memory") or {}
         pk = m.get("peak_bytes") or {}
+        nr = "not recorded" if not pk else None
         rows.append([x["dir"], n(x["span"]["docs_per_s"], 4), n(x["excluded_straggler"]["docs_per_s"], 4),
-                     n(x.get("engine_cores"), 2), n(x.get("idle_spin_cores"), 3), mb(pk.get("total")),
-                     mb(pk.get("anon")), n((x.get("lost_documents") or {}).get("n")), share(x.get("parse_share")),
+                     n(x.get("engine_cores"), 2), n(x.get("idle_spin_cores"), 3), nr or mb(pk.get("total")),
+                     nr or mb(pk.get("anon")), n((x.get("lost_documents") or {}).get("n")), share(x.get("parse_share")),
                      f"{share(x.get('steal_share'), 3)} / {n(x.get('mhz_mean'), 0)}"])
     return rows
 
@@ -197,7 +215,8 @@ def sec_docs(d: Optional[Dict[str, Any]], b1: Optional[Dict[str, Any]], c1: Opti
                                                               for k, v in sorted(sm["base"]["per_doc"].items())])
     sp = b.get("speed_384") or {}
     if sp:
-        out.append(f"**Speed, 384 slice ABAB:** baseline {sp['a_docs_per_s']} vs fixed {sp['b_docs_per_s']} docs/s → "
+        out.append(f"**Speed, 384 slice ABAB:** baseline {' / '.join(n(x, 4) for x in sp['a_docs_per_s'])} vs fixed "
+                   f"{' / '.join(n(x, 4) for x in sp['b_docs_per_s'])} docs/s → "
                    f"{pct(sp['delta_b_vs_a'])} against {share(sp['threshold'], 2)} → {'readable' if sp['readable'] else 'UNREADABLE'}.")
         out.append("")
     fu = b.get("full")
@@ -219,8 +238,23 @@ def sec_docs(d: Optional[Dict[str, Any]], b1: Optional[Dict[str, Any]], c1: Opti
         out.append(f"**Build (p1c_build.json):** rr:p1-pdfium `{(c1.get('image_id') or '')[:19]}` FROM rr:p1-tikafix; in-image check "
                    f"{json.dumps(c1.get('in_image_check'))[:300]}. PyMuPDF/MuPDF is AGPL-3.0: out of scope for an MIT product; pypdf excluded (slower than Tika in H6).")
         out.append("")
+    if c.get("prototype_failed"):
+        out.append(f"**Verdict: {c.get('verdict')}.** The prototype node's own counters, per leg (docs / text / fallback / errors): " +
+                   "; ".join(f"{k} {v.get('docs')}/{v.get('text')}/{v.get('fallback')}/{v.get('errors')}" for k, v in (c.get("node_counters") or {}).items()) + ".")
+        out.append("")
+        ri, rf, ro = (c.get("context_hybrid_replay_identity_full") or {}), (c.get("context_hybrid_full_vs_fix") or {}), (c.get("context_replay_overhead_384") or {})
+        out.append(f"**Context (not the P1-C question):** with every document replayed, HYBRID is fixed Tika behind the node's "
+                   f"buffer-and-replay path. Full corpus: {n(ri.get('documents_ok_in_both'))} documents ok in both, chunk lists differ on "
+                   f"{n(len(ri.get('chunk_lists_differ') or []))}, lost {n(len(ri.get('lost_by_b') or []))}, gained {n(len(ri.get('gained_by_b') or []))}; "
+                   f"docs/s {n(rf.get('a_docs_per_s'), 4)} (fixed Tika) vs {n(rf.get('b_docs_per_s'), 4)} (replay) → {pct(rf.get('delta_b_vs_a'))} against "
+                   f"{share(rf.get('threshold'), 2)}. 384 ABAB: {' / '.join(n(x, 4) for x in ro.get('a_docs_per_s') or [])} vs "
+                   f"{' / '.join(n(x, 4) for x in ro.get('b_docs_per_s') or [])} → {pct(ro.get('delta_b_vs_a'))} "
+                   f"against {share(ro.get('threshold'), 2)} ({'readable' if ro.get('readable') else 'UNREADABLE'}).")
+        out.append("")
     for lab in ("hybrid", "pure"):
         x = c.get(f"correctness_{lab}") or {}
+        if c.get("prototype_failed"):
+            continue
         if x.get("adoptable") is None:
             out.append(f"**Correctness {lab.upper()}:** {x.get('status') or 'NOT RUN'}.")
             out.append("")
@@ -236,7 +270,8 @@ def sec_docs(d: Optional[Dict[str, Any]], b1: Optional[Dict[str, Any]], c1: Opti
     for k in ("hybrid_vs_fix", "pure_vs_fix"):
         sp = (c.get("speed_384") or {}).get(k) or {}
         if sp:
-            out.append(f"**384 ABAB, {k.replace('_', ' ')}:** {sp['a_docs_per_s']} vs {sp['b_docs_per_s']} docs/s → "
+            out.append(f"**384 ABAB, {k.replace('_', ' ')}:** {' / '.join(n(x, 4) for x in sp['a_docs_per_s'])} vs "
+                       f"{' / '.join(n(x, 4) for x in sp['b_docs_per_s'])} docs/s → "
                        f"{pct(sp['delta_b_vs_a'])} against {share(sp['threshold'], 2)} → {'readable' if sp['readable'] else 'UNREADABLE'}.")
             out.append("")
     for k in ("full_hybrid_vs_fix", "full_pure_vs_fix"):
@@ -247,7 +282,8 @@ def sec_docs(d: Optional[Dict[str, Any]], b1: Optional[Dict[str, Any]], c1: Opti
             out.append("")
     out += table(LEG_HEAD, docs_leg_rows(L, ["p1c_hyb_full", "p1c_pure_full", "p1c_fix_a", "p1c_hyb_a", "p1c_pure_a",
                                               "p1c_fix_b", "p1c_hyb_b", "p1c_pure_b"]))
-    out.append(f"**Verdict (pre-registered):** {c.get('verdict') or 'NOT RUN'}.")
+    if not c.get("prototype_failed"):
+        out.append(f"**Verdict (pre-registered):** {c.get('verdict') or 'NOT RUN'}.")
     out.append("")
     return out
 
@@ -267,7 +303,10 @@ def sec_v1full(v: Optional[Dict[str, Any]]) -> List[str]:
     out += table(["arm", "leg", "videos", "errors", "frames", "frames/s", "CPU-s per frame", "memory peak (sampled)",
                   "determinism vs P0 V1"], rows)
     g = v.get("gap") or {}
-    if g:
+    if g and g.get("li_over_rr_minus_1") is None:
+        out.append(f"**Gap: {g.get('verdict')}** — {g.get('why')}.")
+        out.append("")
+    elif g:
         out.append(f"**Gap:** LI/RR − 1 = {pct(g['li_over_rr_minus_1'], 1)} (P0, 16 videos: {pct(g.get('p0_v1_gap_16_videos'), 1)}); noise "
                    f"max(0.82%, P0 spreads) {share(g['noise'], 2)}; margin {pts(g['margin_pp'])} → **{g['verdict']}**; same session {n(g.get('same_session'))}.")
         out.append("")

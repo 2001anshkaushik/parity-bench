@@ -36,7 +36,7 @@ ELEVEN = {"011_011464.pdf", "039_039660.pdf", "008_008871.pdf", "011_011730.pdf"
 def leg_dir(camp: Path, name: str) -> Optional[Path]:
     for suf in ("", "_r1", "_r2"):
         d = camp / f"{name}{suf}"
-        if d.is_dir() and list(d.glob("leg_*.json")) and list(d.glob("perdoc_*.jsonl")):
+        if d.is_dir() and list(d.glob("leg_*.json")) and (list(d.glob("perdoc_*.jsonl")) or list(d.glob("perdoc_*.jsonl.gz"))):
             return d
     return None
 
@@ -69,7 +69,9 @@ def leg_summary(d: Path) -> Dict[str, Any]:
     t1 = max(r["completion_ns"] for r in rows) / 1e9
     rest = [r for r in rows if r["doc"] not in ELEVEN]
     s = (g.get("session") or {})
-    d1 = rr_d1(g) if g["stamps"] else None
+    # stages over documents answered ok: a document the client timed out on has no completion to measure
+    # (its row's completion is the timeout, and the engine's own stamps run past it)
+    d1 = rr_d1(dict(g, rows=[r for r in rows if r.get("ok")])) if g["stamps"] else None
     lost = sorted(r["doc"] for r in rows if not r.get("ok"))
     return {"dir": d.name, "n": len(rows), "span": g["span"], "excluded_straggler": span_raw(rest),
             "boot_id": g["boot_id"], "steal_share": (s.get("steal") or {}).get("share"),
@@ -205,31 +207,56 @@ def main() -> int:
                         "NOT SUPPORTED" if b["correctness"]["pass"] else "OUTPUT-CHANGING")
     out["p1b"] = b
     c: Dict[str, Any] = {}
-    if a.texts_dir and "p1b_fix_full" in L:
-        for lab, n in (("hybrid", "p1c_hyb_full"), ("pure", "p1c_pure_full")):
-            if n in L:
-                c[f"correctness_{lab}"] = p1c_correctness(camp, a.texts_dir, L["p1b_fix_full"]["dir"], L[n]["dir"], lab,
-                                                          L["p1b_fix_full"], L[n])
-    cells = {k: [L[f"p1c_{k}_{s}"]["_g"] for s in ("a", "b") if f"p1c_{k}_{s}" in L] for k in ("fix", "hyb", "pure")}
-    if all(len(v) == 2 for v in cells.values()):
-        c["speed_384"] = {"hybrid_vs_fix": pair_compare(cells["fix"], cells["hyb"], FLOOR),
-                          "pure_vs_fix": pair_compare(cells["fix"], cells["pure"], FLOOR)}
-    if "p1b_fix_full" in L:
-        for lab, n in (("hybrid", "p1c_hyb_full"), ("pure", "p1c_pure_full")):
-            if n in L:
-                c[f"full_{lab}_vs_fix"] = one_vs_one(L["p1b_fix_full"], L[n])
-    ch = c.get("correctness_hybrid") or {}
-    if ch.get("adoptable") is not None:
-        sp = (c.get("speed_384") or {}).get("hybrid_vs_fix") or {}
-        if not ch["adoptable"]:
-            v = "P1-B OPTIMAL (HYBRID not adoptable)"
-        elif sp and sp["readable"] and sp["delta_b_vs_a"] > 0:
-            v = "HYBRID OPTIMAL"
-        elif sp and sp["readable"] and sp["delta_b_vs_a"] < 0:
-            v = "P1-B OPTIMAL (HYBRID readably slower)"
-        else:
-            v = "TIE within the floor" if sp else None
-        c["verdict"] = v
+    # the prototype node's own counters (written every 50 documents): did its parser ever run?
+    counters = {}
+    for n in [x for x in L if x.startswith("p1c_") and not x.startswith("p1c_fix")]:
+        d = leg_dir(camp, n)
+        for f in sorted(d.glob("p1_pdfium_*.json")):
+            counters[n] = json.loads(f.read_text())
+    c["node_counters"] = counters
+    # the counters are written every 50 documents while other threads keep counting, so errors can trail
+    # docs by a few: the test is NO text from the parser in any leg and errors on at least 90% of documents
+    failed = bool(counters) and all(v.get("docs") and not v.get("text") and v.get("errors", 0) >= 0.9 * v["docs"]
+                                    for v in counters.values())
+    c["prototype_failed"] = failed
+    if failed:
+        c["verdict"] = ("NOT RUN — the prototype's parser never ran: pypdfium2 failed on every document in every P1-C leg "
+                        "(node counters: text 0 in every leg, errors on at least 90% of documents); PURE returned no text, HYBRID replayed every "
+                        "document to the fixed Tika")
+        # CONTEXT only: with every document replayed, HYBRID is fixed Tika behind the node's buffer-and-replay path
+        if "p1b_fix_full" in L and "p1c_hyb_full" in L:
+            c["context_hybrid_replay_identity_full"] = correctness_identity(L["p1b_fix_full"], L["p1c_hyb_full"])
+            c["context_hybrid_full_vs_fix"] = one_vs_one(L["p1b_fix_full"], L["p1c_hyb_full"])
+        cells = {k: [L[f"p1c_{k}_{s2}"]["_g"] for s2 in ("a", "b") if f"p1c_{k}_{s2}" in L] for k in ("fix", "hyb")}
+        if all(len(v) == 2 for v in cells.values()):
+            c["context_replay_overhead_384"] = pair_compare(cells["fix"], cells["hyb"], FLOOR)
+        c["pure"] = {k: L[k]["lost_documents"]["n"] for k in L if k.startswith("p1c_pure")}
+    else:
+        if a.texts_dir and "p1b_fix_full" in L:
+            for lab, n in (("hybrid", "p1c_hyb_full"), ("pure", "p1c_pure_full")):
+                if n in L:
+                    c[f"correctness_{lab}"] = p1c_correctness(camp, a.texts_dir, L["p1b_fix_full"]["dir"], L[n]["dir"], lab,
+                                                              L["p1b_fix_full"], L[n])
+        cells = {k: [L[f"p1c_{k}_{s2}"]["_g"] for s2 in ("a", "b") if f"p1c_{k}_{s2}" in L] for k in ("fix", "hyb", "pure")}
+        if all(len(v) == 2 for v in cells.values()):
+            c["speed_384"] = {"hybrid_vs_fix": pair_compare(cells["fix"], cells["hyb"], FLOOR),
+                              "pure_vs_fix": pair_compare(cells["fix"], cells["pure"], FLOOR)}
+        if "p1b_fix_full" in L:
+            for lab, n in (("hybrid", "p1c_hyb_full"), ("pure", "p1c_pure_full")):
+                if n in L:
+                    c[f"full_{lab}_vs_fix"] = one_vs_one(L["p1b_fix_full"], L[n])
+        ch = c.get("correctness_hybrid") or {}
+        if ch.get("adoptable") is not None:
+            sp = (c.get("speed_384") or {}).get("hybrid_vs_fix") or {}
+            if not ch["adoptable"]:
+                v = "P1-B OPTIMAL (HYBRID not adoptable)"
+            elif sp and sp["readable"] and sp["delta_b_vs_a"] > 0:
+                v = "HYBRID OPTIMAL"
+            elif sp and sp["readable"] and sp["delta_b_vs_a"] < 0:
+                v = "P1-B OPTIMAL (HYBRID readably slower)"
+            else:
+                v = "TIE within the floor" if sp else None
+            c["verdict"] = v
     out["p1c"] = c
     (camp / "analysis_p1docs.json").write_text(json.dumps(out, indent=1, default=str))
     print(json.dumps({"p1b": {k: v for k, v in b.items() if k in ("verdict",)}, "p1c": c.get("verdict"),
