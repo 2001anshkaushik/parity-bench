@@ -1,0 +1,46 @@
+{
+ "items": [
+  {
+   "bottleneck": "the docs parse tail: the engine's Tika wrapper extracted every PDF inline image and probed external tools per image",
+   "fix": "DONE in P1-B (rr:p1-tikafix): TikaApi.getPdfConfig code byte 9 iconst_1 -> iconst_0 (setExtractInlineImages off; PATCH) and two parser-exclude lines in tika-config.xml (CONFIG); output-neutral on the 384 slice (the gate) and chunk-identical over the full corpus (context). Ready to ship as a wrapper change",
+   "scope": "PATCH",
+   "share_key": "docs_base:parse_bracket",
+   "evidence": "P1-B correctness, smoke, 384 ABAB and full runs"
+  },
+  {
+   "bottleneck": "per-document embedding (MiniLM) \u2014 after the wrapper fix, nearly all of document time",
+   "fix": "encode the chunks of several in-flight documents in one call inside the one model instance; output effect to be verified (batch composition can move floats)",
+   "scope": "PYTHON",
+   "share_key": "docs_fixed:embed",
+   "evidence": "P1-B fixed legs' D1 stage shares"
+  },
+  {
+   "bottleneck": "response path: vectors serialised as JSON text on the websocket",
+   "fix": "binary vector encoding on the response lane",
+   "scope": "PYTHON",
+   "share_key": "docs_fixed:return",
+   "evidence": "P1-B fixed legs' D1 stage shares"
+  },
+  {
+   "bottleneck": "video: RocketRide's T=4 forward pass is slower than LlamaIndex's at identical libraries and pool settings; its calling thread is on-CPU for less of it",
+   "fix": "not yet named: E2's pre-registered readings are unreadable (the tracer failed its null control). Candidates for P2, from E2's read-backs: the attached debugger (pydevd as sys.monitoring tool 0, RocketRide only), the per-frame device lock rotating forward calls across 16 pipe threads each with its own OpenMP pool, MALLOC_ARENA_MAX=2 (LlamaIndex only), the task process's thread count. Scope THREADING is provisional",
+   "scope": "THREADING",
+   "evidence": "E2 OFF legs (forward times, caller CPU ratio) and read-backs"
+  }
+ ],
+ "out_of_bounds": [
+  "a second token, more task processes, model or engine pools, the model-server mode (unchanged from P0)"
+ ],
+ "not_run": [
+  "P1-C's native-parser question: the prototype's pypdfium2 never ran (the image lacked pypdfium2's top-level pypdfium2_cfg module; the build's own check failed with rc 8 and my master did not gate on it). Needs: the module added (install the wheel into the engine's site-packages), the counters checked after the first leg, then the pre-registered P1-C design (about 1.5 h of box time)",
+  "P1-D's LlamaIndex 168-video leg: the chain's per-leg budget check found the 11-hour budget passed; the gap is not computed. Needs about 2 h of box time plus a RocketRide leg in the same session",
+  "E2's tracer-ON readings (GIL wait in forward, run-queue wait, busy OpenMP workers): unreadable because the tracer itself cost about 6% on both arms (null control failed). Needs a lighter instrument (for example bpftrace off-CPU accounting only for the forward-calling threads) and its own null control",
+  "memory samples for p1b_base_a and p1b_fix_a: the runner's sampler never ran on them (register 55); later docs legs are covered by the outside watcher",
+  "rr:p1-pdfium's build record (p1c_build.json): the build script stopped at its failed in-image check before writing it; the image id is in chain_p1c_done.json"
+ ],
+ "register": [
+  "53 \u2014 the tracer that could not stop (per-CPU preallocated maps), and a repeat of entry 50 (sudo in a one-shot run)",
+  "54 \u2014 the build check that failed and the orchestration that did not listen (P1-C)",
+  "55 \u2014 the sampler with nowhere to write, and the DEGRADED leg retried twice"
+ ]
+}

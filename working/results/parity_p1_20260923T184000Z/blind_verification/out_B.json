@@ -1,0 +1,16 @@
+{
+ "figures_checked": 249,
+ "mismatches": [
+  {
+   "where": "P1-B smoke table",
+   "figure": "039_039660.pdf baseline s",
+   "report": "1,769.7",
+   "recomputed": "1796.7"
+  }
+ ],
+ "unverifiable": [
+  "Stage tables, 'occupancy max / mean / p50 / p95' column (both tables, 5 stages x 4 values = 40 figures): no definition of occupancy supplied; permitted UNVERIFIABLE.",
+  "Verdicts P1-B row, verdict 'SUPPORTED': the rule mapping gates to the verdict is not among the supplied definitions (all underlying gates recompute as PASS / FIRED / readable, consistent with it).",
+  "Gates P1-B smoke row, thresholds '>= 10x' and '>= 90%': pre-registered constants, not derivable from raw files (outcome FIRED recomputed against them)."
+ ]
+}

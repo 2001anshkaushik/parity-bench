@@ -1,0 +1,55 @@
+{
+ "label": "P1 blind recomputation (P0 form): independent verifiers with only the report copy and the raw files; one planted figure per verifier; a plant must be reported as a MISMATCH, and any other mismatch blocks the report",
+ "written_utc": "2026-09-24T15:30:30Z",
+ "copy_sha256_16": "61f8dc6e626449a7",
+ "verifiers": {
+  "A": {
+   "scope_prompt": "blind_verification/prompt_A.md",
+   "findings": "blind_verification/out_A.json",
+   "figures_checked": 77,
+   "plant": {
+    "where": "E2 leg table, e2_rr_off_b frames/s",
+    "true": "| 2.531 |",
+    "planted": "| 2.513 |"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": []
+  },
+  "B": {
+   "scope_prompt": "blind_verification/prompt_B.md",
+   "findings": "blind_verification/out_B.json",
+   "figures_checked": 249,
+   "plant": {
+    "where": "P1-B smoke table, 039_039660.pdf baseline seconds",
+    "true": "| 1,796.7 |",
+    "planted": "| 1,769.7 |"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    "Stage tables, 'occupancy max / mean / p50 / p95' column (both tables, 5 stages x 4 values = 40 figures): no definition of occupancy supplied; permitted UNVERIFIABLE.",
+    "Verdicts P1-B row, verdict 'SUPPORTED': the rule mapping gates to the verdict is not among the supplied definitions (all underlying gates recompute as PASS / FIRED / readable, consistent with it).",
+    "Gates P1-B smoke row, thresholds '>= 10x' and '>= 90%': pre-registered constants, not derivable from raw files (outcome FIRED recomputed against them)."
+   ]
+  },
+  "C": {
+   "scope_prompt": "blind_verification/prompt_C.md",
+   "findings": "blind_verification/out_C.json",
+   "figures_checked": 142,
+   "plant": {
+    "where": "P1-D table, RocketRide frames",
+    "true": "| 23,049 |",
+    "planted": "| 23,094 |"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    "P1-D Verdicts row 'LlamaIndex: NOT RUN (budget)' and the P1-D 'Gap: NOT RUN' reason (11-hour budget, chain_video_v1full_done.json): the reason is recorded only in chain_video_v1full_done.json, which is not among the listed files. Only the absence of any v1full_li_* leg directory could be confirmed (directory listing).",
+    "ROI table row 1 (video) columns (a) and (b) show '\u2014': no recomputation defined for a video item; not counted as figures."
+   ]
+  }
+ },
+ "outcome": "PASS \u2014 every plant caught, no other mismatch",
+ "after_verification": "wording only, no figure: P1-C's verdict and context sentences now say what the evidence shows (the node produced text for no document; HYBRID's output is fixed Tika's) instead of 'replayed every document', which the node's counters (snapshots every 50 documents) do not show literally (verifier C's note)"
+}

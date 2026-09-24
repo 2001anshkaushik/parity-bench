@@ -1,0 +1,19 @@
+{
+  "figures_checked": 77,
+  "mismatches": [
+    {
+      "where": "## P1-A — E2 first table, row e2_rr_off_b, column 'frames/s'",
+      "figure": "frames/s = throughput.total_frames / throughput.total_span_s = 3203 / 1265.3",
+      "report": "2.513",
+      "recomputed": "2.531 (2.531415)"
+    }
+  ],
+  "unverifiable": [],
+  "notes": [
+    "Scope: first P1-A table (8 legs x 8 figures = 64: frames/s, forward s per frame, caller CPU / forward wall, process cores in forward, idle cores, memory peak MB, steal %, MHz), Readings D OFF/ON (2), Verdicts P1-A row (D OFF, D ON, verdict UNREADABLE by null control = 3), Gates E2 null control rr and li (delta, threshold, identical pair list, outcome = 8).",
+    "All 76 other figures match. Recomputed D OFF = 0.098922 -> 0.099; D ON = 0.102839 -> 0.103.",
+    "Null control rr: delta -5.7341% -> -5.73%; threshold max(0.82%, ON spread 0.231%, OFF spread 0.047%) = 0.82%; identical [True, True]; |delta| > threshold -> FAIL. li: delta -6.4283% -> -6.43%; threshold max(0.82%, ON spread 1.088%, OFF spread 0.607%) = 1.09%; identical [True, True]; FAIL. Both null controls fail, so P1-A is UNREADABLE, as the report says.",
+    "The rr null-control delta (-5.73%) is consistent with e2_rr_off_b at 2.531 frames/s. With the table's 2.513 it would be about -5.4%, so the table cell is likely a digit transposition in the display, not an error in the computation.",
+    "Measured frames: the last 3203 frame rows by t_wall in every leg (RR 3526 rows, none with a kind; LI 5787 'frame' rows + 32 'video' rows). All 3203 carry fw_thread_cpu and fw_proc_cpu. Records: 16 videos per leg, one row each."
+  ]
+}

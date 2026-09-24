@@ -48,7 +48,7 @@ def verdict_rows(A: Dict[str, Any], notes: Dict[str, str]) -> List[List[str]]:
         ri = c.get("context_hybrid_replay_identity_full") or {}
         ro = c.get("context_replay_overhead_384") or {}
         rows.append(["P1-C native parser", "NOT RUN — the prototype's parser never ran",
-                     f"node counters: text 0 in every leg; context: HYBRID (every document replayed to fixed Tika) "
+                     f"node counters: text 0 in every leg; context: HYBRID (no text of its own; its output is fixed Tika's) "
                      f"chunk-identical to fixed Tika on {n(ri.get('documents_ok_in_both'))} documents; replay cost "
                      f"{pct(ro.get('delta_b_vs_a'))} vs {share(ro.get('threshold'), 2)}", notes.get("P1C", "")])
     else:
@@ -243,7 +243,7 @@ def sec_docs(d: Optional[Dict[str, Any]], b1: Optional[Dict[str, Any]], c1: Opti
                    "; ".join(f"{k} {v.get('docs')}/{v.get('text')}/{v.get('fallback')}/{v.get('errors')}" for k, v in (c.get("node_counters") or {}).items()) + ".")
         out.append("")
         ri, rf, ro = (c.get("context_hybrid_replay_identity_full") or {}), (c.get("context_hybrid_full_vs_fix") or {}), (c.get("context_replay_overhead_384") or {})
-        out.append(f"**Context (not the P1-C question):** with every document replayed, HYBRID is fixed Tika behind the node's "
+        out.append(f"**Context (not the P1-C question):** the node produced no text, so HYBRID's output is fixed Tika's behind the node's "
                    f"buffer-and-replay path. Full corpus: {n(ri.get('documents_ok_in_both'))} documents ok in both, chunk lists differ on "
                    f"{n(len(ri.get('chunk_lists_differ') or []))}, lost {n(len(ri.get('lost_by_b') or []))}, gained {n(len(ri.get('gained_by_b') or []))}; "
                    f"docs/s {n(rf.get('a_docs_per_s'), 4)} (fixed Tika) vs {n(rf.get('b_docs_per_s'), 4)} (replay) → {pct(rf.get('delta_b_vs_a'))} against "

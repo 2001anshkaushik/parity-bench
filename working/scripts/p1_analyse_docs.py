@@ -221,9 +221,10 @@ def main() -> int:
     c["prototype_failed"] = failed
     if failed:
         c["verdict"] = ("NOT RUN — the prototype's parser never ran: pypdfium2 failed on every document in every P1-C leg "
-                        "(node counters: text 0 in every leg, errors on at least 90% of documents); PURE returned no text, HYBRID replayed every "
-                        "document to the fixed Tika")
-        # CONTEXT only: with every document replayed, HYBRID is fixed Tika behind the node's buffer-and-replay path
+                        "(node counters: text 0 in every leg, errors on at least 90% of the documents counted; the counters are snapshots "
+                        "written every 50 documents, so they trail the leg's totals); PURE returned no text, and HYBRID produced "
+                        "text for no document itself — its documents came out through the fixed Tika")
+        # CONTEXT only: the node produced no text, so HYBRID's output is fixed Tika's, behind the node's buffer-and-replay path
         if "p1b_fix_full" in L and "p1c_hyb_full" in L:
             c["context_hybrid_replay_identity_full"] = correctness_identity(L["p1b_fix_full"], L["p1c_hyb_full"])
             c["context_hybrid_full_vs_fix"] = one_vs_one(L["p1b_fix_full"], L["p1c_hyb_full"])

@@ -1,0 +1,22 @@
+{
+  "figures_checked": 142,
+  "mismatches": [
+    {
+      "where": "## P1-D — V1 at 168 videos, table row rr / v1full_rr_t4, column 'frames'",
+      "figure": "frames (throughput.total_frames of v1full_rr_t4; also = sum of frames_observed over the 168 last-per-video records)",
+      "report": "23,094",
+      "recomputed": "23,049 (export throughput.total_frames = 23049; sum of frames_observed = 23049). The same row's frames/s 2.532 = 23049/9104.6 and CPU-s per frame 1.514 = 34893.8/23049 are consistent only with 23,049; 23,094 would give 2.537 and 1.511"
+    }
+  ],
+  "unverifiable": [
+    "P1-D Verdicts row 'LlamaIndex: NOT RUN (budget)' and the P1-D 'Gap: NOT RUN' reason (11-hour budget, chain_video_v1full_done.json): the reason is recorded only in chain_video_v1full_done.json, which is not among the listed files. Only the absence of any v1full_li_* leg directory could be confirmed (directory listing).",
+    "ROI table row 1 (video) columns (a) and (b) show '—': no recomputation defined for a video item; not counted as figures."
+  ],
+  "notes": [
+    "All 24 P1-C node counters (docs/text/fallback/errors) match p1_pdfium_<variant>.json in each leg; 'text 0 in every leg' and 'errors on at least 90% of documents' hold (lowest error share 297/303 = 98.0% in p1c_pure_a).",
+    "P1-C context: p1b_fix_full vs p1c_hyb_full = 9,886 ok in both, 0 differ, 0 lost, 0 gained; 5.3441 vs 5.3037 docs/s, delta -0.755% (-0.76%) vs 0.82%; 384 ABAB delta -0.574% (-0.57%) vs threshold 1.392% (1.39%, the hyb pair spread), UNREADABLE: all match.",
+    "P1-C leg table: all 80 cells match (each leg's memwatch window held exactly one container id; no duplicate stage records). Boundary roundings resolved: p1c_hyb_full steal 1.5e-05 -> 0.0015% -> 0.002%; p1c_pure_b engine 2.535 (float 2.53500000000000014) -> 2.54.",
+    "ROI (a)/(b): wrapper 35.136% / 1.5417x; embedding 92.073% / 12.615x; response 1.868% / 1.0190x: all match (b uses the unrounded share).",
+    "Informational, not scored (prose): the prototype counters' docs totals per ABAB leg (300, 350, 303, 403) differ from the 384 measured + 25 warm-up documents each leg ran, and p1c_hyb_b shows fallback 348 of docs 350, so the counters alone do not literally show 'every document replayed' in that leg."
+  ]
+}

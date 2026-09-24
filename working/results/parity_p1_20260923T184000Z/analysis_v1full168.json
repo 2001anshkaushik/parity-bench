@@ -1,0 +1,178 @@
+{
+ "label": "P1-D 168-video V1 confirmation",
+ "rr": {
+  "dir": "v1full_rr_t4",
+  "videos": 168,
+  "errors": 0,
+  "frames": 23049,
+  "frames_per_s": 2.5315774443687804,
+  "cpu_s_per_frame": 1.513896481409172,
+  "engine_cores": 3.833,
+  "boot_id": "e293381c-aa59-4b05-92e2-c0e4f6167125",
+  "session": {
+   "steal_share": 8.243669294520012e-06,
+   "mhz_open_mean": 2764.6784375,
+   "mhz_close_mean": 2604.5335625,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+  },
+  "memstat": {
+   "container": "rr",
+   "cgroup": "/sys/fs/cgroup/system.slice/docker-13d1f01ef9d57078512a27efa36f575c937b34937559498521bcd074fc57517b.scope",
+   "hz": 1.0,
+   "samples": 9216,
+   "sampled_peak_bytes": {
+    "anon": 14121566208,
+    "file": 3265757184,
+    "total": 16692965376,
+    "anon_plus_file": 16496852992
+   },
+   "memory_peak_lifetime_context_only": 16745668608,
+   "note": "sampled peaks are the P1 figure; memory.peak spans the container's whole lifetime (warm-up included) and is context only"
+  },
+  "p0": {
+   "d0_pre": {
+    "d0_schema": 2,
+    "pid": 90,
+    "ppid": 1,
+    "trace": {
+     "sys_gettrace_this_thread": "None",
+     "threading_trace_hook": "None",
+     "threading_profile_hook": "None",
+     "sys_getprofile_this_thread": "None",
+     "pydevd_loaded": true,
+     "debugpy_loaded": true,
+     "sys_monitoring_tools": {
+      "0": "pydevd"
+     }
+    },
+    "proc_threads": 176,
+    "python_threads": 5,
+    "python_threads_by_prefix": {
+     "Main": 1,
+     "GlobalEventLoop": 2,
+     "scanner": 1,
+     "External": 1
+    },
+    "asyncio_executor_threads_alive": 0,
+    "asyncio_executor_max_index": null,
+    "root_modules_with_params": {
+     "rfdetr.models.lwdetr.LWDETR": {
+      "count": 1,
+      "distinct_weights": 1,
+      "params": [
+       32174530
+      ]
+     },
+     "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+      "count": 1,
+      "distinct_weights": 1,
+      "params": [
+       22713216
+      ]
+     }
+    },
+    "model_instances_total": 2
+   },
+   "probe_pid": 90,
+   "torch_num_threads": 4,
+   "env": {
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4",
+    "VECLIB_MAXIMUM_THREADS": "4",
+    "NUMEXPR_NUM_THREADS": "4",
+    "TORCH_NUM_THREADS": "4"
+   },
+   "mandate": {
+    "mandate_violation": false,
+    "violations": []
+   },
+   "d0_post": {
+    "d0_schema": 2,
+    "pid": 90,
+    "ppid": 1,
+    "trace": {
+     "sys_gettrace_this_thread": "None",
+     "threading_trace_hook": "None",
+     "threading_profile_hook": "None",
+     "sys_getprofile_this_thread": "None",
+     "pydevd_loaded": true,
+     "debugpy_loaded": true,
+     "sys_monitoring_tools": {
+      "0": "pydevd"
+     }
+    },
+    "proc_threads": 267,
+    "python_threads": 27,
+    "python_threads_by_prefix": {
+     "Main": 1,
+     "GlobalEventLoop": 2,
+     "scanner": 1,
+     "External": 23
+    },
+    "asyncio_executor_threads_alive": 0,
+    "asyncio_executor_max_index": null,
+    "root_modules_with_params": {
+     "rfdetr.models.lwdetr.LWDETR": {
+      "count": 1,
+      "distinct_weights": 1,
+      "params": [
+       32174530
+      ]
+     },
+     "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+      "count": 1,
+      "distinct_weights": 1,
+      "params": [
+       22713216
+      ]
+     }
+    },
+    "model_instances_total": 2
+   },
+   "post_pid": 90
+  },
+  "task_census": {
+   "declared_tokens": 1,
+   "census_before": 0,
+   "census_after": 1,
+   "new_task_pids": [
+    90
+   ],
+   "project_ids": [
+    "1e70ac4a-2cb8-5c05-ab8b-9ee3fef06aee"
+   ]
+  },
+  "container_procs": {
+   "containers": {
+    "rr": {
+     "leg_start": {
+      "n": 2,
+      "state": "measured",
+      "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-936b20c7.webhook_1-uub8jyz9.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+     },
+     "leg_end": {
+      "n": 2,
+      "state": "measured",
+      "top_cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-936b20c7.webhook_1-uub8jyz9.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+     }
+    }
+   },
+   "service_peak_process_count": 18,
+   "service_distinct_pids_seen": 170
+  },
+  "determinism_vs_p0_v1": {
+   "a": "v1full_rr_t4",
+   "b": "v1_rr_t4_a",
+   "videos_compared": 16,
+   "chunk_hash_differs": [],
+   "frame_scores_differ": [],
+   "identical": true
+  }
+ },
+ "li": null,
+ "gap": {
+  "verdict": "NOT RUN",
+  "why": "the LlamaIndex 168-video leg did not run: the chain's per-leg check found the P1 11-hour budget passed (chain_video_v1full_done.json: v1full_li_t4:NOT_RUN_budget); one arm has no comparison"
+ }
+}
