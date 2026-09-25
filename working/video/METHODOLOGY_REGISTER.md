@@ -1892,3 +1892,23 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   side virtualenv default to UTF-8; an engine's embedded Python in a minimal container may not.
 > - **Name the encoding on every read of a source file.** `open(p, encoding="utf-8")`, never the
 >   locale's default.
+
+## 58. The container that could not write where it was told to (added 2026-09-25)
+
+> P3's bare microbenchmark runs one script in two images. The P3 rule that every gate runs whole, in its
+> real runtime, against a positive and a null control before launch caught this before any leg ran.
+> In the control run, all four microbenchmark controls exited 1: both positive controls and both null
+> controls. The positive controls should have passed and the null controls should have exited 3. The
+> cause was in the fixture step. li:video runs as uid 10002 (ws1v), not root, and could not create its
+> frame directory in a host directory owned by the box user. The frame set came out empty, and every
+> benchmark run refused on "0 frames". The same permission would have stopped cell (b) of every P3-B
+> leg from writing its result file. rr:patched-video runs as root and writes anywhere, which is why a
+> test on one image would not have shown it.
+>
+> Rules:
+>
+> - **A container's user is part of its runtime.** Before mounting a host directory for a container to
+>   write into, read the image's user (`docker run --rm --entrypoint id <image>`) and make the directory
+>   writable for it. Do not change the image's user: that user is part of what is being measured.
+> - **Keep the failed control record.** A re-run of the controls writes a new, numbered record. The
+>   first record stays as the evidence that the rule caught something.

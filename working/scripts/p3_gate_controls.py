@@ -86,14 +86,20 @@ def write_vecs(leg: Path, eps: float) -> None:
             f.write(json.dumps({"doc": r["doc"], "dim": 4, "vecs": vecs}) + "\n")
 
 
+RUN_N = 1
 NO_DOCKER = __import__("os").environ.get("P3_CTL_NO_DOCKER") == "1"   # laptop dry run only: can never yield all_pass
 
 
 def main() -> int:
     camp = Path(sys.argv[1])
-    base = Path(__import__("os").environ.get("P3_CTL_BASE", str(Path.home()))) / f"p3_gate_controls_{camp.name}"
+    # numbered runs (append-only): run 1 wrote gate_controls.json; run N >= 2 writes gate_controls_run<N>.json; the master
+    # reads the highest-numbered record
+    n = 1 + len(list(camp.glob("gate_controls.json"))) + len(list(camp.glob("gate_controls_run*.json")))
+    global RUN_N
+    RUN_N = n
+    base = Path(__import__("os").environ.get("P3_CTL_BASE", str(Path.home()))) / (f"p3_gate_controls_{camp.name}" + ("" if n == 1 else f"_run{n}"))
     if base.exists():
-        print(f"REFUSED: {base} exists (one control run per campaign; append-only)")
+        print(f"REFUSED: {base} exists (one directory per control run; append-only)")
         return 2
     base.mkdir()
     t0 = time.time()
@@ -191,7 +197,7 @@ def main() -> int:
         ctl("G_build_D", kind, want, f"ok={j.get('ok')} rc={r.returncode}", json.dumps(j)[:400])
 
     print("P3-B bare microbenchmark one-model check (each image's own interpreter)")
-    fr = base / "frames"; fr.mkdir()
+    fr = base / "frames"; fr.mkdir(); fr.chmod(0o777)        # li:video runs as uid 10002 (ws1v): it must be able to write here
     man = Path.home() / "parity-bench-video" / "working" / "video" / "ami_video_manifest.jsonl"
     rows = [json.loads(x) for x in man.read_text().splitlines() if x.strip() and not x.startswith("#")]
     first = [r for r in rows if isinstance(r, dict) and r.get("role") == "measured"][0]["file"]
@@ -210,7 +216,7 @@ def main() -> int:
              "b": (["--entrypoint", "python", "li:video"], "/opt/rfdetr-cache")}
     for cell, (img, wdir) in cells.items():
         for kind, extra, want_rc in (("positive: one model", [], 0), ("null: --null-two-models", ["--null-two-models"], 3)):
-            out = base / f"bench_{cell}_{want_rc}"; out.mkdir()
+            out = base / f"bench_{cell}_{want_rc}"; out.mkdir(); out.chmod(0o777)
             r = run(["docker", "run", "--rm", "--network", "none", "--memory", "16g", *env, "-v", f"{small.parent}:/frames:ro",
                      "-v", f"{BENCH_DIR}:/x:ro", "-v", f"{out}:/out", *img, "/x/p3b_bench.py", "--frames", "/frames",
                      "--weights-dir", wdir, "--out", "/out/bench.json", "--warmup", "2", *extra])
@@ -227,7 +233,8 @@ def finish(camp: Path, t0: float, dry: bool = False) -> int:
            "boot_id": open("/proc/sys/kernel/random/boot_id").read().strip() if Path("/proc/sys/kernel/random/boot_id").exists() else None,
            "seconds": round(time.time() - t0, 1), "dry_run_no_docker": dry,
            "controls": RESULTS, "n": len(RESULTS), "n_pass": sum(x["pass"] for x in RESULTS), "all_pass": all_pass}
-    out = camp / ("gate_controls_DRYRUN.json" if dry else "gate_controls.json")
+    out = camp / ("gate_controls_DRYRUN.json" if dry else ("gate_controls.json" if RUN_N == 1 else f"gate_controls_run{RUN_N}.json"))
+    rec["run"] = RUN_N
     out.write_text(json.dumps(rec, indent=1) + "\n")
     print(f"\ngate controls: {rec['n_pass']} of {rec['n']} as expected -> all_pass={all_pass} ({out.name})")
     return 0 if all_pass else 1

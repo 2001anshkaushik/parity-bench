@@ -1,0 +1,204 @@
+{
+ "label": "P3 gate controls: every gate run whole in its real runtime against a positive control (must PASS) and a null control (must FAIL), before launch (the P3 GATE CONTROLS rule)",
+ "run_utc": "2026-09-25T03:54:24Z",
+ "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+ "seconds": 59.4,
+ "dry_run_no_docker": false,
+ "controls": [
+  {
+   "gate": "G_memstat",
+   "control": "positive: P2's p2a_rr_a",
+   "expect": "0 (pass/fired/clean)",
+   "got": "0 (pass/fired/clean)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_memstat",
+   "control": "null: an empty memstat.jsonl",
+   "expect": "1 (fail/not fired/violation)",
+   "got": "1 (fail/not fired/violation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_mandate_docs",
+   "control": "positive: P2's p2a_rr_a (clean)",
+   "expect": "0 (pass/fired/clean)",
+   "got": "0 (pass/fired/clean)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_mandate_docs",
+   "control": "null: the same leg marked violating",
+   "expect": "1 (fail/not fired/violation)",
+   "got": "1 (fail/not fired/violation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_mandate_video",
+   "control": "positive: P2's p2b_rr_base_a (clean)",
+   "expect": "0 (pass/fired/clean)",
+   "got": "0 (pass/fired/clean)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_mandate_video",
+   "control": "null: a leg with MANDATE_VIOLATION.json",
+   "expect": "1 (fail/not fired/violation)",
+   "got": "1 (fail/not fired/violation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_health_A",
+   "control": "positive: P2's p2a_rr_b / p2a_li_b as the P3 legs",
+   "expect": "0 (pass/fired/clean)",
+   "got": "0 (pass/fired/clean)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_health_A",
+   "control": "null: one chunk hash altered in the RR leg",
+   "expect": "1 (fail/not fired/violation)",
+   "got": "1 (fail/not fired/violation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_health_A",
+   "control": "null: the LlamaIndex leg's memory sampler empty",
+   "expect": "1 (fail/not fired/violation)",
+   "got": "1 (fail/not fired/violation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_smoke_C",
+   "control": "positive: vars=2 10% faster, chunks identical",
+   "expect": "[\"2\"]",
+   "got": "[\"2\"]",
+   "pass": true,
+   "detail": "vector max|delta| vars2 vs vars1: 9.98377799987793e-07"
+  },
+  {
+   "gate": "G_smoke_C",
+   "control": "null: vars=2 and vars=4 as fast as vars=1",
+   "expect": "[]",
+   "got": "[]",
+   "pass": true,
+   "detail": "vector max|delta| vars2 vs vars1: 9.98377799987793e-07"
+  },
+  {
+   "gate": "G_smoke_C",
+   "control": "null: vars=2 faster but one chunk list differs",
+   "expect": "[]",
+   "got": "[]",
+   "pass": true,
+   "detail": "vector max|delta| vars2 vs vars1: 9.98377799987793e-07"
+  },
+  {
+   "gate": "G_node_D",
+   "control": "positive: counters with text",
+   "expect": "0 (pass/fired/clean)",
+   "got": "0 (pass/fired/clean)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_node_D",
+   "control": "null: P1's failure (text 0)",
+   "expect": "1 (fail/not fired/violation)",
+   "got": "1 (fail/not fired/violation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_smoke_D",
+   "control": "positive: HYBRID 10% faster than Tika's spread, no coverage loss",
+   "expect": "[\"hybrid\"]",
+   "got": "[\"hybrid\"]",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_smoke_D",
+   "control": "null: both variants inside Tika's spread",
+   "expect": "[]",
+   "got": "[]",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_alone",
+   "control": "positive: no container on the box",
+   "expect": "0 (pass/fired/clean)",
+   "got": "0 (pass/fired/clean)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_alone",
+   "control": "null: one created container present",
+   "expect": "1 (fail/not fired/violation)",
+   "got": "1 (fail/not fired/violation)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_build_D",
+   "control": "positive: rr:p2-pdfium (pypdfium2 complete)",
+   "expect": "ok=True rc=0",
+   "got": "ok=True rc=0",
+   "pass": true,
+   "detail": "{\"python\": \"3.12.13\", \"ok\": true, \"pypdfium2_cfg\": \"/opt/rocketride/engine/lib/python3.12/site-packages/pypdfium2_cfg/__init__.py\", \"pypdfium2\": \"5.13.0\", \"pages\": 1, \"chars\": 10314, \"pdfium_pure\": {\"HYBRID\": false, \"STUB\": null}, \"pdfium_hybrid\": {\"HYBRID\": true, \"STUB\": null}}"
+  },
+  {
+   "gate": "G_build_D",
+   "control": "null: rr:p1-pdfium (pypdfium2_cfg missing)",
+   "expect": "ok=False rc=1",
+   "got": "ok=False rc=1",
+   "pass": true,
+   "detail": "{\"python\": \"3.12.13\", \"ok\": false, \"error\": \"ModuleNotFoundError: No module named 'pypdfium2_cfg'\"}"
+  },
+  {
+   "gate": "P3B_one_model (a)",
+   "control": "positive: one model",
+   "expect": "rc=0",
+   "got": "rc=1",
+   "pass": false,
+   "detail": "lbumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>\n  data = fetch_version_info()\n/x/p3b_bench.py:52: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead\n  mods = [o for o in gc.get_objects() if isinstance(o, torch.nn.Module)]\nREFUSED: 0 frames, warm-up 2\n"
+  },
+  {
+   "gate": "P3B_one_model (a)",
+   "control": "null: --null-two-models",
+   "expect": "rc=3",
+   "got": "rc=1",
+   "pass": false,
+   "detail": "lbumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>\n  data = fetch_version_info()\n/x/p3b_bench.py:52: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead\n  mods = [o for o in gc.get_objects() if isinstance(o, torch.nn.Module)]\nREFUSED: 0 frames, warm-up 2\n"
+  },
+  {
+   "gate": "P3B_one_model (b)",
+   "control": "positive: one model",
+   "expect": "rc=0",
+   "got": "rc=1",
+   "pass": false,
+   "detail": "lbumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>\n  data = fetch_version_info()\n/x/p3b_bench.py:52: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead\n  mods = [o for o in gc.get_objects() if isinstance(o, torch.nn.Module)]\nREFUSED: 0 frames, warm-up 2\n"
+  },
+  {
+   "gate": "P3B_one_model (b)",
+   "control": "null: --null-two-models",
+   "expect": "rc=3",
+   "got": "rc=1",
+   "pass": false,
+   "detail": "lbumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>\n  data = fetch_version_info()\n/x/p3b_bench.py:52: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead\n  mods = [o for o in gc.get_objects() if isinstance(o, torch.nn.Module)]\nREFUSED: 0 frames, warm-up 2\n"
+  }
+ ],
+ "n": 24,
+ "n_pass": 20,
+ "all_pass": false
+}

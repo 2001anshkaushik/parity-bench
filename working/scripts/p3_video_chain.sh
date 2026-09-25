@@ -75,7 +75,7 @@ PYDONE
 alone || exit 3
 if [ ! -f "$D/p3b_frames_manifest.json" ]; then
   [ -e "$FR" ] && { echo "REFUSED: $FR exists without a manifest (append-only)"; exit 3; }
-  mkdir -p "$FR"
+  mkdir -p "$FR"; chmod 0777 "$FR"      # li:video runs as uid 10002 (ws1v); the extraction writes here
   mapfile -t VIDS < <("$PY" -c 'import json,sys; rows=[json.loads(x) for x in open(sys.argv[1]) if x.strip() and not x.startswith("#")]; rows=[r for r in rows if isinstance(r,dict) and r.get("role")=="measured"][:int(sys.argv[2])]; print("\n".join(r["file"] for r in rows))' "$VMAN" "$NV")
   [ "${#VIDS[@]}" = "$NV" ] || { echo "REFUSED: could not read $NV measured rows from the manifest (${#VIDS[@]})"; exit 2; }
   echo "frame videos: ${VIDS[*]}"
@@ -106,7 +106,7 @@ bare() {
   for try in "" _r1 _r2; do
     L="$D/${name}${try}"; [ -e "$L" ] && continue
     alone || { R+=("${name}${try}:NOT_ALONE"); return 1; }
-    mkdir -p "$L"; C="p3b_${cell}"
+    mkdir -p "$L"; chmod 0777 "$L"; C="p3b_${cell}"   # (b) runs as li:video's uid 10002 and writes bench.json here
     echo "===== LEG ${name}${try} (bare $cell) $(date -u +%H:%M:%SZ) ====="
     sess_open "$L"
     if [ "$cell" = a ]; then

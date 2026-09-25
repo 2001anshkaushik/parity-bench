@@ -27,8 +27,9 @@ PY="$HOME/.venv/bin/python"
 HAVE="$(git rev-parse HEAD | cut -c1-12)"; [ "$HAVE" = "$(echo "$H" | cut -c1-12)" ] || { echo "REFUSED: head $HAVE" >&2; exit 2; }
 [ -f "$D/preregistration.json" ] || { echo "REFUSED: preregistration.json absent" >&2; exit 5; }
 [ -e "$D/master_gates.jsonl" ] && { echo "REFUSED: master_gates.jsonl exists (one master per campaign)" >&2; exit 3; }
-"$PY" -c 'import json,sys; r=json.load(open(sys.argv[1])); sys.exit(0 if r.get("all_pass") is True else 1)' "$D/gate_controls.json" 2>/dev/null \
-  || { echo "REFUSED: gate_controls.json absent or not all_pass — no gate goes on the box without both controls passing" >&2; exit 5; }
+CTLF="$(ls "$D"/gate_controls_run*.json 2>/dev/null | sort -V | tail -1)"; [ -n "$CTLF" ] || CTLF="$D/gate_controls.json"
+"$PY" -c 'import json,sys; r=json.load(open(sys.argv[1])); sys.exit(0 if r.get("all_pass") is True else 1)' "$CTLF" 2>/dev/null \
+  || { echo "REFUSED: the latest gate-controls record ($CTLF) is absent or not all_pass — no gate goes on the box without both controls passing" >&2; exit 5; }
 export P3B_RR_WEIGHTS=/opt/rocketride/engine/cache/models/rfdetr P3B_LI_WEIGHTS=/opt/rfdetr-cache
 SNAP=0
 rec() {
@@ -63,7 +64,7 @@ PYD
 stop_all() { rec MASTER STOPPED "$1" "$2"; finish "STOPPED: $2"; exit "$1"; }
 chain_rc() { case "$1" in 9) stop_all 9 "G_mandate: a D0 violation in $2";; 10) stop_all 10 "G_memstat: the first leg's sampler wrote nothing in $2";; esac; }
 
-rec G_controls PASS 0 "gate_controls.json all_pass (the GATE CONTROLS rule)"
+rec G_controls PASS 0 "$(basename "$CTLF") all_pass (the GATE CONTROLS rule)"
 export P3_DEADLINE_EPOCH=$(( $(date +%s) + 25200 ))
 rec BUDGET SET 0 "7 h from the first leg: deadline $(date -u -d @"$P3_DEADLINE_EPOCH" +%FT%TZ) (epoch $P3_DEADLINE_EPOCH)"
 
