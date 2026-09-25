@@ -1,0 +1,8 @@
+/usr/local/lib/python3.12/site-packages/albumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>
+  data = fetch_version_info()
+[2026-09-25 04:12:29] [INFO] rf-detr - File rf-detr-base.pth already exists with correct MD5 hash.
+[2026-09-25 04:12:29] [INFO] rf-detr - Loading pretrain weights
+/x/p3b_bench.py:52: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  mods = [o for o in gc.get_objects() if isinstance(o, torch.nn.Module)]
+[2026-09-25 04:12:30] [WARNING] rf-detr - Model is not optimized for inference. Latency may be higher than expected. You can optimize the model for inference by calling model.optimize_for_inference().
+P3B_BENCH {"out": "/out/bench.json", "measured_frames": 695, "one_model_instance": true, "rfdetr_models": 1, "forward_mean_s": 0.18494537486762572, "cores_in_forward": 4.00068441399505, "torch_threads": 4}

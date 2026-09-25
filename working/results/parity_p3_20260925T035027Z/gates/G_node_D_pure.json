@@ -1,0 +1,16 @@
+{
+ "gate": "G_node_D_pure",
+ "decided_utc": "2026-09-25T05:54:37Z",
+ "leg": "p3d_s_pure_a",
+ "counters_file": "p1_pdfium_pure.json",
+ "counters": {
+  "hybrid": false,
+  "docs": 36,
+  "text": 36,
+  "fallback": 0,
+  "errors": 0,
+  "last_error": null
+ },
+ "rule": "the prototype node's own counters show docs >= 1 and text >= 1",
+ "outcome": "PASS"
+}

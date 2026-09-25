@@ -1,0 +1,16 @@
+PID 88 engine /opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-829d358d.webhook_1-9u5uy5b8.json --autoterm --monitor=app --debug_port=20000 --debug_h
+/opt/rocketride/engine/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0
+/opt/rocketride/engine/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so
+/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so
+/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0
+/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0
+/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0
+/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10.so
+/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10_cuda.so
+/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1
+/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch.so
+/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so
+/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so
+/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so
+/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so
+/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_python.so

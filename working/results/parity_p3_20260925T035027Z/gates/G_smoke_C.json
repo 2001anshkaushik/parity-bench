@@ -1,0 +1,155 @@
+{
+ "gate": "G_smoke_C",
+ "decided_utc": "2026-09-25T04:43:05Z",
+ "rule": "correctness first: a shape counts only if its text chunks equal vars=1's on every shared ok document (both runs against both vars=1 runs) and it loses none; then it FIRES iff mean(shape)/mean(vars=1) - 1 > max(0.82%, spread vars=1, spread shape); the winner is the fired shape with the largest gain",
+ "vars1": {
+  "docs_per_s": [
+   3.2271259366122678,
+   3.21236453365849
+  ],
+  "mean": 3.219745235135379,
+  "spread": 0.00458464936687988,
+  "vector_max_abs_delta_run_a_vs_b": {
+   "a": "p3c_t1_a",
+   "b": "p3c_t1_b",
+   "documents_compared": 384,
+   "chunks_compared": 7457,
+   "max_abs_delta": 0.0,
+   "skipped_chunk_count_differs": []
+  }
+ },
+ "per_shape": {
+  "2": {
+   "docs_per_s": [
+    4.324243970998903,
+    4.336460254391717
+   ],
+   "mean": 4.33035211269531,
+   "spread": 0.0028210831532613774,
+   "delta_vs_vars1": 0.3449362593786818,
+   "threshold": 0.0082,
+   "beats_vars1": true,
+   "correctness": {
+    "text_chunks_identical_to_vars1": true,
+    "pairs": [
+     {
+      "shape_leg": "p3c_t2_a",
+      "vars1_leg": "p3c_t1_a",
+      "shared_ok": 382,
+      "chunk_lists_differ": [],
+      "ok_in_vars1_not_here": []
+     },
+     {
+      "shape_leg": "p3c_t2_a",
+      "vars1_leg": "p3c_t1_b",
+      "shared_ok": 382,
+      "chunk_lists_differ": [],
+      "ok_in_vars1_not_here": []
+     },
+     {
+      "shape_leg": "p3c_t2_b",
+      "vars1_leg": "p3c_t1_a",
+      "shared_ok": 382,
+      "chunk_lists_differ": [],
+      "ok_in_vars1_not_here": []
+     },
+     {
+      "shape_leg": "p3c_t2_b",
+      "vars1_leg": "p3c_t1_b",
+      "shared_ok": 382,
+      "chunk_lists_differ": [],
+      "ok_in_vars1_not_here": []
+     }
+    ]
+   },
+   "vector_max_abs_delta_vs_vars1": [
+    {
+     "a": "p3c_t1_a",
+     "b": "p3c_t2_a",
+     "documents_compared": 384,
+     "chunks_compared": 7457,
+     "max_abs_delta": 1.0803341865539551e-07,
+     "skipped_chunk_count_differs": []
+    },
+    {
+     "a": "p3c_t1_b",
+     "b": "p3c_t2_b",
+     "documents_compared": 384,
+     "chunks_compared": 7457,
+     "max_abs_delta": 1.0803341865539551e-07,
+     "skipped_chunk_count_differs": []
+    }
+   ],
+   "fired": true
+  },
+  "4": {
+   "docs_per_s": [
+    5.145126996545237,
+    5.154759256705946
+   ],
+   "mean": 5.149943126625591,
+   "spread": 0.001870362433889674,
+   "delta_vs_vars1": 0.5994877701586394,
+   "threshold": 0.0082,
+   "beats_vars1": true,
+   "correctness": {
+    "text_chunks_identical_to_vars1": true,
+    "pairs": [
+     {
+      "shape_leg": "p3c_t4_a",
+      "vars1_leg": "p3c_t1_a",
+      "shared_ok": 382,
+      "chunk_lists_differ": [],
+      "ok_in_vars1_not_here": []
+     },
+     {
+      "shape_leg": "p3c_t4_a",
+      "vars1_leg": "p3c_t1_b",
+      "shared_ok": 382,
+      "chunk_lists_differ": [],
+      "ok_in_vars1_not_here": []
+     },
+     {
+      "shape_leg": "p3c_t4_b",
+      "vars1_leg": "p3c_t1_a",
+      "shared_ok": 382,
+      "chunk_lists_differ": [],
+      "ok_in_vars1_not_here": []
+     },
+     {
+      "shape_leg": "p3c_t4_b",
+      "vars1_leg": "p3c_t1_b",
+      "shared_ok": 382,
+      "chunk_lists_differ": [],
+      "ok_in_vars1_not_here": []
+     }
+    ]
+   },
+   "vector_max_abs_delta_vs_vars1": [
+    {
+     "a": "p3c_t1_a",
+     "b": "p3c_t4_a",
+     "documents_compared": 384,
+     "chunks_compared": 7457,
+     "max_abs_delta": 1.150183379650116e-07,
+     "skipped_chunk_count_differs": []
+    },
+    {
+     "a": "p3c_t1_b",
+     "b": "p3c_t4_b",
+     "documents_compared": 384,
+     "chunks_compared": 7457,
+     "max_abs_delta": 1.150183379650116e-07,
+     "skipped_chunk_count_differs": []
+    }
+   ],
+   "fired": true
+  }
+ },
+ "fired_shapes": [
+  "2",
+  "4"
+ ],
+ "winner": "4",
+ "outcome": "EVALUATED"
+}

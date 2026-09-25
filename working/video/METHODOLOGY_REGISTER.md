@@ -1912,3 +1912,22 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   writable for it. Do not change the image's user: that user is part of what is being measured.
 > - **Keep the failed control record.** A re-run of the controls writes a new, numbered record. The
 >   first record stays as the evidence that the rule caught something.
+
+## 59. A rule that did not encode its own hypothesis (added 2026-09-25)
+
+> P3-B (1) hypothesised that the RocketRide engine process loads a second OpenMP or BLAS runtime
+> that LlamaIndex's detector process does not. The pre-registered reading rule had two clauses:
+> SUPPORTED if the RocketRide task process maps two or more distinct OpenMP runtime files, OR if it
+> maps a runtime family that LlamaIndex's does not. The first clause never asked about LlamaIndex. The
+> inspection found two OpenMP files in the RocketRide task process: torch's libgomp.so.1 and a
+> vendored libgomp that simsimd ships. LlamaIndex's detector process maps the SAME two files, from
+> the same packages, and so do both bare processes. The rule therefore reads SUPPORTED, while the
+> hypothesis it was written for is contradicted. The report states the rule's result and states the
+> defect beside it; the rule is not rewritten after the data.
+>
+> Rules:
+>
+> - **Every clause of a reading rule must test the hypothesis's own condition.** If the hypothesis
+>   says "that the other arm does not", each clause must compare against the other arm.
+> - **Before registering a rule, find the outcome where the rule and the hypothesis disagree.** If one
+>   exists, fix the rule then, not after the data.

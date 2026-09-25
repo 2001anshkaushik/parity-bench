@@ -187,14 +187,14 @@ def p3d(camp: Path, L: Dict[str, Any], texts_dir: Optional[Path]) -> Dict[str, A
         for _, name in VAR:
             per[name] = {"a": {"holds": False, "status": "NOT EVALUABLE"}}
     out["eleven_detail"] = {a: [{k: x[k] for k in ("leg", "documents", "p50_s", "not_ok", "incomplete_stamps", "parse_bracket_s")} for x in ev[a]] for a in ev}
-    fix = [P2.leg_dir(camp, f"p3d_fix_{r}") for r in ("a", "b")]
+    fix = [with_s3(camp, f"p3d_fix_{r}", texts_dir, "texts.jsonl.gz") for r in ("a", "b")]
     if None not in fix and all((d / "texts.jsonl.gz").exists() for d in fix):
         measured = {r["doc"] for r in load_leg(fix[0])["rows"]}
         tika_text = set()
         for d in fix:
             tika_text |= {k for k, s in texts_of(d).items() if k in measured and s.strip()}
         for v, name in VAR:
-            vd = [P2.leg_dir(camp, f"p3d_{v}_{r}") for r in ("a", "b")]
+            vd = [with_s3(camp, f"p3d_{v}_{r}", texts_dir, "texts.jsonl.gz") for r in ("a", "b")]
             if None in vd or not all((d / "texts.jsonl.gz").exists() for d in vd):
                 per[name]["b"] = {"holds": False, "status": "NOT EVALUABLE (legs or texts absent)"}
                 continue
@@ -217,7 +217,7 @@ def p3d(camp: Path, L: Dict[str, Any], texts_dir: Optional[Path]) -> Dict[str, A
     corr: Dict[str, Any] = {}
     for v, name in VAR:
         for rr_ in ("a", "b"):
-            ref, cand = P2.leg_dir(camp, f"p3d_fix_{rr_}"), P2.leg_dir(camp, f"p3d_{v}_{rr_}")
+            ref, cand = with_s3(camp, f"p3d_fix_{rr_}", texts_dir, "texts.jsonl.gz"), with_s3(camp, f"p3d_{v}_{rr_}", texts_dir, "texts.jsonl.gz")
             if ref and cand and (ref / "texts.jsonl.gz").exists() and (cand / "texts.jsonl.gz").exists():
                 corr[f"{name}_{rr_}"] = P2.correctness_texts(camp, ref, cand, f"p3d_384_{name}_{rr_}")
     out["correctness_384"] = corr

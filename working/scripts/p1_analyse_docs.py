@@ -73,7 +73,8 @@ def leg_summary(d: Path) -> Dict[str, Any]:
     # (its row's completion is the timeout, and the engine's own stamps run past it)
     d1 = rr_d1(dict(g, rows=[r for r in rows if r.get("ok")])) if g["stamps"] else None
     lost = sorted(r["doc"] for r in rows if not r.get("ok"))
-    return {"dir": d.name, "n": len(rows), "span": g["span"], "excluded_straggler": span_raw(rest),
+    # a leg made only of the eleven (P3-D smoke (i)) has no excluded-straggler view (None; P1's legs are unaffected)
+    return {"dir": d.name, "n": len(rows), "span": g["span"], "excluded_straggler": span_raw(rest) if rest else None,
             "boot_id": g["boot_id"], "steal_share": (s.get("steal") or {}).get("share"),
             "mhz_mean": (s.get("mhz_over_window") or {}).get("mean_of_samples"),
             "cpu_model": ((s.get("cpu_open") or {}).get("model") or [None])[0],

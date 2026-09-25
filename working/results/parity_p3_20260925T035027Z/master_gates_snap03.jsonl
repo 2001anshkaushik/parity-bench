@@ -1,0 +1,3 @@
+{"utc": "2026-09-25T03:59:07Z", "gate": "G_controls", "status": "PASS", "exit_code": "0", "detail": "gate_controls_run2.json all_pass (the GATE CONTROLS rule)"}
+{"utc": "2026-09-25T03:59:08Z", "gate": "BUDGET", "status": "SET", "exit_code": "0", "detail": "7 h from the first leg: deadline 2026-09-25T10:59:08Z (epoch 1790333948)"}
+{"utc": "2026-09-25T04:25:17Z", "gate": "B_CHAIN", "status": "complete", "exit_code": "0", "detail": "p3_video_chain (P3-B)"}

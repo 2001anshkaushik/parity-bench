@@ -1,0 +1,25 @@
+{
+ "stage_complete_utc": "2026-09-25T06:21:34Z",
+ "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+ "outcome": "complete",
+ "legs": [
+  "p3d_s_fix_a:rc=0",
+  "p3d_s_hyb_a:rc=0",
+  "p3d_s_pure_a:rc=0",
+  "p3d_s_fix_b:rc=0",
+  "p3d_s_hyb_b:rc=0",
+  "p3d_s_pure_b:rc=0",
+  "p3d_fix_a:rc=0",
+  "p3d_hyb_a:rc=0",
+  "p3d_pure_a:rc=0",
+  "p3d_fix_b:rc=0",
+  "p3d_hyb_b:rc=0",
+  "p3d_pure_b:rc=0"
+ ],
+ "image_ids_at_end": {
+  "rr:patched": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+  "rr:p1-tikafix": "sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b",
+  "rr:p3-pdfium": "sha256:b81af529c79a9014ca7b6e19c6b275f68e320b51db11299e26c3902561683222"
+ }
+}

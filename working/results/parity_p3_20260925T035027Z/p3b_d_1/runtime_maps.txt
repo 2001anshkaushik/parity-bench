@@ -1,0 +1,17 @@
+PID 1 python python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-
+/usr/local/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0
+/usr/local/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so
+/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libgfortran-91cc3cb1.so.3.0.0
+/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblas-r0-f650aae0.3.3.so
+/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0
+/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0
+/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0
+/usr/local/lib/python3.12/site-packages/torch/lib/libc10.so
+/usr/local/lib/python3.12/site-packages/torch/lib/libc10_cuda.so
+/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1
+/usr/local/lib/python3.12/site-packages/torch/lib/libtorch.so
+/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so
+/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so
+/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so
+/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so
+/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_python.so

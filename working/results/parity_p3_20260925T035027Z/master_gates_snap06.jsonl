@@ -1,0 +1,6 @@
+{"utc": "2026-09-25T03:59:07Z", "gate": "G_controls", "status": "PASS", "exit_code": "0", "detail": "gate_controls_run2.json all_pass (the GATE CONTROLS rule)"}
+{"utc": "2026-09-25T03:59:08Z", "gate": "BUDGET", "status": "SET", "exit_code": "0", "detail": "7 h from the first leg: deadline 2026-09-25T10:59:08Z (epoch 1790333948)"}
+{"utc": "2026-09-25T04:25:17Z", "gate": "B_CHAIN", "status": "complete", "exit_code": "0", "detail": "p3_video_chain (P3-B)"}
+{"utc": "2026-09-25T04:43:01Z", "gate": "C_SMOKE_CHAIN", "status": "complete", "exit_code": "0", "detail": "p3_docs_chain c_smoke"}
+{"utc": "2026-09-25T04:43:07Z", "gate": "G_smoke_C", "status": "FIRED (winner vars=4)", "exit_code": "0", "detail": "gates/G_smoke_C.json"}
+{"utc": "2026-09-25T04:49:07Z", "gate": "A_HEALTH_CHAIN", "status": "complete", "exit_code": "0", "detail": "p3_docs_chain a_health"}

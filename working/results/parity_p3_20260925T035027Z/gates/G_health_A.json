@@ -1,0 +1,64 @@
+{
+ "gate": "G_health_A",
+ "decided_utc": "2026-09-25T04:49:08Z",
+ "rule": "HEALTH gate (Ansh's ruling: not a performance proxy): FIRES iff both legs are verdict OK or DEGRADED with every row, D0 is clean, the memory sampler is non-empty on both, and the RR leg's chunk lists equal P2-A's committed rr:p1-tikafix legs on every shared ok document",
+ "legs": {
+  "rr": {
+   "leg": "p3a_rr_h",
+   "arm": "rr",
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "verdict_ok": true,
+   "memstat_rows": 181,
+   "d0_clean": true,
+   "violations": []
+  },
+  "li": {
+   "leg": "p3a_li_h",
+   "arm": "li",
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 381,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "verdict_ok": true,
+   "memstat_rows": 123,
+   "d0_clean": true,
+   "violations": []
+  }
+ },
+ "identity": [
+  {
+   "reference": "parity_p2_20260924T160106Z/p2a_rr_a",
+   "shared_ok_documents": 382,
+   "chunk_lists_differ": [],
+   "ok_in_reference_not_here": [],
+   "identical": true
+  },
+  {
+   "reference": "parity_p2_20260924T160106Z/p2a_rr_b",
+   "shared_ok_documents": 382,
+   "chunk_lists_differ": [],
+   "ok_in_reference_not_here": [],
+   "identical": true
+  }
+ ],
+ "conditions": {
+  "both_verdicts_ok_or_degraded_with_all_rows": true,
+  "d0_clean": true,
+  "memory_sampler_non_empty": true,
+  "rr_chunks_identical_to_p2a_on_shared_documents": true
+ },
+ "outcome": "FIRED"
+}

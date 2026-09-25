@@ -1,0 +1,14 @@
+{
+ "container": "rr",
+ "cgroup": "/sys/fs/cgroup/system.slice/docker-96291b6e8effbae3e414c8b729f2442aefc8da8681f127b4e4407056c67acf4d.scope",
+ "hz": 1.0,
+ "samples": 1687,
+ "sampled_peak_bytes": {
+  "anon": 13708201984,
+  "file": 7732391936,
+  "total": 21826105344,
+  "anon_plus_file": 21434015744
+ },
+ "memory_peak_lifetime_context_only": 22210789376,
+ "note": "sampled peaks are the P1 figure; memory.peak spans the container's whole lifetime (warm-up included) and is context only"
+}

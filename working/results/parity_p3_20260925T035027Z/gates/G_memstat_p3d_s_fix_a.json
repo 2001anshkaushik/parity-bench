@@ -1,0 +1,10 @@
+{
+ "gate": "G_memstat_p3d_s_fix_a",
+ "decided_utc": "2026-09-25T05:49:35Z",
+ "leg": "p3d_s_fix_a",
+ "file": "memstat.jsonl",
+ "exists": true,
+ "rows": 132,
+ "rule": "the first leg's memstat.jsonl has >= 1 row (register 55)",
+ "outcome": "PASS"
+}

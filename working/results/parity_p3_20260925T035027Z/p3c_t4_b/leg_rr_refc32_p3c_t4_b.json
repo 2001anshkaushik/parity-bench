@@ -1,0 +1,422 @@
+{
+ "arm": "rr",
+ "leg": "refc32_p3c_t4_b",
+ "k": null,
+ "reference_c": 32,
+ "verdict": "OK",
+ "submission_shape": "send per document, C=32 in flight, no barrier (the banked blast shape)",
+ "documents": {
+  "submitted": 384,
+  "recorded": 384,
+  "ok": 382,
+  "empty": 2,
+  "hard_failures": 0,
+  "hard_failure_reasons": []
+ },
+ "throughput": {
+  "span_s": 74.187,
+  "docs_per_s": 5.1492,
+  "chunks": 7457,
+  "chunks_per_s": 100.5168,
+  "basis": "MEASURED \u2014 first submit to last return, one clock"
+ },
+ "batches": null,
+ "cost": {
+  "cpu_s": 1653.848,
+  "effective_cores": 22.293,
+  "cpu_utilization": 0.6967,
+  "cpu_utilization_valid": true,
+  "cpu_s_per_doc": 4.3294,
+  "available_cpus": 32,
+  "cpuset_cpus": 32,
+  "cpu_utilization_of_cpuset": 0.6967,
+  "available_cpus_source": "host nproc (Ruling A); arm cgroup reports '0-31' via cgroup cpuset.cpus.effective",
+  "engine_container_cpu_s": 1653.848,
+  "engine_container_cores": 22.293,
+  "driver_cpu_s": 5.518,
+  "driver_cores": 0.074,
+  "host_total_cpu_s": 1664.896,
+  "host_total_cores": 22.442,
+  "unattributed_cores": 0.075,
+  "idle_spin_measured": {
+   "cores": 1.235,
+   "window_s": 6.0,
+   "basis": "arm cgroup cpu.stat with the pipeline loaded and nothing submitted"
+  },
+  "engine_cores_net_of_idle_spin": 21.058,
+  "idle_core_equivalents_arm": 9.707,
+  "basis": "engine: arm cgroup cpu.stat at the leg's t0/t1; driver: getrusage self+children over the same window; host: per-core /proc/stat"
+ },
+ "process_readback": {
+  "thirty_s_into_window": {
+   "processes": [
+    {
+     "pid": 26008,
+     "name": "engine",
+     "threads": 411,
+     "cpus_allowed": "0-31",
+     "cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-2f04f98e.webhook_1-o00qm4ui.json --autoterm --"
+    },
+    {
+     "pid": 25721,
+     "name": "engine",
+     "threads": 32,
+     "cpus_allowed": "0-31",
+     "cmd": "./engine ai/eaas.py --host=0.0.0.0 --port=5565 "
+    }
+   ],
+   "total_threads": 443,
+   "n_processes": 2,
+   "taken_utc": "04:42:03Z"
+  },
+  "at_window_close": {
+   "processes": [
+    {
+     "pid": 26008,
+     "name": "engine",
+     "threads": 410,
+     "cpus_allowed": "0-31",
+     "cmd": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-2f04f98e.webhook_1-o00qm4ui.json --autoterm --"
+    },
+    {
+     "pid": 25721,
+     "name": "engine",
+     "threads": 32,
+     "cpus_allowed": "0-31",
+     "cmd": "./engine ai/eaas.py --host=0.0.0.0 --port=5565 "
+    }
+   ],
+   "total_threads": 442,
+   "n_processes": 2,
+   "taken_utc": "04:42:47Z"
+  }
+ },
+ "cpuset_declared_for_s5c": null,
+ "instrumented_s5d_stamps": true,
+ "p0": {
+  "session": {
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "cpu_open": {
+    "model": [
+     "Intel(R) Xeon(R) Platinum 8488C"
+    ],
+    "mhz_mean": 2572.7,
+    "mhz_min": 2400.0,
+    "mhz_max": 3786.536,
+    "n": 32
+   },
+   "boot_id_close": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "cpu_close": {
+    "model": [
+     "Intel(R) Xeon(R) Platinum 8488C"
+    ],
+    "mhz_mean": 2691.1,
+    "mhz_min": 2400.0,
+    "mhz_max": 3737.822,
+    "n": 32
+   },
+   "steal": {
+    "ticks": 9,
+    "total_ticks": 235743,
+    "share": 3.8e-05,
+    "cores": 0.0012,
+    "basis": "/proc/stat aggregate line, window open to close"
+   },
+   "mhz_over_window": {
+    "mean_of_samples": 3011.4,
+    "min": 2591.0,
+    "max": 3272.4,
+    "n": 16
+   },
+   "d0_external": {
+    "samples": 16,
+    "every_s": 5.0,
+    "n_processes_max": 2,
+    "task_instances_max": 1,
+    "task_instances_min": 1,
+    "li_worker_processes_max": null,
+    "max_threads_by_process": {
+     "engine|./engine ai/eaas.py --host=0.0.0.0 --port=5565": 32,
+     "engine|task": 417
+    },
+    "definition": "RocketRide task instance = a process named 'engine' running ai/node.py; the eaas server and one-thread forked helpers are listed, not counted"
+   },
+   "task_cmdlines": [
+    "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-2f04f98e.webhook_1-o00qm4ui.json --autoterm --monitor=app --debug_port=20000 --debug_h"
+   ],
+   "same_session": true
+  },
+  "d0_in_process": {
+   "pre": {
+    "env_probe_schema": 3,
+    "pid": 73,
+    "env": {
+     "OMP_NUM_THREADS": "4",
+     "MKL_NUM_THREADS": "4",
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4"
+    },
+    "os_cpu_count": 32,
+    "threads_alive": 36,
+    "python_version": "3.12.13",
+    "python_executable": "/opt/rocketride/engine/engine",
+    "torch_num_threads": 4,
+    "torch_num_interop_threads": 16,
+    "torch_version": "2.10.0+cu128",
+    "rfdetr_import_ok": false,
+    "rfdetr_import_error": "ModuleNotFoundError: No module named 'rfdetr'",
+    "package_versions": {
+     "rfdetr": null,
+     "torchvision": "0.25.0+cu128",
+     "transformers": "4.53.3",
+     "supervision": null,
+     "timm": null,
+     "sentence-transformers": "5.7.0",
+     "imageio-ffmpeg": null
+    },
+    "d0": {
+     "d0_schema": 2,
+     "pid": 73,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 388,
+     "python_threads": 36,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "tqdm_monitor": 1,
+      "scanner": 1,
+      "External": 28,
+      "asyncio": 3
+     },
+     "asyncio_executor_threads_alive": 3,
+     "asyncio_executor_max_index": 27,
+     "root_modules_with_params": {
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 1
+    },
+    "t_utc": "04:41:27Z"
+   },
+   "post": {
+    "env_probe_schema": 3,
+    "pid": 73,
+    "env": {
+     "OMP_NUM_THREADS": "4",
+     "MKL_NUM_THREADS": "4",
+     "OPENBLAS_NUM_THREADS": "4",
+     "VECLIB_MAXIMUM_THREADS": "4",
+     "NUMEXPR_NUM_THREADS": "4",
+     "TORCH_NUM_THREADS": "4"
+    },
+    "os_cpu_count": 32,
+    "threads_alive": 37,
+    "python_version": "3.12.13",
+    "python_executable": "/opt/rocketride/engine/engine",
+    "torch_num_threads": 4,
+    "torch_num_interop_threads": 16,
+    "torch_version": "2.10.0+cu128",
+    "rfdetr_import_ok": false,
+    "rfdetr_import_error": "ModuleNotFoundError: No module named 'rfdetr'",
+    "package_versions": {
+     "rfdetr": null,
+     "torchvision": "0.25.0+cu128",
+     "transformers": "4.53.3",
+     "supervision": null,
+     "timm": null,
+     "sentence-transformers": "5.7.0",
+     "imageio-ffmpeg": null
+    },
+    "d0": {
+     "d0_schema": 2,
+     "pid": 73,
+     "ppid": 1,
+     "trace": {
+      "sys_gettrace_this_thread": "None",
+      "threading_trace_hook": "None",
+      "threading_profile_hook": "None",
+      "sys_getprofile_this_thread": "None",
+      "pydevd_loaded": true,
+      "debugpy_loaded": true,
+      "sys_monitoring_tools": {
+       "0": "pydevd"
+      }
+     },
+     "proc_threads": 410,
+     "python_threads": 37,
+     "python_threads_by_prefix": {
+      "Main": 1,
+      "GlobalEventLoop": 2,
+      "tqdm_monitor": 1,
+      "scanner": 1,
+      "External": 32
+     },
+     "asyncio_executor_threads_alive": 0,
+     "asyncio_executor_max_index": null,
+     "root_modules_with_params": {
+      "sentence_transformers.sentence_transformer.model.SentenceTransformer": {
+       "count": 1,
+       "distinct_weights": 1,
+       "params": [
+        22713216
+       ]
+      }
+     },
+     "model_instances_total": 1
+    },
+    "t_utc": "04:42:48Z"
+   },
+   "source": "env_probe schema 3 on the measured token"
+  },
+  "mandate": {
+   "mandate_violation": false,
+   "violations": [],
+   "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+  },
+  "profile_label": "PROFILE \u2014 stage stamps",
+  "nodebug_launch": false,
+  "diagnostic_label": null,
+  "pyspy": null
+ },
+ "memory": {
+  "at_window_open": {
+   "current_mb": 11811.6,
+   "peak_mb": 12844.9,
+   "anon_mb": 4123.5,
+   "limit_mb": 59392.0,
+   "basis": "container cgroup memory.current / memory.peak / memory.stat anon; peak is a kernel high-water mark over the container's lifetime"
+  },
+  "at_window_close": {
+   "current_mb": 14964.2,
+   "peak_mb": 17506.7,
+   "anon_mb": 7269.3,
+   "limit_mb": 59392.0,
+   "basis": "container cgroup memory.current / memory.peak / memory.stat anon; peak is a kernel high-water mark over the container's lifetime"
+  }
+ },
+ "deadlines": {
+  "batch_timeout_s": 1800,
+  "doc_timeout_s": 1800,
+  "breaker_consecutive": 3
+ },
+ "failure_blast_radius": {
+  "documents_per_batch": null,
+  "batches_with_a_hard_failure": null,
+  "documents_lost_to_batch_failures": null,
+  "exposure_note": "a single failed batch loses K documents; at K=1 the blast radius is one document and the continuous shape has no batch to lose"
+ },
+ "percore_host": {
+  "n_intervals": 74,
+  "ncpus": 32,
+  "idle_threshold": 0.1,
+  "mean_busy_cores": 22.442,
+  "idle_core_equivalents": 9.558,
+  "host_util_of_cpuset": 0.7013,
+  "idle_core_count_mean": 6.12,
+  "idle_core_count_min": 0,
+  "idle_core_count_p50": 0,
+  "idle_core_count_max": 27,
+  "cores_idle_whole_leg": 0,
+  "per_core_mean_busy": {
+   "0": 0.656,
+   "1": 0.673,
+   "2": 0.654,
+   "3": 0.704,
+   "4": 0.657,
+   "5": 0.659,
+   "6": 0.651,
+   "7": 0.657,
+   "8": 0.729,
+   "9": 0.682,
+   "10": 0.658,
+   "11": 0.694,
+   "12": 0.658,
+   "13": 0.661,
+   "14": 0.778,
+   "15": 0.687,
+   "16": 0.682,
+   "17": 0.689,
+   "18": 0.855,
+   "19": 0.648,
+   "20": 0.675,
+   "21": 0.834,
+   "22": 0.684,
+   "23": 0.896,
+   "24": 0.647,
+   "25": 0.659,
+   "26": 0.681,
+   "27": 0.665,
+   "28": 0.688,
+   "29": 0.688,
+   "30": 0.772,
+   "31": 0.822
+  },
+  "basis": "host /proc/stat per-cpu lines over the arm's cpuset; idle = idle+iowait; sees every process on those cores, not only the arm",
+  "interval_s": 1.0,
+  "intervals_dropped": 0,
+  "sampler_read_s_total": 0.0275,
+  "idle_core_equivalents_net_of_spin": 10.793,
+  "idle_spin_cores_subtracted": 1.235,
+  "net_of_spin_basis": "raw idle + measured idle spin: the spin is busy CPU doing no work, so it is unused capacity"
+ },
+ "box_hygiene": {
+  "other_containers": [],
+  "stray_processes": {
+   "limit_cores": 0.5,
+   "window_s": 4.0,
+   "strays": [],
+   "clean": true,
+   "basis": "per-process /proc/<pid>/stat utime+stime delta, excluding the arm's cgroup.procs and the driver itself"
+  },
+  "host_idle_baseline_cores": 30.97,
+  "ruling": "C \u2014 one workload on the box; the leg records the baseline it assumed"
+ },
+ "page_cache": {
+  "attempted": false
+ },
+ "prewarm": {
+  "attempted": true,
+  "files": 409,
+  "seconds": 0.04,
+  "basis": "every measured and warm-up file read once; the leg then starts warm"
+ },
+ "warm_up": {
+  "docs": 25,
+  "seconds": 30.44,
+  "disjoint_from_measured": true,
+  "same_shape_as_leg": true
+ },
+ "quiet_box_before": {
+  "host_busy_cores": 1.03,
+  "arm_idle_cores": 1.001,
+  "foreign_busy_cores": 0.029,
+  "max_foreign": 2.0,
+  "quiet": true,
+  "load1": 8.17138671875,
+  "window_s": 4.0,
+  "basis": "/proc/stat aggregate busy \u2212 arm cgroup usage_usec rate, one window"
+ },
+ "window": {
+  "t0_ns": 1790311293710708524,
+  "t1_ns": 1790311367897303014
+ },
+ "leaked_task": null
+}
