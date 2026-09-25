@@ -1,0 +1,27 @@
+{
+ "label": "P5-C (2) drift note (rule fixed in the pre-registration; no figure adjusted)",
+ "canary_F_s": {
+  "round_1": 0.1852321261673654,
+  "round_2": 0.18992010831800646
+ },
+ "canary_change": 0.025308688334146012,
+ "p5_cells_F_change_round2_over_round1": {
+  "stock_k16": -0.039593374837507356,
+  "p5_k16": -0.02441259237355664,
+  "p5_k1": -0.007455044896758856,
+  "li_k16": 0.009966005491373275
+ },
+ "p5_cells_median_change": -0.015933818635157748,
+ "p4_round_drift_F_change": {
+  "rr_k1": 0.0733651172734564,
+  "rr_k16": 0.03928840255030752,
+  "li_k1": 0.2195944126475644,
+  "li_k16": 0.1091129443639276,
+  "rr_k16_active": 0.17969203675359502
+ },
+ "p4_every_cell_slower_in_round_2": true,
+ "floor": 0.0082,
+ "canary_moved": true,
+ "moved_with_the_cells": false,
+ "reading": "the canary moved AGAINST the cells"
+}

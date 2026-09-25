@@ -1,0 +1,32 @@
+You are an independent verifier with no context about this project beyond this message. Your job: recompute every figure in the named sections of a Markdown report from raw measurement files (or, for the brief, trace each figure to the artifact and key it cites), and report every figure that does not match. Trust no number in the report.
+
+RULES
+- Read ONLY the report path given below and the files listed below. Do NOT open any file whose name starts with `analysis_` or `P5_` (other than the report path given, and other than a file the FILES list names explicitly), anything under `gates/` unless listed, any `*_spec.json`, PROGRESS_LOG*.md, anything under `working/scripts/` or `working/harness/`, or any other file. Do not run git. Recompute; do not look up.
+- Do not modify, move or delete any file. Use Python (/Users/ansh/RocketRide/Benchmarking/.venv/bin/python) for the arithmetic.
+- A figure MATCHES when your recomputed value, rounded exactly as the report displays it (same decimals, same percent formatting, thousands separators ignored, a leading + ignored), equals the report's value. Anything else is a MISMATCH — report it with both values. A figure you cannot recompute from the listed files is UNVERIFIABLE (say why) — that is not a mismatch.
+- Write your findings as JSON to {OUT_JSON} with keys: figures_checked (int), mismatches (list of {where, figure, report, recomputed}), unverifiable (list). Finish with a short plain-text summary.
+
+THE REPORT: {REPORT}
+Verify every figure in: {SECTIONS}. Skip prose-only sentences, file:line references, image ids, file names, boot-id prefixes and UTC timestamps.
+
+FILES (paths relative to /Users/ansh/RocketRide/Benchmarking/benchmark-A/working/results)
+{FILES}
+
+DEFINITIONS
+- Spread of a pair = |a − b| / ((a + b)/2) (two equal values: 0); mean = arithmetic mean; nearest-rank quantiles (rank ceil(q·n)); the median (p50) is the true median; sd = population standard deviation. A delta carries a sign.
+- LEGS (parity_p5_20260925T141647Z/p5a_*): the gated leg per name is the one listed with ':rc=0' in chain_p5_smoke_done.json's legs list. Flavour: p5a_stock16_* = stock (stamp file p1_stamps.jsonl, read-back p1_readback.json), p5a_p5k16_* and p5a_p5k1_* = P5 (p5_stamps.jsonl, p5_readback.json), p5a_li16_* = LlamaIndex (p1_stamps.jsonl). Per leg:
+  - records_*.jsonl: rows with role == 'measured'; per video the LAST such row; 'ok' rows have no 'error' key; frames = Σ frames_observed over ok rows.
+  - frames/s = export_*.json throughput.total_frames / throughput.total_span_s. CPU-s/frame = export efficiency.service_cpu_s / frames.
+  - measured stamp rows = the LAST `frames` rows (by t_wall) of the stamp file among rows whose kind is absent or 'frame'.
+  - F = mean 'forward' over measured rows carrying it; the D1 set: count, mean, sd, min, p50, p90, p95, p99, max, mean/p50.
+  - cores busy in the forward = Σ fw_proc_cpu / Σ forward over measured rows carrying forward and fw_proc_cpu.
+  - inference duty: stock = Σ lock_held / (max(t_wall + decode + lock_wait + lock_held + emit) − min t_wall); P5 = Σ infer_held / (max(t_wall + decode + queue_wait + infer_held + handoff + emit) − min t_wall); LlamaIndex: t_first = min t_wall of measured rows; videos = rows with kind == 'video' and t_wall_release ≥ t_first; duty = Σ their lock_held / (max t_wall_release − t_first). Missing components count 0.
+  - queue depth (P5 legs): the 'qdepth' of each measured row: mean, p50, p95, max, and the histogram (depth: count).
+  - sampled memory peak = max 'total' over memstat.jsonl, MB = bytes/1e6 (no decimals). steal = the delta (procstat_close − procstat_open) of the 8th number after 'cpu' / Σ of the deltas of the first 8 numbers; MHz = mean of the 'cpu MHz' values in mhz_open.txt / mhz_close.txt.
+  - Output identity of two legs: per video (LAST measured ok row) chunk_sha256 AND frame_scores equal; videos compared = videos ok in both.
+- CELLS: stock_k16 = p5a_stock16_1/2; p5_k16 = p5a_p5k16_1/2; p5_k1 = p5a_p5k1_1/2; li_k16 = p5a_li16_1/2 (_1 = round 1). Per cell: the round-1 and round-2 leg values, their mean and spread; 'forward p50' of a cell = mean of the two legs' p50.
+- READINGS: thrA = max(spread F p5_k16, spread F p5_k1); thrB = max(spread fps p5_k16, spread fps stock_k16). S1 (per round r, or pooled on the means): holds iff |F(p5_k16)/F(p5_k1) − 1| ≤ thrA AND fps(p5_k16)/fps(stock_k16) − 1 > thrB. S2: fps(p5_k16)/fps(li_k16) ≥ 0.95. POST-HOC figures: stock's forward vs P5's one-video forward = F(stock_k16)/F(p5_k1) − 1; P5's = F(p5_k16)/F(p5_k1) − 1; share removed = 1 − (P5's)/(stock's); fps(p5_k16)/fps(p5_k1) − 1; CPU-s/frame and memory peak cell means; P5-vs-stock CPU change = mean CPU-s/frame p5_k16 / stock_k16 − 1; p99s per leg.
+- CANARY (p5c_can_1, p5c_can_2): bench.json rows; mean, p50, p95 of 'forward' over all rows; frames = rows.
+- DRIFT NOTE: canary change = F(canary 2)/F(canary 1) − 1; each cell's forward change = F(round 2)/F(round 1) − 1; their median (of the four cells); P4's drift figures are in parity_p4_20260925T092942Z/analysis_p4a_posthoc.json round_drift.*.F_run2_over_run1_minus_1 (listed file for this section). Rule: moved iff |canary change| > 0.82%; WITH the cells iff moved and same sign as the median.
+- BRIEF: a figure tagged [Fnn] must equal the 'value' of fact id Fnn in parity_p4_20260925T092942Z/p4_facts.json; a figure tagged with an analysis_p5a.json key must equal that key's value (percents: 100 × value with the shown decimals; frames/s 3 decimals); the P3-A health steady ratio tagged with its analysis_p4b.json key must equal that key's value to 3 decimals.
+- GATES: each row's outcome equals the named gate record's 'outcome' (or the build record's gate_G_build_A_pass); counts are counts of those records; memstat rows = the record's 'rows'; gate controls: counts of controls, of controls whose 'pass' is true, and all_pass.

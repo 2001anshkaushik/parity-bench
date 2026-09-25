@@ -2011,3 +2011,22 @@ than rewritten from memory, which is entry 2's point in miniature.
 > - **Its first pre-registered use records its own full-scale confirmation.** The validation behind
 >   this rule is two sessions and one shape comparison, post-hoc; the rule is revisited if a
 >   full-scale run disagrees.
+
+## 64. An "equal within the spread" clause that tightens as the session gets quieter (added 2026-09-25)
+
+> P5-A's reading S1 asked that the single inference thread keep the forward pass at 16 videos in
+> flight "within the spread" of its one-video forward. The spread was the larger replicate spread of
+> the two cells. P5's session was quiet, with cells repeating within about 0.6% to 4%. The P5 forward
+> at 16 in flight came out 6.2% longer than at one video, against a 2.5% threshold, so S1 did not
+> hold and the 168-video confirmation did not run. The same residual would have read "within" in
+> P4's session, whose spreads reached 20%. The patch removed about 93% of the slowdown, and the rule
+> could not say so: it tested equality at whatever noise level the session happened to have.
+>
+> Rules:
+>
+> - **An equivalence clause needs a fixed tolerance, pre-registered beside the spread.** "Within
+>   max(the replicate spread, X%)", with X chosen for the decision the reading feeds. Otherwise the
+>   same effect passes in a noisy session and fails in a quiet one.
+> - **Pre-register the effect size the hypothesis claims.** "Removes the slowdown" and "removes most
+>   of it" are different hypotheses. Say which one, and read the result against it. The verdict of
+>   the rule as written stands; the lesson applies to the next rule.

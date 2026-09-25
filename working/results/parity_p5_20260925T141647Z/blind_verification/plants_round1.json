@@ -1,0 +1,8 @@
+{
+ "report_sha256": "909249fcf87b6c10d687b3ad09446e1d39ca79f5152e887184cde951b8239d98",
+ "plants": {
+  "A": "Per cell, RR P5 K=1 frames/s mean: true 4.294, planted 4.249",
+  "B": "D1 table, p5a_stock16_2 p90: true 0.3896, planted 0.3869",
+  "C": "CTO brief, P5 K=16 frames/s: true 4.644, planted 4.664"
+ }
+}

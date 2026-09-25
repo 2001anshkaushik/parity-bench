@@ -1,0 +1,24 @@
+{
+  "figures_checked": 193,
+  "figures_checked_breakdown": {
+    "per_leg_table": 136,
+    "queue_depth_histograms": 32,
+    "canary_table": 8,
+    "summary_bullet_5_drift": 2,
+    "p5c_2_drift_note": 15
+  },
+  "mismatches": [
+    {
+      "where": "### Per leg: forward D1 metric set, row p5a_stock16_2, column p90",
+      "figure": "p90 of forward (s), nearest-rank rank ceil(0.9*3203)=2883 over the last 3203 frame stamp rows by t_wall of p5a_stock16_2/p1_stamps.jsonl",
+      "report": "0.3869",
+      "recomputed": "0.3896 (0.3895925)"
+    }
+  ],
+  "unverifiable": [],
+  "notes": [
+    "The qualitative readings were also checked. 'the canary moved AGAINST the cells' in Summary bullet 5 and in P5-C (2) is consistent: |+2.53%| > 0.82% (moved) and the sign is opposite to the cells' median of -1.59%.",
+    "The prose range 'P4 ... drifted by +3.93% to +21.96%' matches the min and max of analysis_p4a_posthoc.json round_drift.*.F_run2_over_run1_minus_1 (rr_k16 0.03929, li_k1 0.21959).",
+    "Every gated leg is ':rc=0' in chain_p5_smoke_done.json. Each leg has 16 measured videos, all ok, frames = 3203, and 3203 measured stamp rows carrying forward. MHz is the mean of 32 values in each file."
+  ]
+}

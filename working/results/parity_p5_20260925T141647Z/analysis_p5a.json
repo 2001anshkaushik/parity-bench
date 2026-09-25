@@ -1,0 +1,934 @@
+{
+ "label": "P5-A single inference thread smoke (preregistration.json P5_A)",
+ "gated_legs": {
+  "p5c_can_1": "p5c_can_1",
+  "p5a_stock16_1": "p5a_stock16_1",
+  "p5a_p5k16_1": "p5a_p5k16_1",
+  "p5a_p5k1_1": "p5a_p5k1_1",
+  "p5a_li16_1": "p5a_li16_1",
+  "p5c_can_2": "p5c_can_2",
+  "p5a_stock16_2": "p5a_stock16_2",
+  "p5a_p5k16_2": "p5a_p5k16_2",
+  "p5a_p5k1_2": "p5a_p5k1_2",
+  "p5a_li16_2": "p5a_li16_2"
+ },
+ "legs": {
+  "p5a_stock16_1": {
+   "dir": "p5a_stock16_1",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "span_s": 1225.8,
+   "frames_per_s": 2.6129874367759833,
+   "cpu_s_per_frame": 1.3977833281298784,
+   "engine_cores": 3.653,
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463",
+   "session": {
+    "steal_share": 4.806337425519354e-05,
+    "mhz_open_mean": 2993.66503125,
+    "mhz_close_mean": 2948.99878125,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "flavour": "stock",
+   "stamp_frames_measured": 3203,
+   "F_s": 0.3702960432335325,
+   "forward_D1": {
+    "count": 3203,
+    "sum": 1186.0582264770046,
+    "share_of_run_total": null,
+    "min": 0.244965566999781,
+    "mean": 0.3702960432335325,
+    "sd": 0.03578080955761165,
+    "p50": 0.37154929999996966,
+    "p90": 0.40082303100007266,
+    "p95": 0.4086947690002489,
+    "p99": 0.501939830000083,
+    "max": 0.6041401719999158,
+    "mean_over_p50": 0.9966269435403666
+   },
+   "cores_in_forward": 2.427645108122222,
+   "duty": 0.9993168752152163,
+   "duty_kind": "device-lock held / window (P0 V2)",
+   "memory_peak_total_bytes": 7602790400,
+   "_by_video": "16 videos (records file)"
+  },
+  "p5a_stock16_2": {
+   "dir": "p5a_stock16_2",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "span_s": 1178.5,
+   "frames_per_s": 2.717861688587187,
+   "cpu_s_per_frame": 1.3568217296284732,
+   "engine_cores": 3.688,
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463",
+   "session": {
+    "steal_share": 5.3890061361845544e-05,
+    "mhz_open_mean": 2893.82115625,
+    "mhz_close_mean": 2691.96778125,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "flavour": "stock",
+   "stamp_frames_measured": 3203,
+   "F_s": 0.3556347731929414,
+   "forward_D1": {
+    "count": 3203,
+    "sum": 1139.0981785369913,
+    "share_of_run_total": null,
+    "min": 0.23391949399956502,
+    "mean": 0.3556347731929414,
+    "sd": 0.03662521345433379,
+    "p50": 0.36051339599998755,
+    "p90": 0.389592463999179,
+    "p95": 0.40026244100045005,
+    "p99": 0.4660705189999135,
+    "max": 0.6536139229992841,
+    "mean_over_p50": 0.9864675685808737
+   },
+   "cores_in_forward": 2.461674212978238,
+   "duty": 0.9993316069528647,
+   "duty_kind": "device-lock held / window (P0 V2)",
+   "memory_peak_total_bytes": 7367622656,
+   "_by_video": "16 videos (records file)"
+  },
+  "p5a_p5k16_1": {
+   "dir": "p5a_p5k16_1",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "span_s": 698.3,
+   "frames_per_s": 4.586853787770299,
+   "cpu_s_per_frame": 1.2142054324071183,
+   "engine_cores": 5.57,
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463",
+   "session": {
+    "steal_share": 4.5901249825459534e-05,
+    "mhz_open_mean": 3085.09109375,
+    "mhz_close_mean": 2712.23025,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "flavour": "p5",
+   "stamp_frames_measured": 3203,
+   "F_s": 0.2091936933081511,
+   "forward_D1": {
+    "count": 3203,
+    "sum": 670.047399666008,
+    "share_of_run_total": null,
+    "min": 0.18503350300034072,
+    "mean": 0.2091936933081511,
+    "sd": 0.04855770240756187,
+    "p50": 0.19684888600022532,
+    "p90": 0.21270757599995704,
+    "p95": 0.23005293799997162,
+    "p99": 0.47614035900005547,
+    "max": 0.6956598880001366,
+    "mean_over_p50": 1.0627121014437015
+   },
+   "cores_in_forward": 4.211000999632943,
+   "duty": 0.9997173469690741,
+   "duty_kind": "inference thread busy / window",
+   "queue_depth": {
+    "D1": {
+     "count": 3203,
+     "sum": 40974.0,
+     "share_of_run_total": null,
+     "min": 1.0,
+     "mean": 12.792382141742117,
+     "sd": 3.1968868581162146,
+     "p50": 15.0,
+     "p90": 15.0,
+     "p95": 15.0,
+     "p99": 15.0,
+     "max": 15.0,
+     "mean_over_p50": 0.8528254761161411
+    },
+    "histogram": {
+     "1": 13,
+     "2": 11,
+     "3": 23,
+     "4": 32,
+     "5": 33,
+     "6": 25,
+     "7": 184,
+     "8": 83,
+     "9": 10,
+     "10": 567,
+     "11": 9,
+     "12": 10,
+     "13": 134,
+     "14": 281,
+     "15": 1788
+    }
+   },
+   "infer_threads": [
+    173
+   ],
+   "queue_wait_D1": {
+    "count": 3203,
+    "sum": 8429.378013623997,
+    "share_of_run_total": null,
+    "min": 4.9154999942402355e-05,
+    "mean": 2.631713397946924,
+    "sd": 0.5867788062215379,
+    "p50": 2.949465693000093,
+    "p90": 3.1783005130000674,
+    "p95": 3.1974645469999814,
+    "p99": 3.217948842000169,
+    "max": 4.109842010000193,
+    "mean_over_p50": 0.8922678450516363
+   },
+   "memory_peak_total_bytes": 5502513152,
+   "_by_video": "16 videos (records file)"
+  },
+  "p5a_p5k16_2": {
+   "dir": "p5a_p5k16_2",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "span_s": 681.4,
+   "frames_per_s": 4.7006163780452015,
+   "cpu_s_per_frame": 1.1866375273181393,
+   "engine_cores": 5.578,
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463",
+   "session": {
+    "steal_share": 4.5996354392394104e-05,
+    "mhz_open_mean": 3140.8614375,
+    "mhz_close_mean": 2695.1363125,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "flavour": "p5",
+   "stamp_frames_measured": 3203,
+   "F_s": 0.2040867329463004,
+   "forward_D1": {
+    "count": 3203,
+    "sum": 653.6898056270002,
+    "share_of_run_total": null,
+    "min": 0.1850535960002162,
+    "mean": 0.2040867329463004,
+    "sd": 0.05002500859885922,
+    "p50": 0.19089914500000305,
+    "p90": 0.20817801799967128,
+    "p95": 0.2288740340000004,
+    "p99": 0.4687035669994657,
+    "max": 0.5764579530004994,
+    "mean_over_p50": 1.069081440602037
+   },
+   "cores_in_forward": 4.206884745297906,
+   "duty": 0.999706430568133,
+   "duty_kind": "inference thread busy / window",
+   "queue_depth": {
+    "D1": {
+     "count": 3203,
+     "sum": 40871.0,
+     "share_of_run_total": null,
+     "min": 1.0,
+     "mean": 12.760224789260068,
+     "sd": 3.211838692380606,
+     "p50": 15.0,
+     "p90": 15.0,
+     "p95": 15.0,
+     "p99": 15.0,
+     "max": 15.0,
+     "mean_over_p50": 0.8506816526173379
+    },
+    "histogram": {
+     "1": 14,
+     "2": 8,
+     "3": 26,
+     "4": 33,
+     "5": 36,
+     "6": 24,
+     "7": 186,
+     "8": 81,
+     "9": 11,
+     "10": 570,
+     "11": 17,
+     "12": 15,
+     "13": 134,
+     "14": 271,
+     "15": 1777
+    }
+   },
+   "infer_threads": [
+    173
+   ],
+   "queue_wait_D1": {
+    "count": 3203,
+    "sum": 8168.867138992018,
+    "share_of_run_total": null,
+    "min": 5.942100051470334e-05,
+    "mean": 2.5503799996853007,
+    "sd": 0.5668158428162537,
+    "p50": 2.8710018739993757,
+    "p90": 2.956154387999959,
+    "p95": 3.077864196000519,
+    "p99": 3.3387339109995082,
+    "max": 3.819699679999758,
+    "mean_over_p50": 0.8883240456170651
+   },
+   "memory_peak_total_bytes": 5723344896,
+   "_by_video": "16 videos (records file)"
+  },
+  "p5a_p5k1_1": {
+   "dir": "p5a_p5k1_1",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "span_s": 748.3,
+   "frames_per_s": 4.280368836028331,
+   "cpu_s_per_frame": 1.2119575398064315,
+   "engine_cores": 5.188,
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463",
+   "session": {
+    "steal_share": 4.7213187151621156e-05,
+    "mhz_open_mean": 3098.62415625,
+    "mhz_close_mean": 2752.0274375,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "flavour": "p5",
+   "stamp_frames_measured": 3203,
+   "F_s": 0.19531965133406334,
+   "forward_D1": {
+    "count": 3203,
+    "sum": 625.6088432230049,
+    "share_of_run_total": null,
+    "min": 0.18434955000020636,
+    "mean": 0.19531965133406334,
+    "sd": 0.008913653861825082,
+    "p50": 0.19134455200037337,
+    "p90": 0.2077809869997509,
+    "p95": 0.21285096600013276,
+    "p99": 0.22085694599991257,
+    "max": 0.26123450199975196,
+    "mean_over_p50": 1.0207745623908968
+   },
+   "cores_in_forward": 4.225472202057264,
+   "duty": 0.8568277856689592,
+   "duty_kind": "inference thread busy / window",
+   "queue_depth": {
+    "D1": {
+     "count": 3203,
+     "sum": 3203.0,
+     "share_of_run_total": null,
+     "min": 1.0,
+     "mean": 1.0,
+     "sd": 0.0,
+     "p50": 1.0,
+     "p90": 1.0,
+     "p95": 1.0,
+     "p99": 1.0,
+     "max": 1.0,
+     "mean_over_p50": 1.0
+    },
+    "histogram": {
+     "1": 3203
+    }
+   },
+   "infer_threads": [
+    173
+   ],
+   "queue_wait_D1": {
+    "count": 3203,
+    "sum": 0.5808073879966287,
+    "share_of_run_total": null,
+    "min": 3.715999991982244e-05,
+    "mean": 0.00018133230970859466,
+    "sd": 5.337448725556725e-05,
+    "p50": 0.00018459400007486693,
+    "p90": 0.00023811400023987517,
+    "p95": 0.0002621110002110072,
+    "p99": 0.00031824699999560835,
+    "max": 0.0004564010000649432,
+    "mean_over_p50": 0.9823304638019145
+   },
+   "memory_peak_total_bytes": 1845530624,
+   "_by_video": "16 videos (records file)"
+  },
+  "p5a_p5k1_2": {
+   "dir": "p5a_p5k1_2",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "span_s": 743.6,
+   "frames_per_s": 4.307423345884884,
+   "cpu_s_per_frame": 1.2031220730565095,
+   "engine_cores": 5.182,
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463",
+   "session": {
+    "steal_share": 4.300310136896882e-05,
+    "mhz_open_mean": 2993.42390625,
+    "mhz_close_mean": 2680.7092187499998,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "flavour": "p5",
+   "stamp_frames_measured": 3203,
+   "F_s": 0.19386353456414862,
+   "forward_D1": {
+    "count": 3203,
+    "sum": 620.9449012089681,
+    "share_of_run_total": null,
+    "min": 0.18437449200064293,
+    "mean": 0.19386353456414862,
+    "sd": 0.00567474025500696,
+    "p50": 0.19217220099926635,
+    "p90": 0.2021967399996356,
+    "p95": 0.20418317899930116,
+    "p99": 0.2085049559991603,
+    "max": 0.23866917000123067,
+    "mean_over_p50": 1.0088011354196267
+   },
+   "cores_in_forward": 4.22611171354136,
+   "duty": 0.8550233235874054,
+   "duty_kind": "inference thread busy / window",
+   "queue_depth": {
+    "D1": {
+     "count": 3203,
+     "sum": 3203.0,
+     "share_of_run_total": null,
+     "min": 1.0,
+     "mean": 1.0,
+     "sd": 0.0,
+     "p50": 1.0,
+     "p90": 1.0,
+     "p95": 1.0,
+     "p99": 1.0,
+     "max": 1.0,
+     "mean_over_p50": 1.0
+    },
+    "histogram": {
+     "1": 3203
+    }
+   },
+   "infer_threads": [
+    174
+   ],
+   "queue_wait_D1": {
+    "count": 3203,
+    "sum": 0.5533222809717699,
+    "share_of_run_total": null,
+    "min": 3.556100091373082e-05,
+    "mean": 0.00017275125849883544,
+    "sd": 6.448629608101564e-05,
+    "p50": 0.00018054499923891854,
+    "p90": 0.0002405600007477915,
+    "p95": 0.00026963600066665094,
+    "p99": 0.0003382009999768343,
+    "max": 0.0005560829995374661,
+    "mean_over_p50": 0.9568321428290046
+   },
+   "memory_peak_total_bytes": 1871622144,
+   "_by_video": "16 videos (records file)"
+  },
+  "p5a_li16_1": {
+   "dir": "p5a_li16_1",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "span_s": 942.1,
+   "frames_per_s": 3.3998513958178536,
+   "cpu_s_per_frame": 0.8813924445832032,
+   "engine_cores": 2.997,
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463",
+   "session": {
+    "steal_share": 5.3152918482431376e-05,
+    "mhz_open_mean": 2837.70284375,
+    "mhz_close_mean": 2630.86153125,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "flavour": "li",
+   "stamp_frames_measured": 3203,
+   "F_s": 0.2750639627396302,
+   "forward_D1": {
+    "count": 3203,
+    "sum": 881.0298726550354,
+    "share_of_run_total": null,
+    "min": 0.1831936210001004,
+    "mean": 0.2750639627396302,
+    "sd": 0.08485468537000825,
+    "p50": 0.28805680200002826,
+    "p90": 0.3743887270002233,
+    "p95": 0.37984987100026046,
+    "p99": 0.3887442830000509,
+    "max": 0.6693954110005507,
+    "mean_over_p50": 0.954894870837326
+   },
+   "cores_in_forward": 2.766837877463727,
+   "duty": 0.9999974540636587,
+   "duty_kind": "per-video lock held / window (P0 V2)",
+   "memory_peak_total_bytes": 5359263744,
+   "_by_video": "16 videos (records file)"
+  },
+  "p5a_li16_2": {
+   "dir": "p5a_li16_2",
+   "videos": 16,
+   "errors": 0,
+   "frames": 3203,
+   "span_s": 952.2,
+   "frames_per_s": 3.363789119932787,
+   "cpu_s_per_frame": 0.8829222603808929,
+   "engine_cores": 2.97,
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463",
+   "session": {
+    "steal_share": 5.30588329340744e-05,
+    "mhz_open_mean": 2895.1555625,
+    "mhz_close_mean": 2704.6031875,
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+   },
+   "flavour": "li",
+   "stamp_frames_measured": 3203,
+   "F_s": 0.2778052517027722,
+   "forward_D1": {
+    "count": 3203,
+    "sum": 889.8102212039794,
+    "share_of_run_total": null,
+    "min": 0.18109441200067522,
+    "mean": 0.2778052517027722,
+    "sd": 0.08818872801857382,
+    "p50": 0.292070732000866,
+    "p90": 0.378955522999604,
+    "p95": 0.39249565999853075,
+    "p99": 0.4096474620000663,
+    "max": 0.6247728689995711,
+    "mean_over_p50": 0.9511574466898263
+   },
+   "cores_in_forward": 2.742686744356416,
+   "duty": 0.9999974540576375,
+   "duty_kind": "per-video lock held / window (P0 V2)",
+   "memory_peak_total_bytes": 5357985792,
+   "_by_video": "16 videos (records file)"
+  }
+ },
+ "cells": {
+  "stock_k16": {
+   "legs": [
+    "p5a_stock16_1",
+    "p5a_stock16_2"
+   ],
+   "complete": true,
+   "frames_per_s": {
+    "round_1": 2.6129874367759833,
+    "round_2": 2.717861688587187,
+    "mean": 2.665424562681585,
+    "spread": 0.03934617144283141
+   },
+   "F_s": {
+    "round_1": 0.3702960432335325,
+    "round_2": 0.3556347731929414,
+    "mean": 0.362965408213237,
+    "spread": 0.04039302288546958
+   },
+   "duty": {
+    "round_1": 0.9993168752152163,
+    "round_2": 0.9993316069528647,
+    "mean": 0.9993242410840405,
+    "spread": 1.4741699483294618e-05
+   },
+   "cores_in_forward": {
+    "round_1": 2.427645108122222,
+    "round_2": 2.461674212978238,
+    "mean": 2.44465966055023,
+    "spread": 0.013919771903282889
+   },
+   "cpu_s_per_frame": {
+    "round_1": 1.3977833281298784,
+    "round_2": 1.3568217296284732,
+    "mean": 1.3773025288791758,
+    "spread": 0.029740451093732433
+   },
+   "memory_peak_total_bytes": {
+    "round_1": 7602790400,
+    "round_2": 7367622656,
+    "mean": 7485206528,
+    "spread": 0.031417669388320184
+   },
+   "forward_p50": {
+    "round_1": 0.37154929999996966,
+    "round_2": 0.36051339599998755,
+    "mean": 0.3660313479999786,
+    "spread": 0.030150160799841536
+   },
+   "forward_p95": {
+    "round_1": 0.4086947690002489,
+    "round_2": 0.40026244100045005,
+    "mean": 0.4044786050003495,
+    "spread": 0.020847401804581448
+   },
+   "engine_cores": {
+    "round_1": 3.653,
+    "round_2": 3.688,
+    "mean": 3.6705,
+    "spread": 0.009535485628660984
+   }
+  },
+  "p5_k16": {
+   "legs": [
+    "p5a_p5k16_1",
+    "p5a_p5k16_2"
+   ],
+   "complete": true,
+   "frames_per_s": {
+    "round_1": 4.586853787770299,
+    "round_2": 4.7006163780452015,
+    "mean": 4.64373508290775,
+    "spread": 0.024498079292599936
+   },
+   "F_s": {
+    "round_1": 0.2091936933081511,
+    "round_2": 0.2040867329463004,
+    "mean": 0.20664021312722575,
+    "spread": 0.02471426197526432
+   },
+   "duty": {
+    "round_1": 0.9997173469690741,
+    "round_2": 0.999706430568133,
+    "mean": 0.9997118887686036,
+    "spread": 1.0919546985213791e-05
+   },
+   "cores_in_forward": {
+    "round_1": 4.211000999632943,
+    "round_2": 4.206884745297906,
+    "mean": 4.208942872465425,
+    "spread": 0.0009779781906676557
+   },
+   "cpu_s_per_frame": {
+    "round_1": 1.2142054324071183,
+    "round_2": 1.1866375273181393,
+    "mean": 1.2004214798626287,
+    "spread": 0.022965188103876443
+   },
+   "memory_peak_total_bytes": {
+    "round_1": 5502513152,
+    "round_2": 5723344896,
+    "mean": 5612929024,
+    "spread": 0.03934340574337539
+   },
+   "forward_p50": {
+    "round_1": 0.19684888600022532,
+    "round_2": 0.19089914500000305,
+    "mean": 0.19387401550011418,
+    "spread": 0.03068869742484274
+   },
+   "forward_p95": {
+    "round_1": 0.23005293799997162,
+    "round_2": 0.2288740340000004,
+    "mean": 0.229463485999986,
+    "spread": 0.005137654014248253
+   },
+   "engine_cores": {
+    "round_1": 5.57,
+    "round_2": 5.578,
+    "mean": 5.574,
+    "spread": 0.001435235019734483
+   }
+  },
+  "p5_k1": {
+   "legs": [
+    "p5a_p5k1_1",
+    "p5a_p5k1_2"
+   ],
+   "complete": true,
+   "frames_per_s": {
+    "round_1": 4.280368836028331,
+    "round_2": 4.307423345884884,
+    "mean": 4.293896090956608,
+    "spread": 0.006300690394798497
+   },
+   "F_s": {
+    "round_1": 0.19531965133406334,
+    "round_2": 0.19386353456414862,
+    "mean": 0.194591592949106,
+    "spread": 0.007482937715071582
+   },
+   "duty": {
+    "round_1": 0.8568277856689592,
+    "round_2": 0.8550233235874054,
+    "mean": 0.8559255546281823,
+    "spread": 0.0021081997982145676
+   },
+   "cores_in_forward": {
+    "round_1": 4.225472202057264,
+    "round_2": 4.22611171354136,
+    "mean": 4.225791957799312,
+    "spread": 0.00015133529773401819
+   },
+   "cpu_s_per_frame": {
+    "round_1": 1.2119575398064315,
+    "round_2": 1.2031220730565095,
+    "mean": 1.2075398064314706,
+    "spread": 0.007316915519358819
+   },
+   "memory_peak_total_bytes": {
+    "round_1": 1845530624,
+    "round_2": 1871622144,
+    "mean": 1858576384,
+    "spread": 0.014038443738237018
+   },
+   "forward_p50": {
+    "round_1": 0.19134455200037337,
+    "round_2": 0.19217220099926635,
+    "mean": 0.19175837649981986,
+    "spread": 0.004316103494408548
+   },
+   "forward_p95": {
+    "round_1": 0.21285096600013276,
+    "round_2": 0.20418317899930116,
+    "mean": 0.20851707249971696,
+    "spread": 0.04156871615797004
+   },
+   "engine_cores": {
+    "round_1": 5.188,
+    "round_2": 5.182,
+    "mean": 5.1850000000000005,
+    "spread": 0.0011571841851493422
+   }
+  },
+  "li_k16": {
+   "legs": [
+    "p5a_li16_1",
+    "p5a_li16_2"
+   ],
+   "complete": true,
+   "frames_per_s": {
+    "round_1": 3.3998513958178536,
+    "round_2": 3.363789119932787,
+    "mean": 3.3818202578753205,
+    "spread": 0.010663569656337465
+   },
+   "F_s": {
+    "round_1": 0.2750639627396302,
+    "round_2": 0.2778052517027722,
+    "mean": 0.27643460722120117,
+    "spread": 0.009916591090740159
+   },
+   "duty": {
+    "round_1": 0.9999974540636587,
+    "round_2": 0.9999974540576375,
+    "mean": 0.9999974540606481,
+    "spread": 6.021198881359252e-12
+   },
+   "cores_in_forward": {
+    "round_1": 2.766837877463727,
+    "round_2": 2.742686744356416,
+    "mean": 2.7547623109100714,
+    "spread": 0.008767047890724236
+   },
+   "cpu_s_per_frame": {
+    "round_1": 0.8813924445832032,
+    "round_2": 0.8829222603808929,
+    "mean": 0.8821573524820481,
+    "spread": 0.0017341756472192067
+   },
+   "memory_peak_total_bytes": {
+    "round_1": 5359263744,
+    "round_2": 5357985792,
+    "mean": 5358624768,
+    "spread": 0.0002384850694587765
+   },
+   "forward_p50": {
+    "round_1": 0.28805680200002826,
+    "round_2": 0.292070732000866,
+    "mean": 0.2900637670004471,
+    "spread": 0.013838095127653535
+   },
+   "forward_p95": {
+    "round_1": 0.37984987100026046,
+    "round_2": 0.39249565999853075,
+    "mean": 0.3861727654993956,
+    "spread": 0.03274645476854603
+   },
+   "engine_cores": {
+    "round_1": 2.997,
+    "round_2": 2.97,
+    "mean": 2.9835000000000003,
+    "spread": 0.009049773755656004
+   }
+  }
+ },
+ "correctness": {
+  "gate_pairs": [
+   {
+    "a": "p5a_p5k16_1",
+    "b": "p5a_stock16_1",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   },
+   {
+    "a": "p5a_p5k1_1",
+    "b": "p5a_stock16_1",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   },
+   {
+    "a": "p5a_p5k1_1",
+    "b": "P4 p4a_rr1_1 (stock, K=1, committed)",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   },
+   {
+    "a": "p5a_p5k16_2",
+    "b": "p5a_stock16_2",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   },
+   {
+    "a": "p5a_p5k1_2",
+    "b": "p5a_stock16_2",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   },
+   {
+    "a": "p5a_p5k1_2",
+    "b": "P4 p4a_rr1_1 (stock, K=1, committed)",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   }
+  ],
+  "gate_pass": true,
+  "beside": {
+   "stock_k16_run_to_run": {
+    "a": "p5a_stock16_1",
+    "b": "p5a_stock16_2",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   },
+   "p5_k16_run_to_run": {
+    "a": "p5a_p5k16_1",
+    "b": "p5a_p5k16_2",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   },
+   "p5_k1_vs_p5_k16_round_1": {
+    "a": "p5a_p5k1_1",
+    "b": "p5a_p5k16_1",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   },
+   "li_k16_run_to_run": {
+    "a": "p5a_li16_1",
+    "b": "p5a_li16_2",
+    "videos_compared": 16,
+    "chunk_hash_differs": [],
+    "frame_scores_differ": [],
+    "identical": true,
+    "videos_eq_16": true
+   }
+  },
+  "rule": "per round: P5 K=16 vs stock K=16, P5 K=1 vs stock K=16, P5 K=1 vs P4's committed stock K=1 \u2014 all identical on 16/16"
+ },
+ "readings": {
+  "S1": {
+   "threshold_forward": 0.02471426197526432,
+   "threshold_fps": 0.03934617144283141,
+   "pooled": {
+    "F_p5k16_over_p5k1_minus_1": 0.06191747544443493,
+    "clause_forward_within": false,
+    "fps_p5k16_over_stock_k16_minus_1": 0.7422121593401467,
+    "clause_fps_beyond": true,
+    "holds": false
+   },
+   "round_1": {
+    "F_p5k16_over_p5k1_minus_1": 0.07103249406460588,
+    "clause_forward_within": false,
+    "fps_p5k16_over_stock_k16_minus_1": 0.755405985965917,
+    "clause_fps_beyond": true,
+    "holds": false
+   },
+   "round_2": {
+    "F_p5k16_over_p5k1_minus_1": 0.05273399355446573,
+    "clause_forward_within": false,
+    "fps_p5k16_over_stock_k16_minus_1": 0.7295274434986794,
+    "clause_fps_beyond": true,
+    "holds": false
+   },
+   "verdict": "DOES NOT HOLD (pooled); round 1 does not, round 2 does not"
+  },
+  "S2": {
+   "bar": 0.95,
+   "pooled": {
+    "fps_p5k16_over_li_k16": 1.3731466277942421,
+    "holds": true
+   },
+   "round_1": {
+    "fps_p5k16_over_li_k16": 1.3491336101961908,
+    "holds": true
+   },
+   "round_2": {
+    "fps_p5k16_over_li_k16": 1.397417082477253,
+    "holds": true
+   },
+   "verdict": "HOLDS (pooled); round 1 holds, round 2 holds"
+  }
+ },
+ "canary": {
+  "p5c_can_1": {
+   "leg": "p5c_can_1",
+   "frames": 239,
+   "F_s": 0.1852321261673654,
+   "forward_D1": {
+    "count": 239,
+    "sum": 44.27047815400033,
+    "share_of_run_total": null,
+    "min": 0.17988628700004483,
+    "mean": 0.1852321261673654,
+    "sd": 0.002784539330440728,
+    "p50": 0.18549110399999336,
+    "p90": 0.1886174790000723,
+    "p95": 0.189825036000002,
+    "p99": 0.19142694200002097,
+    "max": 0.19241401900001165,
+    "mean_over_p50": 0.9986038261294301
+   },
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463"
+  },
+  "p5c_can_2": {
+   "leg": "p5c_can_2",
+   "frames": 239,
+   "F_s": 0.18992010831800646,
+   "forward_D1": {
+    "count": 239,
+    "sum": 45.390905888003545,
+    "share_of_run_total": null,
+    "min": 0.184724112999902,
+    "mean": 0.18992010831800646,
+    "sd": 0.003880418443819516,
+    "p50": 0.18810867199954373,
+    "p90": 0.19590838300064206,
+    "p95": 0.1966012890006823,
+    "p99": 0.1982932319997417,
+    "max": 0.20195701200009353,
+    "mean_over_p50": 1.009629733170766
+   },
+   "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463"
+  }
+ },
+ "sessions": [
+  "b9a0e24b-a331-46b7-bc08-80657140f463"
+ ]
+}

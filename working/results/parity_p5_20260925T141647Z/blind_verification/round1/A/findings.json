@@ -1,0 +1,12 @@
+{
+  "figures_checked": 191,
+  "mismatches": [
+    {
+      "where": "### Per cell table, row 'RR P5 K=1', column 'frames/s', cell mean (p5a_p5k1_1 / p5a_p5k1_2 mean)",
+      "figure": "mean frames/s of cell p5_k1 = (fps p5a_p5k1_1 + fps p5a_p5k1_2)/2; legs 4.280368836 and 4.307423346 from export throughput.total_frames/total_span_s",
+      "report": "4.249",
+      "recomputed": "4.294 (4.293896)"
+    }
+  ],
+  "unverifiable": []
+}

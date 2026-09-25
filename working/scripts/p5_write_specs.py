@@ -64,12 +64,16 @@ if A:
                    "this session's replicate spread, which is why S1 does not hold. (ii) The inference thread is busy for "
                    f"{sh(m('p5_k16', 'duty'), 2)} of the window at 16 in flight and keeps {m('p5_k16', 'cores_in_forward'):.2f} cores busy during a forward "
                    f"(stock at 16: {m('stock_k16', 'cores_in_forward'):.2f}; P5 at one in flight: {m('p5_k1', 'cores_in_forward'):.2f}); the queue's median depth "
-                   f"is {qd[0]['p50']:.0f} and {qd[1]['p50']:.0f} in the two runs (its maximum is 15 other callers), so the one thread is the bottleneck and every other "
-                   f"caller waits. (iii) P5 at 16 in flight runs {pc(m('p5_k16', 'frames_per_s') / m('p5_k1', 'frames_per_s') - 1)} frames/s over P5 at one in flight "
+                   f"is {qd[0]['p50']:.0f} and {qd[1]['p50']:.0f} in the two runs — with 16 callers and one frame in the forward, that is every other caller's frame "
+                   f"waiting: the one thread is the bottleneck. (iii) P5 at 16 in flight runs {pc(m('p5_k16', 'frames_per_s') / m('p5_k1', 'frames_per_s') - 1)} frames/s over P5 at one in flight "
                    "(decoding overlaps the forward). (iv) Cost: CPU-s per frame "
                    f"{m('p5_k16', 'cpu_s_per_frame'):.3f} vs stock {m('stock_k16', 'cpu_s_per_frame'):.3f} ({pc(m('p5_k16', 'cpu_s_per_frame') / m('stock_k16', 'cpu_s_per_frame') - 1)}) "
                    f"and LlamaIndex {m('li_k16', 'cpu_s_per_frame'):.3f}; sampled memory peak {m('p5_k16', 'memory_peak_total_bytes') / 1e6:,.0f} MB vs stock "
                    f"{m('stock_k16', 'memory_peak_total_bytes') / 1e6:,.0f} MB and LlamaIndex {m('li_k16', 'memory_peak_total_bytes') / 1e6:,.0f} MB (means of two runs). "
+                   f"(v) The residual sits in the tail: the median forward (mean of the two runs' p50) is {m('p5_k16', 'forward_p50') * 1000:.1f} ms at 16 in flight "
+                   f"against {m('p5_k1', 'forward_p50') * 1000:.1f} ms at one ({pc(m('p5_k16', 'forward_p50') / m('p5_k1', 'forward_p50') - 1)}), while the p99 is "
+                   f"{ph['p5a_p5k16_1']['forward_D1']['p99'] * 1000:.0f} and {ph['p5a_p5k16_2']['forward_D1']['p99'] * 1000:.0f} ms against "
+                   f"{ph['p5a_p5k1_1']['forward_D1']['p99'] * 1000:.0f} and {ph['p5a_p5k1_2']['forward_D1']['p99'] * 1000:.0f} ms. "
                    "What the residual forward penalty at 16 in flight is made of was not measured.")
     if a.posthoc:
         R["A"] = (R.get("A", "") + " POST-HOC, not pre-registered: " + a.posthoc).strip()
@@ -94,7 +98,9 @@ summary.append("The CTO brief draft is below; it is not sent, posted or filed.")
 spec = {"summary": summary, "readings": R, "not_run": a.not_run, "register": a.register,
         "self_audit": {
             "1. HYPOTHESIS": "stated before the first leg in preregistration.json (P5-A hypothesis, build, the in-image check, the hard correctness gate, S1/S2 per round and pooled, the P5-B gate and block design with its container choice, the P5-C rules including the drift rule), committed at 504cf101; no amendment.",
-            "2. EVIDENCE": "every figure is computed by working/scripts/p5_report.py and p5_write_specs.py from analysis_p5a.json (p5_analyse_a.py over the raw smoke legs), analysis_p5b.json (p5_analyse_b.py over the raw block legs), analysis_p5_drift.json, the build record, the gate-control record, the gate records and the chain records; the brief from p4_facts.json and the P5 analysis files.",
+            "2. EVIDENCE": "every figure is computed by working/scripts/p5_report.py and p5_write_specs.py from analysis_p5a.json (p5_analyse_a.py over the raw smoke legs), "
+                           + ("analysis_p5b.json (p5_analyse_b.py over the raw block legs), " if B else "(P5-B did not run, so there is no analysis_p5b.json), ")
+                           + "analysis_p5_drift.json, the build record, the gate-control record, the gate records and the chain records; the brief from p4_facts.json and the P5 analysis files.",
             "3. NULL CONTROL": "every gate ran whole in its real runtime against a positive and a null control before launch (gate_controls.json, real control legs for every G_cell flavour, the in-image check in both images); the laptop worker test has a mis-routing null control; the blind recomputation's planted figures had to be caught.",
             "4. REGISTER": "3 (one session); 48 (blind recomputation); 54, 55 (hard gates, the sampler gated after the first leg); 56-58 (gates tested whole; containers' users); 59 (reading clauses against the hypothesis); 61 (a gate reads the record its writer finalises last: D0 from the export); 62 (ABAB rounds, the canary); 63 (the steady-phase metric).",
             "5. NOT VERIFIED": "whether P5's gain holds on other videos, other T or other hardware; why the box drifts between rounds (the canary describes it, nothing explains it); the P5 node beyond this benchmark's pipeline (source only, not a RocketRide change); the CTO brief is a draft.",

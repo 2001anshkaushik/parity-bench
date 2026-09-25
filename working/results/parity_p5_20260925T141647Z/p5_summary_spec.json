@@ -1,0 +1,30 @@
+{
+ "summary": [
+  "Correctness: rr:p5-infer's output is identical to stock rr:patched-video on 16/16 videos in all 6 gate comparisons (K=16 and K=1, both rounds, and against P4's committed stock K=1 leg).",
+  "S1 (fix works): DOES NOT HOLD (pooled); round 1 does not, round 2 does not. With 16 videos in flight the P5 forward is +6.19% against one in flight (within 2.47% is the rule), and P5 runs 4.644 frames/s against stock's 2.665 (+74.22%; beyond 3.93% is the rule).",
+  "S2 (parity >= 0.95): HOLDS (pooled); round 1 holds, round 2 holds. P5 at 16 in flight / LlamaIndex at 16 in flight = 1.373 pooled (1.349 in round 1, 1.397 in round 2); LlamaIndex ran 3.382 frames/s.",
+  "P5-B: NOT RUN — its gate did not fire.",
+  "Drift: the canary moved AGAINST the cells (canary +2.53% from round 1 to round 2; P5-A cells' median -1.59%).",
+  "The CTO brief draft is below; it is not sent, posted or filed."
+ ],
+ "readings": {
+  "A": "Stated plainly, per round and pooled. S1: round 1 does not hold (forward +7.10%, frames/s vs stock +75.54%); round 2 does not hold (forward +5.27%, frames/s vs stock +72.95%); pooled DOES NOT HOLD. S2: round 1 1.349, round 2 1.397, pooled 1.373 against 0.95 — HOLDS pooled. POST-HOC, not pre-registered (from analysis_p5a.json). (i) Against the same one-video forward, stock's forward at 16 in flight is +86.53% and P5's +6.19%: P5 removes 92.8% of the slowdown, not all of it, and the residual is beyond this session's replicate spread, which is why S1 does not hold. (ii) The inference thread is busy for 99.97% of the window at 16 in flight and keeps 4.21 cores busy during a forward (stock at 16: 2.44; P5 at one in flight: 4.23); the queue's median depth is 15 and 15 in the two runs — with 16 callers and one frame in the forward, that is every other caller's frame waiting: the one thread is the bottleneck. (iii) P5 at 16 in flight runs +8.15% frames/s over P5 at one in flight (decoding overlaps the forward). (iv) Cost: CPU-s per frame 1.200 vs stock 1.377 (-12.84%) and LlamaIndex 0.882; sampled memory peak 5,613 MB vs stock 7,485 MB and LlamaIndex 5,359 MB (means of two runs). (v) The residual sits in the tail: the median forward (mean of the two runs' p50) is 193.9 ms at 16 in flight against 191.8 ms at one (+1.10%), while the p99 is 476 and 469 ms against 221 and 209 ms. What the residual forward penalty at 16 in flight is made of was not measured.",
+  "B_not_run": "NOT RUN: the P5-B gate (correctness AND S1 AND S2, pooled) did not fire, so the 168-video confirmation was not started.",
+  "drift": "The canary is the same bare microbenchmark every round, alone, in rr:patched-video; it measures the box, not either engine. P4, which had no canary, drifted by +3.93% to +21.96% between its rounds. No figure in this report is adjusted by the canary."
+ },
+ "not_run": [
+  "P5-B (the 168-video block-interleaved confirmation): its pre-registered gate G_smoke_P5B did not fire — S1 does not hold (the P5 forward at 16 videos in flight is beyond this session's replicate spread of its one-video forward), although S2 holds and the correctness gate passed"
+ ],
+ "register": [
+  "63 — steady-phase docs/s is the smoke metric for docs throughput gates (Ansh's ruling, added at Step 0)",
+  "64 — an 'equal within the spread' clause that tightens as the session gets quieter (S1's forward clause; the verdict as written stands)"
+ ],
+ "self_audit": {
+  "1. HYPOTHESIS": "stated before the first leg in preregistration.json (P5-A hypothesis, build, the in-image check, the hard correctness gate, S1/S2 per round and pooled, the P5-B gate and block design with its container choice, the P5-C rules including the drift rule), committed at 504cf101; no amendment.",
+  "2. EVIDENCE": "every figure is computed by working/scripts/p5_report.py and p5_write_specs.py from analysis_p5a.json (p5_analyse_a.py over the raw smoke legs), (P5-B did not run, so there is no analysis_p5b.json), analysis_p5_drift.json, the build record, the gate-control record, the gate records and the chain records; the brief from p4_facts.json and the P5 analysis files.",
+  "3. NULL CONTROL": "every gate ran whole in its real runtime against a positive and a null control before launch (gate_controls.json, real control legs for every G_cell flavour, the in-image check in both images); the laptop worker test has a mis-routing null control; the blind recomputation's planted figures had to be caught.",
+  "4. REGISTER": "3 (one session); 48 (blind recomputation); 54, 55 (hard gates, the sampler gated after the first leg); 56-58 (gates tested whole; containers' users); 59 (reading clauses against the hypothesis); 61 (a gate reads the record its writer finalises last: D0 from the export); 62 (ABAB rounds, the canary); 63 (the steady-phase metric).",
+  "5. NOT VERIFIED": "whether P5's gain holds on other videos, other T or other hardware; why the box drifts between rounds (the canary describes it, nothing explains it); the P5 node beyond this benchmark's pipeline (source only, not a RocketRide change); the CTO brief is a draft.",
+  "6. GATES": "every P5 landing through working/harness/autoland.sh with its gates and the ls-remote read-back; box commands through box.sh; the gate controls before launch; hard gates after every leg; protected ids read back before and after the build and at stage start and end; the box stopped with box.sh stop and its state read back."
+ }
+}

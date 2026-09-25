@@ -1,0 +1,16 @@
+{
+ "figures_checked": 118,
+ "mismatches": [
+  {
+   "where": "P5-C (1) CTO brief draft, Video bullet \"P5 (single inference thread ...)\": P5 K=16 frames/s tagged [analysis_p5a.json cells.p5_k16.frames_per_s.mean]",
+   "figure": "P5 at 16 videos in flight, frames/s (cell mean)",
+   "report": "4.664",
+   "recomputed": "4.644"
+  }
+ ],
+ "unverifiable": [],
+ "notes": [
+  "Outside the verified scope (image ids were to be skipped): the Gates table G_build_A row shows image sha256:b42c03b69f12, but p5a_build.json image_id (and chain_p5_run_start/done rr:p5-infer, and every P5 G_cell record) begins sha256:b42c03b69f17. Not counted as a mismatch.",
+  "Scope counted: Gates table 46 figures (outcomes, per-leg/per-canary outcomes, 239 frames, T=4, 1,335 rows, pair identity and 16-video counts, S1/S2 verdicts, UNCHANGED, 7.5 h, WITHIN); Gate controls 32 (run 1, 28 controls, 28 as expected, all_pass True, and each of the 28 control outcomes with rc); CTO brief 35 (24 [Fnn] tags, the analysis_p4b.json steady ratio, 16/16 correctness, six analysis_p5a.json figures, S1/S2 verdicts, NOT FIRED); NOT RUN 5."
+ ]
+}

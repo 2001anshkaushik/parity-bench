@@ -1,0 +1,34 @@
+{
+ "label": "P5 blind recomputation: independent verifiers recompute every figure in their sections from raw files (the brief: trace each figure to its cited key); each report copy carries ONE planted wrong figure; the plant key was kept outside the repository until every verifier had finished",
+ "outcome": "PASS (round 1)",
+ "summary": "every plant caught (3 of 3), no other mismatch; 502 figures checked by 3 verifiers.",
+ "round_1": {
+  "outcome": "PASS",
+  "report_sha256": "909249fcf87b6c10d687b3ad09446e1d39ca79f5152e887184cde951b8239d98",
+  "verifiers": {
+   "A": {
+    "figures_checked": 191,
+    "plant": "Per cell, RR P5 K=1 frames/s mean: true 4.294, planted 4.249",
+    "mismatches_reported": 1,
+    "unverifiable": []
+   },
+   "B": {
+    "figures_checked": 193,
+    "plant": "D1 table, p5a_stock16_2 p90: true 0.3896, planted 0.3869",
+    "mismatches_reported": 1,
+    "unverifiable": []
+   },
+   "C": {
+    "figures_checked": 118,
+    "plant": "CTO brief, P5 K=16 frames/s: true 4.644, planted 4.664",
+    "mismatches_reported": 1,
+    "unverifiable": []
+   }
+  },
+  "plants_caught": "3 of 3",
+  "notes_checked": [
+   "verifier C noted, outside its scope, that the G_build_A row shows the image as sha256:b42c03b69f12; checked: the report and C's own copy show sha256:b42c03b69f17, equal to the build record's id — a misreading, no change"
+  ]
+ },
+ "after_round_1": "the final report differs from the verified copy only in the generation timestamp and this record's result line"
+}
