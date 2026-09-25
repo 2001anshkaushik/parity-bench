@@ -1,0 +1,123 @@
+{
+ "label": "P4 pre-registration (feat/parity-p4 from feat/parity-p3 f9f1efe7). Written and committed BEFORE the first leg; every hypothesis, reading rule and gate threshold is fixed here. Nothing below is changed after data exists; an amendment would be a NEW file, named as such.",
+ "written_utc": "2026-09-25T09:29:42Z",
+ "branch": {"name": "feat/parity-p4", "from": "feat/parity-p3", "at": "f9f1efe7e3730be12d9120edb75e3839894f0b95"},
+ "step0": {
+  "sso": "checked 2026-09-25T09:21Z: role credentials valid (refreshed from the 03:46Z approval; the SSO session has lasted ~15.5 h before, so it is expected to hold until ~19:15Z); not expired and not within 2 h of expiry -> no login",
+  "autoland_self_test": "71 pass, 0 fail",
+  "origin": "feat/parity-p3 on origin = f9f1efe7 (ls-remote); feat/parity-p4 created from it"
+ },
+ "recorded_correction": {
+  "who": "the advisor's error, recorded as instructed",
+  "text": "P3-B's 'ruled out beforehand' rested on P0's 'K=1 no faster than K=16', which was measured at the engine's default of 16 torch threads (batchsize_video_run.sh:122, the batch-size campaign's default posture: --rr-threads-env unset), not at T=4. It has no bearing on T=4 and is withdrawn as a premise. P4-A measures K=1 and K=16 at T=4 in one session."
+ },
+ "carried_rules": {
+  "mandate": "ONE engine process, ONE pipeline (one token), ONE model instance per model; threads unrestricted. LlamaIndex: ONE container, ONE uvicorn worker (WS1V_WORKERS=1), one detector.",
+  "D0": "read back on EVERY cell after every leg (G_d0 below); a violation, or absent D0 evidence, stops the run (exit 9)",
+  "rulings": "A (32 vCPU, unconstrained) and C (one workload at a time: every leg runs ALONE — no other container exists at its start)",
+  "retries": "at most two per leg (<leg>_r1, <leg>_r2); a leg whose driver exits non-zero but whose records hold a measured row for every video is DEGRADED-with-all-rows and is KEPT as the result (no retry)",
+  "launch_and_poll": "the chain runs under box.sh launch; the laptop polls; progress logs are NEW files (PROGRESS_LOG.md, PROGRESS_LOG_2.md, ...)",
+  "per_leg_session_facts": "steal (/proc/stat at open and close), CPU model, MHz at open and close, boot id; the percore sampler; the 1 Hz memory sampler on the service container, verified non-empty after the FIRST leg (G_memstat, exit 10)",
+  "images": "no new image is built in P4. rr:patched-video and li:video are used as they are; the P1 stamped detect copies are installed into each leg's CONTAINER writable layer only (p1_stamp.sh refuses unless the container's original has the base md5: RR 984d80e45e885b5ae21e987664850b4c, LI 2eff189a5bdba7e353194f1b9ef8d1e7). rr:patched and rr:patched-video ids are read back at chain start and at chain end (and li:video's beside them)",
+  "protected_ids": {"rr:patched": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+                    "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"}
+ },
+ "budget": "5 hours from the FIRST measured leg's start (P4_DEADLINE_EPOCH = that start + 18,000 s). A leg not started by the deadline is NOT RUN and reported as such. The gate-control leg (below) runs before the first measured leg and is not a measured leg. P4-B runs on the laptop while the box measures.",
+
+ "P4_A_video_concurrency": {
+  "hypothesis": "RocketRide's per-instance video gap is concurrency-induced: RR's forward pass degrades from 1 to 16 videos in flight more than LlamaIndex's does, because RR's device lock is held per FRAME, rotating 16 caller threads, while LlamaIndex's is held per VIDEO, serving one caller at a time.",
+  "evidence_before": [
+   "P3-B, 1 video in flight, same session: engine forward 0.190 s, bare 0.186 s, LlamaIndex service 0.192 s; engine 4.4 f/s against LlamaIndex 3.1 f/s (3-video slice)",
+   "16 in flight, CROSS-SESSION (P1-A, P2-B): RR forward 0.382 s against LI 0.283 s",
+   "P0 V3 source trace: RR's lock covers one Detector.detect call per frame (engine/nodes/detect/IInstance.py:106-107, lock from IGlobal.py:79-81 make_device_lock -> ai/common/models/base.py:241-252); LI's covers the whole per-video frame loop (li_video/pipeline.py:251)"
+  ],
+  "cells": {
+   "slice": "the 16-video AMI slice: the first 16 measured rows of ~/parity-bench-video/working/video/ami_video_manifest.jsonl (driver --n 16), the same 16 videos as P0 V1, P1-A and P2-B",
+   "T": "4: the six thread variables (OMP_NUM_THREADS, MKL_NUM_THREADS, OPENBLAS_NUM_THREADS, VECLIB_MAXIMUM_THREADS, NUMEXPR_NUM_THREADS, TORCH_NUM_THREADS) = 4 in the service container's environment on BOTH arms (RR additionally --rr-threads-env 4, as P2-B)",
+   "stamps": "the V2-derived P1 stamped detect copies on BOTH arms (per-frame forward pre/post hooks on the same root module, lock wait/hold, thread and process CPU across the forward; the one-time in-process read-back p1_readback.json)",
+   "rr_k1": "rr:patched-video, ONE token, K=1 (driver --blast-concurrency 1), P0_ONTOKEN D0",
+   "rr_k16": "rr:patched-video, ONE token, K=16 (--blast-concurrency 16), P0_ONTOKEN D0 — exactly P2-B's baseline RR cell",
+   "li_k1": "li:video, ONE container, ONE worker, K=1",
+   "li_k16": "li:video, ONE container, ONE worker, K=16 — exactly P2-B's LI cell",
+   "rr_k16_active": "rr_k16 plus OMP_WAIT_POLICY=ACTIVE in the service container's environment (the configuration discriminator); OMP_WAIT_POLICY is read back IN-PROCESS (p1_readback.json env, the detector's own os.environ) and must equal ACTIVE (G_cell)",
+   "order": "interleaved ABAB, two runs each, one session, every leg alone, a fresh container per leg: p4a_rr16_1 p4a_li16_1 p4a_rr1_1 p4a_li1_1 p4a_act_1 p4a_rr16_2 p4a_li16_2 p4a_rr1_2 p4a_li1_2 p4a_act_2",
+   "no_tracer": "no bpftrace, py-spy or other tracer on any leg"
+  },
+  "metrics_per_leg": {
+   "frames_per_s": "export throughput.total_frames / throughput.total_span_s (p0_analyse_video.load: the definition every banked video figure used)",
+   "measured_frames": "N = the sum of frames_observed over the LAST measured record per video without error; the stamp rows counted are the LAST N frame rows of p1_stamps.jsonl by t_wall (p1_analyse_e2.measured_frames; warm-up frames precede them)",
+   "forward_per_frame": "F = mean 'forward' (forward pre-hook to post-hook, CLOCK_MONOTONIC) over the measured frames that carry it; with the full D1 metric set (p0_analyse_video.metric_set: count, sum, share_of_run_total, min, mean, sd, p50, p90, p95, p99, max, mean_over_p50) for forward and every stamped component, run_total as P0 V2 defines it per arm",
+   "lock_duty": "P0 V2's duty cycle (p0_analyse_video.v2_components), on the P1 stamp file: RR = sum of per-frame lock_held / (max(t_wall + decode + lock_wait + lock_held + emit) - min t_wall) over measured frames; LI = sum of per-VIDEO lock_held over the videos released after the first measured frame began / (max t_wall_release - min measured-frame t_wall)",
+   "cores_busy_in_forward": "sum fw_proc_cpu / sum forward over measured frames carrying both (process CPU across the forward interval / its wall). KNOWN BIAS, stated now: at K=16 the process CPU across a forward includes other callers' concurrent non-forward work (decode, pre/post, emit), so at K=16 it is an upper bound on the forward's own cores",
+   "cpu_s_per_frame": "export efficiency.service_cpu_s / measured frames",
+   "caller_switch_rate": "over the measured frames that carry fw0_mono, ordered by fw0_mono (forward start): the share of consecutive pairs whose tid differs = count(tid_i != tid_(i-1)) / (n - 1)",
+   "caller_threads": "distinct tid over measured frames",
+   "session_facts": "steal share, MHz open/close, CPU model, boot id",
+   "memory": "the sampled memory peak (max 'total' in memstat.jsonl over the leg)"
+  },
+  "per_cell": "mean of the two legs; within-session replicate spread = |a - b| / ((a + b) / 2), for F and for f/s",
+  "CORRECTNESS_GATE": {
+   "rule": "the ACTIVE cell must be output-identical to RR K=16 on 16/16 videos: for EVERY pair (p4a_act_i, p4a_rr16_j) available, p0_analyse_video.identity reports videos_compared == 16 and identical (per-video chunk sha256 AND frame scores equal). If not: the ACTIVE cell is OUTPUT-CHANGING and NO speed reading (R2/R3) is given.",
+   "reported_beside": "RR K=16 run-to-run identity, RR K=1 vs RR K=16 identity, LI K=1 vs LI K=16 identity, LI run-to-run identity (context: K should not change output)",
+   "order": "correctness is reported BEFORE any speed figure"
+  },
+  "readings": {
+   "definitions": {
+    "degradation": "per arm, D = F(K=16 cell mean) / F(K=1 cell mean)",
+    "beyond": "by more than the larger within-session replicate spread (of F) of the cells involved",
+    "R1_threshold": "S1 = max(spread_F over rr_k1, rr_k16, li_k1, li_k16)",
+    "R2_threshold": "S2 = max(spread_F over rr_k16, rr_k16_active)"
+   },
+   "R1_CONCURRENCY_SPECIFIC": "SUPPORTED iff (D_RR / D_LI - 1 > S1) AND (mean f/s rr_k1 >= mean f/s li_k1). If R1 fails it is stated plainly: the gap is not concurrency-specific, naming which clause failed and what the K=1 cells show instead (their f/s and F on both arms).",
+   "R2_R3_precondition": "evaluated only if the CORRECTNESS_GATE passes AND RR degrades beyond its spreads: F(rr_k16)/F(rr_k1) - 1 > max(spread_F rr_k1, spread_F rr_k16). Otherwise R2/R3 are NOT EVALUABLE and the report says which condition failed.",
+   "closure": "c = (F(rr_k16) - F(rr_k16_active)) / (F(rr_k16) - F(rr_k1))",
+   "R2_POOL_WAKE_UP": "iff c >= 0.5 AND F(rr_k16)/F(rr_k16_active) - 1 > S2 (ACTIVE's reduction is itself beyond the spreads). The fix is CONFIG.",
+   "R3_NOT_WAKE_UP": "iff the precondition holds and R2 does not (c < 0.5, or ACTIVE's reduction is not beyond S2, including ACTIVE being slower). The degradation is caller interleaving or shared contention, and the P5 candidate is a single inference thread (P4-B item 3).",
+   "reported_beside_not_rules": "f/s for every cell; D_RR and D_LI; lock duty, cores busy, CPU-s/frame, caller switch rate per cell; the 0.82% RR floor; the sum of the four spreads (a ratio of ratios carries more noise than its largest part — context only, the rule stands as written)"
+  },
+  "gates": {
+   "G_alone": "before every leg: no container exists on the box (p4_gates.py alone); refusal -> the leg is not started (NOT_ALONE)",
+   "G_d0": "after every leg (p4_gates.py d0 <leg> rr|li). RR: no MANDATE_VIOLATION.json AND the export's p0 block (provenance_video.p0: the driver's post-leg record) holds d0_pre and d0_post read-backs (dicts; the driver writes a string when the post probe failed) and a mandate with mandate_violation false (absence fails). LI: the export's lifetime_state shows exactly ONE container at leg start and at leg end, holding ONE process each time, whose command line carries '--workers 1'. Fail -> exit 9, everything stops.",
+   "G_cell": "after every leg (p4_gates.py cell <leg> <arm> <K> <T> <ACTIVE|unset> <n>): the detector's in-process read-back (p1_readback.json) is present with torch.num_threads == T and env OMP_NUM_THREADS == T; env OMP_WAIT_POLICY == 'ACTIVE' for the ACTIVE cell and ABSENT for every other cell; the measured records hold n videos and the maximum number of videos in flight (overlap of the LAST measured record per video's [admit_ns, done_ns]) == K; p1_stamps.jsonl holds at least N frame rows and every one of the last N carries 'forward'. Fail -> exit 11, everything stops (the harness is not measuring the cell it names).",
+   "G_memstat": "after the FIRST leg: its memstat.jsonl has >= 1 row (p2_gates memstat). Fail -> exit 10.",
+   "G_correct_active": "the CORRECTNESS_GATE above, recorded once at chain end (p4_gates.py correct); not a stop.",
+   "exit_codes": "0 = pass / clean; 1 = fail / violation; 2 = evidence missing. The chain treats any non-zero as FAIL.",
+   "GATE_CONTROLS": "before launch, every gate runs WHOLE, in its real runtime (the box's ~/.venv Python on the box, docker for G_alone), against a known-good target that must PASS (rc 0) and a known-bad target that must FAIL (rc != 0), by p4_gate_controls.py. The chain's 'run' stage refuses unless the highest-numbered gate_controls record says all_pass. Targets (committed legs unless marked):",
+   "controls": {
+    "G_memstat": "positive P2 p2b_rr_base_a; null batchsize_smoke video_n16/rr_k16 (a real leg with no memory sampler)",
+    "G_d0 rr": "positive P2 p2b_rr_base_a; null batchsize_smoke video_n16/rr_k16 (a real RR leg with no on-token D0: absence); null a copy of p2b_rr_base_a holding MANDATE_VIOLATION.json; null a copy of p2b_rr_base_a whose export p0 mandate says violation",
+    "G_d0 li": "positive P2 p2b_li_a; null batchsize_smoke video_n16/li_k16 (a real LlamaIndex leg with EIGHT containers)",
+    "G_cell rr K=16 T=4 unset n=16": "positive P2 p2b_rr_base_a; null batchsize_smoke video_n16/rr_k16 (no read-back, default threads); null the control leg p4ctl_active (OMP_WAIT_POLICY=ACTIVE, K=2, n=2)",
+    "G_cell rr K=1 T=4 unset n=3": "positive P3 p3b_c_1 (K=1, T=4, stamped); null P2 p2b_rr_base_a with the same spec (K=16, n=16)",
+    "G_cell li K=16 T=4 unset n=16": "positive P2 p2b_li_a; null batchsize_smoke video_n16/li_k16 (no read-back)",
+    "G_cell li K=1 T=4 unset n=3": "positive P3 p3b_d_1; null P2 p2b_li_a with the same spec",
+    "G_cell rr ACTIVE": "positive the control leg p4ctl_active with its own spec (K=2, T=4, ACTIVE, n=2) — a REAL engine leg, run on the box before launch through the chain's own leg() with OMP_WAIT_POLICY=ACTIVE, T=4, K=2, 2 videos, stamped, P0_ONTOKEN; null P2 p2b_rr_base_a with the ACTIVE spec (K=16, T=4, ACTIVE, n=16)",
+    "G_d0 rr (control leg)": "the control leg p4ctl_active must also pass G_d0 rr (its own on-token D0)",
+    "G_correct_active": "positive P0 v1_rr_t4_a vs v1_rr_t4_b (identical 16/16); null P0 v1_rr_def_a vs v1_rr_t4_a (T=16 vs T=4: differs on 16/16); null P3 p3b_c_1 vs p3b_c_2 (identical but only 3 videos compared)",
+    "G_alone": "positive no container on the box; null one created (not started) container present"
+   },
+   "control_leg": "p4ctl_active is a gate-control target, not a measured leg: its figures are not readings and are not reported as results"
+  }
+ },
+
+ "P4_B_laptop": {
+  "(1)_steady_phase_smoke_metric": {
+   "label": "POST-HOC VALIDATION on committed data (the legs already exist; the rule below is fixed before the figures are computed)",
+   "definition": "P0's steady-phase docs/s (p0_analyse_docs.drain on the leg's measured rows, load_leg): t0 = min submit; L = max submit - t0 (the last submission); steady docs/s = (documents answered ok with completion - t0 <= L) / L",
+   "legs": "the 384-slice legs of P2-A (p2a_rr_a, p2a_rr_b, p2a_li_a, p2a_li_b), P3-A health (p3a_rr_h, p3a_li_h) and P3-C smoke (p3c_t1_a, p3c_t1_b, p3c_t2_a, p3c_t2_b, p3c_t4_a, p3c_t4_b)",
+   "check_1_ratio": "per session: P2-A ratio = mean(steady RR over p2a_rr_a, p2a_rr_b) / mean(steady LI over p2a_li_a, p2a_li_b); P3-A health ratio = steady p3a_rr_h / steady p3a_li_h. Each AGREES iff |ratio / R_full - 1| <= 0.0819, R_full = P3-A's full-scale span ratio 1.0664319 (analysis_p3docs.json P3_A.full.ratio_rr_over_li). Check 1 passes iff BOTH sessions agree.",
+   "check_2_ranking": "mean(steady over p3c_t4_a, p3c_t4_b) < mean(steady over p3c_t1_a, p3c_t1_b) (the full-scale sign: vars=4 slower). The margin against max(0.82%, both spreads) is reported beside; the rule is the sign.",
+   "verdict": "VALIDATES iff check 1 AND check 2. If it validates, a register entry is DRAFTED proposing steady-phase docs/s as the smoke metric for future throughput gates (draft only, in the campaign directory). If not, the report names the check(s) that failed. The span docs/s figures are reported beside for every leg."
+  },
+  "(2)_parser_close_out": {
+   "legs": "P3's committed full legs p3d_hyb_full (HYBRID) and p3a_rr_full (fixed Tika, rr:p1-tikafix, the P3-D full comparator), same session",
+   "definitions": "docs/s = span docs/s (ok / span, p0_analyse_docs.span_raw); chunks = sum n_chunks over ok rows of perdoc; chunks/s = chunks / the same span; CPU-s per chunk = cost.cpu_s (the engine container's CPU over the leg window) / chunks; chunks per ok document = chunks / ok",
+   "decomposition": "R_docs = docs/s(HYB)/docs/s(FIX); R_cpd = chunks-per-ok-doc(HYB)/chunks-per-ok-doc(FIX); R_chunks = chunks/s(HYB)/chunks/s(FIX); identity R_docs = R_chunks / R_cpd. Share of the docs/s gain that is fewer chunks = ln(1/R_cpd) / ln(R_docs); the rest, ln(R_chunks) / ln(R_docs), is chunk throughput. A share above 100% means HYBRID moves fewer chunks per second than fixed Tika and all of its docs/s gain is fewer chunks.",
+   "statement": "the closing statement gives HYBRID's docs/s gain and how much of it is fewer chunks, with figures only from committed artifacts"
+  },
+  "(3)_P5_design_draft": "a single inference thread for the detect node — frame ordering and per-video result routing, backpressure and memory bound, the correctness test (output-identical to stock at the same T), the in-bounds proof (one model, one process; threads only), and which P4-A readings make it the right next step. DRAFT only; nothing filed or sent.",
+  "(4)_CTO_facts_sheet": "one file listing every claimable figure across the campaign with its source artifact, session (boot id), n, and one caveat line; including 'matches, not beats' for P3-A, the unshipped-fix dependency, the CPU / memory / idle-spin costs and the out-of-box baseline. Every figure traces to a committed artifact; no prose beyond one caveat line per figure; withdrawn figures are not listed as claimable."
+ },
+
+ "deliverable": "one P4 report: the gate table with each gate's control results; correctness before speed; the P4-A reading stated plainly; the steady-phase validation result; the parser close-out; the P5 design draft; the facts sheet; anything NOT RUN with the reason. Then a blind recompute with planted figures; stop the box and read back its state."
+}
