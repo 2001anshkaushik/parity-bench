@@ -1,0 +1,24 @@
+[driver] driver lock held: /tmp/driver_video_llamaindex.lock (pid 8120)
+[driver] LI: warm_workers=1 declared=1 over 1 instance(s)  detect_impl=rfdetr
+[driver] preflight: manifest
+[driver] preflight: corpus_dir=/home/ssm-user/parity-bench-video/corpus/ami/full [manifest meta]
+[driver] preflight: container flags
+[driver] preflight: network mode {'li_bal_0': 'host'} (Crossroad 22: host, both arms)
+[driver] preflight: quiet box PASS foreign -0.0 vs threshold 2.0 — host busy 0.01 − containers 0.01 {'li_bal_0': 0.006} − ours 0.005 [instantaneous (/proc/stat busy − containers − ours)]; load1 3.58 (lagging, by-load1 foreign 3.54); 1 reading(s) over 4.1s, trend SINGLE READING
+[driver] preflight: read-backs (absence fails before agreement)
+[driver] idle burden: 0.00 cores with 1 instance(s) live = 0.0% of the box before any work (pre-instance baseline 0.006)
+[driver] preflight PASSED — llamaindex_video workers[declared_workers=1] leg=blast n=2
+[driver] cache eviction: rc=0 }
+[driver] warm-up: 2 disjoint items
+[driver] warm-up wave 1/2: 2 concurrent sends over 2 warm rows -> 1/1 worker pids observed
+[driver] warm-up consumed 2 send(s) over 2 warm rows (1 wave(s) x 2 concurrent (max(2 x 1 workers, leg concurrency 2)) — Crossroad 40; warm SET re-sent per Crossroad 32; warmth gated on warm markers, Crossroad 41)
+[driver] warm-up ledger: warmup_llamaindex_video_workers_blast.json
+[driver] warm-up gate: 1/1 warm markers present (Crossroad 41)
+[driver] warm-up distribution (REPORTED, not gated): 1/1 distinct response pids over 2 sends; busiest 2, quietest 2 — kernel accept skew, published
+[driver] warm-up complete: tokens=n/a worker_pids=1
+[driver] service CPU bracket: summing 1 container cgroup(s): li_bal_0
+[driver] lifetime_state leg_start: docker_root free 588.0 GiB | frag avg-extent 32591.1 KiB, >=4MiB share 0.9926 | li_bal_0: spool du 196 KiB/5 files, layer 233kB (virtual 9.08GB), cg anon 0.87 GiB, procs 1 rss 1.31 GiB
+[driver] stream residency: max 2 concurrent in-flight (cap = 2); sha pass off-loop via to_thread; no whole blob held (streaming refactor 2026-08-27, DIAG_M1_BLAST discipline kept)
+[driver] lifetime_state leg_end: docker_root free 588.0 GiB | frag avg-extent 32618.9 KiB, >=4MiB share 0.9926 | li_bal_0: spool du 436 KiB/5 files, layer 479kB (virtual 9.08GB), cg anon 0.89 GiB, procs 1 rss 1.34 GiB
+[driver] export: /home/ssm-user/parity-bench-p5/working/results/parity_p5_20260925T141647Z/p5ctl_li/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 2 (errors 0) / offered 2 | THROUGHPUT 3.751 frames/s (56.28x realtime), steady window undefined | SERVICE CPU 3.359 cores = 10.5% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok

@@ -1,0 +1,14 @@
+{
+ "container": "p5_canary",
+ "cgroup": "/sys/fs/cgroup/system.slice/docker-17da2798982ee72af48d9f296111625d1993e8262b72dad999042b0c88b82ff3.scope",
+ "hz": 1.0,
+ "samples": 55,
+ "sampled_peak_bytes": {
+  "anon": 821760000,
+  "file": 34254848,
+  "total": 874389504,
+  "anon_plus_file": 854077440
+ },
+ "memory_peak_lifetime_context_only": null,
+ "note": "sampled peaks are the P1 figure; memory.peak spans the container's whole lifetime (warm-up included) and is context only"
+}

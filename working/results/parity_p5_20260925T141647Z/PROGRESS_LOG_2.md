@@ -1,0 +1,7 @@
+# P5 progress log (part 2)
+
+- 14:17Z Landed the pre-registration and tooling at 504cf101. Box started (boot b9a0e24b); no container; rr:patched, rr:patched-video and li:video ids unchanged; the image's detect node carries IInstance 984d80e4… and IGlobal 9edc29c9… (the P5 files' origins); EN2001a's 239 frames present; worktree `~/parity-bench-p5` at 504cf101.
+- 14:19Z Build: rr:p5-infer (sha256:b42c03b6…) FROM rr:patched-video; G_build_A PASS — node identity, compiled, one frame end to end on the `detect-infer` thread, detections equal a direct detect(), ONE LWDETR; protected ids unchanged before and after (p5a_build.json). A small defect of mine: the base node files are owned 1001:1001; my `--chown` took the owner by NAME from `stat`, which printed UNKNOWN for that unnamed uid, and the copies ended root:root (mode 644 as the base). The engine runs as root, so loading is unaffected (the control legs below load and run the node); recorded, not fixed.
+- 14:20Z–14:33Z Control stage (gate-control targets, not measured legs): p5ctl_p5 (rr:p5-infer), p5ctl_stock (rr:patched-video), p5ctl_li (li:video), each K=2, 2 videos, stamped — all rc 0; the P5 leg's on-token D0 read ONE LWDETR and its read-back, taken on the inference thread, torch 4 threads with grad disabled; p5ctl_canary — G_canary PASS (239 of 239 manifest frames).
+- 14:33Z Gate controls (gate_controls.json, run 1, on the box): every control came out as expected, all_pass.
+- 14:34:10Z The run stage launched (`p5_run`); deadline 22:04:10Z.

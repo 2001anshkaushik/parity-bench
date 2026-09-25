@@ -1,0 +1,244 @@
+{
+ "label": "P5 gate controls: every gate run whole in its real runtime against a positive control (must PASS) and a null control (must FAIL), before launch",
+ "run": 1,
+ "run_utc": "2026-09-25T14:33:40Z",
+ "boot_id": "b9a0e24b-a331-46b7-bc08-80657140f463",
+ "python": "/home/ssm-user/.venv/bin/python",
+ "dry_run_no_docker": false,
+ "seconds": 11.1,
+ "control_targets_present": true,
+ "image_ids": {
+  "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+  "rr:p5-infer": "sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd",
+  "li:video": "sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95"
+ },
+ "controls": [
+  {
+   "gate": "G_memstat",
+   "control": "positive: P4 p4a_rr16_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_memstat",
+   "control": "null: batchsize_smoke rr_k16 (no memory sampler)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "positive: P4 p4a_rr16_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T14:33:29Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)\", \"mandate_violation_file\": false, \"mandate\": \"\\u2026\", \"lwdetr_counts\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "positive: the control leg p5ctl_p5 (rr:p5-infer)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T14:33:29Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)\", \"mandate_violation_file\": false, \"mandate\": \"\\u2026\", \"lwdetr_counts\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "null: batchsize_smoke rr_k16 (no on-token D0: absence)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T14:33:29Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)\", \"mandate_violation_file\": false, \"mandate\": null, \"lwdetr_counts\": \"\\u2026\", \"evidence_present\": false, \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "null: a copy of p4a_rr16_1 holding MANDATE_VIOLATION.json",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T14:33:29Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)\", \"mandate_violation_file\": true, \"mandate\": \"\\u2026\", \"lwdetr_counts\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"VIOLATION\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "null: a copy of p4a_rr16_1 whose post-leg D0 counts TWO LWDETR instances",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T14:33:29Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)\", \"mandate_violation_file\": false, \"mandate\": \"\\u2026\", \"lwdetr_counts\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"VIOLATION\"}"
+  },
+  {
+   "gate": "G_d0 li",
+   "control": "positive: P4 p4a_li16_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T14:33:29Z\", \"leg\": \"L\", \"arm\": \"li\", \"rule\": \"the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)\", \"export\": \"export_llamaindex_video_workers_blast.json\", \"containers\": \"\\u2026\", \"checks\": \"\\u2026\", \"service_peak_process_count\": 10, \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 li",
+   "control": "positive: the control leg p5ctl_li",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"arm\": \"li\", \"rule\": \"the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)\", \"export\": \"export_llamaindex_video_workers_blast.json\", \"containers\": \"\\u2026\", \"checks\": \"\\u2026\", \"service_peak_process_count\": 3, \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 li",
+   "control": "null: batchsize_smoke li_k16 (eight LlamaIndex containers)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"arm\": \"li\", \"rule\": \"the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)\", \"export\": \"export_llamaindex_video_workers_blast.json\", \"containers\": \"\\u2026\", \"checks\": \"\\u2026\", \"service_peak_process_count\": 22, \"evidence_present\": true, \"outcome\": \"VIOLATION\"}"
+  },
+  {
+   "gate": "G_cell stock",
+   "control": "positive: the control leg p5ctl_stock",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell p5",
+   "control": "positive: the control leg p5ctl_p5",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell li",
+   "control": "positive: the control leg p5ctl_li",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell stock",
+   "control": "null: p5ctl_p5 against the STOCK spec (image, stamps)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_cell p5",
+   "control": "null: p5ctl_stock against the P5 spec (image, node)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_cell stock",
+   "control": "null: p5ctl_stock against K=1 (two in flight)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_cell li",
+   "control": "null: batchsize_smoke li_k16 (no read-back, no image record)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_canary",
+   "control": "positive: the control canary p5ctl_canary",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_canary_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"manifest_subset\": \"v00_EN2001a\", \"frames_expected\": 239, \"frames_got\": 239, \"checks\": \"\\u2026\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_canary",
+   "control": "null: P3 p3b_a_1 (the same bench over all three videos)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_canary_L\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"leg\": \"L\", \"manifest_subset\": \"v00_EN2001a\", \"frames_expected\": 239, \"frames_got\": 695, \"checks\": \"\\u2026\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_correct",
+   "control": "positive: P0 v1_rr_t4_a vs v1_rr_t4_b (identical 16/16)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"n\": 16, \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_correct",
+   "control": "null: P0 v1_rr_def_a vs v1_rr_t4_a (T=16 vs T=4: differs on 16/16)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"n\": 16, \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_correct",
+   "control": "null: P3 p3b_c_1 vs p3b_c_2 (identical but 3 videos)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct\", \"decided_utc\": \"2026-09-25T14:33:30Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"n\": 16, \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_smoke_P5B",
+   "control": "positive: P5 K=16 cells = P4's stock K=1 legs (no slowdown, faster than stock K=16, above LI)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_smoke_P5B\", \"decided_utc\": \"2026-09-25T14:33:31Z\", \"rule\": \"fires iff the correctness gate passed AND S1 holds AND S2 holds (pooled; per round reported beside)\", \"correctness_gate\": true, \"S1\": \"\\u2026\", \"S2\": \"\\u2026\", \"outcome\": \"FIRED\"}"
+  },
+  {
+   "gate": "G_smoke_P5B",
+   "control": "null: P5 K=16 cells = P4's ACTIVE legs (the K=16 slowdown kept)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_smoke_P5B\", \"decided_utc\": \"2026-09-25T14:33:32Z\", \"rule\": \"fires iff the correctness gate passed AND S1 holds AND S2 holds (pooled; per round reported beside)\", \"correctness_gate\": true, \"S1\": \"\\u2026\", \"S2\": \"\\u2026\", \"outcome\": \"NOT FIRED\"}"
+  },
+  {
+   "gate": "G_build_A",
+   "control": "positive: rr:p5-infer (the P5 node loads; one frame end to end on the inference thread; one LWDETR)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "P5_CHECK {\"ok\": true, \"node_md5\": {\"IGlobal.py\": \"22fc2536b8b3bebdcc708375f9aa52e5\", \"IInstance.py\": \"780202974588b9d85287f2096c0b67bb\", \"infer_worker.py\": \"b522c83ffeed93dca8de340e3b0b8799\"}, \"identity_ok\": true, \"compiled\": true, \"frame_end_to_end\": true, \"n_dets\": 4, \"detect_ran_on\": \"detect-infer\", \"infer_thread\": \"detect-infer\", \"same_as_direct\": true, \"torch_num_threads\": 16, \"lwdetr_instances\": 1}"
+  },
+  {
+   "gate": "G_build_A",
+   "control": "null: rr:patched-video (fails the node-identity check)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "P5_CHECK {\"ok\": false, \"node_md5\": {\"IGlobal.py\": \"9edc29c94a5a34ba366d938d048e89fd\", \"IInstance.py\": \"984d80e45e885b5ae21e987664850b4c\", \"infer_worker.py\": null}, \"identity_ok\": false, \"why\": \"node identity: the image's detect node is not the P5 source\"}"
+  },
+  {
+   "gate": "G_alone",
+   "control": "positive: no container on the box",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "containers present: 0"
+  },
+  {
+   "gate": "G_alone",
+   "control": "null: one created container present",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "containers present: 1 "
+  }
+ ],
+ "n": 28,
+ "n_pass": 28,
+ "all_pass": true
+}

@@ -1,0 +1,48 @@
+{
+ "built_utc": "2026-09-25T14:19:37Z",
+ "image": "rr:p5-infer",
+ "image_id": "sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd",
+ "from": "rr:patched-video",
+ "protected_ids_before_and_after": [
+  "rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+ ],
+ "base_node": [
+  "984d80e45e885b5ae21e987664850b4c  IInstance.py",
+  "9edc29c94a5a34ba366d938d048e89fd  IGlobal.py",
+  "UNKNOWN:UNKNOWN 644 IInstance.py",
+  "UNKNOWN:UNKNOWN 644 IGlobal.py"
+ ],
+ "expected_p5_md5": {
+  "IGlobal.py": "22fc2536b8b3bebdcc708375f9aa52e5",
+  "IInstance.py": "780202974588b9d85287f2096c0b67bb",
+  "infer_worker.py": "b522c83ffeed93dca8de340e3b0b8799"
+ },
+ "in_image_node": [
+  "22fc2536b8b3bebdcc708375f9aa52e5  IGlobal.py",
+  "780202974588b9d85287f2096c0b67bb  IInstance.py",
+  "b522c83ffeed93dca8de340e3b0b8799  infer_worker.py",
+  "root:root 644 IGlobal.py",
+  "root:root 644 IInstance.py",
+  "root:root 644 infer_worker.py"
+ ],
+ "in_image_check": {
+  "ok": true,
+  "node_md5": {
+   "IGlobal.py": "22fc2536b8b3bebdcc708375f9aa52e5",
+   "IInstance.py": "780202974588b9d85287f2096c0b67bb",
+   "infer_worker.py": "b522c83ffeed93dca8de340e3b0b8799"
+  },
+  "identity_ok": true,
+  "compiled": true,
+  "frame_end_to_end": true,
+  "n_dets": 4,
+  "detect_ran_on": "detect-infer",
+  "infer_thread": "detect-infer",
+  "same_as_direct": true,
+  "torch_num_threads": 16,
+  "lwdetr_instances": 1
+ },
+ "in_image_check_rc": 0,
+ "gate_G_build_A_pass": true
+}
