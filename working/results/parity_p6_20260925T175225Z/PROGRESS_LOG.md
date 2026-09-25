@@ -1,0 +1,6 @@
+# P6 progress log (part 1)
+
+- 17:43Z Step 0. SSO: role credentials valid to 19:31Z — within 2 h of expiry, so a login was required; `box.sh login` opened the authorization page and Ansh approved it at 17:44Z. `feat/parity-p6` created from `feat/parity-p5` at c76bb99c (origin agrees); autoland self-test all pass.
+- One harness change, opt-in: the video driver's `--warm-sends N --warm-concurrency C` (P6 warm symmetry: the same warm set on both arms, declared in the warm-up ledger). Laptop test `p6_warm_test.py` passes, including its null control; the existing `test_warmup_distribution.py` passes unchanged.
+- Tooling: `p6_gates.py` (P5's gates plus the out-of-box G_cell form, G_warm and G_smoke_P6B), `p6_analyse.py` (P6-A, P6-B, P6-C), `p6_gate_controls.py`, `p6_chain.sh` (control, run: P6-A, the P6-B block runner with warm symmetry, P6-C). The laptop dry run of the controls behaved as expected wherever the box's control legs were not needed.
+- `preregistration.json` written: the recorded P5 verdict and register 64's lesson; P6-A with FIXED tolerances (Q1 >= 0.95, Q2 >= 1.20) and forward degradation descriptive only; the P6-B gate; P6-B's warm symmetry; P6-C's cells, reference and readings, with the cross-stage comparison flagged as not ABAB-protected; P6-D.

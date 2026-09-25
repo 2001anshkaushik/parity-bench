@@ -1,0 +1,75 @@
+{
+ "label": "P6 pre-registration (feat/parity-p6 from feat/parity-p5 c76bb99c). Written and committed BEFORE the first leg; every hypothesis, reading rule and gate threshold is fixed here. Nothing below changes after data exists; an amendment would be a NEW file, named as such.",
+ "written_utc": "2026-09-25T17:52:25Z",
+ "branch": {"name": "feat/parity-p6", "from": "feat/parity-p5", "at": "c76bb99cf7b3eb99c00ea5ce3ffd16e5026d8155"},
+ "step0": {
+  "sso": "checked 17:43Z: role credentials valid to 19:31Z — within 2 h of expiry, so a login was required; Ansh approved it at 17:44Z (the new SSO session carries a refresh token and outlasts the 8 h budget)",
+  "autoland_self_test": "71 pass, 0 fail",
+  "origin": "feat/parity-p5 on origin = c76bb99c; feat/parity-p6 created from it"
+ },
+ "recorded": {
+  "p5_verdict_stands": "P5's verdict stands unchanged: S1 does not hold, P5-B NOT RUN. P6 is a NEW experiment informed by P5's data, not a re-reading of P5.",
+  "register_64_applied": "every equivalence or superiority claim in P6 uses a FIXED tolerance stated here, never a noise-derived one. P5's forward clause asked for zero degradation under concurrent decoding, which LlamaIndex itself does not achieve (1.40x in P4); P6 reports forward degradation as a number and never gates on it."
+ },
+ "carried_rules": {
+  "mandate": "ONE engine process, ONE pipeline (one token), ONE model instance per model; threads unrestricted. D0 after every leg and block (G_d0: RocketRide on-token D0 pre and post, mandate clean, exactly ONE LWDETR; LlamaIndex one container, one process, --workers 1); a violation or absent evidence stops the run (exit 9).",
+  "rulings": "A (32 vCPU, unconstrained) and C (one workload at a time)",
+  "retries": "at most two per smoke leg; DEGRADED-with-all-rows kept. P6-B blocks are not retried (a retry would break the alternation); a failed block is recorded FAILED.",
+  "abab_and_canary": "every comparison interleaved ABAB inside its stage; the canary (the P3-B bare microbenchmark in rr:patched-video on v00_EN2001a's 239 frames, T=4, one caller, alone) before every round and in P6-B before block 1 and after block 6; it explains drift and adjusts nothing",
+  "per_leg": "steal, CPU model, MHz, boot id; percore sampler; 1 Hz memory sampler verified non-empty after the first leg (exit 10)",
+  "images": "NO build: rr:p5-infer (sha256:b42c03b6…, P5's image) is used as it is — the chain refuses unless its id reads back as P5's; rr:patched, rr:patched-video, li:video and rr:p5-infer ids read back at every stage's start and end",
+  "driver_change": "one harness change, opt-in: working/video/driver_video.py --warm-sends N --warm-concurrency C (P6 warm symmetry: exactly N warm sends over the warm rows at concurrency C, the same policy on both arms, recorded in the warm-up ledger as warm_sends_declared / warm_concurrency_declared; the per-arm coverage gates still apply). Without the flags the driver is unchanged (Crossroad 40). Laptop test working/scripts/p6_warm_test.py, with a null control; the existing test_warmup_distribution.py passes unchanged."
+ },
+ "budget": "8 hours from the run stage's first leg (P6_DEADLINE_EPOCH = that start + 28,800 s). Order: P6-A smoke, P6-B (only if its gate fires), P6-C. P6-D on the laptop. Past the budget the leg or block in flight finishes and the rest is NOT RUN; report; stop the box.",
+
+ "P6_A": {
+  "hypothesis": "rr:p5-infer at K=16 runs at least 0.95 of one LlamaIndex instance, and at least 1.20x stock.",
+  "evidence_before": ["P5, one session, output identical 16/16: P5 over LlamaIndex 1.349 in round 1, 1.397 in round 2", "P5 over stock: +75.5% in round 1, +73.0% in round 2"],
+  "cells": "the 16-video AMI slice, T=4 (six vars = 4), stamped, two ABAB rounds, each after the canary: p6c_can_a<r>, p6a_stock16_<r> (rr:patched-video, one token, K=16), p6a_p5k16_<r> (rr:p5-infer, one token, K=16), p6a_li16_<r> (li:video, one instance, K=16)",
+  "CORRECTNESS": "HARD, after each round's P5 leg (G_correct_A<r>): p6a_p5k16_<r> output identical (per-video chunk sha256 AND frame scores) to p6a_stock16_<r> on 16/16 videos. A failure stops P6 (exit 13): OUTPUT-CHANGING, no speed reading.",
+  "readings": {
+   "tolerances": "FIXED, stated now",
+   "Q1_PARITY": "holds iff fps(P5 K=16) / fps(LI K=16) >= 0.95",
+   "Q2_SPEEDUP": "holds iff fps(P5 K=16) / fps(stock K=16) >= 1.20",
+   "per_round_and_pooled": "each read per round (that round's legs) and pooled (the cell means of the two rounds)",
+   "DESCRIPTIVE_ONLY": "forward degradation: the P5 forward at K=16 (mean, p50, p99 of the cell) over P5's K=1 forward reference (the committed parity_p5 p5a_p5k1_1/2: the means of their mean, p50 and p99) — reported as numbers, CROSS-SESSION, never gated",
+   "frames_per_s": "export total_frames / total_span_s; the per-leg metrics are P5's (p5_analyse_a.leg)"
+  },
+  "SMOKE_GATE_P6B": "G_smoke_P6B fires iff correctness holds in both rounds AND Q1 holds in round 1 AND in round 2 AND pooled. Q2 is reported and does not gate."
+ },
+
+ "P6_B": {
+  "run_only_if": "G_smoke_P6B fired",
+  "design": "RR P5 K=16 vs LI one instance K=16, T=4, stamped; the 168-video slice (the first 168 measured manifest rows) in 11 blocks (10 x 16, then 8), arms alternating block by block (odd blocks RR first, even blocks LI first), each arm processing all 168 exactly once; one container per arm for the whole stage, the idle arm PAUSED (docker pause), its cgroup CPU over every block recorded",
+  "warm_symmetry": "fixes the P5 runner. At container start each arm runs its one-time long warm-up: 16 warm sends at concurrency 16 (LlamaIndex's Crossroad 40 K=16 wave; RocketRide given the same) through --warm-sends 16 --warm-concurrency 16, in a start-warm driver run whose one measured video (the first of the 168) is EXCLUDED from measurement (p6b_<arm>_startwarm). After EVERY resume both arms process the same small warm set — 2 warm sends at concurrency 2 (--warm-sends 2 --warm-concurrency 2) — inside the block's own driver run (RocketRide's model lives in the run's task process), excluded from measurement.",
+  "gates_per_block": "G_d0, G_cell (T=4, K=16, n = the block's videos) and G_warm (the ledger declares and shows exactly 2 sends at concurrency 2, every one served; 16 at 16 for the start warms); a failure stops the stage",
+  "canary": "before block 1 (both service containers paused, none running) and after block 6",
+  "report": "per-arm total frames/s (sum of frames / sum of the blocks' spans) and the ratio RR/LI against Q1's 0.95; the per-block ratio distribution (min, p50, max); errors, D0, cell and warm outcomes per block; the paused arm's CPU per block",
+  "CORRECTNESS": "P5 output per video identical to the banked P1-D stock RR T=4 168-video output (parity_p1_20260923T184000Z/v1full_rr_t4); every differing video named"
+ },
+
+ "P6_C": {
+  "hypothesis": "With a single inference thread, more intra-op threads now speed up the forward, because callers no longer contend for the model.",
+  "evidence_before": ["RR's out-of-box posture is torch 16 threads", "S5-A's finding that T=16 was no faster than T=2 was measured with 16 contending callers", "P5's inference thread is 99.97% busy, so frames/s is bound by forward time alone"],
+  "cells": "the 16-video slice, K=16, two ABAB rounds, each after the canary: p6c_p5t16_<r> (rr:p5-infer with the six thread variables UNSET, as out of box; the driver's --rr-threads-env unset) and p6c_lit16_<r> (li:video one instance with the six variables = 16). Torch threads read back in-process on both (P5: on the inference thread); G_cell requires 16 on both and, for P5, the six variables absent.",
+  "CORRECTNESS": "p6c_p5t16_1 output identical on 16/16 videos to the committed out-of-box RR output (the default-posture 16-video leg of V1: parity_p0_20260923T083031Z/v1_rr_def_a — P1-A ran no default-posture leg; P0's V1 is the committed out-of-box reference). HARD for P6-C: if it differs, P6-C stops and gives no speed reading.",
+  "readings": {
+   "T16_FORWARD": "fixed tolerance: F(P5 T=16) / F(P5 T=4) <= 0.95 (faster by at least 5%), F(P5 T=4) = P6-A's p6a_p5k16 cell; per round (P6-C round r against P6-A round r) and pooled (cell means)",
+   "T16_PARITY": "fps(P5 T=16) / fps(LI T=16), reported against 0.95",
+   "not_interleaved": "the T=16 vs T=4 comparison crosses stages of the session (P6-A, then P6-B, then P6-C), as the question specifies; it is NOT ABAB-protected. The canary per round (P6-A and P6-C) is reported beside it and adjusts nothing."
+  },
+  "no_full_run": true
+ },
+
+ "P6_D_laptop": {
+  "(1)_CTO_brief": "update the P5 draft with P6's analysis keys (working/scripts/p6_brief.py, every figure read and cited): it states explicitly that docs compares ONE token against LlamaIndex's 24-worker optimum; that video compares ONE token against ONE LlamaIndex instance; and LlamaIndex's multi-instance video configuration (8 instances x 4 threads, 13.52 frames/s, Stage 4: batchsize_s4_20260921T013303Z/p5_li_video/analysis_video.json) as a context line, never hidden. It keeps 'matches, not beats' for docs, the unshipped wrapper fix and its image-lane caveat, the CPU/memory/idle-spin costs and the out-of-box baseline. Draft only: not sent, posted or filed.",
+  "(2)_upstream_patch_description": "a draft for the single inference thread: what changed (IGlobal, IInstance, infer_worker.py), the output-identity evidence, the mandate compliance (one model, threads only), the measured speedup, CPU and memory, the known residual (the forward degradation value and its p99 tail), and what a reviewer should test. Draft only."
+ },
+
+ "gates": {
+  "list": "G_alone before every leg; G_d0, G_cell after every leg and block; G_warm where a warm set is declared; G_memstat after the first leg; G_canary after every canary; G_correct_A1/A2 (hard); G_smoke_P6B; G_correct_C1 (hard for P6-C)",
+  "GATE_CONTROLS": "p6_gate_controls.py runs every gate whole in its real runtime against a positive (must PASS) and a null (must FAIL) before launch; the run stage refuses without an all_pass record. Control targets: committed legs (P0, P3, P5, batch-size smoke) and the control stage's real legs p6ctl_p5t16 (rr:p5-infer, six vars unset), p6ctl_lit16 (li:video T=16), p6ctl_warm_rr and p6ctl_warm_li (T=4, --warm-sends 2 --warm-concurrency 2) — each K=2, 2 videos, stamped, through the chain's own leg(); gate-control targets, not measured legs."
+ },
+
+ "deliverable": "one P6 report: the gate table with each gate's control results; correctness before speed; Q1 and Q2 per round and pooled; the P6-B result or NOT RUN; the P6-C reading; the canary drift note; both drafts. Blind recompute with planted figures. Stop the box and read back its state."
+}

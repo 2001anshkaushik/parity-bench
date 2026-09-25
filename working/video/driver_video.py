@@ -1905,7 +1905,22 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
         finally:
             entry['wall_s'] = round(time.monotonic() - t0, 3)
 
-    if args.arm == 'rocketride':
+    if getattr(args, 'warm_sends', None):
+        # P6 WARM SYMMETRY (2026-09-25, parity_p6 preregistration P6_B): opt-in, both arms get the SAME
+        # warm set — exactly N sends over the warm rows (re-sent when exhausted, Crossroad 32) at
+        # concurrency C — so an instance resumed from pause starts a block equally warm on either arm.
+        # The coverage gates below (RR tokens touched, LI warm markers) still apply unchanged.
+        sem = asyncio.Semaphore(args.warm_concurrency)
+
+        async def sem_warm(row):
+            async with sem:
+                await warm_one(row)
+
+        await asyncio.gather(*[sem_warm(warm[k % len(warm)]) for k in range(args.warm_sends)])
+        policy = (f'P6 warm symmetry: {args.warm_sends} send(s) at concurrency {args.warm_concurrency} over '
+                  f'{len(warm)} warm rows, the same on both arms (--warm-sends/--warm-concurrency)')
+        say(f'warm-up consumed {len(ledger)} send(s) ({policy})')
+    elif args.arm == 'rocketride':
         # Tokens are DRIVER-ADDRESSED round-robin (_next_token): a
         # sequential top-up reaches a NEW token every send, so coverage is
         # by construction and kernel accept plays no part. This arithmetic
@@ -2041,6 +2056,8 @@ async def run_warmup(args, arm, posture, warm, pf, out_dir, stem) -> None:
     warm_path = out_dir / f'warmup_{stem}.json'
     warm_path.write_text(json.dumps({
         'arm': arm.name, 'leg': args.leg, 'posture': posture.name, 'policy': policy,
+        'warm_sends_declared': getattr(args, 'warm_sends', None),
+        'warm_concurrency_declared': getattr(args, 'warm_concurrency', None),
         'gate': {'rule': 'warm markers via /health (Crossroad 41)',
                  'warm_workers': warm_markers, 'declared_workers': warm_declared,
                  'tokens_seen': sorted(seen_tokens) or None},
@@ -2133,6 +2150,11 @@ async def amain() -> int:
                          'readbacks) against live containers, then stop cleanly — the '
                          'minute-zero plan check runs this so a leg cannot die at minute 40 '
                          'on a preflight the plan check never exercised (2026-08-26)')
+    ap.add_argument('--warm-sends', type=positive_int('warm-sends', 256), default=None,
+                    help='P6 warm symmetry (opt-in): exactly N warm sends over the warm rows, the same policy on '
+                         'both arms; requires --warm-concurrency. Default: the per-arm policies (Crossroad 40).')
+    ap.add_argument('--warm-concurrency', type=positive_int('warm-concurrency', 256), default=None,
+                    help='P6 warm symmetry: concurrency of the --warm-sends sends')
     ap.add_argument('--skip-warmup', action='store_true',
                     help='resume aid ONLY — a fresh container without warm-up is not measurable')
     ap.add_argument('--no-collector', action='store_true')
@@ -2187,6 +2209,11 @@ async def amain() -> int:
                     help='cross-arm gates over two completed record files; no run')
     args = ap.parse_args()
 
+    if (args.warm_sends is None) != (args.warm_concurrency is None):
+        raise SystemExit('NOT DONE — --warm-sends and --warm-concurrency go together (P6 warm symmetry): '
+                         'one without the other is not a declared warm policy.')
+    if args.warm_sends is not None and args.skip_warmup:
+        raise SystemExit('NOT DONE — --warm-sends with --skip-warmup: a declared warm set that never runs.')
     if args.arm == 'rocketride' and args.rr_threads_env is None:
         raise SystemExit('NOT DONE — --rr-threads-env is required for the rocketride arm '
                          '(an int or "unset"): the thread env is a declared, read-back value '
