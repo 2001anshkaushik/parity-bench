@@ -63,13 +63,20 @@ def main() -> int:
             L.append(f"- **Known residual (descriptive, cross-session).** Its forward at 16 in flight is {d['F_over_ref_minus_1'] * 100:+.1f}% "
                      f"over one video in flight [P6_A.descriptive_forward_degradation.F_over_ref_minus_1]: median {d['p50_over_ref_minus_1'] * 100:+.1f}%, "
                      f"p99 {d['p99_over_ref_minus_1'] * 100:+.1f}% [..p50_over_ref_minus_1, ..p99_over_ref_minus_1] — a tail.")
-    if b:
+    if b and not b.get("complete_168") and (b.get("paired_blocks") or {}).get("ratio_rr_over_li") is not None:
+        pb, dist = b["paired_blocks"], b["per_block_ratio_distribution"]
+        L.append(f"- **Block-interleaved confirmation, INCOMPLETE (the budget):** {len(pb['blocks'])} of 11 blocks ran on both arms "
+                 f"({pb['per_arm']['rr']['videos']} of 168 videos) [P6_B.paired_blocks]: RocketRide {pb['per_arm']['rr']['total_frames_per_s']:.3f} vs one LlamaIndex "
+                 f"instance {pb['per_arm']['li']['total_frames_per_s']:.3f} frames/s, ratio {pb['ratio_rr_over_li']:.3f} [P6_B.paired_blocks.ratio_rr_over_li] against 0.95; "
+                 f"per block {dist['min']:.3f} to {dist['max']:.3f} (median {dist['p50']:.3f}) [P6_B.per_block_ratio_distribution]; output vs the banked stock run: "
+                 f"{b['correctness_vs_p1d']['identical']} of {b['correctness_vs_p1d']['videos_compared']} videos identical [P6_B.correctness_vs_p1d].")
+    elif b:
         dist = b["per_block_ratio_distribution"]
         L.append(f"- **168 videos, block-interleaved:** RocketRide {b['per_arm']['rr']['total_frames_per_s']:.3f} vs LlamaIndex "
                  f"{b['per_arm']['li']['total_frames_per_s']:.3f} frames/s [P6_B.per_arm.*.total_frames_per_s], ratio {b['ratio_rr_over_li_totals']:.3f} "
                  f"[P6_B.ratio_rr_over_li_totals] against 0.95; per block {dist['min']:.3f} to {dist['max']:.3f} (median {dist['p50']:.3f}) "
                  f"[P6_B.per_block_ratio_distribution]; output vs the banked stock run: "
-                 f"{'identical on all ' + str(b['correctness_vs_p1d']['videos_compared']) if b['correctness_vs_p1d']['pass'] else str(len(b['correctness_vs_p1d']['differ'])) + ' differ'} "
+                 f"{'identical on all ' + str(b['correctness_vs_p1d']['videos_compared']) if b['correctness_vs_p1d']['all_compared_identical'] else str(len(b['correctness_vs_p1d']['differ'])) + ' differ'} "
                  "[P6_B.correctness_vs_p1d].")
     else:
         gf = camp / "gates" / "G_smoke_P6B.json"

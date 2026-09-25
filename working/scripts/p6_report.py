@@ -173,6 +173,13 @@ def main() -> int:
         pa, dist = B["per_arm"], B["per_block_ratio_distribution"]
         body += table(["arm", "blocks", "videos", "errors", "frames", "Σ span s", "total frames/s"],
                       [[k, n(v["blocks"]), n(v["videos"]), n(v["errors"]), n(v["frames"]), f(v["span_s"], 1), f(v["total_frames_per_s"])] for k, v in pa.items()])
+        pb = B.get("paired_blocks") or {}
+        if pb:
+            body += table(["arm, over the blocks BOTH arms ran", "blocks", "videos", "frames", "Σ span s", "total frames/s"],
+                          [[k, n(v["blocks"]), n(v["videos"]), n(v["frames"]), f(v["span_s"], 1), f(v["total_frames_per_s"])] for k, v in pb["per_arm"].items()])
+            body += [f"All 168 videos on both arms: **{'yes' if B.get('complete_168') else 'NO (the budget; see NOT RUN)'}**. Over the {n(len(pb['blocks']))} blocks both arms ran "
+                     f"(beside the pre-registered totals, so both arms cover the same videos): RR/LI **{f(pb['ratio_rr_over_li'])}** "
+                     f"({'meets' if pb['meets_q1_bar'] else 'does not meet'} 0.95).", ""]
         body += [f"RR/LI of the totals: **{f(B['ratio_rr_over_li_totals'])}** against Q1's 0.95 ({'meets' if B['ratio_meets_q1_bar'] else 'does not meet'}); "
                  f"per-block ratio over {n(dist['blocks'])} blocks: min {f(dist['min'])}, p50 {f(dist['p50'])}, max {f(dist['max'])}. Start warms: "
                  + ", ".join(f"{k}: {v}" for k, v in B["start_warm"].items()) + ".", ""]

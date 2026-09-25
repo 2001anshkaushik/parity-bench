@@ -48,10 +48,15 @@ else:
     S.append(f"P6-A: {rd.get('Q1', {}).get('verdict')}.")
 if B:
     pa, dist, cr = B["per_arm"], B["per_block_ratio_distribution"], B["correctness_vs_p1d"]
+    pb = B.get("paired_blocks") or {}
+    if not B.get("complete_168") and pb.get("ratio_rr_over_li") is not None:
+        S.append(f"P6-B did NOT complete within the budget: {len(pb['blocks'])} of 11 blocks ran on both arms ({pb['per_arm']['rr']['videos']} of 168 videos each). "
+                 f"Over those blocks RocketRide P5 runs {pb['per_arm']['rr']['total_frames_per_s']:.3f} vs one LlamaIndex instance {pb['per_arm']['li']['total_frames_per_s']:.3f} "
+                 f"frames/s — ratio {pb['ratio_rr_over_li']:.3f} ({'meets' if pb['meets_q1_bar'] else 'does not meet'} 0.95).")
     S.append(f"P6-B (168 videos, block-interleaved, warm-symmetric): RocketRide P5 {pa['rr']['total_frames_per_s']:.3f} vs one LlamaIndex instance "
              f"{pa['li']['total_frames_per_s']:.3f} frames/s — ratio {B['ratio_rr_over_li_totals']:.3f} against 0.95 ({'meets' if B['ratio_meets_q1_bar'] else 'does not meet'}); "
              f"per block {dist['min']:.3f} to {dist['max']:.3f} (median {dist['p50']:.3f}); output vs the banked stock run: "
-             f"{'identical on all ' + str(cr['videos_compared']) if cr['pass'] else str(len(cr['differ'])) + ' of ' + str(cr['videos_compared']) + ' differ'}.")
+             f"{'identical on all ' + str(cr['videos_compared']) if cr['all_compared_identical'] else str(len(cr['differ'])) + ' of ' + str(cr['videos_compared']) + ' differ'}.")
     others = [x["other_container_cpu_s_during_block"] for x in B["blocks"].values() if x and x.get("other_container_cpu_s_during_block") is not None]
     R["B"] = (f"{pa['rr']['blocks']} RocketRide and {pa['li']['blocks']} LlamaIndex blocks ran ({pa['rr']['videos']} and {pa['li']['videos']} videos; errors "
               f"{pa['rr']['errors']} and {pa['li']['errors']}). " + ("Blocks NOT RUN: " + ", ".join(B["blocks_not_run"]) + ". " if B["blocks_not_run"] else "Every block ran. ")

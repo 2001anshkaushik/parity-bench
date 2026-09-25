@@ -161,6 +161,15 @@ def analyse_b(camp: Path) -> Optional[Dict[str, Any]]:
         per_arm[arm] = {"blocks": len(xs), "videos": sum(x["videos"] for x in xs), "errors": sum(x["errors"] for x in xs),
                         "frames": fr, "span_s": sp, "total_frames_per_s": fr / sp if sp else None}
     both = [b for b in range(1, 12) if blocks.get(f"p6b_rr_b{b:02d}") and blocks.get(f"p6b_li_b{b:02d}")]
+    # beside the pre-registered totals (each arm over the blocks IT ran): the same over the blocks BOTH arms ran, so an
+    # incomplete stage (the budget) still compares the same videos on both arms
+    paired = {}
+    for arm in ("rr", "li"):
+        xs = [blocks[f"p6b_{arm}_b{b:02d}"] for b in both]
+        fr, sp = sum(x["frames"] for x in xs), sum(x["span_s"] for x in xs)
+        paired[arm] = {"blocks": len(xs), "videos": sum(x["videos"] for x in xs), "frames": fr, "span_s": sp,
+                       "total_frames_per_s": fr / sp if sp else None}
+    paired_ratio = (paired["rr"]["total_frames_per_s"] / paired["li"]["total_frames_per_s"]) if paired["rr"]["total_frames_per_s"] and paired["li"]["total_frames_per_s"] else None
     ratios = {str(b): blocks[f"p6b_rr_b{b:02d}"]["frames_per_s"] / blocks[f"p6b_li_b{b:02d}"]["frames_per_s"] for b in both}
     rv = sorted(ratios.values())
     tot = (per_arm["rr"]["total_frames_per_s"] / per_arm["li"]["total_frames_per_s"]) if per_arm["rr"]["total_frames_per_s"] and per_arm["li"]["total_frames_per_s"] else None
@@ -180,11 +189,16 @@ def analyse_b(camp: Path) -> Optional[Dict[str, Any]]:
             same += 1
     strip(blocks)
     return {"blocks": blocks, "per_arm": per_arm, "ratio_rr_over_li_totals": tot, "q1_bar": Q1_BAR,
+            "paired_blocks": {"blocks": both, "per_arm": paired, "ratio_rr_over_li": paired_ratio,
+                              "meets_q1_bar": (paired_ratio >= Q1_BAR) if paired_ratio is not None else None,
+                              "note": "beside the pre-registered totals: the same arithmetic over the blocks BOTH arms ran"},
+            "complete_168": per_arm["rr"]["videos"] == 168 and per_arm["li"]["videos"] == 168,
             "ratio_meets_q1_bar": (tot >= Q1_BAR) if tot is not None else None,
             "per_block_ratio_distribution": {"blocks": len(rv), "min": rv[0] if rv else None, "p50": statistics.median(rv) if rv else None,
                                              "max": rv[-1] if rv else None, "per_block": ratios},
             "correctness_vs_p1d": {"reference": "parity_p1_20260923T184000Z/v1full_rr_t4", "videos_compared": len(mine), "identical": same,
-                                   "differ": differ, "pass": bool(mine) and not differ and len(mine) == 168},
+                                   "differ": differ, "pass": bool(mine) and not differ and len(mine) == 168,
+                                   "all_compared_identical": bool(mine) and not differ},
             "blocks_not_run": [n for n, x in blocks.items() if x is None],
             "start_warm": {n: (json.loads((camp / "gates" / f"G_warm_{n}.json").read_text()).get("outcome") if (camp / "gates" / f"G_warm_{n}.json").exists() else None)
                            for n in ("p6b_rr_startwarm", "p6b_li_startwarm")},
