@@ -1,0 +1,40 @@
+{
+ "gate": "G_correct_A1",
+ "decided_utc": "2026-09-25T15:26:35Z",
+ "pairs": [
+  {
+   "a": "p5a_p5k16_1",
+   "b": "p5a_stock16_1",
+   "videos_compared": 16,
+   "chunk_hash_differs": [],
+   "frame_scores_differ": [],
+   "identical": true,
+   "videos_eq_n": true,
+   "pass": true
+  },
+  {
+   "a": "p5a_p5k1_1",
+   "b": "p5a_stock16_1",
+   "videos_compared": 16,
+   "chunk_hash_differs": [],
+   "frame_scores_differ": [],
+   "identical": true,
+   "videos_eq_n": true,
+   "pass": true
+  },
+  {
+   "a": "p5a_p5k1_1",
+   "b": "p4a_rr1_1",
+   "videos_compared": 16,
+   "chunk_hash_differs": [],
+   "frame_scores_differ": [],
+   "identical": true,
+   "videos_eq_n": true,
+   "pass": true
+  }
+ ],
+ "missing": [],
+ "n": 16,
+ "rule": "every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16",
+ "outcome": "PASS"
+}

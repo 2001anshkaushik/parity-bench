@@ -1,0 +1,15 @@
+{
+ "legs": [
+  "p5c_can_1:rc=0",
+  "p5a_stock16_1:rc=0",
+  "p5a_p5k16_1:rc=0",
+  "p5a_p5k1_1:rc=0",
+  "G_correct_A1:PASS",
+  "p5a_li16_1:rc=0",
+  "p5c_can_2:rc=0",
+  "p5a_stock16_2:rc=0",
+  "p5a_p5k16_2:rc=0",
+  "p5a_p5k1_2:rc=0",
+  "p5a_li16_2:rc=0"
+ ]
+}

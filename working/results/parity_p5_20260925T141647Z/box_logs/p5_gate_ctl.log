@@ -1,0 +1,41 @@
+nohup: ignoring input
+G_memstat
+  ok    G_memstat [positive: P4 p4a_rr16_1] expect PASS, got rc 0  
+  ok    G_memstat [null: batchsize_smoke rr_k16 (no memory sampler)] expect FAIL, got rc 1  
+G_d0 rr (P4's rule plus exactly one LWDETR, pre and post)
+  ok    G_d0 rr [positive: P4 p4a_rr16_1] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T14:33:29Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [positive: the control leg p5ctl_p5 (rr:p5-infer)] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T14:33:29Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [null: batchsize_smoke rr_k16 (no on-token D0: absence)] expect FAIL, got rc 2  {"gate": "G_d0_L", "decided_utc": "2026-09-25T14:33:29Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [null: a copy of p4a_rr16_1 holding MANDATE_VIOLATION.json] expect FAIL, got rc 1  {"gate": "G_d0_L", "decided_utc": "2026-09-25T14:33:29Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [null: a copy of p4a_rr16_1 whose post-leg D0 counts TWO LWDETR instances] expect FAIL, got rc 1  {"gate": "G_d0_L", "decided_utc": "2026-09-25T14:33:29Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+G_d0 li
+  ok    G_d0 li [positive: P4 p4a_li16_1] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T14:33:29Z", "leg": "L", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE co
+  ok    G_d0 li [positive: the control leg p5ctl_li] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE co
+  ok    G_d0 li [null: batchsize_smoke li_k16 (eight LlamaIndex containers)] expect FAIL, got rc 1  {"gate": "G_d0_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE co
+G_cell
+  ok    G_cell stock [positive: the control leg p5ctl_stock] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell p5 [positive: the control leg p5ctl_p5] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell li [positive: the control leg p5ctl_li] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell stock [null: p5ctl_p5 against the STOCK spec (image, stamps)] expect FAIL, got rc 2  {"gate": "G_cell_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell p5 [null: p5ctl_stock against the P5 spec (image, node)] expect FAIL, got rc 2  {"gate": "G_cell_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell stock [null: p5ctl_stock against K=1 (two in flight)] expect FAIL, got rc 1  {"gate": "G_cell_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell li [null: batchsize_smoke li_k16 (no read-back, no image record)] expect FAIL, got rc 2  {"gate": "G_cell_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+G_canary
+  ok    G_canary [positive: the control canary p5ctl_canary] expect PASS, got rc 0  {"gate": "G_canary_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "manifest_subset": "v00_EN2001a", "frames_expected": 239, "frames_
+  ok    G_canary [null: P3 p3b_a_1 (the same bench over all three videos)] expect FAIL, got rc 1  {"gate": "G_canary_L", "decided_utc": "2026-09-25T14:33:30Z", "leg": "L", "manifest_subset": "v00_EN2001a", "frames_expected": 239, "frames_
+G_correct
+  ok    G_correct [positive: P0 v1_rr_t4_a vs v1_rr_t4_b (identical 16/16)] expect PASS, got rc 0  {"gate": "G_correct", "decided_utc": "2026-09-25T14:33:30Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-ide
+  ok    G_correct [null: P0 v1_rr_def_a vs v1_rr_t4_a (T=16 vs T=4: differs on 16/16)] expect FAIL, got rc 1  {"gate": "G_correct", "decided_utc": "2026-09-25T14:33:30Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-ide
+  ok    G_correct [null: P3 p3b_c_1 vs p3b_c_2 (identical but 3 videos)] expect FAIL, got rc 1  {"gate": "G_correct", "decided_utc": "2026-09-25T14:33:30Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-ide
+G_smoke_P5B (S1 AND S2 pooled, correctness first) on committed P4 legs re-expressed as P5 cells
+  ok    G_smoke_P5B [positive: P5 K=16 cells = P4's stock K=1 legs (no slowdown, faster than stock K=16, above LI)] expect PASS, got rc 0  {"gate": "G_smoke_P5B", "decided_utc": "2026-09-25T14:33:31Z", "rule": "fires iff the correctness gate passed AND S1 holds AND S2 holds (poo
+  ok    G_smoke_P5B [null: P5 K=16 cells = P4's ACTIVE legs (the K=16 slowdown kept)] expect FAIL, got rc 1  {"gate": "G_smoke_P5B", "decided_utc": "2026-09-25T14:33:32Z", "rule": "fires iff the correctness gate passed AND S1 holds AND S2 holds (poo
+G_build_A in-image check (the engine's own Python inside each image)
+  ok    G_build_A [positive: rr:p5-infer (the P5 node loads; one frame end to end on the inference thread; one LWDETR)] expect PASS, got rc 0  P5_CHECK {"ok": true, "node_md5": {"IGlobal.py": "22fc2536b8b3bebdcc708375f9aa52e5", "IInstance.py": "780202974588b9d85287f2096c0b67bb", "in
+  ok    G_build_A [null: rr:patched-video (fails the node-identity check)] expect FAIL, got rc 1  P5_CHECK {"ok": false, "node_md5": {"IGlobal.py": "9edc29c94a5a34ba366d938d048e89fd", "IInstance.py": "984d80e45e885b5ae21e987664850b4c", "i
+G_alone
+  ok    G_alone [positive: no container on the box] expect PASS, got rc 0  containers present: 0
+  ok    G_alone [null: one created container present] expect FAIL, got rc 1  containers present: 1 
+
+gate controls: 28 of 28 as expected -> all_pass=True (gate_controls.json)
+CTL_DONE

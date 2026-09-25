@@ -57,7 +57,7 @@ def main() -> int:
             L.append(f"- **P5 (single inference thread): not evaluable** — {rd.get('S1', {}).get('verdict')} [analysis_p5a.json readings].")
         else:
             s1, s2 = rd["S1"]["pooled"], rd["S2"]["pooled"]
-            L.append(f"- **P5 (single inference thread), output identical to stock on 16/16 videos at K=1 and K=16** [analysis_p5a.json correctness.gate_pass]: "
+            L.append(f"- **P5 (single inference thread; a benchmark prototype, not shipped), output identical to stock on 16/16 videos at K=1 and K=16** [analysis_p5a.json correctness.gate_pass]: "
                      f"at 16 videos in flight it runs {C['p5_k16']['frames_per_s']['mean']:.3f} frames/s [cells.p5_k16.frames_per_s.mean] against stock "
                      f"{C['stock_k16']['frames_per_s']['mean']:.3f} [cells.stock_k16.frames_per_s.mean] "
                      f"({s1['fps_p5k16_over_stock_k16_minus_1'] * 100:+.1f}% [readings.S1.pooled.fps_p5k16_over_stock_k16_minus_1]) and LlamaIndex "
@@ -65,7 +65,10 @@ def main() -> int:
                      f"[readings.S2.pooled.fps_p5k16_over_li_k16]. Its forward at 16 in flight is {s1['F_p5k16_over_p5k1_minus_1'] * 100:+.1f}% against one "
                      f"in flight [readings.S1.pooled.F_p5k16_over_p5k1_minus_1]. S1 (fix works): {rd['S1']['verdict']}; S2 (parity >= 0.95): {rd['S2']['verdict']}.")
         if b5 is None:
-            L.append("- **P5-B 168-video confirmation: NOT RUN** (its gate did not fire, or not reached).")
+            gf = camp / "gates" / "G_smoke_P5B.json"
+            go = json.loads(gf.read_text()).get("outcome") if gf.exists() else None
+            L.append("- **P5-B 168-video confirmation: NOT RUN** — " + (f"its pre-registered gate {go} [gates/G_smoke_P5B.json outcome]: "
+                     "S1 does not hold." if go == "NOT FIRED" else "not reached."))
         else:
             pa, dist = b5["per_arm"], b5["per_block_ratio_distribution"]
             L.append(f"- **P5-B, 168 videos, block-interleaved:** RocketRide {pa['rr']['total_frames_per_s']:.3f} vs LlamaIndex "

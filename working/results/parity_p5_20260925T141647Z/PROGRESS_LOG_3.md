@@ -1,0 +1,7 @@
+# P5 progress log (part 3)
+
+- 14:34:10Z–17:19:06Z The run stage: two ABAB rounds, each preceded by the canary (G_canary PASS both). Every leg rc 0; after every leg G_d0 CLEAN (the P5 legs' on-token D0 read exactly one LWDETR pre and post) and G_cell PASS (P5: one inference thread ran every measured forward; torch 4 threads read on it); G_memstat PASS after the first leg.
+- After round 1's P5 K=1 leg the HARD correctness gate G_correct_A1 PASSED: rr:p5-infer output identical to stock on 16/16 at K=16 and at K=1, and to P4's committed stock K=1 leg. G_correct_A (all pairs, both rounds) PASSED.
+- G_smoke_P5B NOT FIRED: S1 does not hold (the P5 forward at 16 videos in flight is beyond this session's replicate spread of its one-video forward), S2 holds. P5-B NOT RUN by its gate. The chain finished well inside the 22:04:10Z deadline; protected ids unchanged at the end; rr:p5-infer unchanged.
+- 17:20Z Box logs uploaded and copied; every S3 object of the campaign present locally with equal sizes. Box: no container, no chain process, image ids read back; `box.sh stop`; read back `stopped`, "User initiated (2026-09-25 17:20:16 GMT)" at 17:20:48Z. The SSO credentials (valid to 19:31Z) were never at risk, so no re-login was requested.
+- Analysis: analysis_p5a.json (correctness, cells, S1/S2 per round and pooled), analysis_p5_drift.json (the canary moved against the cells), the CTO brief draft; register entry 64 added (an equivalence clause keyed to the session's own spread).

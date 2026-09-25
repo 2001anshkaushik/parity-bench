@@ -1,0 +1,49 @@
+{
+ "gate": "G_smoke_P5B",
+ "decided_utc": "2026-09-25T17:18:50Z",
+ "rule": "fires iff the correctness gate passed AND S1 holds AND S2 holds (pooled; per round reported beside)",
+ "correctness_gate": true,
+ "S1": {
+  "threshold_forward": 0.02471426197526432,
+  "threshold_fps": 0.03934617144283141,
+  "pooled": {
+   "F_p5k16_over_p5k1_minus_1": 0.06191747544443493,
+   "clause_forward_within": false,
+   "fps_p5k16_over_stock_k16_minus_1": 0.7422121593401467,
+   "clause_fps_beyond": true,
+   "holds": false
+  },
+  "round_1": {
+   "F_p5k16_over_p5k1_minus_1": 0.07103249406460588,
+   "clause_forward_within": false,
+   "fps_p5k16_over_stock_k16_minus_1": 0.755405985965917,
+   "clause_fps_beyond": true,
+   "holds": false
+  },
+  "round_2": {
+   "F_p5k16_over_p5k1_minus_1": 0.05273399355446573,
+   "clause_forward_within": false,
+   "fps_p5k16_over_stock_k16_minus_1": 0.7295274434986794,
+   "clause_fps_beyond": true,
+   "holds": false
+  },
+  "verdict": "DOES NOT HOLD (pooled); round 1 does not, round 2 does not"
+ },
+ "S2": {
+  "bar": 0.95,
+  "pooled": {
+   "fps_p5k16_over_li_k16": 1.3731466277942421,
+   "holds": true
+  },
+  "round_1": {
+   "fps_p5k16_over_li_k16": 1.3491336101961908,
+   "holds": true
+  },
+  "round_2": {
+   "fps_p5k16_over_li_k16": 1.397417082477253,
+   "holds": true
+  },
+  "verdict": "HOLDS (pooled); round 1 holds, round 2 holds"
+ },
+ "outcome": "NOT FIRED"
+}

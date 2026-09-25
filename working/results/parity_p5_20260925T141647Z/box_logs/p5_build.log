@@ -1,0 +1,90 @@
+nohup: ignoring input
+p5_chain.sh sha256: da476f14fe4126f5ef0219b1e19db88207a066743f900240ff385f7d03aec580
+boot_id b9a0e24b-a331-46b7-bc08-80657140f463  stage build  head 504cf101ca75  manifest f5a2255cc5c9ad87
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image li:video sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95
+image rr:p5-infer 
+p5_infer_build.sh sha256: 2ad945c941945b5bb313de226e5ab536aa3a8ae2fd07f0ef793b04478283f234
+images before:
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+984d80e45e885b5ae21e987664850b4c  IInstance.py
+9edc29c94a5a34ba366d938d048e89fd  IGlobal.py
+UNKNOWN:UNKNOWN 644 IInstance.py
+UNKNOWN:UNKNOWN 644 IGlobal.py
+FROM rr:patched-video
+COPY --chown=UNKNOWN:UNKNOWN IGlobal.py IInstance.py infer_worker.py /opt/rocketride/engine/nodes/detect/
+sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd
+images after:
+rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+22fc2536b8b3bebdcc708375f9aa52e5  IGlobal.py
+780202974588b9d85287f2096c0b67bb  IInstance.py
+b522c83ffeed93dca8de340e3b0b8799  infer_worker.py
+root:root 644 IGlobal.py
+root:root 644 IInstance.py
+root:root 644 infer_worker.py
+/opt/rocketride/engine/lib/python3.12/site-packages/albumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>
+  data = fetch_version_info()
+[2026-09-25 14:19:32] [INFO] rf-detr - File rf-detr-base.pth already exists with correct MD5 hash.
+[2026-09-25 14:19:32] [INFO] rf-detr - Loading pretrain weights
+[2026-09-25 14:19:33] [WARNING] rf-detr - Model is not optimized for inference. Latency may be higher than expected. You can optimize the model for inference by calling model.optimize_for_inference().
+/x/check.py:73: FutureWarning: `torch.distributed.reduce_op` is deprecated, please use `torch.distributed.ReduceOp` instead
+  out["lwdetr_instances"] = sum(1 for o in gc.get_objects() if isinstance(o, torch.nn.Module) and type(o).__name__ == "LWDETR")
+P5_CHECK {"ok": true, "node_md5": {"IGlobal.py": "22fc2536b8b3bebdcc708375f9aa52e5", "IInstance.py": "780202974588b9d85287f2096c0b67bb", "infer_worker.py": "b522c83ffeed93dca8de340e3b0b8799"}, "identity_ok": true, "compiled": true, "frame_end_to_end": true, "n_dets": 4, "detect_ran_on": "detect-infer", "infer_thread": "detect-infer", "same_as_direct": true, "torch_num_threads": 16, "lwdetr_instances": 1}
+{
+ "built_utc": "2026-09-25T14:19:37Z",
+ "image": "rr:p5-infer",
+ "image_id": "sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd",
+ "from": "rr:patched-video",
+ "protected_ids_before_and_after": [
+  "rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+  "rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+ ],
+ "base_node": [
+  "984d80e45e885b5ae21e987664850b4c  IInstance.py",
+  "9edc29c94a5a34ba366d938d048e89fd  IGlobal.py",
+  "UNKNOWN:UNKNOWN 644 IInstance.py",
+  "UNKNOWN:UNKNOWN 644 IGlobal.py"
+ ],
+ "expected_p5_md5": {
+  "IGlobal.py": "22fc2536b8b3bebdcc708375f9aa52e5",
+  "IInstance.py": "780202974588b9d85287f2096c0b67bb",
+  "infer_worker.py": "b522c83ffeed93dca8de340e3b0b8799"
+ },
+ "in_image_node": [
+  "22fc2536b8b3bebdcc708375f9aa52e5  IGlobal.py",
+  "780202974588b9d85287f2096c0b67bb  IInstance.py",
+  "b522c83ffeed93dca8de340e3b0b8799  infer_worker.py",
+  "root:root 644 IGlobal.py",
+  "root:root 644 IInstance.py",
+  "root:root 644 infer_worker.py"
+ ],
+ "in_image_check": {
+  "ok": true,
+  "node_md5": {
+   "IGlobal.py": "22fc2536b8b3bebdcc708375f9aa52e5",
+   "IInstance.py": "780202974588b9d85287f2096c0b67bb",
+   "infer_worker.py": "b522c83ffeed93dca8de340e3b0b8799"
+  },
+  "identity_ok": true,
+  "compiled": true,
+  "frame_end_to_end": true,
+  "n_dets": 4,
+  "detect_ran_on": "detect-infer",
+  "infer_thread": "detect-infer",
+  "same_as_direct": true,
+  "torch_num_threads": 16,
+  "lwdetr_instances": 1
+ },
+ "in_image_check_rc": 0,
+ "gate_G_build_A_pass": true
+}
+CHAIN_DONE p5_infer_build (G_build_A PASS)
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image li:video sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95
+image rr:p5-infer sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd
+CHAIN RESULTS: build:rc=0
+CHAIN_DONE p5 build build complete, G_build_A PASS
