@@ -1,0 +1,5 @@
+{
+ "label": "P6 pre-registration ADDENDUM 1, written before the first measured leg (the control stage only had started). It adds a rule the deliverable needs and preregistration.json did not state; nothing in preregistration.json changes.",
+ "written_utc": "2026-09-25T17:56:00Z",
+ "drift_note_rule": "P5's committed rule (parity_p5_20260925T141647Z/preregistration.json P5_C_laptop (2)), applied to P6-A: the canary MOVED iff |F(p6c_can_a2) / F(p6c_can_a1) - 1| > 0.82% (the RR floor); it moved WITH the cells iff it moved in the same direction as the median of the P6-A cells' round-2 / round-1 forward changes (stock, P5, LlamaIndex). The P6-B canaries (before block 1, after block 6) and the P6-C canaries (before each P6-C round) are reported beside, in time order, with the same arithmetic. No figure is adjusted."
+}

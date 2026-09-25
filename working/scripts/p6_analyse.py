@@ -217,10 +217,31 @@ def analyse_c(camp: Path, a: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "canary": {n: canary_leg(camp, n) for n in ("p6c_can_c1", "p6c_can_c2")}}
 
 
+def drift(camp: Path, a: Dict[str, Any]) -> Dict[str, Any]:
+    """preregistration_addendum_1.json: P5's rule on P6-A's rounds; the other canaries beside, in time order."""
+    order = ("p6c_can_a1", "p6c_can_a2", "p6c_can_b0", "p6c_can_bmid", "p6c_can_c1", "p6c_can_c2")
+    can = {n: (canary_leg(camp, n) or {}).get("F_s") for n in order}
+    c1, c2 = can["p6c_can_a1"], can["p6c_can_a2"]
+    cells = {c: v["F_s"]["round_2"] / v["F_s"]["round_1"] - 1 for c, v in a["cells"].items() if v["F_s"]["round_1"] and v["F_s"]["round_2"]}
+    med = statistics.median(cells.values()) if cells else None
+    out = {"canary_F_s_in_time_order": can, "canary_change_a2_over_a1": (c2 / c1 - 1) if (c1 and c2) else None,
+           "p6a_cells_F_change_round2_over_round1": cells, "p6a_cells_median_change": med, "floor": 0.0082,
+           "canary_vs_first": {n: (v / c1 - 1) if (v and c1) else None for n, v in can.items()}}
+    ch = out["canary_change_a2_over_a1"]
+    if ch is None or med is None:
+        out["reading"] = "NOT EVALUABLE"
+    else:
+        moved = abs(ch) > 0.0082
+        out.update({"canary_moved": moved, "moved_with_the_cells": moved and med != 0 and (ch > 0) == (med > 0),
+                    "reading": ("the canary MOVED WITH the cells" if (moved and med != 0 and (ch > 0) == (med > 0)) else
+                                "the canary moved AGAINST the cells" if moved else "the canary did NOT move (within the 0.82% floor)")})
+    return out
+
+
 def main() -> int:
     camp = Path(sys.argv[1])
     a = analyse_a(camp)
-    out = {"label": "P6 analysis (preregistration.json)", "P6_A": a, "P6_B": analyse_b(camp), "P6_C": analyse_c(camp, a)}
+    out = {"label": "P6 analysis (preregistration.json)", "P6_A": a, "P6_B": analyse_b(camp), "P6_C": analyse_c(camp, a), "drift": drift(camp, a)}
     (camp / "analysis_p6.json").write_text(json.dumps(out, indent=1, default=str) + "\n")
     print(f"wrote analysis_p6.json: A correctness {a['correctness']['gate_pass']}; Q1 {a['readings']['Q1'].get('verdict')}; Q2 {a['readings']['Q2'].get('verdict')}; "
           f"B {'present' if out['P6_B'] else 'absent'}; C {'present' if out['P6_C'] else 'absent'}")
