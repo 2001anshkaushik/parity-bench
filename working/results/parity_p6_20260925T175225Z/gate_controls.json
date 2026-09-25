@@ -1,0 +1,284 @@
+{
+ "label": "P6 gate controls: every gate run whole in its real runtime against a positive control (must PASS) and a null control (must FAIL), before launch",
+ "run": 1,
+ "run_utc": "2026-09-25T18:15:19Z",
+ "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e",
+ "python": "/home/ssm-user/.venv/bin/python",
+ "dry_run_no_docker": false,
+ "seconds": 2.5,
+ "control_targets_present": true,
+ "image_ids": {
+  "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+  "rr:p5-infer": "sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd",
+  "li:video": "sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95"
+ },
+ "controls": [
+  {
+   "gate": "G_memstat",
+   "control": "positive: P5 p5a_stock16_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_memstat",
+   "control": "null: batchsize_smoke rr_k16 (no memory sampler)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "positive: P5 p5a_p5k16_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T18:15:16Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)\", \"mandate_violation_file\": false, \"mandate\": \"\\u2026\", \"lwdetr_counts\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "positive: the control leg p6ctl_p5t16 (out of box)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T18:15:16Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)\", \"mandate_violation_file\": false, \"mandate\": \"\\u2026\", \"lwdetr_counts\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "null: batchsize_smoke rr_k16 (no on-token D0: absence)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T18:15:16Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)\", \"mandate_violation_file\": false, \"mandate\": null, \"lwdetr_counts\": \"\\u2026\", \"evidence_present\": false, \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_d0 li",
+   "control": "positive: P5 p5a_li16_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T18:15:16Z\", \"leg\": \"L\", \"arm\": \"li\", \"rule\": \"the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)\", \"export\": \"export_llamaindex_video_workers_blast.json\", \"containers\": \"\\u2026\", \"checks\": \"\\u2026\", \"service_peak_process_count\": 10, \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 li",
+   "control": "positive: the control leg p6ctl_lit16",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T18:15:16Z\", \"leg\": \"L\", \"arm\": \"li\", \"rule\": \"the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)\", \"export\": \"export_llamaindex_video_workers_blast.json\", \"containers\": \"\\u2026\", \"checks\": \"\\u2026\", \"service_peak_process_count\": 3, \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 li",
+   "control": "null: batchsize_smoke li_k16 (eight LlamaIndex containers)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T18:15:16Z\", \"leg\": \"L\", \"arm\": \"li\", \"rule\": \"the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)\", \"export\": \"export_llamaindex_video_workers_blast.json\", \"containers\": \"\\u2026\", \"checks\": \"\\u2026\", \"service_peak_process_count\": 22, \"evidence_present\": true, \"outcome\": \"VIOLATION\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "null: a copy of p5a_p5k16_1 whose post-leg D0 counts TWO LWDETR instances",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T18:15:16Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)\", \"mandate_violation_file\": false, \"mandate\": \"\\u2026\", \"lwdetr_counts\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"VIOLATION\"}"
+  },
+  {
+   "gate": "G_cell p5 T=4",
+   "control": "positive: P5 p5a_p5k16_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell p5 T=4",
+   "control": "null: p6ctl_p5t16 against T=4 (torch 16, the six vars unset)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_cell p5 T=16 unset",
+   "control": "positive: the control leg p6ctl_p5t16",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"posture\": \"out of box: the six thread variables unset\", \"env_seen\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell (unset form)\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell p5 T=16 unset",
+   "control": "null: P5 p5a_p5k16_1 against T=16 unset (torch 4, vars set)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"posture\": \"out of box: the six thread variables unset\", \"env_seen\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell (unset form)\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_cell li T=16",
+   "control": "positive: the control leg p6ctl_lit16",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell li T=16",
+   "control": "null: P5 p5a_li16_1 against T=16 (torch 4)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_cell stock T=4",
+   "control": "positive: P5 p5a_stock16_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell stock T=4",
+   "control": "null: P5 p5a_p5k16_1 against the stock spec (image, stamps)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_cell li T=4",
+   "control": "positive: P5 p5a_li16_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell li T=4",
+   "control": "null: batchsize_smoke li_k16 (no read-back)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json gates.G_cell\", \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_warm",
+   "control": "positive: the control leg p6ctl_warm_rr (2 at 2)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_warm_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"checks\": \"\\u2026\", \"policy\": \"P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_warm",
+   "control": "positive: the control leg p6ctl_warm_li (2 at 2)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_warm_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"checks\": \"\\u2026\", \"policy\": \"P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_warm",
+   "control": "null: P5 p5a_p5k16_1 (the default warm policy, nothing declared)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_warm_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"checks\": \"\\u2026\", \"policy\": \"2 first batch + 0 top-up; rows re-sent when exhausted \\u2014 Crossroad 32; tokens round-robin (addressed, not accepted)\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_warm",
+   "control": "null: p6ctl_warm_rr against 16 at 16",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_warm_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"checks\": \"\\u2026\", \"policy\": \"P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_canary",
+   "control": "positive: P5 p5c_can_1 (committed canary)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_canary_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"manifest_subset\": \"v00_EN2001a\", \"frames_expected\": 239, \"frames_got\": 239, \"checks\": \"\\u2026\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_canary",
+   "control": "null: P3 p3b_a_1 (the same bench over all three videos)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_canary_L\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"leg\": \"L\", \"manifest_subset\": \"v00_EN2001a\", \"frames_expected\": 239, \"frames_got\": 695, \"checks\": \"\\u2026\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_correct",
+   "control": "positive: P0 v1_rr_t4_a vs v1_rr_t4_b (identical 16/16)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"n\": 16, \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_correct",
+   "control": "positive (the P6-C reference form, an absolute path): P0 v1_rr_def_b vs v1_rr_def_a (identical 16/16)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"n\": 16, \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_correct",
+   "control": "null: P0 v1_rr_def_a vs v1_rr_t4_a (T=16 vs T=4: differs on 16/16)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"n\": 16, \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_correct",
+   "control": "null: P3 p3b_c_1 vs p3b_c_2 (identical but 3 videos)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct\", \"decided_utc\": \"2026-09-25T18:15:17Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"n\": 16, \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_smoke_P6B",
+   "control": "positive: P6-A cells = P5's stock / P5 / LI K=16 legs (Q1 1.35 and 1.40, identical output)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_smoke_P6B\", \"decided_utc\": \"2026-09-25T18:15:18Z\", \"rule\": \"fires iff correctness holds in both rounds AND Q1 (P5 f/s / LI f/s >= 0.95) holds in round 1 AND round 2 AND pooled\", \"correctness_both_rounds\": true, \"Q1\": \"\\u2026\", \"Q2_reported_not_gating\": \"\\u2026\", \"outcome\": \"FIRED\"}"
+  },
+  {
+   "gate": "G_smoke_P6B",
+   "control": "null: the 'P5' cell = P5's STOCK legs (P5/LI below 0.95; output identical)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_smoke_P6B\", \"decided_utc\": \"2026-09-25T18:15:18Z\", \"rule\": \"fires iff correctness holds in both rounds AND Q1 (P5 f/s / LI f/s >= 0.95) holds in round 1 AND round 2 AND pooled\", \"correctness_both_rounds\": true, \"Q1\": \"\\u2026\", \"Q2_reported_not_gating\": \"\\u2026\", \"outcome\": \"NOT FIRED\"}"
+  },
+  {
+   "gate": "G_alone",
+   "control": "positive: no container on the box",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "containers present: 0"
+  },
+  {
+   "gate": "G_alone",
+   "control": "null: one created container present",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "containers present: 1 "
+  }
+ ],
+ "n": 33,
+ "n_pass": 33,
+ "all_pass": true
+}
