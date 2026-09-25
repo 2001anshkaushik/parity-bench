@@ -1,0 +1,133 @@
+{
+ "label": "P3 pre-registration — written before the first P3 leg; every hypothesis, verdict rule and gate threshold below is fixed before data. Nothing is adjusted after a smoke result; a known bias is recorded, never corrected after the fact.",
+ "written_utc": "2026-09-25T04:05Z (see the commit time)",
+ "branch": "feat/parity-p3, cut from feat/parity-p2 at eaa652230c8c (the P2 deliverable), confirmed against origin (ls-remote eaa652230c8c445a3b4645a54db13168a7d99f57); autoland self-test on the new branch: 71 pass, 0 fail",
+ "step0": {
+  "sso": "EXPIRED at 03:35Z 2026-09-25 (refresh failed) -> login flow started under STEP 0's rule; the first authorization expired unapproved at ~03:45Z; the second was APPROVED by Ansh at 03:46:22Z",
+  "harness_stop_search": "READ-ONLY. working/harness/box.sh (383 lines) contains exactly ONE call that stops the instance: box.sh:344 `\"${A[@]}\" ec2 stop-instances --instance-ids \"$INSTANCE\"`, inside the `stop)` branch of the command dispatch — it runs only when box.sh is invoked with the explicit subcommand `stop`. box.sh has NO `trap` statement at all (none on EXIT, HUP, TERM or INT), sources no other script, and calls only the aws CLI (ec2 describe-instances / start-instances / wait / stop-instances; ssm start-session / describe-sessions) and `script` (the pty for SSM); `shutdown`, `reboot` and the like appear only in its REFUSAL list (box.sh:110-131) and its self-test cases (box.sh:262-263), i.e. they are blocked, never issued. Nothing in it fires on disconnect. Repo-wide, no other script calls stop-instances / terminate-instances / shutdown / poweroff; the traps that exist are all EXIT traps that stop or remove CONTAINERS or temp directories (batchsize_docs_run.sh:116, batchsize_video_run.sh:69, p0_video_chain.sh:35, p1_video_chain.sh:37, p2_video_chain.sh:39, p1_tooling_test.sh:11, and the build scripts' temp-dir traps), never the instance. Nothing was changed; the 08:18Z stop was not investigated further, by instruction."
+ },
+ "session": {
+  "box_boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0 (the P3 box session, started 03:48Z 2026-09-25; every P3 comparison is interleaved ABAB inside it; P0/P1/P2/Stage-4 figures are context and cross-session evidence only)",
+  "protected_images_read_back_at_start": {
+   "rr:patched": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+   "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+  },
+  "images": "new tags only: rr:p3-pdfium (P3-D) is the only image P3 builds; rr:p2-pdfium and rr:p1-pdfium stay as they are; rr:patched and rr:patched-video are never modified, retagged or removed and their ids are read back before and after the build and at every chain start and end",
+  "per_leg": "steal (/proc/stat), CPU model, MHz, boot id; the 1 Hz memory.stat sampler on the leg's container, started after the leg directory exists; the FIRST leg of every chain is gated on it (G_memstat, exit 10 stops everything)",
+  "D0": "every RocketRide cell: one task process and one loaded instance per model (P0_ONTOKEN / BSZ_P0 on-token env_probe, pre and post; a violation stops everything). LlamaIndex service cells: the runner refuses unless warm workers equal the declared count (24 docs, 1 video). P3-B bare cells: exactly ONE RF-DETR model instance, counted in-process with gc by the model's own root class (the script exits 3 otherwise), and the cell runs ALONE — no other container exists at its start (G_alone)",
+  "rulings": "A (32 vCPU unconstrained) and C (one workload at a time)",
+  "retries": "a leg that did not complete is retried at most twice; a docs leg DEGRADED with every row recorded is a RESULT and is not retried (register 55)",
+  "launch": "every chain runs detached (box.sh launch) and the laptop polls S3; nothing waits in a session",
+  "progress_log": "a NEW PROGRESS_LOG_<n>.md per landing; a landed file is never appended to",
+  "correctness_first": "on every changed cell, correctness is decided before any speed figure is reported",
+  "floors": {
+   "rr_docs": 0.0082,
+   "li_docs": 0.0987,
+   "video": 0.0082,
+   "rule": "an ABAB comparison is readable iff |delta| > max(floor, the spread of each pair); spread = |a-b|/mean(a,b)"
+  },
+  "mandate": "ONE engine process, ONE pipeline (one token), ONE instance per model; threads unrestricted; P3-B is approved by Ansh as within the mandate (each cell alone, one model instance at any moment, a standalone script, never a pipeline or a pool)"
+ },
+ "GATE_CONTROLS": {
+  "rule": "before launch every gate and in-image check runs WHOLE in its real runtime against a known-good target that must PASS (positive control) and a known-bad target that must FAIL (null control); a gate without both controls passing does not go on the box. working/scripts/p3_gate_controls.py runs them on the box (the box's ~/.venv Python for the chain gates; the engine's Python inside the container for the in-image check; each image's own interpreter for the bare microbenchmark) and writes gate_controls.json; p3_master.sh REFUSES to start unless it says all_pass",
+  "controls": {
+   "G_memstat": "positive P2's committed p2a_rr_a (rows) -> pass; null an empty memstat.jsonl -> fail",
+   "G_mandate (docs)": "positive P2's p2a_rr_a -> clean; null the same leg marked violating -> violation",
+   "G_mandate (video)": "positive P2's p2b_rr_base_a -> clean; null a directory holding MANDATE_VIOLATION.json -> violation",
+   "G_alone": "positive no container -> pass; null one created container -> fail",
+   "G_health_A": "positive P2's p2a_rr_b / p2a_li_b standing in as the P3 legs against the committed p2a_rr_a/b -> fired; null one RR chunk hash altered -> not fired; null the LlamaIndex sampler empty -> not fired",
+   "G_smoke_C": "positive vars=2 10% faster with identical chunks -> fires vars=2; null all shapes equal -> none; null vars=2 faster but one chunk list differs -> none (correctness first)",
+   "G_node_D": "positive counters with text -> pass; null P1's failure (text 0) -> fail",
+   "G_smoke_D": "positive HYBRID faster than Tika's spread, no coverage loss -> fires hybrid; null both variants inside Tika's spread -> none",
+   "G_build_D in-image check": "positive rr:p2-pdfium (pypdfium2 complete) under the landed encoding-fixed check -> ok true, rc 0; null rr:p1-pdfium (pypdfium2_cfg missing) -> ok false, rc 1",
+   "P3-B one-model check": "each image's own interpreter: positive one model -> rc 0; null --null-two-models -> rc 3 (the mandate refusal)"
+  }
+ },
+ "hard_dependency_gates": {
+  "rule": "register 55: any failed build, in-image check or correctness gate STOPS every stage that depends on it; independent stages continue; the master records every gate's exit status in master_gates.jsonl",
+  "gates": {
+   "G_controls": "gate_controls.json all_pass, else the master refuses",
+   "G_mandate": "exit 9 from any chain stops everything",
+   "G_memstat": "exit 10 stops everything",
+   "G_health_A": "not fired -> the P3-A full runs are NOT RUN",
+   "G_smoke_C": "no shape fired -> the P3-C full run is NOT RUN",
+   "G_build_D": "rr:p3-pdfium's build or in-image check fails -> P3-D smoke and full NOT RUN",
+   "G_node_D": "the prototype's counters show no text after the first HYBRID or PURE leg -> P3-D stops",
+   "G_smoke_D": "per variant; only fired variants get a full run"
+  }
+ },
+ "budget_and_order": {
+  "budget": "7 hours from the start of the first leg (P3_DEADLINE_EPOCH recorded in master_gates.jsonl); a leg in flight finishes; a leg not started past it is NOT_RUN_budget; then report and stop the box",
+  "order": [
+   "1 P3-B video discriminator",
+   "2 P3-C embedding thread-shape smoke",
+   "3 P3-A docs health smoke, then its full runs",
+   "4 P3-D parser smoke",
+   "5 full runs for P3-C and P3-D, only if their gates fired, P3-C first"
+  ],
+  "laptop": "P3-E runs on the laptop from source (no box time)"
+ },
+ "P3_A_docs_full_scale_headline": {
+  "hypothesis": "with the P1-B wrapper fix, one RocketRide token reaches at least 0.85 of LlamaIndex's 24-worker docs/s on the FULL corpus",
+  "evidence": "cross-session: rr:p1-tikafix 5.34 docs/s (P1-B) vs LlamaIndex 5.10 (Stage 4); P2-A's 384 smoke gave 0.826, but that slice holds none of the eleven pathological PDFs (P1-B +12.6% on the slice vs +128% full) and its span is drain-dominated (both arms ~13 of 32 cores)",
+  "health_smoke": "Ansh's ruling: for this experiment the smoke is a HEALTH gate, not a performance proxy. One 384 leg each: p3a_rr_h (rr:p1-tikafix, ONE token, C=32, stamped) and p3a_li_h (LlamaIndex 24 workers, C=32)",
+  "G_health_A": "FIRES iff (i) both legs are verdict OK or DEGRADED with every row recorded; (ii) D0 is clean on both; (iii) the memory sampler is non-empty on both; (iv) the RR leg's chunk lists equal P2-A's COMMITTED rr:p1-tikafix legs (p2a_rr_a AND p2a_rr_b) on every shared ok document",
+  "full": "only if G_health_A fired: one 9,975 run each, same arms, this session, RR first: p3a_rr_full (texts captured; the fixed-Tika full comparator for P3-C and P3-D) and p3a_li_full",
+  "report": "span docs/s, the excluded-straggler view, CPU-s/doc, utilisation, idle cores, idle spin, sampled memory peak, lost documents, the empty-document set difference both ways",
+  "ratio_rule": "r = RR span docs/s / LI span docs/s, n = 1 per arm, stated plainly. LlamaIndex's smoke-scale replicate spread (8.19%, P2-A) bounds how much of it is readable: SUPPORTED iff r >= 0.85 x 1.0819 = 0.9196 (readably at or above the bar); NOT SUPPORTED iff r < 0.85 x (1 - 0.0819) = 0.7804 (readably below); otherwise the ratio is AT THE BAR WITHIN LlamaIndex's REPLICATE SPREAD and the hypothesis is UNREADABLE at n = 1 — the report says so",
+  "if_not_fired": "the full runs are NOT RUN and the report names the failed health condition"
+ },
+ "P3_B_video_discriminator": {
+  "approval": "approved by Ansh as within the single-instance mandate",
+  "hypothesis": "RocketRide's slower forward pass is caused by the engine process environment, not by the model or its libraries",
+  "evidence": "P2-B: removing the debugger and setting MALLOC_ARENA_MAX=2 closed only 0.25 of the gap; post-hoc, CPU per frame is about equal once the idle burn is removed but RR's forward runs on fewer cores at once; torch, rfdetr and model construction are identical (P0 V2) and pool and affinity read-backs are identical (P1-A)",
+  "ruled_out_beforehand": "per-frame lock hand-off leaving caller pools cold: P0 measured K=1 (one caller) at 2.39 f/s, no faster than K=16",
+  "frames": "ONE fixed set: the first 3 measured rows of the AMI manifest, extracted once with li:video's imageio-ffmpeg binary and the engine-mirror argv (fps=1/15, -fps_mode passthrough, -vcodec png; byte-identical to the engine's frame grabber per probe_frame_parity 2026-08-27) -> p3b_frames_manifest.json (sha256 per frame; the frames stay outside the repository). Cells (a) and (b) hash every frame they load and must match it; cell (c) runs the same 3 videos through the engine's own frame grabber (identity by construction; its frame count must equal the manifest's)",
+  "(1)_inspection": {
+   "what": "READ-ONLY: from /proc/<pid>/maps of each detector process, every loaded OpenMP, BLAS or threading runtime (libgomp, libiomp5, libomp, libmkl*, libopenblas*, libblas, libcblas, libflexiblas, liblapack, libtbb*) with paths, plus the torch (libtorch*, libc10*) and numpy (_multiarray_umath) library identities. RR: the engine task process in the (c) legs, at warm-up end (driver P1_SYNC_DIR hook, before the measured window). LlamaIndex: its worker process in one service leg p3b_d_1 (li:video, one instance, K=1, the same 3 videos, stamped) — that leg exists for the inspection; its figures are context. The bare cells read their own /proc/self/maps",
+   "hypothesis": "the RR engine process loads a second OpenMP or BLAS runtime that LlamaIndex's does not",
+   "reading": "SUPPORTED iff the RR task process maps two or more distinct OpenMP runtime files (libgomp* / libiomp5* / libomp* by path), OR maps an OpenMP, BLAS or TBB runtime family that LlamaIndex's detector process does not; otherwise NOT SUPPORTED. Paths are reported either way"
+  },
+  "(2)_bare_microbenchmark": {
+   "cells": {
+    "a": "rr:patched-video's embedded Python (/opt/rocketride/engine/engine) running working/video/p3b/p3b_bench.py as a bare script outside the engine; RFDETRBase() constructed with the image's weights directory as cwd (/opt/rocketride/engine/cache/models/rfdetr), as detection.py RFDetrLoader.load does",
+    "b": "li:video's Python running the same script; RFDETRBase() with /opt/rfdetr-cache as cwd",
+    "c": "inside the RR engine task process: rr:patched-video, one token, the P1 stamped detect copy (forward pre/post hooks on the same root module), K=1 (one video in flight) on the same 3 videos, P0_ONTOKEN D0"
+   },
+   "common": "T=4 (six thread variables = 4, set by docker run -e; torch threads read back in-process); ONE caller thread in (a)/(b) (the main thread); predict(image, threshold=0.3); the bare cells run a 10-frame warm-up pre-pass, then measure EVERY frame of the set; the engine cell's warm-up runs on the manifest's disjoint warm rows; --network none on the bare cells",
+   "order": "ABAB two runs each: p3b_a_1 p3b_b_1 p3b_c_1 p3b_a_2 p3b_b_2 p3b_c_2, then p3b_d_1 (the LlamaIndex inspection leg)",
+   "mandate": "each cell runs ALONE (G_alone before every bare cell: no container exists); exactly one model instance exists at any moment (the bare script counts its model's root-class instances and exits 3 on any count but 1); a standalone script, never a pipeline or a pool",
+   "metrics": "per leg: F = mean forward wall per measured frame (a/b: every frame of the set; c: the last N frame stamps by wall time, N = the records' frame count); cores busy during the forward = sum process CPU across forwards / sum forward wall; caller on-CPU share = sum calling-thread CPU / sum forward wall. Per cell: the mean of its two legs and its replicate spread",
+   "approx_rule": "x ~= y iff |F_x / F_y - 1| <= max(spread_x, spread_y) (the larger of the two cells' replicate spreads, as instructed); x < y iff F_x / F_y - 1 < -max(spread_x, spread_y); the carried 0.82% floor is reported beside each comparison",
+   "reading": {
+    "a ~= b < c": "the engine process environment owns the gap (a < c and b < c)",
+    "a ~= c > b": "the interpreter or runtime build owns it (a > b and c > b)",
+    "a ~= b ~= c": "the gap lives in pipeline-level scheduling (all three pairs ~=)",
+    "otherwise": "no pre-registered reading matches; the three pairwise relations and the cores-in-forward figures are reported"
+   }
+  }
+ },
+ "P3_C_embedding_thread_shape": {
+  "scope": "CONFIG/THREADING only, no patch; cross-document batching is a node patch and is NOT built in P3 (P3-E drafts its design)",
+  "hypothesis": "32 concurrent single-threaded embedding passes are not the best shape for the stage that is now ~92% of RR document time",
+  "evidence": "P1-B stage shares (embed ~0.92); P2-D embedding trace: no cross-document batching, up to 32 single-threaded passes, no model lock; S5-E: unset threads (16) measured -13.7% against =1, so an optimum may lie between",
+  "smoke": "the 384 slice, rr:p1-tikafix, ONE token, C=32, stamped, the six thread variables in {1, 2, 4} (read back in-process: torch threads must equal the declared value — a mismatch is a D0 violation), ABAB two runs each: p3c_t1_a p3c_t2_a p3c_t4_a p3c_t1_b p3c_t2_b p3c_t4_b; every leg captures its chunk embedding vectors (P3_VEC_DUMP; S3 only)",
+  "correctness": "FIRST: a shape counts only if its text chunks (chunk_sha256 lists) equal vars=1's on every shared ok document — both of its runs against both vars=1 runs — and it loses no document vars=1 answered. Reported beside, never gating: the embedding vectors' maximum absolute delta against vars=1 (same-letter pair) per shape, and vars=1 run a vs run b as the determinism reference, since thread count can shift numerics",
+  "SMOKE_GATE_P3_C": {
+   "rule": "a shape FIRES iff it passes correctness AND mean(shape span docs/s) / mean(vars=1) - 1 > max(0.82%, spread(vars=1), spread(shape)); the WINNER is the fired shape with the largest gain",
+   "threshold": "max(0.82%, the two within-session replicate spreads)"
+  },
+  "full": "only if a shape fired: one 9,975 run of the winner (p3c_t<W>_full), compared with P3-A's RR full leg (vars=1); if that leg does not exist, a vars=1 full leg p3c_t1_full runs first; one run each, readable iff |delta| > 0.82%"
+ },
+ "P3_D_parser_rerun": {
+  "what": "P2-C, amended: rebuilt as a NEW tag rr:p3-pdfium FROM rr:p1-tikafix by working/scripts/p2_pdfium_build.sh (wheel by RECORD incl. pypdfium2_cfg) with the LANDED encoding-fixed in-image check; rr:p2-pdfium stays as it is. The in-image check first passes the GATE CONTROLS rule (positive rr:p2-pdfium, null rr:p1-pdfium)",
+  "design": "EXACTLY P2-C's (preregistration of parity_p2_20260924T160106Z, P2_C_parser_rerun): the eleven stragglers at C=1 stamped ABAB (p3d_s_fix_a, p3d_s_hyb_a, p3d_s_pure_a, p3d_s_fix_b, p3d_s_hyb_b, p3d_s_pure_b; G_node_D after the first HYBRID and PURE legs), then the 384 slice C=32 stamped with texts ABAB (p3d_fix_a, p3d_hyb_a, p3d_pure_a, p3d_fix_b, p3d_hyb_b, p3d_pure_b); the per-variant gate (a) SPEED (T - V)/T > spread_T on the p50 parse bracket over the eleven, (b) COVERAGE L_V empty on the 384 slice; correctness first; P2-C's known bias recorded; full runs per fired variant with texts",
+  "comparator": "P3-A's RR full leg (p3a_rr_full, texts); if absent, p3d_fix_full runs first",
+  "verdict": "P2-C's: 'a native parser gains little' is SUPPORTED iff no variant is both ADOPTABLE (empty on no document fixed Tika recovers, at full scale) and faster than fixed Tika at full scale by more than +5.83% (readable beyond 0.82%), including when no smoke gate fires; NOT SUPPORTED otherwise; NOT RUN if G_build_D or G_node_D fails"
+ },
+ "P3_E_laptop": {
+  "(1)": "cross-document embedding batching DESIGN: where the batch forms, its bound, how results route back per document, the correctness test (vector tolerance and text chunk identity), the in-bounds proof (one model, one process). Draft only",
+  "(2)": "TICKET DRAFT: noDebug by default plus MALLOC_ARENA_MAX=2 in the engine image (the task process starts debugpy.listen on port 20000 unless noDebug; a performance cost and an open debug port). Evidence: P2-B identical output on 16/16 and anonymous memory roughly halved; the speed gain is NOT readable (pair b gained +3.4% inside spreads of ~5%) and the draft says so. Drafts stay in the campaign directory; nothing is filed, posted or sent"
+ },
+ "deliverable": "one P3 report: the gate table with each gate's positive and null control results; correctness before speed; the P3-A ratio stated plainly; the P3-B reading; the P3-C and P3-D verdicts; both drafts; the Step 0 harness-search result; anything NOT RUN with its reason. Blind recompute with planted figures; stop the box and read back its state"
+}

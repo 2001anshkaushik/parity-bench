@@ -779,11 +779,13 @@ async def rr_send_continuous(c, tok, files: List[Path], conc: int, w: Optional[J
                 kw = {"objinfo": {"name": p.name}} if (STAMP or P0) else {}
                 o = await asyncio.wait_for(c.send(tok, b, mimetype="application/pdf", **kw),
                                            timeout=DOC_TIMEOUT_S)
-                texts = [d.get("page_content", "") for d in documents_from(o)]
+                docs_o = documents_from(o)
+                texts = [d.get("page_content", "") for d in docs_o]
                 row.update(completion_ns=time.time_ns(), ok=bool(texts), n_chunks=len(texts),
                            chunk_sha256=[gs.chunk_hash(t) for t in texts],
                            reason="completed" if texts else "no_documents")
                 text_dump(p.name, texts)
+                vec_dump(p.name, docs_o)
             except Exception as e:
                 row.update(completion_ns=time.time_ns(), ok=False, n_chunks=0, chunk_sha256=[],
                            reason=f"error:{type(e).__name__}")
@@ -809,6 +811,30 @@ def text_dump(doc: str, texts: List[str]) -> None:
         _TD.append(gzip.open(TEXT_DUMP, "at", encoding="utf-8"))
         atexit.register(_TD[0].close)
     _TD[0].write(json.dumps({"doc": doc, "texts": texts}) + "\n")
+
+
+# P3-C (preregistration.json P3_C correctness): every document's chunk embedding vectors as returned (Doc.embedding,
+# in the response's documents), as float32 little-endian base64 per chunk, appended client-side AFTER the
+# document's completion stamp, to a gzipped JSONL. OFF unless P3_VEC_DUMP; the measured path is unchanged.
+VEC_DUMP = os.environ.get("P3_VEC_DUMP") or None
+_VD: List[Any] = []
+
+
+def vec_dump(doc: str, docs_o: List[Dict[str, Any]]) -> None:
+    if not VEC_DUMP:
+        return
+    import base64
+    import struct
+    if not _VD:
+        import atexit
+        import gzip
+        _VD.append(gzip.open(VEC_DUMP, "at", encoding="utf-8"))
+        atexit.register(_VD[0].close)
+    vecs = []
+    for d in docs_o:
+        e = d.get("embedding")
+        vecs.append(base64.b64encode(struct.pack(f"<{len(e)}f", *e)).decode() if isinstance(e, list) and e else None)
+    _VD[0].write(json.dumps({"doc": doc, "dim": len(docs_o[0].get("embedding") or []) if docs_o else 0, "vecs": vecs}) + "\n")
 
 
 # ------------------------------------------------------------------ llamaindex
