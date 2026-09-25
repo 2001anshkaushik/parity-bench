@@ -1,0 +1,9 @@
+{
+ "report_sha256": "28e67bbcac707c7603c82581651d88cf22ada770e54628f6efc43a5088a78a31",
+ "plants": {
+  "A": "Per cell table, LlamaIndex K=16 frames/s: true 3.299, planted 3.329",
+  "B": "D1 table, p4a_rr1_2 p95: true 0.2507, planted 0.2517",
+  "C": "P4-B (1) leg table, p3a_li_h steady-phase docs/s: true 7.6214, planted 7.6241",
+  "D": "facts sheet F16 stock CPU-s per document: true 7.706, planted 7.760"
+ }
+}

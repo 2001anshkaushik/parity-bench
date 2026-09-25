@@ -1,0 +1,59 @@
+{
+ "label": "P4-A POST-HOC observations (not pre-registered; beside the readings, never replacing them)",
+ "round_drift": {
+  "rr_k1": {
+   "F_run2_over_run1_minus_1": 0.0733651172734564,
+   "fps_run2_over_run1_minus_1": -0.06344212871936017
+  },
+  "rr_k16": {
+   "F_run2_over_run1_minus_1": 0.03928840255030752,
+   "fps_run2_over_run1_minus_1": -0.03698249059073799
+  },
+  "li_k1": {
+   "F_run2_over_run1_minus_1": 0.2195944126475644,
+   "fps_run2_over_run1_minus_1": -0.14116231086657505
+  },
+  "li_k16": {
+   "F_run2_over_run1_minus_1": 0.1091129443639276,
+   "fps_run2_over_run1_minus_1": -0.09419367472828732
+  },
+  "rr_k16_active": {
+   "F_run2_over_run1_minus_1": 0.17969203675359502,
+   "fps_run2_over_run1_minus_1": -0.14946488784635703
+  }
+ },
+ "every_cell_slower_in_round_2": true,
+ "per_round_readings": {
+  "round_1": {
+   "D_RR": 1.8978646754126522,
+   "D_LI": 1.4767330322404086,
+   "D_RR_over_D_LI_minus_1": 0.28517791230912515,
+   "closure": 0.03029538781278795,
+   "active_F_over_rr16_F_minus_1": -0.014332506894420671
+  },
+  "round_2": {
+   "D_RR": 1.837612118210626,
+   "D_LI": 1.3429577115494187,
+   "D_RR_over_D_LI_minus_1": 0.3683320795637761,
+   "closure": -0.2606913457951292,
+   "active_F_over_rr16_F_minus_1": 0.11882716063238807
+  }
+ },
+ "active_cost": {
+  "cpu_s_per_frame_active_over_rr16_minus_1": 0.7246988911910017,
+  "service_cores_active": 6.010999999999999,
+  "service_cores_rr16": 3.6615
+ },
+ "cores_in_forward": {
+  "rr_k1": 4.225544403778233,
+  "rr_k16": 2.435601690195168,
+  "li_k1": 4.000882468606754,
+  "li_k16": 2.788716931793002,
+  "rr_k16_active": 4.744420367243503
+ },
+ "k16_gap_li_over_rr_fps_minus_1": 0.2352144755244332,
+ "k1_lock_duty": {
+  "rr_k1": 0.8607139588992062,
+  "li_k1": 0.6302295256441779
+ }
+}

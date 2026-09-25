@@ -1,0 +1,20 @@
+{
+  "figures_checked": 163,
+  "mismatches": [
+    {
+      "where": "### Per cell (mean of two legs ...) table, row 'LlamaIndex K=16', column 'frames/s (spread)'",
+      "figure": "LlamaIndex K=16 cell mean frames/s (mean of p4a_li16_1 and p4a_li16_2, each export throughput.total_frames / throughput.total_span_s)",
+      "report": "3.329",
+      "recomputed": "3.299 (legs 3203/925.1 = 3.4623 and 3.1362; mean 3.29926; the spread 9.88% in the same cell does match)"
+    }
+  ],
+  "unverifiable": [],
+  "notes": [
+    "Figure count: Summary bullets 1-3 = 7; Correctness first (ACTIVE table 16, gate line 2, beside table 26) = 44; Per cell = 55 (5 cells x 11 values); Readings tables including the two verdict lines = 20; Readings prose paragraph including POST-HOC = 37.",
+    "Every gated leg is the plain leg name (all ten legs ':rc=0' in chain_p4a_run_done.json; no retries). Every leg has 16 measured ok videos and 3,203 frames; every stamp-based metric used 3,203 measured rows.",
+    "The Readings prose itself states the LlamaIndex K=16 frames/s as 3.299 (matches), and the POST-HOC K=16 gap +23.52% is consistent with 3.299, not 3.329; the mismatch is confined to the Per cell table.",
+    "All 17 output-identity comparisons recompute as identical on 16 videos with no chunk-hash or frame-score differences.",
+    "Round drift per cell (F run2/run1 - 1): rr_k1 +7.34%, rr_k16 +3.93%, li_k1 +21.96%, li_k16 +10.91%, active +17.97%; all positive, so 'every cell's second run was slower' and the range +3.93% (rr_k16) to +21.96% (li_k1) match. Steal is 0.000% on every leg.",
+    "No recomputed value lies near a rounding boundary for any displayed figure."
+  ]
+}

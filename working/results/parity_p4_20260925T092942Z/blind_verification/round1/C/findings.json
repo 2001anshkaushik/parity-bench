@@ -1,0 +1,20 @@
+{
+  "figures_checked": 120,
+  "mismatches": [
+    {
+      "where": "## P4-B (1) - first table (leg rows), row p3a_li_h, column 'steady-phase docs/s'",
+      "figure": "p3a_li_h steady-phase docs/s",
+      "report": "7.6241",
+      "recomputed": "7.6214 (349 ok docs completed by last submission / L = 45.7923 s = 7.621373)"
+    }
+  ],
+  "unverifiable": [
+    "## P4-B (1) Check 2 threshold '0.82%': the definitions give no rule for this threshold, and none of the obvious candidates from the listed files reproduce it (steady spreads vars=1/2/4 = 0.13%/0.54%/0.30%; max(vars=1, vars=4) = 0.30%; their sum = 0.43%; P2-A pair steady spreads 1.06% (RR) / 3.41% (LI)). The -12.62% it is compared against, and the PASS, hold under any of these candidates."
+  ],
+  "notes": [
+    "The P3-A health steady RR/LI ratio 1.0524 in the session table and paragraph matches the recomputed 8.0209 / 7.6214; the report's own cell 7.6241 would give 1.0520, so the table cell is inconsistent with the report's ratio.",
+    "Agreement bound 8.19% and R_full 1.0664 reproduce (R_full = 6.2969 / 5.9046 span docs/s of p3a_rr_full / p3a_li_full; 8.19% also equals the p2a_li_a/p2a_li_b span-docs/s spread).",
+    "Summary bullet 4 has no numeric figure; its VALIDATES verdict follows from Check 1 (both |vs full-scale - 1| <= 8.19%) and Check 2 (vars=4 steady -12.62% vs vars=1). Summary bullet 5 '+10.39%' matches R_docs - 1.",
+    "All P4-B (2) figures match: FIX 9,886/9,975, 1570.0 s, 6.2969, 209,797, 133.63, 43,913.7, 0.2093, 21.222; HYB 9,886/9,975, 1422.2 s, 6.9513, 186,931, 131.44, 37,119.0, 0.1986, 18.909; R_docs 1.1039, R_cpd 0.8910, R_chunks 0.9836, CPU-s/chunk ratio 0.9487, check 1.1039, shares 116.7% / -16.7%; closing +10.39%, 10.9% fewer chunks, -1.64%, -5.13%."
+  ]
+}

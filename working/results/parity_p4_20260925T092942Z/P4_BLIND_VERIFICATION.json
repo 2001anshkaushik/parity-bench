@@ -1,0 +1,76 @@
+{
+ "label": "P4 blind recomputation: independent verifiers recompute every figure in their sections from raw files (the facts sheet: trace each value to its named artifact and key); each report copy carries ONE planted wrong figure; the plant key was kept outside the repository until every verifier had finished",
+ "outcome": "PASS (round 2)",
+ "summary": "round 1 BLOCKED — all 4 plants caught; real trace defects in the facts sheet (F23 showed its key negated, F24 showed its key minus one, F15's caveat quoted a figure with no key), one undefined beside-threshold (P4-B (1) check 2), one label (the budget row's 'first leg' was the stage start); fixed; round 2 re-verified the changed sections with new plants — both plants caught, no other mismatch. 661 figures checked in round 1 by 4 verifiers, 211 in round 2 by 2.",
+ "round_1": {
+  "outcome": "BLOCKED",
+  "report_sha256": "28e67bbcac707c7603c82581651d88cf22ada770e54628f6efc43a5088a78a31",
+  "verifiers": {
+   "A": {
+    "figures_checked": 163,
+    "plant": "Per cell table, LlamaIndex K=16 frames/s: true 3.299, planted 3.329",
+    "mismatches_reported": 1,
+    "unverifiable": []
+   },
+   "B": {
+    "figures_checked": 241,
+    "plant": "D1 table, p4a_rr1_2 p95: true 0.2507, planted 0.2517",
+    "mismatches_reported": 1,
+    "unverifiable": []
+   },
+   "C": {
+    "figures_checked": 120,
+    "plant": "P4-B (1) leg table, p3a_li_h steady-phase docs/s: true 7.6214, planted 7.6241",
+    "mismatches_reported": 1,
+    "unverifiable": [
+     "## P4-B (1) Check 2 threshold '0.82%': the definitions give no rule for this threshold, and none of the obvious candidates from the listed files reproduce it (steady spreads vars=1/2/4 = 0.13%/0.54%/0.30%; max(vars=1, vars=4) = 0.30%; their sum = 0.43%; P2-A pair steady spreads 1.06% (RR) / 3.41% (LI)). The -12.62% it is compared against, and the PASS, hold under any of these candidates."
+    ]
+   },
+   "D": {
+    "figures_checked": 137,
+    "plant": "facts sheet F16 stock CPU-s per document: true 7.706, planted 7.760",
+    "mismatches_reported": 3,
+    "unverifiable": [
+     "F15 caveat 'cross-session drift 15.4%': no key in the named artifact (analysis_p1docs.json) holds a 15.4% drift or its ratio; the row's value 2.3454 itself matches p1b.full.a_docs_per_s.",
+     "Gates G_memstat '1,286 rows' and every G_d0/G_cell per-leg outcome are verified against the gate records only; the underlying leg files (memstat.jsonl, exports, p1_readback.json) are not in the gate-section file list, so the gate records themselves were not re-derived from raw leg data."
+    ]
+   }
+  },
+  "plants_caught": "4 of 4",
+  "real_findings": [
+   "facts sheet F23: the row showed -10.9% for key chunks_fewer (value 0.109): display was the key negated -> now '10.9% fewer'",
+   "facts sheet F24: the row showed -1.64% for key R_chunks_per_s (value 0.9836): display was the key minus one -> key text now names 'R_chunks_per_s − 1'",
+   "facts sheet F15: the caveat quoted the cross-session drift figure with no key -> the figure removed; the caveat cites register 46",
+   "P4-B (1) check 2: the beside-threshold was not defined in the report -> its definition is now printed (max(0.82% floor, the vars=1 and vars=4 steady spreads))",
+   "gates, budget row: 'first leg' showed the run stage's start (one second before the first leg) -> relabelled, and the deadline is printed"
+  ],
+  "template_change_for_round_2": "prompt_template.md gained two definitions (the facts-sheet display conventions and the check-2 beside-threshold); the round-1 prompts as sent are kept beside it"
+ },
+ "round_2": {
+  "outcome": "PASS",
+  "report_sha256": "ba32df6d0f490977f46409df3ebc3c9f1c786563cf530d677027971d174c16ac",
+  "verifiers": {
+   "C2": {
+    "figures_checked": 85,
+    "plant": "P4-B (1) shape table, vars=2 steady mean: true 7.4102, planted 7.4120",
+    "mismatches_reported": 1,
+    "unverifiable": [
+     "Paragraph: 'the full-scale sign' for vars=4 vs vars=1 — no full-scale vars=1/vars=4 legs are among the listed files, so the full-scale direction cannot be recomputed (the -12.62% steady and +59.95% span figures themselves were recomputed and match).",
+     "The ±8.19% agreement bound and the 0.82% floor are constants taken from the definitions, not derivable from data; they are consistent with the definitions (threshold max(0.82%, 0.13%, 0.30%) = 0.82% recomputed)."
+    ]
+   },
+   "D2": {
+    "figures_checked": 126,
+    "plant": "facts sheet F09 RocketRide idle spin cores: true 1.234, planted 1.243",
+    "mismatches_reported": 1,
+    "unverifiable": []
+   }
+  },
+  "plants_caught": "2 of 2",
+  "sections": "P4-B (1) (C2); Gates with the gate controls and the whole facts sheet (D2)",
+  "notes_acted_on": [
+   "C2 side note (not a figure): the P4-B (1) limits sentence said the slice's steady-phase rate is 'well above' full-scale throughput; that holds in one session only and compares across sessions -> the claim was removed (prose only, in the report and in the draft register entry)"
+  ]
+ },
+ "after_round_2": "the final report differs from the round-2 verified copy only in the generation timestamp, this record's result line, and the one prose sentence above (no figure)"
+}

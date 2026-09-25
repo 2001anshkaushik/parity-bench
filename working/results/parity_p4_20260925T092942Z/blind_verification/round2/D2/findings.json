@@ -1,0 +1,18 @@
+{
+ "figures_checked": 126,
+ "mismatches": [
+  {
+   "where": "## P4-B (4) — CTO facts sheet, row F09 (RocketRide idle spin, cores burned with nothing submitted)",
+   "figure": "working/results/parity_p3_20260925T035027Z/analysis_p3docs.json : P3_A.full.per_arm.rr.idle_spin_cores",
+   "report": "1.243",
+   "recomputed": "1.234"
+  }
+ ],
+ "unverifiable": [],
+ "notes": [
+  "Gates section (65 figures): G_d0 10/10 legs CLEAN and overall CLEAN; G_cell 10/10 PASS (read-back T=4, OMP_WAIT_POLICY as declared, 16 videos, max_in_flight = K, all checks true); G_memstat p4a_rr16_1 rows 1286, PASS; G_correct_active 4 pairs identical on 16 videos, PASS; protected image ids equal at chain start and end (UNCHANGED); budget 5 h (preregistration: start + 18,000 s; deadline_epoch 1790347408 = 14:43:28Z), chain done 13:27:07Z before deadline -> WITHIN. All match.",
+  "Gate controls: gate_controls.json run 1, 25 controls, 25 with pass true, all_pass true; every per-control outcome and rc in the table matches the record's 'got'. All match.",
+  "Facts sheet: 60 row values checked, 59 match; F09 mismatches. F42's caveat (names cells.a.mean): c/a - 1 = +2.10%, consistent with 'within 3%'.",
+  "Out of scope but checked for context: the '(two runs differ by X%)' caveat figures on F43-F56 all match the cells' spread keys in analysis_p4a.json."
+ ]
+}

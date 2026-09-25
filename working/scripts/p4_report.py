@@ -82,7 +82,9 @@ def sec_gates(A: Dict[str, Any], G: Dict[str, Any], runs: List[Dict[str, Any]], 
     same = all(ids0.get(k) == v and ids1.get(k) == v for k, v in prot.items())
     rows.append(["protected image ids", "rr:patched, rr:patched-video unchanged start → end",
                  " ".join(f"{k} {ids1.get(k, '—')[:19]}" for k in prot), "UNCHANGED" if same else "CHANGED OR UNREAD"])
-    rows.append(["budget", "5 h from the first leg", f"first leg {((start or {}).get('stage_start_utc') or '—')}; chain done {((done or {}).get('stage_complete_utc') or '—')}",
+    dl = (done or {}).get("deadline_epoch")
+    dls = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(int(dl))) if dl else "—"
+    rows.append(["budget", "5 h from the first leg (deadline set as the chain enters its first leg)", f"run stage start {((start or {}).get('stage_start_utc') or '—')}; deadline {dls}; chain done {((done or {}).get('stage_complete_utc') or '—')}",
                  "WITHIN" if done and not any("NOT_RUN_budget" in x for x in done.get("legs", [])) else "SEE NOT RUN"])
     out += table(["gate", "rule", "measured", "outcome"], rows)
     out += ["### Gate controls (every gate whole, in its real runtime; positive must PASS, null must FAIL)", ""]
@@ -204,7 +206,7 @@ def sec_b1(B: Dict[str, Any], notes: Dict[str, str]) -> List[str]:
     out += table(["shape (P3-C smoke)", "steady mean", "steady spread", "span mean (beside)", "span spread (beside)"],
                  [[k, f(v["steady_mean"], 4), share(v["steady_spread"], 2), f(v["span_mean_beside"], 4), share(v["span_spread_beside"], 2)] for k, v in c2["shapes"].items()])
     out += [f"Check 1 (both sessions agree): **{'PASS' if i['check_1']['pass'] else 'FAIL'}**. Check 2 (vars=4 slower than vars=1 on the steady phase; "
-            f"{pct(c2['vars4_vs_vars1_steady_minus_1'])}, beside the threshold {share(c2['threshold_beside'], 2)}): **{'PASS' if c2['pass'] else 'FAIL'}**.", "",
+            f"{pct(c2['vars4_vs_vars1_steady_minus_1'])}; reported beside, not the rule: the threshold max(0.82% floor, the vars=1 and vars=4 steady spreads) = {share(c2['threshold_beside'], 2)}): **{'PASS' if c2['pass'] else 'FAIL'}**.", "",
             f"**Verdict: {i['verdict']}**" + (f" — failed: {'; '.join(i['failed_checks'])}" if i["failed_checks"] else "") + ".", ""]
     if notes.get("B1"):
         out += [notes["B1"], ""]

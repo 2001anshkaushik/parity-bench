@@ -84,7 +84,7 @@ def main() -> int:
     s1 = at(P1, "analysis_p1docs.json", "legs.p1b_base_full.boot_id")[:8]
     fact("docs out of box", "stock rr:patched, one token, full corpus: span docs/s", f"{at(P1, 'analysis_p1docs.json', 'p1b.full.a_docs_per_s'):.4f}",
          P1, "analysis_p1docs.json", "p1b.full.a_docs_per_s", s1, "1 run",
-         "the out-of-box baseline; no same-session LlamaIndex full run (cross-session drift 15.4%: form no ratio)")
+         "the out-of-box baseline; no same-session LlamaIndex full run: form no ratio with a LlamaIndex figure (register 46)")
     fact("docs out of box", "stock rr:patched CPU-s per document (full corpus)", f"{at(P1, 'analysis_p1docs.json', 'legs.p1b_base_full.cpu_s_per_doc'):.3f}",
          P1, "analysis_p1docs.json", "legs.p1b_base_full.cpu_s_per_doc", s1, "1 run", "stock image at the banked posture")
     fact("docs fix", "with the wrapper fix (rr:p1-tikafix), full corpus: span docs/s", f"{at(P1, 'analysis_p1docs.json', 'p1b.full.b_docs_per_s'):.4f}",
@@ -101,10 +101,10 @@ def main() -> int:
     fact("docs parser", "HYBRID parser vs fixed Tika, full corpus: docs/s", pct(at(P3, "analysis_p3docs.json", "P3_D.full.hybrid.speed.delta")),
          P3, "analysis_p3docs.json", "P3_D.full.hybrid.speed.delta", s3, "1 run per arm", "a smaller, different output, not a faster parser; parser track closed")
     b2 = f"{P4}"
-    fact("docs parser", "HYBRID vs fixed Tika: chunks", pct(-at(b2, "analysis_p4b.json", "item2_parser_close_out.chunks_fewer"), 1),
+    fact("docs parser", "HYBRID vs fixed Tika: chunks, share fewer", f"{at(b2, 'analysis_p4b.json', 'item2_parser_close_out.chunks_fewer') * 100:.1f}% fewer",
          b2, "analysis_p4b.json", "item2_parser_close_out.chunks_fewer", s3, "1 run per arm", "fewer chunks for the same documents: its text differs from Tika's")
     fact("docs parser", "HYBRID vs fixed Tika: chunks/s", pct(at(b2, "analysis_p4b.json", "item2_parser_close_out.R_chunks_per_s") - 1),
-         b2, "analysis_p4b.json", "item2_parser_close_out.R_chunks_per_s", s3, "1 run per arm", "per chunk HYBRID is not faster: all of its docs/s gain is fewer chunks")
+         b2, "analysis_p4b.json", "item2_parser_close_out.R_chunks_per_s − 1", s3, "1 run per arm", "per chunk HYBRID is not faster: all of its docs/s gain is fewer chunks")
     fact("docs parser", "PURE parser: documents lost that fixed Tika recovers", f"{at(P3, 'analysis_p3docs.json', 'P3_D.full.pure.correctness.n_loses')}",
          P3, "analysis_p3docs.json", "P3_D.full.pure.correctness.n_loses", s3, "1 run", "not adoptable; the five P0's H6 predicted")
     s2d = at(P2, "analysis_p2docs.json", "legs.p2a_rr_a.boot_id")[:8]
@@ -171,7 +171,7 @@ def main() -> int:
     out = {"label": "P4-B (4) CTO facts sheet", "facts": FACTS}
     (p4 / "p4_facts.json").write_text(json.dumps(out, indent=1) + "\n")
     lines = ["# Parity campaign facts sheet (P0-P4)", "",
-             "Every figure is read by working/scripts/p4_facts.py from the named committed artifact at the named key; session = boot id prefix; one caveat line each. Withdrawn figures are not listed.", "",
+             "Every figure is read by working/scripts/p4_facts.py from the named committed artifact at the named key; a key ending in '− 1' shows that value minus one, and a percent shows 100 × the value; session = boot id prefix; one caveat line each. Withdrawn figures are not listed.", "",
              "| id | area | figure | value | source (artifact : key) | session | n | caveat |", "|---|---|---|---|---|---|---|---|"]
     for f in FACTS:
         lines.append(f"| {f['id']} | {f['area']} | {f['figure']} | {f['value']} | `{f['source']}` : `{f['keys']}` | {f['session']} | {f['n']} | {f['caveat']} |")

@@ -1,0 +1,15 @@
+{
+  "figures_checked": 85,
+  "mismatches": [
+    {
+      "where": "## P4-B (1) — shape (P3-C smoke) table, row vars=2, column 'steady mean'",
+      "figure": "steady-phase docs/s mean of p3c_t2_a and p3c_t2_b",
+      "report": "7.4120",
+      "recomputed": "7.4102 (p3c_t2_a 7.430374, p3c_t2_b 7.390047; mean 7.410210)"
+    }
+  ],
+  "unverifiable": [
+    "Paragraph: 'the full-scale sign' for vars=4 vs vars=1 — no full-scale vars=1/vars=4 legs are among the listed files, so the full-scale direction cannot be recomputed (the -12.62% steady and +59.95% span figures themselves were recomputed and match).",
+    "The ±8.19% agreement bound and the 0.82% floor are constants taken from the definitions, not derivable from data; they are consistent with the definitions (threshold max(0.82%, 0.13%, 0.30%) = 0.82% recomputed)."
+  ]
+}

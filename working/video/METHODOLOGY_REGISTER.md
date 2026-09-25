@@ -1949,3 +1949,38 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   as a known bias of every such gate. Better, pick a smoke whose busy-core count matches full scale.
 > - **A known bias from one experiment belongs in the next experiment's pre-registration.** P2-A's
 >   drain-dominated slice was known before P3-C was written.
+
+## 61. A gate that read the record before its writer finished it (added 2026-09-25)
+
+> P4's D0 gate for RocketRide video legs first read the p0 block in each leg's preflight file. The
+> driver writes that file before the leg, holding only the pre-leg read-back. After the leg it writes
+> the post-leg read-back and the mandate verdict into the EXPORT's p0 block. On P2's clean committed
+> leg the gate answered "evidence missing", so a clean P4 leg would have stopped the chain at its
+> first gate. The laptop dry run of the gate controls caught it before commit: the positive control,
+> a real clean leg, failed. Every null control "passed" against the broken gate, because a gate that
+> fails everything fails the nulls too.
+>
+> Rules:
+>
+> - **A gate reads the copy of a record that its writer finalises LAST.** When a writer completes a
+>   record in two places, the gate's rule names the one it reads.
+> - **Only a positive control on a real, clean target catches a gate that fails everything.** Null
+>   controls cannot. A control set without a passing real target proves nothing about the gate.
+
+## 62. A session that drifted between its rounds (added 2026-09-25)
+
+> P4-A ran five video cells twice each, ABAB, in one box session. Every cell's second run was slower
+> than its first, with the forward per frame 4% to 22% longer. Steal stayed near zero and the per-leg
+> MHz snapshots did not explain it. In P3-B, on the same box type, replicate spreads were about 1% or
+> less. In P4-A they reached 20% (LlamaIndex at one video in flight), and the pre-registered threshold,
+> "the larger within-session replicate spread", absorbed the drift. The readings still held, because
+> ABAB put both runs of every cell in each round, and read round by round they gave the same verdicts.
+> Without ABAB, the drift would have landed on whichever cells ran late.
+>
+> Rules:
+>
+> - **Within-session is not the same as stable.** Report each cell's run-to-run change and each
+>   round's readings beside the pooled rule. When a spread far exceeds the carried floors, say so
+>   where the reading is stated.
+> - **ABAB is what makes a drifting session readable.** Never run a cell's two runs back to back.
+>   A monotone drift then widens the thresholds instead of biasing a comparison.

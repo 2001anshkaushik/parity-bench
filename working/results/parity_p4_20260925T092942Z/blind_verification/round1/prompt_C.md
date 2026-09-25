@@ -1,0 +1,36 @@
+You are an independent verifier with no context about this project beyond this message. Your job: recompute every figure in the named sections of a Markdown report from raw measurement files (or, for the facts sheet, trace each figure to the artifact and key it names), and report every figure that does not match. Trust no number in the report.
+
+RULES
+- Read ONLY the report path given below and the files listed below. Do NOT open any file whose name starts with `analysis_` (EXCEPT the facts-sheet sources named in its own rows, and only for the facts-sheet section), any `P4_*` file other than the report path given, anything under `gates/` unless listed, any `*_spec.json`, PROGRESS_LOG*.md, anything under `working/scripts/` or `working/harness/`, or any other file. Do not run git. Recompute; do not look up.
+- Do not modify, move or delete any file. Use Python (/Users/ansh/RocketRide/Benchmarking/.venv/bin/python) for the arithmetic.
+- A figure MATCHES when your recomputed value, rounded exactly as the report displays it (same decimals, same percent formatting, thousands separators ignored, a leading + ignored), equals the report's value. Anything else is a MISMATCH — report it with both values. A figure you cannot recompute from the listed files is UNVERIFIABLE (say why) — that is not a mismatch.
+- Write your findings as JSON to /Users/ansh/RocketRide/Benchmarking/benchmark-A/working/results/parity_p4_20260925T092942Z/blind_verification/round1/C/findings.json with keys: figures_checked (int), mismatches (list of {where, figure, report, recomputed}), unverifiable (list). Finish with a short plain-text summary.
+
+THE REPORT: /Users/ansh/RocketRide/Benchmarking/benchmark-A/working/results/parity_p4_20260925T092942Z/blind_verification/round1/C/report.md
+Verify every figure in: the '## Summary' bullets 4-5 (P4-B (1) and (2)), '## P4-B (1) — steady-phase docs/s ...' (tables, checks and the paragraph) and '## P4-B (2) — parser track close-out ...' (tables and the closing statement). Skip prose-only sentences, file:line references, image ids, file names, boot-id prefixes and UTC timestamps.
+
+FILES (paths relative to /Users/ansh/RocketRide/Benchmarking/benchmark-A/working/results)
+- parity_p2_20260924T160106Z/p2a_rr_a, p2a_rr_b, p2a_li_a, p2a_li_b
+- parity_p3_20260925T035027Z/p3a_rr_h, p3a_li_h, p3c_t1_a, p3c_t1_b, p3c_t2_a, p3c_t2_b, p3c_t4_a, p3c_t4_b, p3a_rr_full, p3a_li_full, p3d_hyb_full
+  (in each ONLY perdoc_*.jsonl or perdoc_*.jsonl.gz, and leg_*.json)
+
+DEFINITIONS
+- Spread of a pair = |a − b| / ((a + b)/2) (two equal values: 0); mean = arithmetic mean; nearest-rank quantiles (rank ceil(q·n)); the median (p50) is the true median; sd = population standard deviation. Percent figures show the decimals the report shows; a delta carries a sign.
+- VIDEO LEGS (parity_p4_20260925T092942Z/p4a_*): the gated leg per name is the one listed with ':rc=0' or ':DEGRADED_all_rows' in chain_p4a_run_done.json's legs list (a retry is named <leg>_r1/_r2). Per leg:
+  - records_*.jsonl: keep rows with role == 'measured'; per video keep the LAST such row; 'ok' rows are those without an 'error' key. frames = Σ frames_observed over ok rows.
+  - frames/s = export_*.json throughput.total_frames / throughput.total_span_s.
+  - CPU-s/frame = export efficiency.service_cpu_s / frames.
+  - measured stamp rows = the LAST `frames` rows (by t_wall) of p1_stamps.jsonl among rows whose kind is absent or 'frame'.
+  - F = mean of 'forward' over measured stamp rows that carry it; the D1 set over those forwards: count, mean, sd, min, p50, p90, p95, p99, max, mean/p50.
+  - cores busy in the forward = Σ fw_proc_cpu / Σ forward, and caller on-CPU = Σ fw_thread_cpu / Σ forward, both over measured rows carrying forward and fw_thread_cpu (and fw_proc_cpu for the first).
+  - lock duty, RocketRide legs (rr16, rr1, act): Σ lock_held / (max(t_wall + decode + lock_wait + lock_held + emit) − min t_wall) over measured rows (missing components count 0). LlamaIndex legs (li16, li1): let t_first = min t_wall of measured rows; videos = rows with kind == 'video' and t_wall_release ≥ t_first; duty = Σ their lock_held / (max t_wall_release − t_first).
+  - caller switch rate = over measured rows carrying fw0_mono and tid, ordered by fw0_mono: (number of consecutive pairs with different tid) / (count − 1). Caller threads = distinct tid among those rows.
+  - sampled memory peak = max 'total' over memstat.jsonl rows, MB = bytes/1e6. steal = the delta (procstat_close − procstat_open) of the 8th number after 'cpu' / Σ of the deltas of the first 8 numbers; MHz = mean of the 'cpu MHz' values in mhz_open.txt / mhz_close.txt.
+  - torch T / OMP_WAIT_POLICY = p1_readback.json torch.num_threads / env.OMP_WAIT_POLICY ('ABSENT' if missing).
+  - Output identity of two legs: per video (LAST measured ok row) chunk_sha256 AND frame_scores equal; videos compared = videos ok in both.
+- CELLS: rr_k1 = p4a_rr1_1/2; rr_k16 = p4a_rr16_1/2; li_k1 = p4a_li1_1/2; li_k16 = p4a_li16_1/2; rr_k16_active = p4a_act_1/2. Per cell: mean and spread of each per-leg figure; 'forward p50 / p95' = the mean over the two legs of each leg's p50 / p95.
+- READINGS: D_RR = F(rr_k16)/F(rr_k1), D_LI = F(li_k16)/F(li_k1) (cell means of F); S1 = max F spread of rr_k1, rr_k16, li_k1, li_k16; R1 SUPPORTED iff D_RR/D_LI − 1 > S1 AND mean f/s rr_k1 ≥ mean f/s li_k1. RR degradation = F(rr_k16)/F(rr_k1) − 1, its threshold max(spread F rr_k1, rr_k16); closure c = (F(rr_k16) − F(active)) / (F(rr_k16) − F(rr_k1)); ACTIVE's reduction = F(rr_k16)/F(active) − 1; S2 = max(spread F rr_k16, active); R2 iff c ≥ 0.5 AND reduction > S2 (given the correctness gate passes and the degradation exceeds its threshold); else R3.
+- DOCS LEGS (P4-B 1 and 2): perdoc_*.jsonl or perdoc_*.jsonl.gz (gzip) rows: doc, ok, submit_ns, completion_ns, n_chunks. span docs/s = ok rows / ((max completion_ns − min submit_ns)/1e9). Steady-phase: t0 = min submit_ns; L = (max submit_ns − t0)/1e9; steady docs/s = (ok rows with (completion_ns − t0)/1e9 ≤ L) / L; drain share = (span − L)/span. Session ratios: P2-A = mean(steady p2a_rr_a, p2a_rr_b) / mean(steady p2a_li_a, p2a_li_b); P3-A health = steady p3a_rr_h / steady p3a_li_h; 'vs full-scale − 1' = ratio / R_full − 1 with R_full = (ok rows / span) of p3a_rr_full ÷ the same of p3a_li_full; agrees iff |that| ≤ 8.19%. Shapes: vars=t = p3c_t{t}_a, p3c_t{t}_b.
+  - Parser close-out: chunks = Σ n_chunks over ok rows; chunks/s = chunks / span s; CPU-s = leg_*.json cost.cpu_s; CPU-s per chunk = CPU-s / chunks; chunks per ok doc = chunks / ok. R_x = HYB/FIX; share from fewer chunks = ln(1/R_cpd)/ln(R_docs); from chunk throughput = ln(R_chunks)/ln(R_docs).
+- FACTS SHEET: each row names an artifact and a key path (dots separate keys; a list index is a number). A row MATCHES when the value at that key (for rows whose key text says 'mean' of several legs or 'mean of two', the mean of the named values; for percent rows, 100 × the value with the shown decimals; for MB rows, bytes/1e6 with no decimals; for 'x of y' rows, the length of the named list and the named count) displays as the report shows it.
+- Gate controls: counts of controls, of controls whose 'pass' is true, and all_pass, per record file.

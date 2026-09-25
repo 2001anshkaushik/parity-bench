@@ -1,0 +1,7 @@
+{
+ "report_sha256": "ba32df6d0f490977f46409df3ebc3c9f1c786563cf530d677027971d174c16ac",
+ "plants": {
+  "C2": "P4-B (1) shape table, vars=2 steady mean: true 7.4102, planted 7.4120",
+  "D2": "facts sheet F09 RocketRide idle spin cores: true 1.234, planted 1.243"
+ }
+}

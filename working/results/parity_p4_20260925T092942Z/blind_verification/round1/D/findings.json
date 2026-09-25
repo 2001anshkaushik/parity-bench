@@ -1,0 +1,38 @@
+{
+  "figures_checked": 137,
+  "breakdown": {
+    "gates_table": "36 (G_d0 10 legs + outcome; G_cell 10 legs + outcome; G_memstat rows + outcome; G_correct_active 4 pairs x identical/videos + outcome; protected ids outcome; budget rule 5 h + outcome), from gates/*.json, chain_p4a_run_start.json, chain_p4a_run_done.json, preregistration.json",
+    "gate_controls": "29 (header: 25 controls, 25 as expected, all_pass True, run 1; plus each of the 25 control outcomes and rc), from gate_controls.json",
+    "facts_sheet_values": "60 (F01-F60 value column against the named artifact and key)",
+    "facts_sheet_caveat_figures": "12 (F03 8.19% = P3_A.full.li_smoke_spread_bound; F42 'within 3%' = cells.c.mean/cells.a.mean - 1 = 2.10%; F43/F44/F46/F47/F49/F50/F52/F53/F55/F56 'the two runs differ by' = analysis_p4a.json cells.*.{frames_per_s,F_s}.spread), all match"
+  },
+  "mismatches": [
+    {
+      "where": "P4-B (4) facts sheet, row F16 (stock rr:patched CPU-s per document, full corpus)",
+      "figure": "working/results/parity_p1_20260923T184000Z/analysis_p1docs.json : legs.p1b_base_full.cpu_s_per_doc",
+      "report": "7.760",
+      "recomputed": "7.706 (key value 7.7062)"
+    },
+    {
+      "where": "P4-B (4) facts sheet, row F23 (HYBRID vs fixed Tika: chunks)",
+      "figure": "working/results/parity_p4_20260925T092942Z/analysis_p4b.json : item2_parser_close_out.chunks_fewer",
+      "report": "-10.9%",
+      "recomputed": "10.9% (key value 0.10899; 100 x value). Sign/convention only: the report shows the negated key value; the magnitude is correct and 'chunks_fewer' implies a -10.9% change, so no arithmetic error, but the row does not display the named key's value as the facts-sheet rule defines it."
+    },
+    {
+      "where": "P4-B (4) facts sheet, row F24 (HYBRID vs fixed Tika: chunks/s)",
+      "figure": "working/results/parity_p4_20260925T092942Z/analysis_p4b.json : item2_parser_close_out.R_chunks_per_s",
+      "report": "-1.64%",
+      "recomputed": "98.36% (key value 0.98360; 100 x value). Transform/convention only: the report shows value - 1 = -1.64%, which is arithmetically consistent, but the named key holds the ratio, not the delta, so the row does not display the named key's value as the facts-sheet rule defines it."
+    }
+  ],
+  "unverifiable": [
+    "F15 caveat 'cross-session drift 15.4%': no key in the named artifact (analysis_p1docs.json) holds a 15.4% drift or its ratio; the row's value 2.3454 itself matches p1b.full.a_docs_per_s.",
+    "Gates G_memstat '1,286 rows' and every G_d0/G_cell per-leg outcome are verified against the gate records only; the underlying leg files (memstat.jsonl, exports, p1_readback.json) are not in the gate-section file list, so the gate records themselves were not re-derived from raw leg data."
+  ],
+  "notes": [
+    "Budget: first leg 2026-09-25T09:43:27Z to chain done 13:27:07Z = 3.73 h < 5 h; chain_p4a_run_done.json deadline_epoch 1790347408 is start + 18,001 s (preregistration says + 18,000 s), a one-second difference that does not change WITHIN.",
+    "Protected image ids: rr:patched and rr:patched-video identical in image_ids_at_start and image_ids_at_end -> UNCHANGED matches.",
+    "All other F-rows match, including composite keys: F32 1.423, F33 0.878, F34 2.094 (mean of the two cpu_s_per_frame values), F35 1.23 (mean 1.2305 of 1.226, 1.235), F39 5,397 -> 2,415 (anon means 5396.93 MB, 2414.50 MB), F40 4.44 (mean 4.4353), F20 0 of 9,885, F38 16 of 16 videos, both pairs."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+ "figures_checked": 241,
+ "mismatches": [
+  {
+   "where": "### Forward pass per frame, full D1 metric set / row p4a_rr1_2 / column p95",
+   "figure": "p95 of forward over the 3,203 measured stamp rows (nearest-rank, rank ceil(0.95*3203)=3043)",
+   "report": "0.2517",
+   "recomputed": "0.2507"
+  }
+ ],
+ "unverifiable": []
+}
