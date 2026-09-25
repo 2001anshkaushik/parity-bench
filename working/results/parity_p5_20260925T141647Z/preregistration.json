@@ -1,0 +1,85 @@
+{
+ "label": "P5 pre-registration (feat/parity-p5 from feat/parity-p4 264872d7). Written and committed BEFORE the first leg; every hypothesis, reading rule and gate threshold is fixed here. Nothing below changes after data exists; an amendment would be a NEW file, named as such.",
+ "written_utc": "2026-09-25T14:16:47Z",
+ "branch": {"name": "feat/parity-p5", "from": "feat/parity-p4", "at": "264872d7d03df1a51e7c6c2ef9ae630c9bfc7ec7"},
+ "step0": {
+  "sso": "checked 2026-09-25T14:02Z: role credentials valid to 19:31:40Z; neither expired nor within 2 h of expiry -> no login. The 7.5 h budget will outlast the credentials; Ansh is asked to re-login before a leg that would outlast them.",
+  "autoland_self_test": "71 pass, 0 fail",
+  "origin": "feat/parity-p4 on origin = 264872d7; feat/parity-p5 created from it",
+  "register": "the drafted steady-phase entry added as register entry 63 (Ansh's ruling: steady-phase docs/s is the pre-registered metric for docs throughput smoke gates from P5 on; span still reported)"
+ },
+ "carried_rules": {
+  "mandate": "ONE engine process, ONE pipeline (one token), ONE model instance per model; threads unrestricted. P5's inference thread is one extra thread in the one task process, owning the one detector. LlamaIndex: ONE container, ONE worker.",
+  "D0": "after every leg (G_d0): RocketRide — the on-token D0 read-back pre and post, mandate clean, AND exactly ONE LWDETR root module in both (P5's 'D0 must read 1'); LlamaIndex — one container, one process, --workers 1. A violation or absent evidence stops the run (exit 9).",
+  "rulings": "A (32 vCPU, unconstrained) and C (one workload at a time)",
+  "retries": "at most two per leg; DEGRADED-with-all-rows kept as the result",
+  "per_leg": "steal, CPU model, MHz open/close, boot id; percore sampler; 1 Hz memory sampler verified non-empty after the first measured leg (exit 10)",
+  "images": "one new image, rr:p5-infer FROM rr:patched-video; rr:patched and rr:patched-video read back before and after the build (the build refuses on any change) and at every stage's start and end",
+  "abab": "register 62: every comparison is interleaved ABAB; same session alone is not protection",
+  "canary": "at the start of each round (and in P5-B before the first block and after block 6): the P3-B bare microbenchmark (working/video/p3b/p3b_bench.py) in rr:patched-video on the first manifest video's frames (v00_EN2001a of p3b_frames_manifest.json, 239 frames), T=4, one caller, alone; its mean forward per frame is reported per round. It explains drift and NEVER adjusts any figure. G_canary checks it ran on exactly those frames (sha256 against the committed manifest), one model instance, torch 4 threads."
+ },
+ "budget": "7.5 hours from the run stage's first leg (P5_DEADLINE_EPOCH = that start + 27,000 s). Order: P5-A build and controls, P5-A smoke, P5-B only if its gate fires. Past the budget the leg or block in flight finishes and the rest is NOT RUN; report; stop the box. P5-C runs on the laptop while the box measures.",
+
+ "P5_A": {
+  "hypothesis": "RocketRide's forward-pass slowdown under concurrency comes from 16 caller threads taking turns at the model frame by frame. A single dedicated inference thread fed by a bounded frame queue keeps the forward near its one-video time while decoding overlaps, removing the slowdown.",
+  "evidence_before": ["P4-A (one session, ABAB, output identical 16/16): RR forward slows 1.867x from K=1 to K=16, LI 1.403x; RR's is 33.0% worse (threshold 19.8%)",
+                      "caller switch rate: RR K=16 0.997, RR K=1 0.005, LI K=16 0.005",
+                      "frames/s: RR 4.34 at K=1 falls to 2.67 at K=16; LI 2.98 rises to 3.30",
+                      "OMP_WAIT_POLICY=ACTIVE closed -0.115 of the slowdown at +72% CPU/frame (R3)"],
+  "build": {
+   "image": "rr:p5-infer FROM rr:patched-video (working/scripts/p5_infer_build.sh); adds exactly engine/nodes/detect/IGlobal.py, IInstance.py and infer_worker.py from working/nodes/p5_infer_src",
+   "design": "the P4-B (3) design: every in-flight video's pipeline instance decodes its frame on its own thread, submits it to ONE bounded FIFO queue (RR_DETECT_QUEUE_MAX, default 64) and blocks on its own Future; ONE dedicated daemon thread ('detect-infer') owns the single Detector and runs every detect() (the same call, same object, same pre/post-processing) at T=4; results route back per video in original frame order by construction (one outstanding frame per caller); the per-frame device lock is removed (the queue replaces it); a detect error reaches its own caller's existing except branch; a frame waits at most 600 s",
+   "base_md5": {"IInstance.py": "984d80e45e885b5ae21e987664850b4c", "IGlobal.py": "9edc29c94a5a34ba366d938d048e89fd"},
+   "laptop_test": "working/scripts/p5_worker_test.py: 16 callers x 40 frames routed and ordered, ONE detect thread, backpressure, error propagation, close — clean and stamped workers — with a mis-routing null control that must be caught",
+   "G_build_A": "the in-image check working/nodes/p5_infer_src/check_p5_in_image.py, run whole under the engine's own Python in the image: node identity (the three files carry the P5 source md5s), the node files compile, the shipped worker loads, ONE frame (v00_EN2001a/f_000001.png) goes end to end through it on the inference thread with a Detector built as IGlobal builds it, its detections equal a direct detect(), and exactly ONE LWDETR exists. Controls: POSITIVE rr:p5-infer must pass; NULL rr:patched-video must fail (node identity). The build refuses to finish unless the check passes (exit 8) and the chain stops."
+  },
+  "stamps": "V2-style stamps on the forward on every cell: stock RR and LlamaIndex use the P1 stamped copies (p1_stamp.sh, as P4); P5 uses its own stamped copy (working/nodes/p5_infer_stamped, installed by p5_stamp.sh only onto the clean P5 files' md5s): forward pre/post hooks on the same root module, fired on the inference thread; decode, queue wait, inference held, hand-off and emit per frame; the queue depth right after each frame is queued; thread and process CPU across the forward; the one-time read-back taken ON the inference thread",
+  "CORRECTNESS_GATE": {
+   "rule": "HARD, evaluated after round 1's p5a_p5k1_1 (G_correct_A1): rr:p5-infer output identical (per-video chunk sha256 AND frame scores) to rr:patched-video at T=4 on 16/16 videos at BOTH K=16 and K=1: p5a_p5k16_1 vs p5a_stock16_1, p5a_p5k1_1 vs p5a_stock16_1, and p5a_p5k1_1 vs P4's committed stock K=1 leg p4a_rr1_1. If any differs: OUTPUT-CHANGING, no speed reading, P5-A and P5-B stop (exit 13). After round 2 every (P5, stock) pair is recorded (G_correct_A).",
+   "order": "correctness is reported before any speed figure"
+  },
+  "smoke": {
+   "slice": "the 16-video AMI slice (the first 16 measured manifest rows), T=4, stamped, every leg alone, a fresh container per leg",
+   "order": "two ABAB rounds, each preceded by the canary: p5c_can_r, p5a_stock16_r (rr:patched-video, K=16), p5a_p5k16_r (rr:p5-infer, K=16), p5a_p5k1_r (rr:p5-infer, K=1), p5a_li16_r (li:video one instance, K=16); r = 1, 2"
+  },
+  "metrics_per_leg": {
+   "frames_per_s": "export total_frames / total_span_s",
+   "forward": "F = mean forward over the measured stamp rows (the last N frame rows by t_wall, N = frames of the last measured record per video without error), with the full D1 metric set",
+   "inference_duty": "stock RR: P0 V2's lock duty (lock held / window); P5: the inference thread's held time / the same kind of window (max(t_wall + decode + queue wait + held + hand-off + emit) - min t_wall); LlamaIndex: P0 V2's per-video lock duty",
+   "cores_busy_in_forward": "sum fw_proc_cpu / sum forward (registered bias: at K=16 other callers' concurrent work counts)",
+   "cpu_s_per_frame": "export service_cpu_s / frames",
+   "queue_depth": "P5 only: the queue size right after each measured frame is queued — D1 metric set and histogram",
+   "memory": "the sampled memory peak (max total in memstat.jsonl)"
+  },
+  "readings": {
+   "spread": "each cell runs once per round, so its replicate spread is the spread of its two ABAB runs, |a - b| / mean. 'beyond' = by more than the larger replicate spread of the two cells compared. Per round the same thresholds are applied to that round's values; pooled uses the cell means.",
+   "S1_FIX_WORKS": "holds iff |F(p5 K=16) / F(p5 K=1) - 1| <= max(spread_F p5 K=16, spread_F p5 K=1) AND fps(p5 K=16) / fps(stock K=16) - 1 > max(spread_fps p5 K=16, spread_fps stock K=16)",
+   "S2_PARITY": "holds iff fps(p5 K=16) / fps(LI K=16) >= 0.95",
+   "report": "both per round and pooled, stated plainly"
+  },
+  "SMOKE_GATE_P5B": "G_smoke_P5B fires iff the correctness gate passed AND S1 holds AND S2 holds, POOLED (the per-round readings are reported beside and do not gate)"
+ },
+
+ "P5_B": {
+  "run_only_if": "G_smoke_P5B fired",
+  "design": "RR p5 K=16 vs LI K=16, T=4, stamped, the 168-video slice (the first 168 measured manifest rows) in 11 blocks (10 x 16, then 8), arms alternating block by block — odd blocks RR first, even blocks LI first — so each arm processes all 168 exactly once. Each block is its own driver run on a per-block manifest (the meta row, the warm rows, that block's measured rows; recorded in p5b_manifests/).",
+  "containers": "DESIGN CHOICE (stated here, before data): ONE container per arm for the whole stage; while one arm runs a block the other arm's container is PAUSED (docker pause: its cgroup frozen, no CPU) — one workload at a time; the paused container's cgroup CPU over each block and its paused state are recorded. Reason: a fresh LlamaIndex container needs the driver's K=16 warm-up (16 video sends, about 14 min) and 11 of them do not fit the budget. RocketRide warms up at every block (each driver run starts a new task process, and the D0 read-back is taken per block); LlamaIndex warms up at its first block, and before every later block the chain re-reads its warm marker through /health (wait_ready --workers 1) and runs the driver with --skip-warmup (the container is not fresh). The canary runs with both service containers paused (none running).",
+  "canary": "before the first block and after block 6",
+  "gates_per_block": "G_d0 and G_cell (K=16, n = the block's videos) as in P5-A; a failure stops the stage (exit 9 / 11)",
+  "report": "per-arm total frames/s (sum of frames / sum of the blocks' spans) and the ratio RR/LI; the per-block ratio distribution (min, p50, max); errors and D0 per block; the paused container's CPU per block",
+  "CORRECTNESS": "RR p5 output per video against the banked P1-D stock RR T=4 168-video output (parity_p1_20260923T184000Z/v1full_rr_t4): chunk sha256 AND frame scores; every video that differs is named"
+ },
+
+ "P5_C_laptop": {
+  "(1)_CTO_brief": "one page, generated strictly from the P4 facts sheet keys (parity_p4_20260925T092942Z/p4_facts.json) plus the P5 analysis files; every figure cites its key. It states: docs 'matches, not beats' (corroborated by the steady-phase ABAB ratios 1.048 and 1.052 across two sessions); the unshipped wrapper fix, and that the one-byte patch breaks image pipelines (source P2D_WRAPPER_TICKET_DRAFT.md); the CPU, memory and idle-spin costs; the out-of-box baseline; the video mechanism, and P5's result or NOT RUN. Draft only: not sent, posted or filed.",
+  "(2)_drift_note": "the canary per round beside P4's round-to-round drift (analysis_p4a_posthoc.json). Rule, fixed now: the canary MOVED iff |canary round-2 F / round-1 F - 1| > 0.82% (the RR floor); it moved WITH the cells iff it moved in the same direction as the median of the P5-A cells' round-2/round-1 forward changes. No figure is adjusted."
+ },
+
+ "gates": {
+  "list": "G_alone (before every leg), G_build_A (the build), G_d0 and G_cell (after every leg and block), G_memstat (after the first measured leg), G_canary (after every canary), G_correct_A1 (hard, after round 1's P5 K=1 leg), G_correct_A (recorded), G_smoke_P5B",
+  "G_cell": "the leg's own read-back: torch threads == 4 and OMP_NUM_THREADS == 4 in the detector's read-back (P5: read ON the inference thread, node 'p5-infer stamped', ONE inference thread ran every measured forward), OMP_WAIT_POLICY absent, the container's image id == the declared image's id, n videos, max in flight == min(K, n), stamps on every measured frame. Fail -> exit 11.",
+  "GATE_CONTROLS": "p5_gate_controls.py runs every gate whole in its real runtime against a positive (must PASS) and a null (must FAIL) before launch; the run stage refuses without an all_pass record. Control targets: committed legs (P0, P2, P3, P4, batch-size smoke) and the control stage's real legs p5ctl_p5 (rr:p5-infer), p5ctl_stock (rr:patched-video), p5ctl_li (li:video) — each K=2, 2 videos, stamped, through the chain's own leg() — and p5ctl_canary; the smoke gate's positive and null are P4's committed legs re-expressed in the P5 stamp schema (P5 K=16 := P4 stock K=1 -> must FIRE; P5 K=16 := P4 ACTIVE -> must NOT FIRE). The control legs are gate-control targets, not measured legs."
+ },
+
+ "deliverable": "one P5 report: the gate table with each gate's control results; correctness before speed; S1 and S2 stated plainly, per round and pooled; the P5-B result or NOT RUN; the canary drift note; the CTO brief draft. Blind recompute with planted figures. Stop the box and read back its state."
+}

@@ -1,0 +1,335 @@
+# =============================================================================
+# MIT License
+#
+# Copyright (c) 2026 Aparavi Software AG
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# =============================================================================
+
+import json
+import time
+
+from rocketlib import IInstanceBase, AVI_ACTION, debug, warning
+from ai.common.image import ImageProcessor
+from .IGlobal import IGlobal
+
+# P5: a frame waits at most this long for the inference thread (then the node's own except branch drops it)
+_RESULT_TIMEOUT_S = 600.0
+
+
+# P5 STAMPED COPY (benchmark-only; never part of RocketRide) of working/nodes/p5_infer_src/IInstance.py, with
+# P1 E2's instrumentation (working/nodes/p1_detect_stamped/IInstance.py) carried over unchanged in method:
+# per-frame timing marks on the caller (decode, submit, result, emit) and on the inference thread (pick-up,
+# detect, forward), and pass-through timing wrappers on the
+# facade's own steps (resize_for_inference, DetectorLoader.preprocess/inference/postprocess,
+# Detector._rescale_to_original, RFDetrLoader.detect, the rfdetr model's predict) plus torch
+# forward pre/post hooks on its root nn.Module. Every wrapper calls the original with the same
+# arguments and returns its result unchanged. Copied into a RUNNING container's writable layer
+# (never the image) only when that container's original file has the md5 this was derived from.
+# ---------------------------------------------------------------------------------------------
+import os as _os
+import threading as _th
+os, threading = _os, _th   # names the P1 additions use
+
+from .infer_worker import TL as _TL, ON_FRAME_DONE as _ON_FRAME_DONE
+_OUT = _os.environ.get('P5_STAMPS_OUT', '/tmp/p5_stamps.jsonl')
+_WLOCK = _th.Lock()
+_INSTALLED = []
+
+
+def _m(k):
+    d = getattr(_TL, 'd', None)
+    if d is not None and k not in d:
+        d[k] = time.perf_counter()
+
+
+# ---- P1 E2 additions (additions only; nothing here touches a frame, a detection or a vector) ----
+# Per frame: the forward pass's interval on CLOCK_MONOTONIC (the clock bpftrace's nsecs uses), and the
+# CPU the calling thread and the whole process spent across it (thread_time / process_time).
+# Once per process, after its third recorded frame: an in-process read-back of the torch pools,
+# the thread env, the CPU capability, grad/inference mode inside forward, and every thread's affinity.
+_P1_FWMODE = {}
+_P1_RB = {'frames': 0, 'done': False}
+
+
+def _p1_c(d, k):
+    if d is not None and (k + '_mono') not in d:
+        d[k + '_mono'] = time.monotonic()
+        d[k + '_tcpu'] = time.thread_time()
+        d[k + '_pcpu'] = time.process_time()
+
+
+def _p1_fwmode():
+    if not _P1_FWMODE:
+        try:
+            import torch
+            _P1_FWMODE.update({'grad_enabled': torch.is_grad_enabled(),
+                               'inference_mode': torch.is_inference_mode_enabled()})
+        except Exception as e:                   # noqa: BLE001
+            _P1_FWMODE['error'] = f'{type(e).__name__}: {e}'
+
+
+def _p1_fields(d):
+    def sp(a, b):
+        return (d[b] - d[a]) if (a in d and b in d) else None
+    return {'fw0_mono': d.get('fw0_mono'), 'fw1_mono': d.get('fw1_mono'),
+            'fw_thread_cpu': sp('fw0_tcpu', 'fw1_tcpu'), 'fw_proc_cpu': sp('fw0_pcpu', 'fw1_pcpu'),
+            'hold0_mono': d.get('h0_mono'), 'hold1_mono': d.get('h1_mono')}
+
+
+def _p1_readback_tick():
+    try:
+        _P1_RB['frames'] += 1
+        if _P1_RB['done'] or _P1_RB['frames'] < 3:
+            return
+        _P1_RB['done'] = True
+        import sys
+        out = {'pid': os.getpid(), 't_wall': time.time(), 't_mono': time.monotonic(),
+               'forward_mode': dict(_P1_FWMODE)}
+        try:
+            import torch
+            out['torch'] = {'version': torch.__version__, 'num_threads': torch.get_num_threads(),
+                            'num_interop_threads': torch.get_num_interop_threads(),
+                            'parallel_info': torch.__config__.parallel_info(),
+                            'cpu_capability': torch.backends.cpu.get_cpu_capability(),
+                            'mkldnn_enabled': bool(torch.backends.mkldnn.enabled),
+                            'default_dtype': str(torch.get_default_dtype()),
+                            'float32_matmul_precision': torch.get_float32_matmul_precision()}
+        except Exception as e:                   # noqa: BLE001
+            out['torch'] = f'unavailable: {type(e).__name__}: {e}'
+        out['env'] = {k: v for k, v in os.environ.items()
+                      if k.startswith(('OMP_', 'MKL_', 'KMP_', 'GOMP_', 'OPENBLAS_', 'VECLIB_', 'NUMEXPR_',
+                                       'TORCH_', 'ATEN_', 'DNNL_', 'ONEDNN_', 'PYTORCH_', 'MALLOC_', 'LD_PRELOAD'))}
+        out['process_affinity'] = sorted(os.sched_getaffinity(0))
+        th = []
+        for tid in sorted(os.listdir('/proc/self/task'), key=int):
+            try:
+                with open(f'/proc/self/task/{tid}/status') as fh:
+                    f = dict(ln.split(':', 1) for ln in fh.read().splitlines() if ':' in ln)
+                th.append([int(tid), f.get('Name', '').strip(), f.get('Cpus_allowed_list', '').strip()])
+            except (OSError, ValueError):
+                continue
+        out['os_threads'] = th
+        out['switch_interval_s'] = sys.getswitchinterval()
+        try:
+            out['monitoring_tools'] = {i: sys.monitoring.get_tool(i) for i in range(6) if sys.monitoring.get_tool(i)}
+        except Exception as e:                   # noqa: BLE001
+            out['monitoring_tools'] = f'unavailable: {e}'
+        out['gettrace'] = repr(sys.gettrace())
+        out['getprofile'] = repr(sys.getprofile())
+        out['python_threads'] = sorted(t.name for t in threading.enumerate())
+        out['node'] = 'p5-infer stamped'
+        out['readback_thread'] = {'name': threading.current_thread().name, 'native_id': threading.get_native_id()}
+        with open(os.environ.get('P5_READBACK_OUT', '/tmp/p5_readback.json'), 'w') as fh:
+            fh.write(json.dumps(out, indent=1, default=str))
+    except Exception:                            # noqa: BLE001 — never the frame's problem
+        pass
+
+
+def _wrap(orig, a, b):
+    def w(*args, **kw):
+        _m(a)
+        r = orig(*args, **kw)
+        _m(b)
+        return r
+    return w
+
+
+_INSTALL_ERR = []
+
+
+def _install():
+    # An instrumentation failure must NEVER reach the frame: the node's own except below would drop
+    # the frame and change the output. Failures are recorded and the frame runs uninstrumented.
+    with _WLOCK:
+        if _INSTALLED:
+            return
+        _INSTALLED.append(True)
+        try:
+            _install_inner()
+        except Exception as e:                   # noqa: BLE001
+            _INSTALL_ERR.append(f"{type(e).__name__}: {e}")
+
+
+def _install_inner():
+    if True:
+        from ai.common.image import dense_resize as _dr
+        from ai.common.models.vision import detection as _det
+        _dr.resize_for_inference = _wrap(_dr.resize_for_inference, 'rs0', 'rs1')
+        for name in ('preprocess', 'inference', 'postprocess'):
+            setattr(_det.DetectorLoader, name,
+                    staticmethod(_wrap(getattr(_det.DetectorLoader, name), name + '0', name + '1')))
+        _det.Detector._rescale_to_original = staticmethod(
+            _wrap(_det.Detector._rescale_to_original, 'sc0', 'sc1'))
+        orig_detect = _det.RFDetrLoader.detect
+
+        def rfd(self, *args, **kw):
+            m = getattr(self, '_model', None)
+            if m is not None and not getattr(self, '_p0_hooked', False):
+                self._p0_hooked = True
+                try:
+                    import torch
+                    mod = getattr(getattr(m, 'model', None), 'model', None)
+                    if isinstance(mod, torch.nn.Module):
+                        def _pre(*x):
+                            _m('fw0')
+                            _p1_c(getattr(_TL, 'd', None), 'fw0')
+                            _p1_fwmode()
+
+                        def _post(*x):
+                            _p1_c(getattr(_TL, 'd', None), 'fw1')
+                            _m('fw1')
+                        mod.register_forward_pre_hook(_pre)
+                        mod.register_forward_hook(_post)
+                    m.predict = _wrap(m.predict, 'pr0', 'pr1')
+                except Exception as e:           # noqa: BLE001
+                    _INSTALL_ERR.append(f"hooks: {type(e).__name__}: {e}")
+            _m('rfd0')
+            r = orig_detect(self, *args, **kw)
+            _m('rfd1')
+            return r
+        _det.RFDetrLoader.detect = rfd
+        _INSTALLED.append(True)
+
+
+
+def _span(d, a, b):
+    return (d[b] - d[a]) if (a in d and b in d) else None
+
+
+def _record(d, n_dets):
+    rec = {'kind': 'frame', 't_wall': d.get('wall'), 'tid': _th.get_native_id(), 'infer_tid': d.get('infer_tid'),
+           'n_dets': n_dets, 'qdepth': d.get('qdepth'),
+           'decode': _span(d, 't0', 'dec1'), 'queue_wait': _span(d, 'sub0', 'ws'), 'infer_held': _span(d, 'ws', 'we'),
+           'handoff': _span(d, 'we', 'res1'), 'emit': _span(d, 'res1', 'em1'),
+           'resize': _span(d, 'rs0', 'rs1'), 'preprocess': _span(d, 'preprocess0', 'preprocess1'),
+           'inference': _span(d, 'inference0', 'inference1'), 'loader_post': _span(d, 'postprocess0', 'postprocess1'),
+           'rescale': _span(d, 'sc0', 'sc1'), 'predict_pre': _span(d, 'pr0', 'fw0'), 'forward': _span(d, 'fw0', 'fw1'),
+           'predict_post': _span(d, 'fw1', 'pr1'), 'dict_build': _span(d, 'pr1', 'rfd1'), **_p1_fields(d)}
+    if _INSTALL_ERR:
+        rec['instrument_error'] = _INSTALL_ERR[:3]
+    try:
+        with _WLOCK:
+            with open(_OUT, 'a') as f:
+                f.write(json.dumps(rec) + '\n')
+    except Exception:                            # noqa: BLE001 — never the frame's problem
+        pass
+
+
+_ON_FRAME_DONE.append(_p1_readback_tick)
+
+
+class IInstance(IInstanceBase):
+    """
+    Per-frame object detection for the detect node.
+
+    Accepts an image lane (AVI stream). Emits per frame:
+      - text lane: JSON array of detections [{label, score, box, centroid}].
+      - image lane: annotated frame with bounding boxes + labels.
+    """
+
+    IGlobal: IGlobal
+
+    def __init__(self, *args, **kwargs):
+        """Initialize per-instance image-accumulation state."""
+        super().__init__(*args, **kwargs)
+        self._image_data = None
+
+    def _annotate(self, image, detections):
+        """Draw boxes + labels onto a copy of the image.
+
+        Args:
+            image: Source PIL image.
+            detections: Canonical detection dicts.
+
+        Returns:
+            Annotated PIL image copy.
+        """
+        from PIL import ImageDraw
+
+        annotated = image.copy()
+        draw = ImageDraw.Draw(annotated)
+        for det in detections:
+            b = det['box']
+            draw.rectangle([b['x1'], b['y1'], b['x2'], b['y2']], outline='lime', width=2)
+            draw.text((b['x1'], b['y1'] - 10), f'{det["label"]} {det["score"]:.2f}', fill='lime')
+        return annotated
+
+    def _emit(self, image, detections):
+        """Write detections (text lane) and the annotated frame (image lane).
+
+        Args:
+            image: Source PIL image for this frame.
+            detections: Canonical detection dicts.
+        """
+        if self.instance.hasListener('text'):
+            self.instance.writeText(json.dumps(detections))
+
+        if self.instance.hasListener('image'):
+            image_bytes = ImageProcessor.get_bytes(self._annotate(image, detections), fmt='JPEG')
+            self.instance.writeImage(AVI_ACTION.BEGIN, 'image/jpeg')
+            self.instance.writeImage(AVI_ACTION.WRITE, 'image/jpeg', image_bytes)
+            self.instance.writeImage(AVI_ACTION.END, 'image/jpeg')
+
+    def writeImage(self, action: int, mimeType: str, buffer: bytes):
+        """Accumulate an inbound image stream and run detection on END.
+
+        Args:
+            action: AVI stream action (BEGIN/WRITE/END).
+            mimeType: MIME type of the image chunk.
+            buffer: Raw bytes for a WRITE action.
+
+        Returns:
+            preventDefault() on END to suppress default forwarding; None otherwise.
+        """
+        if action == AVI_ACTION.BEGIN:
+            self._image_data = bytearray()
+        elif action == AVI_ACTION.WRITE:
+            self._image_data += buffer
+        elif action == AVI_ACTION.END:
+            try:
+                _install()
+                _TL.d = {'wall': time.time()}
+                _m('t0')
+                t0 = time.perf_counter()
+                image = ImageProcessor.load_image_from_bytes(self._image_data)
+                _m('dec1')
+                t_decode = (time.perf_counter() - t0) * 1000
+                t0 = time.perf_counter()
+                detections = self.IGlobal.infer.detect(image, timeout=_RESULT_TIMEOUT_S, ctx=_TL.d)
+                _m('res1')
+                t_detect = (time.perf_counter() - t0) * 1000
+                t0 = time.perf_counter()
+                self._emit(image, detections)
+                _m('em1')
+                try:
+                    _record(_TL.d, len(detections))
+                except Exception:                # noqa: BLE001 — never the frame's problem
+                    pass
+                _TL.d = None
+                t_emit = (time.perf_counter() - t0) * 1000
+                debug(
+                    f'detect: decode={t_decode:.0f}ms detect={t_detect:.0f}ms '
+                    f'emit={t_emit:.0f}ms total={t_decode + t_detect + t_emit:.0f}ms'
+                )
+            except Exception as exc:
+                warning(f'detect: dropping frame due to inference error: {exc}')
+            finally:
+                self._image_data = None
+            return self.preventDefault()

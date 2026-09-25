@@ -1984,3 +1984,30 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   where the reading is stated.
 > - **ABAB is what makes a drifting session readable.** Never run a cell's two runs back to back.
 >   A monotone drift then widens the thresholds instead of biasing a comparison.
+
+## 63. Steady-phase docs/s is the smoke metric for docs throughput gates (added 2026-09-25; Ansh's ruling)
+
+> P2-A and P3-A ran their smoke gates on the 384-document slice with span docs/s: documents answered
+> ok, divided by the time from the first submission to the last completion. On that slice most of the
+> span is drain, the tail after the last submission when fewer than C documents remain in flight. The
+> drain penalises whichever arm has the longer tail, and it leaves the box idle. So a span-based
+> smoke neither predicted the full-scale ratio (P2-A's gate did not fire, yet P3-A's full run cleared
+> the bar) nor ranked thread shapes the way full scale did (P3-C, register 60).
+>
+> P4-B (1) re-read the committed 384-slice legs with P0's steady-phase definition: ok documents
+> completed by the last submission, divided by the time to the last submission. The rule was fixed
+> before the figures were computed, and the validation is post-hoc. In both sessions (P2-A, P3-A
+> health) the steady-phase RocketRide/LlamaIndex ratio agreed with the full-scale ratio within
+> LlamaIndex's replicate spread. The steady phase also ranked vars=4 below vars=1, as full scale did
+> (parity_p4_20260925T092942Z/analysis_p4b.json). Ansh ruled on 2026-09-25 that from P5 on it is
+> the pre-registered metric for docs throughput smoke gates.
+>
+> Rules:
+>
+> - **A docs throughput smoke gate reads steady-phase docs/s, pre-registered as such.** Span docs/s
+>   and the drain share are still reported beside it.
+> - **Only ratios and rankings carry over.** The absolute steady-phase rate on a slice is not
+>   full-scale throughput and is never quoted as throughput.
+> - **Its first pre-registered use records its own full-scale confirmation.** The validation behind
+>   this rule is two sessions and one shape comparison, post-hoc; the rule is revisited if a
+>   full-scale run disagrees.
