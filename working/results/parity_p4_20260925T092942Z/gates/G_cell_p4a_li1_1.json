@@ -1,0 +1,35 @@
+{
+ "gate": "G_cell_p4a_li1_1",
+ "decided_utc": "2026-09-25T11:07:31Z",
+ "leg": "p4a_li1_1",
+ "declared": {
+  "arm": "li",
+  "K": 1,
+  "T": 4,
+  "OMP_WAIT_POLICY": "unset",
+  "videos": 16
+ },
+ "read_back": {
+  "torch_num_threads": 4,
+  "OMP_NUM_THREADS": "4",
+  "OMP_WAIT_POLICY": "ABSENT",
+  "detector_pid": 1,
+  "videos": 16,
+  "videos_without_error": 16,
+  "max_in_flight": 1,
+  "measured_frames": 3203,
+  "stamp_frame_rows": 3526
+ },
+ "checks": {
+  "readback_present": true,
+  "torch_num_threads_eq_T": true,
+  "env_OMP_NUM_THREADS_eq_T": true,
+  "omp_wait_policy_as_declared": true,
+  "videos_eq_n": true,
+  "max_in_flight_eq_K": true,
+  "stamps_cover_measured_frames": true,
+  "every_measured_frame_has_forward": true
+ },
+ "rule": "preregistration.json P4_A_video_concurrency.gates.G_cell",
+ "outcome": "PASS"
+}

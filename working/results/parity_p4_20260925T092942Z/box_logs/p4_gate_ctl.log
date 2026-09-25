@@ -1,0 +1,35 @@
+nohup: ignoring input
+G_memstat
+  ok    G_memstat [positive: P2 p2b_rr_base_a] expect PASS, got rc 0  {"gate": "G_memstat_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "file": "memstat.jsonl", "exists": true, "rows": 1469, "rule": "t
+  ok    G_memstat [null: batchsize_smoke rr_k16 (no memory sampler)] expect FAIL, got rc 1  {"gate": "G_memstat_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "file": "memstat.jsonl", "exists": false, "rows": 0, "rule": "the
+G_d0 rr
+  ok    G_d0 rr [positive: P2 p2b_rr_base_a] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [positive: the control leg p4ctl_active (its own on-token D0)] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [null: batchsize_smoke rr_k16 (no on-token D0: absence)] expect FAIL, got rc 2  {"gate": "G_d0_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [null: a copy of p2b_rr_base_a holding MANDATE_VIOLATION.json] expect FAIL, got rc 1  {"gate": "G_d0_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [null: a copy of p2b_rr_base_a whose export p0 mandate says violation] expect FAIL, got rc 1  {"gate": "G_d0_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+G_d0 li
+  ok    G_d0 li [positive: P2 p2b_li_a (one container, one worker)] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE co
+  ok    G_d0 li [null: batchsize_smoke li_k16 (eight LlamaIndex containers)] expect FAIL, got rc 1  {"gate": "G_d0_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE co
+G_cell
+  ok    G_cell rr K=16 T=4 unset n=16 [positive: P2 p2b_rr_base_a] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell rr K=16 T=4 unset n=16 [null: batchsize_smoke rr_k16 (no read-back, default threads)] expect FAIL, got rc 2  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell rr K=16 T=4 unset n=16 [null: the control leg p4ctl_active (ACTIVE, K=2, n=2)] expect FAIL, got rc 1  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell rr K=1 T=4 unset n=3 [positive: P3 p3b_c_1 (K=1, T=4, stamped)] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell rr K=1 T=4 unset n=3 [null: P2 p2b_rr_base_a (K=16, n=16)] expect FAIL, got rc 1  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:12Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell li K=16 T=4 unset n=16 [positive: P2 p2b_li_a] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:13Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell li K=16 T=4 unset n=16 [null: batchsize_smoke li_k16 (no read-back)] expect FAIL, got rc 2  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:13Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell li K=1 T=4 unset n=3 [positive: P3 p3b_d_1] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:13Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell li K=1 T=4 unset n=3 [null: P2 p2b_li_a (K=16, n=16)] expect FAIL, got rc 1  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:13Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell rr ACTIVE (control-leg spec K=2 T=4 n=2) [positive: the control leg p4ctl_active] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:13Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell rr ACTIVE K=16 T=4 n=16 [null: P2 p2b_rr_base_a (OMP_WAIT_POLICY absent)] expect FAIL, got rc 1  {"gate": "G_cell_L", "decided_utc": "2026-09-25T09:42:13Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+G_correct_active
+  ok    G_correct_active [positive: P0 v1_rr_t4_a vs v1_rr_t4_b (identical 16/16)] expect PASS, got rc 0  {"gate": "G_correct_active", "decided_utc": "2026-09-25T09:42:13Z", "pairs": "\u2026", "missing": "\u2026", "rule": "every pair output-ident
+  ok    G_correct_active [null: P0 v1_rr_def_a vs v1_rr_t4_a (T=16 vs T=4: differs on 16/16)] expect FAIL, got rc 1  {"gate": "G_correct_active", "decided_utc": "2026-09-25T09:42:13Z", "pairs": "\u2026", "missing": "\u2026", "rule": "every pair output-ident
+  ok    G_correct_active [null: P3 p3b_c_1 vs p3b_c_2 (identical but 3 videos)] expect FAIL, got rc 1  {"gate": "G_correct_active", "decided_utc": "2026-09-25T09:42:13Z", "pairs": "\u2026", "missing": "\u2026", "rule": "every pair output-ident
+G_alone
+  ok    G_alone [positive: no container on the box] expect PASS, got rc 0  containers present: 0
+  ok    G_alone [null: one created container present] expect FAIL, got rc 1  containers present: 1 
+
+gate controls: 25 of 25 as expected -> all_pass=True (gate_controls.json)
+CTL_DONE

@@ -1,0 +1,21 @@
+{
+ "gate": "G_d0_p4a_rr16_2",
+ "decided_utc": "2026-09-25T11:52:06Z",
+ "leg": "p4a_rr16_2",
+ "arm": "rr",
+ "rule": "no MANDATE_VIOLATION.json AND the export's p0 block (the driver's post-leg record) holds d0_pre and d0_post read-backs and a mandate with mandate_violation false (absence fails)",
+ "mandate_violation_file": false,
+ "export": "export_rocketride_video_parity_blast.json",
+ "d0_pre_present": true,
+ "d0_post_present": true,
+ "mandate": {
+  "mandate_violation": false,
+  "violations": []
+ },
+ "task_pids": [
+  89,
+  89
+ ],
+ "evidence_present": true,
+ "outcome": "CLEAN"
+}

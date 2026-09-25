@@ -1,0 +1,58 @@
+{
+  "roles": {
+    "driver": {
+      "peak_rss_bytes": 142520320,
+      "peak_rss_mb": 135.92,
+      "peak_vms_bytes": 1408311296,
+      "peak_uss_bytes": null,
+      "peak_pss_bytes": null,
+      "peak_pss_mb": null,
+      "peak_process_count": 2,
+      "peak_thread_count": 19,
+      "peak_cgroup_anon_mb": 172.18,
+      "peak_cgroup_current_mb": 5940.66,
+      "peak_cgroup_tasks": 74,
+      "cgroup_path": "/sys/fs/cgroup/system.slice/snap.amazon-ssm-agent.amazon-ssm-agent.service",
+      "cgroup_samples": 2045,
+      "peak_fd_count": 48,
+      "distinct_pids_seen": 2,
+      "total_cpu_seconds": 37.11,
+      "ctx_switches_voluntary": 21090,
+      "ctx_switches_involuntary": 42,
+      "samples": 2045,
+      "oom_events": 0,
+      "rss_leak_slope_bytes_per_s": 639.03,
+      "rss_final_over_initial": 1.0568
+    },
+    "service": {
+      "peak_rss_bytes": 2228879360,
+      "peak_rss_mb": 2125.62,
+      "peak_vms_bytes": 15330893824,
+      "peak_uss_bytes": null,
+      "peak_pss_bytes": null,
+      "peak_pss_mb": null,
+      "peak_process_count": 10,
+      "peak_thread_count": 793,
+      "peak_cgroup_anon_mb": 1542.99,
+      "peak_cgroup_current_mb": 5084.6,
+      "peak_cgroup_tasks": 793,
+      "cgroup_path": "/sys/fs/cgroup/system.slice/docker-24c5dccd564b286fc7025b5f92df7a319b21a84e8913d539afe7175d0175ed18.scope",
+      "cgroup_samples": 2045,
+      "peak_fd_count": 0,
+      "distinct_pids_seen": 17,
+      "total_cpu_seconds": 5569.23,
+      "ctx_switches_voluntary": 71984,
+      "ctx_switches_involuntary": 227,
+      "samples": 2045,
+      "oom_events": 0,
+      "rss_leak_slope_bytes_per_s": 159907.58,
+      "rss_final_over_initial": 1.0769
+    }
+  },
+  "system": {
+    "compressor_delta_bytes": 0,
+    "swapouts_delta": 0,
+    "compressions_delta": 0,
+    "peak_system_mem_percent": 5.4
+  }
+}

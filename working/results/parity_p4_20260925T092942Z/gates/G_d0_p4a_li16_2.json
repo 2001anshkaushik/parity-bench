@@ -1,0 +1,28 @@
+{
+ "gate": "G_d0_p4a_li16_2",
+ "decided_utc": "2026-09-25T12:24:24Z",
+ "leg": "p4a_li16_2",
+ "arm": "li",
+ "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)",
+ "export": "export_llamaindex_video_workers_blast.json",
+ "containers": [
+  "li_bal_0"
+ ],
+ "checks": [
+  {
+   "container": "li_bal_0",
+   "when": "leg_start",
+   "n": 1,
+   "workers_1": true
+  },
+  {
+   "container": "li_bal_0",
+   "when": "leg_end",
+   "n": 1,
+   "workers_1": true
+  }
+ ],
+ "service_peak_process_count": 10,
+ "evidence_present": true,
+ "outcome": "CLEAN"
+}

@@ -1,0 +1,28 @@
+nohup: ignoring input
+p4_video_chain.sh sha256: 175e2777a374366701e92257402a489a2752ce4ec21a56ee0d140c9c478a8ea3
+boot_id ff48c148-1c4f-4ab7-9e5d-19360b37e7ae  stage control  head 1fcb6ce4e04a  manifest f5a2255cc5c9ad87
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image li:video sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95
+containers present: 0
+===== LEG p4ctl_active (rr K=2 n=2 T=4 OMP_WAIT_POLICY=ACTIVE) 09:37:09Z =====
+P1 stamps installed in rr:/opt/rocketride/engine/nodes/detect/IInstance.py (base md5 984d80e45e885b5ae21e987664850b4c; stamped md5 ceac2d61fda3d025b4d0adc82717dfec)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 0.0,
+ "attempts": 1
+}
+P1 stamps collected: 792 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 589.5 GiB | frag avg-extent 33220.7 KiB, >=4MiB share 0.9924 | rr: spool du 604 KiB/5 files, layer 942kB (virtual 9.67GB), cg anon 1.62 GiB, procs 2 rss 2.12 GiB
+[driver] export: /home/ssm-user/parity-bench-p4/working/results/parity_p4_20260925T092942Z/p4ctl_active/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 2 (errors 0) / offered 2 | THROUGHPUT 4.313 frames/s (64.71x realtime), steady window undefined | SERVICE CPU 14.008 cores = 43.8% of 32 | IDLE BURDEN 4.236 cores with 1 rr_tokens live = 13.2% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p4/parity_p4_20260925T092942Z/p4ctl_active/
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image li:video sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95
+CHAIN RESULTS: p4ctl_active:rc=0
+CHAIN_DONE p4a control control leg complete (a gate-control target, not a measured leg)

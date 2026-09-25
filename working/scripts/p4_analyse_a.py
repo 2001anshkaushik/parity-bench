@@ -123,6 +123,11 @@ def leg(camp: Path, name: str, arm: str) -> Optional[Dict[str, Any]]:
     return out
 
 
+def spread0(a: float, b: float) -> float:
+    """spread() with equal values (including two zeros, e.g. a K=1 cell's switch rate) defined as 0."""
+    return 0.0 if a == b else spread(a, b)
+
+
 def mean(v: List[float]) -> Optional[float]:
     v = [x for x in v if x is not None]
     return statistics.mean(v) if v else None
@@ -131,7 +136,7 @@ def mean(v: List[float]) -> Optional[float]:
 def cell_of(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
     def pair(k):
         v = [x[k] for x in legs]
-        return {"per_leg": v, "mean": mean(v), "spread": spread(*v) if len(v) == 2 and None not in v else None}
+        return {"per_leg": v, "mean": mean(v), "spread": spread0(*v) if len(v) == 2 and None not in v else None}
     return {"legs": [x["dir"] for x in legs], "n_legs": len(legs), "F_s": pair("F_s"), "frames_per_s": pair("frames_per_s"),
             "lock_duty": pair("lock_duty"), "cores_in_forward": pair("cores_in_forward"), "cpu_s_per_frame": pair("cpu_s_per_frame"),
             "caller_switch_rate": pair_v([x["caller_switch"]["rate"] for x in legs]),
@@ -143,7 +148,7 @@ def cell_of(legs: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def pair_v(v: List[Optional[float]]) -> Dict[str, Any]:
-    return {"per_leg": v, "mean": mean(v), "spread": spread(*v) if len(v) == 2 and None not in v else None}
+    return {"per_leg": v, "mean": mean(v), "spread": spread0(*v) if len(v) == 2 and None not in v else None}
 
 
 def main() -> int:
