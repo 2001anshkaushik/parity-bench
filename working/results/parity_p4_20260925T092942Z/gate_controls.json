@@ -1,0 +1,215 @@
+{
+ "label": "P4 gate controls: every gate run whole in its real runtime against a positive control (must PASS) and a null control (must FAIL), before launch",
+ "run": 1,
+ "run_utc": "2026-09-25T09:42:13Z",
+ "boot_id": "ff48c148-1c4f-4ab7-9e5d-19360b37e7ae",
+ "python": "/home/ssm-user/.venv/bin/python",
+ "dry_run_no_docker": false,
+ "seconds": 1.2,
+ "control_leg_present": true,
+ "controls": [
+  {
+   "gate": "G_memstat",
+   "control": "positive: P2 p2b_rr_base_a",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_memstat_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"file\": \"memstat.jsonl\", \"exists\": true, \"rows\": 1469, \"rule\": \"the first leg's memstat.jsonl has >= 1 row (register 55)\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_memstat",
+   "control": "null: batchsize_smoke rr_k16 (no memory sampler)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_memstat_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"file\": \"memstat.jsonl\", \"exists\": false, \"rows\": 0, \"rule\": \"the first leg's memstat.jsonl has >= 1 row (register 55)\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "positive: P2 p2b_rr_base_a",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block (the driver's post-leg record) holds d0_pre and d0_post read-backs and a mandate with mandate_violation false (absence fails)\", \"mandate_violation_file\": false, \"export\": \"export_rocketride_video_parity_blast.json\", \"d0_pre_present\": true, \"d0_post_present\": true, \"mandate\": \"\\u2026\", \"task_pids\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "positive: the control leg p4ctl_active (its own on-token D0)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block (the driver's post-leg record) holds d0_pre and d0_post read-backs and a mandate with mandate_violation false (absence fails)\", \"mandate_violation_file\": false, \"export\": \"export_rocketride_video_parity_blast.json\", \"d0_pre_present\": true, \"d0_post_present\": true, \"mandate\": \"\\u2026\", \"task_pids\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "null: batchsize_smoke rr_k16 (no on-token D0: absence)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block (the driver's post-leg record) holds d0_pre and d0_post read-backs and a mandate with mandate_violation false (absence fails)\", \"mandate_violation_file\": false, \"export\": \"export_rocketride_video_default_blast.json\", \"d0_pre_present\": false, \"d0_post_present\": false, \"mandate\": null, \"task_pids\": \"\\u2026\", \"evidence_present\": false, \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "null: a copy of p2b_rr_base_a holding MANDATE_VIOLATION.json",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block (the driver's post-leg record) holds d0_pre and d0_post read-backs and a mandate with mandate_violation false (absence fails)\", \"mandate_violation_file\": true, \"export\": \"export_rocketride_video_parity_blast.json\", \"d0_pre_present\": true, \"d0_post_present\": true, \"mandate\": \"\\u2026\", \"task_pids\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"VIOLATION\"}"
+  },
+  {
+   "gate": "G_d0 rr",
+   "control": "null: a copy of p2b_rr_base_a whose export p0 mandate says violation",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"arm\": \"rr\", \"rule\": \"no MANDATE_VIOLATION.json AND the export's p0 block (the driver's post-leg record) holds d0_pre and d0_post read-backs and a mandate with mandate_violation false (absence fails)\", \"mandate_violation_file\": false, \"export\": \"export_rocketride_video_parity_blast.json\", \"d0_pre_present\": true, \"d0_post_present\": true, \"mandate\": \"\\u2026\", \"task_pids\": \"\\u2026\", \"evidence_present\": true, \"outcome\": \"VIOLATION\"}"
+  },
+  {
+   "gate": "G_d0 li",
+   "control": "positive: P2 p2b_li_a (one container, one worker)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"arm\": \"li\", \"rule\": \"the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)\", \"export\": \"export_llamaindex_video_workers_blast.json\", \"containers\": \"\\u2026\", \"checks\": \"\\u2026\", \"service_peak_process_count\": 11, \"evidence_present\": true, \"outcome\": \"CLEAN\"}"
+  },
+  {
+   "gate": "G_d0 li",
+   "control": "null: batchsize_smoke li_k16 (eight LlamaIndex containers)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_d0_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"arm\": \"li\", \"rule\": \"the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)\", \"export\": \"export_llamaindex_video_workers_blast.json\", \"containers\": \"\\u2026\", \"checks\": \"\\u2026\", \"service_peak_process_count\": 22, \"evidence_present\": true, \"outcome\": \"VIOLATION\"}"
+  },
+  {
+   "gate": "G_cell rr K=16 T=4 unset n=16",
+   "control": "positive: P2 p2b_rr_base_a",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell rr K=16 T=4 unset n=16",
+   "control": "null: batchsize_smoke rr_k16 (no read-back, default threads)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_cell rr K=16 T=4 unset n=16",
+   "control": "null: the control leg p4ctl_active (ACTIVE, K=2, n=2)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_cell rr K=1 T=4 unset n=3",
+   "control": "positive: P3 p3b_c_1 (K=1, T=4, stamped)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell rr K=1 T=4 unset n=3",
+   "control": "null: P2 p2b_rr_base_a (K=16, n=16)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:12Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_cell li K=16 T=4 unset n=16",
+   "control": "positive: P2 p2b_li_a",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:13Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell li K=16 T=4 unset n=16",
+   "control": "null: batchsize_smoke li_k16 (no read-back)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 2)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:13Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"EVIDENCE MISSING\"}"
+  },
+  {
+   "gate": "G_cell li K=1 T=4 unset n=3",
+   "control": "positive: P3 p3b_d_1",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:13Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell li K=1 T=4 unset n=3",
+   "control": "null: P2 p2b_li_a (K=16, n=16)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:13Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_cell rr ACTIVE (control-leg spec K=2 T=4 n=2)",
+   "control": "positive: the control leg p4ctl_active",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:13Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_cell rr ACTIVE K=16 T=4 n=16",
+   "control": "null: P2 p2b_rr_base_a (OMP_WAIT_POLICY absent)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_cell_L\", \"decided_utc\": \"2026-09-25T09:42:13Z\", \"leg\": \"L\", \"declared\": \"\\u2026\", \"read_back\": \"\\u2026\", \"checks\": \"\\u2026\", \"rule\": \"preregistration.json P4_A_video_concurrency.gates.G_cell\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_correct_active",
+   "control": "positive: P0 v1_rr_t4_a vs v1_rr_t4_b (identical 16/16)",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct_active\", \"decided_utc\": \"2026-09-25T09:42:13Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"PASS\"}"
+  },
+  {
+   "gate": "G_correct_active",
+   "control": "null: P0 v1_rr_def_a vs v1_rr_t4_a (T=16 vs T=4: differs on 16/16)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct_active\", \"decided_utc\": \"2026-09-25T09:42:13Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_correct_active",
+   "control": "null: P3 p3b_c_1 vs p3b_c_2 (identical but 3 videos)",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "{\"gate\": \"G_correct_active\", \"decided_utc\": \"2026-09-25T09:42:13Z\", \"pairs\": \"\\u2026\", \"missing\": \"\\u2026\", \"rule\": \"every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16\", \"outcome\": \"FAIL\"}"
+  },
+  {
+   "gate": "G_alone",
+   "control": "positive: no container on the box",
+   "expect": "PASS (rc 0)",
+   "got": "PASS (rc 0)",
+   "pass": true,
+   "detail": "containers present: 0"
+  },
+  {
+   "gate": "G_alone",
+   "control": "null: one created container present",
+   "expect": "FAIL (rc != 0)",
+   "got": "FAIL (rc 1)",
+   "pass": true,
+   "detail": "containers present: 1 "
+  }
+ ],
+ "n": 25,
+ "n_pass": 25,
+ "all_pass": true
+}
