@@ -1,0 +1,22 @@
+{
+  "figures_checked": 93,
+  "mismatches": [
+    {
+      "where": "## P3-A — the docs headline at full scale / ### Full run (9,975, one run each) table, row p3a_li_full, column CPU-s/doc",
+      "figure": "p3a_li_full CPU-s/doc (cost.cpu_s_per_doc)",
+      "report": "3.818",
+      "recomputed": "3.881 (cost.cpu_s_per_doc = 3.8807 in p3a_li_full/leg_li_refc32_p3a_li_full.json)"
+    }
+  ],
+  "unverifiable": [
+    "Ratio paragraph: LlamaIndex's smoke-scale replicate spread '8.19%, P2-A' -- it would need P2's LlamaIndex legs (p2a_li_a/b), which are not among the listed files; the value equals the 0.0819 constant supplied in the definitions, and the band and verdict were recomputed using that constant.",
+    "Verdicts row and ratio paragraph: the '0.85' parity bar is a pre-registered constant (supplied in the definitions), not something computed from raw files."
+  ],
+  "notes": [
+    "Counted per figure: Verdicts row 7 (1.0664; n=1; 0.7804; 0.9196; SUPPORTED; 24 workers from the LlamaIndex leg's uvicorn '--workers 24' cmdline; 'beats it is inside the replicate spread' since 1.0664 < 1.0819). Gate row G_health_A 6 (four conditions, each yes, FIRED). Health table 25 (2 rows x 12 values + 'of 32'). Health paragraph 9 (4 yes, FIRED, 382/0 vs p2a_rr_a, 382/0 vs p2a_rr_b). Full-run heading 2 (9,975; one run each). Full table 24. Ratio paragraph 11 (6.2969, 24, 5.9046, 1.0664, n=1, 0.9196, 0.7804, SUPPORTED, 6.2899, 5.8981, 1.0664). Lost/empty paragraph 9 (RR 89 + first-ten list, LI 102 + first-ten list, empty 89/102, RR-only 0, LI-only 13 + the 13-name list).",
+    "Recomputed values: p3a_rr_h span 3.235560, excl 3.235560, 382/384, 4.0575, 13.128, 41.02%, 18.725, 1.217, 19,901.9 MB, steal 0.0053%, 2795.1 MHz; p3a_li_h 4.026107, 4.026107, 381/384, 3.3254, 13.387, 41.83%, 18.511, 0.026, 18,018.6 MB, 0.0059%, 2834.3; p3a_rr_full 6.296902, 6.289896, 9886/9975, 4.442, 27.968, 87.40%, 3.826, 1.234, 21,826.1 MB, 0.0038%, 3140.7; p3a_li_full 5.904645, 5.898067, 9873/9975, 3.8807, 22.914, 71.61%, 9.035, 0.026, 18,068.7 MB, 0.0031%, 3071.9.",
+    "Ratio 1.066432 (excl. eleven 1.066433); band [0.780385, 0.919615]; ratio >= upper end -> SUPPORTED.",
+    "Health: both verdicts OK; mandate_violation False in both; memstat non-empty lines 181 (RR) and 123 (LI); p3a_rr_h vs p2a_rr_a 382 shared ok, 382 equal, 0 differ; vs p2a_rr_b 382 shared ok, 382 equal, 0 differ.",
+    "Empty/lost (not ok or zero chunks; no ok rows had zero chunks): RR 89, LI 102; RR-only 0; LI-only 13 with exactly the 13 names listed; the ten names listed per arm are the first ten sorted."
+  ]
+}

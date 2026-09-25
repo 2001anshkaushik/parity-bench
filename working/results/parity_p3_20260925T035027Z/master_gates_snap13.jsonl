@@ -1,0 +1,13 @@
+{"utc": "2026-09-25T03:59:07Z", "gate": "G_controls", "status": "PASS", "exit_code": "0", "detail": "gate_controls_run2.json all_pass (the GATE CONTROLS rule)"}
+{"utc": "2026-09-25T03:59:08Z", "gate": "BUDGET", "status": "SET", "exit_code": "0", "detail": "7 h from the first leg: deadline 2026-09-25T10:59:08Z (epoch 1790333948)"}
+{"utc": "2026-09-25T04:25:17Z", "gate": "B_CHAIN", "status": "complete", "exit_code": "0", "detail": "p3_video_chain (P3-B)"}
+{"utc": "2026-09-25T04:43:01Z", "gate": "C_SMOKE_CHAIN", "status": "complete", "exit_code": "0", "detail": "p3_docs_chain c_smoke"}
+{"utc": "2026-09-25T04:43:07Z", "gate": "G_smoke_C", "status": "FIRED (winner vars=4)", "exit_code": "0", "detail": "gates/G_smoke_C.json"}
+{"utc": "2026-09-25T04:49:07Z", "gate": "A_HEALTH_CHAIN", "status": "complete", "exit_code": "0", "detail": "p3_docs_chain a_health"}
+{"utc": "2026-09-25T04:49:09Z", "gate": "G_health_A", "status": "FIRED", "exit_code": "0", "detail": "gates/G_health_A.json"}
+{"utc": "2026-09-25T05:46:50Z", "gate": "A_FULL_CHAIN", "status": "complete", "exit_code": "0", "detail": "p3_docs_chain a_full"}
+{"utc": "2026-09-25T05:46:54Z", "gate": "G_build_D", "status": "PASS", "exit_code": "0", "detail": "p2_pdfium_build.sh rr:p3-pdfium -> p3d_build.json"}
+{"utc": "2026-09-25T06:21:34Z", "gate": "D_SMOKE_CHAIN", "status": "complete", "exit_code": "0", "detail": "p3_docs_chain d_smoke"}
+{"utc": "2026-09-25T06:21:35Z", "gate": "G_node_D", "status": "PASS", "exit_code": "0", "detail": "gates/G_node_D_hybrid.json, gates/G_node_D_pure.json"}
+{"utc": "2026-09-25T06:21:38Z", "gate": "G_smoke_D", "status": "EVALUATED", "exit_code": "0", "detail": "fired variants: [hybrid pure]"}
+{"utc": "2026-09-25T06:50:36Z", "gate": "C_FULL_CHAIN", "status": "complete", "exit_code": "0", "detail": "vars=4"}

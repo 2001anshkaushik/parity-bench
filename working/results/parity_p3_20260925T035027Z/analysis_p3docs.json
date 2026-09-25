@@ -1,0 +1,7017 @@
+{
+ "label": "P3 docs analysis (P3-A, P3-C, P3-D), from raw leg files; gates recomputed and compared with the chain's records",
+ "session": {
+  "boot_ids": [
+   "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0"
+  ],
+  "one_session": true
+ },
+ "legs": {
+  "p3c_t1_a": {
+   "dir": "p3c_t1_a",
+   "n": 384,
+   "span": {
+    "span_s": 118.371581247,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.2271259366122678
+   },
+   "excluded_straggler": {
+    "span_s": 118.371581247,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.2271259366122678
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 1.3e-05,
+   "mhz_mean": 2796.5,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 13.111,
+   "idle_spin_cores": 1.234,
+   "cpu_s_per_doc": 4.0655,
+   "memory": {
+    "samples_in_window": 118,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 11924258816,
+     "file": 7807426560,
+     "total": 20091199488
+    },
+    "peak_anon_plus_file_bytes": 19727466496
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1602.6574079990387,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 7.733789682388306,
+      "share_of_run_total": 0.004825603802651842,
+      "min": 0.0013680458068847656,
+      "mean": 0.0202455227287652,
+      "sd": 0.06720500897450186,
+      "p50": 0.007762312889099121,
+      "p90": 0.032820701599121094,
+      "p95": 0.04886651039123535,
+      "p99": 0.3476145267486572,
+      "max": 1.0206727981567383,
+      "mean_over_p50": 2.608181738872788,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 30,
+       "mean": 0.06529235752995016,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.44862055778503
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 94.85171151161194,
+      "share_of_run_total": 0.0591840221361076,
+      "min": 0.021192073822021484,
+      "mean": 0.24830290971626162,
+      "sd": 0.2831377292945912,
+      "p50": 0.15426206588745117,
+      "p90": 0.5187413692474365,
+      "p95": 0.8422214984893799,
+      "p99": 1.635784387588501,
+      "max": 2.163433074951172,
+      "mean_over_p50": 1.6096174278997546,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.8007835892469396,
+       "p50": 0,
+       "p95": 4,
+       "window_s": 118.44862055778503
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 2.1293013095855713,
+      "share_of_run_total": 0.0013286066622585683,
+      "min": 0.00038552284240722656,
+      "mean": 0.005574087197867988,
+      "sd": 0.0075925306905359246,
+      "p50": 0.003155827522277832,
+      "p90": 0.012390851974487305,
+      "p95": 0.01896190643310547,
+      "p99": 0.040338993072509766,
+      "max": 0.0613858699798584,
+      "mean_over_p50": 1.7662838537654586,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 2,
+       "mean": 0.01797658174116763,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.44862055778503
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1466.1892042160034,
+      "share_of_run_total": 0.9148487985629945,
+      "min": 0.0973501205444336,
+      "mean": 3.8381916340733073,
+      "sd": 6.73089372393031,
+      "p50": 1.9022623300552368,
+      "p90": 8.169161081314087,
+      "p95": 12.124930143356323,
+      "p99": 28.292112588882446,
+      "max": 93.70832228660583,
+      "mean_over_p50": 2.0176983865111056,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.378271670126582,
+       "p50": 3,
+       "p95": 31,
+       "window_s": 118.44862055778503
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 31.753401279449463,
+      "share_of_run_total": 0.0198129688359875,
+      "min": 0.005533933639526367,
+      "mean": 0.08312408711897765,
+      "sd": 0.10295766680172151,
+      "p50": 0.053177714347839355,
+      "p90": 0.17253470420837402,
+      "p95": 0.2586705684661865,
+      "p99": 0.49091458320617676,
+      "max": 1.279808759689331,
+      "mean_over_p50": 1.5631376439998315,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 6,
+       "mean": 0.2680774257219703,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 118.44862055778503
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1602.6574079990387,
+     "share_of_run_total": 1.0,
+     "min": 0.23404502868652344,
+     "mean": 4.19543824083518,
+     "sd": 6.967043724783939,
+     "p50": 2.1950775384902954,
+     "p90": 8.606521368026733,
+     "p95": 12.579472064971924,
+     "p99": 29.2038791179657,
+     "max": 97.21211862564087,
+     "mean_over_p50": 1.911293868790015
+    }
+   },
+   "parse_share": 0.0591840221361076,
+   "utilisation": 0.4097,
+   "host_busy_cores": 13.198,
+   "idle_cores": 18.802,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3c_t1_a",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3c_t2_a": {
+   "dir": "p3c_t2_a",
+   "n": 384,
+   "span": {
+    "span_s": 88.339141492,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 4.324243970998903
+   },
+   "excluded_straggler": {
+    "span_s": 88.339141492,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 4.324243970998903
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 3.5e-05,
+   "mhz_mean": 2905.5,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 17.945,
+   "idle_spin_cores": 1.232,
+   "cpu_s_per_doc": 4.1535,
+   "memory": {
+    "samples_in_window": 88,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 10450448384,
+     "file": 7740301312,
+     "total": 18521796608
+    },
+    "peak_anon_plus_file_bytes": 18164641792
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1635.2497644424438,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 19.047234058380127,
+      "share_of_run_total": 0.011647905092268573,
+      "min": 0.0015401840209960938,
+      "mean": 0.0498618692627752,
+      "sd": 0.07999564772950128,
+      "p50": 0.0314253568649292,
+      "p90": 0.09216141700744629,
+      "p95": 0.13561081886291504,
+      "p99": 0.37325215339660645,
+      "max": 1.1123552322387695,
+      "mean_over_p50": 1.5866763097421246,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.215427716004894,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 88.41589379310608
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 133.15389442443848,
+      "share_of_run_total": 0.08142725186072033,
+      "min": 0.05488872528076172,
+      "mean": 0.3485704042524567,
+      "sd": 0.2984739993029672,
+      "p50": 0.2604060173034668,
+      "p90": 0.6736433506011963,
+      "p95": 0.8876674175262451,
+      "p99": 1.7371582984924316,
+      "max": 2.1729352474212646,
+      "mean_over_p50": 1.338565091014186,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 1.5059950051064313,
+       "p50": 0,
+       "p95": 5,
+       "window_s": 88.41589379310608
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 5.391726493835449,
+      "share_of_run_total": 0.0032971883629494465,
+      "min": 0.0003933906555175781,
+      "mean": 0.014114467261349344,
+      "sd": 0.015867168644210866,
+      "p50": 0.011275529861450195,
+      "p90": 0.029528379440307617,
+      "p95": 0.03876829147338867,
+      "p99": 0.052725791931152344,
+      "max": 0.22226595878601074,
+      "mean_over_p50": 1.251778624577561,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 6,
+       "mean": 0.06098141705666782,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 88.41589379310608
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1424.4236195087433,
+      "share_of_run_total": 0.8710740404811591,
+      "min": 0.3043863773345947,
+      "mean": 3.728857642693045,
+      "sd": 4.874039593998547,
+      "p50": 2.2506725788116455,
+      "p90": 7.540948390960693,
+      "p95": 10.005107164382935,
+      "p99": 23.260650396347046,
+      "max": 61.37490177154541,
+      "mean_over_p50": 1.6567748138033835,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 16.110492790378913,
+       "p50": 24,
+       "p95": 31,
+       "window_s": 88.41589379310608
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 53.23328995704651,
+      "share_of_run_total": 0.0325536142029025,
+      "min": 0.00970005989074707,
+      "mean": 0.13935416219122124,
+      "sd": 0.11234869638501416,
+      "p50": 0.1164313554763794,
+      "p90": 0.24311566352844238,
+      "p95": 0.3190016746520996,
+      "p99": 0.6198735237121582,
+      "max": 1.2303082942962646,
+      "mean_over_p50": 1.1968782946917784,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 7,
+       "mean": 0.6020782878880674,
+       "p50": 0,
+       "p95": 2,
+       "window_s": 88.41589379310608
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1635.2497644424438,
+     "share_of_run_total": 1.0,
+     "min": 0.6288540363311768,
+     "mean": 4.280758545660848,
+     "sd": 5.114734723044627,
+     "p50": 2.745028018951416,
+     "p90": 8.315692663192749,
+     "p95": 11.205407619476318,
+     "p99": 24.59901452064514,
+     "max": 65.00187110900879,
+     "mean_over_p50": 1.559458962206175
+    }
+   },
+   "parse_share": 0.08142725186072033,
+   "utilisation": 0.5608,
+   "host_busy_cores": 18.102,
+   "idle_cores": 13.898,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3c_t2_a",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3c_t4_a": {
+   "dir": "p3c_t4_a",
+   "n": 384,
+   "span": {
+    "span_s": 74.245008968,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 5.145126996545237
+   },
+   "excluded_straggler": {
+    "span_s": 74.245008968,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 5.145126996545237
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 7.6e-05,
+   "mhz_mean": 3016.7,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 22.294,
+   "idle_spin_cores": 1.223,
+   "cpu_s_per_doc": 4.3374,
+   "memory": {
+    "samples_in_window": 74,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 10004508672,
+     "file": 7747981312,
+     "total": 18086469632
+    },
+    "peak_anon_plus_file_bytes": 17726365696
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1700.6981103420258,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 30.631812810897827,
+      "share_of_run_total": 0.018011317014245104,
+      "min": 0.002429485321044922,
+      "mean": 0.080187991651565,
+      "sd": 0.1351271060090643,
+      "p50": 0.04805421829223633,
+      "p90": 0.14476895332336426,
+      "p95": 0.2327282428741455,
+      "p99": 0.7326867580413818,
+      "max": 1.48832368850708,
+      "mean_over_p50": 1.6686982850061307,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 31,
+       "mean": 0.4121526933355763,
+       "p50": 0,
+       "p95": 2,
+       "window_s": 74.32151556015015
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 163.88285326957703,
+      "share_of_run_total": 0.09636210699182743,
+      "min": 0.03216910362243652,
+      "mean": 0.4290127048941807,
+      "sd": 0.3206143317038335,
+      "p50": 0.33620262145996094,
+      "p90": 0.8083946704864502,
+      "p95": 1.0025861263275146,
+      "p99": 1.7206785678863525,
+      "max": 2.5049686431884766,
+      "mean_over_p50": 1.2760540147818946,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 2.205052628897789,
+       "p50": 1,
+       "p95": 6,
+       "window_s": 74.32151556015015
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 6.749255180358887,
+      "share_of_run_total": 0.003968520420712145,
+      "min": 0.0004482269287109375,
+      "mean": 0.017668207278426405,
+      "sd": 0.014927099181650989,
+      "p50": 0.014722466468811035,
+      "p90": 0.0370030403137207,
+      "p95": 0.0444645881652832,
+      "p99": 0.0664527416229248,
+      "max": 0.10320854187011719,
+      "mean_over_p50": 1.2000847355200845,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.09081159243713964,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 74.32151556015015
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1428.5481357574463,
+      "share_of_run_total": 0.8399774934013141,
+      "min": 0.6611342430114746,
+      "mean": 3.739654805647765,
+      "sd": 3.962284745070941,
+      "p50": 2.5419514179229736,
+      "p90": 7.142377614974976,
+      "p95": 8.968059539794922,
+      "p99": 20.5618097782135,
+      "max": 45.685463666915894,
+      "mean_over_p50": 1.4711747751274624,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 19.221192207810788,
+       "p50": 26,
+       "p95": 30,
+       "window_s": 74.32151556015015
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 70.88605332374573,
+      "share_of_run_total": 0.04168056217190122,
+      "min": 0.015698671340942383,
+      "mean": 0.1855655846171354,
+      "sd": 0.12555772733969112,
+      "p50": 0.16179800033569336,
+      "p90": 0.30387425422668457,
+      "p95": 0.40558552742004395,
+      "p99": 0.731334924697876,
+      "max": 1.2331197261810303,
+      "mean_over_p50": 1.1468966503425866,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 7,
+       "mean": 0.953775670335678,
+       "p50": 1,
+       "p95": 3,
+       "window_s": 74.32151556015015
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1700.6981103420258,
+     "share_of_run_total": 1.0,
+     "min": 1.0018956661224365,
+     "mean": 4.452089294089073,
+     "sd": 4.21300660702712,
+     "p50": 3.228870153427124,
+     "p90": 8.030984163284302,
+     "p95": 9.855746507644653,
+     "p99": 22.044756174087524,
+     "max": 49.419660329818726,
+     "mean_over_p50": 1.378838133011829
+    }
+   },
+   "parse_share": 0.09636210699182743,
+   "utilisation": 0.6967,
+   "host_busy_cores": 22.487,
+   "idle_cores": 9.513,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3c_t4_a",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3c_t1_b": {
+   "dir": "p3c_t1_b",
+   "n": 384,
+   "span": {
+    "span_s": 118.915520327,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.21236453365849
+   },
+   "excluded_straggler": {
+    "span_s": 118.915520327,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.21236453365849
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 5.5e-05,
+   "mhz_mean": 2815.1,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 13.071,
+   "idle_spin_cores": 1.226,
+   "cpu_s_per_doc": 4.0717,
+   "memory": {
+    "samples_in_window": 119,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 11324506112,
+     "file": 7741763584,
+     "total": 19398914048
+    },
+    "peak_anon_plus_file_bytes": 19040247808
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1601.6964485645294,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 6.913167715072632,
+      "share_of_run_total": 0.004316153489176019,
+      "min": 0.0013384819030761719,
+      "mean": 0.01809729768343621,
+      "sd": 0.04323882145822706,
+      "p50": 0.0074939727783203125,
+      "p90": 0.03522229194641113,
+      "p95": 0.05789995193481445,
+      "p99": 0.34735751152038574,
+      "max": 0.387420654296875,
+      "mean_over_p50": 2.414913720502266,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 28,
+       "mean": 0.058097819542628916,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.99186182022095
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 94.93018245697021,
+      "share_of_run_total": 0.059268522785355764,
+      "min": 0.025913715362548828,
+      "mean": 0.24850833103918904,
+      "sd": 0.29082090010380596,
+      "p50": 0.14970803260803223,
+      "p90": 0.49965953826904297,
+      "p95": 0.8389449119567871,
+      "p99": 1.5663340091705322,
+      "max": 2.151766300201416,
+      "mean_over_p50": 1.6599532216807444,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.7977871848109717,
+       "p50": 0,
+       "p95": 4,
+       "window_s": 118.99186182022095
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 2.5983951091766357,
+      "share_of_run_total": 0.0016222768749380486,
+      "min": 0.0003910064697265625,
+      "mean": 0.006802081437635172,
+      "sd": 0.014212775545476217,
+      "p50": 0.0037610530853271484,
+      "p90": 0.01369929313659668,
+      "p95": 0.020205020904541016,
+      "p99": 0.039246559143066406,
+      "max": 0.2454535961151123,
+      "mean_over_p50": 1.808557678744783,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 3,
+       "mean": 0.021836746391130726,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.99186182022095
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1465.8283445835114,
+      "share_of_run_total": 0.9151723760748889,
+      "min": 0.07471561431884766,
+      "mean": 3.837246975349506,
+      "sd": 6.744453985638074,
+      "p50": 1.8591301441192627,
+      "p90": 8.2462797164917,
+      "p95": 12.173182487487793,
+      "p99": 28.342819929122925,
+      "max": 94.09049105644226,
+      "mean_over_p50": 2.0640012682744966,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.318727702556336,
+       "p50": 3,
+       "p95": 31,
+       "window_s": 118.99186182022095
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 31.426358699798584,
+      "share_of_run_total": 0.01962067077564134,
+      "min": 0.006625652313232422,
+      "mean": 0.08226795471151462,
+      "sd": 0.09802346824284361,
+      "p50": 0.05190145969390869,
+      "p90": 0.1688709259033203,
+      "p95": 0.22744250297546387,
+      "p99": 0.4432394504547119,
+      "max": 1.2341718673706055,
+      "mean_over_p50": 1.5850797876725196,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 5,
+       "mean": 0.2641051095349626,
+       "p50": 0,
+       "p95": 2,
+       "window_s": 118.99186182022095
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1601.6964485645294,
+     "share_of_run_total": 1.0,
+     "min": 0.13937783241271973,
+     "mean": 4.192922640221282,
+     "sd": 6.986188839638971,
+     "p50": 2.1785632371902466,
+     "p90": 8.86475157737732,
+     "p95": 12.559837818145752,
+     "p99": 29.66930079460144,
+     "max": 97.64142966270447,
+     "mean_over_p50": 1.9246274648556956
+    }
+   },
+   "parse_share": 0.059268522785355764,
+   "utilisation": 0.4085,
+   "host_busy_cores": 13.209,
+   "idle_cores": 18.791,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3c_t1_b",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3c_t2_b": {
+   "dir": "p3c_t2_b",
+   "n": 384,
+   "span": {
+    "span_s": 88.090280457,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 4.336460254391717
+   },
+   "excluded_straggler": {
+    "span_s": 88.090280457,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 4.336460254391717
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 6.8e-05,
+   "mhz_mean": 2916.7,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 17.97,
+   "idle_spin_cores": 1.234,
+   "cpu_s_per_doc": 4.1475,
+   "memory": {
+    "samples_in_window": 88,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 11469242368,
+     "file": 7745433600,
+     "total": 19549868032
+    },
+    "peak_anon_plus_file_bytes": 19189690368
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1642.0569353103638,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 19.07057785987854,
+      "share_of_run_total": 0.011613834727523639,
+      "min": 0.0014655590057373047,
+      "mean": 0.049922978690781515,
+      "sd": 0.0929777280881326,
+      "p50": 0.027005553245544434,
+      "p90": 0.08892583847045898,
+      "p95": 0.13239836692810059,
+      "p99": 0.49840879440307617,
+      "max": 1.1978468894958496,
+      "mean_over_p50": 1.8486189946513374,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 31,
+       "mean": 0.21630072588533295,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 88.16696190834045
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 137.78410840034485,
+      "share_of_run_total": 0.08390945858055913,
+      "min": 0.055963993072509766,
+      "mean": 0.360691383246976,
+      "sd": 0.31152132819801964,
+      "p50": 0.2640436887741089,
+      "p90": 0.6666738986968994,
+      "p95": 0.9132201671600342,
+      "p99": 1.8222734928131104,
+      "max": 2.5873541831970215,
+      "mean_over_p50": 1.3660291784347471,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 1.5627634821259582,
+       "p50": 1,
+       "p95": 5,
+       "window_s": 88.16696190834045
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 5.366016149520874,
+      "share_of_run_total": 0.003267862419463944,
+      "min": 0.00040268898010253906,
+      "mean": 0.014047162695080821,
+      "sd": 0.011493698051831168,
+      "p50": 0.01124870777130127,
+      "p90": 0.02891254425048828,
+      "p95": 0.037619590759277344,
+      "p99": 0.0541834831237793,
+      "max": 0.06994009017944336,
+      "mean_over_p50": 1.2487801248530277,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.060861983143974674,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 88.16696190834045
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1425.6415827274323,
+      "share_of_run_total": 0.8682047205981764,
+      "min": 0.37686610221862793,
+      "mean": 3.7320460280822836,
+      "sd": 4.852846509118272,
+      "p50": 2.2724599838256836,
+      "p90": 7.47131872177124,
+      "p95": 10.158989429473877,
+      "p99": 23.467624187469482,
+      "max": 60.76726698875427,
+      "mean_over_p50": 1.642293397747488,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 16.16979367180133,
+       "p50": 24,
+       "p95": 30,
+       "window_s": 88.16696190834045
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 54.194650173187256,
+      "share_of_run_total": 0.033004123674276846,
+      "min": 0.01661229133605957,
+      "mean": 0.14187081197169438,
+      "sd": 0.11568450875822878,
+      "p50": 0.11312365531921387,
+      "p90": 0.2548224925994873,
+      "p95": 0.32573509216308594,
+      "p99": 0.6085457801818848,
+      "max": 1.2205166816711426,
+      "mean_over_p50": 1.2541215325067192,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 7,
+       "mean": 0.6146820645757164,
+       "p50": 0,
+       "p95": 3,
+       "window_s": 88.16696190834045
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1642.0569353103638,
+     "share_of_run_total": 1.0,
+     "min": 0.6438617706298828,
+     "mean": 4.298578364686816,
+     "sd": 5.103071455444495,
+     "p50": 2.7813148498535156,
+     "p90": 8.274592638015747,
+     "p95": 10.983400821685791,
+     "p99": 24.929367542266846,
+     "max": 64.63990879058838,
+     "mean_over_p50": 1.5455202293667725
+    }
+   },
+   "parse_share": 0.08390945858055913,
+   "utilisation": 0.5616,
+   "host_busy_cores": 18.078,
+   "idle_cores": 13.922,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3c_t2_b",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3c_t4_b": {
+   "dir": "p3c_t4_b",
+   "n": 384,
+   "span": {
+    "span_s": 74.106273635,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 5.154759256705946
+   },
+   "excluded_straggler": {
+    "span_s": 74.106273635,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 5.154759256705946
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 3.8e-05,
+   "mhz_mean": 3011.4,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 22.293,
+   "idle_spin_cores": 1.235,
+   "cpu_s_per_doc": 4.3294,
+   "memory": {
+    "samples_in_window": 74,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 9735577600,
+     "file": 7741419520,
+     "total": 17812045824
+    },
+    "peak_anon_plus_file_bytes": 17450811392
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1694.0198061466217,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 26.126312971115112,
+      "share_of_run_total": 0.015422672672608537,
+      "min": 0.003528118133544922,
+      "mean": 0.06839348945318093,
+      "sd": 0.10422450756881231,
+      "p50": 0.04572904109954834,
+      "p90": 0.11773943901062012,
+      "p95": 0.1787424087524414,
+      "p99": 0.5603733062744141,
+      "max": 1.3326642513275146,
+      "mean_over_p50": 1.4956248328998187,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.3521702683359896,
+       "p50": 0,
+       "p95": 2,
+       "window_s": 74.18659472465515
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 156.3305377960205,
+      "share_of_run_total": 0.09228377214291537,
+      "min": 0.0616602897644043,
+      "mean": 0.4092422455393207,
+      "sd": 0.30059543978127046,
+      "p50": 0.33811843395233154,
+      "p90": 0.6782186031341553,
+      "p95": 0.8994348049163818,
+      "p99": 1.8560214042663574,
+      "max": 2.358095407485962,
+      "mean_over_p50": 1.2103517715837295,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 2.107261269724592,
+       "p50": 2,
+       "p95": 6,
+       "window_s": 74.18659472465515
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 6.612556219100952,
+      "share_of_run_total": 0.003903470428803604,
+      "min": 0.0003788471221923828,
+      "mean": 0.01731035659450511,
+      "sd": 0.01481295246526393,
+      "p50": 0.013782978057861328,
+      "p90": 0.034432411193847656,
+      "p95": 0.045873403549194336,
+      "p99": 0.07470059394836426,
+      "max": 0.09293270111083984,
+      "mean_over_p50": 1.255922814491596,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 3,
+       "mean": 0.08913411167669268,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 74.18659472465515
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1433.6063640117645,
+      "share_of_run_total": 0.8462748539362014,
+      "min": 0.5495190620422363,
+      "mean": 3.7528962408684934,
+      "sd": 4.006905144073769,
+      "p50": 2.5663079023361206,
+      "p90": 7.030609130859375,
+      "p95": 9.028311014175415,
+      "p99": 21.049612522125244,
+      "max": 45.505534648895264,
+      "mean_over_p50": 1.4623717744282425,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 19.32433169810017,
+       "p50": 26,
+       "p95": 30,
+       "window_s": 74.18659472465515
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 71.3440351486206,
+      "share_of_run_total": 0.042115230819471064,
+      "min": 0.008952617645263672,
+      "mean": 0.186764489917855,
+      "sd": 0.13128595154320427,
+      "p50": 0.1551496982574463,
+      "p90": 0.3086669445037842,
+      "p95": 0.40886807441711426,
+      "p99": 0.7675220966339111,
+      "max": 1.2271037101745605,
+      "mean_over_p50": 1.203769598107429,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 8,
+       "mean": 0.9616836493630048,
+       "p50": 1,
+       "p95": 3,
+       "window_s": 74.18659472465515
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1694.0198061466217,
+     "share_of_run_total": 1.0,
+     "min": 1.0475471019744873,
+     "mean": 4.434606822373356,
+     "sd": 4.246034771704593,
+     "p50": 3.2111475467681885,
+     "p90": 7.736670255661011,
+     "p95": 9.980393171310425,
+     "p99": 22.492265701293945,
+     "max": 49.05620765686035,
+     "mean_over_p50": 1.3810037557559445
+    }
+   },
+   "parse_share": 0.09228377214291537,
+   "utilisation": 0.6967,
+   "host_busy_cores": 22.442,
+   "idle_cores": 9.558,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3c_t4_b",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3a_rr_h": {
+   "dir": "p3a_rr_h",
+   "n": 384,
+   "span": {
+    "span_s": 118.063030818,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.235559830654118
+   },
+   "excluded_straggler": {
+    "span_s": 118.063030818,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.235559830654118
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 5.3e-05,
+   "mhz_mean": 2795.1,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 13.128,
+   "idle_spin_cores": 1.217,
+   "cpu_s_per_doc": 4.0575,
+   "memory": {
+    "samples_in_window": 118,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 11827224576,
+     "file": 7715024896,
+     "total": 19901923328
+    },
+    "peak_anon_plus_file_bytes": 19542155264
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1597.643809556961,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 7.797293186187744,
+      "share_of_run_total": 0.004880495351682922,
+      "min": 0.001287221908569336,
+      "mean": 0.020411762267507183,
+      "sd": 0.07030995035429263,
+      "p50": 0.007425427436828613,
+      "p90": 0.03383040428161621,
+      "p95": 0.04403114318847656,
+      "p99": 0.3986537456512451,
+      "max": 1.085482120513916,
+      "mean_over_p50": 2.7489006445971023,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 29,
+       "mean": 0.06604051785331727,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.0683228969574
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 91.24135088920593,
+      "share_of_run_total": 0.05710994549811942,
+      "min": 0.0273439884185791,
+      "mean": 0.23885170389844484,
+      "sd": 0.26680213381909984,
+      "p50": 0.15071499347686768,
+      "p90": 0.512549638748169,
+      "p95": 0.6810965538024902,
+      "p99": 1.544724702835083,
+      "max": 2.032782554626465,
+      "mean_over_p50": 1.5847905930812698,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.7727843391900776,
+       "p50": 0,
+       "p95": 3,
+       "window_s": 118.0683228969574
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 1.95003342628479,
+      "share_of_run_total": 0.001220568323564906,
+      "min": 0.0004355907440185547,
+      "mean": 0.005104799545248141,
+      "sd": 0.0055886040948391795,
+      "p50": 0.0031175613403320312,
+      "p90": 0.01212763786315918,
+      "p95": 0.01535487174987793,
+      "p99": 0.02680659294128418,
+      "max": 0.04659390449523926,
+      "mean_over_p50": 1.6374335539792337,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 3,
+       "mean": 0.016516144029475682,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.0683228969574
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1465.9220139980316,
+      "share_of_run_total": 0.9175524639653836,
+      "min": 0.08630013465881348,
+      "mean": 3.8374921832409203,
+      "sd": 6.723243004637432,
+      "p50": 1.9054478406906128,
+      "p90": 8.177426099777222,
+      "p95": 12.101522207260132,
+      "p99": 28.344842672348022,
+      "max": 93.63091039657593,
+      "mean_over_p50": 2.013958136922843,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.415879026903736,
+       "p50": 3,
+       "p95": 31,
+       "window_s": 118.0683228969574
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 30.733118057250977,
+      "share_of_run_total": 0.019236526861249197,
+      "min": 0.007547855377197266,
+      "mean": 0.08045318863154706,
+      "sd": 0.09940441218258414,
+      "p50": 0.05312609672546387,
+      "p90": 0.16162753105163574,
+      "p95": 0.2411954402923584,
+      "p99": 0.4642601013183594,
+      "max": 1.2727830410003662,
+      "mean_over_p50": 1.5143816992108334,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 5,
+       "mean": 0.2602994376745142,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 118.0683228969574
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1597.643809556961,
+     "share_of_run_total": 1.0,
+     "min": 0.14812421798706055,
+     "mean": 4.182313637583667,
+     "sd": 6.9516465746520275,
+     "p50": 2.1493499279022217,
+     "p90": 8.980736255645752,
+     "p95": 12.505693674087524,
+     "p99": 29.385892152786255,
+     "max": 96.9765350818634,
+     "mean_over_p50": 1.9458505026520416
+    }
+   },
+   "parse_share": 0.05710994549811942,
+   "utilisation": 0.4102,
+   "host_busy_cores": 13.275,
+   "idle_cores": 18.725,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3a_rr_h",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3a_li_h": {
+   "dir": "p3a_li_h",
+   "n": 384,
+   "span": {
+    "span_s": 94.632366961,
+    "ok": 381,
+    "n": 384,
+    "docs_per_s": 4.026106629637808
+   },
+   "excluded_straggler": {
+    "span_s": 94.632366961,
+    "ok": 381,
+    "n": 384,
+    "docs_per_s": 4.026106629637808
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 5.9e-05,
+   "mhz_mean": 2834.3,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 13.387,
+   "idle_spin_cores": 0.026,
+   "cpu_s_per_doc": 3.3254,
+   "memory": {
+    "samples_in_window": 95,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 17125535744,
+     "file": 722657280,
+     "total": 18018631680
+    },
+    "peak_anon_plus_file_bytes": 17848193024
+   },
+   "lost_documents": {
+    "n": 3,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf",
+     "040_040669.pdf"
+    ]
+   },
+   "d1": null,
+   "parse_share": null,
+   "utilisation": 0.4183,
+   "host_busy_cores": 13.489,
+   "idle_cores": 18.511,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 381,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3a_li_h",
+   "empty_documents": {
+    "n": 3,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf",
+     "040_040669.pdf"
+    ]
+   }
+  },
+  "p3a_rr_full": {
+   "dir": "p3a_rr_full",
+   "n": 9975,
+   "span": {
+    "span_s": 1569.978330913,
+    "ok": 9886,
+    "n": 9975,
+    "docs_per_s": 6.296902196255746
+   },
+   "excluded_straggler": {
+    "span_s": 1569.978330913,
+    "ok": 9875,
+    "n": 9964,
+    "docs_per_s": 6.289895730125985
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 3.8e-05,
+   "mhz_mean": 3140.7,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 27.968,
+   "idle_spin_cores": 1.234,
+   "cpu_s_per_doc": 4.442,
+   "memory": {
+    "samples_in_window": 1569,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 13708201984,
+     "file": 7732391936,
+     "total": 21826105344
+    },
+    "peak_anon_plus_file_bytes": 21434015744
+   },
+   "lost_documents": {
+    "n": 89,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf",
+     "040_040760.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 9886,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 48845.04180455208,
+    "stages": {
+     "admission": {
+      "count": 9886,
+      "sum": 137.64922714233398,
+      "share_of_run_total": 0.002818079830766075,
+      "min": 0.0009343624114990234,
+      "mean": 0.013923652351035199,
+      "sd": 0.02872922222366378,
+      "p50": 0.005666255950927734,
+      "p90": 0.03153634071350098,
+      "p95": 0.05407357215881348,
+      "p99": 0.11682820320129395,
+      "max": 1.0511407852172852,
+      "mean_over_p50": 2.45729322353599,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 30,
+       "mean": 0.08766723291951928,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 1570.133133649826
+      }
+     },
+     "parse_bracket": {
+      "count": 9886,
+      "sum": 2121.2796835899353,
+      "share_of_run_total": 0.04342876175801009,
+      "min": 0.016439199447631836,
+      "mean": 0.21457411325004402,
+      "sd": 0.34967959746259447,
+      "p50": 0.13093483448028564,
+      "p90": 0.4109203815460205,
+      "p95": 0.6150610446929932,
+      "p99": 1.4651703834533691,
+      "max": 12.545178413391113,
+      "mean_over_p50": 1.6387855386364094,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 1.3510189920385611,
+       "p50": 1,
+       "p95": 4,
+       "window_s": 1570.133133649826
+      }
+     },
+     "split": {
+      "count": 9886,
+      "sum": 57.82784080505371,
+      "share_of_run_total": 0.0011839040088540674,
+      "min": 0.0003266334533691406,
+      "mean": 0.005849468015886477,
+      "sd": 0.013769933217383845,
+      "p50": 0.0026053190231323242,
+      "p90": 0.012927055358886719,
+      "p95": 0.020128250122070312,
+      "p99": 0.043128013610839844,
+      "max": 0.6732404232025146,
+      "mean_over_p50": 2.2452022051617218,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 8,
+       "mean": 0.03682989650096167,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 1570.133133649826
+      }
+     },
+     "embed": {
+      "count": 9886,
+      "sum": 45236.00610041618,
+      "share_of_run_total": 0.9261125475421427,
+      "min": 0.029761552810668945,
+      "mean": 4.575764323327553,
+      "sd": 11.534874152770225,
+      "p50": 1.8491390943527222,
+      "p90": 9.461318969726562,
+      "p95": 16.0766122341156,
+      "p99": 43.48883128166199,
+      "max": 415.3143358230591,
+      "mean_over_p50": 2.474537657714314,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 28.81029966883356,
+       "p50": 30,
+       "p95": 32,
+       "window_s": 1570.133133649826
+      }
+     },
+     "return": {
+      "count": 9886,
+      "sum": 1292.2789525985718,
+      "share_of_run_total": 0.026456706860227087,
+      "min": 0.004270315170288086,
+      "mean": 0.13071808138767668,
+      "sd": 0.26339929200241363,
+      "p50": 0.05773806571960449,
+      "p90": 0.28115105628967285,
+      "p95": 0.47804927825927734,
+      "p99": 1.246917486190796,
+      "max": 4.831690073013306,
+      "mean_over_p50": 2.263984422728807,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 19,
+       "mean": 0.823037820744937,
+       "p50": 0,
+       "p95": 3,
+       "window_s": 1570.133133649826
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 9886,
+     "sum": 48845.04180455208,
+     "share_of_run_total": 1.0,
+     "min": 0.08835911750793457,
+     "mean": 4.940829638332195,
+     "sd": 11.85465254192309,
+     "p50": 2.1459840536117554,
+     "p90": 10.17567253112793,
+     "p95": 16.869388580322266,
+     "p99": 44.986485958099365,
+     "max": 424.9927089214325,
+     "mean_over_p50": 2.302360835355058
+    }
+   },
+   "parse_share": 0.04342876175801009,
+   "utilisation": 0.874,
+   "host_busy_cores": 28.174,
+   "idle_cores": 3.826,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 9975,
+    "recorded": 9975,
+    "ok": 9886,
+    "empty": 89,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3a_rr_full",
+   "empty_documents": {
+    "n": 89,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf",
+     "040_040760.pdf"
+    ]
+   }
+  },
+  "p3a_li_full": {
+   "dir": "p3a_li_full",
+   "n": 9975,
+   "span": {
+    "span_s": 1672.073333677,
+    "ok": 9873,
+    "n": 9975,
+    "docs_per_s": 5.904645329334103
+   },
+   "excluded_straggler": {
+    "span_s": 1672.073333677,
+    "ok": 9862,
+    "n": 9964,
+    "docs_per_s": 5.898066670504702
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 3.1e-05,
+   "mhz_mean": 3071.9,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 22.914,
+   "idle_spin_cores": 0.026,
+   "cpu_s_per_doc": 3.8807,
+   "memory": {
+    "samples_in_window": 1671,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 17936056320,
+     "file": 1040384,
+     "total": 18068652032
+    },
+    "peak_anon_plus_file_bytes": 17937096704
+   },
+   "lost_documents": {
+    "n": 102,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002400.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004306.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008724.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "009_009802.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014222.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018542.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020747.pdf",
+     "020_020806.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "022_022819.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "027_027613.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "033_033689.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037919.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": null,
+   "parse_share": null,
+   "utilisation": 0.7161,
+   "host_busy_cores": 22.965,
+   "idle_cores": 9.035,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 9975,
+    "recorded": 9975,
+    "ok": 9873,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3a_li_full",
+   "empty_documents": {
+    "n": 102,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002400.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004306.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008724.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "009_009802.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014222.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018542.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020747.pdf",
+     "020_020806.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "022_022819.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "027_027613.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "033_033689.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037919.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf",
+     "040_040669.pdf",
+     "040_040760.pdf"
+    ]
+   }
+  },
+  "p3d_s_fix_a": {
+   "dir": "p3d_s_fix_a",
+   "n": 11,
+   "span": {
+    "span_s": 53.377508338,
+    "ok": 11,
+    "n": 11,
+    "docs_per_s": 0.20607930835484478
+   },
+   "excluded_straggler": null,
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 6e-06,
+   "mhz_mean": 2625.0,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 2.296,
+   "idle_spin_cores": 1.228,
+   "cpu_s_per_doc": 11.1409,
+   "memory": {
+    "samples_in_window": 53,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 2275532800,
+     "file": 7724408832,
+     "total": 10326757376
+    },
+    "peak_anon_plus_file_bytes": 9991016448
+   },
+   "lost_documents": {
+    "n": 0,
+    "docs": []
+   },
+   "d1": {
+    "docs_with_complete_stamps": 11,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 53.373790979385376,
+    "stages": {
+     "admission": {
+      "count": 11,
+      "sum": 0.019433975219726562,
+      "share_of_run_total": 0.00036411082786367134,
+      "min": 0.0014846324920654297,
+      "mean": 0.001766725019975142,
+      "sd": 0.00037401545317161596,
+      "p50": 0.0016443729400634766,
+      "p90": 0.0023140907287597656,
+      "p95": 0.00272369384765625,
+      "p99": 0.00272369384765625,
+      "max": 0.00272369384765625,
+      "mean_over_p50": 1.0744065272120948,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.00036407660205295574,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 53.37880849838257
+      }
+     },
+     "parse_bracket": {
+      "count": 11,
+      "sum": 4.52288818359375,
+      "share_of_run_total": 0.08473987139756722,
+      "min": 0.16762661933898926,
+      "mean": 0.4111716530539773,
+      "sd": 0.3299842928277529,
+      "p50": 0.2995729446411133,
+      "p90": 1.0480353832244873,
+      "p95": 1.1228902339935303,
+      "p99": 1.1228902339935303,
+      "max": 1.1228902339935303,
+      "mean_over_p50": 1.3725259921137358,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.08473190599094767,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 53.37880849838257
+      }
+     },
+     "split": {
+      "count": 11,
+      "sum": 0.020940780639648438,
+      "share_of_run_total": 0.0003923420138497642,
+      "min": 0.0003578662872314453,
+      "mean": 0.0019037073308771307,
+      "sd": 0.0021150970183346366,
+      "p50": 0.0007338523864746094,
+      "p90": 0.0054666996002197266,
+      "p95": 0.006896257400512695,
+      "p99": 0.006896257400512695,
+      "max": 0.006896257400512695,
+      "mean_over_p50": 2.5941284186898224,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.00039230513435463746,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 53.37880849838257
+      }
+     },
+     "embed": {
+      "count": 11,
+      "sum": 48.03827691078186,
+      "share_of_run_total": 0.9000349427930975,
+      "min": 0.060610055923461914,
+      "mean": 4.367116082798351,
+      "sd": 6.349613461816788,
+      "p50": 0.8216426372528076,
+      "p90": 15.765567541122437,
+      "p95": 18.79853367805481,
+      "p99": 18.79853367805481,
+      "max": 18.79853367805481,
+      "mean_over_p50": 5.315104018214006,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.8999503410091566,
+       "p50": 1,
+       "p95": 1,
+       "window_s": 53.37880849838257
+      }
+     },
+     "return": {
+      "count": 11,
+      "sum": 0.7722511291503906,
+      "share_of_run_total": 0.014468732967621845,
+      "min": 0.0043163299560546875,
+      "mean": 0.07020464810458096,
+      "sd": 0.09557243175543527,
+      "p50": 0.01779031753540039,
+      "p90": 0.23720645904541016,
+      "p95": 0.2901015281677246,
+      "p99": 0.2901015281677246,
+      "max": 0.2901015281677246,
+      "mean_over_p50": 3.9462279391518984,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.014467372930847466,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 53.37880849838257
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 11,
+     "sum": 53.373790979385376,
+     "share_of_run_total": 1.0,
+     "min": 0.371340274810791,
+     "mean": 4.852162816307762,
+     "sd": 6.605127658727864,
+     "p50": 1.3272829055786133,
+     "p90": 17.132620096206665,
+     "p95": 19.579925298690796,
+     "p99": 19.579925298690796,
+     "max": 19.579925298690796,
+     "mean_over_p50": 3.655711074040028
+    }
+   },
+   "parse_share": 0.08473987139756722,
+   "utilisation": 0.0717,
+   "host_busy_cores": 2.3,
+   "idle_cores": 29.7,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 11,
+    "recorded": 11,
+    "ok": 11,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_s_fix_a",
+   "empty_documents": {
+    "n": 0,
+    "docs": []
+   }
+  },
+  "p3d_s_hyb_a": {
+   "dir": "p3d_s_hyb_a",
+   "n": 11,
+   "span": {
+    "span_s": 44.535593771,
+    "ok": 11,
+    "n": 11,
+    "docs_per_s": 0.24699345104864887
+   },
+   "excluded_straggler": null,
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 1.4e-05,
+   "mhz_mean": 2633.8,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 2.227,
+   "idle_spin_cores": 1.234,
+   "cpu_s_per_doc": 9.0177,
+   "memory": {
+    "samples_in_window": 44,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 1552920576,
+     "file": 7714959360,
+     "total": 9602162688
+    },
+    "peak_anon_plus_file_bytes": 9267879936
+   },
+   "lost_documents": {
+    "n": 0,
+    "docs": []
+   },
+   "d1": {
+    "docs_with_complete_stamps": 11,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 44.53226065635681,
+    "stages": {
+     "admission": {
+      "count": 11,
+      "sum": 0.022317886352539062,
+      "share_of_run_total": 0.0005011622141700832,
+      "min": 0.0014667510986328125,
+      "mean": 0.002028898759321733,
+      "sd": 0.0006311702180948633,
+      "p50": 0.0016508102416992188,
+      "p90": 0.0031065940856933594,
+      "p95": 0.003417491912841797,
+      "p99": 0.003417491912841797,
+      "max": 0.003417491912841797,
+      "mean_over_p50": 1.2290320886508062,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.0005010998549755737,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.53780245780945
+      }
+     },
+     "parse_bracket": {
+      "count": 11,
+      "sum": 4.537530183792114,
+      "share_of_run_total": 0.10189310214468977,
+      "min": 0.11202573776245117,
+      "mean": 0.4125027439811013,
+      "sd": 0.4286957298380827,
+      "p50": 0.2697937488555908,
+      "p90": 0.6365585327148438,
+      "p95": 1.695711374282837,
+      "p99": 1.695711374282837,
+      "max": 1.695711374282837,
+      "mean_over_p50": 1.5289558995745915,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.1018804236713409,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 44.53780245780945
+      }
+     },
+     "split": {
+      "count": 11,
+      "sum": 0.07232666015625,
+      "share_of_run_total": 0.0016241407709879118,
+      "min": 0.0012276172637939453,
+      "mean": 0.006575150923295455,
+      "sd": 0.006344084056550015,
+      "p50": 0.0029959678649902344,
+      "p90": 0.01619696617126465,
+      "p95": 0.0180814266204834,
+      "p99": 0.0180814266204834,
+      "max": 0.0180814266204834,
+      "mean_over_p50": 2.194666705250821,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.0016239386805122428,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.53780245780945
+      }
+     },
+     "embed": {
+      "count": 11,
+      "sum": 39.25604057312012,
+      "share_of_run_total": 0.8815191502638541,
+      "min": 0.0553278923034668,
+      "mean": 3.568730961192738,
+      "sd": 4.835529658512203,
+      "p50": 0.8195195198059082,
+      "p90": 12.971423864364624,
+      "p95": 13.607545137405396,
+      "p99": 13.607545137405396,
+      "max": 13.607545137405396,
+      "mean_over_p50": 4.354662549145799,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.8814094635743932,
+       "p50": 1,
+       "p95": 1,
+       "window_s": 44.53780245780945
+      }
+     },
+     "return": {
+      "count": 11,
+      "sum": 0.644045352935791,
+      "share_of_run_total": 0.014462444606298154,
+      "min": 0.003697633743286133,
+      "mean": 0.05854957753961736,
+      "sd": 0.0737432896000724,
+      "p50": 0.01768326759338379,
+      "p90": 0.1986551284790039,
+      "p95": 0.21364593505859375,
+      "p99": 0.21364593505859375,
+      "max": 0.21364593505859375,
+      "mean_over_p50": 3.3110157514962757,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.01446064505643029,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.53780245780945
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 11,
+     "sum": 44.53226065635681,
+     "share_of_run_total": 1.0,
+     "min": 0.34358906745910645,
+     "mean": 4.048387332396074,
+     "sd": 4.937725579920154,
+     "p50": 1.5553221702575684,
+     "p90": 13.824460506439209,
+     "p95": 14.180837154388428,
+     "p99": 14.180837154388428,
+     "max": 14.180837154388428,
+     "mean_over_p50": 2.602925239422031
+    }
+   },
+   "parse_share": 0.10189310214468977,
+   "utilisation": 0.0696,
+   "host_busy_cores": 2.234,
+   "idle_cores": 29.766,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 11,
+    "recorded": 11,
+    "ok": 11,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_s_hyb_a",
+   "empty_documents": {
+    "n": 0,
+    "docs": []
+   }
+  },
+  "p3d_s_pure_a": {
+   "dir": "p3d_s_pure_a",
+   "n": 11,
+   "span": {
+    "span_s": 44.79046628,
+    "ok": 11,
+    "n": 11,
+    "docs_per_s": 0.24558797694213244
+   },
+   "excluded_straggler": null,
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 6.3e-05,
+   "mhz_mean": 2616.4,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 2.228,
+   "idle_spin_cores": 1.225,
+   "cpu_s_per_doc": 9.0723,
+   "memory": {
+    "samples_in_window": 45,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 1448996864,
+     "file": 7714406400,
+     "total": 9494859776
+    },
+    "peak_anon_plus_file_bytes": 9163403264
+   },
+   "lost_documents": {
+    "n": 0,
+    "docs": []
+   },
+   "d1": {
+    "docs_with_complete_stamps": 11,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 44.78694462776184,
+    "stages": {
+     "admission": {
+      "count": 11,
+      "sum": 0.02012348175048828,
+      "share_of_run_total": 0.00044931579766694887,
+      "min": 0.0014917850494384766,
+      "mean": 0.001829407431862571,
+      "sd": 0.00029314789605828405,
+      "p50": 0.0017123222351074219,
+      "p90": 0.002338409423828125,
+      "p95": 0.0023660659790039062,
+      "p99": 0.0023660659790039062,
+      "max": 0.0023660659790039062,
+      "mean_over_p50": 1.0683780157464369,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.0004492557813232102,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.792927742004395
+      }
+     },
+     "parse_bracket": {
+      "count": 11,
+      "sum": 4.5722434520721436,
+      "share_of_run_total": 0.10208875577634229,
+      "min": 0.11238694190979004,
+      "mean": 0.4156584956429221,
+      "sd": 0.4368850406204287,
+      "p50": 0.2732067108154297,
+      "p90": 0.6384701728820801,
+      "p95": 1.7258434295654297,
+      "p99": 1.7258434295654297,
+      "max": 1.7258434295654297,
+      "mean_over_p50": 1.5214066096777858,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.10207511950116491,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 44.792927742004395
+      }
+     },
+     "split": {
+      "count": 11,
+      "sum": 0.06481456756591797,
+      "share_of_run_total": 0.0014471754683113996,
+      "min": 0.0012030601501464844,
+      "mean": 0.005892233415083451,
+      "sd": 0.005423852463240102,
+      "p50": 0.0031404495239257812,
+      "p90": 0.013201713562011719,
+      "p95": 0.016419410705566406,
+      "p99": 0.016419410705566406,
+      "max": 0.016419410705566406,
+      "mean_over_p50": 1.8762388537669434,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.001446982165113944,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.792927742004395
+      }
+     },
+     "embed": {
+      "count": 11,
+      "sum": 39.48683309555054,
+      "share_of_run_total": 0.8816594528547957,
+      "min": 0.05499005317687988,
+      "mean": 3.5897120995955034,
+      "sd": 4.841249971810747,
+      "p50": 0.819380521774292,
+      "p90": 13.097140550613403,
+      "p95": 13.498132228851318,
+      "p99": 13.498132228851318,
+      "max": 13.498132228851318,
+      "mean_over_p50": 4.381007363736591,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.8815416871829503,
+       "p50": 1,
+       "p95": 1,
+       "window_s": 44.792927742004395
+      }
+     },
+     "return": {
+      "count": 11,
+      "sum": 0.6429300308227539,
+      "share_of_run_total": 0.014355300102883651,
+      "min": 0.004085063934326172,
+      "mean": 0.05844818462025036,
+      "sd": 0.07349609610327065,
+      "p50": 0.017674922943115234,
+      "p90": 0.19963288307189941,
+      "p95": 0.21170592308044434,
+      "p99": 0.21170592308044434,
+      "max": 0.21170592308044434,
+      "mean_over_p50": 3.3068424008613397,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.014353382626066854,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.792927742004395
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 11,
+     "sum": 44.78694462776184,
+     "share_of_run_total": 1.0,
+     "min": 0.34319639205932617,
+     "mean": 4.071540420705622,
+     "sd": 4.94172928826282,
+     "p50": 1.563554286956787,
+     "p90": 13.953348636627197,
+     "p95": 14.06334638595581,
+     "p99": 14.06334638595581,
+     "max": 14.06334638595581,
+     "mean_over_p50": 2.60402881733658
+    }
+   },
+   "parse_share": 0.10208875577634229,
+   "utilisation": 0.0696,
+   "host_busy_cores": 2.236,
+   "idle_cores": 29.764,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 11,
+    "recorded": 11,
+    "ok": 11,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_s_pure_a",
+   "empty_documents": {
+    "n": 0,
+    "docs": []
+   }
+  },
+  "p3d_s_fix_b": {
+   "dir": "p3d_s_fix_b",
+   "n": 11,
+   "span": {
+    "span_s": 53.171675433,
+    "ok": 11,
+    "n": 11,
+    "docs_per_s": 0.20687706209033724
+   },
+   "excluded_straggler": null,
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 3.5e-05,
+   "mhz_mean": 2622.5,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 2.294,
+   "idle_spin_cores": 1.234,
+   "cpu_s_per_doc": 11.0906,
+   "memory": {
+    "samples_in_window": 53,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 2275876864,
+     "file": 7722930176,
+     "total": 10327130112
+    },
+    "peak_anon_plus_file_bytes": 9989881856
+   },
+   "lost_documents": {
+    "n": 0,
+    "docs": []
+   },
+   "d1": {
+    "docs_with_complete_stamps": 11,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 53.168097734451294,
+    "stages": {
+     "admission": {
+      "count": 11,
+      "sum": 0.018102169036865234,
+      "share_of_run_total": 0.00034047050408454965,
+      "min": 0.0013082027435302734,
+      "mean": 0.0016456517306241121,
+      "sd": 0.00032154684474054604,
+      "p50": 0.0015196800231933594,
+      "p90": 0.0021202564239501953,
+      "p95": 0.002329111099243164,
+      "p99": 0.002329111099243164,
+      "max": 0.002329111099243164,
+      "mean_over_p50": 1.0828935733234446,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.00034043275322323584,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 53.1739935874939
+      }
+     },
+     "parse_bracket": {
+      "count": 11,
+      "sum": 4.551693916320801,
+      "share_of_run_total": 0.08560949347961049,
+      "min": 0.17893552780151367,
+      "mean": 0.4137903560291637,
+      "sd": 0.32693237469870373,
+      "p50": 0.30445432662963867,
+      "p90": 1.0669679641723633,
+      "p95": 1.106135606765747,
+      "p99": 1.106135606765747,
+      "max": 1.106135606765747,
+      "mean_over_p50": 1.3591212863022626,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.08560000122675238,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 53.1739935874939
+      }
+     },
+     "split": {
+      "count": 11,
+      "sum": 0.02061176300048828,
+      "share_of_run_total": 0.0003876716278892275,
+      "min": 0.0003800392150878906,
+      "mean": 0.0018737966364080255,
+      "sd": 0.0020577786008146863,
+      "p50": 0.0007517337799072266,
+      "p90": 0.005237102508544922,
+      "p95": 0.006781101226806641,
+      "p99": 0.006781101226806641,
+      "max": 0.006781101226806641,
+      "mean_over_p50": 2.492633278551452,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.0003876286434377576,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 53.1739935874939
+      }
+     },
+     "embed": {
+      "count": 11,
+      "sum": 47.80715751647949,
+      "share_of_run_total": 0.8991699826323093,
+      "min": 0.0589141845703125,
+      "mean": 4.346105228770863,
+      "sd": 6.297085447163821,
+      "p50": 0.8122701644897461,
+      "p90": 15.586933612823486,
+      "p95": 18.680583953857422,
+      "p99": 18.680583953857422,
+      "max": 18.680583953857422,
+      "mean_over_p50": 5.35056612783631,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.8990702840067171,
+       "p50": 1,
+       "p95": 1,
+       "window_s": 53.1739935874939
+      }
+     },
+     "return": {
+      "count": 11,
+      "sum": 0.7705323696136475,
+      "share_of_run_total": 0.014492381756106466,
+      "min": 0.004321098327636719,
+      "mean": 0.07004839723760431,
+      "sd": 0.09539515699356425,
+      "p50": 0.01755833625793457,
+      "p90": 0.23728513717651367,
+      "p95": 0.2890341281890869,
+      "p99": 0.2890341281890869,
+      "max": 0.2890341281890869,
+      "mean_over_p50": 3.9894666674896153,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.014490774862448371,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 53.1739935874939
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 11,
+     "sum": 53.168097734451294,
+     "share_of_run_total": 1.0,
+     "min": 0.3700244426727295,
+     "mean": 4.833463430404663,
+     "sd": 6.539868892505596,
+     "p50": 1.3465332984924316,
+     "p90": 16.937111139297485,
+     "p95": 19.434510469436646,
+     "p99": 19.434510469436646,
+     "max": 19.434510469436646,
+     "mean_over_p50": 3.5895610125766453
+    }
+   },
+   "parse_share": 0.08560949347961049,
+   "utilisation": 0.0717,
+   "host_busy_cores": 2.301,
+   "idle_cores": 29.699,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 11,
+    "recorded": 11,
+    "ok": 11,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_s_fix_b",
+   "empty_documents": {
+    "n": 0,
+    "docs": []
+   }
+  },
+  "p3d_s_hyb_b": {
+   "dir": "p3d_s_hyb_b",
+   "n": 11,
+   "span": {
+    "span_s": 44.417748248,
+    "ok": 11,
+    "n": 11,
+    "docs_per_s": 0.24764875379506202
+   },
+   "excluded_straggler": null,
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 7e-06,
+   "mhz_mean": 2626.3,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 2.228,
+   "idle_spin_cores": 1.233,
+   "cpu_s_per_doc": 8.9967,
+   "memory": {
+    "samples_in_window": 44,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 1518956544,
+     "file": 7716540416,
+     "total": 9569476608
+    },
+    "peak_anon_plus_file_bytes": 9235492864
+   },
+   "lost_documents": {
+    "n": 0,
+    "docs": []
+   },
+   "d1": {
+    "docs_with_complete_stamps": 11,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 44.41434597969055,
+    "stages": {
+     "admission": {
+      "count": 11,
+      "sum": 0.019098520278930664,
+      "share_of_run_total": 0.000430007914282108,
+      "min": 0.0014965534210205078,
+      "mean": 0.001736229116266424,
+      "sd": 0.0001586374263043097,
+      "p50": 0.0017428398132324219,
+      "p90": 0.001926422119140625,
+      "p95": 0.002079486846923828,
+      "p99": 0.002079486846923828,
+      "max": 0.002079486846923828,
+      "mean_over_p50": 0.9962069394353936,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.0004299522290091155,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.420098304748535
+      }
+     },
+     "parse_bracket": {
+      "count": 11,
+      "sum": 4.616899251937866,
+      "share_of_run_total": 0.10395063014209521,
+      "min": 0.11440348625183105,
+      "mean": 0.41971811381253327,
+      "sd": 0.4317814535005533,
+      "p50": 0.2785019874572754,
+      "p90": 0.6437568664550781,
+      "p95": 1.7118399143218994,
+      "p99": 1.7118399143218994,
+      "max": 1.7118399143218994,
+      "mean_over_p50": 1.507056081159642,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.10393716871725871,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 44.420098304748535
+      }
+     },
+     "split": {
+      "count": 11,
+      "sum": 0.05797600746154785,
+      "share_of_run_total": 0.001305344167131464,
+      "min": 0.0011944770812988281,
+      "mean": 0.005270546132867987,
+      "sd": 0.006891611379074087,
+      "p50": 0.0022940635681152344,
+      "p90": 0.016242265701293945,
+      "p95": 0.022688865661621094,
+      "p99": 0.022688865661621094,
+      "max": 0.022688865661621094,
+      "mean_over_p50": 2.2974717031046277,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.0013051751273443306,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.420098304748535
+      }
+     },
+     "embed": {
+      "count": 11,
+      "sum": 39.07656955718994,
+      "share_of_run_total": 0.8798186418203382,
+      "min": 0.05544161796569824,
+      "mean": 3.5524154142899946,
+      "sd": 4.806830037400455,
+      "p50": 0.8211171627044678,
+      "p90": 12.894896268844604,
+      "p95": 13.531312942504883,
+      "p99": 13.531312942504883,
+      "max": 13.531312942504883,
+      "mean_over_p50": 4.326319769750765,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.8797047068446634,
+       "p50": 1,
+       "p95": 1,
+       "window_s": 44.420098304748535
+      }
+     },
+     "return": {
+      "count": 11,
+      "sum": 0.6438026428222656,
+      "share_of_run_total": 0.014495375956152967,
+      "min": 0.0039942264556884766,
+      "mean": 0.05852751298384233,
+      "sd": 0.07371278768249886,
+      "p50": 0.017442703247070312,
+      "p90": 0.19947171211242676,
+      "p95": 0.21279573440551758,
+      "p99": 0.21279573440551758,
+      "max": 0.21279573440551758,
+      "mean_over_p50": 3.355415279089418,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.014493498830313097,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.420098304748535
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 11,
+     "sum": 44.41434597969055,
+     "share_of_run_total": 1.0,
+     "min": 0.34261465072631836,
+     "mean": 4.037667816335505,
+     "sd": 4.910506004867207,
+     "p50": 1.5647354125976562,
+     "p90": 13.756120204925537,
+     "p95": 14.114306449890137,
+     "p99": 14.114306449890137,
+     "max": 14.114306449890137,
+     "mean_over_p50": 2.580415694454356
+    }
+   },
+   "parse_share": 0.10395063014209521,
+   "utilisation": 0.0696,
+   "host_busy_cores": 2.232,
+   "idle_cores": 29.768,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 11,
+    "recorded": 11,
+    "ok": 11,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_s_hyb_b",
+   "empty_documents": {
+    "n": 0,
+    "docs": []
+   }
+  },
+  "p3d_s_pure_b": {
+   "dir": "p3d_s_pure_b",
+   "n": 11,
+   "span": {
+    "span_s": 44.962227684,
+    "ok": 11,
+    "n": 11,
+    "docs_per_s": 0.2446497997676925
+   },
+   "excluded_straggler": null,
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 7.7e-05,
+   "mhz_mean": 2598.3,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 2.227,
+   "idle_spin_cores": 1.222,
+   "cpu_s_per_doc": 9.1035,
+   "memory": {
+    "samples_in_window": 45,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 1323053056,
+     "file": 7714422784,
+     "total": 9367752704
+    },
+    "peak_anon_plus_file_bytes": 9037475840
+   },
+   "lost_documents": {
+    "n": 0,
+    "docs": []
+   },
+   "d1": {
+    "docs_with_complete_stamps": 11,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 44.95878505706787,
+    "stages": {
+     "admission": {
+      "count": 11,
+      "sum": 0.018824338912963867,
+      "share_of_run_total": 0.00041870212660483216,
+      "min": 0.0013935565948486328,
+      "mean": 0.0017113035375421698,
+      "sd": 0.0002670286168313942,
+      "p50": 0.0016446113586425781,
+      "p90": 0.002130746841430664,
+      "p95": 0.0021889209747314453,
+      "p99": 0.0021889209747314453,
+      "max": 0.0021889209747314453,
+      "mean_over_p50": 1.0405519386383406,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.00041864728109442434,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.964674949645996
+      }
+     },
+     "parse_bracket": {
+      "count": 11,
+      "sum": 4.589986562728882,
+      "share_of_run_total": 0.10209320729869902,
+      "min": 0.11388754844665527,
+      "mean": 0.4172715057026256,
+      "sd": 0.43781260331614213,
+      "p50": 0.2710754871368408,
+      "p90": 0.6373343467712402,
+      "p95": 1.731287956237793,
+      "p99": 1.731287956237793,
+      "max": 1.731287956237793,
+      "mean_over_p50": 1.5393184758605045,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.10207983417802997,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 44.964674949645996
+      }
+     },
+     "split": {
+      "count": 11,
+      "sum": 0.06243491172790527,
+      "share_of_run_total": 0.0013887143891600784,
+      "min": 0.001154184341430664,
+      "mean": 0.005675901066173206,
+      "sd": 0.00529477128702415,
+      "p50": 0.0030820369720458984,
+      "p90": 0.012261629104614258,
+      "p95": 0.016219377517700195,
+      "p99": 0.016219377517700195,
+      "max": 0.016219377517700195,
+      "mean_over_p50": 1.8416070662531556,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.0013885324823947563,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.964674949645996
+      }
+     },
+     "embed": {
+      "count": 11,
+      "sum": 39.639082193374634,
+      "share_of_run_total": 0.8816760093285275,
+      "min": 0.05515909194946289,
+      "mean": 3.6035529266704214,
+      "sd": 4.843783558090516,
+      "p50": 0.8220605850219727,
+      "p90": 13.128621101379395,
+      "p95": 13.499218702316284,
+      "p99": 13.499218702316284,
+      "max": 13.499218702316284,
+      "mean_over_p50": 4.3835612512356406,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.881560519180106,
+       "p50": 1,
+       "p95": 1,
+       "window_s": 44.964674949645996
+      }
+     },
+     "return": {
+      "count": 11,
+      "sum": 0.6484570503234863,
+      "share_of_run_total": 0.014423366857008603,
+      "min": 0.0038442611694335938,
+      "mean": 0.058950640938498756,
+      "sd": 0.0743550384092422,
+      "p50": 0.01788020133972168,
+      "p90": 0.20023703575134277,
+      "p95": 0.21587848663330078,
+      "p99": 0.21587848663330078,
+      "max": 0.21587848663330078,
+      "mean_over_p50": 3.296978586451218,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 1,
+       "mean": 0.014421477549869213,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 44.964674949645996
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 11,
+     "sum": 44.95878505706787,
+     "share_of_run_total": 1.0,
+     "min": 0.3439621925354004,
+     "mean": 4.087162277915261,
+     "sd": 4.943714482434245,
+     "p50": 1.5932533740997314,
+     "p90": 13.983870506286621,
+     "p95": 14.069239377975464,
+     "p99": 14.069239377975464,
+     "max": 14.069239377975464,
+     "mean_over_p50": 2.5652933452751756
+    }
+   },
+   "parse_share": 0.10209320729869902,
+   "utilisation": 0.0696,
+   "host_busy_cores": 2.238,
+   "idle_cores": 29.762,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 11,
+    "recorded": 11,
+    "ok": 11,
+    "empty": 0,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_s_pure_b",
+   "empty_documents": {
+    "n": 0,
+    "docs": []
+   }
+  },
+  "p3d_fix_a": {
+   "dir": "p3d_fix_a",
+   "n": 384,
+   "span": {
+    "span_s": 118.332969367,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.2281789432263657
+   },
+   "excluded_straggler": {
+    "span_s": 118.332969367,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.2281789432263657
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 1.1e-05,
+   "mhz_mean": 2816.4,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 13.13,
+   "idle_spin_cores": 1.219,
+   "cpu_s_per_doc": 4.0735,
+   "memory": {
+    "samples_in_window": 118,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 10649571328,
+     "file": 7740338176,
+     "total": 18720985088
+    },
+    "peak_anon_plus_file_bytes": 18363801600
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1601.527331829071,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 6.293255805969238,
+      "share_of_run_total": 0.003929533814937671,
+      "min": 0.0014421939849853516,
+      "mean": 0.01647449163866293,
+      "sd": 0.034920932931997196,
+      "p50": 0.007838606834411621,
+      "p90": 0.028573274612426758,
+      "p95": 0.04842329025268555,
+      "p99": 0.2823066711425781,
+      "max": 0.34815549850463867,
+      "mean_over_p50": 2.1017116927385135,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 31,
+       "mean": 0.05310289621675229,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.51059460639954
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 93.14088416099548,
+      "share_of_run_total": 0.058157536440306155,
+      "min": 0.02639603614807129,
+      "mean": 0.24382430408637562,
+      "sd": 0.26929141737521484,
+      "p50": 0.15205204486846924,
+      "p90": 0.49835920333862305,
+      "p95": 0.7502002716064453,
+      "p99": 1.540726661682129,
+      "max": 2.1309902667999268,
+      "mean_over_p50": 1.6035582046745431,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.7859287557398341,
+       "p50": 0,
+       "p95": 4,
+       "window_s": 118.51059460639954
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 2.400377035140991,
+      "share_of_run_total": 0.0014988049141812464,
+      "min": 0.00041103363037109375,
+      "mean": 0.006283709516075893,
+      "sd": 0.013873601131507823,
+      "p50": 0.003263235092163086,
+      "p90": 0.014146566390991211,
+      "p95": 0.0187222957611084,
+      "p99": 0.039057254791259766,
+      "max": 0.24013972282409668,
+      "mean_over_p50": 1.9256073615924003,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 3,
+       "mean": 0.020254535411902926,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.51059460639954
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1468.6799082756042,
+      "share_of_run_total": 0.917049543324531,
+      "min": 0.09420895576477051,
+      "mean": 3.8447118017685975,
+      "sd": 6.719827798316655,
+      "p50": 1.8955117464065552,
+      "p90": 8.352408409118652,
+      "p95": 12.290271997451782,
+      "p99": 27.636292457580566,
+      "max": 93.52910256385803,
+      "mean_over_p50": 2.028323912556737,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.392815285025124,
+       "p50": 3,
+       "p95": 31,
+       "window_s": 118.51059460639954
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 31.012906551361084,
+      "share_of_run_total": 0.019364581506043914,
+      "min": 0.007111310958862305,
+      "mean": 0.08118561924440075,
+      "sd": 0.10071075183787144,
+      "p50": 0.053020596504211426,
+      "p90": 0.16707849502563477,
+      "p95": 0.25481677055358887,
+      "p99": 0.49942731857299805,
+      "max": 1.2261765003204346,
+      "mean_over_p50": 1.531209088489832,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.26168889502547815,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 118.51059460639954
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1601.527331829071,
+     "share_of_run_total": 1.0,
+     "min": 0.20464706420898438,
+     "mean": 4.192479926254113,
+     "sd": 6.958892323318513,
+     "p50": 2.146029233932495,
+     "p90": 8.89057970046997,
+     "p95": 12.94680118560791,
+     "p99": 28.669076919555664,
+     "max": 97.14492726325989,
+     "mean_over_p50": 1.9535987021815149
+    }
+   },
+   "parse_share": 0.058157536440306155,
+   "utilisation": 0.4103,
+   "host_busy_cores": 13.241,
+   "idle_cores": 18.759,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_fix_a",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3d_hyb_a": {
+   "dir": "p3d_hyb_a",
+   "n": 384,
+   "span": {
+    "span_s": 96.616500941,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.95377597283587
+   },
+   "excluded_straggler": {
+    "span_s": 96.616500941,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.95377597283587
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 6e-06,
+   "mhz_mean": 2842.4,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 12.949,
+   "idle_spin_cores": 1.232,
+   "cpu_s_per_doc": 3.2816,
+   "memory": {
+    "samples_in_window": 96,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 8710332416,
+     "file": 7714783232,
+     "total": 16778354688
+    },
+    "peak_anon_plus_file_bytes": 16425013248
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1442.1803431510925,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 7.760189056396484,
+      "share_of_run_total": 0.005380872852171079,
+      "min": 0.0011043548583984375,
+      "mean": 0.02031463103768713,
+      "sd": 0.05576524554360597,
+      "p50": 0.005651116371154785,
+      "p90": 0.03560638427734375,
+      "p95": 0.052846431732177734,
+      "p99": 0.398357629776001,
+      "max": 0.43457746505737305,
+      "mean_over_p50": 3.5947996295705216,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.08015890818006928,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 96.8100643157959
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 216.7927918434143,
+      "share_of_run_total": 0.150322941838004,
+      "min": 0.018023252487182617,
+      "mean": 0.5675203974958489,
+      "sd": 0.4636531815360436,
+      "p50": 0.4490654468536377,
+      "p90": 1.1618802547454834,
+      "p95": 1.720573902130127,
+      "p99": 2.0976428985595703,
+      "max": 2.2389976978302,
+      "mean_over_p50": 1.2637810400959637,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 2.23936213012144,
+       "p50": 0,
+       "p95": 11,
+       "window_s": 96.8100643157959
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 5.4467613697052,
+      "share_of_run_total": 0.003776754686452248,
+      "min": 0.0012307167053222656,
+      "mean": 0.01425853761702932,
+      "sd": 0.022767488846634,
+      "p50": 0.010038375854492188,
+      "p90": 0.026944875717163086,
+      "p95": 0.037302255630493164,
+      "p99": 0.07407450675964355,
+      "max": 0.3792140483856201,
+      "mean_over_p50": 1.4204028444151755,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.056262346360372015,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 96.8100643157959
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1185.0348813533783,
+      "share_of_run_total": 0.8216967364595581,
+      "min": 0.07060527801513672,
+      "mean": 3.102185553281095,
+      "sd": 5.20197433000365,
+      "p50": 1.5845307111740112,
+      "p90": 6.919516324996948,
+      "p95": 9.720594644546509,
+      "p99": 21.706053256988525,
+      "max": 73.5502758026123,
+      "mean_over_p50": 1.9577945264201426,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.240823200858296,
+       "p50": 5,
+       "p95": 31,
+       "window_s": 96.8100643157959
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 27.145719528198242,
+      "share_of_run_total": 0.018822694163814626,
+      "min": 0.003989458084106445,
+      "mean": 0.07106209300575456,
+      "sd": 0.09113526026051513,
+      "p50": 0.043766140937805176,
+      "p90": 0.15167856216430664,
+      "p95": 0.23829174041748047,
+      "p99": 0.42878150939941406,
+      "max": 0.9802975654602051,
+      "mean_over_p50": 1.6236773789751966,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 8,
+       "mean": 0.2804018334255878,
+       "p50": 0,
+       "p95": 2,
+       "window_s": 96.8100643157959
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1442.1803431510925,
+     "share_of_run_total": 1.0,
+     "min": 0.21021556854248047,
+     "mean": 3.775341212437415,
+     "sd": 5.398292950305117,
+     "p50": 2.20352041721344,
+     "p90": 8.076682090759277,
+     "p95": 10.726231098175049,
+     "p99": 22.96380043029785,
+     "max": 76.61573052406311,
+     "mean_over_p50": 1.7133225464784625
+    }
+   },
+   "parse_share": 0.150322941838004,
+   "utilisation": 0.4046,
+   "host_busy_cores": 13.13,
+   "idle_cores": 18.87,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_hyb_a",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3d_pure_a": {
+   "dir": "p3d_pure_a",
+   "n": 384,
+   "span": {
+    "span_s": 97.223171417,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.9291044967208837
+   },
+   "excluded_straggler": {
+    "span_s": 97.223171417,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.9291044967208837
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 3e-06,
+   "mhz_mean": 2834.8,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 12.82,
+   "idle_spin_cores": 1.234,
+   "cpu_s_per_doc": 3.2695,
+   "memory": {
+    "samples_in_window": 97,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 8586440704,
+     "file": 7714672640,
+     "total": 16652541952
+    },
+    "peak_anon_plus_file_bytes": 16301006848
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1450.8282511234283,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 7.062355041503906,
+      "share_of_run_total": 0.00486780915386454,
+      "min": 0.001340627670288086,
+      "mean": 0.018487840422785094,
+      "sd": 0.06522195492456988,
+      "p50": 0.00469052791595459,
+      "p90": 0.031636953353881836,
+      "p95": 0.05092120170593262,
+      "p99": 0.3466224670410156,
+      "max": 0.9625673294067383,
+      "mean_over_p50": 3.9415265731389537,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.07248968774041067,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 97.42565131187439
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 228.20224404335022,
+      "share_of_run_total": 0.15729101212817234,
+      "min": 0.029393434524536133,
+      "mean": 0.5973880734119116,
+      "sd": 0.45440711678956225,
+      "p50": 0.46113669872283936,
+      "p90": 1.2046217918395996,
+      "p95": 1.755899429321289,
+      "p99": 2.0365071296691895,
+      "max": 2.0946145057678223,
+      "mean_over_p50": 1.2954685130600818,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 2.3423219754809748,
+       "p50": 0,
+       "p95": 12,
+       "window_s": 97.42565131187439
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 5.3432862758636475,
+      "share_of_run_total": 0.003682921304934715,
+      "min": 0.0009884834289550781,
+      "mean": 0.01398766040802002,
+      "sd": 0.012469698665163507,
+      "p50": 0.010936141014099121,
+      "p90": 0.03154325485229492,
+      "p95": 0.03711652755737305,
+      "p99": 0.055747032165527344,
+      "max": 0.0973663330078125,
+      "mean_over_p50": 1.2790307284797087,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.054844758068478,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 97.42565131187439
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1182.0702612400055,
+      "share_of_run_total": 0.8147554752429766,
+      "min": 0.05095195770263672,
+      "mean": 3.0944247676439933,
+      "sd": 5.181233567456727,
+      "p50": 1.6077009439468384,
+      "p90": 7.0460686683654785,
+      "p95": 10.070028066635132,
+      "p99": 21.62309741973877,
+      "max": 74.1749939918518,
+      "mean_over_p50": 1.9247514777513972,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.133049616019687,
+       "p50": 5,
+       "p95": 30,
+       "window_s": 97.42565131187439
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 28.150104522705078,
+      "share_of_run_total": 0.019402782170051792,
+      "min": 0.0052165985107421875,
+      "mean": 0.07369137309608659,
+      "sd": 0.09089365195254778,
+      "p50": 0.0461733341217041,
+      "p90": 0.15216517448425293,
+      "p95": 0.24748992919921875,
+      "p99": 0.49586963653564453,
+      "max": 0.9778242111206055,
+      "mean_over_p50": 1.5959725347502562,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 7,
+       "mean": 0.28893935163535417,
+       "p50": 0,
+       "p95": 2,
+       "window_s": 97.42565131187439
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1450.8282511234283,
+     "share_of_run_total": 1.0,
+     "min": 0.22809481620788574,
+     "mean": 3.7979797149827967,
+     "sd": 5.369424161836228,
+     "p50": 2.29058039188385,
+     "p90": 7.837699890136719,
+     "p95": 10.940847396850586,
+     "p99": 23.079455137252808,
+     "max": 77.24211740493774,
+     "mean_over_p50": 1.658086190050379
+    }
+   },
+   "parse_share": 0.15729101212817234,
+   "utilisation": 0.4006,
+   "host_busy_cores": 12.951,
+   "idle_cores": 19.049,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_pure_a",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3d_fix_b": {
+   "dir": "p3d_fix_b",
+   "n": 384,
+   "span": {
+    "span_s": 118.320504622,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.228519023142947
+   },
+   "excluded_straggler": {
+    "span_s": 118.320504622,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.228519023142947
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 8e-06,
+   "mhz_mean": 2813.3,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 13.096,
+   "idle_spin_cores": 1.234,
+   "cpu_s_per_doc": 4.0624,
+   "memory": {
+    "samples_in_window": 119,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 13025927168,
+     "file": 7714308096,
+     "total": 21103243264
+    },
+    "peak_anon_plus_file_bytes": 20740136960
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1601.9042251110077,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 7.8213279247283936,
+      "share_of_run_total": 0.004882519068320951,
+      "min": 0.0011768341064453125,
+      "mean": 0.02047468043122616,
+      "sd": 0.06698044816719802,
+      "p50": 0.007386445999145508,
+      "p90": 0.03603816032409668,
+      "p95": 0.04889345169067383,
+      "p99": 0.3306591510772705,
+      "max": 1.0560879707336426,
+      "mean_over_p50": 2.771925826519919,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 30,
+       "mean": 0.06600371573753558,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.49829721450806
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 93.2443459033966,
+      "share_of_run_total": 0.05820843995647432,
+      "min": 0.023740291595458984,
+      "mean": 0.24409514634397017,
+      "sd": 0.2742611877120024,
+      "p50": 0.15104126930236816,
+      "p90": 0.5064077377319336,
+      "p95": 0.7685139179229736,
+      "p99": 1.5093920230865479,
+      "max": 2.0482370853424072,
+      "mean_over_p50": 1.6160824619085945,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 0.7868834244478954,
+       "p50": 0,
+       "p95": 4,
+       "window_s": 118.49829721450806
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 2.391115427017212,
+      "share_of_run_total": 0.0014926706537973667,
+      "min": 0.00040078163146972656,
+      "mean": 0.006259464468631445,
+      "sd": 0.013732113440244843,
+      "p50": 0.0035609006881713867,
+      "p90": 0.013340234756469727,
+      "p95": 0.020635366439819336,
+      "p99": 0.03230476379394531,
+      "max": 0.24380779266357422,
+      "mean_over_p50": 1.7578318006520532,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 5,
+       "mean": 0.02017847921214231,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 118.49829721450806
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1465.3895502090454,
+      "share_of_run_total": 0.9147797522710809,
+      "min": 0.0898134708404541,
+      "mean": 3.836098298976559,
+      "sd": 6.737515860790546,
+      "p50": 1.8437799215316772,
+      "p90": 8.160593271255493,
+      "p95": 12.0634024143219,
+      "p99": 28.239996910095215,
+      "max": 93.89548826217651,
+      "mean_over_p50": 2.08056192291638,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.366334239861414,
+       "p50": 3,
+       "p95": 31,
+       "window_s": 118.49829721450806
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 33.05788564682007,
+      "share_of_run_total": 0.020636618050326478,
+      "min": 0.007402658462524414,
+      "mean": 0.08653896766183264,
+      "sd": 0.10202215186235597,
+      "p50": 0.05859780311584473,
+      "p90": 0.17272663116455078,
+      "p95": 0.2425374984741211,
+      "p99": 0.47962236404418945,
+      "max": 1.2237074375152588,
+      "mean_over_p50": 1.4768295577694222,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 5,
+       "mean": 0.27897350783849667,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 118.49829721450806
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1601.9042251110077,
+     "share_of_run_total": 1.0,
+     "min": 0.13499832153320312,
+     "mean": 4.1934665578822194,
+     "sd": 6.968416494806469,
+     "p50": 2.1621187925338745,
+     "p90": 8.947324752807617,
+     "p95": 12.582603454589844,
+     "p99": 29.43989086151123,
+     "max": 97.23469305038452,
+     "mean_over_p50": 1.9395171867350203
+    }
+   },
+   "parse_share": 0.05820843995647432,
+   "utilisation": 0.4092,
+   "host_busy_cores": 13.182,
+   "idle_cores": 18.818,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_fix_b",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3d_hyb_b": {
+   "dir": "p3d_hyb_b",
+   "n": 384,
+   "span": {
+    "span_s": 97.12460864,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.933091781259197
+   },
+   "excluded_straggler": {
+    "span_s": 97.12460864,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.933091781259197
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 6.1e-05,
+   "mhz_mean": 2850.3,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 12.845,
+   "idle_spin_cores": 1.231,
+   "cpu_s_per_doc": 3.2725,
+   "memory": {
+    "samples_in_window": 97,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 8588218368,
+     "file": 7714762752,
+     "total": 16655863808
+    },
+    "peak_anon_plus_file_bytes": 16302784512
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1451.107882976532,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 4.97438645362854,
+      "share_of_run_total": 0.003427992165148336,
+      "min": 0.0011425018310546875,
+      "mean": 0.013021954067090419,
+      "sd": 0.03123784750295085,
+      "p50": 0.005138278007507324,
+      "p90": 0.025493860244750977,
+      "p95": 0.04632210731506348,
+      "p99": 0.12351489067077637,
+      "max": 0.3334839344024658,
+      "mean_over_p50": 2.534303135810204,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 29,
+       "mean": 0.0511139991856485,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 97.31945323944092
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 234.19262671470642,
+      "share_of_run_total": 0.16138884604108644,
+      "min": 0.02797698974609375,
+      "mean": 0.6130697034416398,
+      "sd": 0.4800889798679746,
+      "p50": 0.4869908094406128,
+      "p90": 1.277247667312622,
+      "p95": 1.696197271347046,
+      "p99": 2.1110599040985107,
+      "max": 2.3146748542785645,
+      "mean_over_p50": 1.258893785173993,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 2.4064317967190814,
+       "p50": 0,
+       "p95": 11,
+       "window_s": 97.31945323944092
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 5.479184627532959,
+      "share_of_run_total": 0.0037758630435484795,
+      "min": 0.0010080337524414062,
+      "mean": 0.014343415255321882,
+      "sd": 0.015510218906786983,
+      "p50": 0.01100611686706543,
+      "p90": 0.027658462524414062,
+      "p95": 0.035314083099365234,
+      "p99": 0.06789660453796387,
+      "max": 0.2111055850982666,
+      "mean_over_p50": 1.3032221471537289,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.056301021482849795,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 97.31945323944092
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1181.3255167007446,
+      "share_of_run_total": 0.8140852451835585,
+      "min": 0.07184028625488281,
+      "mean": 3.0924751746092793,
+      "sd": 5.201534594487217,
+      "p50": 1.522917628288269,
+      "p90": 6.8949198722839355,
+      "p95": 10.072799921035767,
+      "p99": 21.434795141220093,
+      "max": 74.0564866065979,
+      "mean_over_p50": 2.0306253714359874,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.13863700810421,
+       "p50": 5,
+       "p95": 31,
+       "window_s": 97.31945323944092
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 25.136168479919434,
+      "share_of_run_total": 0.01732205356665818,
+      "min": 0.0036840438842773438,
+      "mean": 0.06580148816732836,
+      "sd": 0.07828987489139337,
+      "p50": 0.04377424716949463,
+      "p90": 0.13424420356750488,
+      "p95": 0.18788623809814453,
+      "p99": 0.3014202117919922,
+      "max": 0.9777538776397705,
+      "mean_over_p50": 1.5032009097162513,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 6,
+       "mean": 0.2582851387181081,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 97.31945323944092
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1451.107882976532,
+     "share_of_run_total": 1.0,
+     "min": 0.2518937587738037,
+     "mean": 3.7987117355406594,
+     "sd": 5.40184542329526,
+     "p50": 2.2291479110717773,
+     "p90": 7.9944987297058105,
+     "p95": 11.069509029388428,
+     "p99": 22.922075748443604,
+     "max": 77.23601007461548,
+     "mean_over_p50": 1.7041093220746548
+    }
+   },
+   "parse_share": 0.16138884604108644,
+   "utilisation": 0.4014,
+   "host_busy_cores": 12.968,
+   "idle_cores": 19.032,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_hyb_b",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3d_pure_b": {
+   "dir": "p3d_pure_b",
+   "n": 384,
+   "span": {
+    "span_s": 97.949864518,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.899954347867432
+   },
+   "excluded_straggler": {
+    "span_s": 97.949864518,
+    "ok": 382,
+    "n": 384,
+    "docs_per_s": 3.899954347867432
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 6.1e-05,
+   "mhz_mean": 2849.6,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 12.859,
+   "idle_spin_cores": 1.226,
+   "cpu_s_per_doc": 3.3038,
+   "memory": {
+    "samples_in_window": 98,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 8118603776,
+     "file": 7714697216,
+     "total": 16181575680
+    },
+    "peak_anon_plus_file_bytes": 15833112576
+   },
+   "lost_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 382,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 1457.566487312317,
+    "stages": {
+     "admission": {
+      "count": 382,
+      "sum": 5.922606706619263,
+      "share_of_run_total": 0.004063352689687773,
+      "min": 0.0010228157043457031,
+      "mean": 0.01550420603827032,
+      "sd": 0.035693946796216264,
+      "p50": 0.005766391754150391,
+      "p90": 0.03199648857116699,
+      "p95": 0.050971269607543945,
+      "p99": 0.22179508209228516,
+      "max": 0.3529493808746338,
+      "mean_over_p50": 2.688718820935308,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 30,
+       "mean": 0.06034666719178336,
+       "p50": 0,
+       "p95": 0,
+       "window_s": 98.14306211471558
+      }
+     },
+     "parse_bracket": {
+      "count": 382,
+      "sum": 221.4033215045929,
+      "share_of_run_total": 0.15189929477100567,
+      "min": 0.018439292907714844,
+      "mean": 0.5795898468706621,
+      "sd": 0.4780138527459408,
+      "p50": 0.44843077659606934,
+      "p90": 1.1861603260040283,
+      "p95": 1.6696958541870117,
+      "p99": 2.195350408554077,
+      "max": 2.3559067249298096,
+      "mean_over_p50": 1.2924845419179072,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 2.255924328566427,
+       "p50": 0,
+       "p95": 11,
+       "window_s": 98.14306211471558
+      }
+     },
+     "split": {
+      "count": 382,
+      "sum": 5.229405403137207,
+      "share_of_run_total": 0.0035877645710556787,
+      "min": 0.0012230873107910156,
+      "mean": 0.013689542940149757,
+      "sd": 0.013042988186630933,
+      "p50": 0.010305404663085938,
+      "p90": 0.02944207191467285,
+      "p95": 0.037766456604003906,
+      "p99": 0.06034064292907715,
+      "max": 0.11441302299499512,
+      "mean_over_p50": 1.3283848027031715,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 3,
+       "mean": 0.053283495444892075,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 98.14306211471558
+      }
+     },
+     "embed": {
+      "count": 382,
+      "sum": 1197.859655380249,
+      "share_of_run_total": 0.8218216224146626,
+      "min": 0.041460514068603516,
+      "mean": 3.13575826015772,
+      "sd": 5.223925950934428,
+      "p50": 1.624619483947754,
+      "p90": 7.071124792098999,
+      "p95": 10.012508630752563,
+      "p99": 21.427200078964233,
+      "max": 74.48813819885254,
+      "mean_over_p50": 1.9301493618296175,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 12.205240284637929,
+       "p50": 5,
+       "p95": 31,
+       "window_s": 98.14306211471558
+      }
+     },
+     "return": {
+      "count": 382,
+      "sum": 27.151498317718506,
+      "share_of_run_total": 0.01862796555358828,
+      "min": 0.004116058349609375,
+      "mean": 0.0710772207270118,
+      "sd": 0.08643482201378774,
+      "p50": 0.04241597652435303,
+      "p90": 0.1456589698791504,
+      "p95": 0.22210478782653809,
+      "p99": 0.3711116313934326,
+      "max": 0.9771015644073486,
+      "mean_over_p50": 1.6757181267818504,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 7,
+       "mean": 0.2766522434971734,
+       "p50": 0,
+       "p95": 2,
+       "window_s": 98.14306211471558
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 382,
+     "sum": 1457.566487312317,
+     "share_of_run_total": 1.0,
+     "min": 0.26398134231567383,
+     "mean": 3.815619076733814,
+     "sd": 5.435875680087263,
+     "p50": 2.3024121522903442,
+     "p90": 8.143640756607056,
+     "p95": 11.00967788696289,
+     "p99": 22.902186632156372,
+     "max": 77.90639638900757,
+     "mean_over_p50": 1.6572267797223854
+    }
+   },
+   "parse_share": 0.15189929477100567,
+   "utilisation": 0.4019,
+   "host_busy_cores": 12.967,
+   "idle_cores": 19.033,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 384,
+    "recorded": 384,
+    "ok": 382,
+    "empty": 2,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_pure_b",
+   "empty_documents": {
+    "n": 2,
+    "docs": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ]
+   }
+  },
+  "p3c_t4_full": {
+   "dir": "p3c_t4_full",
+   "n": 9975,
+   "span": {
+    "span_s": 1645.061358083,
+    "ok": 9886,
+    "n": 9975,
+    "docs_per_s": 6.00950229085693
+   },
+   "excluded_straggler": {
+    "span_s": 1645.061358083,
+    "ok": 9875,
+    "n": 9964,
+    "docs_per_s": 6.0028156101772385
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 2e-05,
+   "mhz_mean": 3156.7,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 28.791,
+   "idle_spin_cores": 1.235,
+   "cpu_s_per_doc": 4.791,
+   "memory": {
+    "samples_in_window": 1644,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 13497323520,
+     "file": 7740329984,
+     "total": 21586841600
+    },
+    "peak_anon_plus_file_bytes": 21218045952
+   },
+   "lost_documents": {
+    "n": 89,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf",
+     "040_040760.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 9886,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 52127.763551950455,
+    "stages": {
+     "admission": {
+      "count": 9886,
+      "sum": 564.1121771335602,
+      "share_of_run_total": 0.010821722220470226,
+      "min": 0.0014879703521728516,
+      "mean": 0.05706172133659318,
+      "sd": 0.06145003407077548,
+      "p50": 0.0425722599029541,
+      "p90": 0.11262392997741699,
+      "p95": 0.15640997886657715,
+      "p99": 0.2797400951385498,
+      "max": 1.3247039318084717,
+      "mean_over_p50": 1.3403498303042551,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 31,
+       "mean": 0.3429066002599906,
+       "p50": 0,
+       "p95": 2,
+       "window_s": 1645.0898778438568
+      }
+     },
+     "parse_bracket": {
+      "count": 9886,
+      "sum": 3810.4386672973633,
+      "share_of_run_total": 0.07309806536203851,
+      "min": 0.030517578125,
+      "mean": 0.3854378583145219,
+      "sd": 0.39720199735408457,
+      "p50": 0.29368579387664795,
+      "p90": 0.6689035892486572,
+      "p95": 0.9078977108001709,
+      "p99": 2.020261764526367,
+      "max": 14.279819250106812,
+      "mean_over_p50": 1.312415739374888,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 2.316249536646307,
+       "p50": 2,
+       "p95": 6,
+       "window_s": 1645.0898778438568
+      }
+     },
+     "split": {
+      "count": 9886,
+      "sum": 189.07932257652283,
+      "share_of_run_total": 0.0036272287489964275,
+      "min": 0.00036144256591796875,
+      "mean": 0.019125968296229298,
+      "sd": 0.02000948279279925,
+      "p50": 0.01436471939086914,
+      "p90": 0.039981842041015625,
+      "p95": 0.05184125900268555,
+      "p99": 0.0848686695098877,
+      "max": 0.6118948459625244,
+      "mean_over_p50": 1.331454362302867,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 7,
+       "mean": 0.11493555769994789,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 1645.0898778438568
+      }
+     },
+     "embed": {
+      "count": 9886,
+      "sum": 45313.45056295395,
+      "share_of_run_total": 0.8692767054507264,
+      "min": 0.1362910270690918,
+      "mean": 4.583598074342904,
+      "sd": 8.849117484299152,
+      "p50": 2.6225695610046387,
+      "p90": 8.354998111724854,
+      "p95": 13.005944728851318,
+      "p99": 34.14610147476196,
+      "max": 332.7391622066498,
+      "mean_over_p50": 1.747750809929726,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 27.544665597446986,
+       "p50": 28,
+       "p95": 31,
+       "window_s": 1645.0898778438568
+      }
+     },
+     "return": {
+      "count": 9886,
+      "sum": 2250.6828219890594,
+      "share_of_run_total": 0.04317627821776839,
+      "min": 0.007378816604614258,
+      "mean": 0.22766364778363943,
+      "sd": 0.29317007509633763,
+      "p50": 0.15424299240112305,
+      "p90": 0.41812658309936523,
+      "p95": 0.6452488899230957,
+      "p99": 1.6319918632507324,
+      "max": 5.574441194534302,
+      "mean_over_p50": 1.4760064249245064,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 23,
+       "mean": 1.3681214943337474,
+       "p50": 1,
+       "p95": 4,
+       "window_s": 1645.0898778438568
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 9886,
+     "sum": 52127.763551950455,
+     "share_of_run_total": 1.0,
+     "min": 0.3380167484283447,
+     "mean": 5.272887270073888,
+     "sd": 9.222876942069067,
+     "p50": 3.2227885723114014,
+     "p90": 9.333602666854858,
+     "p95": 14.193876028060913,
+     "p99": 35.90725922584534,
+     "max": 343.11693930625916,
+     "mean_over_p50": 1.6361257190049374
+    }
+   },
+   "parse_share": 0.07309806536203851,
+   "utilisation": 0.8997,
+   "host_busy_cores": 28.931,
+   "idle_cores": 3.069,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 9975,
+    "recorded": 9975,
+    "ok": 9886,
+    "empty": 89,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3c_t4_full",
+   "empty_documents": {
+    "n": 89,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf",
+     "040_040760.pdf"
+    ]
+   }
+  },
+  "p3d_hyb_full": {
+   "dir": "p3d_hyb_full",
+   "n": 9975,
+   "span": {
+    "span_s": 1422.182771242,
+    "ok": 9886,
+    "n": 9975,
+    "docs_per_s": 6.951286571532928
+   },
+   "excluded_straggler": {
+    "span_s": 1422.182771242,
+    "ok": 9875,
+    "n": 9964,
+    "docs_per_s": 6.943551981983377
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 2.6e-05,
+   "mhz_mean": 3129.2,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 26.097,
+   "idle_spin_cores": 1.235,
+   "cpu_s_per_doc": 3.7547,
+   "memory": {
+    "samples_in_window": 1421,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 10913861632,
+     "file": 7723343872,
+     "total": 19011973120
+    },
+    "peak_anon_plus_file_bytes": 18632994816
+   },
+   "lost_documents": {
+    "n": 89,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf",
+     "040_040760.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 9886,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 44277.17150139809,
+    "stages": {
+     "admission": {
+      "count": 9886,
+      "sum": 135.46779036521912,
+      "share_of_run_total": 0.003059540295182171,
+      "min": 0.0009315013885498047,
+      "mean": 0.013702993158529143,
+      "sd": 0.03510697013367533,
+      "p50": 0.004851341247558594,
+      "p90": 0.029424190521240234,
+      "p95": 0.052463531494140625,
+      "p99": 0.13292694091796875,
+      "max": 1.268688440322876,
+      "mean_over_p50": 2.8245782886176243,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 31,
+       "mean": 0.09524347818597317,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 1422.3314073085785
+      }
+     },
+     "parse_bracket": {
+      "count": 9886,
+      "sum": 5271.08304977417,
+      "share_of_run_total": 0.11904742039829105,
+      "min": 0.008686542510986328,
+      "mean": 0.5331866325889308,
+      "sd": 0.5318577869503713,
+      "p50": 0.3721867799758911,
+      "p90": 1.1975154876708984,
+      "p95": 1.569495677947998,
+      "p99": 2.4435999393463135,
+      "max": 4.788238525390625,
+      "mean_over_p50": 1.4325781066793095,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 3.7059457610856192,
+       "p50": 3,
+       "p95": 11,
+       "window_s": 1422.3314073085785
+      }
+     },
+     "split": {
+      "count": 9886,
+      "sum": 74.4528558254242,
+      "share_of_run_total": 0.0016815178860978797,
+      "min": 0.0004839897155761719,
+      "mean": 0.007531140585213858,
+      "sd": 0.011952971596682014,
+      "p50": 0.004617452621459961,
+      "p90": 0.015393495559692383,
+      "p95": 0.022673606872558594,
+      "p99": 0.04640531539916992,
+      "max": 0.4185218811035156,
+      "mean_over_p50": 1.6310163206033368,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 3,
+       "mean": 0.05234564563705191,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 1422.3314073085785
+      }
+     },
+     "embed": {
+      "count": 9886,
+      "sum": 37687.16762971878,
+      "share_of_run_total": 0.8511647504070755,
+      "min": 0.015750885009765625,
+      "mean": 3.8121755644061075,
+      "sd": 8.537897406060788,
+      "p50": 1.6153416633605957,
+      "p90": 8.04216456413269,
+      "p95": 13.374333620071411,
+      "p99": 34.944485902786255,
+      "max": 264.59963726997375,
+      "mean_over_p50": 2.3599809568925285,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 26.496755563482015,
+       "p50": 28,
+       "p95": 32,
+       "window_s": 1422.3314073085785
+      }
+     },
+     "return": {
+      "count": 9886,
+      "sum": 1109.0001757144928,
+      "share_of_run_total": 0.025046771013353356,
+      "min": 0.0036835670471191406,
+      "mean": 0.11217885653595921,
+      "sd": 0.20858687550416208,
+      "p50": 0.049788475036621094,
+      "p90": 0.25003647804260254,
+      "p95": 0.39843153953552246,
+      "p99": 1.0941870212554932,
+      "max": 3.2472009658813477,
+      "mean_over_p50": 2.2531089062970477,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 22,
+       "mean": 0.7797058899325088,
+       "p50": 0,
+       "p95": 3,
+       "window_s": 1422.3314073085785
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 9886,
+     "sum": 44277.17150139809,
+     "share_of_run_total": 1.0,
+     "min": 0.09958672523498535,
+     "mean": 4.47877518727474,
+     "sd": 8.826653249599277,
+     "p50": 2.241366744041443,
+     "p90": 9.010609865188599,
+     "p95": 14.386718988418579,
+     "p99": 36.859288454055786,
+     "max": 271.25639295578003,
+     "mean_over_p50": 1.9982339789690071
+    }
+   },
+   "parse_share": 0.11904742039829105,
+   "utilisation": 0.8155,
+   "host_busy_cores": 26.316,
+   "idle_cores": 5.684,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 9975,
+    "recorded": 9975,
+    "ok": 9886,
+    "empty": 89,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_hyb_full",
+   "empty_documents": {
+    "n": 89,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf",
+     "040_040760.pdf"
+    ]
+   }
+  },
+  "p3d_pure_full": {
+   "dir": "p3d_pure_full",
+   "n": 9975,
+   "span": {
+    "span_s": 1421.502122943,
+    "ok": 9881,
+    "n": 9975,
+    "docs_per_s": 6.9510976033879714
+   },
+   "excluded_straggler": {
+    "span_s": 1421.502122943,
+    "ok": 9870,
+    "n": 9964,
+    "docs_per_s": 6.9433593103369375
+   },
+   "boot_id": "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0",
+   "steal_share": 2.3e-05,
+   "mhz_mean": 3131.2,
+   "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+   "mandate": {
+    "mandate_violation": false,
+    "violations": [],
+    "rule": "ONE engine task process, ONE pipeline (one token), ONE loaded instance per model; threads unrestricted"
+   },
+   "engine_cores": 26.044,
+   "idle_spin_cores": 1.234,
+   "cpu_s_per_doc": 3.7471,
+   "memory": {
+    "samples_in_window": 1420,
+    "hz": 1.0,
+    "source": "the leg's own sampler",
+    "peak_bytes": {
+     "anon": 9568067584,
+     "file": 7723102208,
+     "total": 17647239168
+    },
+    "peak_anon_plus_file_bytes": 17290416128
+   },
+   "lost_documents": {
+    "n": 94,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004306.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008724.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "009_009802.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018542.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037919.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf",
+     "040_040760.pdf"
+    ]
+   },
+   "d1": {
+    "docs_with_complete_stamps": 9881,
+    "docs_incomplete_stamps": 0,
+    "run_total_s": 44214.07260584831,
+    "stages": {
+     "admission": {
+      "count": 9881,
+      "sum": 131.16963386535645,
+      "share_of_run_total": 0.0029666942250419675,
+      "min": 0.0009260177612304688,
+      "mean": 0.01327493511439697,
+      "sd": 0.029852871291072215,
+      "p50": 0.004853010177612305,
+      "p90": 0.030246734619140625,
+      "p95": 0.051661014556884766,
+      "p99": 0.12228059768676758,
+      "max": 1.0420219898223877,
+      "mean_over_p50": 2.7354022819973305,
+      "timed_from": "OUTSIDE (client submit -> engine pipe open)",
+      "occupancy": {
+       "max": 29,
+       "mean": 0.09226566553882379,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 1421.65163064003
+      }
+     },
+     "parse_bracket": {
+      "count": 9881,
+      "sum": 5309.619099140167,
+      "share_of_run_total": 0.12008889446745627,
+      "min": 0.007104396820068359,
+      "mean": 0.5373564516891172,
+      "sd": 0.5413651582653667,
+      "p50": 0.3619663715362549,
+      "p90": 1.2286136150360107,
+      "p95": 1.6217694282531738,
+      "p99": 2.557352304458618,
+      "max": 4.813167572021484,
+      "mean_over_p50": 1.4845479965679493,
+      "timed_from": "OUTSIDE (pipe open -> parse's last text): upload, executor-thread wait, Tika and engine glue; parse is native C++",
+      "occupancy": {
+       "max": 32,
+       "mean": 3.73482433016995,
+       "p50": 3,
+       "p95": 11,
+       "window_s": 1421.65163064003
+      }
+     },
+     "split": {
+      "count": 9881,
+      "sum": 73.24503517150879,
+      "share_of_run_total": 0.0016566000563770838,
+      "min": 0.0007140636444091797,
+      "mean": 0.007412714823551138,
+      "sd": 0.011429700429071933,
+      "p50": 0.004541873931884766,
+      "p90": 0.014577150344848633,
+      "p95": 0.0220792293548584,
+      "p99": 0.047715187072753906,
+      "max": 0.2874457836151123,
+      "mean_over_p50": 1.6320829099884426,
+      "timed_from": "INSIDE at node boundaries (LangChain splitter, Python)",
+      "occupancy": {
+       "max": 4,
+       "mean": 0.05152108547051978,
+       "p50": 0,
+       "p95": 1,
+       "window_s": 1421.65163064003
+      }
+     },
+     "embed": {
+      "count": 9881,
+      "sum": 37616.98593592644,
+      "share_of_run_total": 0.8507921509802456,
+      "min": 0.017998695373535156,
+      "mean": 3.8070019163977773,
+      "sd": 8.511524064029258,
+      "p50": 1.6218278408050537,
+      "p90": 8.021193981170654,
+      "p95": 13.21598744392395,
+      "p99": 34.353004455566406,
+      "max": 269.34818172454834,
+      "mean_over_p50": 2.347352672468634,
+      "timed_from": "INSIDE at node boundaries (MiniLM, Python/torch; node's buffered flush)",
+      "occupancy": {
+       "max": 32,
+       "mean": 26.460058937920824,
+       "p50": 28,
+       "p95": 32,
+       "window_s": 1421.65163064003
+      }
+     },
+     "return": {
+      "count": 9881,
+      "sum": 1083.0529017448425,
+      "share_of_run_total": 0.024495660270879103,
+      "min": 0.003770589828491211,
+      "mean": 0.1096096449493819,
+      "sd": 0.2226462445508947,
+      "p50": 0.049523115158081055,
+      "p90": 0.23519062995910645,
+      "p95": 0.3801748752593994,
+      "p99": 1.042405366897583,
+      "max": 4.399778604507446,
+      "mean_over_p50": 2.2133027092399313,
+      "timed_from": "OUTSIDE (embed's last documents -> client completion)",
+      "occupancy": {
+       "max": 23,
+       "mean": 0.7618272144894248,
+       "p50": 0,
+       "p95": 3,
+       "window_s": 1421.65163064003
+      }
+     }
+    },
+    "end_to_end": {
+     "count": 9881,
+     "sum": 44214.07260584831,
+     "share_of_run_total": 1.0,
+     "min": 0.11238241195678711,
+     "mean": 4.474655662974224,
+     "sd": 8.80148096002954,
+     "p50": 2.274170160293579,
+     "p90": 9.035642385482788,
+     "p95": 14.42523717880249,
+     "p99": 36.06818461418152,
+     "max": 276.39743280410767,
+     "mean_over_p50": 1.9675993208866034
+    }
+   },
+   "parse_share": 0.12008889446745627,
+   "utilisation": 0.8139,
+   "host_busy_cores": 26.248,
+   "idle_cores": 5.752,
+   "verdict": "OK",
+   "documents": {
+    "submitted": 9975,
+    "recorded": 9975,
+    "ok": 9881,
+    "empty": 94,
+    "hard_failures": 0,
+    "hard_failure_reasons": []
+   },
+   "attempt": "p3d_pure_full",
+   "empty_documents": {
+    "n": 94,
+    "docs": [
+     "000_000164.pdf",
+     "000_000357.pdf",
+     "001_001657.pdf",
+     "002_002014.pdf",
+     "002_002103.pdf",
+     "002_002189.pdf",
+     "002_002472.pdf",
+     "002_002477.pdf",
+     "002_002978.pdf",
+     "003_003010.pdf",
+     "003_003113.pdf",
+     "003_003358.pdf",
+     "003_003988.pdf",
+     "004_004306.pdf",
+     "004_004749.pdf",
+     "004_004859.pdf",
+     "005_005393.pdf",
+     "005_005697.pdf",
+     "006_006192.pdf",
+     "006_006368.pdf",
+     "006_006487.pdf",
+     "006_006582.pdf",
+     "006_006736.pdf",
+     "007_007030.pdf",
+     "007_007136.pdf",
+     "007_007201.pdf",
+     "007_007224.pdf",
+     "008_008575.pdf",
+     "008_008724.pdf",
+     "008_008766.pdf",
+     "009_009305.pdf",
+     "009_009469.pdf",
+     "009_009535.pdf",
+     "009_009802.pdf",
+     "010_010242.pdf",
+     "010_010257.pdf",
+     "010_010312.pdf",
+     "010_010584.pdf",
+     "010_010609.pdf",
+     "010_010956.pdf",
+     "011_011390.pdf",
+     "012_012802.pdf",
+     "013_013108.pdf",
+     "014_014939.pdf",
+     "014_014961.pdf",
+     "015_015512.pdf",
+     "016_016288.pdf",
+     "016_016387.pdf",
+     "016_016503.pdf",
+     "016_016914.pdf",
+     "017_017017.pdf",
+     "017_017865.pdf",
+     "017_017872.pdf",
+     "018_018542.pdf",
+     "018_018765.pdf",
+     "018_018778.pdf",
+     "018_018831.pdf",
+     "018_018868.pdf",
+     "019_019031.pdf",
+     "019_019054.pdf",
+     "019_019208.pdf",
+     "020_020821.pdf",
+     "020_020913.pdf",
+     "021_021709.pdf",
+     "022_022778.pdf",
+     "023_023515.pdf",
+     "023_023712.pdf",
+     "023_023767.pdf",
+     "024_024301.pdf",
+     "025_025004.pdf",
+     "025_025297.pdf",
+     "025_025385.pdf",
+     "025_025749.pdf",
+     "025_025754.pdf",
+     "026_026202.pdf",
+     "026_026303.pdf",
+     "030_030226.pdf",
+     "030_030475.pdf",
+     "030_030814.pdf",
+     "031_031229.pdf",
+     "031_031374.pdf",
+     "031_031947.pdf",
+     "032_032208.pdf",
+     "032_032423.pdf",
+     "032_032565.pdf",
+     "034_034153.pdf",
+     "034_034685.pdf",
+     "037_037393.pdf",
+     "037_037919.pdf",
+     "037_037957.pdf",
+     "039_039045.pdf",
+     "039_039399.pdf",
+     "039_039457.pdf",
+     "040_040760.pdf"
+    ]
+   }
+  }
+ },
+ "legs_absent": [
+  "p3c_t1_full",
+  "p3c_t2_full",
+  "p3d_fix_full"
+ ],
+ "P3_A": {
+  "health_gate": {
+   "legs": {
+    "rr": {
+     "leg": "p3a_rr_h",
+     "arm": "rr",
+     "verdict": "OK",
+     "documents": {
+      "submitted": 384,
+      "recorded": 384,
+      "ok": 382,
+      "empty": 2,
+      "hard_failures": 0,
+      "hard_failure_reasons": []
+     },
+     "verdict_ok": true,
+     "memstat_rows": 181,
+     "d0_clean": true,
+     "violations": []
+    },
+    "li": {
+     "leg": "p3a_li_h",
+     "arm": "li",
+     "verdict": "OK",
+     "documents": {
+      "submitted": 384,
+      "recorded": 384,
+      "ok": 381,
+      "empty": 0,
+      "hard_failures": 0,
+      "hard_failure_reasons": []
+     },
+     "verdict_ok": true,
+     "memstat_rows": 123,
+     "d0_clean": true,
+     "violations": []
+    }
+   },
+   "identity": [
+    {
+     "reference": "p2a_rr_a",
+     "shared_ok_documents": 382,
+     "chunk_lists_differ": [],
+     "ok_in_reference_not_here": [],
+     "identical": true
+    },
+    {
+     "reference": "p2a_rr_b",
+     "shared_ok_documents": 382,
+     "chunk_lists_differ": [],
+     "ok_in_reference_not_here": [],
+     "identical": true
+    }
+   ],
+   "conditions": {
+    "both_verdicts_ok_or_degraded_with_all_rows": true,
+    "d0_clean": true,
+    "memory_sampler_non_empty": true,
+    "rr_chunks_identical_to_p2a_on_shared_documents": true
+   },
+   "fired": true,
+   "health_legs_docs_per_s": {
+    "rr": 3.235559830654118,
+    "li": 4.026106629637808
+   },
+   "note": "a HEALTH gate (Ansh's ruling): its docs/s are reported, never read as performance",
+   "agrees_with_chain_record": true
+  },
+  "full": {
+   "rr": "p3a_rr_full",
+   "li": "p3a_li_full",
+   "rr_docs_per_s": 6.296902196255746,
+   "li_docs_per_s": 5.904645329334103,
+   "ratio_rr_over_li": 1.0664319099697526,
+   "n_per_arm": 1,
+   "bar": 0.85,
+   "readable_band": [
+    0.780385,
+    0.9196150000000001
+   ],
+   "li_smoke_spread_bound": 0.0819,
+   "verdict": "SUPPORTED",
+   "excluded_straggler": {
+    "rr": 6.289895730125985,
+    "li": 5.898066670504702,
+    "ratio_rr_over_li": 1.0664334741383577
+   },
+   "per_arm": {
+    "rr": {
+     "cpu_s_per_doc": 4.442,
+     "engine_cores": 27.968,
+     "utilisation": 0.874,
+     "host_busy_cores": 28.174,
+     "idle_cores": 3.826,
+     "idle_spin_cores": 1.234,
+     "memory": {
+      "samples_in_window": 1569,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 13708201984,
+       "file": 7732391936,
+       "total": 21826105344
+      },
+      "peak_anon_plus_file_bytes": 21434015744
+     },
+     "lost_documents": {
+      "n": 89,
+      "docs": [
+       "000_000164.pdf",
+       "000_000357.pdf",
+       "001_001657.pdf",
+       "002_002014.pdf",
+       "002_002103.pdf",
+       "002_002189.pdf",
+       "002_002472.pdf",
+       "002_002477.pdf",
+       "002_002978.pdf",
+       "003_003010.pdf",
+       "003_003113.pdf",
+       "003_003358.pdf",
+       "003_003988.pdf",
+       "004_004749.pdf",
+       "004_004859.pdf",
+       "005_005393.pdf",
+       "005_005697.pdf",
+       "006_006192.pdf",
+       "006_006368.pdf",
+       "006_006487.pdf",
+       "006_006582.pdf",
+       "006_006736.pdf",
+       "007_007030.pdf",
+       "007_007136.pdf",
+       "007_007201.pdf",
+       "007_007224.pdf",
+       "008_008575.pdf",
+       "008_008766.pdf",
+       "009_009305.pdf",
+       "009_009469.pdf",
+       "009_009535.pdf",
+       "010_010242.pdf",
+       "010_010257.pdf",
+       "010_010312.pdf",
+       "010_010584.pdf",
+       "010_010609.pdf",
+       "010_010956.pdf",
+       "011_011390.pdf",
+       "012_012802.pdf",
+       "013_013108.pdf",
+       "014_014939.pdf",
+       "014_014961.pdf",
+       "015_015512.pdf",
+       "016_016288.pdf",
+       "016_016387.pdf",
+       "016_016503.pdf",
+       "016_016914.pdf",
+       "017_017017.pdf",
+       "017_017865.pdf",
+       "017_017872.pdf",
+       "018_018765.pdf",
+       "018_018778.pdf",
+       "018_018831.pdf",
+       "018_018868.pdf",
+       "019_019031.pdf",
+       "019_019054.pdf",
+       "019_019208.pdf",
+       "020_020821.pdf",
+       "020_020913.pdf",
+       "021_021709.pdf",
+       "022_022778.pdf",
+       "023_023515.pdf",
+       "023_023712.pdf",
+       "023_023767.pdf",
+       "024_024301.pdf",
+       "025_025004.pdf",
+       "025_025297.pdf",
+       "025_025385.pdf",
+       "025_025749.pdf",
+       "025_025754.pdf",
+       "026_026202.pdf",
+       "026_026303.pdf",
+       "030_030226.pdf",
+       "030_030475.pdf",
+       "030_030814.pdf",
+       "031_031229.pdf",
+       "031_031374.pdf",
+       "031_031947.pdf",
+       "032_032208.pdf",
+       "032_032423.pdf",
+       "032_032565.pdf",
+       "034_034153.pdf",
+       "034_034685.pdf",
+       "037_037393.pdf",
+       "037_037957.pdf",
+       "039_039045.pdf",
+       "039_039399.pdf",
+       "039_039457.pdf",
+       "040_040760.pdf"
+      ]
+     },
+     "verdict": "OK",
+     "parse_share": 0.04342876175801009
+    },
+    "li": {
+     "cpu_s_per_doc": 3.8807,
+     "engine_cores": 22.914,
+     "utilisation": 0.7161,
+     "host_busy_cores": 22.965,
+     "idle_cores": 9.035,
+     "idle_spin_cores": 0.026,
+     "memory": {
+      "samples_in_window": 1671,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 17936056320,
+       "file": 1040384,
+       "total": 18068652032
+      },
+      "peak_anon_plus_file_bytes": 17937096704
+     },
+     "lost_documents": {
+      "n": 102,
+      "docs": [
+       "000_000164.pdf",
+       "000_000357.pdf",
+       "001_001657.pdf",
+       "002_002014.pdf",
+       "002_002103.pdf",
+       "002_002189.pdf",
+       "002_002400.pdf",
+       "002_002472.pdf",
+       "002_002477.pdf",
+       "002_002978.pdf",
+       "003_003010.pdf",
+       "003_003113.pdf",
+       "003_003358.pdf",
+       "003_003988.pdf",
+       "004_004306.pdf",
+       "004_004749.pdf",
+       "004_004859.pdf",
+       "005_005393.pdf",
+       "005_005697.pdf",
+       "006_006192.pdf",
+       "006_006368.pdf",
+       "006_006487.pdf",
+       "006_006582.pdf",
+       "006_006736.pdf",
+       "007_007030.pdf",
+       "007_007136.pdf",
+       "007_007201.pdf",
+       "007_007224.pdf",
+       "008_008575.pdf",
+       "008_008724.pdf",
+       "008_008766.pdf",
+       "009_009305.pdf",
+       "009_009469.pdf",
+       "009_009535.pdf",
+       "009_009802.pdf",
+       "010_010242.pdf",
+       "010_010257.pdf",
+       "010_010312.pdf",
+       "010_010584.pdf",
+       "010_010609.pdf",
+       "010_010956.pdf",
+       "011_011390.pdf",
+       "012_012802.pdf",
+       "013_013108.pdf",
+       "014_014222.pdf",
+       "014_014939.pdf",
+       "014_014961.pdf",
+       "015_015512.pdf",
+       "016_016288.pdf",
+       "016_016387.pdf",
+       "016_016503.pdf",
+       "016_016914.pdf",
+       "017_017017.pdf",
+       "017_017865.pdf",
+       "017_017872.pdf",
+       "018_018542.pdf",
+       "018_018765.pdf",
+       "018_018778.pdf",
+       "018_018831.pdf",
+       "018_018868.pdf",
+       "019_019031.pdf",
+       "019_019054.pdf",
+       "019_019208.pdf",
+       "020_020747.pdf",
+       "020_020806.pdf",
+       "020_020821.pdf",
+       "020_020913.pdf",
+       "021_021709.pdf",
+       "022_022778.pdf",
+       "022_022819.pdf",
+       "023_023515.pdf",
+       "023_023712.pdf",
+       "023_023767.pdf",
+       "024_024301.pdf",
+       "025_025004.pdf",
+       "025_025297.pdf",
+       "025_025385.pdf",
+       "025_025749.pdf",
+       "025_025754.pdf",
+       "026_026202.pdf",
+       "026_026303.pdf",
+       "027_027613.pdf",
+       "030_030226.pdf",
+       "030_030475.pdf",
+       "030_030814.pdf",
+       "031_031229.pdf",
+       "031_031374.pdf",
+       "031_031947.pdf",
+       "032_032208.pdf",
+       "032_032423.pdf",
+       "032_032565.pdf",
+       "033_033689.pdf",
+       "034_034153.pdf",
+       "034_034685.pdf",
+       "037_037393.pdf",
+       "037_037919.pdf",
+       "037_037957.pdf",
+       "039_039045.pdf",
+       "039_039399.pdf",
+       "039_039457.pdf"
+      ]
+     },
+     "verdict": "OK",
+     "parse_share": null
+    }
+   },
+   "empty_documents": {
+    "rr": 89,
+    "li": 102,
+    "rr_only": [],
+    "li_only": [
+     "002_002400.pdf",
+     "004_004306.pdf",
+     "008_008724.pdf",
+     "009_009802.pdf",
+     "014_014222.pdf",
+     "018_018542.pdf",
+     "020_020747.pdf",
+     "020_020806.pdf",
+     "022_022819.pdf",
+     "027_027613.pdf",
+     "033_033689.pdf",
+     "037_037919.pdf",
+     "040_040669.pdf"
+    ]
+   },
+   "rule": "r = RR/LI span docs/s, n=1 per arm; SUPPORTED iff r >= 0.85 x 1.0819; NOT SUPPORTED iff r < 0.85 x 0.9181; else UNREADABLE at n=1"
+  }
+ },
+ "P3_C": {
+  "smoke_gate": {
+   "vars1": {
+    "docs_per_s": [
+     3.2271259366122678,
+     3.21236453365849
+    ],
+    "mean": 3.219745235135379,
+    "spread": 0.00458464936687988,
+    "embed_share": [
+     0.9148487985629945,
+     0.9151723760748889
+    ],
+    "cpu_s_per_doc": [
+     4.0655,
+     4.0717
+    ],
+    "engine_cores": [
+     13.111,
+     13.071
+    ],
+    "vector_max_abs_delta_run_a_vs_b": {
+     "a": "p3c_t1_a",
+     "b": "p3c_t1_b",
+     "documents_compared": 384,
+     "chunks_compared": 7457,
+     "max_abs_delta": 0.0,
+     "skipped_chunk_count_differs": []
+    }
+   },
+   "per_shape": {
+    "2": {
+     "docs_per_s": [
+      4.324243970998903,
+      4.336460254391717
+     ],
+     "mean": 4.33035211269531,
+     "spread": 0.0028210831532613774,
+     "delta_vs_vars1": 0.3449362593786818,
+     "threshold": 0.0082,
+     "beats_vars1": true,
+     "correctness": {
+      "text_chunks_identical_to_vars1": true,
+      "pairs": [
+       {
+        "shape_leg": "p3c_t2_a",
+        "vars1_leg": "p3c_t1_a",
+        "shared_ok": 382,
+        "chunk_lists_differ": [],
+        "ok_in_vars1_not_here": []
+       },
+       {
+        "shape_leg": "p3c_t2_a",
+        "vars1_leg": "p3c_t1_b",
+        "shared_ok": 382,
+        "chunk_lists_differ": [],
+        "ok_in_vars1_not_here": []
+       },
+       {
+        "shape_leg": "p3c_t2_b",
+        "vars1_leg": "p3c_t1_a",
+        "shared_ok": 382,
+        "chunk_lists_differ": [],
+        "ok_in_vars1_not_here": []
+       },
+       {
+        "shape_leg": "p3c_t2_b",
+        "vars1_leg": "p3c_t1_b",
+        "shared_ok": 382,
+        "chunk_lists_differ": [],
+        "ok_in_vars1_not_here": []
+       }
+      ]
+     },
+     "vector_max_abs_delta_vs_vars1": [
+      {
+       "a": "p3c_t1_a",
+       "b": "p3c_t2_a",
+       "documents_compared": 384,
+       "chunks_compared": 7457,
+       "max_abs_delta": 1.0803341865539551e-07,
+       "skipped_chunk_count_differs": []
+      },
+      {
+       "a": "p3c_t1_b",
+       "b": "p3c_t2_b",
+       "documents_compared": 384,
+       "chunks_compared": 7457,
+       "max_abs_delta": 1.0803341865539551e-07,
+       "skipped_chunk_count_differs": []
+      }
+     ],
+     "fired": true,
+     "embed_share": [
+      0.8710740404811591,
+      0.8682047205981764
+     ],
+     "cpu_s_per_doc": [
+      4.1535,
+      4.1475
+     ],
+     "engine_cores": [
+      17.945,
+      17.97
+     ],
+     "memory_peak_bytes": [
+      {
+       "anon": 10450448384,
+       "file": 7740301312,
+       "total": 18521796608
+      },
+      {
+       "anon": 11469242368,
+       "file": 7745433600,
+       "total": 19549868032
+      }
+     ]
+    },
+    "4": {
+     "docs_per_s": [
+      5.145126996545237,
+      5.154759256705946
+     ],
+     "mean": 5.149943126625591,
+     "spread": 0.001870362433889674,
+     "delta_vs_vars1": 0.5994877701586394,
+     "threshold": 0.0082,
+     "beats_vars1": true,
+     "correctness": {
+      "text_chunks_identical_to_vars1": true,
+      "pairs": [
+       {
+        "shape_leg": "p3c_t4_a",
+        "vars1_leg": "p3c_t1_a",
+        "shared_ok": 382,
+        "chunk_lists_differ": [],
+        "ok_in_vars1_not_here": []
+       },
+       {
+        "shape_leg": "p3c_t4_a",
+        "vars1_leg": "p3c_t1_b",
+        "shared_ok": 382,
+        "chunk_lists_differ": [],
+        "ok_in_vars1_not_here": []
+       },
+       {
+        "shape_leg": "p3c_t4_b",
+        "vars1_leg": "p3c_t1_a",
+        "shared_ok": 382,
+        "chunk_lists_differ": [],
+        "ok_in_vars1_not_here": []
+       },
+       {
+        "shape_leg": "p3c_t4_b",
+        "vars1_leg": "p3c_t1_b",
+        "shared_ok": 382,
+        "chunk_lists_differ": [],
+        "ok_in_vars1_not_here": []
+       }
+      ]
+     },
+     "vector_max_abs_delta_vs_vars1": [
+      {
+       "a": "p3c_t1_a",
+       "b": "p3c_t4_a",
+       "documents_compared": 384,
+       "chunks_compared": 7457,
+       "max_abs_delta": 1.150183379650116e-07,
+       "skipped_chunk_count_differs": []
+      },
+      {
+       "a": "p3c_t1_b",
+       "b": "p3c_t4_b",
+       "documents_compared": 384,
+       "chunks_compared": 7457,
+       "max_abs_delta": 1.150183379650116e-07,
+       "skipped_chunk_count_differs": []
+      }
+     ],
+     "fired": true,
+     "embed_share": [
+      0.8399774934013141,
+      0.8462748539362014
+     ],
+     "cpu_s_per_doc": [
+      4.3374,
+      4.3294
+     ],
+     "engine_cores": [
+      22.294,
+      22.293
+     ],
+     "memory_peak_bytes": [
+      {
+       "anon": 10004508672,
+       "file": 7747981312,
+       "total": 18086469632
+      },
+      {
+       "anon": 9735577600,
+       "file": 7741419520,
+       "total": 17812045824
+      }
+     ]
+    }
+   },
+   "fired_shapes": [
+    "2",
+    "4"
+   ],
+   "winner": "4",
+   "chain_record": {
+    "fired_shapes": [
+     "2",
+     "4"
+    ],
+    "winner": "4"
+   },
+   "agrees_with_chain_record": true
+  },
+  "full": {
+   "winner": "4",
+   "leg": "p3c_t4_full",
+   "comparator": "p3a_rr_full",
+   "winner_docs_per_s": 6.00950229085693,
+   "comparator_docs_per_s": 6.296902196255746,
+   "delta": -0.045641475195487335,
+   "readable": true,
+   "chunk_identity_vs_comparator": {
+    "a": "p3a_rr_full",
+    "b": "p3c_t4_full",
+    "documents_ok_in_both": 9886,
+    "chunk_lists_differ": [],
+    "lost_by_b": [],
+    "gained_by_b": [],
+    "pass": true
+   },
+   "excluded_straggler_delta": -0.045641475195487224,
+   "cpu_s_per_doc": {
+    "winner": 4.791,
+    "comparator": 4.442
+   },
+   "memory": {
+    "winner": {
+     "samples_in_window": 1644,
+     "hz": 1.0,
+     "source": "the leg's own sampler",
+     "peak_bytes": {
+      "anon": 13497323520,
+      "file": 7740329984,
+      "total": 21586841600
+     },
+     "peak_anon_plus_file_bytes": 21218045952
+    },
+    "comparator": {
+     "samples_in_window": 1569,
+     "hz": 1.0,
+     "source": "the leg's own sampler",
+     "peak_bytes": {
+      "anon": 13708201984,
+      "file": 7732391936,
+      "total": 21826105344
+     },
+     "peak_anon_plus_file_bytes": 21434015744
+    }
+   }
+  }
+ },
+ "P3_D": {
+  "build": {
+   "built_utc": "2026-09-25T05:46:53Z",
+   "image": "rr:p3-pdfium",
+   "image_id": "sha256:b81af529c79a9014ca7b6e19c6b275f68e320b51db11299e26c3902561683222",
+   "from": "rr:p1-tikafix",
+   "base_ids_before_and_after": [
+    "rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
+    "rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+    "rr:p1-tikafix sha256:35d4b477478417b55fcd29b516e83d885975df3100f8e0f4e066dc797a5d879b"
+   ],
+   "engine_site_packages": "/opt/rocketride/engine/lib/python3.12/site-packages",
+   "wheel_record_top_level": [
+    "pypdfium2",
+    "pypdfium2-5.13.0.dist-info",
+    "pypdfium2_cfg",
+    "pypdfium2_cli",
+    "pypdfium2_raw"
+   ],
+   "in_image_check": {
+    "python": "3.12.13",
+    "ok": true,
+    "pypdfium2_cfg": "/opt/rocketride/engine/lib/python3.12/site-packages/pypdfium2_cfg/__init__.py",
+    "pypdfium2": "5.13.0",
+    "pages": 1,
+    "chars": 10314,
+    "pdfium_pure": {
+     "HYBRID": false,
+     "STUB": null
+    },
+    "pdfium_hybrid": {
+     "HYBRID": true,
+     "STUB": null
+    }
+   },
+   "in_image_check_rc": 0,
+   "gate_G_build_C_pass": true
+  },
+  "node_gates": {
+   "hybrid": {
+    "gate": "G_node_D_hybrid",
+    "decided_utc": "2026-09-25T05:52:08Z",
+    "leg": "p3d_s_hyb_a",
+    "counters_file": "p1_pdfium_hybrid.json",
+    "counters": {
+     "hybrid": true,
+     "docs": 36,
+     "text": 36,
+     "fallback": 0,
+     "errors": 0,
+     "last_error": null
+    },
+    "rule": "the prototype node's own counters show docs >= 1 and text >= 1",
+    "outcome": "PASS"
+   },
+   "pure": {
+    "gate": "G_node_D_pure",
+    "decided_utc": "2026-09-25T05:54:37Z",
+    "leg": "p3d_s_pure_a",
+    "counters_file": "p1_pdfium_pure.json",
+    "counters": {
+     "hybrid": false,
+     "docs": 36,
+     "text": 36,
+     "fallback": 0,
+     "errors": 0,
+     "last_error": null
+    },
+    "rule": "the prototype node's own counters show docs >= 1 and text >= 1",
+    "outcome": "PASS"
+   }
+  },
+  "eleven_detail": {
+   "fix": [
+    {
+     "leg": "p3d_s_fix_a",
+     "documents": 11,
+     "p50_s": 0.2995729446411133,
+     "not_ok": [],
+     "incomplete_stamps": 0,
+     "parse_bracket_s": {
+      "000_000344.pdf": 0.3042774200439453,
+      "002_002489.pdf": 0.16762661933898926,
+      "008_008871.pdf": 0.48282694816589355,
+      "011_011464.pdf": 0.2995729446411133,
+      "011_011730.pdf": 0.20390701293945312,
+      "014_014261.pdf": 0.17780804634094238,
+      "014_014969.pdf": 0.18821978569030762,
+      "031_031239.pdf": 1.1228902339935303,
+      "033_033172.pdf": 0.3221406936645508,
+      "034_034697.pdf": 0.2055830955505371,
+      "039_039660.pdf": 1.0480353832244873
+     }
+    },
+    {
+     "leg": "p3d_s_fix_b",
+     "documents": 11,
+     "p50_s": 0.30445432662963867,
+     "not_ok": [],
+     "incomplete_stamps": 0,
+     "parse_bracket_s": {
+      "000_000344.pdf": 0.30445432662963867,
+      "002_002489.pdf": 0.1980276107788086,
+      "008_008871.pdf": 0.45667028427124023,
+      "011_011464.pdf": 0.31024765968322754,
+      "011_011730.pdf": 0.21167445182800293,
+      "014_014261.pdf": 0.17893552780151367,
+      "014_014969.pdf": 0.18436098098754883,
+      "031_031239.pdf": 1.106135606765747,
+      "033_033172.pdf": 0.3262960910797119,
+      "034_034697.pdf": 0.20792341232299805,
+      "039_039660.pdf": 1.0669679641723633
+     }
+    }
+   ],
+   "hyb": [
+    {
+     "leg": "p3d_s_hyb_a",
+     "documents": 11,
+     "p50_s": 0.2697937488555908,
+     "not_ok": [],
+     "incomplete_stamps": 0,
+     "parse_bracket_s": {
+      "000_000344.pdf": 0.2697937488555908,
+      "002_002489.pdf": 0.1775684356689453,
+      "008_008871.pdf": 0.33991384506225586,
+      "011_011464.pdf": 0.3898458480834961,
+      "011_011730.pdf": 0.17925667762756348,
+      "014_014261.pdf": 0.18347573280334473,
+      "014_014969.pdf": 0.11202573776245117,
+      "031_031239.pdf": 0.6365585327148438,
+      "033_033172.pdf": 0.3451693058013916,
+      "034_034697.pdf": 0.20821094512939453,
+      "039_039660.pdf": 1.695711374282837
+     }
+    },
+    {
+     "leg": "p3d_s_hyb_b",
+     "documents": 11,
+     "p50_s": 0.2785019874572754,
+     "not_ok": [],
+     "incomplete_stamps": 0,
+     "parse_bracket_s": {
+      "000_000344.pdf": 0.2785019874572754,
+      "002_002489.pdf": 0.18683671951293945,
+      "008_008871.pdf": 0.3457784652709961,
+      "011_011464.pdf": 0.40355777740478516,
+      "011_011730.pdf": 0.18389368057250977,
+      "014_014261.pdf": 0.1876661777496338,
+      "014_014969.pdf": 0.11440348625183105,
+      "031_031239.pdf": 0.6437568664550781,
+      "033_033172.pdf": 0.34952807426452637,
+      "034_034697.pdf": 0.2111361026763916,
+      "039_039660.pdf": 1.7118399143218994
+     }
+    }
+   ],
+   "pure": [
+    {
+     "leg": "p3d_s_pure_a",
+     "documents": 11,
+     "p50_s": 0.2732067108154297,
+     "not_ok": [],
+     "incomplete_stamps": 0,
+     "parse_bracket_s": {
+      "000_000344.pdf": 0.2732067108154297,
+      "002_002489.pdf": 0.17708039283752441,
+      "008_008871.pdf": 0.33878040313720703,
+      "011_011464.pdf": 0.3886141777038574,
+      "011_011730.pdf": 0.1788804531097412,
+      "014_014261.pdf": 0.18293523788452148,
+      "014_014969.pdf": 0.11238694190979004,
+      "031_031239.pdf": 0.6384701728820801,
+      "033_033172.pdf": 0.3465278148651123,
+      "034_034697.pdf": 0.2095177173614502,
+      "039_039660.pdf": 1.7258434295654297
+     }
+    },
+    {
+     "leg": "p3d_s_pure_b",
+     "documents": 11,
+     "p50_s": 0.2710754871368408,
+     "not_ok": [],
+     "incomplete_stamps": 0,
+     "parse_bracket_s": {
+      "000_000344.pdf": 0.2710754871368408,
+      "002_002489.pdf": 0.18166279792785645,
+      "008_008871.pdf": 0.3404262065887451,
+      "011_011464.pdf": 0.3920300006866455,
+      "011_011730.pdf": 0.18141531944274902,
+      "014_014261.pdf": 0.18348455429077148,
+      "014_014969.pdf": 0.11388754844665527,
+      "031_031239.pdf": 0.6373343467712402,
+      "033_033172.pdf": 0.346696138381958,
+      "034_034697.pdf": 0.21068620681762695,
+      "039_039660.pdf": 1.731287956237793
+     }
+    }
+   ]
+  },
+  "smoke_gate": {
+   "per_variant": {
+    "hybrid": {
+     "a": {
+      "T_legs_p50_s": [
+       0.2995729446411133,
+       0.30445432662963867
+      ],
+      "T_mean_s": 0.302013635635376,
+      "spread_T": 0.016162786750525168,
+      "V_legs_p50_s": [
+       0.2697937488555908,
+       0.2785019874572754
+      ],
+      "V_mean_s": 0.2741478681564331,
+      "relative_reduction": 0.0922665873026524,
+      "holds": true
+     },
+     "b": {
+      "tika_extracts": 382,
+      "variant_empty_any_run": 2,
+      "L_V": [],
+      "holds": true
+     },
+     "fired": true
+    },
+    "pure": {
+     "a": {
+      "T_legs_p50_s": [
+       0.2995729446411133,
+       0.30445432662963867
+      ],
+      "T_mean_s": 0.302013635635376,
+      "spread_T": 0.016162786750525168,
+      "V_legs_p50_s": [
+       0.2732067108154297,
+       0.2710754871368408
+      ],
+      "V_mean_s": 0.27214109897613525,
+      "relative_reduction": 0.09891121835077052,
+      "holds": true
+     },
+     "b": {
+      "tika_extracts": 382,
+      "variant_empty_any_run": 2,
+      "L_V": [],
+      "holds": true
+     },
+     "fired": true
+    }
+   },
+   "fired_variants": [
+    "hybrid",
+    "pure"
+   ],
+   "chain_record_fired": [
+    "hybrid",
+    "pure"
+   ],
+   "agrees_with_chain_record": true
+  },
+  "correctness_384": {
+   "hybrid_a": {
+    "reference": "p3d_fix_a",
+    "candidate": "p3d_hyb_a",
+    "documents": 384,
+    "texts_sha256": {
+     "p3d_fix_a": "c18371d8ac35449e1b572f418e5fd6632a81dad7fb4002241cc9701d90fa6be0",
+     "p3d_hyb_a": "315698d858340942d70b9b886fd5f35c11721da109355ae40740ee02a583931e"
+    },
+    "empty": {
+     "reference": 2,
+     "candidate": 2
+    },
+    "candidate_empty_where_reference_recovers": [],
+    "n_loses": 0,
+    "candidate_recovers_where_reference_empty": [],
+    "char_ratio": {
+     "n": 382,
+     "min": 0.05444541854348681,
+     "p5": 0.902409492674658,
+     "p25": 0.9994229215558035,
+     "p50": 1.009159721491415,
+     "p75": 1.0205225972860827,
+     "p95": 1.031502022990759
+    },
+    "dice": {
+     "n": 382,
+     "min": 0.09389671361502347,
+     "p5": 0.8261565551464704,
+     "p25": 0.9466571834992887,
+     "p50": 0.9683493098928593,
+     "p75": 0.9774205506689583,
+     "p95": 0.995475113122172
+    },
+    "failures": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ],
+    "adoptable": true,
+    "per_document_file": "p2c_correctness_p3d_384_hybrid_a.jsonl"
+   },
+   "hybrid_b": {
+    "reference": "p3d_fix_b",
+    "candidate": "p3d_hyb_b",
+    "documents": 384,
+    "texts_sha256": {
+     "p3d_fix_b": "11023f8648af1afa71da7ca5169b26f135bda2650d64ba1981262956309ecd1d",
+     "p3d_hyb_b": "594200146657865a255ca88a8d06c3cf46d8a894b72c9d73199b3f6d8275e549"
+    },
+    "empty": {
+     "reference": 2,
+     "candidate": 2
+    },
+    "candidate_empty_where_reference_recovers": [],
+    "n_loses": 0,
+    "candidate_recovers_where_reference_empty": [],
+    "char_ratio": {
+     "n": 382,
+     "min": 0.05444541854348681,
+     "p5": 0.902409492674658,
+     "p25": 0.9994229215558035,
+     "p50": 1.009159721491415,
+     "p75": 1.0205225972860827,
+     "p95": 1.031502022990759
+    },
+    "dice": {
+     "n": 382,
+     "min": 0.09389671361502347,
+     "p5": 0.8261565551464704,
+     "p25": 0.9466571834992887,
+     "p50": 0.9683493098928593,
+     "p75": 0.9774205506689583,
+     "p95": 0.995475113122172
+    },
+    "failures": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ],
+    "adoptable": true,
+    "per_document_file": "p2c_correctness_p3d_384_hybrid_b.jsonl"
+   },
+   "pure_a": {
+    "reference": "p3d_fix_a",
+    "candidate": "p3d_pure_a",
+    "documents": 384,
+    "texts_sha256": {
+     "p3d_fix_a": "c18371d8ac35449e1b572f418e5fd6632a81dad7fb4002241cc9701d90fa6be0",
+     "p3d_pure_a": "d71cb53de12c29081e2633cc9e60bae5f9bea4d535492c45e07a27a7992d2405"
+    },
+    "empty": {
+     "reference": 2,
+     "candidate": 2
+    },
+    "candidate_empty_where_reference_recovers": [],
+    "n_loses": 0,
+    "candidate_recovers_where_reference_empty": [],
+    "char_ratio": {
+     "n": 382,
+     "min": 0.05444541854348681,
+     "p5": 0.902409492674658,
+     "p25": 0.9994229215558035,
+     "p50": 1.009159721491415,
+     "p75": 1.0205225972860827,
+     "p95": 1.031502022990759
+    },
+    "dice": {
+     "n": 382,
+     "min": 0.09389671361502347,
+     "p5": 0.8261565551464704,
+     "p25": 0.9466571834992887,
+     "p50": 0.9683493098928593,
+     "p75": 0.9774205506689583,
+     "p95": 0.995475113122172
+    },
+    "failures": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ],
+    "adoptable": true,
+    "per_document_file": "p2c_correctness_p3d_384_pure_a.jsonl"
+   },
+   "pure_b": {
+    "reference": "p3d_fix_b",
+    "candidate": "p3d_pure_b",
+    "documents": 384,
+    "texts_sha256": {
+     "p3d_fix_b": "11023f8648af1afa71da7ca5169b26f135bda2650d64ba1981262956309ecd1d",
+     "p3d_pure_b": "f5fea1c62ff83d814ce86bfef852a5e8480aa8e9b6d43b78db92d76935fcb688"
+    },
+    "empty": {
+     "reference": 2,
+     "candidate": 2
+    },
+    "candidate_empty_where_reference_recovers": [],
+    "n_loses": 0,
+    "candidate_recovers_where_reference_empty": [],
+    "char_ratio": {
+     "n": 382,
+     "min": 0.05444541854348681,
+     "p5": 0.902409492674658,
+     "p25": 0.9994229215558035,
+     "p50": 1.009159721491415,
+     "p75": 1.0205225972860827,
+     "p95": 1.031502022990759
+    },
+    "dice": {
+     "n": 382,
+     "min": 0.09389671361502347,
+     "p5": 0.8261565551464704,
+     "p25": 0.9466571834992887,
+     "p50": 0.9683493098928593,
+     "p75": 0.9774205506689583,
+     "p95": 0.995475113122172
+    },
+    "failures": [
+     "014_014961.pdf",
+     "039_039457.pdf"
+    ],
+    "adoptable": true,
+    "per_document_file": "p2c_correctness_p3d_384_pure_b.jsonl"
+   }
+  },
+  "speed_384": {
+   "hybrid": {
+    "a_legs": [
+     "p3d_fix_a",
+     "p3d_fix_b"
+    ],
+    "b_legs": [
+     "p3d_hyb_a",
+     "p3d_hyb_b"
+    ],
+    "a_docs_per_s": [
+     3.2281789432263657,
+     3.228519023142947
+    ],
+    "b_docs_per_s": [
+     3.95377597283587,
+     3.933091781259197
+    ],
+    "a_mean": 3.2283489831846564,
+    "b_mean": 3.9434338770475335,
+    "a_spread": 0.000105341745379052,
+    "b_spread": 0.005245223381850957,
+    "delta_b_vs_a": 0.22150173280134977,
+    "threshold": 0.0082,
+    "readable": true,
+    "parse_share": {
+     "fix": [
+      0.058157536440306155,
+      0.05820843995647432
+     ],
+     "hybrid": [
+      0.150322941838004,
+      0.16138884604108644
+     ]
+    }
+   },
+   "pure": {
+    "a_legs": [
+     "p3d_fix_a",
+     "p3d_fix_b"
+    ],
+    "b_legs": [
+     "p3d_pure_a",
+     "p3d_pure_b"
+    ],
+    "a_docs_per_s": [
+     3.2281789432263657,
+     3.228519023142947
+    ],
+    "b_docs_per_s": [
+     3.9291044967208837,
+     3.899954347867432
+    ],
+    "a_mean": 3.2283489831846564,
+    "b_mean": 3.914529422294158,
+    "a_spread": 0.000105341745379052,
+    "b_spread": 0.007446654682791475,
+    "delta_b_vs_a": 0.21254840870165403,
+    "threshold": 0.0082,
+    "readable": true,
+    "parse_share": {
+     "fix": [
+      0.058157536440306155,
+      0.05820843995647432
+     ],
+     "pure": [
+      0.15729101212817234,
+      0.15189929477100567
+     ]
+    }
+   }
+  },
+  "full": {
+   "hybrid": {
+    "comparator": "p3a_rr_full",
+    "correctness": {
+     "reference": "p3a_rr_full",
+     "candidate": "p3d_hyb_full",
+     "documents": 9975,
+     "texts_sha256": {
+      "p3a_rr_full": "0c299d677790db54687bd6bffee013c5d535924b4f40fd4d4833b938a21c87e7",
+      "p3d_hyb_full": "49d57bf62d7f7ae9446e7c9d35bd25022ffc00a702a609affdaca2380b28fe53"
+     },
+     "empty": {
+      "reference": 89,
+      "candidate": 89
+     },
+     "candidate_empty_where_reference_recovers": [],
+     "n_loses": 0,
+     "candidate_recovers_where_reference_empty": [],
+     "char_ratio": {
+      "n": 9886,
+      "min": 0.05444541854348681,
+      "p5": 0.9387687188019966,
+      "p25": 1.0,
+      "p50": 1.0112732736201624,
+      "p75": 1.0229585835933948,
+      "p95": 1.0357372137812968
+     },
+     "dice": {
+      "n": 9886,
+      "min": 0.0,
+      "p5": 0.8541796826190179,
+      "p25": 0.9505462466856633,
+      "p50": 0.9710958440147492,
+      "p75": 0.9774647887323944,
+      "p95": 0.9970384995064165
+     },
+     "failures": [
+      "000_000164.pdf",
+      "000_000357.pdf",
+      "001_001657.pdf",
+      "002_002014.pdf",
+      "002_002103.pdf",
+      "002_002189.pdf",
+      "002_002472.pdf",
+      "002_002477.pdf",
+      "002_002978.pdf",
+      "003_003010.pdf",
+      "003_003113.pdf",
+      "003_003358.pdf",
+      "003_003988.pdf",
+      "004_004749.pdf",
+      "004_004859.pdf",
+      "005_005393.pdf",
+      "005_005697.pdf",
+      "006_006192.pdf",
+      "006_006368.pdf",
+      "006_006487.pdf",
+      "006_006582.pdf",
+      "006_006736.pdf",
+      "007_007030.pdf",
+      "007_007136.pdf",
+      "007_007201.pdf",
+      "007_007224.pdf",
+      "008_008575.pdf",
+      "008_008766.pdf",
+      "009_009305.pdf",
+      "009_009469.pdf",
+      "009_009535.pdf",
+      "010_010242.pdf",
+      "010_010257.pdf",
+      "010_010312.pdf",
+      "010_010584.pdf",
+      "010_010609.pdf",
+      "010_010956.pdf",
+      "011_011390.pdf",
+      "012_012802.pdf",
+      "013_013108.pdf",
+      "014_014939.pdf",
+      "014_014961.pdf",
+      "015_015512.pdf",
+      "016_016288.pdf",
+      "016_016387.pdf",
+      "016_016503.pdf",
+      "016_016914.pdf",
+      "017_017017.pdf",
+      "017_017865.pdf",
+      "017_017872.pdf",
+      "018_018765.pdf",
+      "018_018778.pdf",
+      "018_018831.pdf",
+      "018_018868.pdf",
+      "019_019031.pdf",
+      "019_019054.pdf",
+      "019_019208.pdf",
+      "020_020821.pdf",
+      "020_020913.pdf",
+      "021_021709.pdf",
+      "022_022778.pdf",
+      "023_023515.pdf",
+      "023_023712.pdf",
+      "023_023767.pdf",
+      "024_024301.pdf",
+      "025_025004.pdf",
+      "025_025297.pdf",
+      "025_025385.pdf",
+      "025_025749.pdf",
+      "025_025754.pdf",
+      "026_026202.pdf",
+      "026_026303.pdf",
+      "030_030226.pdf",
+      "030_030475.pdf",
+      "030_030814.pdf",
+      "031_031229.pdf",
+      "031_031374.pdf",
+      "031_031947.pdf",
+      "032_032208.pdf",
+      "032_032423.pdf",
+      "032_032565.pdf",
+      "034_034153.pdf",
+      "034_034685.pdf",
+      "037_037393.pdf",
+      "037_037957.pdf",
+      "039_039045.pdf",
+      "039_039399.pdf",
+      "039_039457.pdf",
+      "040_040760.pdf"
+     ],
+     "adoptable": true,
+     "per_document_file": "p2c_correctness_p3d_full_hybrid.jsonl"
+    },
+    "speed": {
+     "comparator_docs_per_s": 6.296902196255746,
+     "variant_docs_per_s": 6.951286571532928,
+     "delta": 0.10392163557285206,
+     "readable": true,
+     "excluded_straggler_delta": 0.10392163557285228,
+     "exceeds_little_bar": true,
+     "little_bar": 0.0583130489998942
+    },
+    "memory": {
+     "variant": {
+      "samples_in_window": 1421,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 10913861632,
+       "file": 7723343872,
+       "total": 19011973120
+      },
+      "peak_anon_plus_file_bytes": 18632994816
+     },
+     "comparator": {
+      "samples_in_window": 1569,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 13708201984,
+       "file": 7732391936,
+       "total": 21826105344
+      },
+      "peak_anon_plus_file_bytes": 21434015744
+     }
+    },
+    "parse_share": {
+     "variant": 0.11904742039829105,
+     "comparator": 0.04342876175801009
+    }
+   },
+   "pure": {
+    "comparator": "p3a_rr_full",
+    "correctness": {
+     "reference": "p3a_rr_full",
+     "candidate": "p3d_pure_full",
+     "documents": 9975,
+     "texts_sha256": {
+      "p3a_rr_full": "0c299d677790db54687bd6bffee013c5d535924b4f40fd4d4833b938a21c87e7",
+      "p3d_pure_full": "fd25f6c91e4ccba0bf2c2b0781b274ec75f864f36aedf34c76426337e00e7344"
+     },
+     "empty": {
+      "reference": 89,
+      "candidate": 94
+     },
+     "candidate_empty_where_reference_recovers": [
+      "004_004306.pdf",
+      "008_008724.pdf",
+      "009_009802.pdf",
+      "018_018542.pdf",
+      "037_037919.pdf"
+     ],
+     "n_loses": 5,
+     "candidate_recovers_where_reference_empty": [],
+     "char_ratio": {
+      "n": 9886,
+      "min": 0.0,
+      "p5": 0.937331571994716,
+      "p25": 1.0,
+      "p50": 1.0112732736201624,
+      "p75": 1.0229585835933948,
+      "p95": 1.0357372137812968
+     },
+     "dice": {
+      "n": 9886,
+      "min": 0.0,
+      "p5": 0.8520236087689713,
+      "p25": 0.9504950495049505,
+      "p50": 0.9710730636649054,
+      "p75": 0.9774569559442382,
+      "p95": 0.9968847352024922
+     },
+     "failures": [
+      "000_000164.pdf",
+      "000_000357.pdf",
+      "001_001657.pdf",
+      "002_002014.pdf",
+      "002_002103.pdf",
+      "002_002189.pdf",
+      "002_002472.pdf",
+      "002_002477.pdf",
+      "002_002978.pdf",
+      "003_003010.pdf",
+      "003_003113.pdf",
+      "003_003358.pdf",
+      "003_003988.pdf",
+      "004_004306.pdf",
+      "004_004749.pdf",
+      "004_004859.pdf",
+      "005_005393.pdf",
+      "005_005697.pdf",
+      "006_006192.pdf",
+      "006_006368.pdf",
+      "006_006487.pdf",
+      "006_006582.pdf",
+      "006_006736.pdf",
+      "007_007030.pdf",
+      "007_007136.pdf",
+      "007_007201.pdf",
+      "007_007224.pdf",
+      "008_008575.pdf",
+      "008_008724.pdf",
+      "008_008766.pdf",
+      "009_009305.pdf",
+      "009_009469.pdf",
+      "009_009535.pdf",
+      "009_009802.pdf",
+      "010_010242.pdf",
+      "010_010257.pdf",
+      "010_010312.pdf",
+      "010_010584.pdf",
+      "010_010609.pdf",
+      "010_010956.pdf",
+      "011_011390.pdf",
+      "012_012802.pdf",
+      "013_013108.pdf",
+      "014_014939.pdf",
+      "014_014961.pdf",
+      "015_015512.pdf",
+      "016_016288.pdf",
+      "016_016387.pdf",
+      "016_016503.pdf",
+      "016_016914.pdf",
+      "017_017017.pdf",
+      "017_017865.pdf",
+      "017_017872.pdf",
+      "018_018542.pdf",
+      "018_018765.pdf",
+      "018_018778.pdf",
+      "018_018831.pdf",
+      "018_018868.pdf",
+      "019_019031.pdf",
+      "019_019054.pdf",
+      "019_019208.pdf",
+      "020_020821.pdf",
+      "020_020913.pdf",
+      "021_021709.pdf",
+      "022_022778.pdf",
+      "023_023515.pdf",
+      "023_023712.pdf",
+      "023_023767.pdf",
+      "024_024301.pdf",
+      "025_025004.pdf",
+      "025_025297.pdf",
+      "025_025385.pdf",
+      "025_025749.pdf",
+      "025_025754.pdf",
+      "026_026202.pdf",
+      "026_026303.pdf",
+      "030_030226.pdf",
+      "030_030475.pdf",
+      "030_030814.pdf",
+      "031_031229.pdf",
+      "031_031374.pdf",
+      "031_031947.pdf",
+      "032_032208.pdf",
+      "032_032423.pdf",
+      "032_032565.pdf",
+      "034_034153.pdf",
+      "034_034685.pdf",
+      "037_037393.pdf",
+      "037_037919.pdf",
+      "037_037957.pdf",
+      "039_039045.pdf",
+      "039_039399.pdf",
+      "039_039457.pdf",
+      "040_040760.pdf"
+     ],
+     "adoptable": false,
+     "per_document_file": "p2c_correctness_p3d_full_pure.jsonl"
+    },
+    "speed": {
+     "comparator_docs_per_s": 6.296902196255746,
+     "variant_docs_per_s": 6.9510976033879714,
+     "delta": 0.10389162587299228,
+     "readable": true,
+     "excluded_straggler_delta": 0.10389100364273673,
+     "exceeds_little_bar": true,
+     "little_bar": 0.0583130489998942
+    },
+    "memory": {
+     "variant": {
+      "samples_in_window": 1420,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 9568067584,
+       "file": 7723102208,
+       "total": 17647239168
+      },
+      "peak_anon_plus_file_bytes": 17290416128
+     },
+     "comparator": {
+      "samples_in_window": 1569,
+      "hz": 1.0,
+      "source": "the leg's own sampler",
+      "peak_bytes": {
+       "anon": 13708201984,
+       "file": 7732391936,
+       "total": 21826105344
+      },
+      "peak_anon_plus_file_bytes": 21434015744
+     }
+    },
+    "parse_share": {
+     "variant": 0.12008889446745627,
+     "comparator": 0.04342876175801009
+    }
+   }
+  },
+  "verdict": {
+   "little_bar": 0.0583130489998942,
+   "variants_adoptable_and_faster_than_bar": [
+    "hybrid"
+   ],
+   "hypothesis_gains_little": "NOT SUPPORTED"
+  }
+ }
+}

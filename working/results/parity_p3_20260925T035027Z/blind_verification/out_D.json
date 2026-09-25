@@ -1,0 +1,26 @@
+{
+ "figures_checked": 276,
+ "mismatches": [
+  {
+   "where": "## P3-D, table 'The eleven at C=1 \u2014 p50 parse bracket per leg', row p3d_s_hyb_b",
+   "figure": "p50 parse bracket (s)",
+   "report": "0.297",
+   "recomputed": "0.279 (0.27850 s; median over the 11 ok documents of after_parse.last_t - min(open_t). The report's own gate figure (T-V)/T = +9.23% for hybrid only works with 0.2785: with 0.297 it would be +6.17%)"
+  }
+ ],
+ "unverifiable": [
+  "Gate table G_smoke_D (hybrid) and (pure): '(b) 0 coverage losses'. The prompt says 384-slice coverage needs the text files, which are not listed. A perdoc proxy (rows not ok or with 0 chunks) also gives 0 variant-only empties.",
+  "P3-D correctness table, all 4 rows: char ratio p5/p50/p95 (0.902 / 1.009 / 1.032) and Dice min/p5/p50 (0.094 / 0.826 / 0.968). These are text-based, 24 figures.",
+  "P3-D verdict paragraph: 'char ratio p5 about 0.90', 'Dice p5 about 0.83', 'one document near-disjoint'. These are text-based.",
+  "P3-D verdict paragraph: 'Dice below 0.5 on 115 of 9,886, below 0.1 on 34'. The 115 and 34 are text-based. The 9,886 was verified.",
+  "P3-D verdict paragraph: 'the pre-registered +5.83% little bar'. It is a pre-registered threshold, and preregistration.json is not a listed file.",
+  "P3-D verdict paragraph: 'the five H6 predicted'. It is a pre-registration prediction and is not in the listed files. That all five are also empty on LlamaIndex (p3a_li_full perdoc) WAS verified."
+ ],
+ "notes": [
+  "Rounding tie, not counted as a mismatch: p3d_pure_a CPU-s/doc is stored as 3.2695 and the report shows 3.269. Decimal half-up and half-even both give 3.270. Binary-float formatting (3.26949999...) gives 3.269, which is what the report shows. Similarly p3d_hyb_b's 3.2725 is shown as 3.272, which matches half-even and float formatting but not half-up (3.273).",
+  "Parse share (speed lines) is not defined in the prompt. I inferred it as sum over ok documents with all three stamps of (after_parse.last_t - min open_t) divided by sum of (completion_ns - submit_ns)/1e9. Under that inferred definition all six values match: fix 5.8/5.8, hybrid 15.0/16.1, pure 15.7/15.2.",
+  "384-slice correctness-table counts (documents 384, empty 2/2, 0 variant-only empties, 0 variant-recovers) were checked from perdoc as rows not ok or with 0 chunks. Each variant run was compared with the fixed run of the same letter, and the result is the same against the other fixed run.",
+  "The gate-controls control table matches gate_controls_run2.json (24/24 as expected). In run 1 the four P3B_one_model controls were not as expected, which matches the report's '20 of 24 ... False'.",
+  "'Parse bracket is SLOWER at C=32': the C=32 p50 parse bracket is fixed 0.152/0.151 s against hybrid 0.449/0.487 s and pure 0.461/0.448 s, so the direction holds."
+ ]
+}

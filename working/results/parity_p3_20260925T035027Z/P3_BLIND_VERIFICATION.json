@@ -1,0 +1,223 @@
+{
+ "label": "P3 blind recomputation, two rounds: each verifier was given only its prompt, a copy of P3_REPORT.md carrying ONE planted figure, and the raw leg files; the plant key was kept outside their directory",
+ "run_utc": "2026-09-25T07:54:46Z",
+ "round_1": {
+  "outcome": "BLOCKED",
+  "verifiers": {
+   "A": {
+    "figures_checked": 93,
+    "plant": "P3-A full-run table, row p3a_li_full, CPU-s/doc",
+    "plant_value": {
+     "planted": "3.818",
+     "true": "3.881"
+    },
+    "plant_caught": true,
+    "other_mismatches": [],
+    "unverifiable": [
+     "Ratio paragraph: LlamaIndex's smoke-scale replicate spread '8.19%, P2-A' -- it would need P2's LlamaIndex legs (p2a_li_a/b), which are not among the listed files; the value equals the 0.0819 constant supplied in the definitions, and the band and verdict were recomputed using that constant.",
+     "Verdicts row and ratio paragraph: the '0.85' parity bar is a pre-registered constant (supplied in the definitions), not something computed from raw files."
+    ],
+    "prompt": "blind_verification/prompt_A.md",
+    "findings": "blind_verification/out_A.json"
+   },
+   "B": {
+    "figures_checked": 103,
+    "plant": "P3-B leg table, row p3b_c_2, forward per frame",
+    "plant_value": {
+     "planted": "0.1901",
+     "true": "0.1910"
+    },
+    "plant_caught": true,
+    "other_mismatches": [],
+    "unverifiable": [
+     "Verdicts row and '(2) Reading (pre-registered)': 'NO PRE-REGISTERED READING MATCHES' / '(2) no reading matches' - the three pre-registered readings are defined in preregistration.json, which is not a listed file. The relations the verdict rests on (a > b +0.78%, a < c -2.06%, b < c -2.81%, thresholds 0.35%/1.05%/1.05%) were recomputed and match.",
+     "Verdicts row and '(1) Runtime inspection: SUPPORTED' - the pre-registered rule's text is not in the listed files. Its stated factual basis (the RR task process maps two OpenMP runtime files; family lists; only-in-RR [] and only-in-LlamaIndex []) was recomputed from runtime_maps.txt and bench.json readbacks and matches.",
+     "Verdicts row 'register 59' - a methodology-register reference, not a recomputable figure (register not a listed file).",
+     "Prose: 'The 0.38-vs-0.28 s gap P1/P2 measured' - P1/P2 video legs are not in the listed files.",
+     "Prose: '16 videos in flight' (P1/P2 posture) - not in the listed files.",
+     "Prose: 'P0 measured K=1 at 2.39 f/s, no faster than K=16' - P0 / batch-size-campaign legs are not listed.",
+     "Prose: 'torch 16 threads' under the batch-size campaign's default posture (batchsize_video_run.sh:122, --rr-threads-env unset) - neither the script nor those legs are listed files.",
+     "Prose: 'P2-B's 2.5 f/s at 16 videos' - P2-B legs are not listed.",
+     "Prose: 'the 15.4% cross-session drift' - banked figure from an earlier phase; no listed file carries it."
+    ],
+    "prompt": "blind_verification/prompt_B.md",
+    "findings": "blind_verification/out_B.json"
+   },
+   "C": {
+    "figures_checked": 125,
+    "plant": "P3-C table, row p3c_t2_b, span docs/s",
+    "plant_value": {
+     "planted": "4.3356",
+     "true": "4.3365"
+    },
+    "plant_caught": true,
+    "other_mismatches": [
+     {
+      "where": "## P3-C prose paragraph: 'The smoke gate fired for vars=2 (+34.5%) and vars=4 (+60.0%)'",
+      "figure": "vars=4 delta vs vars=1, one decimal",
+      "report": "+60.0%",
+      "recomputed": "+59.9% (exact 59.94878%: mean(vars=4) 5.149943 / mean(vars=1) 3.219745 - 1). The report seems to have rounded the two-decimal +59.95% a second time."
+     }
+    ],
+    "unverifiable": [
+     "P3-C vars=1 line: 'vector max |delta| run a vs run b: 0.0 over 7,457 chunks'. The embedding-vector files are not in the allowed list. (Side note: 7,457 does equal the sum of n_chunks over ok documents in every P3-C smoke leg, so the chunk count is consistent.)",
+     "P3-C correctness table, vars=2 embedding max |delta| vs vars=1: '1.08e-07 over 7,457 chunks; 1.08e-07 over 7,457 chunks'. Vector files not listed.",
+     "P3-C correctness table, vars=4 embedding max |delta| vs vars=1: '1.15e-07 over 7,457 chunks; 1.15e-07 over 7,457 chunks'. Vector files not listed.",
+     "P3-C prose: 'embedding vectors within about 1.1e-7 of vars=1 (vars=1 against itself: 0.0)'. Vector files not listed.",
+     "G_smoke_C line 'agrees with the chain's record: yes' can only be checked in part. master_done.json records 'FIRED (winner vars=4)', which agrees with the recomputed winner 4. The chain's fired list sits in gates/G_smoke_C.json, which is off-limits, so agreement on the fired list ['2','4'] is not verifiable."
+    ],
+    "prompt": "blind_verification/prompt_C.md",
+    "findings": "blind_verification/out_C.json"
+   },
+   "D": {
+    "figures_checked": 276,
+    "plant": "P3-D eleven table, row p3d_s_hyb_b, p50 parse bracket",
+    "plant_value": {
+     "planted": "0.297",
+     "true": "0.279"
+    },
+    "plant_caught": true,
+    "other_mismatches": [],
+    "unverifiable": [
+     "Gate table G_smoke_D (hybrid) and (pure): '(b) 0 coverage losses'. The prompt says 384-slice coverage needs the text files, which are not listed. A perdoc proxy (rows not ok or with 0 chunks) also gives 0 variant-only empties.",
+     "P3-D correctness table, all 4 rows: char ratio p5/p50/p95 (0.902 / 1.009 / 1.032) and Dice min/p5/p50 (0.094 / 0.826 / 0.968). These are text-based, 24 figures.",
+     "P3-D verdict paragraph: 'char ratio p5 about 0.90', 'Dice p5 about 0.83', 'one document near-disjoint'. These are text-based.",
+     "P3-D verdict paragraph: 'Dice below 0.5 on 115 of 9,886, below 0.1 on 34'. The 115 and 34 are text-based. The 9,886 was verified.",
+     "P3-D verdict paragraph: 'the pre-registered +5.83% little bar'. It is a pre-registered threshold, and preregistration.json is not a listed file.",
+     "P3-D verdict paragraph: 'the five H6 predicted'. It is a pre-registration prediction and is not in the listed files. That all five are also empty on LlamaIndex (p3a_li_full perdoc) WAS verified."
+    ],
+    "prompt": "blind_verification/prompt_D.md",
+    "findings": "blind_verification/out_D.json"
+   }
+  },
+  "fixed_after": "verifier C found one real mismatch in my prose: 'vars=4 (+60.0%)' — the change is 59.949%, +59.9% at one decimal (a two-decimal figure rounded a second time). Fixed in p3_write_specs.py. Verifier B's two readings flagged as ambiguous were tightened: 'the bare cells' forward passes are 2.1% and 2.8% shorter than the engine cell's' and '4.4 f/s (the mean of its two legs)'. Only those two paragraphs changed (diff recorded in PROGRESS_LOG_5 companion notes); the P3-A and P3-D sections are byte-identical to the round-1 copies."
+ },
+ "round_2": {
+  "outcome": "PASS",
+  "scope": "the two changed sections (P3-B and P3-C), fresh verifiers, new plants",
+  "verifiers": {
+   "B2": {
+    "figures_checked": 113,
+    "plant": "P3-B leg table, row p3b_b_2, cores busy during the forward",
+    "plant_value": {
+     "planted": "4.010",
+     "true": "4.001"
+    },
+    "plant_caught": true,
+    "other_mismatches": [],
+    "unverifiable": [
+     "Verdicts row P3-B verdict 'NO PRE-REGISTERED READING MATCHES': the three pre-registered readings are not in the listed files (they are in the pre-registration). The three relations it rests on were recomputed and match.",
+     "Verdicts row and (1) paragraph '(1) inspection: SUPPORTED': the pre-registered rule for (1) is not in the listed files. Its stated basis was recomputed and holds: the RR task process (PID 88 in p3b_c_1 and p3b_c_2 runtime_maps.txt) maps two OpenMP files, simsimd.libs/libgomp-e985bcbb.so.1.0.0 and torch/lib/libgomp.so.1.",
+     "'(2) Reading (pre-registered): NO PRE-REGISTERED READING MATCHES': same reason as above (readings not in the listed files).",
+     "Prose: 'The 0.38-vs-0.28 s gap P1/P2 measured exists at 16 videos in flight': P1/P2 data are not among the listed files.",
+     "Prose: 'P0 measured K=1 at 2.39 f/s, no faster than K=16': P0 / batch-size campaign data are not listed.",
+     "Prose: '--rr-threads-env unset: torch 16 threads' for the batch-size campaign's default posture: that campaign's data are not listed.",
+     "Prose: 'P2-B's 2.5 f/s at 16 videos': P2-B leg data are not listed.",
+     "Prose: 'the 15.4% cross-session drift': source not in the listed files."
+    ],
+    "prompt": "blind_verification/prompt_B2.md",
+    "findings": "blind_verification/out_B2.json"
+   },
+   "C2": {
+    "figures_checked": 122,
+    "plant": "P3-C table, row p3c_t4_a, CPU-s/doc",
+    "plant_value": {
+     "planted": "4.373",
+     "true": "4.337"
+    },
+    "plant_caught": true,
+    "other_mismatches": [],
+    "unverifiable": [
+     "P3-C vars=1 line: 'vector max |Δ| run a vs run b: 0.0 over 7,457 chunks' - embedding vectors (vecs.jsonl.gz) are not among the listed files. Consistency note only: the sum of n_chunks over ok documents is 7,457 in both p3c_t1_a and p3c_t1_b.",
+     "P3-C correctness table, vars=2 embedding column: '1.08e-07 over 7,457 chunks; 1.08e-07 over 7,457 chunks' - vector files not listed.",
+     "P3-C correctness table, vars=4 embedding column: '1.15e-07 over 7,457 chunks; 1.15e-07 over 7,457 chunks' - vector files not listed.",
+     "P3-C prose: 'embedding vectors within about 1.1e-7 of vars=1 (vars=1 against itself: 0.0)' - vector files not listed.",
+     "P3-C gate line: 'agrees with the chain's record: yes' - only partly checkable: master_done.json records G_smoke_C 'FIRED (winner vars=4)', which agrees with the recomputed winner; the chain's fired list is in gates/G_smoke_C.json, which is off-limits, so agreement on the fired set ['2','4'] could not be checked."
+    ],
+    "prompt": "blind_verification/prompt_C2.md",
+    "findings": "blind_verification/out_C2.json"
+   }
+  }
+ },
+ "outcome": "PASS",
+ "rule": "PASS iff, after the last round, every verifier of every section caught its plant and reported no other mismatch; a round with a real mismatch is BLOCKED, fixed, and the changed sections re-verified",
+ "verifiers": {
+  "A (round 1)": {
+   "figures_checked": 93,
+   "plant": "P3-A full-run table, row p3a_li_full, CPU-s/doc",
+   "plant_value": {
+    "planted": "3.818",
+    "true": "3.881"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    "Ratio paragraph: LlamaIndex's smoke-scale replicate spread '8.19%, P2-A' -- it would need P2's LlamaIndex legs (p2a_li_a/b), which are not among the listed files; the value equals the 0.0819 constant supplied in the definitions, and the band and verdict were recomputed using that constant.",
+    "Verdicts row and ratio paragraph: the '0.85' parity bar is a pre-registered constant (supplied in the definitions), not something computed from raw files."
+   ],
+   "prompt": "blind_verification/prompt_A.md",
+   "findings": "blind_verification/out_A.json"
+  },
+  "D (round 1)": {
+   "figures_checked": 276,
+   "plant": "P3-D eleven table, row p3d_s_hyb_b, p50 parse bracket",
+   "plant_value": {
+    "planted": "0.297",
+    "true": "0.279"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    "Gate table G_smoke_D (hybrid) and (pure): '(b) 0 coverage losses'. The prompt says 384-slice coverage needs the text files, which are not listed. A perdoc proxy (rows not ok or with 0 chunks) also gives 0 variant-only empties.",
+    "P3-D correctness table, all 4 rows: char ratio p5/p50/p95 (0.902 / 1.009 / 1.032) and Dice min/p5/p50 (0.094 / 0.826 / 0.968). These are text-based, 24 figures.",
+    "P3-D verdict paragraph: 'char ratio p5 about 0.90', 'Dice p5 about 0.83', 'one document near-disjoint'. These are text-based.",
+    "P3-D verdict paragraph: 'Dice below 0.5 on 115 of 9,886, below 0.1 on 34'. The 115 and 34 are text-based. The 9,886 was verified.",
+    "P3-D verdict paragraph: 'the pre-registered +5.83% little bar'. It is a pre-registered threshold, and preregistration.json is not a listed file.",
+    "P3-D verdict paragraph: 'the five H6 predicted'. It is a pre-registration prediction and is not in the listed files. That all five are also empty on LlamaIndex (p3a_li_full perdoc) WAS verified."
+   ],
+   "prompt": "blind_verification/prompt_D.md",
+   "findings": "blind_verification/out_D.json"
+  },
+  "B2 (round 2)": {
+   "figures_checked": 113,
+   "plant": "P3-B leg table, row p3b_b_2, cores busy during the forward",
+   "plant_value": {
+    "planted": "4.010",
+    "true": "4.001"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    "Verdicts row P3-B verdict 'NO PRE-REGISTERED READING MATCHES': the three pre-registered readings are not in the listed files (they are in the pre-registration). The three relations it rests on were recomputed and match.",
+    "Verdicts row and (1) paragraph '(1) inspection: SUPPORTED': the pre-registered rule for (1) is not in the listed files. Its stated basis was recomputed and holds: the RR task process (PID 88 in p3b_c_1 and p3b_c_2 runtime_maps.txt) maps two OpenMP files, simsimd.libs/libgomp-e985bcbb.so.1.0.0 and torch/lib/libgomp.so.1.",
+    "'(2) Reading (pre-registered): NO PRE-REGISTERED READING MATCHES': same reason as above (readings not in the listed files).",
+    "Prose: 'The 0.38-vs-0.28 s gap P1/P2 measured exists at 16 videos in flight': P1/P2 data are not among the listed files.",
+    "Prose: 'P0 measured K=1 at 2.39 f/s, no faster than K=16': P0 / batch-size campaign data are not listed.",
+    "Prose: '--rr-threads-env unset: torch 16 threads' for the batch-size campaign's default posture: that campaign's data are not listed.",
+    "Prose: 'P2-B's 2.5 f/s at 16 videos': P2-B leg data are not listed.",
+    "Prose: 'the 15.4% cross-session drift': source not in the listed files."
+   ],
+   "prompt": "blind_verification/prompt_B2.md",
+   "findings": "blind_verification/out_B2.json"
+  },
+  "C2 (round 2)": {
+   "figures_checked": 122,
+   "plant": "P3-C table, row p3c_t4_a, CPU-s/doc",
+   "plant_value": {
+    "planted": "4.373",
+    "true": "4.337"
+   },
+   "plant_caught": true,
+   "other_mismatches": [],
+   "unverifiable": [
+    "P3-C vars=1 line: 'vector max |Δ| run a vs run b: 0.0 over 7,457 chunks' - embedding vectors (vecs.jsonl.gz) are not among the listed files. Consistency note only: the sum of n_chunks over ok documents is 7,457 in both p3c_t1_a and p3c_t1_b.",
+    "P3-C correctness table, vars=2 embedding column: '1.08e-07 over 7,457 chunks; 1.08e-07 over 7,457 chunks' - vector files not listed.",
+    "P3-C correctness table, vars=4 embedding column: '1.15e-07 over 7,457 chunks; 1.15e-07 over 7,457 chunks' - vector files not listed.",
+    "P3-C prose: 'embedding vectors within about 1.1e-7 of vars=1 (vars=1 against itself: 0.0)' - vector files not listed.",
+    "P3-C gate line: 'agrees with the chain's record: yes' - only partly checkable: master_done.json records G_smoke_C 'FIRED (winner vars=4)', which agrees with the recomputed winner; the chain's fired list is in gates/G_smoke_C.json, which is off-limits, so agreement on the fired set ['2','4'] could not be checked."
+   ],
+   "prompt": "blind_verification/prompt_C2.md",
+   "findings": "blind_verification/out_C2.json"
+  }
+ }
+}

@@ -1,0 +1,46 @@
+nohup: ignoring input
+G_memstat
+  PASS  G_memstat [positive: P2's p2a_rr_a] expect 0 (pass/fired/clean), got 0 (pass/fired/clean)  
+  PASS  G_memstat [null: an empty memstat.jsonl] expect 1 (fail/not fired/violation), got 1 (fail/not fired/violation)  
+G_mandate (docs and video)
+  PASS  G_mandate_docs [positive: P2's p2a_rr_a (clean)] expect 0 (pass/fired/clean), got 0 (pass/fired/clean)  
+  PASS  G_mandate_docs [null: the same leg marked violating] expect 1 (fail/not fired/violation), got 1 (fail/not fired/violation)  
+  PASS  G_mandate_video [positive: P2's p2b_rr_base_a (clean)] expect 0 (pass/fired/clean), got 0 (pass/fired/clean)  
+  PASS  G_mandate_video [null: a leg with MANDATE_VIOLATION.json] expect 1 (fail/not fired/violation), got 1 (fail/not fired/violation)  
+G_health_A
+  PASS  G_health_A [positive: P2's p2a_rr_b / p2a_li_b as the P3 legs] expect 0 (pass/fired/clean), got 0 (pass/fired/clean)  
+  PASS  G_health_A [null: one chunk hash altered in the RR leg] expect 1 (fail/not fired/violation), got 1 (fail/not fired/violation)  
+  PASS  G_health_A [null: the LlamaIndex leg's memory sampler empty] expect 1 (fail/not fired/violation), got 1 (fail/not fired/violation)  
+G_smoke_C (thread shapes)
+  PASS  G_smoke_C [positive: vars=2 10% faster, chunks identical] expect ["2"], got ["2"]  vector max|delta| vars2 vs vars1: 9.98377799987793e-07
+  PASS  G_smoke_C [null: vars=2 and vars=4 as fast as vars=1] expect [], got []  vector max|delta| vars2 vs vars1: 9.98377799987793e-07
+  PASS  G_smoke_C [null: vars=2 faster but one chunk list differs] expect [], got []  vector max|delta| vars2 vs vars1: 9.98377799987793e-07
+G_node_D
+  PASS  G_node_D [positive: counters with text] expect 0 (pass/fired/clean), got 0 (pass/fired/clean)  
+  PASS  G_node_D [null: P1's failure (text 0)] expect 1 (fail/not fired/violation), got 1 (fail/not fired/violation)  
+G_smoke_D (P2-C's gate, P3 names)
+  PASS  G_smoke_D [positive: HYBRID 10% faster than Tika's spread, no coverage loss] expect ["hybrid"], got ["hybrid"]  
+  PASS  G_smoke_D [null: both variants inside Tika's spread] expect [], got []  
+G_alone (P3-B: every cell alone)
+  PASS  G_alone [positive: no container on the box] expect 0 (pass/fired/clean), got 0 (pass/fired/clean)  
+  PASS  G_alone [null: one created container present] expect 1 (fail/not fired/violation), got 1 (fail/not fired/violation)  
+G_build_D in-image check (the engine's own Python inside the container)
+  PASS  G_build_D [positive: rr:p2-pdfium (pypdfium2 complete)] expect ok=True rc=0, got ok=True rc=0  {"python": "3.12.13", "ok": true, "pypdfium2_cfg": "/opt/rocketride/engine/lib/python3.12/site-packages/pypdfium2_cfg/__init__.py", "pypdfium2": "5.13.0", "page
+  PASS  G_build_D [null: rr:p1-pdfium (pypdfium2_cfg missing)] expect ok=False rc=1, got ok=False rc=1  {"python": "3.12.13", "ok": false, "error": "ModuleNotFoundError: No module named 'pypdfium2_cfg'"}
+P3-B bare microbenchmark one-model check (each image's own interpreter)
+   frames: ffmpeg /usr/local/lib/python3.12/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2 0.6.0 recent call last):
+  File "/x/p3b_frames.py", line 23, in <module>
+    os.makedirs(out)
+  File "<frozen os>", line 225, in makedirs
+PermissionError: [Errno 13] Permission denied: '/frames/v00_EN2001a'
+  FAIL  P3B_one_model (a) [positive: one model] expect rc=0, got rc=1  lbumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>
+  data = fetch_versi
+  FAIL  P3B_one_model (a) [null: --null-two-models] expect rc=3, got rc=1  lbumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>
+  data = fetch_versi
+  FAIL  P3B_one_model (b) [positive: one model] expect rc=0, got rc=1  lbumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>
+  data = fetch_versi
+  FAIL  P3B_one_model (b) [null: --null-two-models] expect rc=3, got rc=1  lbumentations/check_version.py:51: UserWarning: Error fetching version info <urlopen error [Errno -3] Temporary failure in name resolution>
+  data = fetch_versi
+
+gate controls: 20 of 24 as expected -> all_pass=False (gate_controls.json)
+CTL_DONE

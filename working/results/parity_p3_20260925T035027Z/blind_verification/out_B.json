@@ -1,0 +1,22 @@
+{
+  "figures_checked": 103,
+  "mismatches": [
+    {
+      "where": "## P3-B — the video discriminator, leg table, row p3b_c_2, column 'forward per frame F (s)'",
+      "figure": "F for p3b_c_2 = mean 'forward' over the last 695 frame rows of p1_stamps.jsonl by t_wall (N = sum of frames_observed 239+230+226 over the last measured record per video, none with error)",
+      "report": "0.1901",
+      "recomputed": "0.1910 (0.190959)"
+    }
+  ],
+  "unverifiable": [
+    "Verdicts row and '(2) Reading (pre-registered)': 'NO PRE-REGISTERED READING MATCHES' / '(2) no reading matches' - the three pre-registered readings are defined in preregistration.json, which is not a listed file. The relations the verdict rests on (a > b +0.78%, a < c -2.06%, b < c -2.81%, thresholds 0.35%/1.05%/1.05%) were recomputed and match.",
+    "Verdicts row and '(1) Runtime inspection: SUPPORTED' - the pre-registered rule's text is not in the listed files. Its stated factual basis (the RR task process maps two OpenMP runtime files; family lists; only-in-RR [] and only-in-LlamaIndex []) was recomputed from runtime_maps.txt and bench.json readbacks and matches.",
+    "Verdicts row 'register 59' - a methodology-register reference, not a recomputable figure (register not a listed file).",
+    "Prose: 'The 0.38-vs-0.28 s gap P1/P2 measured' - P1/P2 video legs are not in the listed files.",
+    "Prose: '16 videos in flight' (P1/P2 posture) - not in the listed files.",
+    "Prose: 'P0 measured K=1 at 2.39 f/s, no faster than K=16' - P0 / batch-size-campaign legs are not listed.",
+    "Prose: 'torch 16 threads' under the batch-size campaign's default posture (batchsize_video_run.sh:122, --rr-threads-env unset) - neither the script nor those legs are listed files.",
+    "Prose: 'P2-B's 2.5 f/s at 16 videos' - P2-B legs are not listed.",
+    "Prose: 'the 15.4% cross-session drift' - banked figure from an earlier phase; no listed file carries it."
+  ]
+}

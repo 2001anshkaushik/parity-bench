@@ -1,0 +1,24 @@
+{
+  "figures_checked": 125,
+  "mismatches": [
+    {
+      "where": "## P3-C leg table, row p3c_t2_b, column 'span docs/s'",
+      "figure": "span docs/s of p3c_t2_b (ok rows / ((max completion_ns - min submit_ns)/1e9))",
+      "report": "4.3356",
+      "recomputed": "4.3365 (4.336460254...; ok 382 over 384 rows). The same leg's 'excl. eleven' 4.3365 and the vars=2 mean 4.3304 = (4.3242+4.3365)/2 both match the recomputed value, so only this cell is wrong (digits transposed)."
+    },
+    {
+      "where": "## P3-C prose paragraph: 'The smoke gate fired for vars=2 (+34.5%) and vars=4 (+60.0%)'",
+      "figure": "vars=4 delta vs vars=1, one decimal",
+      "report": "+60.0%",
+      "recomputed": "+59.9% (exact 59.94878%: mean(vars=4) 5.149943 / mean(vars=1) 3.219745 - 1). The report seems to have rounded the two-decimal +59.95% a second time."
+    }
+  ],
+  "unverifiable": [
+    "P3-C vars=1 line: 'vector max |delta| run a vs run b: 0.0 over 7,457 chunks'. The embedding-vector files are not in the allowed list. (Side note: 7,457 does equal the sum of n_chunks over ok documents in every P3-C smoke leg, so the chunk count is consistent.)",
+    "P3-C correctness table, vars=2 embedding max |delta| vs vars=1: '1.08e-07 over 7,457 chunks; 1.08e-07 over 7,457 chunks'. Vector files not listed.",
+    "P3-C correctness table, vars=4 embedding max |delta| vs vars=1: '1.15e-07 over 7,457 chunks; 1.15e-07 over 7,457 chunks'. Vector files not listed.",
+    "P3-C prose: 'embedding vectors within about 1.1e-7 of vars=1 (vars=1 against itself: 0.0)'. Vector files not listed.",
+    "G_smoke_C line 'agrees with the chain's record: yes' can only be checked in part. master_done.json records 'FIRED (winner vars=4)', which agrees with the recomputed winner 4. The chain's fired list sits in gates/G_smoke_C.json, which is off-limits, so agreement on the fired list ['2','4'] is not verifiable."
+  ]
+}

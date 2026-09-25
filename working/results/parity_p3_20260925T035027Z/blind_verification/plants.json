@@ -1,0 +1,56 @@
+{
+ "A": {
+  "where": "P3-A full-run table, row p3a_li_full, CPU-s/doc",
+  "true": "| 9,873/9,975 | 3.881 |",
+  "planted": "| 9,873/9,975 | 3.818 |",
+  "vals": [
+   "3.818",
+   "3.881"
+  ]
+ },
+ "B": {
+  "where": "P3-B leg table, row p3b_c_2, forward per frame",
+  "true": "| p3b_c_2 | 695 | 0.1910 |",
+  "planted": "| p3b_c_2 | 695 | 0.1901 |",
+  "vals": [
+   "0.1901",
+   "0.1910"
+  ]
+ },
+ "C": {
+  "where": "P3-C table, row p3c_t2_b, span docs/s",
+  "true": "| p3c_t2_b | 4.3365 |",
+  "planted": "| p3c_t2_b | 4.3356 |",
+  "vals": [
+   "4.3356",
+   "4.3365"
+  ]
+ },
+ "D": {
+  "where": "P3-D eleven table, row p3d_s_hyb_b, p50 parse bracket",
+  "true": "| p3d_s_hyb_b | 11 | 0.279 |",
+  "planted": "| p3d_s_hyb_b | 11 | 0.297 |",
+  "vals": [
+   "0.297",
+   "0.279"
+  ]
+ },
+ "B2": {
+  "where": "P3-B leg table, row p3b_b_2, cores busy during the forward",
+  "true": "| p3b_b_2 | 695 | 0.1849 | 4.001 |",
+  "planted": "| p3b_b_2 | 695 | 0.1849 | 4.010 |",
+  "vals": [
+   "4.010",
+   "4.001"
+  ]
+ },
+ "C2": {
+  "where": "P3-C table, row p3c_t4_a, CPU-s/doc",
+  "true": "| p3c_t4_a | 5.1451 | 5.1451 | 382/384 | 4.337 |",
+  "planted": "| p3c_t4_a | 5.1451 | 5.1451 | 382/384 | 4.373 |",
+  "vals": [
+   "4.373",
+   "4.337"
+  ]
+ }
+}

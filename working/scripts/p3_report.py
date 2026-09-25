@@ -290,7 +290,9 @@ def main() -> int:
         vs = (A["bv"].get("verifiers") or {}).values()
         head += [f"**Blind recomputation (P3_BLIND_VERIFICATION.json):** {A['bv'].get('outcome')} — {n(sum(v.get('figures_checked') or 0 for v in vs))} figures checked by "
                  f"{len(vs)} verifiers; plants caught {sum(1 for v in vs if v.get('plant_caught'))} of {len(vs)}; other mismatches "
-                 f"{sum(len(v.get('other_mismatches') or []) for v in vs)}.", ""]
+                 f"{sum(len(v.get('other_mismatches') or []) for v in vs)}"
+                 + (f" (round 1: {A['bv']['round_1']['outcome']} — one real mismatch in the prose, fixed; round 2 re-verified the changed "
+                    f"sections: {A['bv']['round_2']['outcome']})" if A["bv"].get("round_1") else "") + ".", ""]
     fu = (d.get("P3_A") or {}).get("full") or {}
     rows = [["P3-A docs full-scale headline", fu.get("verdict", "NOT RUN"),
              (f"RR/LI = {f4(fu['ratio_rr_over_li'])} (n=1 per arm; readable band {f4(fu['readable_band'][0])}–{f4(fu['readable_band'][1])})" if fu.get("rr") else "full runs NOT RUN"),

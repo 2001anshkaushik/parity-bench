@@ -1931,3 +1931,21 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   says "that the other arm does not", each clause must compare against the other arm.
 > - **Before registering a rule, find the outcome where the rule and the hypothesis disagree.** If one
 >   exists, fix the rule then, not after the data.
+
+## 60. A smoke slice's idle cores read as a shape's gain (added 2026-09-25)
+
+> P3-C tried the six thread variables at 1, 2 and 4 on the 384-document slice. vars=4 ran 60% faster
+> than vars=1 with identical text chunks, the smoke gate fired, and the pre-registered full run of
+> vars=4 followed. On the full 9,975 it was 4.6% SLOWER than vars=1, readably so, with identical
+> output and more CPU per document. The slice is drain-dominated: both arms leave most of the box idle
+> there, which is why Ansh ruled P3-A's smoke a health gate and not a performance proxy. Extra
+> intra-op threads filled the idle cores. At full scale vars=1 already keeps about 28 of 32 cores
+> busy, and the extra threads only contend. P3-C's pre-registration did not record this bias, although
+> P2-A had already shown it. The gate did its job by queueing the full run that exposed it.
+>
+> Rules:
+>
+> - **A smoke slice that leaves the box idle cannot rank anything that uses more cores.** Record that
+>   as a known bias of every such gate. Better, pick a smoke whose busy-core count matches full scale.
+> - **A known bias from one experiment belongs in the next experiment's pre-registration.** P2-A's
+>   drain-dominated slice was known before P3-C was written.

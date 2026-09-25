@@ -1,0 +1,750 @@
+{
+ "label": "P3-B video discriminator (preregistration.json P3_B)",
+ "frames": {
+  "videos": [
+   "EN2001a.avi",
+   "EN2001b.avi",
+   "EN2001d.avi"
+  ],
+  "n_frames": 695,
+  "set_sha256": "01f836e49f494b84d4dec830ff8bd1da88b2ec9b5112bb72b0d2cfbfbc6837a8",
+  "argv": "fps=1/15 -fps_mode passthrough -vcodec png (li:video imageio-ffmpeg)"
+ },
+ "identity": {
+  "bare_frames_identical_to_manifest": true,
+  "engine_frame_count_equals_manifest": true,
+  "bare_one_model_instance": true,
+  "torch_threads": {
+   "p3b_a_1": 4,
+   "p3b_a_2": 4,
+   "p3b_b_1": 4,
+   "p3b_b_2": 4,
+   "p3b_c_1": 4,
+   "p3b_c_2": 4,
+   "p3b_d_1": 4
+  },
+  "detections_a_vs_b_identical_per_frame": true
+ },
+ "legs": {
+  "p3b_a_1": {
+   "leg": "p3b_a_1",
+   "frames_identical_to_manifest": true,
+   "n_frames": 695,
+   "measured": 695,
+   "F_s": 0.1860282231136714,
+   "cores_in_forward": 5.000796136069717,
+   "caller_cpu_ratio": 0.999913251331162,
+   "callers": [
+    1
+   ],
+   "one_model_instance": true,
+   "rfdetr_models": 1,
+   "torch_threads": 4,
+   "torch_interop": 16,
+   "torch_version": "2.10.0+cu128",
+   "torch_file": "/opt/rocketride/engine/lib/python3.12/site-packages/torch/__init__.py",
+   "numpy": {
+    "version": "2.5.2",
+    "file": "/opt/rocketride/engine/lib/python3.12/site-packages/numpy/__init__.py"
+   },
+   "rfdetr": {
+    "version": null,
+    "file": "/opt/rocketride/engine/lib/python3.12/site-packages/rfdetr/__init__.py"
+   },
+   "python": "3.12.13",
+   "executable": "/opt/rocketride/engine/engine",
+   "env": {
+    "OPENBLAS_NUM_THREADS": "4",
+    "VECLIB_MAXIMUM_THREADS": "4",
+    "NUMEXPR_NUM_THREADS": "4",
+    "TORCH_NUM_THREADS": "4",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+    "KMP_DUPLICATE_LIB_OK": "True",
+    "KMP_INIT_AT_FORK": "FALSE"
+   },
+   "os_threads_at_end": 42,
+   "runtimes": {
+    "families": {
+     "blas:libopenblas": [
+      "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so"
+     ],
+     "openmp:libgomp": [
+      "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+     ]
+    },
+    "openmp_files": [
+     "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+    ],
+    "all": [
+     "/opt/rocketride/engine/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+    ]
+   },
+   "dets_sha256": "695 per-frame hashes (bench.json)"
+  },
+  "p3b_a_2": {
+   "leg": "p3b_a_2",
+   "frames_identical_to_manifest": true,
+   "n_frames": 695,
+   "measured": 695,
+   "F_s": 0.18608778411799126,
+   "cores_in_forward": 5.000521323455228,
+   "caller_cpu_ratio": 0.9999026761794589,
+   "callers": [
+    1
+   ],
+   "one_model_instance": true,
+   "rfdetr_models": 1,
+   "torch_threads": 4,
+   "torch_interop": 16,
+   "torch_version": "2.10.0+cu128",
+   "torch_file": "/opt/rocketride/engine/lib/python3.12/site-packages/torch/__init__.py",
+   "numpy": {
+    "version": "2.5.2",
+    "file": "/opt/rocketride/engine/lib/python3.12/site-packages/numpy/__init__.py"
+   },
+   "rfdetr": {
+    "version": null,
+    "file": "/opt/rocketride/engine/lib/python3.12/site-packages/rfdetr/__init__.py"
+   },
+   "python": "3.12.13",
+   "executable": "/opt/rocketride/engine/engine",
+   "env": {
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4",
+    "VECLIB_MAXIMUM_THREADS": "4",
+    "NUMEXPR_NUM_THREADS": "4",
+    "TORCH_NUM_THREADS": "4",
+    "OMP_NUM_THREADS": "4",
+    "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+    "KMP_DUPLICATE_LIB_OK": "True",
+    "KMP_INIT_AT_FORK": "FALSE"
+   },
+   "os_threads_at_end": 42,
+   "runtimes": {
+    "families": {
+     "blas:libopenblas": [
+      "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so"
+     ],
+     "openmp:libgomp": [
+      "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+     ]
+    },
+    "openmp_files": [
+     "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+    ],
+    "all": [
+     "/opt/rocketride/engine/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+     "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+    ]
+   },
+   "dets_sha256": "695 per-frame hashes (bench.json)"
+  },
+  "p3b_b_1": {
+   "leg": "p3b_b_1",
+   "frames_identical_to_manifest": true,
+   "n_frames": 695,
+   "measured": 695,
+   "F_s": 0.18429789634532076,
+   "cores_in_forward": 4.000462682812817,
+   "caller_cpu_ratio": 0.9999289034304881,
+   "callers": [
+    1
+   ],
+   "one_model_instance": true,
+   "rfdetr_models": 1,
+   "torch_threads": 4,
+   "torch_interop": 16,
+   "torch_version": "2.10.0+cu128",
+   "torch_file": "/usr/local/lib/python3.12/site-packages/torch/__init__.py",
+   "numpy": {
+    "version": "2.5.2",
+    "file": "/usr/local/lib/python3.12/site-packages/numpy/__init__.py"
+   },
+   "rfdetr": {
+    "version": null,
+    "file": "/usr/local/lib/python3.12/site-packages/rfdetr/__init__.py"
+   },
+   "python": "3.12.13",
+   "executable": "/usr/local/bin/python",
+   "env": {
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4",
+    "VECLIB_MAXIMUM_THREADS": "4",
+    "NUMEXPR_NUM_THREADS": "4",
+    "TORCH_NUM_THREADS": "4",
+    "MALLOC_ARENA_MAX": "2",
+    "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+    "KMP_DUPLICATE_LIB_OK": "True",
+    "KMP_INIT_AT_FORK": "FALSE"
+   },
+   "os_threads_at_end": 10,
+   "runtimes": {
+    "families": {
+     "blas:libopenblas": [
+      "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblas-r0-f650aae0.3.3.so"
+     ],
+     "openmp:libgomp": [
+      "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+     ]
+    },
+    "openmp_files": [
+     "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+    ],
+    "all": [
+     "/usr/local/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+     "/usr/local/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+     "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libgfortran-91cc3cb1.so.3.0.0",
+     "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblas-r0-f650aae0.3.3.so",
+     "/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+     "/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+     "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libc10.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+    ]
+   },
+   "dets_sha256": "695 per-frame hashes (bench.json)"
+  },
+  "p3b_b_2": {
+   "leg": "p3b_b_2",
+   "frames_identical_to_manifest": true,
+   "n_frames": 695,
+   "measured": 695,
+   "F_s": 0.18494537486762572,
+   "cores_in_forward": 4.00068441399505,
+   "caller_cpu_ratio": 0.9999190640350718,
+   "callers": [
+    1
+   ],
+   "one_model_instance": true,
+   "rfdetr_models": 1,
+   "torch_threads": 4,
+   "torch_interop": 16,
+   "torch_version": "2.10.0+cu128",
+   "torch_file": "/usr/local/lib/python3.12/site-packages/torch/__init__.py",
+   "numpy": {
+    "version": "2.5.2",
+    "file": "/usr/local/lib/python3.12/site-packages/numpy/__init__.py"
+   },
+   "rfdetr": {
+    "version": null,
+    "file": "/usr/local/lib/python3.12/site-packages/rfdetr/__init__.py"
+   },
+   "python": "3.12.13",
+   "executable": "/usr/local/bin/python",
+   "env": {
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4",
+    "VECLIB_MAXIMUM_THREADS": "4",
+    "NUMEXPR_NUM_THREADS": "4",
+    "TORCH_NUM_THREADS": "4",
+    "MALLOC_ARENA_MAX": "2",
+    "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+    "KMP_DUPLICATE_LIB_OK": "True",
+    "KMP_INIT_AT_FORK": "FALSE"
+   },
+   "os_threads_at_end": 10,
+   "runtimes": {
+    "families": {
+     "blas:libopenblas": [
+      "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblas-r0-f650aae0.3.3.so"
+     ],
+     "openmp:libgomp": [
+      "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+     ]
+    },
+    "openmp_files": [
+     "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+    ],
+    "all": [
+     "/usr/local/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+     "/usr/local/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+     "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libgfortran-91cc3cb1.so.3.0.0",
+     "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblas-r0-f650aae0.3.3.so",
+     "/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+     "/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+     "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libc10.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+     "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+    ]
+   },
+   "dets_sha256": "695 per-frame hashes (bench.json)"
+  },
+  "p3b_c_1": {
+   "leg": "p3b_c_1",
+   "frames_observed": 695,
+   "manifest_frames": 695,
+   "frame_count_equals_manifest": true,
+   "errors": 0,
+   "videos": 3,
+   "frames_per_s": 4.455128205128205,
+   "F_s": 0.18897051000000123,
+   "cores_in_forward": 4.225274848691877,
+   "caller_cpu_ratio": 0.9994613981504931,
+   "callers": [
+    580,
+    670,
+    760
+   ],
+   "measured": 695,
+   "torch_threads": 4,
+   "p0": {
+    "d0_pre": 88,
+    "d0_post": 88
+   },
+   "maps_processes": [
+    {
+     "pid": 88,
+     "comm": "engine",
+     "cmdline": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-b3c3e363.webhook_1-wnqp67rb.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+     "runtimes": {
+      "families": {
+       "blas:libopenblas": [
+        "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so"
+       ],
+       "openmp:libgomp": [
+        "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+        "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+       ]
+      },
+      "openmp_files": [
+       "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+      ],
+      "all": [
+       "/opt/rocketride/engine/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+      ]
+     }
+    }
+   ]
+  },
+  "p3b_c_2": {
+   "leg": "p3b_c_2",
+   "frames_observed": 695,
+   "manifest_frames": 695,
+   "frame_count_equals_manifest": true,
+   "errors": 0,
+   "videos": 3,
+   "frames_per_s": 4.415501905972046,
+   "F_s": 0.19095899586187187,
+   "cores_in_forward": 4.2258213450426485,
+   "caller_cpu_ratio": 0.9994679753996609,
+   "callers": [
+    580,
+    670,
+    760
+   ],
+   "measured": 695,
+   "torch_threads": 4,
+   "p0": {
+    "d0_pre": 88,
+    "d0_post": 88
+   },
+   "maps_processes": [
+    {
+     "pid": 88,
+     "comm": "engine",
+     "cmdline": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-829d358d.webhook_1-9u5uy5b8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+     "runtimes": {
+      "families": {
+       "blas:libopenblas": [
+        "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so"
+       ],
+       "openmp:libgomp": [
+        "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+        "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+       ]
+      },
+      "openmp_files": [
+       "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+      ],
+      "all": [
+       "/opt/rocketride/engine/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+      ]
+     }
+    }
+   ]
+  },
+  "p3b_d_1": {
+   "leg": "p3b_d_1",
+   "frames_observed": 695,
+   "manifest_frames": 695,
+   "frame_count_equals_manifest": true,
+   "errors": 0,
+   "videos": 3,
+   "frames_per_s": 3.141952983725136,
+   "F_s": 0.19169487155684614,
+   "cores_in_forward": 4.001037747558023,
+   "caller_cpu_ratio": 0.9998394193087904,
+   "callers": [
+    141
+   ],
+   "measured": 695,
+   "torch_threads": 4,
+   "p0": {
+    "d0_pre": null,
+    "d0_post": null
+   },
+   "maps_processes": [
+    {
+     "pid": 1,
+     "comm": "python",
+     "cmdline": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-",
+     "runtimes": {
+      "families": {
+       "blas:libopenblas": [
+        "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblas-r0-f650aae0.3.3.so"
+       ],
+       "openmp:libgomp": [
+        "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+        "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+       ]
+      },
+      "openmp_files": [
+       "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+      ],
+      "all": [
+       "/usr/local/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+       "/usr/local/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+       "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libgfortran-91cc3cb1.so.3.0.0",
+       "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblas-r0-f650aae0.3.3.so",
+       "/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+       "/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+       "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libc10.so",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch.so",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "cells": {
+  "a": {
+   "legs": [
+    "p3b_a_1",
+    "p3b_a_2"
+   ],
+   "F_s": [
+    0.1860282231136714,
+    0.18608778411799126
+   ],
+   "mean": 0.18605800361583133,
+   "spread": 0.00032012062454912646,
+   "cores_in_forward": [
+    5.000796136069717,
+    5.000521323455228
+   ],
+   "caller_cpu_ratio": [
+    0.999913251331162,
+    0.9999026761794589
+   ]
+  },
+  "b": {
+   "legs": [
+    "p3b_b_1",
+    "p3b_b_2"
+   ],
+   "F_s": [
+    0.18429789634532076,
+    0.18494537486762572
+   ],
+   "mean": 0.18462163560647324,
+   "spread": 0.0035070565818465438,
+   "cores_in_forward": [
+    4.000462682812817,
+    4.00068441399505
+   ],
+   "caller_cpu_ratio": [
+    0.9999289034304881,
+    0.9999190640350718
+   ]
+  },
+  "c": {
+   "legs": [
+    "p3b_c_1",
+    "p3b_c_2"
+   ],
+   "F_s": [
+    0.18897051000000123,
+    0.19095899586187187
+   ],
+   "mean": 0.18996475293093656,
+   "spread": 0.010467656926827761,
+   "cores_in_forward": [
+    4.225274848691877,
+    4.2258213450426485
+   ],
+   "caller_cpu_ratio": [
+    0.9994613981504931,
+    0.9994679753996609
+   ]
+  }
+ },
+ "reading": {
+  "approx_rule": "x ~= y iff |F_x/F_y - 1| <= max(spread_x, spread_y)",
+  "a_vs_b": {
+   "ratio_minus_1": 0.007780063288030714,
+   "threshold": 0.0035070565818465438,
+   "approx_equal": false,
+   "less": false,
+   "greater": true,
+   "beyond_floor_0_82pct": false
+  },
+  "a_vs_c": {
+   "ratio_minus_1": -0.020565653653262572,
+   "threshold": 0.010467656926827761,
+   "approx_equal": false,
+   "less": true,
+   "greater": false,
+   "beyond_floor_0_82pct": true
+  },
+  "b_vs_c": {
+   "ratio_minus_1": -0.028126887972769743,
+   "threshold": 0.010467656926827761,
+   "approx_equal": false,
+   "less": true,
+   "greater": false,
+   "beyond_floor_0_82pct": true
+  },
+  "verdict": "NO PRE-REGISTERED READING MATCHES (the three relations are reported)"
+ },
+ "inspection_1": {
+  "rr_task_processes": [
+   {
+    "pid": 88,
+    "comm": "engine",
+    "cmdline": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-b3c3e363.webhook_1-wnqp67rb.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+    "runtimes": {
+     "families": {
+      "blas:libopenblas": [
+       "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so"
+      ],
+      "openmp:libgomp": [
+       "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+      ]
+     },
+     "openmp_files": [
+      "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+     ],
+     "all": [
+      "/opt/rocketride/engine/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+     ]
+    }
+   },
+   {
+    "pid": 88,
+    "comm": "engine",
+    "cmdline": "/opt/rocketride/engine/engine /opt/rocketride/engine/ai/node.py /tmp/task-829d358d.webhook_1-9u5uy5b8.json --autoterm --monitor=app --debug_port=20000 --debug_h",
+    "runtimes": {
+     "families": {
+      "blas:libopenblas": [
+       "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so"
+      ],
+      "openmp:libgomp": [
+       "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+       "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+      ]
+     },
+     "openmp_files": [
+      "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+     ],
+     "all": [
+      "/opt/rocketride/engine/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+      "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+     ]
+    }
+   }
+  ],
+  "li_detector_processes": [
+   {
+    "pid": 1,
+    "comm": "python",
+    "cmdline": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-",
+    "runtimes": {
+     "families": {
+      "blas:libopenblas": [
+       "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblas-r0-f650aae0.3.3.so"
+      ],
+      "openmp:libgomp": [
+       "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+       "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+      ]
+     },
+     "openmp_files": [
+      "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+     ],
+     "all": [
+      "/usr/local/lib/python3.12/site-packages/numpy.libs/libgfortran-83c28eba-468e71e5.so.5.0.0",
+      "/usr/local/lib/python3.12/site-packages/numpy/_core/_multiarray_umath.cpython-312-x86_64-linux-gnu.so",
+      "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libgfortran-91cc3cb1.so.3.0.0",
+      "/usr/local/lib/python3.12/site-packages/opencv_python_headless.libs/libopenblas-r0-f650aae0.3.3.so",
+      "/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-040039e1-0352e75f.so.5.0.0",
+      "/usr/local/lib/python3.12/site-packages/scipy.libs/libgfortran-83c28eba.so.5.0.0",
+      "/usr/local/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libc10.so",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libc10_cuda.so",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libgomp.so.1",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch.so",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_global_deps.so",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_nvshmem.so",
+      "/usr/local/lib/python3.12/site-packages/torch/lib/libtorch_python.so"
+     ]
+    }
+   }
+  ],
+  "rr_families": [
+   "blas:libopenblas",
+   "openmp:libgomp"
+  ],
+  "li_families": [
+   "blas:libopenblas",
+   "openmp:libgomp"
+  ],
+  "families_only_in_rr": [],
+  "families_only_in_li": [],
+  "rr_openmp_files": [
+   "/opt/rocketride/engine/lib/python3.12/site-packages/simsimd.libs/libgomp-e985bcbb.so.1.0.0",
+   "/opt/rocketride/engine/lib/python3.12/site-packages/torch/lib/libgomp.so.1"
+  ],
+  "rr_openmp_files_per_process": [
+   2,
+   2
+  ],
+  "bare_a_families": [
+   "blas:libopenblas",
+   "openmp:libgomp"
+  ],
+  "bare_b_families": [
+   "blas:libopenblas",
+   "openmp:libgomp"
+  ],
+  "reading": "SUPPORTED",
+  "rule": "SUPPORTED iff the RR task process maps two or more distinct OpenMP runtime files, OR maps an OpenMP, BLAS or TBB family that LlamaIndex's detector process does not"
+ },
+ "boot_ids": [
+  "3a2dc046-fb93-4b15-8616-7a3b64fcbdb0"
+ ]
+}

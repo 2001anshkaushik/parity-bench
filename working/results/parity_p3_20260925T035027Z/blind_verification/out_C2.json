@@ -1,0 +1,18 @@
+{
+  "figures_checked": 122,
+  "mismatches": [
+    {
+      "where": "## P3-C leg table, row p3c_t4_a, column CPU-s/doc",
+      "figure": "CPU-s/doc (cost.cpu_s_per_doc of p3c_t4_a/leg_rr_refc32_p3c_t4_a.json)",
+      "report": "4.373",
+      "recomputed": "4.337 (raw 4.3374)"
+    }
+  ],
+  "unverifiable": [
+    "P3-C vars=1 line: 'vector max |Δ| run a vs run b: 0.0 over 7,457 chunks' - embedding vectors (vecs.jsonl.gz) are not among the listed files. Consistency note only: the sum of n_chunks over ok documents is 7,457 in both p3c_t1_a and p3c_t1_b.",
+    "P3-C correctness table, vars=2 embedding column: '1.08e-07 over 7,457 chunks; 1.08e-07 over 7,457 chunks' - vector files not listed.",
+    "P3-C correctness table, vars=4 embedding column: '1.15e-07 over 7,457 chunks; 1.15e-07 over 7,457 chunks' - vector files not listed.",
+    "P3-C prose: 'embedding vectors within about 1.1e-7 of vars=1 (vars=1 against itself: 0.0)' - vector files not listed.",
+    "P3-C gate line: 'agrees with the chain's record: yes' - only partly checkable: master_done.json records G_smoke_C 'FIRED (winner vars=4)', which agrees with the recomputed winner; the chain's fired list is in gates/G_smoke_C.json, which is off-limits, so agreement on the fired set ['2','4'] could not be checked."
+  ]
+}

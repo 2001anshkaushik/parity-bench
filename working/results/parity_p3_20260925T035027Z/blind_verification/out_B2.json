@@ -1,0 +1,67 @@
+{
+  "figures_checked": 113,
+  "figures_checked_note": "113 figures examined in scope: 104 recomputed (103 match, 1 mismatch) + 9 unverifiable figures (8 entries: the (1) SUPPORTED entry covers both the Verdicts row and the (1) paragraph). Breakdown: Verdicts row 3, frames paragraph 6, leg table 45 (7 legs x 6 numeric columns + 3 service frames/s), cell table 12, relations 12, (2) reading 1, (1) paragraph 8, following prose paragraph 26.",
+  "mismatches": [
+    {
+      "where": "## P3-B leg table, row p3b_b_2, column 'cores busy during the forward'",
+      "figure": "cores busy during the forward = sum(fw_proc_cpu) / sum(forward) over the 695 bench.json rows of p3b_b_2",
+      "report": "4.010",
+      "recomputed": "4.001 (4.00068441399505)"
+    }
+  ],
+  "unverifiable": [
+    "Verdicts row P3-B verdict 'NO PRE-REGISTERED READING MATCHES': the three pre-registered readings are not in the listed files (they are in the pre-registration). The three relations it rests on were recomputed and match.",
+    "Verdicts row and (1) paragraph '(1) inspection: SUPPORTED': the pre-registered rule for (1) is not in the listed files. Its stated basis was recomputed and holds: the RR task process (PID 88 in p3b_c_1 and p3b_c_2 runtime_maps.txt) maps two OpenMP files, simsimd.libs/libgomp-e985bcbb.so.1.0.0 and torch/lib/libgomp.so.1.",
+    "'(2) Reading (pre-registered): NO PRE-REGISTERED READING MATCHES': same reason as above (readings not in the listed files).",
+    "Prose: 'The 0.38-vs-0.28 s gap P1/P2 measured exists at 16 videos in flight': P1/P2 data are not among the listed files.",
+    "Prose: 'P0 measured K=1 at 2.39 f/s, no faster than K=16': P0 / batch-size campaign data are not listed.",
+    "Prose: '--rr-threads-env unset: torch 16 threads' for the batch-size campaign's default posture: that campaign's data are not listed.",
+    "Prose: 'P2-B's 2.5 f/s at 16 videos': P2-B leg data are not listed.",
+    "Prose: 'the 15.4% cross-session drift': source not in the listed files."
+  ],
+  "matched_highlights": {
+    "F per leg (s)": {
+      "p3b_a_1": 0.186028,
+      "p3b_a_2": 0.186088,
+      "p3b_b_1": 0.184298,
+      "p3b_b_2": 0.184945,
+      "p3b_c_1": 0.188971,
+      "p3b_c_2": 0.190959,
+      "p3b_d_1": 0.191695
+    },
+    "cores busy": {
+      "p3b_a_1": 5.0008,
+      "p3b_a_2": 5.0005,
+      "p3b_b_1": 4.0005,
+      "p3b_b_2": 4.0007,
+      "p3b_c_1": 4.2253,
+      "p3b_c_2": 4.2258,
+      "p3b_d_1": 4.001
+    },
+    "caller on-CPU": {
+      "p3b_a_1": 0.99991,
+      "p3b_a_2": 0.9999,
+      "p3b_b_1": 0.99993,
+      "p3b_b_2": 0.99992,
+      "p3b_c_1": 0.99946,
+      "p3b_c_2": 0.99947,
+      "p3b_d_1": 0.99984
+    },
+    "frames/s": {
+      "p3b_c_1": "695/156.0 = 4.45513",
+      "p3b_c_2": "695/157.4 = 4.41550",
+      "p3b_d_1": "695/221.2 = 3.14195"
+    },
+    "cells": {
+      "a": "mean 0.186058, spread 0.0320%",
+      "b": "mean 0.184622, spread 0.3507%",
+      "c": "mean 0.189965, spread 1.0468%"
+    },
+    "relations": {
+      "a vs b": "+0.778% vs 0.351% -> >, floor no",
+      "a vs c": "-2.057% vs 1.047% -> <, floor yes",
+      "b vs c": "-2.813% vs 1.047% -> <, floor yes"
+    },
+    "prose": "0.78%; 2.1%/2.8% shorter; a~=b<c under the floor; c mean 0.190 s; d 0.192 s (c/d-1 = -0.90%, inside c's 1.05% spread); engine 4.4 f/s mean of legs (4.4353); LI 3.1 f/s; bare a 5.0 vs b 4.0 cores; T=4 (torch.num_threads 4 in every leg)"
+  }
+}

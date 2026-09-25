@@ -1,0 +1,10 @@
+{
+ "gate": "G_memstat_p3d_hyb_full",
+ "decided_utc": "2026-09-25T07:16:11Z",
+ "leg": "p3d_hyb_full",
+ "file": "memstat.jsonl",
+ "exists": true,
+ "rows": 1494,
+ "rule": "the first leg's memstat.jsonl has >= 1 row (register 55)",
+ "outcome": "PASS"
+}
