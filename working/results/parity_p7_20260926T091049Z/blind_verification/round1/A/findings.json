@@ -1,0 +1,34 @@
+{
+  "figures_checked": 244,
+  "mismatches": [
+    {
+      "where": "## P7-A, IN1002.avi#58 per-frame table, rank 9, column |Δ|",
+      "figure": "|Δ| between banked stock 0.4617 and prototype 0.4790 (rank-paired)",
+      "report": "0.0137",
+      "recomputed": "0.0173"
+    },
+    {
+      "where": "## P7-A, Sessions table, row IN1002.avi / banked stock / parity_p1_20260923T184000Z/v1full_rr_t4, MHz close",
+      "figure": "mean 'cpu MHz' of mhz_close.txt (32 values, mean 2604.5335625)",
+      "report": "2604",
+      "recomputed": "2605"
+    },
+    {
+      "where": "## P7-A, Sessions table, row IN1002.avi / prototype / parity_p6_20260925T175225Z/p6b_rr_b06, MHz close",
+      "figure": "mean 'cpu MHz' of mhz_close.txt (32 values, mean 2734.541375)",
+      "report": "2734",
+      "recomputed": "2735"
+    },
+    {
+      "where": "## P7-A, Sessions table, row TS3010a.avi / banked stock / parity_p1_20260923T184000Z/v1full_rr_t4, MHz close",
+      "figure": "mean 'cpu MHz' of mhz_close.txt (32 values, mean 2604.5335625)",
+      "report": "2604",
+      "recomputed": "2605"
+    }
+  ],
+  "unverifiable": [
+    "Summary P7-A bullet and August-evidence bullet: 'The August 0.3004 figure is not in any committed artifact' / 'no committed file other than the report carries the 0.3004 figure for IN1002' - proving absence across all committed files needs a repository-wide search outside the listed files; the two listed apples_* directories (listing only) contain only export_*.json and collector_*.summary.json files, consistent with the claim that they hold RocketRide exports and collector summaries only (no LlamaIndex records, no cross_detection_agreement output).",
+    "August-evidence bullet: 'the only committed mention is working/video/WS1_Phase2_Video_Benchmark_DEFINITIVE.md section 5.1 (commit 21990572, a byte-for-byte copy of a received report)' - that file is not in the FILES list and git may not be run.",
+    "Reading 'NOT BOUNDARY': the reading rule itself (Ansh's verbatim rule) is not among the listed files; checked only as consistent with the recomputed clauses (C1 FAILED, C2 holds, C3 NOT EVALUABLE)."
+  ]
+}

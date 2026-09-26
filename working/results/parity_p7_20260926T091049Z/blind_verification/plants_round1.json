@@ -1,0 +1,25 @@
+{
+ "report_sha256": "b472e5c6fe1d3a94500a6f37bb11d4788af551d32269e304b74e99d2b49837d7",
+ "plants": {
+  "A": {
+   "where": "P7-A IN1002.avi#58 table, rank 9 |delta|: true 0.0173, planted 0.0137",
+   "old": "| 9 | 0.4617 | 0.4790 | 0.0173 |",
+   "new": "| 9 | 0.4617 | 0.4790 | 0.0137 |"
+  },
+  "B": {
+   "where": "Tier 1 legs table, p7b_stock_2 frames/s: true 3.763, planted 3.736",
+   "old": "| p7b_stock_2 | rr:patched-video | 318 | 3.763 |",
+   "new": "| p7b_stock_2 | rr:patched-video | 318 | 3.736 |"
+  },
+  "C": {
+   "where": "P7-C legs table, p7c_lit16_2 p99: true 0.3892, planted 0.3829",
+   "old": "| p7c_lit16_2 | P7 | 0.3588 | 0.3584 | 0.3892 |",
+   "new": "| p7c_lit16_2 | P7 | 0.3588 | 0.3584 | 0.3829 |"
+  },
+  "D": {
+   "where": "patch draft, P5 sampled memory peak: true 5,649 MB, planted 5,694 MB",
+   "old": "sampled memory peak 5,649 MB",
+   "new": "sampled memory peak 5,694 MB"
+  }
+ }
+}

@@ -1,0 +1,88 @@
+{
+ "label": "P7 blind recomputation: independent verifiers recompute every figure in their sections from raw files (the gate table and the drafts: trace each figure to the record or key it cites); each report copy carries ONE planted wrong figure; the plant key was kept outside the repository until every verifier of the round had finished",
+ "outcome": "PASS (round 2, after a round-1 correction)",
+ "summary": "round 1: every plant caught (4 of 4) over 671 figures, and 3 REAL mismatches found \u2014 three MHz means in the P7-A sessions table, rounded twice (to 0.1 in p7a_frames.json, then again in the report), each one unit low; corrected (the report now rounds the raw means once) and re-verified in round 2: the plant caught (1 of 1) over 20 figures, no other mismatch.",
+ "round_1": {
+  "outcome": "FAIL \u2014 real mismatches found (the plants were all caught)",
+  "report_sha256": "b472e5c6fe1d3a94500a6f37bb11d4788af551d32269e304b74e99d2b49837d7",
+  "verifiers": {
+   "A": {
+    "figures_checked": 244,
+    "plant": "P7-A IN1002.avi#58 table, rank 9 |delta|: true 0.0173, planted 0.0137",
+    "plant_caught": true,
+    "mismatches_reported": 4,
+    "real_mismatches": [
+     {
+      "where": "## P7-A, Sessions table, row IN1002.avi / banked stock / parity_p1_20260923T184000Z/v1full_rr_t4, MHz close",
+      "report": "2604",
+      "recomputed": "2605"
+     },
+     {
+      "where": "## P7-A, Sessions table, row IN1002.avi / prototype / parity_p6_20260925T175225Z/p6b_rr_b06, MHz close",
+      "report": "2734",
+      "recomputed": "2735"
+     },
+     {
+      "where": "## P7-A, Sessions table, row TS3010a.avi / banked stock / parity_p1_20260923T184000Z/v1full_rr_t4, MHz close",
+      "report": "2604",
+      "recomputed": "2605"
+     }
+    ],
+    "unverifiable": [
+     "Summary P7-A bullet and August-evidence bullet: 'The August 0.3004 figure is not in any committed artifact' / 'no committed file other than the report carries the 0.3004 figure for IN1002' - proving absence across all committed files needs a repository-wide search outside the listed files; the two listed apples_* directories (listing only) contain only export_*.json and collector_*.summary.json files, consistent with the claim that they hold RocketRide exports and collector summaries only (no LlamaIndex records, no cross_detection_agreement output).",
+     "August-evidence bullet: 'the only committed mention is working/video/WS1_Phase2_Video_Benchmark_DEFINITIVE.md section 5.1 (commit 21990572, a byte-for-byte copy of a received report)' - that file is not in the FILES list and git may not be run.",
+     "Reading 'NOT BOUNDARY': the reading rule itself (Ansh's verbatim rule) is not among the listed files; checked only as consistent with the recomputed clauses (C1 FAILED, C2 holds, C3 NOT EVALUABLE)."
+    ]
+   },
+   "B": {
+    "figures_checked": 175,
+    "plant": "Tier 1 legs table, p7b_stock_2 frames/s: true 3.763, planted 3.736",
+    "plant_caught": true,
+    "mismatches_reported": 1,
+    "real_mismatches": [],
+    "unverifiable": [
+     "Legs table 'image' column tag names (rr:patched-video for the stock legs, rr:p5-infer for the p5 legs): the listed files carry only image sha256 ids (G_cell_p7b_* declared and read_back: stock legs sha256:b7f51acc9533..., p5 legs sha256:b42c03b69f17...; flavour 'stock' / 'p5'), consistent within each image, but no listed file maps tag names to ids.",
+     "'Tier 2 NOT RUN: G_tier2 did not fire' (Summary P7-B bullet and the reading paragraph): the G_tier2 gate record is not in the FILES list; the statement is only consistent with the recomputed Tier 1 reading (UNCLASSIFIED, not CONDITION-DEPENDENT)."
+    ]
+   },
+   "C": {
+    "figures_checked": 63,
+    "plant": "P7-C legs table, p7c_lit16_2 p99: true 0.3892, planted 0.3829",
+    "plant_caught": true,
+    "mismatches_reported": 1,
+    "real_mismatches": [],
+    "unverifiable": []
+   },
+   "D": {
+    "figures_checked": 189,
+    "plant": "patch draft, P5 sampled memory peak: true 5,649 MB, planted 5,694 MB",
+    "plant_caught": true,
+    "mismatches_reported": 1,
+    "real_mismatches": [],
+    "unverifiable": [
+     "P7-D (1) 'Mandate compliance': 'the on-token D0 read exactly one LWDETR before and after every measured leg (P5, P6, P7 gate records G_d0)' -- verified for the six P7 G_d0 records (four rr legs plus p7c_p5t16_2 all show LWDETR = 1 pre and post; p7c_lit16_2 is the li arm); the P5 and P6 G_d0 records are not in the permitted file list."
+    ]
+   }
+  },
+  "plants_caught": "4 of 4"
+ },
+ "correction": "p7_report.py computes the P7-A sessions table's MHz means from the legs' raw mhz_open/close.txt and rounds once; p7a_frames.json (committed at ed2cb388, append-only) keeps its values rounded to 0.1, which are correct at that precision. The report changed only in those three cells and the generation timestamp (diffed).",
+ "unverifiable_notes": "round 1's unverifiable items are outside the verifiers' file lists: the repository-wide absence of the 0.3004 figure and the DEFINITIVE report reference (verifier A), the image names behind the ids and the G_tier2 record (verifier B), and the P5/P6 G_d0 records the patch draft cites (verifier D; those are verified in their own campaigns). None is a figure contradicted by a file.",
+ "round_2": {
+  "outcome": "PASS",
+  "scope": "the P7-A sessions table (the corrected section)",
+  "report_sha256": "81066f55c42cde941537cc8677544cd574aafdbdd0b61431ed525d78e0848032",
+  "verifiers": {
+   "E": {
+    "figures_checked": 20,
+    "plant": "P7-A sessions table, TS3010a.avi prototype MHz open: true 3226, planted 3262",
+    "plant_caught": true,
+    "mismatches_reported": 1,
+    "real_mismatches": [],
+    "unverifiable": []
+   }
+  },
+  "plants_caught": "1 of 1"
+ },
+ "after_round_2": "the final report differs from the round-2 verified copy only in the generation timestamp and this record's result line"
+}

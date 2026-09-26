@@ -1,0 +1,19 @@
+{
+ "figures_checked": 189,
+ "mismatches": [
+  {
+   "where": "## P7-D (1) upstream patch draft, 'Measured effect' section, CPU-s per frame line (report.md line 257): 'sampled memory peak 5,694 MB vs 7,583 MB' [analysis_p6.json P6_A.cells.*]",
+   "figure": "P5 (single inference thread) sampled memory peak, MB = P6_A.cells.p5_k16.memory_peak_total_bytes.mean / 1e6",
+   "report": "5,694",
+   "recomputed": "5,649 (5649455104 bytes; rounds are 5515.6 and 5783.3 MB, so no reading of the key gives 5,694)"
+  }
+ ],
+ "unverifiable": [
+  "P7-D (1) 'Mandate compliance': 'the on-token D0 read exactly one LWDETR before and after every measured leg (P5, P6, P7 gate records G_d0)' -- verified for the six P7 G_d0 records (four rr legs plus p7c_p5t16_2 all show LWDETR = 1 pre and post; p7c_lit16_2 is the li arm); the P5 and P6 G_d0 records are not in the permitted file list."
+ ],
+ "notes": [
+  "Gates table: G_alone 9 'containers present: 0' lines and 0 NOT_ALONE chain entries; every per-leg outcome matches its gate record (G_d0 6 CLEAN, G_cell 6 PASS, G_detcap 4 PASS, G_canary 3 PASS); G_memstat 203 rows PASS; G_tier2 UNCLASSIFIED / NOT FIRED; G_correct_C2 one pair, 16 videos, identical, PASS; image ids (first 19 chars) equal at start and end; budget 09:19:36Z / 09:19:37Z / deadline_epoch 1790425177 = 2026-09-26T12:19:37Z / 10:41:11Z -- all match.",
+  "Gate controls: n 42, n_pass 42 (42 controls with pass true), all_pass true, run 1, boot e80a450e; every row's got equals its expected and the report's text for all 42 controls, including the four G_tier2 readings.",
+  "Drafts: every [Fnn] value matches p4_facts.json; every analysis_p6/analysis_p7/p7a_frames key traced matches; S5-A, Stage 4 (13.524 -> 13.52, workers[declared_workers=8], threads 4), the P3-A health steady ratio 1.052, the diff counts (+11/-6, +4/-2), infer_worker.py 88 lines, all five md5s, 3.3.1.35, P5 gate_pass True, RR_DETECT_QUEUE_MAX default 64 and timeout 600 match."
+ ]
+}

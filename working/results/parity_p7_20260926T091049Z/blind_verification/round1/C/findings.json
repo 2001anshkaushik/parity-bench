@@ -1,0 +1,17 @@
+{
+  "figures_checked": 63,
+  "mismatches": [
+    {
+      "where": "## P7-C, leg table, row p7c_lit16_2, column p99",
+      "figure": "p99 forward (s) of p7c_lit16_2 (nearest rank ceil(0.99*n) over the last 3203 frame stamp rows by t_wall of p1_stamps.jsonl)",
+      "report": "0.3829",
+      "recomputed": "0.3892"
+    }
+  ],
+  "unverifiable": [],
+  "notes": [
+    "Checked: Summary P6-C pooled bullet (1.705x, NOT faster by >=5%, 0.942 vs 0.95, P7-C output identical yes); P7-C correctness line (PASS, 16 videos, identical yes); leg table 6 legs x (F, p50, p99, frames/s, CPU-s/frame); ratio table 3 rows x (forward ratio, <=0.95 verdict, fps ratio, comparison with 0.95); pooled bold line (NOT faster, 0.942); canaries table 6 x (mean forward, frames).",
+    "p7c_lit16_2 p99 = 0.3892 is robust: same value by t_wall order, by file order and by numpy linear percentile; 0.3829 does not arise from any of these. (P6's p6c_lit16_1 p99 is 0.3830.)",
+    "G_correct_C2 PASS was checked by recomputing the 16/16 comparison (chunk_sha256 and frame_scores equal on all 16 videos), not from the gate record (gates/ not in the FILES list)."
+  ]
+}

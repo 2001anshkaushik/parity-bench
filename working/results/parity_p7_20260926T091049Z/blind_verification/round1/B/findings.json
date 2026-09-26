@@ -1,0 +1,19 @@
+{
+  "figures_checked": 175,
+  "mismatches": [
+    {
+      "where": "## P7-B, Tier 1 legs table, row p7b_stock_2, column frames/s",
+      "figure": "p7b_stock_2 frames/s = export throughput.total_frames / throughput.total_span_s = 318 / 84.5",
+      "report": "3.736",
+      "recomputed": "3.763"
+    }
+  ],
+  "unverifiable": [
+    "Legs table 'image' column tag names (rr:patched-video for the stock legs, rr:p5-infer for the p5 legs): the listed files carry only image sha256 ids (G_cell_p7b_* declared and read_back: stock legs sha256:b7f51acc9533..., p5 legs sha256:b42c03b69f17...; flavour 'stock' / 'p5'), consistent within each image, but no listed file maps tag names to ids.",
+    "'Tier 2 NOT RUN: G_tier2 did not fire' (Summary P7-B bullet and the reading paragraph): the G_tier2 gate record is not in the FILES list; the statement is only consistent with the recomputed Tier 1 reading (UNCLASSIFIED, not CONDITION-DEPENDENT)."
+  ],
+  "notes": [
+    "All other P7-B figures recomputed and matched: K=3/T=4 (G_cell declared and read back); frames 318 per leg; frames/s 3.795, 3.795, 3.768 (stock_1, p5_1, p5_2); D0 CLEAN / cell PASS / detcap PASS per leg (gate record outcomes); microcode 0x2b000661 all legs; MHz 2828->2981, 3130->2832, 2929->2708, 2927->2700; control IN1009.avi video-identical 6 of 6 pairs; per-frame table (all 30 cells); deltas table (all 8 rows: counts 17/17 and 12/12, rank-paired 0.0000 / 0.0100, Tier 2 1.22e-02 / 7.00e-01 OUTSIDE for the two IN1002 pairs involving prototype 1, zeros and 'within' elsewhere; same result with either run as FIRST); other-frames table (165/69/84 frames, none, stock run 1 vs P1-D: none / 56 / none); reading UNCLASSIFIED; post-hoc groups (IN1002.avi#58: 3 groups, 17/18/17 detections, 0.8572/0.3189, 0.8635/0.3017, 0.8568/0.3165; TS3010a.avi#56: 2 groups, 12/12, 0.8578/0.3206, 0.8578/0.3185); 'Stated plainly' counts (2, 1, 3, run 2 matches stock, every rank-paired score differs in each change, 7.00e-01 px, 0 other frames).",
+    "Note: the export's own throughput.total_frames_per_s for p7b_stock_2 is 3.762 (and 3.796 for p7b_stock_1); the prompt's definition (total_frames / total_span_s) gives 3.763 and 3.795, and the report's 3.795 for p7b_stock_1 follows the definition."
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "figures_checked": 20,
+  "mismatches": [
+    {
+      "where": "## P7-A / ### Sessions, row 'TS3010a.avi | prototype | parity_p6_20260925T175225Z/p6b_rr_b10', column 'MHz open -> close' (open value)",
+      "figure": "MHz open (mean of 32 'cpu MHz' values in C6/p6b_rr_b10/mhz_open.txt)",
+      "report": "3262",
+      "recomputed": "3226"
+    }
+  ],
+  "unverifiable": [],
+  "notes": [
+    "Figures checked: 4 rows x 5 columns (CPU, microcode, MHz open, MHz close, boot) = 20.",
+    "Recomputed means: P1D open 2764.678 -> 2765, close 2604.534 -> 2605; p6b_rr_b06 open 2955.750 -> 2956, close 2734.541 -> 2735; p6b_rr_b10 open 3225.531 -> 3226 (report 3262), close 2712.305 -> 2712. Each file has 32 'cpu MHz' lines.",
+    "CPU: all three cpu_model.txt read 'Intel(R) Xeon(R) Platinum 8488C' after ':'; matches all four rows.",
+    "boot: P1D e293381c; p6b_rr_b06 and p6b_rr_b10 eb83839f; matches all four rows.",
+    "microcode: none of the three leg directories (P1D, C6/p6b_rr_b06, C6/p6b_rr_b10) contains a microcode.txt, consistent with the report's 'not recorded' in all four rows; counted as matches."
+  ]
+}

@@ -1,0 +1,8 @@
+# P7 progress log (part 4)
+
+- Raw data, records, box logs, the session record, the generators and the register (65's addendum, 66) landed at bbd00d67.
+- Blind recompute, round 1: four verifiers (A: P7-A; B: P7-B Tier 1; C: P7-C and the canaries; D: the gates, the gate controls and the three drafts), one planted figure each, the key in the scratchpad until all four finished. 671 figures checked; all four plants caught. Verifier A also found THREE REAL mismatches: the P7-A sessions table's MHz-at-close means for the P1-D leg (shown twice) and the P6-B block-06 leg read 2604 and 2734 instead of 2605 and 2735 — `p7_frames.py` stores the means rounded to 0.1 (2604.5), and the report rounded that again half-to-even. The round did not pass.
+- Correction: `p7_report.py` now computes those means from the legs' raw `mhz_open/close.txt` and rounds once. `p7a_frames.json` (committed at ed2cb388) is unchanged; its 0.1-rounded values are correct at that precision. The report changed only in those three cells and the timestamp (diffed).
+- Round 2: one verifier on the corrected sessions table with a new plant: 20 figures, the plant caught, no other mismatch — PASS. Recorded in `P7_BLIND_VERIFICATION.json` with the round-1 unverifiable items (all outside the verifiers' file lists).
+- The committed analyser re-run on the landed data reproduces `analysis_p7.json` byte for byte (sha256 47d20c83…). The final report differs from the round-2 verified copy only in the generation timestamp and the blind-recompute line.
+- Nothing sent, posted or filed: the three drafts stay in the repository. The box stayed stopped (read back 10:42:26Z: stopped, "User initiated").

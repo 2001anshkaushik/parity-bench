@@ -19,6 +19,7 @@ from typing import Any, Dict, List
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from p0_report import INPUTS, load, n, pct, share, table  # noqa: E402
 
+RES = Path(__file__).resolve().parents[2] / "working" / "results"
 PROT = {"rr:patched": "sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90",
         "rr:patched-video": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"}
 P5ID = "sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd"
@@ -186,8 +187,13 @@ def main() -> int:
     srows = []
     for v, s in PA["sessions"].items():
         for lab, x in (("banked stock", s["banked_stock_P1D"]), ("prototype", s["prototype_P6B"])):
+            # MHz from the leg's raw mhz files, rounded ONCE here (p7a_frames.json keeps them rounded to 0.1; rounding that again is a double rounding)
+            ld = RES / x["leg"]
+            def mz(fn):
+                vals = [float(q) for q in re.findall(r"cpu MHz\s*:\s*([0-9.]+)", (ld / fn).read_text())] if (ld / fn).exists() else []
+                return f"{sum(vals) / len(vals):.0f}" if vals else "—"
             srows.append([v, lab, x["leg"], x["cpu_model"].split(":")[-1].strip() if x["cpu_model"] else "—", x["microcode"] if isinstance(x["microcode"], str) else ", ".join(x["microcode"]),
-                          f"{f(x['mhz_mean_open'], 0)} → {f(x['mhz_mean_close'], 0)}", x["boot_id"] or "—"])
+                          f"{mz('mhz_open.txt')} → {mz('mhz_close.txt')}", x["boot_id"] or "—"])
     body += table(["video", "run", "leg", "CPU", "microcode", "MHz open → close", "boot"], srows)
     body += table(["clause", "result"], [[k, "holds" if v else ("FAILED" if v is False else "NOT EVALUABLE")] for k, v in rd["clauses"].items()])
     body += [f"**P7-A: {rd['reading']}** — {rd['why']}.", ""]
