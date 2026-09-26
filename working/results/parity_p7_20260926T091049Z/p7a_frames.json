@@ -1,0 +1,526 @@
+{
+ "frames": {
+  "IN1002.avi#58": {
+   "n_detections": {
+    "banked_stock": 17,
+    "prototype": 18
+   },
+   "label_multiset_difference": {
+    "only_in_prototype": {
+     "book": 1
+    },
+    "only_in_banked_stock": {}
+   },
+   "max_rank_paired_score_delta": 0.01734161376953125,
+   "differing_detections": [
+    {
+     "rank": 0,
+     "score_banked_stock": 0.8572437167167664,
+     "score_prototype": 0.8634926080703735,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.5572437167167663,
+      "prototype": 0.5634926080703735
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 1,
+     "score_banked_stock": 0.6003492474555969,
+     "score_prototype": 0.6008595824241638,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.30034924745559693,
+      "prototype": 0.30085958242416383
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 2,
+     "score_banked_stock": 0.5769473910331726,
+     "score_prototype": 0.5826015472412109,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.2769473910331726,
+      "prototype": 0.28260154724121095
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 3,
+     "score_banked_stock": 0.5247270464897156,
+     "score_prototype": 0.5270692706108093,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.2247270464897156,
+      "prototype": 0.22706927061080934
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 4,
+     "score_banked_stock": 0.5237395763397217,
+     "score_prototype": 0.5249122381210327,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.2237395763397217,
+      "prototype": 0.22491223812103273
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 5,
+     "score_banked_stock": 0.5037245154380798,
+     "score_prototype": 0.5099195241928101,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.20372451543807985,
+      "prototype": 0.20991952419281007
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 6,
+     "score_banked_stock": 0.5014047622680664,
+     "score_prototype": 0.501368522644043,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.20140476226806642,
+      "prototype": 0.20136852264404298
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 7,
+     "score_banked_stock": 0.48567986488342285,
+     "score_prototype": 0.4887489974498749,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.18567986488342286,
+      "prototype": 0.1887489974498749
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 8,
+     "score_banked_stock": 0.47451677918434143,
+     "score_prototype": 0.48332059383392334,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.17451677918434144,
+      "prototype": 0.18332059383392335
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 9,
+     "score_banked_stock": 0.4616987407207489,
+     "score_prototype": 0.47904035449028015,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.1616987407207489,
+      "prototype": 0.17904035449028016
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 10,
+     "score_banked_stock": 0.46148598194122314,
+     "score_prototype": 0.4551275074481964,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.16148598194122316,
+      "prototype": 0.15512750744819642
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 11,
+     "score_banked_stock": 0.43770721554756165,
+     "score_prototype": 0.4349312484264374,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.13770721554756166,
+      "prototype": 0.1349312484264374
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 12,
+     "score_banked_stock": 0.43362709879875183,
+     "score_prototype": 0.4290372431278229,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.13362709879875184,
+      "prototype": 0.1290372431278229
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 13,
+     "score_banked_stock": 0.420759379863739,
+     "score_prototype": 0.4204360842704773,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.12075937986373902,
+      "prototype": 0.1204360842704773
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 14,
+     "score_banked_stock": 0.3757230341434479,
+     "score_prototype": 0.3762902319431305,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.07572303414344789,
+      "prototype": 0.0762902319431305
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 15,
+     "score_banked_stock": 0.37115901708602905,
+     "score_prototype": 0.3702796399593353,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.07115901708602906,
+      "prototype": 0.07027963995933534
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 16,
+     "score_banked_stock": 0.31890591979026794,
+     "score_prototype": 0.32382532954216003,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.018905919790267955,
+      "prototype": 0.023825329542160045
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 17,
+     "score_banked_stock": null,
+     "score_prototype": 0.3016683757305145,
+     "unpaired": true,
+     "label": "book",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": null,
+      "prototype": 0.0016683757305145375
+     },
+     "within_band_in_either_run": false
+    }
+   ],
+   "chunks": {
+    "n": [
+     260,
+     260
+    ],
+    "differing_chunk_indexes": [
+     87
+    ],
+    "note": "every other chunk's text (so every score and box inside it) is byte-identical; a frame sharing a differing chunk with the named frame cannot be excluded"
+   },
+   "prototype_leg": "parity_p6_20260925T175225Z/p6b_rr_b06",
+   "frame": 58
+  },
+  "TS3010a.avi#56": {
+   "n_detections": {
+    "banked_stock": 12,
+    "prototype": 12
+   },
+   "label_multiset_difference": {
+    "only_in_prototype": {},
+    "only_in_banked_stock": {}
+   },
+   "max_rank_paired_score_delta": 0.014354348182678223,
+   "differing_detections": [
+    {
+     "rank": 0,
+     "score_banked_stock": 0.857825517654419,
+     "score_prototype": 0.8577600717544556,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.5578255176544189,
+      "prototype": 0.5577600717544555
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 1,
+     "score_banked_stock": 0.6838605999946594,
+     "score_prototype": 0.6866227984428406,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.38386059999465943,
+      "prototype": 0.3866227984428406
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 2,
+     "score_banked_stock": 0.6588919758796692,
+     "score_prototype": 0.6732463240623474,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.3588919758796692,
+      "prototype": 0.3732463240623474
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 3,
+     "score_banked_stock": 0.633047342300415,
+     "score_prototype": 0.6342387795448303,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.33304734230041505,
+      "prototype": 0.33423877954483033
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 4,
+     "score_banked_stock": 0.5116555094718933,
+     "score_prototype": 0.5101408362388611,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.21165550947189332,
+      "prototype": 0.2101408362388611
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 5,
+     "score_banked_stock": 0.478717565536499,
+     "score_prototype": 0.4795297682285309,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.17871756553649903,
+      "prototype": 0.1795297682285309
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 6,
+     "score_banked_stock": 0.4287237226963043,
+     "score_prototype": 0.42722398042678833,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.12872372269630433,
+      "prototype": 0.12722398042678834
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 7,
+     "score_banked_stock": 0.3634887933731079,
+     "score_prototype": 0.35773414373397827,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.06348879337310792,
+      "prototype": 0.05773414373397828
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 8,
+     "score_banked_stock": 0.3575611710548401,
+     "score_prototype": 0.35517576336860657,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.0575611710548401,
+      "prototype": 0.05517576336860658
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 9,
+     "score_banked_stock": 0.35697218775749207,
+     "score_prototype": 0.3548658788204193,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.05697218775749208,
+      "prototype": 0.05486587882041932
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 10,
+     "score_banked_stock": 0.34460657835006714,
+     "score_prototype": 0.3506699800491333,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.04460657835006715,
+      "prototype": 0.05066998004913331
+     },
+     "within_band_in_either_run": false
+    },
+    {
+     "rank": 11,
+     "score_banked_stock": 0.320633202791214,
+     "score_prototype": 0.31846392154693604,
+     "unpaired": false,
+     "label": "not recoverable (the records keep labels sorted, unpaired with scores)",
+     "box": "not recorded in any committed export",
+     "distance_from_threshold": {
+      "banked_stock": 0.020633202791214,
+      "prototype": 0.018463921546936046
+     },
+     "within_band_in_either_run": false
+    }
+   ],
+   "chunks": {
+    "n": [
+     59,
+     59
+    ],
+    "differing_chunk_indexes": [
+     48
+    ],
+    "note": "every other chunk's text (so every score and box inside it) is byte-identical; a frame sharing a differing chunk with the named frame cannot be excluded"
+   },
+   "prototype_leg": "parity_p6_20260925T175225Z/p6b_rr_b10",
+   "frame": 56
+  }
+ },
+ "other_frames": {
+  "IN1002.avi": {
+   "frames_compared": 164,
+   "max_score_delta": 0.0,
+   "frames_with_count_or_label_difference": [],
+   "max_box_delta_px": "NOT EVALUABLE \u2014 no committed export records boxes"
+  },
+  "TS3010a.avi": {
+   "frames_compared": 68,
+   "max_score_delta": 0.0,
+   "frames_with_count_or_label_difference": [],
+   "max_box_delta_px": "NOT EVALUABLE \u2014 no committed export records boxes"
+  }
+ },
+ "sessions": {
+  "IN1002.avi": {
+   "banked_stock_P1D": {
+    "leg": "parity_p1_20260923T184000Z/v1full_rr_t4",
+    "cpu_model": "model name\t: Intel(R) Xeon(R) Platinum 8488C",
+    "microcode": "not recorded (no leg file carries /proc/cpuinfo's microcode line)",
+    "mhz_mean_open": 2764.7,
+    "mhz_mean_close": 2604.5,
+    "boot_id": "e293381c"
+   },
+   "prototype_P6B": {
+    "leg": "parity_p6_20260925T175225Z/p6b_rr_b06",
+    "cpu_model": "model name\t: Intel(R) Xeon(R) Platinum 8488C",
+    "microcode": "not recorded (no leg file carries /proc/cpuinfo's microcode line)",
+    "mhz_mean_open": 2955.7,
+    "mhz_mean_close": 2734.5,
+    "boot_id": "eb83839f"
+   }
+  },
+  "TS3010a.avi": {
+   "banked_stock_P1D": {
+    "leg": "parity_p1_20260923T184000Z/v1full_rr_t4",
+    "cpu_model": "model name\t: Intel(R) Xeon(R) Platinum 8488C",
+    "microcode": "not recorded (no leg file carries /proc/cpuinfo's microcode line)",
+    "mhz_mean_open": 2764.7,
+    "mhz_mean_close": 2604.5,
+    "boot_id": "e293381c"
+   },
+   "prototype_P6B": {
+    "leg": "parity_p6_20260925T175225Z/p6b_rr_b10",
+    "cpu_model": "model name\t: Intel(R) Xeon(R) Platinum 8488C",
+    "microcode": "not recorded (no leg file carries /proc/cpuinfo's microcode line)",
+    "mhz_mean_open": 3225.5,
+    "mhz_mean_close": 2712.3,
+    "boot_id": "eb83839f"
+   }
+  }
+ },
+ "reading": {
+  "clauses": {
+   "C1 every differing detection's score, in either run, within +/-0.001 of 0.3": false,
+   "C2 every other frame of both videos: max score delta <= 1e-5 (and the same count and labels)": true,
+   "C3 every other frame of both videos: box delta <= 1e-3 px": null
+  },
+  "failed": [
+   "C1 every differing detection's score, in either run, within +/-0.001 of 0.3"
+  ],
+  "not_evaluable": [
+   "C3 every other frame of both videos: box delta <= 1e-3 px"
+  ],
+  "reading": "NOT BOUNDARY",
+  "why": "FAILED: C1 every differing detection's score, in either run, within +/-0.001 of 0.3; NOT EVALUABLE from committed exports: C3 every other frame of both videos: box delta <= 1e-3 px"
+ },
+ "august_artifact": {
+  "claim": "the August ami_full campaign recorded IN1002.avi frame 58 as its single cross_detection_agreement failure, a detection scoring 0.3004 against 0.3",
+  "committed_mention": "working/video/WS1_Phase2_Video_Benchmark_DEFINITIVE.md section 5.1 (commit 21990572, a byte-for-byte copy of a received report)",
+  "committed_artifact": null,
+  "search": "the 26 Aug result directories committed (working/video/results/apples_20260826T041510Z, apples_20260826T052915Z) hold the RocketRide exports and collector summaries only \u2014 no LlamaIndex records and no cross_detection_agreement output; no committed file other than the report carries the 0.3004 figure for IN1002",
+  "used": false,
+  "status": "NOT COMMITTED \u2014 the figure is not used"
+ },
+ "s5b_artifact": {
+  "claim": "S5-B's one label-set change: a score moving 0.3011 -> 0.3008 across the band edge (EN2001a.avi frame 97, tv)",
+  "committed_artifact": "working/results/batchsize_s5_20260921T205917Z/analysis_output_shift.json s5b_tier2_label_set_failures_explained.2.label_set_failures[0].detections_crossing_the_band_edge[0] (score_B1, score_B2)",
+  "used": true
+ }
+}
