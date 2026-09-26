@@ -14,6 +14,7 @@ from pathlib import Path
 RES = Path(__file__).resolve().parents[2] / "working" / "results"
 P4 = RES / "parity_p4_20260925T092942Z"
 S4 = RES / "batchsize_s4_20260921T013303Z" / "p5_li_video" / "analysis_video.json"
+S4X = RES / "batchsize_s4_20260921T013303Z" / "p5_li_video" / "li_k16" / "export_llamaindex_video_workers_blast.json"
 
 
 def main() -> int:
@@ -21,6 +22,8 @@ def main() -> int:
     F = {f["id"]: f for f in json.loads((P4 / "p4_facts.json").read_text())["facts"]}
     b4 = json.loads((P4 / "analysis_p4b.json").read_text())
     s4 = json.loads(S4.read_text())["legs"][0]
+    s4t = json.loads(S4X.read_text())["provenance_video"]["posture"]["threads_env_in_process_torch"]
+    s4w = int(s4["posture"].split("declared_workers=")[1].rstrip("]"))
     A6 = json.loads((camp / "analysis_p6.json").read_text())
     a, b, c = A6["P6_A"], A6.get("P6_B"), A6.get("P6_C")
 
@@ -96,9 +99,10 @@ def main() -> int:
         L.append("- **Out-of-box threads (T=16): OUTPUT-CHANGING** against the out-of-box reference — no speed reading [P6_C.correctness.gate_pass].")
     else:
         L.append("- **Out-of-box threads (T=16): NOT RUN or incomplete.**")
-    L += [f"- **Context, not the comparison:** LlamaIndex's multi-instance video configuration — 8 instances x 4 threads — runs "
+    L += [f"- **Context, not the comparison:** LlamaIndex's multi-instance video configuration — {s4w} instances x {s4t} threads — runs "
           f"{s4['frames_per_s']:.2f} frames/s on the 168 videos (Stage 4) [batchsize_s4_20260921T013303Z/p5_li_video/analysis_video.json legs.0.frames_per_s; "
-          f"posture {s4['posture']}]. That is eight model instances; the comparisons above hold RocketRide to one token and LlamaIndex to one instance.",
+          f"posture {s4['posture']}; threads: li_k16/export_llamaindex_video_workers_blast.json provenance_video.posture.threads_env_in_process_torch]. "
+          f"That is {s4w} model instances; the comparisons above hold RocketRide to one token and LlamaIndex to one instance.",
           "", "## What is not claimed", "",
           "- That RocketRide BEATS LlamaIndex on documents (one run per arm, inside the spread).",
           "- Any figure from an unshipped fix or prototype as shipped behaviour.",

@@ -1,0 +1,31 @@
+{
+ "summary": [
+  "P6-A correctness: rr:p5-infer's output is identical to stock on 16/16 videos in both rounds.",
+  "Q1 PARITY (P5 / one LlamaIndex instance >= 0.95): HOLDS (pooled); round 1 holds, round 2 holds — 1.359 in round 1, 1.321 in round 2, 1.340 pooled (4.220 vs 3.149 frames/s).",
+  "Q2 SPEEDUP (P5 / stock >= 1.20): HOLDS (pooled); round 1 holds, round 2 holds — 1.748, 1.741, 1.744 pooled (stock 2.419 frames/s).",
+  "Forward degradation (descriptive, never gated; cross-session reference): mean +17.21%, p50 +12.55%, p99 +143.62% against P5's one-video forward.",
+  "P6-B (168 videos, block-interleaved, warm-symmetric): RocketRide P5 4.089 vs one LlamaIndex instance 3.134 frames/s — ratio 1.304 against 0.95 (meets); per block 0.987 to 1.351 (median 1.311); output vs the banked stock run: 2 of 168 differ (IN1002.avi, TS3010a.avi; cause not established — register 65).",
+  "P6-C (T=16, six vars unset): round 2 NOT RUN (the budget), so the pooled reading is NOT EVALUABLE. Round 1: the P5 forward at T=16 is 1.700x its T=4 forward (the bar is 0.95: NOT faster — slower); P5 T=16 / LlamaIndex T=16 = 0.955 (reported against 0.95); output identical to the out-of-box reference on 16/16; cross-stage, not ABAB-protected.",
+  "Drift: the canary did NOT move (within the 0.82% floor) (canary -0.28% from P6-A round 1 to round 2; P6-A cells' median +2.59%).",
+  "Both drafts (the CTO brief and the upstream patch description) are below; neither is sent, posted or filed."
+ ],
+ "readings": {
+  "A": "Stated plainly, per round and pooled: Q1 holds in round 1 (1.359) and in round 2 (1.321); pooled 1.340 — HOLDS. Q2: round 1 1.748, round 2 1.741, pooled 1.744 — HOLDS pooled. POST-HOC, about the descriptive figure only: its one-video reference is P5's session, and this session's canary (P6-A rounds, mean 0.2040 s) read +8.73% against P5's canaries (mean 0.1876 s) — part of the +17.21% is the box, not the node; nothing is adjusted.",
+  "B": "11 RocketRide and 11 LlamaIndex blocks ran (168 and 168 videos; errors 0 and 0). Every block ran. The paused arm used at most 0.000 CPU-s during any block. POST-HOC: the lowest per-block ratio (0.987) is block 11, which holds 8 videos (so at most that many in flight).",
+  "C": "Stated plainly: round 2 was NOT RUN (the budget), so the pre-registered pooled reading is NOT EVALUABLE. Round 1 alone: at T=16 (the out-of-box posture) the single-inference-thread node's forward is 1.700x its T=4 forward in P6-A's round 1 — slower, the opposite of the hypothesis — and it runs 0.955 of one LlamaIndex instance at T=16. Its output is identical to the committed out-of-box stock output on 16/16. This comparison crosses stages of the session (not ABAB)."
+ },
+ "not_run": [
+  "P6-C round 2 (the canary p6c_can_c2 and the legs p6c_p5t16_2, p6c_lit16_2): the 8-hour budget passed at 02:15:37Z while round 1's LlamaIndex leg was in flight; by the rule that leg finished and the rest is NOT RUN — so P6-C's pooled reading is not evaluable and round 1 is reported"
+ ],
+ "register": [
+  "65 — an output reference with no replicate of its own (P6-B: 2 of 168 videos differ from the banked stock run on one frame each; cause not established)"
+ ],
+ "self_audit": {
+  "1. HYPOTHESIS": "stated before the first leg in preregistration.json (committed 8e4cf34a) and preregistration_addendum_1.json (the drift-note rule, committed c0af3f83 before the first measured leg); FIXED tolerances throughout (register 64); no other amendment.",
+  "2. EVIDENCE": "every figure is computed by working/scripts/p6_report.py and p6_write_specs.py from analysis_p6.json (p6_analyse.py over the raw legs and blocks), the gate-control record, the gate records and the chain records (the P6-B stamp files, which no analysis reads, are kept in S3 only — p6b_stamps_s3_only.json lists each with its sha256); the drafts from p4_facts.json, the Stage 4 analysis, analysis_p6.json, the P5 analysis and build record, and the node sources.",
+  "3. NULL CONTROL": "every gate ran whole in its real runtime against a positive and a null control before launch (gate_controls.json; real control legs for the out-of-box posture, LlamaIndex at T=16 and the warm flags); the driver's warm flags have a laptop test with a null control; the blind recomputation's planted figures had to be caught.",
+  "4. REGISTER": "3, 48, 54, 55, 56-58, 59, 61, 62 (ABAB and the canary), 64 (fixed tolerances; forward degradation descriptive only); new: 65 (an output reference with no replicate of its own).",
+  "5. NOT VERIFIED": "what the residual forward penalty at 16 in flight is made of; P6-C's T=16 vs T=4 comparison is across stages, not interleaved; the brief and the patch description are drafts; the prototype is not a RocketRide change.",
+  "6. GATES": "every landing through working/harness/autoland.sh with its gates and the ls-remote read-back; box commands through box.sh; the gate controls before launch; hard gates after every leg and block; image ids read back at every stage's start and end (rr:p5-infer not rebuilt); the box stopped with box.sh stop and its state read back."
+ }
+}

@@ -1,0 +1,16 @@
+{
+ "figures_checked": 267,
+ "mismatches": [
+  {
+   "where": "## P6-D (2) upstream patch draft, 'Measured effect' bullet 'CPU-s per frame: 1.317 vs stock 1.489 (-11.8%) [P6_A.cells.*.cpu_s_per_frame.mean]'",
+   "figure": "percent change of P5 cell mean CPU-s/frame vs stock cell mean (P5 mean / stock mean - 1)",
+   "report": "-11.8%",
+   "recomputed": "-11.5% (1.3171870121760851 / 1.4890415235716516 - 1 = -0.115413)"
+  }
+ ],
+ "unverifiable": [
+  "## P6-D (2): 'engine 3.3.1.35' - no listed file records the engine version of the local bundle",
+  "## P6-D (1): '8 instances x 4 threads' - the cited batchsize_s4_20260921T013303Z/p5_li_video/analysis_video.json legs[0] gives posture workers[declared_workers=8] (matches 8 instances) but carries no per-instance thread count, so '4 threads' cannot be traced",
+  "## P6-D (2): P5 'identical ... on 16/16 videos in every comparison, at K=16 and K=1, both rounds, and against an earlier session's stock K=1 leg' - only analysis_p5a.json correctness.gate_pass may be read (it is True, matching the cited '= True'); the 16/16 per-comparison detail cannot be recomputed from the allowed files"
+ ]
+}

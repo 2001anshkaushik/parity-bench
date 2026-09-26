@@ -1,0 +1,12 @@
+{
+  "figures_checked": 13,
+  "mismatches": [
+    {
+      "where": "P6-D (1) Context bullet",
+      "figure": "threads",
+      "report": "5",
+      "recomputed": "4"
+    }
+  ],
+  "unverifiable": []
+}

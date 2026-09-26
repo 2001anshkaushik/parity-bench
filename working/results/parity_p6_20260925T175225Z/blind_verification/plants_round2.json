@@ -1,0 +1,10 @@
+{
+ "report_sha256": "36de1071b81f5e3f56930ea4650246e3f578d95778bd70d1023b297d2a1af9a1",
+ "plants": {
+  "E": {
+   "where": "CTO brief Stage 4 context bullet, threads: true 4, planted 5",
+   "old": "configuration \u2014 8 instances x 4 threads \u2014 runs 13.52",
+   "new": "configuration \u2014 8 instances x 5 threads \u2014 runs 13.52"
+  }
+ }
+}

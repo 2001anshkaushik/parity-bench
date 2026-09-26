@@ -1,0 +1,9 @@
+# P6 progress log (part 4)
+
+- Raw data, gate records, chain records, box logs, the files note, progress log part 3, the generators' edits and register entry 65 landed at 637e1528.
+- Report additions before the blind recompute: the P6-C verdict line states round 2 NOT RUN and round 1's reading; the gate table gains a G_alone row (G_alone writes no record — the row reads the run log's 12 'containers present: 0' lines, the two P6-B canaries' running-only check and the chain record's NOT_ALONE entries; checked against three null inputs, each giving SEE ROW) and the first leg's start time in the budget row; SELF-AUDIT 4 names register 65.
+- Blind recompute, round 1: four verifiers (A: P6-A; B: per-leg tables, P6-C, drift; C: P6-B; D: gates, gate controls, both drafts), one planted figure each, the key in the scratchpad until all four finished. 900 figures checked; each verifier reported exactly one mismatch — its plant (4 of 4); no other mismatch.
+- Between rounds: D could not trace three draft figures. The Stage 4 line's thread count was typed — the brief now reads it from the Stage 4 export (provenance_video.posture.threads_env_in_process_torch) and cites it; the patch draft's engine version now cites parity_p5 PROGRESS_LOG.md:5 and checks the base md5s against p5a_build.json base_node (null control: an altered md5 gives 'NOT checked'); P5's per-comparison identity rests on P5's own blind-verified analysis — no change.
+- Round 2: one verifier on the two changed bullets, one new plant: 13 figures, the plant caught, no other mismatch.
+- The committed analyser re-run on the landed raw data reproduces analysis_p6.json byte for byte (sha256 cd4f1361…). The final report differs from the round-2 verified copy only in the generation timestamp and the blind-recompute line.
+- Nothing sent, posted or filed: both drafts stay in the repository as drafts. The box stayed stopped (read back 02:53:07Z).

@@ -44,6 +44,7 @@ def main() -> int:
     d = a.get("descriptive_forward_degradation") or {}
     stats = {f: diffstat(BASE / f, SRC / f) for f in ("IGlobal.py", "IInstance.py")} if BASE.exists() else {}
     worker_lines = len((SRC / "infer_worker.py").read_text().splitlines())
+    base_img = {x.split()[1]: x.split()[0] for x in build["base_node"] if not x.startswith("UNKNOWN")}
     m = lambda cell, k: C[cell][k]["mean"]  # noqa: E731
     L = ["# DRAFT — upstream patch description: a single inference thread for the detect node (not filed, posted or sent)", "",
          "## What changed", "",
@@ -57,7 +58,9 @@ def main() -> int:
          "outstanding and blocks on its own `Future`, so a video's frames stay in order and each result returns to its caller without a "
          "routing table; a detect exception reaches its own caller's existing `except` branch; a full queue blocks the submitter.",
          f"- Base files: IInstance.py md5 {md5(BASE / 'IInstance.py') if BASE.exists() else '—'}, IGlobal.py md5 "
-         f"{md5(BASE / 'IGlobal.py') if BASE.exists() else '—'} (engine 3.3.1.35; the line counts above are against that local bundle, which is not in the repository). Patched: "
+         f"{md5(BASE / 'IGlobal.py') if BASE.exists() else '—'} — "
+         + ("equal to the image's own node files [parity_p5_20260925T141647Z/p5a_build.json base_node]" if BASE.exists() and base_img == {f: md5(BASE / f) for f in base_img} else "NOT checked against the image's node files")
+         + " (the local engine bundle, 3.3.1.35 per parity_p5_20260925T141647Z/PROGRESS_LOG.md:5; the line counts above are against that bundle, which is not in the repository). Patched: "
          + ", ".join(f"{k} {v}" for k, v in build["expected_p5_md5"].items()) + ".",
          "", "## Output identity", "",
          f"- P5 (parity_p5_20260925T141647Z): identical to stock (per-video chunk sha256 AND frame scores) on 16/16 videos in every comparison, "

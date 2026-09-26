@@ -1,0 +1,25 @@
+{
+ "report_sha256": "cf6e46b988518632665feaa869e343d30cf501b31cde86ee49dae23beca12150",
+ "plants": {
+  "A": {
+   "where": "Q1/Q2 table, round 2 Q1: true 1.321, planted 1.312",
+   "old": "| round 2 | 1.321 | HOLDS | 1.741 | HOLDS |",
+   "new": "| round 2 | 1.312 | HOLDS | 1.741 | HOLDS |"
+  },
+  "B": {
+   "where": "P6-A per-leg table, p6a_li16_2 p90: true 0.3978, planted 0.3987",
+   "old": "| p6a_li16_2 | 3,203 | 0.2974 | 0.0884 | 0.3248 | 0.3978 |",
+   "new": "| p6a_li16_2 | 3,203 | 0.2974 | 0.0884 | 0.3248 | 0.3987 |"
+  },
+  "C": {
+   "where": "P6-B block table, p6b_rr_b07 frames/s: true 3.888, planted 3.838",
+   "old": "| p6b_rr_b07 | 16 | 0 | 1,807 | 464.8 | 3.888 |",
+   "new": "| p6b_rr_b07 | 16 | 0 | 1,807 | 464.8 | 3.838 |"
+  },
+  "D": {
+   "where": "patch draft, CPU-s per frame change: true -11.5%, planted -11.8%",
+   "old": "CPU-s per frame: 1.317 vs stock 1.489 (-11.5%)",
+   "new": "CPU-s per frame: 1.317 vs stock 1.489 (-11.8%)"
+  }
+ }
+}

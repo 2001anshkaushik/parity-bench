@@ -1,0 +1,1512 @@
+{
+ "label": "P6 analysis (preregistration.json)",
+ "P6_A": {
+  "gated_legs": {
+   "p6c_can_a1": "p6c_can_a1",
+   "p6a_stock16_1": "p6a_stock16_1",
+   "p6a_p5k16_1": "p6a_p5k16_1",
+   "p6a_li16_1": "p6a_li16_1",
+   "p6c_can_a2": "p6c_can_a2",
+   "p6a_stock16_2": "p6a_stock16_2",
+   "p6a_p5k16_2": "p6a_p5k16_2",
+   "p6a_li16_2": "p6a_li16_2"
+  },
+  "legs": {
+   "p6a_stock16_1": {
+    "dir": "p6a_stock16_1",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 1307.4,
+    "frames_per_s": 2.449900566008872,
+    "cpu_s_per_frame": 1.4693100218545114,
+    "engine_cores": 3.6,
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e",
+    "session": {
+     "steal_share": 5.5688920370126614e-05,
+     "mhz_open_mean": 2952.523875,
+     "mhz_close_mean": 2637.3984375,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "flavour": "stock",
+    "stamp_frames_measured": 3203,
+    "F_s": 0.39548726136996465,
+    "forward_D1": {
+     "count": 3203,
+     "sum": 1266.7456981679968,
+     "share_of_run_total": null,
+     "min": 0.268516580999858,
+     "mean": 0.39548726136996465,
+     "sd": 0.03195865395092617,
+     "p50": 0.39772462800010544,
+     "p90": 0.4167384580000544,
+     "p95": 0.4246133699998609,
+     "p99": 0.5318189739998616,
+     "max": 0.6638496810001016,
+     "mean_over_p50": 0.9943745836374502
+    },
+    "cores_in_forward": 2.385454891555703,
+    "duty": 0.9992838557826106,
+    "duty_kind": "device-lock held / window (P0 V2)",
+    "memory_peak_total_bytes": 7593644032,
+    "_by_video": "16 videos (records file)"
+   },
+   "p6a_stock16_2": {
+    "dir": "p6a_stock16_2",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 1341.1,
+    "frames_per_s": 2.3883379315487288,
+    "cpu_s_per_frame": 1.5087730252887919,
+    "engine_cores": 3.603,
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e",
+    "session": {
+     "steal_share": 5.6297788657241875e-05,
+     "mhz_open_mean": 2958.0926875,
+     "mhz_close_mean": 2716.3829375,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "flavour": "stock",
+    "stamp_frames_measured": 3203,
+    "F_s": 0.4057281468279626,
+    "forward_D1": {
+     "count": 3203,
+     "sum": 1299.5472542899643,
+     "share_of_run_total": null,
+     "min": 0.2854429219996746,
+     "mean": 0.4057281468279626,
+     "sd": 0.031619691725293345,
+     "p50": 0.40843718600081047,
+     "p90": 0.42422977200021705,
+     "p95": 0.43216719500014733,
+     "p99": 0.5494741370002885,
+     "max": 0.7322280339994904,
+     "mean_over_p50": 0.9933673052657784
+    },
+    "cores_in_forward": 2.393439214991395,
+    "duty": 0.9993122416481943,
+    "duty_kind": "device-lock held / window (P0 V2)",
+    "memory_peak_total_bytes": 7572615168,
+    "_by_video": "16 videos (records file)"
+   },
+   "p6a_p5k16_1": {
+    "dir": "p6a_p5k16_1",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 747.8,
+    "frames_per_s": 4.283230810377106,
+    "cpu_s_per_frame": 1.297002809865751,
+    "engine_cores": 5.555,
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e",
+    "session": {
+     "steal_share": 5.251836422318639e-05,
+     "mhz_open_mean": 2981.33728125,
+     "mhz_close_mean": 2711.86309375,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "flavour": "p5",
+    "stamp_frames_measured": 3203,
+    "F_s": 0.22446188616546894,
+    "forward_D1": {
+     "count": 3203,
+     "sum": 718.951421387997,
+     "share_of_run_total": null,
+     "min": 0.1949535119997563,
+     "mean": 0.22446188616546894,
+     "sd": 0.05229540374156805,
+     "p50": 0.21144112299998596,
+     "p90": 0.22860746199967252,
+     "p95": 0.2482142759999988,
+     "p99": 0.5227255089998835,
+     "max": 0.575896683999872,
+     "mean_over_p50": 1.0615810348561374
+    },
+    "cores_in_forward": 4.211766466984768,
+    "duty": 0.9993146954114499,
+    "duty_kind": "inference thread busy / window",
+    "queue_depth": {
+     "D1": {
+      "count": 3203,
+      "sum": 40985.0,
+      "share_of_run_total": null,
+      "min": 1.0,
+      "mean": 12.795816422104277,
+      "sd": 3.1975474493637015,
+      "p50": 15.0,
+      "p90": 15.0,
+      "p95": 15.0,
+      "p99": 15.0,
+      "max": 15.0,
+      "mean_over_p50": 0.8530544281402851
+     },
+     "histogram": {
+      "1": 14,
+      "2": 11,
+      "3": 24,
+      "4": 32,
+      "5": 30,
+      "6": 25,
+      "7": 183,
+      "8": 81,
+      "9": 14,
+      "10": 558,
+      "11": 22,
+      "12": 3,
+      "13": 143,
+      "14": 268,
+      "15": 1795
+     }
+    },
+    "infer_threads": [
+     173
+    ],
+    "queue_wait_D1": {
+     "count": 3203,
+     "sum": 9037.85847270701,
+     "share_of_run_total": null,
+     "min": 4.913300017506117e-05,
+     "mean": 2.821685442618486,
+     "sd": 0.6279914042824041,
+     "p50": 3.1975365539997256,
+     "p90": 3.291589011999804,
+     "p95": 3.3166184619999513,
+     "p99": 3.3788181499999155,
+     "max": 4.408665036000002,
+     "mean_over_p50": 0.8824560391933296
+    },
+    "memory_peak_total_bytes": 5515599872,
+    "_by_video": "16 videos (records file)"
+   },
+   "p6a_p5k16_2": {
+    "dir": "p6a_p5k16_2",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 770.5,
+    "frames_per_s": 4.157040882543803,
+    "cpu_s_per_frame": 1.3373712144864192,
+    "engine_cores": 5.559,
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e",
+    "session": {
+     "steal_share": 5.453911457330884e-05,
+     "mhz_open_mean": 2863.55634375,
+     "mhz_close_mean": 2724.045375,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "flavour": "p5",
+    "stamp_frames_measured": 3203,
+    "F_s": 0.2317087267958182,
+    "forward_D1": {
+     "count": 3203,
+     "sum": 742.1630519270057,
+     "share_of_run_total": null,
+     "min": 0.20640972500041244,
+     "mean": 0.2317087267958182,
+     "sd": 0.05425932875900078,
+     "p50": 0.2202054910003426,
+     "p90": 0.22771022100005212,
+     "p95": 0.24620695399971737,
+     "p99": 0.5232775559998117,
+     "max": 0.7132460200000423,
+     "mean_over_p50": 1.0522386419304035
+    },
+    "cores_in_forward": 4.214117103542627,
+    "duty": 0.9997491524966053,
+    "duty_kind": "inference thread busy / window",
+    "queue_depth": {
+     "D1": {
+      "count": 3203,
+      "sum": 41017.0,
+      "share_of_run_total": null,
+      "min": 1.0,
+      "mean": 12.805807055885108,
+      "sd": 3.1822178026069166,
+      "p50": 15.0,
+      "p90": 15.0,
+      "p95": 15.0,
+      "p99": 15.0,
+      "max": 15.0,
+      "mean_over_p50": 0.8537204703923406
+     },
+     "histogram": {
+      "1": 13,
+      "2": 9,
+      "3": 24,
+      "4": 31,
+      "5": 33,
+      "6": 26,
+      "7": 182,
+      "8": 76,
+      "9": 17,
+      "10": 566,
+      "11": 3,
+      "12": 19,
+      "13": 137,
+      "14": 273,
+      "15": 1794
+     }
+    },
+    "infer_threads": [
+     174
+    ],
+    "queue_wait_D1": {
+     "count": 3203,
+     "sum": 9326.972120172988,
+     "share_of_run_total": null,
+     "min": 5.958699966868153e-05,
+     "mean": 2.911948835520758,
+     "sd": 0.6377709499249496,
+     "p50": 3.312025533999986,
+     "p90": 3.3771593659994323,
+     "p95": 3.3940119910002977,
+     "p99": 3.4484009449997757,
+     "max": 4.618024155999592,
+     "mean_over_p50": 0.8792048266620551
+    },
+    "memory_peak_total_bytes": 5783310336,
+    "_by_video": "16 videos (records file)"
+   },
+   "p6a_li16_1": {
+    "dir": "p6a_li16_1",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 1016.5,
+    "frames_per_s": 3.1510083620265616,
+    "cpu_s_per_frame": 0.9282235404308461,
+    "engine_cores": 2.925,
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e",
+    "session": {
+     "steal_share": 6.209904159360239e-05,
+     "mhz_open_mean": 3032.58990625,
+     "mhz_close_mean": 2608.6640625,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "flavour": "li",
+    "stamp_frames_measured": 3203,
+    "F_s": 0.2971564481476736,
+    "forward_D1": {
+     "count": 3203,
+     "sum": 951.7921034169985,
+     "share_of_run_total": null,
+     "min": 0.18664736099981383,
+     "mean": 0.2971564481476736,
+     "sd": 0.09623101252140656,
+     "p50": 0.3351638770000136,
+     "p90": 0.40288510600021255,
+     "p95": 0.4059530350004934,
+     "p99": 0.4141780199997811,
+     "max": 0.6738246320001053,
+     "mean_over_p50": 0.8866004618620089
+    },
+    "cores_in_forward": 2.700164377494372,
+    "duty": 0.9999973526999896,
+    "duty_kind": "per-video lock held / window (P0 V2)",
+    "memory_peak_total_bytes": 5386653696,
+    "_by_video": "16 videos (records file)"
+   },
+   "p6a_li16_2": {
+    "dir": "p6a_li16_2",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 1017.5,
+    "frames_per_s": 3.147911547911548,
+    "cpu_s_per_frame": 0.9466749921948173,
+    "engine_cores": 2.98,
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e",
+    "session": {
+     "steal_share": 5.997855889763024e-05,
+     "mhz_open_mean": 2926.36334375,
+     "mhz_close_mean": 2649.4705625,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "flavour": "li",
+    "stamp_frames_measured": 3203,
+    "F_s": 0.29739142469183927,
+    "forward_D1": {
+     "count": 3203,
+     "sum": 952.5447332879612,
+     "share_of_run_total": null,
+     "min": 0.1978502040001331,
+     "mean": 0.29739142469183927,
+     "sd": 0.0884016458298649,
+     "p50": 0.3247647219995997,
+     "p90": 0.3978479219986184,
+     "p95": 0.40249384399976407,
+     "p99": 0.4110451169999578,
+     "max": 0.4688333119993331,
+     "mean_over_p50": 0.9157134520670192
+    },
+    "cores_in_forward": 2.7515959639657575,
+    "duty": 0.9999975059622495,
+    "duty_kind": "per-video lock held / window (P0 V2)",
+    "memory_peak_total_bytes": 5357871104,
+    "_by_video": "16 videos (records file)"
+   }
+  },
+  "cells": {
+   "stock_k16": {
+    "legs": [
+     "p6a_stock16_1",
+     "p6a_stock16_2"
+    ],
+    "complete": true,
+    "frames_per_s": {
+     "round_1": 2.449900566008872,
+     "round_2": 2.3883379315487288,
+     "mean": 2.4191192487788005,
+     "spread": 0.025448367000188585
+    },
+    "F_s": {
+     "round_1": 0.39548726136996465,
+     "round_2": 0.4057281468279626,
+     "mean": 0.4006077040989636,
+     "spread": 0.025563376223708634
+    },
+    "duty": {
+     "round_1": 0.9992838557826106,
+     "round_2": 0.9993122416481943,
+     "mean": 0.9992980487154024,
+     "spread": 2.8405805075097953e-05
+    },
+    "cores_in_forward": {
+     "round_1": 2.385454891555703,
+     "round_2": 2.393439214991395,
+     "mean": 2.389447053273549,
+     "spread": 0.003341494185758774
+    },
+    "cpu_s_per_frame": {
+     "round_1": 1.4693100218545114,
+     "round_2": 1.5087730252887919,
+     "mean": 1.4890415235716516,
+     "spread": 0.026502285402776084
+    },
+    "memory_peak_total_bytes": {
+     "round_1": 7593644032,
+     "round_2": 7572615168,
+     "mean": 7583129600,
+     "spread": 0.0027731115132200827
+    },
+    "forward_p50": {
+     "round_1": 0.39772462800010544,
+     "round_2": 0.40843718600081047,
+     "mean": 0.40308090700045796,
+     "spread": 0.026576694193785912
+    },
+    "forward_p99": {
+     "round_1": 0.5318189739998616,
+     "round_2": 0.5494741370002885,
+     "mean": 0.540646555500075,
+     "spread": 0.032655646874688096
+    },
+    "engine_cores": {
+     "round_1": 3.6,
+     "round_2": 3.603,
+     "mean": 3.6015,
+     "spread": 0.0008329862557268121
+    }
+   },
+   "p5_k16": {
+    "legs": [
+     "p6a_p5k16_1",
+     "p6a_p5k16_2"
+    ],
+    "complete": true,
+    "frames_per_s": {
+     "round_1": 4.283230810377106,
+     "round_2": 4.157040882543803,
+     "mean": 4.220135846460455,
+     "spread": 0.029901863926760232
+    },
+    "F_s": {
+     "round_1": 0.22446188616546894,
+     "round_2": 0.2317087267958182,
+     "mean": 0.22808530648064357,
+     "spread": 0.03177250100924082
+    },
+    "duty": {
+     "round_1": 0.9993146954114499,
+     "round_2": 0.9997491524966053,
+     "mean": 0.9995319239540277,
+     "spread": 0.00043466053934203286
+    },
+    "cores_in_forward": {
+     "round_1": 4.211766466984768,
+     "round_2": 4.214117103542627,
+     "mean": 4.2129417852636974,
+     "spread": 0.0005579560975850486
+    },
+    "cpu_s_per_frame": {
+     "round_1": 1.297002809865751,
+     "round_2": 1.3373712144864192,
+     "mean": 1.3171870121760851,
+     "spread": 0.030647435973405808
+    },
+    "memory_peak_total_bytes": {
+     "round_1": 5515599872,
+     "round_2": 5783310336,
+     "mean": 5649455104,
+     "spread": 0.047386953090476316
+    },
+    "forward_p50": {
+     "round_1": 0.21144112299998596,
+     "round_2": 0.2202054910003426,
+     "mean": 0.21582330700016428,
+     "spread": 0.04060899687886793
+    },
+    "forward_p99": {
+     "round_1": 0.5227255089998835,
+     "round_2": 0.5232775559998117,
+     "mean": 0.5230015324998476,
+     "spread": 0.0010555361038611113
+    },
+    "engine_cores": {
+     "round_1": 5.555,
+     "round_2": 5.559,
+     "mean": 5.557,
+     "spread": 0.0007198128486594291
+    }
+   },
+   "li_k16": {
+    "legs": [
+     "p6a_li16_1",
+     "p6a_li16_2"
+    ],
+    "complete": true,
+    "frames_per_s": {
+     "round_1": 3.1510083620265616,
+     "round_2": 3.147911547911548,
+     "mean": 3.1494599549690547,
+     "spread": 0.000983284169124882
+    },
+    "F_s": {
+     "round_1": 0.2971564481476736,
+     "round_2": 0.29739142469183927,
+     "mean": 0.2972739364197564,
+     "spread": 0.0007904377591779978
+    },
+    "duty": {
+     "round_1": 0.9999973526999896,
+     "round_2": 0.9999975059622495,
+     "mean": 0.9999974293311196,
+     "spread": 1.5326265387074823e-07
+    },
+    "cores_in_forward": {
+     "round_1": 2.700164377494372,
+     "round_2": 2.7515959639657575,
+     "mean": 2.725880170730065,
+     "spread": 0.018867882390299812
+    },
+    "cpu_s_per_frame": {
+     "round_1": 0.9282235404308461,
+     "round_2": 0.9466749921948173,
+     "mean": 0.9374492663128318,
+     "spread": 0.019682613691239352
+    },
+    "memory_peak_total_bytes": {
+     "round_1": 5386653696,
+     "round_2": 5357871104,
+     "mean": 5372262400,
+     "spread": 0.005357629590095971
+    },
+    "forward_p50": {
+     "round_1": 0.3351638770000136,
+     "round_2": 0.3247647219995997,
+     "mean": 0.32996429949980666,
+     "spread": 0.03151600041634194
+    },
+    "forward_p99": {
+     "round_1": 0.4141780199997811,
+     "round_2": 0.4110451169999578,
+     "mean": 0.41261156849986946,
+     "spread": 0.007592862728530754
+    },
+    "engine_cores": {
+     "round_1": 2.925,
+     "round_2": 2.98,
+     "mean": 2.9524999999999997,
+     "spread": 0.01862828111769692
+    }
+   }
+  },
+  "correctness": {
+   "pairs": [
+    {
+     "a": "p6a_p5k16_1",
+     "b": "p6a_stock16_1",
+     "videos_compared": 16,
+     "chunk_hash_differs": [],
+     "frame_scores_differ": [],
+     "identical": true,
+     "videos_eq_n": true
+    },
+    {
+     "a": "p6a_p5k16_2",
+     "b": "p6a_stock16_2",
+     "videos_compared": 16,
+     "chunk_hash_differs": [],
+     "frame_scores_differ": [],
+     "identical": true,
+     "videos_eq_n": true
+    }
+   ],
+   "gate_pass": true,
+   "beside": {
+    "stock_run_to_run": {
+     "a": "p6a_stock16_1",
+     "b": "p6a_stock16_2",
+     "videos_compared": 16,
+     "chunk_hash_differs": [],
+     "frame_scores_differ": [],
+     "identical": true,
+     "videos_eq_n": true
+    },
+    "p5_run_to_run": {
+     "a": "p6a_p5k16_1",
+     "b": "p6a_p5k16_2",
+     "videos_compared": 16,
+     "chunk_hash_differs": [],
+     "frame_scores_differ": [],
+     "identical": true,
+     "videos_eq_n": true
+    },
+    "li_run_to_run": {
+     "a": "p6a_li16_1",
+     "b": "p6a_li16_2",
+     "videos_compared": 16,
+     "chunk_hash_differs": [],
+     "frame_scores_differ": [],
+     "identical": true,
+     "videos_eq_n": true
+    }
+   },
+   "rule": "P5 K=16 output identical to stock K=16 on 16/16 videos in each round (hard)"
+  },
+  "readings": {
+   "Q1": {
+    "round_1": {
+     "ratio": 1.3593206739769994,
+     "bar": 0.95,
+     "holds": true
+    },
+    "round_2": {
+     "ratio": 1.3205710577547047,
+     "bar": 0.95,
+     "holds": true
+    },
+    "pooled": {
+     "ratio": 1.3399553913368998,
+     "bar": 0.95,
+     "holds": true
+    },
+    "verdict": "HOLDS (pooled); round 1 holds, round 2 holds"
+   },
+   "Q2": {
+    "round_1": {
+     "ratio": 1.748328430061514,
+     "bar": 1.2,
+     "holds": true
+    },
+    "round_2": {
+     "ratio": 1.7405580791693704,
+     "bar": 1.2,
+     "holds": true
+    },
+    "pooled": {
+     "ratio": 1.7444926903007483,
+     "bar": 1.2,
+     "holds": true
+    },
+    "verdict": "HOLDS (pooled); round 1 holds, round 2 holds"
+   }
+  },
+  "descriptive_forward_degradation": {
+   "label": "DESCRIPTIVE ONLY \u2014 never gated; the K=1 reference is P5's committed session (cross-session)",
+   "reference_legs": [
+    "parity_p5_20260925T141647Z/p5a_p5k1_1",
+    "parity_p5_20260925T141647Z/p5a_p5k1_2"
+   ],
+   "ref_F_s": 0.194591592949106,
+   "ref_p50": 0.19175837649981986,
+   "ref_p99": 0.21468095099953644,
+   "F_over_ref_minus_1": 0.17212312733519597,
+   "p50_over_ref_minus_1": 0.12549611098927427,
+   "p99_over_ref_minus_1": 1.4361804345695157
+  },
+  "canary": {
+   "p6c_can_a1": {
+    "leg": "p6c_can_a1",
+    "frames": 239,
+    "F_s": 0.20424247048116698,
+    "forward_D1": {
+     "count": 239,
+     "sum": 48.81395044499891,
+     "share_of_run_total": null,
+     "min": 0.19395345199995973,
+     "mean": 0.20424247048116698,
+     "sd": 0.004683676732741682,
+     "p50": 0.20333393999999316,
+     "p90": 0.21107832500001678,
+     "p95": 0.21327328000006673,
+     "p99": 0.2165446650001286,
+     "max": 0.22059355700002925,
+     "mean_over_p50": 1.0044681693630382
+    },
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e"
+   },
+   "p6c_can_a2": {
+    "leg": "p6c_can_a2",
+    "frames": 239,
+    "F_s": 0.20366596891631827,
+    "forward_D1": {
+     "count": 239,
+     "sum": 48.67616657100007,
+     "share_of_run_total": null,
+     "min": 0.19670389699967927,
+     "mean": 0.20366596891631827,
+     "sd": 0.004081612767709337,
+     "p50": 0.20272512400060805,
+     "p90": 0.21009788300034415,
+     "p95": 0.2120908850001797,
+     "p99": 0.21409901800052467,
+     "max": 0.22190757599946664,
+     "mean_over_p50": 1.0046409882364034
+    },
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e"
+   }
+  }
+ },
+ "P6_B": {
+  "blocks": {
+   "p6b_rr_b01": {
+    "dir": "p6b_rr_b01",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 800.6,
+    "frames_per_s": 4.0007494379215585,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b01": {
+    "dir": "p6b_li_b01",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 1044.0,
+    "frames_per_s": 3.068007662835249,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b02": {
+    "dir": "p6b_rr_b02",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2071,
+    "span_s": 500.8,
+    "frames_per_s": 4.13538338658147,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b02": {
+    "dir": "p6b_li_b02",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2071,
+    "span_s": 668.3,
+    "frames_per_s": 3.0989076761933267,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b03": {
+    "dir": "p6b_rr_b03",
+    "videos": 16,
+    "errors": 0,
+    "frames": 1922,
+    "span_s": 475.6,
+    "frames_per_s": 4.04121110176619,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b03": {
+    "dir": "p6b_li_b03",
+    "videos": 16,
+    "errors": 0,
+    "frames": 1922,
+    "span_s": 619.3,
+    "frames_per_s": 3.103503956079445,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b04": {
+    "dir": "p6b_rr_b04",
+    "videos": 16,
+    "errors": 0,
+    "frames": 1686,
+    "span_s": 411.9,
+    "frames_per_s": 4.093226511289148,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b04": {
+    "dir": "p6b_li_b04",
+    "videos": 16,
+    "errors": 0,
+    "frames": 1686,
+    "span_s": 546.8,
+    "frames_per_s": 3.0833942940746164,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b05": {
+    "dir": "p6b_rr_b05",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2120,
+    "span_s": 501.3,
+    "frames_per_s": 4.229004588071016,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b05": {
+    "dir": "p6b_li_b05",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2120,
+    "span_s": 663.3,
+    "frames_per_s": 3.1961405095733455,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b06": {
+    "dir": "p6b_rr_b06",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2846,
+    "span_s": 715.7,
+    "frames_per_s": 3.9765264775744025,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b06": {
+    "dir": "p6b_li_b06",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2846,
+    "span_s": 934.3,
+    "frames_per_s": 3.0461307931071393,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b07": {
+    "dir": "p6b_rr_b07",
+    "videos": 16,
+    "errors": 0,
+    "frames": 1807,
+    "span_s": 464.8,
+    "frames_per_s": 3.8876936316695354,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b07": {
+    "dir": "p6b_li_b07",
+    "videos": 16,
+    "errors": 0,
+    "frames": 1807,
+    "span_s": 609.5,
+    "frames_per_s": 2.9647251845775227,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b08": {
+    "dir": "p6b_rr_b08",
+    "videos": 16,
+    "errors": 0,
+    "frames": 1659,
+    "span_s": 424.5,
+    "frames_per_s": 3.908127208480565,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b08": {
+    "dir": "p6b_li_b08",
+    "videos": 16,
+    "errors": 0,
+    "frames": 1659,
+    "span_s": 550.2,
+    "frames_per_s": 3.015267175572519,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b09": {
+    "dir": "p6b_rr_b09",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2354,
+    "span_s": 568.0,
+    "frames_per_s": 4.144366197183099,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b09": {
+    "dir": "p6b_li_b09",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2354,
+    "span_s": 755.1,
+    "frames_per_s": 3.1174678850483377,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b10": {
+    "dir": "p6b_rr_b10",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2339,
+    "span_s": 546.6,
+    "frames_per_s": 4.279180387852177,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_li_b10": {
+    "dir": "p6b_li_b10",
+    "videos": 16,
+    "errors": 0,
+    "frames": 2339,
+    "span_s": 738.2,
+    "frames_per_s": 3.1685180167976155,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "16 videos (records file)"
+   },
+   "p6b_rr_b11": {
+    "dir": "p6b_rr_b11",
+    "videos": 8,
+    "errors": 0,
+    "frames": 1042,
+    "span_s": 227.7,
+    "frames_per_s": 4.576196750109794,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "li_bal_0",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "8 videos (records file)"
+   },
+   "p6b_li_b11": {
+    "dir": "p6b_li_b11",
+    "videos": 8,
+    "errors": 0,
+    "frames": 1042,
+    "span_s": 224.7,
+    "frames_per_s": 4.63729417000445,
+    "d0": "CLEAN",
+    "cell": "PASS",
+    "warm": "PASS",
+    "other_container": "rr",
+    "other_container_cpu_s_during_block": 0.0,
+    "other_container_state_at_start": "true paused",
+    "_by_video": "8 videos (records file)"
+   }
+  },
+  "per_arm": {
+   "rr": {
+    "blocks": 11,
+    "videos": 168,
+    "errors": 0,
+    "frames": 23049,
+    "span_s": 5637.5,
+    "total_frames_per_s": 4.088514412416852
+   },
+   "li": {
+    "blocks": 11,
+    "videos": 168,
+    "errors": 0,
+    "frames": 23049,
+    "span_s": 7353.7,
+    "total_frames_per_s": 3.134340536056679
+   }
+  },
+  "ratio_rr_over_li_totals": 1.3044257206208427,
+  "q1_bar": 0.95,
+  "paired_blocks": {
+   "blocks": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "per_arm": {
+    "rr": {
+     "blocks": 11,
+     "videos": 168,
+     "frames": 23049,
+     "span_s": 5637.5,
+     "total_frames_per_s": 4.088514412416852
+    },
+    "li": {
+     "blocks": 11,
+     "videos": 168,
+     "frames": 23049,
+     "span_s": 7353.7,
+     "total_frames_per_s": 3.134340536056679
+    }
+   },
+   "ratio_rr_over_li": 1.3044257206208427,
+   "meets_q1_bar": true,
+   "note": "beside the pre-registered totals: the same arithmetic over the blocks BOTH arms ran"
+  },
+  "complete_168": true,
+  "ratio_meets_q1_bar": true,
+  "per_block_ratio_distribution": {
+   "blocks": 11,
+   "min": 0.9868247694334652,
+   "p50": 1.31131669535284,
+   "max": 1.3505305525064035,
+   "per_block": {
+    "1": 1.3040219835123656,
+    "2": 1.3344648562300319,
+    "3": 1.302144659377628,
+    "4": 1.3275066763777617,
+    "5": 1.3231597845601437,
+    "6": 1.3054352382283079,
+    "7": 1.31131669535284,
+    "8": 1.296113074204947,
+    "9": 1.3294014084507044,
+    "10": 1.3505305525064035,
+    "11": 0.9868247694334652
+   }
+  },
+  "correctness_vs_p1d": {
+   "reference": "parity_p1_20260923T184000Z/v1full_rr_t4",
+   "videos_compared": 168,
+   "identical": 166,
+   "differ": [
+    {
+     "video": "IN1002.avi",
+     "absent_from_reference": false,
+     "chunk_hash_differs": true,
+     "frame_scores_differ": true,
+     "frames": 165,
+     "frames_in_reference": 165,
+     "frames_whose_scores_differ": [
+      58
+     ]
+    },
+    {
+     "video": "TS3010a.avi",
+     "absent_from_reference": false,
+     "chunk_hash_differs": true,
+     "frame_scores_differ": true,
+     "frames": 69,
+     "frames_in_reference": 69,
+     "frames_whose_scores_differ": [
+      56
+     ]
+    }
+   ],
+   "pass": false,
+   "all_compared_identical": false
+  },
+  "blocks_not_run": [],
+  "start_warm": {
+   "p6b_rr_startwarm": "PASS",
+   "p6b_li_startwarm": "PASS"
+  },
+  "canary": {
+   "p6c_can_b0": {
+    "leg": "p6c_can_b0",
+    "frames": 239,
+    "F_s": 0.2089563095062784,
+    "forward_D1": {
+     "count": 239,
+     "sum": 49.94055797200053,
+     "share_of_run_total": null,
+     "min": 0.20209414999953879,
+     "mean": 0.2089563095062784,
+     "sd": 0.0030580160422183566,
+     "p50": 0.20898993899936613,
+     "p90": 0.21312256300006993,
+     "p95": 0.21411492700099188,
+     "p99": 0.21678102700025192,
+     "max": 0.21758424299878243,
+     "mean_over_p50": 0.9998390855882883
+    },
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e"
+   },
+   "p6c_can_bmid": {
+    "leg": "p6c_can_bmid",
+    "frames": 239,
+    "F_s": 0.19144397596634108,
+    "forward_D1": {
+     "count": 239,
+     "sum": 45.755110255955515,
+     "share_of_run_total": null,
+     "min": 0.1859478259975731,
+     "mean": 0.19144397596634108,
+     "sd": 0.004134770906024337,
+     "p50": 0.19009890199959045,
+     "p90": 0.1982154109973635,
+     "p95": 0.1984926559998712,
+     "p99": 0.19922917800067808,
+     "max": 0.20085672099958174,
+     "mean_over_p50": 1.0070756535287801
+    },
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e"
+   }
+  }
+ },
+ "P6_C": {
+  "legs": {
+   "p6c_p5t16_1": {
+    "dir": "p6c_p5t16_1",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 1263.7,
+    "frames_per_s": 2.534620558676901,
+    "cpu_s_per_frame": 2.1312831720262255,
+    "engine_cores": 5.402,
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e",
+    "session": {
+     "steal_share": 5.3406623653793616e-05,
+     "mhz_open_mean": 3044.31115625,
+     "mhz_close_mean": 2718.07984375,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "flavour": "p5",
+    "stamp_frames_measured": 3203,
+    "F_s": 0.38165287513235213,
+    "forward_D1": {
+     "count": 3203,
+     "sum": 1222.434159048924,
+     "share_of_run_total": null,
+     "min": 0.3244611780028208,
+     "mean": 0.38165287513235213,
+     "sd": 0.0535311484154358,
+     "p50": 0.3741229410006781,
+     "p90": 0.3886810800031526,
+     "p95": 0.3916150990007736,
+     "p99": 0.8146363239975472,
+     "max": 0.896162502001971,
+     "mean_over_p50": 1.0201268976222988
+    },
+    "cores_in_forward": 4.222135495886793,
+    "duty": 0.999878057777151,
+    "duty_kind": "inference thread busy / window",
+    "queue_depth": {
+     "D1": {
+      "count": 3203,
+      "sum": 41486.0,
+      "share_of_run_total": null,
+      "min": 1.0,
+      "mean": 12.952232282235403,
+      "sd": 3.05520502104708,
+      "p50": 15.0,
+      "p90": 15.0,
+      "p95": 15.0,
+      "p99": 15.0,
+      "max": 15.0,
+      "mean_over_p50": 0.8634821521490269
+     },
+     "histogram": {
+      "1": 9,
+      "2": 6,
+      "3": 22,
+      "4": 29,
+      "5": 20,
+      "6": 26,
+      "7": 185,
+      "8": 40,
+      "9": 54,
+      "10": 482,
+      "11": 70,
+      "12": 9,
+      "13": 118,
+      "14": 301,
+      "15": 1832
+     }
+    },
+    "infer_threads": [
+     269
+    ],
+    "queue_wait_D1": {
+     "count": 3203,
+     "sum": 15980.860325940172,
+     "share_of_run_total": null,
+     "min": 5.692200284102e-05,
+     "mean": 4.989341344345979,
+     "sd": 1.1382854041891155,
+     "p50": 5.708422176998283,
+     "p90": 5.789298200998019,
+     "p95": 5.803253764002875,
+     "p99": 5.824532950002322,
+     "max": 5.8768916799999715,
+     "mean_over_p50": 0.8740315957096176
+    },
+    "memory_peak_total_bytes": 5716463616,
+    "_by_video": "16 videos (records file)"
+   },
+   "p6c_p5t16_2": null,
+   "p6c_lit16_1": {
+    "dir": "p6c_lit16_1",
+    "videos": 16,
+    "errors": 0,
+    "frames": 3203,
+    "span_s": 1206.7,
+    "frames_per_s": 2.654346565012016,
+    "cpu_s_per_frame": 1.4201061504839214,
+    "engine_cores": 3.77,
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e",
+    "session": {
+     "steal_share": 5.591662960564472e-05,
+     "mhz_open_mean": 2956.7341875,
+     "mhz_close_mean": 2619.45878125,
+     "cpu_model": "Intel(R) Xeon(R) Platinum 8488C"
+    },
+    "flavour": "li",
+    "stamp_frames_measured": 3203,
+    "F_s": 0.355465062941599,
+    "forward_D1": {
+     "count": 3203,
+     "sum": 1138.5545966019417,
+     "share_of_run_total": null,
+     "min": 0.1958329910012253,
+     "mean": 0.355465062941599,
+     "sd": 0.017259431371887405,
+     "p50": 0.35829829900103505,
+     "p90": 0.37163934399723075,
+     "p95": 0.37545529099952546,
+     "p99": 0.3829965759978222,
+     "max": 0.40541911699983757,
+     "mean_over_p50": 0.9920925216018739
+    },
+    "cores_in_forward": 3.623072851664206,
+    "duty": 0.9999982657237211,
+    "duty_kind": "per-video lock held / window (P0 V2)",
+    "memory_peak_total_bytes": 6873399296,
+    "_by_video": "16 videos (records file)"
+   },
+   "p6c_lit16_2": null
+  },
+  "cells": {
+   "p5_t16": {
+    "legs": [
+     "p6c_p5t16_1",
+     null
+    ],
+    "complete": false,
+    "frames_per_s": {
+     "round_1": 2.534620558676901,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "F_s": {
+     "round_1": 0.38165287513235213,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "duty": {
+     "round_1": 0.999878057777151,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "cores_in_forward": {
+     "round_1": 4.222135495886793,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "cpu_s_per_frame": {
+     "round_1": 2.1312831720262255,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "memory_peak_total_bytes": {
+     "round_1": 5716463616,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "forward_p50": {
+     "round_1": 0.3741229410006781,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "forward_p99": {
+     "round_1": 0.8146363239975472,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "engine_cores": {
+     "round_1": 5.402,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    }
+   },
+   "li_t16": {
+    "legs": [
+     "p6c_lit16_1",
+     null
+    ],
+    "complete": false,
+    "frames_per_s": {
+     "round_1": 2.654346565012016,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "F_s": {
+     "round_1": 0.355465062941599,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "duty": {
+     "round_1": 0.9999982657237211,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "cores_in_forward": {
+     "round_1": 3.623072851664206,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "cpu_s_per_frame": {
+     "round_1": 1.4201061504839214,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "memory_peak_total_bytes": {
+     "round_1": 6873399296,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "forward_p50": {
+     "round_1": 0.35829829900103505,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "forward_p99": {
+     "round_1": 0.3829965759978222,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    },
+    "engine_cores": {
+     "round_1": 3.77,
+     "round_2": null,
+     "mean": null,
+     "spread": null
+    }
+   }
+  },
+  "correctness": {
+   "pairs": [
+    {
+     "a": "p6c_p5t16_1",
+     "b": "P0 v1_rr_def_a (out of box, committed)",
+     "videos_compared": 16,
+     "chunk_hash_differs": [],
+     "frame_scores_differ": [],
+     "identical": true,
+     "videos_eq_n": true
+    }
+   ],
+   "gate_pass": true,
+   "rule": "P5 at T=16 identical to the committed out-of-box output (P0 V1 v1_rr_def_a) on 16/16 videos"
+  },
+  "readings": {
+   "round_1": {
+    "F_t16_over_F_t4": 1.700301470562379,
+    "faster_by_at_least_5pct": false,
+    "fps_p5_t16_over_li_t16": 0.9548943578380945
+   },
+   "round_2": {
+    "F_t16_over_F_t4": null,
+    "faster_by_at_least_5pct": null,
+    "fps_p5_t16_over_li_t16": null
+   },
+   "pooled": {
+    "F_t16_over_F_t4": null,
+    "faster_by_at_least_5pct": null,
+    "fps_p5_t16_over_li_t16": null
+   }
+  },
+  "not_interleaved_note": "P6-A's T=4 legs and P6-C's T=16 legs are in different stages of the session (not ABAB); the canary per round is reported beside",
+  "canary": {
+   "p6c_can_c1": {
+    "leg": "p6c_can_c1",
+    "frames": 239,
+    "F_s": 0.1922979787028666,
+    "forward_D1": {
+     "count": 239,
+     "sum": 45.959216909985116,
+     "share_of_run_total": null,
+     "min": 0.1863079030008521,
+     "mean": 0.1922979787028666,
+     "sd": 0.004302383177168123,
+     "p50": 0.19043755299935583,
+     "p90": 0.19938448000175413,
+     "p95": 0.19974538699898403,
+     "p99": 0.20046146200184012,
+     "max": 0.20116689700080315,
+     "mean_over_p50": 1.0097692165973013
+    },
+    "boot_id": "eb83839f-a2bd-45ca-880b-0269d56f5b4e"
+   },
+   "p6c_can_c2": null
+  }
+ },
+ "drift": {
+  "canary_F_s_in_time_order": {
+   "p6c_can_a1": 0.20424247048116698,
+   "p6c_can_a2": 0.20366596891631827,
+   "p6c_can_b0": 0.2089563095062784,
+   "p6c_can_bmid": 0.19144397596634108,
+   "p6c_can_c1": 0.1922979787028666,
+   "p6c_can_c2": null
+  },
+  "canary_change_a2_over_a1": -0.0028226331354617162,
+  "p6a_cells_F_change_round2_over_round1": {
+   "stock_k16": 0.025894349725762655,
+   "p5_k16": 0.032285394879944196,
+   "li_k16": 0.0007907502786170806
+  },
+  "p6a_cells_median_change": 0.025894349725762655,
+  "floor": 0.0082,
+  "canary_vs_first": {
+   "p6c_can_a1": 0.0,
+   "p6c_can_a2": -0.0028226331354617162,
+   "p6c_can_b0": 0.023079622049254844,
+   "p6c_can_bmid": -0.06266323788913453,
+   "p6c_can_c1": -0.05848191979934825,
+   "p6c_can_c2": null
+  },
+  "canary_moved": false,
+  "moved_with_the_cells": false,
+  "reading": "the canary did NOT move (within the 0.82% floor)"
+ }
+}

@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -108,6 +109,18 @@ def main() -> int:
         ok = "CLEAN" if kind == "G_d0" else "PASS"
         rows.append([f"{kind} (every leg / block / canary it applies to)", "preregistration.json gates", "; ".join(f"{a}: {b}" for a, b in xs) or "—",
                      f"ALL {ok}" if xs and all(b == ok for _, b in xs) else ("—" if not xs else "SEE ROW")])
+    # G_alone writes no record: its read is the run log's 'containers present: N' line before each leg, canary and the P6-B stage;
+    # P6-B's two canaries run beside the paused arms, so they check for no RUNNING container instead (the log's 'paused containers allowed: 1')
+    rl = c / "box_logs" / "p6_run.log"
+    if rl.exists():
+        txt = rl.read_text(errors="replace")
+        pres = re.findall(r"^containers present: (\d+)$", txt, re.M)
+        pc = re.findall(r"^===== CANARY (\S+) .*\(paused containers allowed: 1\)", txt, re.M)
+        na = [x for x in (done or {}).get("legs", []) if "NOT_ALONE" in x]
+        rows.append(["G_alone (before every leg and canary, and the P6-B stage)", "no container on the box (P6-B's canaries: no RUNNING container; the paused arms allowed)",
+                     f"box_logs/p6_run.log: {len(pres)} checks, containers present = {', '.join(sorted(set(pres))) or '—'}; running-only check on {', '.join(pc) or '—'}; "
+                     f"NOT_ALONE entries in the chain record: {len(na)}",
+                     "PASS" if pres and set(pres) == {"0"} and not na else "SEE ROW"])
     ms = [v for k, v in G.items() if k.startswith("G_memstat_")]
     rows.append(["G_memstat (first leg)", "memstat.jsonl ≥ 1 row", "; ".join(f"{m['leg']}: {n(m['rows'])} rows" for m in ms) or "—", ms[0]["outcome"] if ms else "—"])
     for g_ in ("G_correct_A1", "G_correct_A2", "G_correct_C1"):
@@ -123,7 +136,8 @@ def main() -> int:
     rows.append(["image ids", "rr:patched, rr:patched-video unchanged; rr:p5-infer = P5's, not rebuilt",
                  " ".join(f"{k} {ids1.get(k, '—')[:19]}" for k in (*PROT, "rr:p5-infer")), "UNCHANGED" if same else "CHANGED OR UNREAD"])
     dl = (done or {}).get("deadline_epoch")
-    rows.append(["budget", "8 h from the run stage's first leg", f"run start {(start or {}).get('stage_start_utc', '—')}; deadline "
+    fl = re.search(r"first leg starts (\S+);", rl.read_text(errors="replace")) if rl.exists() else None
+    rows.append(["budget", "8 h from the run stage's first leg", f"run start {(start or {}).get('stage_start_utc', '—')}; first leg {fl.group(1) if fl else '—'}; deadline "
                  f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(int(dl))) if dl else '—'}; chain done {(done or {}).get('stage_complete_utc', '—')}",
                  "SEE NOT RUN" if done and any("NOT_RUN_budget" in x for x in done.get("legs", [])) else ("WITHIN" if done else "—")])
     body += ["## Gates", ""] + table(["gate", "rule", "measured", "outcome"], rows)

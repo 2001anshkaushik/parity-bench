@@ -1,0 +1,21 @@
+{
+  "figures_checked": 309,
+  "mismatches": [
+    {
+      "where": "## P6-B, block table, row p6b_rr_b07, column frames/s",
+      "figure": "frames/s of p6b_rr_b07 = export throughput.total_frames / throughput.total_span_s = 1807 / 464.8",
+      "report": "3.838",
+      "recomputed": "3.888"
+    }
+  ],
+  "unverifiable": [
+    "Summary bullet and P6-B correctness paragraph: 'register 65' (the methodology register entry number) and the claim 'cause not established ... stock was never replicated on these videos' - no listed file carries the register or a stock replicate record; prose/provenance, not recomputable from the listed files."
+  ],
+  "notes": [
+    "Scope: the whole '## P6-B' section (22-row block table incl. D0/cell/warm outcomes and paused-arm name/state/CPU, per-arm totals table, both-arms table, 'All 168 videos on both arms', both-arms ratio, totals ratio, per-block ratio min/p50/max, start warms, correctness vs P1-D incl. frame indices, closing paragraph incl. block-11 post-hoc note) and the Summary bullet on P6-B.",
+    "Per-block frames/s recomputed at full precision from export total_frames/total_span_s; four blocks differ from the export's own rounded total_frames_per_s by 0.001 (rr_b03 4.041 vs 4.042, rr_b09 4.144 vs 4.145, li_b03 3.104 vs 3.103, li_b11 4.637 vs 4.638); the report agrees with the recomputation in all four, so they are matches.",
+    "Frames (sum of frames_observed over last measured ok rows) equal export total_frames on every block.",
+    "The per-block ratio for block 7 recomputed from the correct frames/s is 1.3113, which is the true median (1.311) as reported; the report's median, min, max and totals are unaffected by the displayed 3.838.",
+    "Correctness vs P1-D: 168 RR videos (no video in more than one block), all 168 present and ok in P1-D; 166 identical; IN1002.avi differs in chunk_sha256 and frame_scores at index 58 (n=165); TS3010a.avi differs in chunk_sha256 and frame_scores at index 56 (n=69)."
+  ]
+}

@@ -1,0 +1,17 @@
+{
+ "figures_checked": 164,
+ "mismatches": [
+  {
+   "where": "## P6-A / ### Per leg table, row p6a_li16_2, column p90",
+   "figure": "forward p90 (s) of p6a_li16_2 (nearest rank ceil(0.9*3203)=2883 over the last 3203 frame stamp rows by t_wall)",
+   "report": "0.3987",
+   "recomputed": "0.3978 (0.3978479)"
+  }
+ ],
+ "unverifiable": [],
+ "notes": [
+  "Scope: P6-A '### Per leg' table (6 legs x 13 figures + queue depth on the 2 P5 legs = 84), the whole '## P6-C' section (correctness 2, cell table 16, per-leg 29 + 2 NOT RUN rows, readings 4, prose 3 = 56), the '## Canary drift note' (17), and the Summary bullets on P6-C and drift (7).",
+  "P6-C round 2 legs and p6c_can_c2 are absent on disk and listed NOT_RUN_budget in chain_p6_c_done.json, consistent with the report's dashes and NOT RUN rows.",
+  "The 0.82% floor and 0.95 bars are rule constants from the prompt, not recomputed figures."
+ ]
+}

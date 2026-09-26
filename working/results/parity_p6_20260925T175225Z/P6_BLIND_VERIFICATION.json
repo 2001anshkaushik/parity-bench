@@ -1,0 +1,71 @@
+{
+ "label": "P6 blind recomputation: independent verifiers recompute every figure in their sections from raw files (the gate table and the drafts: trace each figure to the record or key it cites); each report copy carries ONE planted wrong figure; the plant key was kept outside the repository until every verifier of the round had finished",
+ "outcome": "PASS (round 1 and round 2)",
+ "summary": "every plant caught (4 of 4 in round 1, 1 of 1 in round 2), no other mismatch; 900 figures checked by 4 verifiers in round 1, 13 by 1 in round 2.",
+ "round_1": {
+  "outcome": "PASS",
+  "report_sha256": "cf6e46b988518632665feaa869e343d30cf501b31cde86ee49dae23beca12150",
+  "verifiers": {
+   "A": {
+    "figures_checked": 160,
+    "plant": "Q1/Q2 table, round 2 Q1: true 1.321, planted 1.312",
+    "mismatches_reported": 1,
+    "plant_caught": true,
+    "other_mismatches": 0,
+    "unverifiable": [
+     "P6-A section heading 'T=4' and 'K=16': design parameters of the legs; no definition in the prompt derives them from the listed files (the heading's '16 videos' was checked: 16 measured videos per leg).",
+     "Forward-degradation paragraph label 'P5's committed K=1 legs' and the 'Stated plainly' clause 'part of the +17.21% is the box, not the node': interpretation, not a recomputable figure (the +17.21% itself was checked)."
+    ]
+   },
+   "B": {
+    "figures_checked": 164,
+    "plant": "P6-A per-leg table, p6a_li16_2 p90: true 0.3978, planted 0.3987",
+    "mismatches_reported": 1,
+    "plant_caught": true,
+    "other_mismatches": 0,
+    "unverifiable": []
+   },
+   "C": {
+    "figures_checked": 309,
+    "plant": "P6-B block table, p6b_rr_b07 frames/s: true 3.888, planted 3.838",
+    "mismatches_reported": 1,
+    "plant_caught": true,
+    "other_mismatches": 0,
+    "unverifiable": [
+     "Summary bullet and P6-B correctness paragraph: 'register 65' (the methodology register entry number) and the claim 'cause not established ... stock was never replicated on these videos' - no listed file carries the register or a stock replicate record; prose/provenance, not recomputable from the listed files."
+    ]
+   },
+   "D": {
+    "figures_checked": 267,
+    "plant": "patch draft, CPU-s per frame change: true -11.5%, planted -11.8%",
+    "mismatches_reported": 1,
+    "plant_caught": true,
+    "other_mismatches": 0,
+    "unverifiable": [
+     "## P6-D (2): 'engine 3.3.1.35' - no listed file records the engine version of the local bundle",
+     "## P6-D (1): '8 instances x 4 threads' - the cited batchsize_s4_20260921T013303Z/p5_li_video/analysis_video.json legs[0] gives posture workers[declared_workers=8] (matches 8 instances) but carries no per-instance thread count, so '4 threads' cannot be traced",
+     "## P6-D (2): P5 'identical ... on 16/16 videos in every comparison, at K=16 and K=1, both rounds, and against an earlier session's stock K=1 leg' - only analysis_p5a.json correctness.gate_pass may be read (it is True, matching the cited '= True'); the 16/16 per-comparison detail cannot be recomputed from the allowed files"
+    ]
+   }
+  },
+  "plants_caught": "4 of 4"
+ },
+ "between_rounds": "no mismatch other than the plants; verifier D could not trace three draft figures from its files: (1) the Stage 4 line's '4 threads' was typed, not read \u2014 the brief now reads it from li_k16/export_llamaindex_video_workers_blast.json provenance_video.posture.threads_env_in_process_torch and cites it, and the instance count from legs[0].posture; (2) the patch draft's 'engine 3.3.1.35' had no cited source \u2014 it now cites parity_p5_20260925T141647Z/PROGRESS_LOG.md:5 and checks (with a null control) that the base md5s equal p5a_build.json base_node; (3) P5's '16/16 in every comparison' rests on analysis_p5a.json, verified by P5's own blind recomputation (P5_BLIND_VERIFICATION.json, PASS) \u2014 no change. The other unverifiable items are design labels (T=4, K=16), an interpretation sentence, and the register-65 reference \u2014 not figures.",
+ "round_2": {
+  "outcome": "PASS",
+  "scope": "the two changed draft bullets (the Stage 4 context line; the patch draft's base-files line)",
+  "report_sha256": "36de1071b81f5e3f56930ea4650246e3f578d95778bd70d1023b297d2a1af9a1",
+  "verifiers": {
+   "E": {
+    "figures_checked": 13,
+    "plant": "CTO brief Stage 4 context bullet, threads: true 4, planted 5",
+    "mismatches_reported": 1,
+    "plant_caught": true,
+    "other_mismatches": 0,
+    "unverifiable": []
+   }
+  },
+  "plants_caught": "1 of 1"
+ },
+ "after_round_2": "the final report differs from the round-2 verified copy only in the generation timestamp and this record's result line"
+}

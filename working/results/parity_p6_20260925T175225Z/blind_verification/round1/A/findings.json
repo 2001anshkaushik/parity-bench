@@ -1,0 +1,20 @@
+{
+  "figures_checked": 160,
+  "mismatches": [
+    {
+      "where": "## P6-A > ### Q1 and Q2 (fixed tolerances), per round and pooled \u2014 table row 'round 2', column 'Q1: fps(P5) / fps(LI)'",
+      "figure": "Q1 round 2 = frames/s(p6a_p5k16_2) / frames/s(p6a_li16_2)",
+      "report": "1.312",
+      "recomputed": "1.321 (4.157041 / 3.147912 = 1.320571; export total_frames/total_span_s = 3203/770.5 and 3203/1017.5)"
+    }
+  ],
+  "unverifiable": [
+    "P6-A section heading 'T=4' and 'K=16': design parameters of the legs; no definition in the prompt derives them from the listed files (the heading's '16 videos' was checked: 16 measured videos per leg).",
+    "Forward-degradation paragraph label 'P5's committed K=1 legs' and the 'Stated plainly' clause 'part of the +17.21% is the box, not the node': interpretation, not a recomputable figure (the +17.21% itself was checked)."
+  ],
+  "notes": [
+    "Every other checked figure matches: Summary P6-A bullets (correctness 16/16 both rounds; Q1 1.359/1.321/1.340, 4.220 vs 3.149; Q2 1.748/1.741/1.744, stock 2.419; forward degradation +17.21%/+12.55%/+143.62%), the two correctness tables (16 videos, identical, all five pairs), all 90 values of the per-cell table, the Q1/Q2 table apart from the one mismatch and all six verdicts, the forward-degradation paragraph (0.2281 vs 0.1946 s, 0.2158 vs 0.1918 s, 0.5230 vs 0.2147 s), and the 'Stated plainly' paragraph (canary means 0.2040 s and 0.1876 s, +8.73%).",
+    "The Summary bullet and the 'Stated plainly' paragraph both give Q1 round 2 as 1.321, which matches; only the Q1/Q2 table shows 1.312. Changing it would not change a verdict (both are well above 0.95).",
+    "Legs used are the ':rc=0' entries in chain_p6_a_done.json; each P6-A leg has 16 measured videos, 0 errors and 3,203 frames; export total_frames = 3,203 in every leg, so CPU-s/frame is the same whichever frames count is used."
+  ]
+}
