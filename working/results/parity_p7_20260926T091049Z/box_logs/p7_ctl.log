@@ -1,0 +1,30 @@
+nohup: ignoring input
+p7_chain.sh sha256: 49ce6840dcd39346cfa153d117f513f7c190442f54e248bc413d0be381e5f4c9
+boot_id e80a450e-9ae0-486d-922a-3165031f55d6  stage control  head ed2cb388c88e  manifest f5a2255cc5c9ad87
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image li:video sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95
+image rr:p5-infer sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd
+containers present: 0
+===== LEG p7ctl_cap (stock K=1 n=1 T=4 env=set warm=- cap=1 manifest=control.jsonl) 09:15:46Z =====
+P1 stamps installed in rr:/opt/rocketride/engine/nodes/detect/IInstance.py (base md5 984d80e45e885b5ae21e987664850b4c; stamped md5 ceac2d61fda3d025b4d0adc82717dfec)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 0.0,
+ "attempts": 1
+}
+P1 stamps collected: 402 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 584.5 GiB | frag avg-extent 30985.1 KiB, >=4MiB share 0.9925 | rr: spool du 324 KiB/5 files, layer 655kB (virtual 9.67GB), cg anon 1.43 GiB, procs 2 rss 1.92 GiB
+[driver] export: /home/ssm-user/parity-bench-p7/working/results/parity_p7_20260926T091049Z/p7ctl_cap/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 1 (errors 0) / offered 1 | THROUGHPUT 3.518 frames/s (52.54x realtime), steady window undefined | SERVICE CPU 5.079 cores = 15.9% of 32 | IDLE BURDEN 1.226 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p7/parity_p7_20260926T091049Z/p7ctl_cap/
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image li:video sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95
+image rr:p5-infer sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd
+CHAIN RESULTS: p7ctl_cap:rc=0
+CHAIN_DONE p7 control control target complete (a gate-control target, not a measured leg)

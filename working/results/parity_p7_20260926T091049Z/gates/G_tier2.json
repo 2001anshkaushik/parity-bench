@@ -1,0 +1,25 @@
+{
+ "gate": "G_tier2",
+ "decided_utc": "2026-09-26T09:37:11Z",
+ "rule": "fires iff the Tier 1 reading is CONDITION-DEPENDENT (preregistration.json P7_B)",
+ "reading": "UNCLASSIFIED",
+ "pattern": {
+  "stock_stable_both_frames": true,
+  "p5_stable_both_frames": false,
+  "stock_identical_to_reference_both_videos": false,
+  "frames_where_p5_disagrees_with_stock": [
+   "IN1002.avi#58"
+  ]
+ },
+ "control_identical": {
+  "p7b_stock_1 vs p7b_stock_2": true,
+  "p7b_stock_1 vs p7b_p5_1": true,
+  "p7b_stock_1 vs p7b_p5_2": true,
+  "p7b_stock_2 vs p7b_p5_1": true,
+  "p7b_stock_2 vs p7b_p5_2": true,
+  "p7b_p5_1 vs p7b_p5_2": true
+ },
+ "missing": null,
+ "arguments": "the preregistered legs, frames, control and reference",
+ "outcome": "NOT FIRED"
+}

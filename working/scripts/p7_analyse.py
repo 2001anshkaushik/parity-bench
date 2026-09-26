@@ -140,6 +140,7 @@ def tier1(camp: Path, legs: Optional[Dict[str, tuple]] = None, frames: Optional[
             "stock_video_identical_to_ref": [video_identical(s1, R, v), video_identical(s2, R, v)] if R else None,
             "vs_banked": {"P1-D stock": [agree(f, frame(R, v, i)) if R else None for f in fs]},
             "deltas_p5_vs_stock": deltas(fs[2], fs[0]), "deltas_stock_vs_stock": deltas(fs[0], fs[1]),
+            "deltas_p5_vs_p5": deltas(fs[2], fs[3]), "deltas_p5_round2_vs_stock_round2": deltas(fs[3], fs[1]),
             "frames_captured": [f is not None and f["dets"] is not None for f in fs],
             "n_detections": [len(f["scores"]) if f else None for f in fs]}
         bp = (banked_p5 or {}).get(v)
@@ -151,7 +152,33 @@ def tier1(camp: Path, legs: Optional[Dict[str, tuple]] = None, frames: Optional[
     for v in list(frames) + [control]:
         n = len((s1["by_video"].get(v) or {}).get("frame_scores") or [])
         dis = [j for j in range(n) if not (v in frames and j == frames[v]) and not agree(frame(p1, v, j), frame(s1, v, j))]
-        other[v] = {"frames": n, "other_frames_where_p5_round1_disagrees_with_stock_round1": dis}
+        anyd = [j for j in range(n) if not (v in frames and j == frames[v])
+                and not all(agree(frame(a, v, j), frame(b, v, j)) for k, a in enumerate(four) for b in four[k + 1:])]
+        refd = [j for j in range(n) if R and not agree(frame(s1, v, j), frame(R, v, j))]
+        other[v] = {"frames": n, "other_frames_where_p5_round1_disagrees_with_stock_round1": dis,
+                    "other_frames_where_any_two_of_the_four_runs_disagree": anyd,
+                    "frames_where_stock_run1_disagrees_with_banked_P1D": refd}
+    # POST-HOC, DESCRIPTIVE (added after Tier 1 ran; decides nothing): per named frame, the runs grouped by identical output,
+    # the banked P1-D stock run and the banked P6-B prototype run included (records compared; captures too where both have them)
+    for v, i in frames.items():
+        allr = [("banked P1-D stock", R), *[(r["dir"], r) for r in four]]
+        bp = (banked_p5 or {}).get(v)
+        if bp is not None:
+            allr.insert(1, ("banked P6-B prototype", run_of(bp)))
+        groups: List[Dict[str, Any]] = []
+        for name, r in allr:
+            fx = frame(r, v, i) if r else None
+            for gr in groups:
+                if agree(gr["_f"], fx):
+                    gr["runs"].append(name)
+                    break
+            else:
+                groups.append({"runs": [name], "_f": fx, "n_detections": len(fx["scores"]) if fx else None,
+                               "top_score": max(fx["scores"]) if fx and fx["scores"] else None,
+                               "lowest_score": min(fx["scores"]) if fx and fx["scores"] else None})
+        for gr in groups:
+            gr.pop("_f")
+        per[f"{v}#{i}"]["post_hoc_distinct_outputs"] = groups
     cf = list(per.values())
     stock_stable = all(x["stock_stable"] for x in cf)
     p5_stable = all(x["p5_stable"] for x in cf)

@@ -1,0 +1,38 @@
+{
+ "gate": "G_cell_p7b_stock_1",
+ "decided_utc": "2026-09-26T09:24:22Z",
+ "leg": "p7b_stock_1",
+ "declared": {
+  "flavour": "stock",
+  "K": 3,
+  "T": 4,
+  "videos": 3,
+  "image_id": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de"
+ },
+ "read_back": {
+  "torch_num_threads": 4,
+  "OMP_NUM_THREADS": "4",
+  "OMP_WAIT_POLICY": "ABSENT",
+  "container_image_id": "sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de",
+  "videos": 3,
+  "max_in_flight": 3,
+  "measured_frames": 318,
+  "stamp_frame_rows": 641,
+  "node": null,
+  "readback_thread": null,
+  "infer_tids": []
+ },
+ "checks": {
+  "readback_present": true,
+  "torch_num_threads_eq_T": true,
+  "env_OMP_NUM_THREADS_eq_T": true,
+  "omp_wait_policy_absent": true,
+  "container_image_as_declared": true,
+  "videos_eq_n": true,
+  "max_in_flight_eq_K": true,
+  "stamps_cover_measured_frames": true,
+  "every_measured_frame_has_forward": true
+ },
+ "rule": "preregistration.json gates.G_cell",
+ "outcome": "PASS"
+}

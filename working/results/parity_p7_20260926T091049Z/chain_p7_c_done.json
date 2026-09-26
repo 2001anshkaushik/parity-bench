@@ -1,0 +1,16 @@
+{
+ "legs": [
+  "p7b_can_1:rc=0",
+  "p7b_stock_1:rc=0",
+  "p7b_p5_1:rc=0",
+  "p7b_can_2:rc=0",
+  "p7b_stock_2:rc=0",
+  "p7b_p5_2:rc=0",
+  "G_tier2:rc=1",
+  "P7B_T2:NOT_RUN_gate",
+  "p7c_can_c2:rc=0",
+  "p7c_p5t16_2:rc=0",
+  "G_correct_C2:PASS",
+  "p7c_lit16_2:rc=0"
+ ]
+}

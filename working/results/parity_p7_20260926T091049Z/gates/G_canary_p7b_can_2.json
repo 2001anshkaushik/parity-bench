@@ -1,0 +1,16 @@
+{
+ "gate": "G_canary_p7b_can_2",
+ "decided_utc": "2026-09-26T09:29:19Z",
+ "leg": "p7b_can_2",
+ "manifest_subset": "v00_EN2001a",
+ "frames_expected": 239,
+ "frames_got": 239,
+ "checks": {
+  "bench_present": true,
+  "frames_identical_to_manifest_subset": true,
+  "one_model_instance": true,
+  "torch_num_threads_eq_4": true,
+  "every_frame_measured": true
+ },
+ "outcome": "PASS"
+}

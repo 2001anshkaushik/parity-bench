@@ -1,0 +1,10 @@
+{
+ "gate": "G_memstat_p7b_stock_1",
+ "decided_utc": "2026-09-26T09:24:27Z",
+ "leg": "p7b_stock_1",
+ "file": "memstat.jsonl",
+ "exists": true,
+ "rows": 203,
+ "rule": "the first leg's memstat.jsonl has >= 1 row (register 55)",
+ "outcome": "PASS"
+}

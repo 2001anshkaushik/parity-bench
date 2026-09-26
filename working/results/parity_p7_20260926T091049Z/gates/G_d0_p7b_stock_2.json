@@ -1,0 +1,22 @@
+{
+ "gate": "G_d0_p7b_stock_2",
+ "decided_utc": "2026-09-26T09:33:07Z",
+ "leg": "p7b_stock_2",
+ "arm": "rr",
+ "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)",
+ "mandate_violation_file": false,
+ "mandate": {
+  "mandate_violation": false,
+  "violations": []
+ },
+ "lwdetr_counts": {
+  "d0_pre": {
+   "rfdetr.models.lwdetr.LWDETR": 1
+  },
+  "d0_post": {
+   "rfdetr.models.lwdetr.LWDETR": 1
+  }
+ },
+ "evidence_present": true,
+ "outcome": "CLEAN"
+}

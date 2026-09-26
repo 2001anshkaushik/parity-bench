@@ -2047,3 +2047,30 @@ than rewritten from memory, which is entry 2's point in miniature.
 >   candidate's.
 > - **A determinism result holds only for the inputs it covered.** "Identical on 16/16" is a claim
 >   about those 16 videos, not about the corpus.
+
+> **Addendum (P7, 2026-09-26).** P7 ran the rule. The two frames were re-run, two runs of each node
+> in one session, with a control video, plus the two banked runs. On TS3010a.avi frame 56 stock
+> itself gave two different outputs across sessions: the banked P1-D run, and today's two runs,
+> which match every prototype run. On IN1002.avi frame 58 stock gave one output in three runs, and
+> the prototype gave three different outputs in its three. Each change moves every score on the
+> frame, and the boxes by up to 0.7 px. Every other frame of the three videos was identical in all
+> four runs. So a single banked run was not a reference for either frame. The replicate that
+> settled TS3010a was stock across sessions, not stock within one session.
+
+## 66. Three readings that did not cover what happened (added 2026-09-26)
+
+> P7-B was specified with three readings. STOCK VARIES: stock differs from itself. PROTOTYPE SHIFTS:
+> stock is stable and matches the banked run, while the prototype is stable but different. CONDITION-DEPENDENT: all
+> four runs agree. The data fit none of them. Within the session stock was stable on both frames,
+> but it did not match the banked run on one of them. The prototype was not stable on the other.
+> The pre-registration had added an UNCLASSIFIED branch that names the pattern, so the reading was
+> still defined before the data. Without that branch the result would have had to be forced into
+> one of the three, or read after the fact.
+>
+> Rules:
+>
+> - **A pre-registered classification needs an explicit residual reading.** List the readings in
+>   the order they are checked, and end with a named catch-all. When the catch-all fires, report
+>   the pattern it found. Do not argue the data into the nearest category.
+> - **"Stable" must say over what.** Within-session replicates cannot show cross-session
+>   variation. A reading about a reference must say whether it covers runs, sessions or both.

@@ -1,0 +1,9 @@
+{
+ "label": "P7 box session facts, recorded by hand from box.sh output (the transcript is ~/.rocketride_box/transcript_20260926.log on the laptop); read by p7_report.py",
+ "sso_before_box": "09:13:46Z: role credentials valid to 11:09:41Z — within 2 h of expiry, and the 3-hour run would outlast them; box.sh login opened the authorization page and Ansh approved it (09:14Z; the new session carries a refresh token)",
+ "box_start": "09:14Z box.sh start; boot e80a450e; no container; rr:patched 073b43d8b5f9, rr:patched-video b7f51acc9533, li:video 0a52afcbe9d4, rr:p5-infer b42c03b69f17 read back; microcode 0x2b000661",
+ "worktree": "~/parity-bench-p7 at ed2cb388 (git worktree of ~/parity-bench)",
+ "control_stage": "09:15:46Z-09:18:50Z p7ctl_cap rc 0 (a gate-control target, not a measured leg)",
+ "gate_controls": "09:19Z gate_controls.json run 1 on the box: 42 of 42 as expected, all_pass",
+ "run_stage_launch": "09:19:38Z p7_run"
+}
