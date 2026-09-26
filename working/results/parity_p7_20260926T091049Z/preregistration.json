@@ -1,0 +1,116 @@
+{
+ "label": "P7 pre-registration \u2014 written and committed before P7-A is computed and before the first leg",
+ "written_utc": "2026-09-26T09:12:27Z",
+ "branch": "feat/parity-p7 from feat/parity-p6 at 6f08e6a6",
+ "step0": {
+  "sso": "checked 08:55Z: role credentials valid to 11:09Z (more than 2 h away), the SSO session carries a refresh token \u2014 no login; re-checked before any box time (if the credentials will lapse before a leg can finish, Ansh is asked to re-login)",
+  "origin": "origin/feat/parity-p6 = 6f08e6a6; feat/parity-p7 created from it",
+  "autoland_self_test": "71 pass, 0 fail"
+ },
+ "recorded": {
+  "p6_standing": "P6's report stands as landed (6f08e6a6): P6-B 166 of 168 videos identical to the banked P1-D stock output; IN1002.avi frame 58 and TS3010a.avi frame 56 differ; cause not established (register 65). P6-C round 2 NOT RUN.",
+  "data_seen_before_this_file": "While locating the committed data for P7-A (08:58-09:05Z), the two named frames' score lists and label multisets (P1-D vs P6-B) and the other frames' largest score difference were printed to the session. P7-A's reading rule is Ansh's, verbatim below; the definitions under P7_A were fixed afterwards and are the only ones the committed records permit (their labels are sorted, so detections can only be paired by rank; they carry no boxes). Nothing else of P7 was computed."
+ },
+ "carried_rules": [
+  "single-instance mandate with D0 read-back on every cell (G_d0); a violation stops the run",
+  "evidence rules, no autonomy over them",
+  "GATE CONTROLS: every gate whole, in its real runtime, positive and null, before launch (p7_gate_controls.py); the run stage refuses without all_pass",
+  "ABAB interleaving, the canary (P3-B bare microbenchmark, rr:patched-video, v00_EN2001a, T=4) before every round, FIXED tolerances",
+  "hard dependency gates",
+  "progress logs as NEW files",
+  "no image built; rr:patched, rr:patched-video, li:video and rr:p5-infer ids read back at each stage's start and end; rr:p5-infer must be P5's sha256:b42c03b6... (the chain refuses otherwise)",
+  "box commands through box.sh; pushes through autoland.sh; working/results append-only; nothing sent, posted or filed"
+ ],
+ "budget": {
+  "box": "3 hours from the run stage's first leg (P7_DEADLINE_EPOCH = first leg + 10,800 s); past it the leg in flight finishes and the rest is NOT RUN, then the report, then box.sh stop and a read-back",
+  "order": "P7-A on the laptop BEFORE any box time; on the box: P7-B Tier 1 -> P7-B Tier 2 (only if G_tier2 fires) -> P7-C. Tier 2 precedes P7-C because it is the rest of P7's headline question; a budget cut then costs P7-C's LlamaIndex leg first, which the in-flight rule lets finish if it has started"
+ },
+ "P7_A": {
+  "question": "WHERE DO THE TWO FRAMES SIT? (laptop, committed exports only)",
+  "hypothesis": "the two differing frames (IN1002.avi frame 58, TS3010a.avi frame 56) are threshold-boundary artifacts: a detection scoring within rounding distance of the 0.3 threshold, so a last-digit numeric difference decides whether it is emitted",
+  "inputs": {
+   "prototype": "parity_p6_20260925T175225Z p6b_rr_b06 (IN1002.avi) and p6b_rr_b10 (TS3010a.avi) records, the LAST measured ok row per video",
+   "banked_stock": "parity_p1_20260923T184000Z/v1full_rr_t4 records (rr:patched-video, K=16, T=4, 168 videos, no stamps), the LAST measured ok row per video"
+  },
+  "august_evidence": "Find and cite the committed artifact of the August ami_full campaign's cross_detection_agreement failure (IN1002.avi frame 58, 0.3004 against 0.3); if it is not committed, say so and do not use the figure.",
+  "s5b_evidence": "S5-B's one label-set change (0.3011 -> 0.3008 across the band): cite its committed artifact",
+  "definitions": {
+   "detections": "per frame, the records hold frame_scores (the scores in the node's order) and frame_label_multisets (labels SORTED, unpaired with scores); no box. Detections are paired by RANK: each frame's scores sorted descending, pair k with pair k.",
+   "differing_detection": "a rank pair whose two scores differ, or a detection without a partner (the counts differ). Its label is given only when it is unpaired and the frame's label-multiset difference names exactly that many labels of one kind; otherwise 'not recoverable'. Its box: not recorded.",
+   "other_frames": "every frame of both videos except the named one; per frame the rank-paired max |score delta| when the counts and label multisets are equal; a frame whose count or labels differ fails C2",
+   "box": "no committed export records boxes; C3 is therefore NOT EVALUABLE from committed exports (the chunk-hash agreement is reported beside, descriptively)",
+   "sessions": "CPU model (cpu_model.txt), microcode if any leg file records it, mean MHz at leg open and close (mhz_open/close.txt) for the P1-D leg and the P6-B block legs"
+  },
+  "reading_rule_verbatim": "BOUNDARY if every differing detection's score in either run is within +/-0.001 of 0.3 AND every other frame of both videos has max score delta <= 1e-5 and box delta <= 1e-3 px. NOT BOUNDARY otherwise; name what failed.",
+  "reading_rule_as_applied": {
+   "C1": "every differing detection has at least one of its scores (banked stock, prototype) within [0.299, 0.301] (an unpaired detection: its one score)",
+   "C2": "every other frame of both videos: max score delta <= 1e-5, same count and labels",
+   "C3": "every other frame of both videos: max box delta <= 1e-3 px \u2014 NOT EVALUABLE from committed exports",
+   "reading": "BOUNDARY iff C1 AND C2 AND C3 hold; a clause that cannot be evaluated does not hold, so the reading is then NOT BOUNDARY, naming each failed clause and each not-evaluable clause separately"
+  },
+  "script": "working/scripts/p7_frames.py -> p7a_frames.json"
+ },
+ "P7_B": {
+  "question": "IS IT THE PROTOTYPE OR STOCK ITSELF?",
+  "tier_1": {
+   "videos": [
+    "IN1002.avi (frame 58)",
+    "TS3010a.avi (frame 56)",
+    "IN1009.avi (the CONTROL: P6-B block 06, 84 frames, identical to the banked P1-D output in P6-B)"
+   ],
+   "manifest": "p7_manifests/tier1.jsonl (the P6-B manifests' meta and 2 warm rows, then the three videos' rows in that order)",
+   "cells": "stock = rr:patched-video (P1 stamps, as P6-A's stock cells) and prototype = rr:p5-infer (P5 stamps, as P6-A/B); K=3, T=4 (six vars), the driver's default warm policy (as P6-A), --keep-detections (the P7 driver flag: every measured frame's detections \u2014 label, score, box \u2014 kept beside the records, records unchanged)",
+   "order": "two ABAB rounds, each after the canary: p7b_can_1 p7b_stock_1 p7b_p5_1, p7b_can_2 p7b_stock_2 p7b_p5_2; every leg in a fresh container",
+   "definitions": {
+    "frame_agreement": "two runs AGREE on a frame iff its scores list and label multiset are equal and, where both runs captured detections, the detection lists are equal (label, score, box x1 y1 x2 y2, in the node's order)",
+    "video_identity": "chunk_sha256 AND frame_scores equal (P6's identity) and, where both captured, every frame's detection list equal"
+   },
+   "readings_verbatim": {
+    "STOCK VARIES": "stock differs from itself on either frame. The prototype is not implicated.",
+    "PROTOTYPE SHIFTS": "stock is stable and matches the banked P1-D output; the prototype is stable but differs from stock on the same frames. Report the deltas against S5-B's Tier-2 tolerances: labels outside a +/-0.001 band, score <= 1e-5, box <= 1e-3 px.",
+    "CONDITION-DEPENDENT": "all four runs agree with each other on both frames. The difference needs the original conditions, so go to TIER 2.",
+    "control": "The control video must be identical across every run, or the tier is unreadable."
+   },
+   "readings_as_applied": "in this order: UNREADABLE (the control not identical across all four runs) -> STOCK VARIES (the two stock runs disagree on either named frame) -> PROTOTYPE SHIFTS (stock agrees with itself on both frames AND both stock runs are video-identical to P1-D on both named videos; the prototype agrees with itself on both frames and disagrees with stock on BOTH) -> PROTOTYPE SHIFTS ON ONE FRAME (the same, disagreeing on exactly one; named) -> CONDITION-DEPENDENT (all four agree on both frames) -> UNCLASSIFIED (any other pattern, named: e.g. the prototype disagreeing with itself, or stock stable but not the banked output)",
+   "deltas": "S5-B's comparator, batchsize_analyse_s5b.tier2_frame, imported unchanged, on the captured detections of each disagreeing pair; the rank-paired score delta from the records beside",
+   "descriptive": "per named frame, each run's agreement with the banked P1-D stock frame and the banked P6-B prototype frame; every other frame of the three videos where the prototype disagrees with stock",
+   "gate": "G_tier2 fires iff the reading is CONDITION-DEPENDENT"
+  },
+  "tier_2": {
+   "only_if": "G_tier2 fires",
+   "legs": "the exact P6-B blocks: block 06 (IN1002.avi and the control IN1009.avi) and block 10 (TS3010a.avi), with P6-B's committed manifests (parity_p6 p6b_manifests/block_06.jsonl, block_10.jsonl); both P7-B cells (stock and prototype); K=16, T=4, one run each; ABAB: p7t2_can_1 p7t2_stock_b06 p7t2_p5_b06, p7t2_can_2 p7t2_stock_b10 p7t2_p5_b10",
+   "conditions": "P6-B's per-arm procedure in a FRESH container: its one-time start warm (P6-B's start manifest, 16 warm sends at concurrency 16, a separate driver run, excluded) then the block (2 warm sends at 2, excluded; --keep-detections). Differs from P6-B: the container has not served blocks 1..NN-1 before, and no paused LlamaIndex container sits beside it.",
+   "readings_as_applied": "per named video: STOCK VARIES (the Tier 2 stock run disagrees on the frame with either Tier 1 stock run or with P1-D) -> PROTOTYPE SHIFTS (it agrees with them; the Tier 2 prototype run disagrees with it \u2014 and whether it reproduces P6-B's banked prototype frame is reported) -> NOT REPRODUCED (all agree). UNREADABLE if IN1009.avi is not identical across the four Tier 1 runs and both block-06 runs. One reading per video; the overall reading is theirs if they agree, else MIXED with both named."
+  }
+ },
+ "P7_C": {
+  "question": "P6-C round 2 (the thread count)",
+  "cells": "exactly P6-C's: p7c_p5t16_2 = rr:p5-infer with the six thread variables UNSET (out of box; P5 stamps), p7c_lit16_2 = li:video one instance with the six variables = 16; the 16-video slice (the AMI manifest's first 16 measured rows), K=16; one ABAB round after the canary p7c_can_c2; torch threads read back in-process on both (G_cell: 16 on both, and for P5 the six variables absent)",
+  "correctness": "G_correct_C2: p7c_p5t16_2 identical on 16/16 to parity_p0_20260923T083031Z/v1_rr_def_a (P6-C's reference). HARD for P7-C: if it fails, the LlamaIndex leg is NOT RUN and there is no speed reading.",
+  "p6_rule_verbatim": {
+   "T16_FORWARD": "fixed tolerance: F(P5 T=16) / F(P5 T=4) <= 0.95 (faster by at least 5%), F(P5 T=4) = P6-A's p6a_p5k16 cell; per round (P6-C round r against P6-A round r) and pooled (cell means)",
+   "T16_PARITY": "fps(P5 T=16) / fps(LI T=16), reported against 0.95",
+   "not_interleaved": "the T=16 vs T=4 comparison crosses stages of the session (P6-A, then P6-B, then P6-C), as the question specifies; it is NOT ABAB-protected. The canary per round (P6-A and P6-C) is reported beside it and adjusts nothing."
+  },
+  "pooled_as_applied": "P6-C's pooled reading exactly as P6 wrote it: cell means over P6-C round 1 (parity_p6 p6c_p5t16_1, p6c_lit16_1) and P7-C round 2 (p7c_p5t16_2, p7c_lit16_2); F(P5 T=4) = the mean of P6-A's p6a_p5k16_1 and _2 forwards; T16_FORWARD: F(T=16 mean) / F(T=4 mean) <= 0.95 = faster by at least 5%; T16_PARITY: fps(P5 T=16 mean) / fps(LI T=16 mean), reported against 0.95. Round 2 alone (against P6-A round 2) beside. CROSS-SESSION: round 1 and the T=4 reference are in P6's box session, round 2 in P7's; P6's rule is applied as written and the canaries of both sessions are reported beside, adjusting nothing."
+ },
+ "P7_D_laptop": {
+  "1_patch_description": "update P6_UPSTREAM_PATCH_DRAFT with P7-A/B: state exactly what the 168-video correctness claim is and on what evidence; the patch keeps today's default thread count and is presented as output-identical at matched threads",
+  "2_thread_ticket": "a SEPARATE ticket draft, 'default intra-op thread count for the detect node', from P6-C/P7-C: speed at 4 vs 16 threads and the output effect stated plainly (S5-A: labels identical, scores shift; only unset/16 reproduces today's default output) \u2014 drafted only if the pooled reading is readable; otherwise the reason is recorded",
+  "3_cto_brief": "update the CTO brief draft with P7's findings; one page",
+  "all": "drafts only \u2014 nothing sent, posted or filed"
+ },
+ "gates": {
+  "G_alone": "before every leg and canary: no container on the box",
+  "G_d0": "after every leg: RR \u2014 the export's p0 block with d0_pre/d0_post and exactly ONE LWDETR; LI \u2014 one container, one process, --workers 1",
+  "G_cell": "after every leg: P6's G_cell (T read back in-process, the thread env or its absence, the image, K in flight = min(K, n), videos = n, stamps cover the measured frames)",
+  "G_warm": "Tier 2 only: the declared warm set (16 at 16 for the start warm, 2 at 2 for the block) in the leg's warm ledger",
+  "G_detcap": "after every leg run with --keep-detections: the capture exists and agrees exactly with the records (every measured video, frame count, scores in order, sorted labels, a box on every detection)",
+  "G_memstat": "after the first leg: memstat.jsonl non-empty",
+  "G_canary": "after every canary: frame identity against the P3 manifest",
+  "G_tier2": "after Tier 1: fires iff the Tier 1 reading is CONDITION-DEPENDENT",
+  "G_correct_C2": "after p7c_p5t16_2: identical on 16/16 to P0 v1_rr_def_a (HARD for P7-C)",
+  "exit_codes": "G_d0 fail stops the run (exit 9); G_cell, G_warm, G_detcap, G_canary fail stop it (exit 11); G_memstat (exit 10)"
+ },
+ "deliverable": "one P7 report: the P7-A reading; the P7-B reading and the tier reached; the P6-C pooled reading; the three drafts; anything NOT RUN with the reason. Blind recompute with planted figures. Stop the box and read back its state."
+}

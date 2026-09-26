@@ -310,6 +310,24 @@ def frame_arrays_from_chunks(contents: List[str], max_k: int = 400) -> Optional[
     return arrays
 
 
+# P7 DETECTION CAPTURE (2026-09-26, parity_p7 preregistration P7_B): opt-in (--keep-detections, rocketride arm only).
+# When set, record_from_rr carries the per-frame detection arrays it ALREADY parses from the returned chunk text (the
+# detect node's own JSON: label, score, box, centroid) under a private key, and run_leg writes them — keyed by video and
+# role — to detections_<stem>.jsonl beside the records, popping the key first, so the records file is byte-for-byte what
+# it is without the flag. Nothing here touches a send, a timing or a record field. Off (None) by default.
+DETCAP_PATH: Optional[Path] = None
+
+
+def _detcap_take(rec: dict) -> None:
+    """Pop the private detection arrays off a record; with capture on, append them to the capture file."""
+    arrays = rec.pop('_detections', None)
+    if DETCAP_PATH is None or arrays is None:
+        return
+    with open(DETCAP_PATH, 'a') as f:
+        f.write(json.dumps({'video': rec.get('video'), 'role': rec.get('role'), 'n_frames': len(arrays),
+                            'frames': arrays}) + '\n')
+
+
 def record_from_rr(result: dict) -> dict:
     docs = (result or {}).get('documents') or []
     contents = [d.get('page_content') or '' for d in docs]
@@ -322,7 +340,7 @@ def record_from_rr(result: dict) -> dict:
     # indeterminate (uniform content — a static scene can produce identical
     # chunks organically; never folded into PASS or FAIL).
     doubled = gs.whole_list_doubled(hashes)
-    return {
+    out = {
         'n_chunks': n,
         'chunk_chars': lens,
         'chunk_sha256': hashes,
@@ -360,6 +378,9 @@ def record_from_rr(result: dict) -> dict:
         'stage_s': None,
         'serving_pid': None,
     }
+    if DETCAP_PATH is not None and arrays is not None:
+        out['_detections'] = arrays      # P7 capture: popped by run_leg before the record is written
+    return out
 
 
 def record_from_li(body: dict) -> dict:
@@ -1650,6 +1671,7 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
                     stop.set()
             finally:
                 resident -= 1
+            _detcap_take(rec)
             writer.write(rec)
 
     if leg == 'sequential':
@@ -1679,6 +1701,7 @@ async def run_leg(arm, rows: List[dict], leg: str, concurrency: int,
                     except Exception as exc:  # noqa: BLE001
                         rec['error'] = repr(exc)
                         rec['done_ns'] = time.monotonic_ns()
+                    _detcap_take(rec)
                     writer.write(rec)
     else:
         await asyncio.gather(*[one(row) for row in rows])
@@ -2155,6 +2178,10 @@ async def amain() -> int:
                          'both arms; requires --warm-concurrency. Default: the per-arm policies (Crossroad 40).')
     ap.add_argument('--warm-concurrency', type=positive_int('warm-concurrency', 256), default=None,
                     help='P6 warm symmetry: concurrency of the --warm-sends sends')
+    ap.add_argument('--keep-detections', action='store_true',
+                    help='P7 (opt-in, rocketride arm only): write every measured video\'s per-frame detection arrays '
+                         '(label, score, box, as parsed from the returned chunks) to detections_<stem>.jsonl; the '
+                         'records file is unchanged')
     ap.add_argument('--skip-warmup', action='store_true',
                     help='resume aid ONLY — a fresh container without warm-up is not measurable')
     ap.add_argument('--no-collector', action='store_true')
@@ -2214,6 +2241,8 @@ async def amain() -> int:
                          'one without the other is not a declared warm policy.')
     if args.warm_sends is not None and args.skip_warmup:
         raise SystemExit('NOT DONE — --warm-sends with --skip-warmup: a declared warm set that never runs.')
+    if args.keep_detections and args.arm != 'rocketride':
+        raise SystemExit('NOT DONE — --keep-detections is the rocketride arm only (it keeps what record_from_rr parses).')
     if args.arm == 'rocketride' and args.rr_threads_env is None:
         raise SystemExit('NOT DONE — --rr-threads-env is required for the rocketride arm '
                          '(an int or "unset"): the thread env is a declared, read-back value '
@@ -2438,6 +2467,10 @@ async def amain() -> int:
     # overwrote the default leg's (same class as the PASSES defect).
     sfx = '' if args.pass_n == 1 else f'_p{args.pass_n}'
     stem = f'{arm.name}_{posture.name}_{args.leg}{sfx}'
+    if getattr(args, 'keep_detections', False):
+        global DETCAP_PATH
+        DETCAP_PATH = out_dir / f'detections_{stem}.jsonl'
+        say(f'P7 detection capture ON: {DETCAP_PATH.name} (records unchanged)')
     (out_dir / f'preflight_{stem}.json').write_text(json.dumps(
         {k: v for k, v in pf.items() if k != 'rows'}
         | {'posture': posture.label(), 'pass': args.pass_n}, indent=1))
@@ -2776,6 +2809,9 @@ async def amain() -> int:
     }
     # Ruling 2026-08-21: throughput and idle burden legible TOGETHER, at a
     # glance — first key of the export, last line of stdout.
+    if DETCAP_PATH is not None:
+        export['detections_capture'] = {'file': DETCAP_PATH.name, 'flag': '--keep-detections',
+                                        'note': 'P7: per-frame detection arrays per measured video; records unchanged'}
     glance = at_a_glance_line(export)
     export = {'at_a_glance': glance} | export
     # Structural guard: a blast export without window_n must be impossible.
