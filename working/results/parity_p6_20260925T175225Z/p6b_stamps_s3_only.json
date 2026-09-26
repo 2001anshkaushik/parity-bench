@@ -1,0 +1,149 @@
+{
+ "label": "P6-B stamp files kept in S3 only (each block's copy accumulates every earlier block of its long-lived container, so they grow block by block; no P6 analysis reads them \u2014 P6-B reads records and exports; G_cell read them on the box)",
+ "files": [
+  {
+   "file": "p6b_li_b01/p1_stamps.jsonl",
+   "bytes": 3274595,
+   "sha256": "6ac00135c500badeaa9cea9379c4e56f0e0776deae097d394d74932ed44af2e7",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b01/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b02/p1_stamps.jsonl",
+   "bytes": 4510357,
+   "sha256": "6571ba2351e92ba59819c8db20d77008135418987569556328d94aecaff645ac",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b02/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b03/p1_stamps.jsonl",
+   "bytes": 5669655,
+   "sha256": "436bb8b43a802577cac299070e709e5dee7ba634461d50d2100980e855dc7834",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b03/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b04/p1_stamps.jsonl",
+   "bytes": 6707620,
+   "sha256": "c0ff7a889c88425776613ba1b99b7c4242079a242142c8794e18848392c174cc",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b04/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b05/p1_stamps.jsonl",
+   "bytes": 7970012,
+   "sha256": "221c5cfdc4e3e5bcc8a8ee3252ebb87346e637c9a680748c231a7fbc68828a97",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b05/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b06/p1_stamps.jsonl",
+   "bytes": 9611499,
+   "sha256": "f38b95ce640973544658b8898c6b30a18456b9a0868b053523d944abc70a70d4",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b06/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b07/p1_stamps.jsonl",
+   "bytes": 10715684,
+   "sha256": "8573bd665654a6bdd4a9791ffde297796368f1a29a8e182951b352bd3a434ac8",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b07/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b08/p1_stamps.jsonl",
+   "bytes": 11743423,
+   "sha256": "6e628decb59a1210da845fc6791c91e187d54029b67cf14ed92f1c050447587f",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b08/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b09/p1_stamps.jsonl",
+   "bytes": 13128616,
+   "sha256": "a957870b93b8bdc689e14335db3d731314ef544b6875b2a7818d725b8b481ebe",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b09/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b10/p1_stamps.jsonl",
+   "bytes": 14506095,
+   "sha256": "e416c4f9969ae6a3f242bacb5e4b10a38d9b35eab3594a079735535ac29d1577",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b10/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_b11/p1_stamps.jsonl",
+   "bytes": 15213097,
+   "sha256": "d1c8c0ea9f6566e6019b644e01a8101594bdf3d1e3406c036063b008f87f4e61",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b11/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_li_startwarm/p1_stamps.jsonl",
+   "bytes": 1455008,
+   "sha256": "85debd7020b3c1ee3e512a93e07c6c8efb45cd22d1ab7d8e4e63ce669e829932",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_startwarm/p1_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b01/p5_stamps.jsonl",
+   "bytes": 4994734,
+   "sha256": "cd89a80bdb4c03cb27bda5e216ac690ef0c39eaf11a703de1b3b51b6341c520c",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b01/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b02/p5_stamps.jsonl",
+   "bytes": 6878990,
+   "sha256": "f01517d0af57790edd51e5799bfc4793fccd97194e9a66947b1677de9f040f60",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b02/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b03/p5_stamps.jsonl",
+   "bytes": 8646456,
+   "sha256": "1ab715af6c50ecb4d3daa609149e96e581354907c62586df0c4e326caa59923b",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b03/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b04/p5_stamps.jsonl",
+   "bytes": 10227740,
+   "sha256": "ffb0d5a1b666eb087c497a13503f12cb76115b6fdf283575533291577a5bec28",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b04/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b05/p5_stamps.jsonl",
+   "bytes": 12155904,
+   "sha256": "50516754d0b7dc92ebf628c6310b800aac015f03b8628ee653530aeb5e7bc3b9",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b05/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b06/p5_stamps.jsonl",
+   "bytes": 14657450,
+   "sha256": "72c3c8214a14fefe08f0ad1e214c1e0ff0d503ee2512b190f0f8c38135696ece",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b06/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b07/p5_stamps.jsonl",
+   "bytes": 16339198,
+   "sha256": "2d686e268538a7a3369d16ebf25910b8e36c86a830123611ee29768e47961be9",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b07/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b08/p5_stamps.jsonl",
+   "bytes": 17904303,
+   "sha256": "d922f736cd6e1791d0b99262f14867df6c65b8cfa53d5f6b5cf9924af689dd19",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b08/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b09/p5_stamps.jsonl",
+   "bytes": 20017770,
+   "sha256": "bd26009dec67ad270aa2c9dcb09d753639d060b5ad95b2d44596457b4391a069",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b09/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b10/p5_stamps.jsonl",
+   "bytes": 22119733,
+   "sha256": "58353b2922a7a96316f38c43d22ffde41bc94c1da322fde0a8a5bf4a08e639a6",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b10/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_b11/p5_stamps.jsonl",
+   "bytes": 23197211,
+   "sha256": "440c505c39fe26d89b30e17c9376e6f6081c0457c601c8bafca7eeb2b44a262f",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b11/p5_stamps.jsonl"
+  },
+  {
+   "file": "p6b_rr_startwarm/p5_stamps.jsonl",
+   "bytes": 2219230,
+   "sha256": "8ccf4e8e334a20ae856707db3564b42cbc53962c799f02a0cfa7f8866229b1e1",
+   "s3": "s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_startwarm/p5_stamps.jsonl"
+  }
+ ]
+}

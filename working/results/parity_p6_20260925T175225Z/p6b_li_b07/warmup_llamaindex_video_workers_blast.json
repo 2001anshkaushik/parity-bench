@@ -1,0 +1,53 @@
+{
+ "arm": "llamaindex_video",
+ "leg": "blast",
+ "posture": "workers",
+ "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)",
+ "warm_sends_declared": 2,
+ "warm_concurrency_declared": 2,
+ "gate": {
+  "rule": "warm markers via /health (Crossroad 41)",
+  "warm_workers": 1,
+  "declared_workers": 1,
+  "tokens_seen": null
+ },
+ "sends": [
+  {
+   "i": 0,
+   "row": "TS3012c.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 88.73,
+   "error": null
+  },
+  {
+   "i": 1,
+   "row": "TS3012d.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 86.801,
+   "error": null
+  }
+ ],
+ "response_pid_distribution": {
+  "distinct_response_pids": 1,
+  "declared_workers": 1,
+  "sends": 2,
+  "per_pid_send_counts": {
+   "8802:1": 2
+  },
+  "busiest_worker_sends": 2,
+  "quietest_serving_worker_sends": 2,
+  "unserved_declared_pids": null,
+  "note": "REPORTED, NOT GATED (Crossroad 41). uvicorn workers are selected by the kernel at accept and /process_video does not block its event loop, so response-pid spread measures scheduling, not warmth. Warmth is gated on the service warm markers."
+ },
+ "declared_worker_pids": [
+  [
+   8802,
+   1
+  ]
+ ],
+ "note": "pid identity is only comparable within ONE container lifetime (defect #23: pid reuse across restarts)"
+}

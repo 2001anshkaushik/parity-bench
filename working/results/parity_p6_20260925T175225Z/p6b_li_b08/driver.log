@@ -1,0 +1,23 @@
+[driver] driver lock held: /tmp/driver_video_llamaindex.lock (pid 87989)
+[driver] LI: warm_workers=1 declared=1 over 1 instance(s)  detect_impl=rfdetr
+[driver] preflight: manifest
+[driver] preflight: corpus_dir=/home/ssm-user/parity-bench-video/corpus/ami/full [manifest meta]
+[driver] preflight: container flags
+[driver] preflight: network mode {'li_bal_0': 'host'} (Crossroad 22: host, both arms)
+[driver] preflight: quiet box PASS foreign 0.01 vs threshold 2.0 — host busy 0.02 − containers 0.01 {'li_bal_0': 0.006} − ours 0.005 [instantaneous (/proc/stat busy − containers − ours)]; load1 1.65 (lagging, by-load1 foreign 1.61); 1 reading(s) over 4.1s, trend SINGLE READING
+[driver] preflight: read-backs (absence fails before agreement)
+[driver] idle burden: 0.00 cores with 1 instance(s) live = 0.0% of the box before any work (pre-instance baseline 0.006)
+[driver] preflight PASSED — llamaindex_video workers[declared_workers=1] leg=blast n=16
+[driver] cache eviction: rc=0 }
+[driver] warm-up: 2 disjoint items
+[driver] warm-up consumed 2 send(s) (P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency))
+[driver] warm-up ledger: warmup_llamaindex_video_workers_blast.json
+[driver] warm-up gate: 1/1 warm markers present (Crossroad 41)
+[driver] warm-up distribution (REPORTED, not gated): 1/1 distinct response pids over 2 sends; busiest 2, quietest 2 — kernel accept skew, published
+[driver] warm-up complete: tokens=n/a worker_pids=1
+[driver] service CPU bracket: summing 1 container cgroup(s): li_bal_0
+[driver] lifetime_state leg_start: docker_root free 586.1 GiB | frag avg-extent 31598.5 KiB, >=4MiB share 0.9924 | li_bal_0: spool du 10672 KiB/5 files, layer 11MB (virtual 9.1GB), cg anon 1.30 GiB, procs 1 rss 1.75 GiB
+[driver] stream residency: max 16 concurrent in-flight (cap = 16); sha pass off-loop via to_thread; no whole blob held (streaming refactor 2026-08-27, DIAG_M1_BLAST discipline kept)
+[driver] lifetime_state leg_end: docker_root free 586.1 GiB | frag avg-extent 31612.0 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 11516 KiB/5 files, layer 11.8MB (virtual 9.1GB), cg anon 1.37 GiB, procs 1 rss 1.81 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b08/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.015 frames/s (45.25x realtime), steady window undefined | SERVICE CPU 2.952 cores = 9.2% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok

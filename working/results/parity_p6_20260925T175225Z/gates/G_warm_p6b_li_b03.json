@@ -1,0 +1,19 @@
+{
+ "gate": "G_warm_p6b_li_b03",
+ "decided_utc": "2026-09-25T22:34:37Z",
+ "leg": "p6b_li_b03",
+ "declared": {
+  "sends": 2,
+  "concurrency": 2
+ },
+ "checks": {
+  "ledger_present": true,
+  "declared_sends": true,
+  "declared_concurrency": true,
+  "sends_in_ledger": true,
+  "every_send_served": true,
+  "policy_is_p6": true
+ },
+ "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)",
+ "outcome": "PASS"
+}

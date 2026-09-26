@@ -1,0 +1,45 @@
+nohup: ignoring input
+G_memstat
+  ok    G_memstat [positive: P5 p5a_stock16_1] expect PASS, got rc 0  
+  ok    G_memstat [null: batchsize_smoke rr_k16 (no memory sampler)] expect FAIL, got rc 1  
+G_d0
+  ok    G_d0 rr [positive: P5 p5a_p5k16_1] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T18:15:16Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [positive: the control leg p6ctl_p5t16 (out of box)] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T18:15:16Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 rr [null: batchsize_smoke rr_k16 (no on-token D0: absence)] expect FAIL, got rc 2  {"gate": "G_d0_L", "decided_utc": "2026-09-25T18:15:16Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+  ok    G_d0 li [positive: P5 p5a_li16_1] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T18:15:16Z", "leg": "L", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE co
+  ok    G_d0 li [positive: the control leg p6ctl_lit16] expect PASS, got rc 0  {"gate": "G_d0_L", "decided_utc": "2026-09-25T18:15:16Z", "leg": "L", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE co
+  ok    G_d0 li [null: batchsize_smoke li_k16 (eight LlamaIndex containers)] expect FAIL, got rc 1  {"gate": "G_d0_L", "decided_utc": "2026-09-25T18:15:16Z", "leg": "L", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE co
+  ok    G_d0 rr [null: a copy of p5a_p5k16_1 whose post-leg D0 counts TWO LWDETR instances] expect FAIL, got rc 1  {"gate": "G_d0_L", "decided_utc": "2026-09-25T18:15:16Z", "leg": "L", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 bl
+G_cell
+  ok    G_cell p5 T=4 [positive: P5 p5a_p5k16_1] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell p5 T=4 [null: p6ctl_p5t16 against T=4 (torch 16, the six vars unset)] expect FAIL, got rc 1  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell p5 T=16 unset [positive: the control leg p6ctl_p5t16] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "po
+  ok    G_cell p5 T=16 unset [null: P5 p5a_p5k16_1 against T=16 unset (torch 4, vars set)] expect FAIL, got rc 1  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "po
+  ok    G_cell li T=16 [positive: the control leg p6ctl_lit16] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell li T=16 [null: P5 p5a_li16_1 against T=16 (torch 4)] expect FAIL, got rc 1  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell stock T=4 [positive: P5 p5a_stock16_1] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell stock T=4 [null: P5 p5a_p5k16_1 against the stock spec (image, stamps)] expect FAIL, got rc 2  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell li T=4 [positive: P5 p5a_li16_1] expect PASS, got rc 0  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+  ok    G_cell li T=4 [null: batchsize_smoke li_k16 (no read-back)] expect FAIL, got rc 2  {"gate": "G_cell_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "ru
+G_warm (the P6 warm symmetry: declared and shown in the leg's warm-up ledger)
+  ok    G_warm [positive: the control leg p6ctl_warm_rr (2 at 2)] expect PASS, got rc 0  {"gate": "G_warm_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetr
+  ok    G_warm [positive: the control leg p6ctl_warm_li (2 at 2)] expect PASS, got rc 0  {"gate": "G_warm_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetr
+  ok    G_warm [null: P5 p5a_p5k16_1 (the default warm policy, nothing declared)] expect FAIL, got rc 1  {"gate": "G_warm_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "checks": "\u2026", "policy": "2 first batch +
+  ok    G_warm [null: p6ctl_warm_rr against 16 at 16] expect FAIL, got rc 1  {"gate": "G_warm_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetr
+G_canary
+  ok    G_canary [positive: P5 p5c_can_1 (committed canary)] expect PASS, got rc 0  {"gate": "G_canary_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "manifest_subset": "v00_EN2001a", "frames_expected": 239, "frames_
+  ok    G_canary [null: P3 p3b_a_1 (the same bench over all three videos)] expect FAIL, got rc 1  {"gate": "G_canary_L", "decided_utc": "2026-09-25T18:15:17Z", "leg": "L", "manifest_subset": "v00_EN2001a", "frames_expected": 239, "frames_
+G_correct
+  ok    G_correct [positive: P0 v1_rr_t4_a vs v1_rr_t4_b (identical 16/16)] expect PASS, got rc 0  {"gate": "G_correct", "decided_utc": "2026-09-25T18:15:17Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-ide
+  ok    G_correct [positive (the P6-C reference form, an absolute path): P0 v1_rr_def_b vs v1_rr_def_a (identical 16/16)] expect PASS, got rc 0  {"gate": "G_correct", "decided_utc": "2026-09-25T18:15:17Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-ide
+  ok    G_correct [null: P0 v1_rr_def_a vs v1_rr_t4_a (T=16 vs T=4: differs on 16/16)] expect FAIL, got rc 1  {"gate": "G_correct", "decided_utc": "2026-09-25T18:15:17Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-ide
+  ok    G_correct [null: P3 p3b_c_1 vs p3b_c_2 (identical but 3 videos)] expect FAIL, got rc 1  {"gate": "G_correct", "decided_utc": "2026-09-25T18:15:17Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-ide
+G_smoke_P6B (correctness both rounds AND Q1 round 1, round 2, pooled) on P5's committed smoke legs as P6-A cells
+  ok    G_smoke_P6B [positive: P6-A cells = P5's stock / P5 / LI K=16 legs (Q1 1.35 and 1.40, identical output)] expect PASS, got rc 0  {"gate": "G_smoke_P6B", "decided_utc": "2026-09-25T18:15:18Z", "rule": "fires iff correctness holds in both rounds AND Q1 (P5 f/s / LI f/s >
+  ok    G_smoke_P6B [null: the 'P5' cell = P5's STOCK legs (P5/LI below 0.95; output identical)] expect FAIL, got rc 1  {"gate": "G_smoke_P6B", "decided_utc": "2026-09-25T18:15:18Z", "rule": "fires iff correctness holds in both rounds AND Q1 (P5 f/s / LI f/s >
+G_alone
+  ok    G_alone [positive: no container on the box] expect PASS, got rc 0  containers present: 0
+  ok    G_alone [null: one created container present] expect FAIL, got rc 1  containers present: 1 
+
+gate controls: 33 of 33 as expected -> all_pass=True (gate_controls.json)
+CTL_DONE

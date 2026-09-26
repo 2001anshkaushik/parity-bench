@@ -1,0 +1,14 @@
+{
+ "legs": [
+  "p6c_can_a1:rc=0",
+  "p6a_stock16_1:rc=0",
+  "p6a_p5k16_1:rc=0",
+  "G_correct_A1:PASS",
+  "p6a_li16_1:rc=0",
+  "p6c_can_a2:rc=0",
+  "p6a_stock16_2:rc=0",
+  "p6a_p5k16_2:rc=0",
+  "G_correct_A2:PASS",
+  "p6a_li16_2:rc=0"
+ ]
+}

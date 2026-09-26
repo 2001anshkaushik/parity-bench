@@ -1,0 +1,465 @@
+nohup: ignoring input
+p6_chain.sh sha256: 5c88f89bc435e3d11d802ea2b7a947ba32147653940b1a980a86e28dcf608ac5
+boot_id eb83839f-a2bd-45ca-880b-0269d56f5b4e  stage run  head 8e4cf34a8eb4  manifest f5a2255cc5c9ad87
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image li:video sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95
+image rr:p5-infer sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd
+gate controls: gate_controls.json all_pass
+first leg starts 18:15:37Z; deadline 02:15:37Z (epoch 1790388937)
+containers present: 0
+===== CANARY p6c_can_a1 18:15:37Z (paused containers allowed: 0) =====
+P3B_BENCH {"out": "/out/bench.json", "measured_frames": 239, "one_model_instance": true, "rfdetr_models": 1, "forward_mean_s": 0.20424247048116698, "cores_in_forward": 4.999604901123173, "torch_threads": 4}
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6c_can_a1/
+{"gate": "G_canary_p6c_can_a1", "decided_utc": "2026-09-25T18:16:40Z", "leg": "p6c_can_a1", "manifest_subset": "v00_EN2001a", "frames_expected": 239, "frames_got": 239, "checks": "\u2026", "outcome": "PASS"}
+containers present: 0
+===== LEG p6a_stock16_1 (stock K=16 n=16 T=4 env=set warm=-) 18:16:41Z =====
+P1 stamps installed in rr:/opt/rocketride/engine/nodes/detect/IInstance.py (base md5 984d80e45e885b5ae21e987664850b4c; stamped md5 ceac2d61fda3d025b4d0adc82717dfec)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P1 stamps collected: 3526 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 32023.9 KiB, >=4MiB share 0.9926 | rr: spool du 2568 KiB/5 files, layer 2.95MB (virtual 9.67GB), cg anon 5.06 GiB, procs 2 rss 5.57 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6a_stock16_1/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 2.45 frames/s (36.75x realtime), steady window undefined | SERVICE CPU 3.6 cores = 11.2% of 32 | IDLE BURDEN 1.226 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6a_stock16_1/
+{"gate": "G_d0_p6a_stock16_1", "decided_utc": "2026-09-25T18:40:45Z", "leg": "p6a_stock16_1", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6a_stock16_1", "decided_utc": "2026-09-25T18:40:45Z", "leg": "p6a_stock16_1", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_memstat_p6a_stock16_1", "decided_utc": "2026-09-25T18:40:48Z", "leg": "p6a_stock16_1", "file": "memstat.jsonl", "exists": true, "rows": 1425, "rule": "the first leg's memstat.jsonl has >= 1 row (register 55)", "outcome": "PASS"}
+containers present: 0
+===== LEG p6a_p5k16_1 (p5 K=16 n=16 T=4 env=set warm=-) 18:40:51Z =====
+P5 stamps installed in rr (IInstance ec36c7643f1a, infer_worker 3dfc1f9e7dcf)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P5 stamps collected: 3526 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 32010.5 KiB, >=4MiB share 0.9926 | rr: spool du 2732 KiB/5 files, layer 3.14MB (virtual 9.67GB), cg anon 3.12 GiB, procs 2 rss 3.63 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6a_p5k16_1/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 4.283 frames/s (64.24x realtime), steady window undefined | SERVICE CPU 5.555 cores = 17.4% of 32 | IDLE BURDEN 1.236 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6a_p5k16_1/
+{"gate": "G_d0_p6a_p5k16_1", "decided_utc": "2026-09-25T18:55:35Z", "leg": "p6a_p5k16_1", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6a_p5k16_1", "decided_utc": "2026-09-25T18:55:35Z", "leg": "p6a_p5k16_1", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_correct_A1", "decided_utc": "2026-09-25T18:55:41Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16", "outcome": "PASS"}
+containers present: 0
+===== LEG p6a_li16_1 (li K=16 n=16 T=4 env=set warm=-) 18:55:46Z =====
+P1 stamps installed in li_bal_0:/app/li_video/pipeline.py (base md5 2eff189a5bdba7e353194f1b9ef8d1e7; stamped md5 95cc7927c49e666923626adbd5a36f99)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8802,
+ "wall_s": 10.0,
+ "attempts": 3,
+ "warm_workers": 1,
+ "pid": 1
+}
+P1 stamps collected: 5819 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 32055.3 KiB, >=4MiB share 0.9926 | li_bal_0: spool du 2936 KiB/5 files, layer 3.04MB (virtual 9.09GB), cg anon 1.27 GiB, procs 1 rss 1.72 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6a_li16_1/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.151 frames/s (47.26x realtime), steady window undefined | SERVICE CPU 2.925 cores = 9.1% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6a_li16_1/
+{"gate": "G_d0_p6a_li16_1", "decided_utc": "2026-09-25T19:27:16Z", "leg": "p6a_li16_1", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 10, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6a_li16_1", "decided_utc": "2026-09-25T19:27:16Z", "leg": "p6a_li16_1", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+containers present: 0
+===== CANARY p6c_can_a2 19:27:23Z (paused containers allowed: 0) =====
+P3B_BENCH {"out": "/out/bench.json", "measured_frames": 239, "one_model_instance": true, "rfdetr_models": 1, "forward_mean_s": 0.20366596891631827, "cores_in_forward": 5.000114250081532, "torch_threads": 4}
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6c_can_a2/
+{"gate": "G_canary_p6c_can_a2", "decided_utc": "2026-09-25T19:28:24Z", "leg": "p6c_can_a2", "manifest_subset": "v00_EN2001a", "frames_expected": 239, "frames_got": 239, "checks": "\u2026", "outcome": "PASS"}
+containers present: 0
+===== LEG p6a_stock16_2 (stock K=16 n=16 T=4 env=set warm=-) 19:28:31Z =====
+P1 stamps installed in rr:/opt/rocketride/engine/nodes/detect/IInstance.py (base md5 984d80e45e885b5ae21e987664850b4c; stamped md5 ceac2d61fda3d025b4d0adc82717dfec)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P1 stamps collected: 3526 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 31907.0 KiB, >=4MiB share 0.9926 | rr: spool du 2568 KiB/5 files, layer 2.95MB (virtual 9.67GB), cg anon 5.57 GiB, procs 2 rss 6.08 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6a_stock16_2/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 2.388 frames/s (35.82x realtime), steady window undefined | SERVICE CPU 3.603 cores = 11.3% of 32 | IDLE BURDEN 1.237 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6a_stock16_2/
+{"gate": "G_d0_p6a_stock16_2", "decided_utc": "2026-09-25T19:53:09Z", "leg": "p6a_stock16_2", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6a_stock16_2", "decided_utc": "2026-09-25T19:53:09Z", "leg": "p6a_stock16_2", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+containers present: 0
+===== LEG p6a_p5k16_2 (p5 K=16 n=16 T=4 env=set warm=-) 19:53:18Z =====
+P5 stamps installed in rr (IInstance ec36c7643f1a, infer_worker 3dfc1f9e7dcf)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P5 stamps collected: 3526 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 31875.4 KiB, >=4MiB share 0.9926 | rr: spool du 2732 KiB/5 files, layer 3.14MB (virtual 9.67GB), cg anon 3.96 GiB, procs 2 rss 4.47 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6a_p5k16_2/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 4.157 frames/s (62.35x realtime), steady window undefined | SERVICE CPU 5.559 cores = 17.4% of 32 | IDLE BURDEN 1.234 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6a_p5k16_2/
+{"gate": "G_d0_p6a_p5k16_2", "decided_utc": "2026-09-25T20:08:28Z", "leg": "p6a_p5k16_2", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6a_p5k16_2", "decided_utc": "2026-09-25T20:08:28Z", "leg": "p6a_p5k16_2", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_correct_A2", "decided_utc": "2026-09-25T20:08:38Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16", "outcome": "PASS"}
+containers present: 0
+===== LEG p6a_li16_2 (li K=16 n=16 T=4 env=set warm=-) 20:08:49Z =====
+P1 stamps installed in li_bal_0:/app/li_video/pipeline.py (base md5 2eff189a5bdba7e353194f1b9ef8d1e7; stamped md5 95cc7927c49e666923626adbd5a36f99)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8802,
+ "wall_s": 10.0,
+ "attempts": 3,
+ "warm_workers": 1,
+ "pid": 1
+}
+P1 stamps collected: 5819 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 31934.8 KiB, >=4MiB share 0.9926 | li_bal_0: spool du 2932 KiB/5 files, layer 3.04MB (virtual 9.09GB), cg anon 1.33 GiB, procs 1 rss 1.77 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6a_li16_2/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.148 frames/s (47.22x realtime), steady window undefined | SERVICE CPU 2.98 cores = 9.3% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6a_li16_2/
+{"gate": "G_d0_p6a_li16_2", "decided_utc": "2026-09-25T20:40:59Z", "leg": "p6a_li16_2", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 10, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6a_li16_2", "decided_utc": "2026-09-25T20:40:59Z", "leg": "p6a_li16_2", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_smoke_P6B", "decided_utc": "2026-09-25T20:41:13Z", "rule": "fires iff correctness holds in both rounds AND Q1 (P5 f/s / LI f/s >= 0.95) holds in round 1 AND round 2 AND pooled", "correctness_both_rounds": true, "Q1": "\u2026", "Q2_reported_not_gating": "\u2026", "outcome": "FIRED"}
+===== P6-B: block-interleaved 168 videos 20:41:25Z =====
+containers present: 0
+P5 stamps installed in rr (IInstance ec36c7643f1a, infer_worker 3dfc1f9e7dcf)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P1 stamps installed in li_bal_0:/app/li_video/pipeline.py (base md5 2eff189a5bdba7e353194f1b9ef8d1e7; stamped md5 95cc7927c49e666923626adbd5a36f99)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8802,
+ "wall_s": 10.0,
+ "attempts": 3,
+ "warm_workers": 1,
+ "pid": 1
+}
+===== BLOCK p6b_rr_startwarm (rr n=1 K=16 warm=16,16; li_bal_0 paused) 20:42:02Z =====
+P5 stamps collected: 2823 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 31830.6 KiB, >=4MiB share 0.9925 | rr: spool du 2208 KiB/5 files, layer 2.61MB (virtual 9.67GB), cg anon 2.98 GiB, procs 2 rss 3.49 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_startwarm/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 1 (errors 0) / offered 1 | THROUGHPUT 2.218 frames/s (33.29x realtime), steady window undefined | SERVICE CPU 3.407 cores = 10.7% of 32 | IDLE BURDEN 1.225 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_startwarm/
+{"gate": "G_d0_p6b_rr_startwarm", "decided_utc": "2026-09-25T20:54:53Z", "leg": "p6b_rr_startwarm", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_startwarm", "decided_utc": "2026-09-25T20:54:54Z", "leg": "p6b_rr_startwarm", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_startwarm", "decided_utc": "2026-09-25T20:54:54Z", "leg": "p6b_rr_startwarm", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 16 send(s) at concurrency 16 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_startwarm (li n=1 K=16 warm=16,16; rr paused) 20:55:09Z =====
+P1 stamps collected: 2840 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 31846.9 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 1464 KiB/5 files, layer 1.53MB (virtual 9.09GB), cg anon 1.24 GiB, procs 1 rss 1.68 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_startwarm/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 1 (errors 0) / offered 1 | THROUGHPUT 2.847 frames/s (42.73x realtime), steady window undefined | SERVICE CPU 2.682 cores = 8.4% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_startwarm/
+{"gate": "G_d0_p6b_li_startwarm", "decided_utc": "2026-09-25T21:11:18Z", "leg": "p6b_li_startwarm", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 2, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_startwarm", "decided_utc": "2026-09-25T21:11:18Z", "leg": "p6b_li_startwarm", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_startwarm", "decided_utc": "2026-09-25T21:11:18Z", "leg": "p6b_li_startwarm", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 16 send(s) at concurrency 16 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== CANARY p6c_can_b0 21:11:36Z (paused containers allowed: 1) =====
+P3B_BENCH {"out": "/out/bench.json", "measured_frames": 239, "one_model_instance": true, "rfdetr_models": 1, "forward_mean_s": 0.2089563095062784, "cores_in_forward": 4.999688988236554, "torch_threads": 4}
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6c_can_b0/
+{"gate": "G_canary_p6c_can_b0", "decided_utc": "2026-09-25T21:12:39Z", "leg": "p6c_can_b0", "manifest_subset": "v00_EN2001a", "frames_expected": 239, "frames_got": 239, "checks": "\u2026", "outcome": "PASS"}
+===== BLOCK p6b_rr_b01 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 21:12:55Z =====
+P5 stamps collected: 6349 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 31840.0 KiB, >=4MiB share 0.9925 | rr: spool du 4916 KiB/5 files, layer 5.38MB (virtual 9.67GB), cg anon 3.10 GiB, procs 2 rss 3.60 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b01/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 4.001 frames/s (60.01x realtime), steady window undefined | SERVICE CPU 5.313 cores = 16.6% of 32 | IDLE BURDEN 1.226 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b01/
+{"gate": "G_d0_p6b_rr_b01", "decided_utc": "2026-09-25T21:28:11Z", "leg": "p6b_rr_b01", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b01", "decided_utc": "2026-09-25T21:28:11Z", "leg": "p6b_rr_b01", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b01", "decided_utc": "2026-09-25T21:28:11Z", "leg": "p6b_rr_b01", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b01 (li n=16 K=16 warm=2,2; rr paused) 21:28:31Z =====
+P1 stamps collected: 6384 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 31849.5 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 3240 KiB/5 files, layer 3.35MB (virtual 9.09GB), cg anon 1.26 GiB, procs 1 rss 1.71 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b01/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.068 frames/s (46.02x realtime), steady window undefined | SERVICE CPU 2.944 cores = 9.2% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b01/
+{"gate": "G_d0_p6b_li_b01", "decided_utc": "2026-09-25T21:47:45Z", "leg": "p6b_li_b01", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 10, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b01", "decided_utc": "2026-09-25T21:47:45Z", "leg": "p6b_li_b01", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b01", "decided_utc": "2026-09-25T21:47:45Z", "leg": "p6b_li_b01", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b02 (li n=16 K=16 warm=2,2; rr paused) 21:48:07Z =====
+P1 stamps collected: 8796 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.4 GiB | frag avg-extent 31882.2 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 4448 KiB/5 files, layer 4.59MB (virtual 9.09GB), cg anon 1.30 GiB, procs 1 rss 1.75 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b02/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.099 frames/s (46.54x realtime), steady window undefined | SERVICE CPU 2.99 cores = 9.3% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b02/
+{"gate": "G_d0_p6b_li_b02", "decided_utc": "2026-09-25T22:01:04Z", "leg": "p6b_li_b02", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 9, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b02", "decided_utc": "2026-09-25T22:01:04Z", "leg": "p6b_li_b02", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b02", "decided_utc": "2026-09-25T22:01:04Z", "leg": "p6b_li_b02", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_rr_b02 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 22:01:28Z =====
+P5 stamps collected: 8743 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.3 GiB | frag avg-extent 31842.3 KiB, >=4MiB share 0.9925 | rr: spool du 6756 KiB/5 files, layer 7.26MB (virtual 9.68GB), cg anon 3.28 GiB, procs 2 rss 3.78 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b02/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 4.135 frames/s (62.1x realtime), steady window undefined | SERVICE CPU 5.545 cores = 17.3% of 32 | IDLE BURDEN 1.228 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b02/
+{"gate": "G_d0_p6b_rr_b02", "decided_utc": "2026-09-25T22:11:44Z", "leg": "p6b_rr_b02", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b02", "decided_utc": "2026-09-25T22:11:45Z", "leg": "p6b_rr_b02", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b02", "decided_utc": "2026-09-25T22:11:45Z", "leg": "p6b_rr_b02", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_rr_b03 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 22:12:10Z =====
+P5 stamps collected: 10988 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.3 GiB | frag avg-extent 31820.4 KiB, >=4MiB share 0.9925 | rr: spool du 8480 KiB/5 files, layer 9.03MB (virtual 9.68GB), cg anon 3.44 GiB, procs 2 rss 3.95 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b03/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 4.042 frames/s (60.66x realtime), steady window undefined | SERVICE CPU 5.368 cores = 16.8% of 32 | IDLE BURDEN 1.237 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b03/
+{"gate": "G_d0_p6b_rr_b03", "decided_utc": "2026-09-25T22:22:01Z", "leg": "p6b_rr_b03", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b03", "decided_utc": "2026-09-25T22:22:01Z", "leg": "p6b_rr_b03", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b03", "decided_utc": "2026-09-25T22:22:02Z", "leg": "p6b_rr_b03", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b03 (li n=16 K=16 warm=2,2; rr paused) 22:22:29Z =====
+P1 stamps collected: 11059 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.3 GiB | frag avg-extent 31810.0 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 5584 KiB/5 files, layer 5.75MB (virtual 9.09GB), cg anon 1.35 GiB, procs 1 rss 1.79 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b03/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.103 frames/s (46.57x realtime), steady window undefined | SERVICE CPU 2.944 cores = 9.2% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b03/
+{"gate": "G_d0_p6b_li_b03", "decided_utc": "2026-09-25T22:34:37Z", "leg": "p6b_li_b03", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 10, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b03", "decided_utc": "2026-09-25T22:34:37Z", "leg": "p6b_li_b03", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b03", "decided_utc": "2026-09-25T22:34:37Z", "leg": "p6b_li_b03", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b04 (li n=16 K=16 warm=2,2; rr paused) 22:35:07Z =====
+P1 stamps collected: 13086 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.3 GiB | frag avg-extent 31794.8 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 6596 KiB/5 files, layer 6.79MB (virtual 9.09GB), cg anon 1.34 GiB, procs 1 rss 1.79 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b04/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.083 frames/s (46.23x realtime), steady window undefined | SERVICE CPU 2.88 cores = 9.0% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b04/
+{"gate": "G_d0_p6b_li_b04", "decided_utc": "2026-09-25T22:46:01Z", "leg": "p6b_li_b04", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 7, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b04", "decided_utc": "2026-09-25T22:46:02Z", "leg": "p6b_li_b04", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b04", "decided_utc": "2026-09-25T22:46:02Z", "leg": "p6b_li_b04", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_rr_b04 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 22:46:33Z =====
+P5 stamps collected: 12997 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.3 GiB | frag avg-extent 31768.1 KiB, >=4MiB share 0.9925 | rr: spool du 10032 KiB/5 files, layer 10.6MB (virtual 9.68GB), cg anon 3.61 GiB, procs 2 rss 4.11 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b04/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 4.093 frames/s (61.37x realtime), steady window undefined | SERVICE CPU 5.293 cores = 16.5% of 32 | IDLE BURDEN 1.237 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b04/
+{"gate": "G_d0_p6b_rr_b04", "decided_utc": "2026-09-25T22:55:18Z", "leg": "p6b_rr_b04", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b04", "decided_utc": "2026-09-25T22:55:18Z", "leg": "p6b_rr_b04", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b04", "decided_utc": "2026-09-25T22:55:18Z", "leg": "p6b_rr_b04", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_rr_b05 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 22:55:51Z =====
+P5 stamps collected: 15440 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.3 GiB | frag avg-extent 31749.4 KiB, >=4MiB share 0.9925 | rr: spool du 11912 KiB/5 files, layer 12.5MB (virtual 9.68GB), cg anon 3.57 GiB, procs 2 rss 4.08 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b05/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 4.229 frames/s (63.44x realtime), steady window undefined | SERVICE CPU 5.467 cores = 17.1% of 32 | IDLE BURDEN 1.236 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b05/
+{"gate": "G_d0_p6b_rr_b05", "decided_utc": "2026-09-25T23:06:03Z", "leg": "p6b_rr_b05", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b05", "decided_utc": "2026-09-25T23:06:03Z", "leg": "p6b_rr_b05", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b05", "decided_utc": "2026-09-25T23:06:03Z", "leg": "p6b_rr_b05", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b05 (li n=16 K=16 warm=2,2; rr paused) 23:06:37Z =====
+P1 stamps collected: 15547 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.3 GiB | frag avg-extent 31747.0 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 7828 KiB/5 files, layer 8.05MB (virtual 9.09GB), cg anon 1.36 GiB, procs 1 rss 1.80 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b05/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.196 frames/s (47.94x realtime), steady window undefined | SERVICE CPU 2.957 cores = 9.2% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b05/
+{"gate": "G_d0_p6b_li_b05", "decided_utc": "2026-09-25T23:19:25Z", "leg": "p6b_li_b05", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 9, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b05", "decided_utc": "2026-09-25T23:19:25Z", "leg": "p6b_li_b05", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b05", "decided_utc": "2026-09-25T23:19:25Z", "leg": "p6b_li_b05", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b06 (li n=16 K=16 warm=2,2; rr paused) 23:20:01Z =====
+P1 stamps collected: 18734 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.3 GiB | frag avg-extent 31739.9 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 9432 KiB/5 files, layer 9.69MB (virtual 9.09GB), cg anon 1.33 GiB, procs 1 rss 1.77 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b06/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.046 frames/s (45.7x realtime), steady window undefined | SERVICE CPU 2.984 cores = 9.3% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b06/
+{"gate": "G_d0_p6b_li_b06", "decided_utc": "2026-09-25T23:37:19Z", "leg": "p6b_li_b06", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 9, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b06", "decided_utc": "2026-09-25T23:37:19Z", "leg": "p6b_li_b06", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b06", "decided_utc": "2026-09-25T23:37:19Z", "leg": "p6b_li_b06", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_rr_b06 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 23:37:57Z =====
+P5 stamps collected: 18609 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.3 GiB | frag avg-extent 31706.4 KiB, >=4MiB share 0.9925 | rr: spool du 14356 KiB/5 files, layer 15MB (virtual 9.68GB), cg anon 3.85 GiB, procs 2 rss 4.35 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b06/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.977 frames/s (59.66x realtime), steady window undefined | SERVICE CPU 5.56 cores = 17.4% of 32 | IDLE BURDEN 1.229 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b06/
+{"gate": "G_d0_p6b_rr_b06", "decided_utc": "2026-09-25T23:51:41Z", "leg": "p6b_rr_b06", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b06", "decided_utc": "2026-09-25T23:51:41Z", "leg": "p6b_rr_b06", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b06", "decided_utc": "2026-09-25T23:51:41Z", "leg": "p6b_rr_b06", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== CANARY p6c_can_bmid 23:52:21Z (paused containers allowed: 1) =====
+P3B_BENCH {"out": "/out/bench.json", "measured_frames": 239, "one_model_instance": true, "rfdetr_models": 1, "forward_mean_s": 0.19144397596634108, "cores_in_forward": 4.9992307515470795, "torch_threads": 4}
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6c_can_bmid/
+{"gate": "G_canary_p6c_can_bmid", "decided_utc": "2026-09-25T23:53:18Z", "leg": "p6c_can_bmid", "manifest_subset": "v00_EN2001a", "frames_expected": 239, "frames_got": 239, "checks": "\u2026", "outcome": "PASS"}
+===== BLOCK p6b_rr_b07 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 23:53:57Z =====
+P5 stamps collected: 20739 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.2 GiB | frag avg-extent 31655.0 KiB, >=4MiB share 0.9925 | rr: spool du 16000 KiB/5 files, layer 16.7MB (virtual 9.69GB), cg anon 3.90 GiB, procs 2 rss 4.41 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b07/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.888 frames/s (58.4x realtime), steady window undefined | SERVICE CPU 5.421 cores = 16.9% of 32 | IDLE BURDEN 1.227 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b07/
+{"gate": "G_d0_p6b_rr_b07", "decided_utc": "2026-09-26T00:03:30Z", "leg": "p6b_rr_b07", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b07", "decided_utc": "2026-09-26T00:03:30Z", "leg": "p6b_rr_b07", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b07", "decided_utc": "2026-09-26T00:03:30Z", "leg": "p6b_rr_b07", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b07 (li n=16 K=16 warm=2,2; rr paused) 00:04:12Z =====
+P1 stamps collected: 20882 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.2 GiB | frag avg-extent 31635.5 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 10512 KiB/5 files, layer 10.8MB (virtual 9.1GB), cg anon 1.38 GiB, procs 1 rss 1.82 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b07/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 2.965 frames/s (44.53x realtime), steady window undefined | SERVICE CPU 2.939 cores = 9.2% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b07/
+{"gate": "G_d0_p6b_li_b07", "decided_utc": "2026-09-26T00:16:06Z", "leg": "p6b_li_b07", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 9, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b07", "decided_utc": "2026-09-26T00:16:06Z", "leg": "p6b_li_b07", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b07", "decided_utc": "2026-09-26T00:16:06Z", "leg": "p6b_li_b07", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b08 (li n=16 K=16 warm=2,2; rr paused) 00:16:50Z =====
+P1 stamps collected: 22882 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.1 GiB | frag avg-extent 31612.0 KiB, >=4MiB share 0.9925 | li_bal_0: spool du 11516 KiB/5 files, layer 11.8MB (virtual 9.1GB), cg anon 1.37 GiB, procs 1 rss 1.81 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b08/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.015 frames/s (45.25x realtime), steady window undefined | SERVICE CPU 2.952 cores = 9.2% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b08/
+{"gate": "G_d0_p6b_li_b08", "decided_utc": "2026-09-26T00:27:45Z", "leg": "p6b_li_b08", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 10, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b08", "decided_utc": "2026-09-26T00:27:45Z", "leg": "p6b_li_b08", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b08", "decided_utc": "2026-09-26T00:27:45Z", "leg": "p6b_li_b08", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_rr_b08 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 00:28:31Z =====
+P5 stamps collected: 22721 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.1 GiB | frag avg-extent 31582.1 KiB, >=4MiB share 0.9924 | rr: spool du 17528 KiB/5 files, layer 18.3MB (virtual 9.69GB), cg anon 3.98 GiB, procs 2 rss 4.48 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b08/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.908 frames/s (58.65x realtime), steady window undefined | SERVICE CPU 5.467 cores = 17.1% of 32 | IDLE BURDEN 1.23 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b08/
+{"gate": "G_d0_p6b_rr_b08", "decided_utc": "2026-09-26T00:37:24Z", "leg": "p6b_rr_b08", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b08", "decided_utc": "2026-09-26T00:37:24Z", "leg": "p6b_rr_b08", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b08", "decided_utc": "2026-09-26T00:37:24Z", "leg": "p6b_rr_b08", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_rr_b09 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 00:38:11Z =====
+P5 stamps collected: 25398 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.1 GiB | frag avg-extent 31547.0 KiB, >=4MiB share 0.9924 | rr: spool du 19592 KiB/5 files, layer 20.4MB (virtual 9.69GB), cg anon 3.38 GiB, procs 2 rss 3.89 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b09/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 4.145 frames/s (62.13x realtime), steady window undefined | SERVICE CPU 5.361 cores = 16.8% of 32 | IDLE BURDEN 1.233 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b09/
+{"gate": "G_d0_p6b_rr_b09", "decided_utc": "2026-09-26T00:49:28Z", "leg": "p6b_rr_b09", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b09", "decided_utc": "2026-09-26T00:49:28Z", "leg": "p6b_rr_b09", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b09", "decided_utc": "2026-09-26T00:49:28Z", "leg": "p6b_rr_b09", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b09 (li n=16 K=16 warm=2,2; rr paused) 00:50:17Z =====
+P1 stamps collected: 25577 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.1 GiB | frag avg-extent 31558.9 KiB, >=4MiB share 0.9924 | li_bal_0: spool du 12872 KiB/5 files, layer 13.2MB (virtual 9.1GB), cg anon 1.37 GiB, procs 1 rss 1.82 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b09/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.117 frames/s (46.73x realtime), steady window undefined | SERVICE CPU 2.921 cores = 9.1% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b09/
+{"gate": "G_d0_p6b_li_b09", "decided_utc": "2026-09-26T01:04:35Z", "leg": "p6b_li_b09", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 10, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b09", "decided_utc": "2026-09-26T01:04:36Z", "leg": "p6b_li_b09", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b09", "decided_utc": "2026-09-26T01:04:36Z", "leg": "p6b_li_b09", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b10 (li n=16 K=16 warm=2,2; rr paused) 01:05:27Z =====
+P1 stamps collected: 28257 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.1 GiB | frag avg-extent 31564.4 KiB, >=4MiB share 0.9924 | li_bal_0: spool du 14216 KiB/5 files, layer 14.6MB (virtual 9.1GB), cg anon 1.30 GiB, procs 1 rss 1.75 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b10/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.169 frames/s (47.52x realtime), steady window undefined | SERVICE CPU 3.002 cores = 9.4% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b10/
+{"gate": "G_d0_p6b_li_b10", "decided_utc": "2026-09-26T01:19:29Z", "leg": "p6b_li_b10", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 10, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b10", "decided_utc": "2026-09-26T01:19:29Z", "leg": "p6b_li_b10", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b10", "decided_utc": "2026-09-26T01:19:29Z", "leg": "p6b_li_b10", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_rr_b10 (rr n=16 K=16 warm=2,2; li_bal_0 paused) 01:20:22Z =====
+P5 stamps collected: 28060 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.1 GiB | frag avg-extent 31549.0 KiB, >=4MiB share 0.9924 | rr: spool du 21644 KiB/5 files, layer 22.5MB (virtual 9.69GB), cg anon 3.00 GiB, procs 2 rss 3.50 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b10/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 4.279 frames/s (64.18x realtime), steady window undefined | SERVICE CPU 5.617 cores = 17.5% of 32 | IDLE BURDEN 1.235 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b10/
+{"gate": "G_d0_p6b_rr_b10", "decided_utc": "2026-09-26T01:31:17Z", "leg": "p6b_rr_b10", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b10", "decided_utc": "2026-09-26T01:31:17Z", "leg": "p6b_rr_b10", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b10", "decided_utc": "2026-09-26T01:31:17Z", "leg": "p6b_rr_b10", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_rr_b11 (rr n=8 K=16 warm=2,2; li_bal_0 paused) 01:32:12Z =====
+P5 stamps collected: 29425 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.0 GiB | frag avg-extent 31526.7 KiB, >=4MiB share 0.9924 | rr: spool du 22696 KiB/5 files, layer 23.6MB (virtual 9.69GB), cg anon 2.74 GiB, procs 2 rss 3.25 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_rr_b11/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 8 (errors 0) / offered 8 | THROUGHPUT 4.576 frames/s (68.67x realtime), steady window undefined | SERVICE CPU 5.814 cores = 18.2% of 32 | IDLE BURDEN 1.23 cores with 1 rr_tokens live = 3.8% of the box before any work (beside, never subtracted) | thread env expected 4 / in-process torch 4 | gates PASS 7 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_rr_b11/
+{"gate": "G_d0_p6b_rr_b11", "decided_utc": "2026-09-26T01:37:48Z", "leg": "p6b_rr_b11", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_rr_b11", "decided_utc": "2026-09-26T01:37:49Z", "leg": "p6b_rr_b11", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_rr_b11", "decided_utc": "2026-09-26T01:37:49Z", "leg": "p6b_rr_b11", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+===== BLOCK p6b_li_b11 (li n=8 K=16 warm=2,2; rr paused) 01:38:45Z =====
+P1 stamps collected: 29632 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.0 GiB | frag avg-extent 31485.2 KiB, >=4MiB share 0.9924 | li_bal_0: spool du 14908 KiB/5 files, layer 15.3MB (virtual 9.1GB), cg anon 1.30 GiB, procs 1 rss 1.75 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b11/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 8 (errors 0) / offered 8 | THROUGHPUT 4.638 frames/s (69.59x realtime), steady window undefined | SERVICE CPU 4.322 cores = 13.5% of 32 | IDLE BURDEN 0.005 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 · NOT RUN 2 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6b_li_b11/
+{"gate": "G_d0_p6b_li_b11", "decided_utc": "2026-09-26T01:44:14Z", "leg": "p6b_li_b11", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 8, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6b_li_b11", "decided_utc": "2026-09-26T01:44:14Z", "leg": "p6b_li_b11", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+{"gate": "G_warm_p6b_li_b11", "decided_utc": "2026-09-26T01:44:14Z", "leg": "p6b_li_b11", "declared": "\u2026", "checks": "\u2026", "policy": "P6 warm symmetry: 2 send(s) at concurrency 2 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)", "outcome": "PASS"}
+containers present: 0
+===== CANARY p6c_can_c1 01:45:18Z (paused containers allowed: 0) =====
+P3B_BENCH {"out": "/out/bench.json", "measured_frames": 239, "one_model_instance": true, "rfdetr_models": 1, "forward_mean_s": 0.1922979787028666, "cores_in_forward": 4.999425884453662, "torch_threads": 4}
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6c_can_c1/
+{"gate": "G_canary_p6c_can_c1", "decided_utc": "2026-09-26T01:46:16Z", "leg": "p6c_can_c1", "manifest_subset": "v00_EN2001a", "frames_expected": 239, "frames_got": 239, "checks": "\u2026", "outcome": "PASS"}
+containers present: 0
+===== LEG p6c_p5t16_1 (p5 K=16 n=16 T=16 env=unset warm=-) 01:47:14Z =====
+P5 stamps installed in rr (IInstance ec36c7643f1a, infer_worker 3dfc1f9e7dcf)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "rr",
+ "port": 5565,
+ "wall_s": 5.0,
+ "attempts": 2
+}
+P5 stamps collected: 3526 records
+P5 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.0 GiB | frag avg-extent 31212.6 KiB, >=4MiB share 0.9923 | rr: spool du 2744 KiB/5 files, layer 3.15MB (virtual 9.67GB), cg anon 4.21 GiB, procs 2 rss 4.71 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6c_p5t16_1/export_rocketride_video_parity_blast.json
+[driver] AT A GLANCE: rocketride_video parity[tokens=1,threads=unset(engine-default-64)] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 2.535 frames/s (38.02x realtime), steady window undefined | SERVICE CPU 5.402 cores = 16.9% of 32 | IDLE BURDEN 1.236 cores with 1 rr_tokens live = 3.9% of the box before any work (beside, never subtracted) | thread env expected unset / in-process torch 16 | gates PASS 6 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6c_p5t16_1/
+{"gate": "G_d0_p6c_p5t16_1", "decided_utc": "2026-09-26T02:10:42Z", "leg": "p6c_p5t16_1", "arm": "rr", "rule": "no MANDATE_VIOLATION.json AND the export's p0 block holds d0_pre and d0_post (dicts) and a mandate with mandate_violation false AND exactly ONE LWDETR root module in both (absence fails)", "mandate_violation_file": false, "mandate": "\u2026", "lwdetr_counts": "\u2026", "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6c_p5t16_1", "decided_utc": "2026-09-26T02:10:42Z", "leg": "p6c_p5t16_1", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "FAIL"}
+{"gate": "G_cell_p6c_p5t16_1", "decided_utc": "2026-09-26T02:10:42Z", "leg": "p6c_p5t16_1", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "posture": "out of box: the six thread variables unset", "env_seen": "\u2026", "rule": "preregistration.json gates.G_cell (unset form)", "outcome": "PASS"}
+{"gate": "G_correct_C1", "decided_utc": "2026-09-26T02:11:41Z", "pairs": "\u2026", "missing": "\u2026", "n": 16, "rule": "every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16", "outcome": "PASS"}
+containers present: 0
+===== LEG p6c_lit16_1 (li K=16 n=16 T=16 env=set warm=-) 02:12:41Z =====
+P1 stamps installed in li_bal_0:/app/li_video/pipeline.py (base md5 2eff189a5bdba7e353194f1b9ef8d1e7; stamped md5 95cc7927c49e666923626adbd5a36f99)
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8802,
+ "wall_s": 10.0,
+ "attempts": 3,
+ "warm_workers": 1,
+ "pid": 1
+}
+P1 stamps collected: 5819 records
+P1 read-back collected
+[driver] lifetime_state leg_end: docker_root free 586.0 GiB | frag avg-extent 31252.2 KiB, >=4MiB share 0.9923 | li_bal_0: spool du 2956 KiB/5 files, layer 3.06MB (virtual 9.09GB), cg anon 3.74 GiB, procs 1 rss 4.19 GiB
+[driver] export: /home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6c_lit16_1/export_llamaindex_video_workers_blast.json
+[driver] AT A GLANCE: llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 2.654 frames/s (39.81x realtime), steady window undefined | SERVICE CPU 3.77 cores = 11.8% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 16 | gates PASS 5 · NOT RUN 3 · FAIL 0 | efficiency valid=True | COLLECTOR ok
+uploaded s3://rocketride-benchmark-data/ansh/parity-p6/parity_p6_20260925T175225Z/p6c_lit16_1/
+{"gate": "G_d0_p6c_lit16_1", "decided_utc": "2026-09-26T02:49:47Z", "leg": "p6c_lit16_1", "arm": "li", "rule": "the export's lifetime_state shows exactly ONE container at leg start and leg end, ONE process each time, whose command line carries '--workers 1' (absence fails)", "export": "export_llamaindex_video_workers_blast.json", "containers": "\u2026", "checks": "\u2026", "service_peak_process_count": 11, "evidence_present": true, "outcome": "CLEAN"}
+{"gate": "G_cell_p6c_lit16_1", "decided_utc": "2026-09-26T02:49:47Z", "leg": "p6c_lit16_1", "declared": "\u2026", "read_back": "\u2026", "checks": "\u2026", "rule": "preregistration.json gates.G_cell", "outcome": "PASS"}
+!! p6c_can_c2 NOT RUN: budget
+!! p6c_p5t16_2 NOT RUN: the P6 budget has passed
+!! p6c_lit16_2 NOT RUN: the P6 budget has passed
+image rr:patched sha256:073b43d8b5f9a3f26fd0c31b81d8c5f088b8a8dd1480dc9676b2141cb6b4ec90
+image rr:patched-video sha256:b7f51acc95330163c9fa988687d415d399a38ebdc7fee0d84d24ff39b65098de
+image li:video sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95
+image rr:p5-infer sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd

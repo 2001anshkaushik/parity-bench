@@ -1,0 +1,43 @@
+{
+ "gate": "G_smoke_P6B",
+ "decided_utc": "2026-09-25T20:41:13Z",
+ "rule": "fires iff correctness holds in both rounds AND Q1 (P5 f/s / LI f/s >= 0.95) holds in round 1 AND round 2 AND pooled",
+ "correctness_both_rounds": true,
+ "Q1": {
+  "round_1": {
+   "ratio": 1.3593206739769994,
+   "bar": 0.95,
+   "holds": true
+  },
+  "round_2": {
+   "ratio": 1.3205710577547047,
+   "bar": 0.95,
+   "holds": true
+  },
+  "pooled": {
+   "ratio": 1.3399553913368998,
+   "bar": 0.95,
+   "holds": true
+  },
+  "verdict": "HOLDS (pooled); round 1 holds, round 2 holds"
+ },
+ "Q2_reported_not_gating": {
+  "round_1": {
+   "ratio": 1.748328430061514,
+   "bar": 1.2,
+   "holds": true
+  },
+  "round_2": {
+   "ratio": 1.7405580791693704,
+   "bar": 1.2,
+   "holds": true
+  },
+  "pooled": {
+   "ratio": 1.7444926903007483,
+   "bar": 1.2,
+   "holds": true
+  },
+  "verdict": "HOLDS (pooled); round 1 holds, round 2 holds"
+ },
+ "outcome": "FIRED"
+}

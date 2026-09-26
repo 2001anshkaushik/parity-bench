@@ -2030,3 +2030,20 @@ than rewritten from memory, which is entry 2's point in miniature.
 > - **Pre-register the effect size the hypothesis claims.** "Removes the slowdown" and "removes most
 >   of it" are different hypotheses. Say which one, and read the result against it. The verdict of
 >   the rule as written stands; the lesson applies to the next rule.
+
+## 65. An output reference with no replicate of its own (added 2026-09-26)
+
+> P6-B compared the single-inference-thread node's output on the 168-video slice, per video, with the
+> banked P1-D stock run. 166 matched. Two videos differed, on one frame each, with detection scores
+> off by roughly a thousandth to a hundredth. Stock's run-to-run identity had only ever been shown on
+> the 16-video slice (P0, P4, P5), and P1-D is a single run from another session. So the mismatch
+> cannot be attributed. It may be the patch. It may equally be stock varying on those two frames
+> across runs or sessions, which nothing had tested.
+>
+> Rules:
+>
+> - **An output reference needs its own replicate on the same inputs.** Run stock twice, in the same
+>   session as the candidate, before a candidate-versus-stock mismatch can be read as the
+>   candidate's.
+> - **A determinism result holds only for the inputs it covered.** "Identical on 16/16" is a claim
+>   about those 16 videos, not about the corpus.

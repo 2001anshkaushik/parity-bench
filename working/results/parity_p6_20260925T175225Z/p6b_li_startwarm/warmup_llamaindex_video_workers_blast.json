@@ -1,0 +1,179 @@
+{
+ "arm": "llamaindex_video",
+ "leg": "blast",
+ "posture": "workers",
+ "policy": "P6 warm symmetry: 16 send(s) at concurrency 16 over 2 warm rows, the same on both arms (--warm-sends/--warm-concurrency)",
+ "warm_sends_declared": 16,
+ "warm_concurrency_declared": 16,
+ "gate": {
+  "rule": "warm markers via /health (Crossroad 41)",
+  "warm_workers": 1,
+  "declared_workers": 1,
+  "tokens_seen": null
+ },
+ "sends": [
+  {
+   "i": 0,
+   "row": "TS3012c.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 856.614,
+   "error": null
+  },
+  {
+   "i": 1,
+   "row": "TS3012d.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 840.655,
+   "error": null
+  },
+  {
+   "i": 2,
+   "row": "TS3012c.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 859.354,
+   "error": null
+  },
+  {
+   "i": 3,
+   "row": "TS3012d.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 851.193,
+   "error": null
+  },
+  {
+   "i": 4,
+   "row": "TS3012c.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 867.519,
+   "error": null
+  },
+  {
+   "i": 5,
+   "row": "TS3012d.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 853.885,
+   "error": null
+  },
+  {
+   "i": 6,
+   "row": "TS3012c.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 864.746,
+   "error": null
+  },
+  {
+   "i": 7,
+   "row": "TS3012d.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 835.415,
+   "error": null
+  },
+  {
+   "i": 8,
+   "row": "TS3012c.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 862.06,
+   "error": null
+  },
+  {
+   "i": 9,
+   "row": "TS3012d.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 838.044,
+   "error": null
+  },
+  {
+   "i": 10,
+   "row": "TS3012c.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 830.065,
+   "error": null
+  },
+  {
+   "i": 11,
+   "row": "TS3012d.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 845.921,
+   "error": null
+  },
+  {
+   "i": 12,
+   "row": "TS3012c.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 870.221,
+   "error": null
+  },
+  {
+   "i": 13,
+   "row": "TS3012d.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 832.713,
+   "error": null
+  },
+  {
+   "i": 14,
+   "row": "TS3012c.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 843.309,
+   "error": null
+  },
+  {
+   "i": 15,
+   "row": "TS3012d.avi",
+   "serving_pid": 1,
+   "serving_port": 8802,
+   "token_index": null,
+   "wall_s": 848.526,
+   "error": null
+  }
+ ],
+ "response_pid_distribution": {
+  "distinct_response_pids": 1,
+  "declared_workers": 1,
+  "sends": 16,
+  "per_pid_send_counts": {
+   "8802:1": 16
+  },
+  "busiest_worker_sends": 16,
+  "quietest_serving_worker_sends": 16,
+  "unserved_declared_pids": null,
+  "note": "REPORTED, NOT GATED (Crossroad 41). uvicorn workers are selected by the kernel at accept and /process_video does not block its event loop, so response-pid spread measures scheduling, not warmth. Warmth is gated on the service warm markers."
+ },
+ "declared_worker_pids": [
+  [
+   8802,
+   1
+  ]
+ ],
+ "note": "pid identity is only comparable within ONE container lifetime (defect #23: pid reuse across restarts)"
+}

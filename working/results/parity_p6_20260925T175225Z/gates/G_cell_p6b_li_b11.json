@@ -1,0 +1,38 @@
+{
+ "gate": "G_cell_p6b_li_b11",
+ "decided_utc": "2026-09-26T01:44:14Z",
+ "leg": "p6b_li_b11",
+ "declared": {
+  "flavour": "li",
+  "K": 16,
+  "T": 4,
+  "videos": 8,
+  "image_id": "sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95"
+ },
+ "read_back": {
+  "torch_num_threads": 4,
+  "OMP_NUM_THREADS": "4",
+  "OMP_WAIT_POLICY": "ABSENT",
+  "container_image_id": "sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95",
+  "videos": 8,
+  "max_in_flight": 8,
+  "measured_frames": 1042,
+  "stamp_frame_rows": 29425,
+  "node": null,
+  "readback_thread": null,
+  "infer_tids": []
+ },
+ "checks": {
+  "readback_present": true,
+  "torch_num_threads_eq_T": true,
+  "env_OMP_NUM_THREADS_eq_T": true,
+  "omp_wait_policy_absent": true,
+  "container_image_as_declared": true,
+  "videos_eq_n": true,
+  "max_in_flight_eq_K": true,
+  "stamps_cover_measured_frames": true,
+  "every_measured_frame_has_forward": true
+ },
+ "rule": "preregistration.json gates.G_cell",
+ "outcome": "PASS"
+}

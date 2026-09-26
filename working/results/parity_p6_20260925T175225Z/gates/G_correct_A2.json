@@ -1,0 +1,20 @@
+{
+ "gate": "G_correct_A2",
+ "decided_utc": "2026-09-25T20:08:38Z",
+ "pairs": [
+  {
+   "a": "p6a_p5k16_2",
+   "b": "p6a_stock16_2",
+   "videos_compared": 16,
+   "chunk_hash_differs": [],
+   "frame_scores_differ": [],
+   "identical": true,
+   "videos_eq_n": true,
+   "pass": true
+  }
+ ],
+ "missing": [],
+ "n": 16,
+ "rule": "every pair output-identical (per-video chunk sha256 AND frame scores) with videos_compared == 16",
+ "outcome": "PASS"
+}

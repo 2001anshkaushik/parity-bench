@@ -1,0 +1,16 @@
+{
+ "gate": "G_canary_p6c_can_b0",
+ "decided_utc": "2026-09-25T21:12:39Z",
+ "leg": "p6c_can_b0",
+ "manifest_subset": "v00_EN2001a",
+ "frames_expected": 239,
+ "frames_got": 239,
+ "checks": {
+  "bench_present": true,
+  "frames_identical_to_manifest_subset": true,
+  "one_model_instance": true,
+  "torch_num_threads_eq_4": true,
+  "every_frame_measured": true
+ },
+ "outcome": "PASS"
+}

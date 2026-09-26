@@ -185,7 +185,8 @@ def main() -> int:
                  + ", ".join(f"{k}: {v}" for k, v in B["start_warm"].items()) + ".", ""]
         cr = B["correctness_vs_p1d"]
         body += [f"**Correctness vs the banked P1-D stock output:** {n(cr['identical'])} of {n(cr['videos_compared'])} videos identical; "
-                 + ("none differ." if not cr["differ"] else "differ: " + ", ".join(x["video"] for x in cr["differ"]) + "."), ""]
+                 + ("none differ." if not cr["differ"] else "differ: " + "; ".join(f"{x['video']} (frame index {', '.join(str(i) for i in x['frames_whose_scores_differ'])} of {n(x['frames'])})" for x in cr["differ"])
+                    + ". Whether the patch or run-to-run variation in stock causes it is not established: stock was never replicated on these videos (register 65)."), ""]
         if notes.get("B"):
             body += [notes["B"], ""]
     # ---------------- P6-C
@@ -202,7 +203,11 @@ def main() -> int:
         body += table(["", "F(P5 T=16) / F(P5 T=4, P6-A)", "≤ 0.95 (faster by ≥ 5%)", "fps(P5 T=16) / fps(LI T=16)", "against 0.95"],
                       [[k.replace("_", " "), f(r[k]["F_t16_over_F_t4"]), {True: "yes", False: "no", None: "—"}[r[k]["faster_by_at_least_5pct"]], f(r[k]["fps_p5_t16_over_li_t16"]),
                         "—" if r[k]["fps_p5_t16_over_li_t16"] is None else ("≥ 0.95" if r[k]["fps_p5_t16_over_li_t16"] >= 0.95 else "< 0.95")] for k in ("round_1", "round_2", "pooled")])
-        body += [f"**P6-C: {r.get('verdict_forward', 'NOT EVALUABLE')}.** {Cc['not_interleaved_note']}.", ""]
+        if "verdict_forward" not in r and r["round_1"]["F_t16_over_F_t4"] is not None and r["round_2"]["F_t16_over_F_t4"] is None:
+            v = f"pooled NOT EVALUABLE (round 2 NOT RUN); round 1 alone: {'faster by at least 5%' if r['round_1']['faster_by_at_least_5pct'] else 'NOT faster'}"
+        else:
+            v = r.get("verdict_forward", "NOT EVALUABLE")
+        body += [f"**P6-C: {v}.** {Cc['not_interleaved_note']}.", ""]
         if notes.get("C"):
             body += [notes["C"], ""]
     # ---------------- drift

@@ -182,9 +182,12 @@ def analyse_b(camp: Path) -> Optional[Dict[str, Any]]:
     for v, o in sorted(mine.items()):
         r = (ref or {}).get("by_video", {}).get(v)
         if r is None or r["chunk_sha256"] != o["chunk_sha256"] or r["frame_scores"] != o["frame_scores"]:
+            fa, fb = ((r or {}).get("frame_scores") or []), (o.get("frame_scores") or [])
+            idx = [i for i, (x, y) in enumerate(zip(fa, fb)) if x != y]
             differ.append({"video": v, "absent_from_reference": r is None,
                            "chunk_hash_differs": bool(r) and r["chunk_sha256"] != o["chunk_sha256"],
-                           "frame_scores_differ": bool(r) and r["frame_scores"] != o["frame_scores"]})
+                           "frame_scores_differ": bool(r) and r["frame_scores"] != o["frame_scores"],
+                           "frames": len(fb), "frames_in_reference": len(fa), "frames_whose_scores_differ": idx})
         else:
             same += 1
     strip(blocks)

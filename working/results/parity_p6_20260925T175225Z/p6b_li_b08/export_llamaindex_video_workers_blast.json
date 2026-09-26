@@ -1,0 +1,889 @@
+{
+ "at_a_glance": "llamaindex_video workers[declared_workers=1] blast pass 1 records 16 (errors 0) / offered 16 | THROUGHPUT 3.015 frames/s (45.25x realtime), steady window undefined | SERVICE CPU 2.952 cores = 9.2% of 32 | IDLE BURDEN 0.004 cores with 1 li_workers live = 0.0% of the box before any work (beside, never subtracted) | thread env expected None / in-process torch 4 | gates PASS 6 \u00b7 NOT RUN 2 \u00b7 FAIL 0 | efficiency valid=True | COLLECTOR ok",
+ "arm": "llamaindex_video",
+ "posture": "workers[declared_workers=1]",
+ "leg": "blast",
+ "pass": 1,
+ "submission_order": "manifest-seq: deterministic by meeting id, identical both arms; NOT longest-first \u2014 sorting to shorten the drain tail would benchmark our scheduler, not the frameworks (ruling 2026-08-20)",
+ "throughput": {
+  "total_span_s": 550.2,
+  "total_frames": 1659,
+  "total_frames_per_s": 3.015,
+  "total_realtime_factor": 45.25,
+  "steady_window": {
+   "defined": false,
+   "reason": "saturation never reached or zero-width"
+  }
+ },
+ "efficiency": {
+  "valid": true,
+  "source": "container cgroup cpu.stat usage_usec bracketed around the leg \u2014 the same reader as the probes (#34: denominators from the container, never the driver)",
+  "service_cpu_s": 1624.3,
+  "effective_cores": 2.952,
+  "cpu_util_of_box": 0.0923,
+  "box_cpus": 32,
+  "cpu_s_per_footage_min": 3.915,
+  "cpu_s_per_frame": 0.979,
+  "cpu_s_per_video": 101.5,
+  "cpu_s_per_detection": 0.0603,
+  "cpu_s_per_chunk": 1.083,
+  "n_detections": 26938,
+  "n_chunks": 1500,
+  "usd_per_1k_footage_hours": 31.56,
+  "usd_per_hour_basis": "1.428 (instance on-demand $/h; cost = $/h / x_realtime * 1000, her V5 definition)",
+  "idle_burden": {
+   "instances": 1,
+   "instance_kind": "li_workers",
+   "idle_cores_before_instances": 0.006,
+   "idle_cores_with_instances_live": 0.004,
+   "sample_s": 6.0,
+   "idle_share_of_box": 0.0001,
+   "box_cpus": 32,
+   "marginal_cores_per_instance": null,
+   "baseline_note": "RR: before = server only (tokens not yet created); LI: workers already live in both samples",
+   "reference": "Ticket 4, measured 2026-08-21: ~1.0 server + ~0.26 cores/token at T=8, PARTIAL \u2014 probe_concurrency ticket4_idle_answer is the curve",
+   "idle_cpu_s_over_leg_if_additive": 2.2,
+   "idle_share_of_service_cpu_if_additive": 0.0014
+  },
+  "policy": "idle_burden is reported beside every figure above and never subtracted \u2014 additivity under load is unmeasured (Ticket 4)"
+ },
+ "driver_memory": {
+  "ru_maxrss_kb": 90852,
+  "basis": "getrusage(RUSAGE_SELF).ru_maxrss at export time \u2014 the driver process peak over the whole leg (KiB on Linux)"
+ },
+ "collector_status": "ok",
+ "collector_summary": {
+  "roles": {
+   "driver": {
+    "peak_rss_bytes": 136192000,
+    "peak_rss_mb": 129.88,
+    "peak_vms_bytes": 1407365120,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 2,
+    "peak_thread_count": 19,
+    "peak_cgroup_anon_mb": 163.33,
+    "peak_cgroup_current_mb": 20028.06,
+    "peak_cgroup_tasks": 58,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/snap.amazon-ssm-agent.amazon-ssm-agent.service",
+    "cgroup_samples": 1103,
+    "peak_fd_count": 48,
+    "distinct_pids_seen": 2,
+    "total_cpu_seconds": 12.67,
+    "ctx_switches_voluntary": 11439,
+    "ctx_switches_involuntary": 47,
+    "samples": 1103,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": 749.45,
+    "rss_final_over_initial": 1.0661
+   },
+   "service": {
+    "peak_rss_bytes": 2329722880,
+    "peak_rss_mb": 2221.8,
+    "peak_vms_bytes": 15290564608,
+    "peak_uss_bytes": null,
+    "peak_pss_bytes": null,
+    "peak_pss_mb": null,
+    "peak_process_count": 10,
+    "peak_thread_count": 786,
+    "peak_cgroup_anon_mb": 1634.03,
+    "peak_cgroup_current_mb": 3626.98,
+    "peak_cgroup_tasks": 786,
+    "cgroup_path": "/sys/fs/cgroup/system.slice/docker-aae49f45305d6423692c43b5d4b44a7323d8d5d2df767948593295e5cb8ddcb1.scope",
+    "cgroup_samples": 1103,
+    "peak_fd_count": 0,
+    "distinct_pids_seen": 17,
+    "total_cpu_seconds": 19968.91,
+    "ctx_switches_voluntary": 161085,
+    "ctx_switches_involuntary": 917,
+    "samples": 1103,
+    "oom_events": 0,
+    "rss_leak_slope_bytes_per_s": 165673.97,
+    "rss_final_over_initial": 1.041
+   }
+  },
+  "system": {
+   "compressor_delta_bytes": 0,
+   "swapouts_delta": 0,
+   "compressions_delta": 0,
+   "peak_system_mem_percent": 5.9
+  }
+ },
+ "lifetime_state": {
+  "basis": {
+   "spool_df": "df -kP of the spool path INSIDE the container (the overlay the engine writes to; size/used/avail in KiB as the engine sees them)",
+   "spool_du": "du -sk + `find -type f | wc -l` of the spool path inside the container \u2014 spool in flight at the instant of the read; at leg END (before the tokens are terminated) a non-zero count is a spool LEAK",
+   "mounts": "/proc/mounts lines for / and the spool path inside the container \u2014 a spool path with no mount of its own lives on the writable layer (host fs under the docker root)",
+   "cgroup": "cgroup v2 memory.current (incl. page cache) / memory.stat anon (OOM-relevant) / file (reclaimable), read inside the container",
+   "procs": "sum over every /proc/[0-9]*/status in the container of VmRSS, RssAnon, VmData, VmSize (KiB) + n processes; top_by_rss lists the largest with cmdline so the persistent engine server and the per-token processes are separable",
+   "layer": "docker ps -s SIZE: the writable layer (spool + container logs + anything written), first token; virtual size second",
+   "host_df": "os.statvfs of each host path: total/free/avail/used bytes; device and fstype from df -P",
+   "frag_ext4": "/proc/fs/ext4/<dev>/mb_groups summed over block groups: free blocks, free fragments, avg free extent KiB, per-order histogram (count of free extents of 2^k blocks), share of free blocks in extents >= 2^10 blocks (4 MiB; lower bound from the histogram) \u2014 e2freefrag's data source",
+   "frag_tool": "e2freefrag / xfs_spaceman text, best-effort via sudo -n; state recorded",
+   "diskstats": "/proc/diskstats row for the device: reads, sectors_read, writes, sectors_written, io_ms (cumulative; leg delta = churn volume)",
+   "fs_stream": "statvfs of the host paths every period_s under the leg: used/avail bytes; summary = start/end/max used, min avail per path",
+   "service_memory_trajectory": "collector role_tick rows for role=service: first 5 min mean -> last 5 min mean, max, time-quartile means, for rss / vms / cg_anon / cg_current / n_procs"
+  },
+  "spool_paths": [
+   "/tmp"
+  ],
+  "leg_start": {
+   "phase": "leg_start",
+   "taken_utc": "2026-09-26T00:18:31Z",
+   "containers": {
+    "li_bal_0": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 401441144,
+       "avail_kb": 614599720,
+       "mounted_on": "/",
+       "du_kb": 10672,
+       "n_files": 5,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/2674/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/2675/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/2675/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1422254080,
+      "anon": 1399857152,
+      "file": 11898880
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1835000,
+      "rssanon_kb": 1366776,
+      "vmdata_kb": 2375096,
+      "vmsize_kb": 6994184,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 6994184,
+        "vmrss": 1835000,
+        "rssanon": 1366776,
+        "vmdata": 2375096,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "11MB (virtual 9.1GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    }
+   },
+   "host": {
+    "df": {
+     "corpus": {
+      "path": "/home/ssm-user/parity-bench-video/corpus/ami/full",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 629366890496,
+      "avail_bytes": 629350113280,
+      "used_bytes": 411075731456,
+      "inodes_free": 128412872,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "host_tmp": {
+      "path": "/tmp",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 629366890496,
+      "avail_bytes": 629350113280,
+      "used_bytes": 411075731456,
+      "inodes_free": 128412872,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "out_dir": {
+      "path": "/home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b08",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 629366890496,
+      "avail_bytes": 629350113280,
+      "used_bytes": 411075731456,
+      "inodes_free": 128412872,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "docker_root": {
+      "path": "/var/lib/docker",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 629366890496,
+      "avail_bytes": 629350113280,
+      "used_bytes": 411075731456,
+      "inodes_free": 128412872,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     }
+    },
+    "docker_root": "/var/lib/docker",
+    "frag": {
+     "device": "/dev/root",
+     "fstype": "ext4",
+     "mount": "/",
+     "proc_fs_ext4_entries": [
+      "nvme0n1p1"
+     ],
+     "mb_groups": {
+      "source": "/proc/fs/ext4/nvme0n1p1/mb_groups",
+      "state": "measured",
+      "groups": 8000,
+      "free_blocks": 153560607,
+      "free_fragments": 19439,
+      "avg_free_extent_kb": 31598.5,
+      "hist_by_order": [
+       10931,
+       8548,
+       6965,
+       5510,
+       3040,
+       2377,
+       1942,
+       1584,
+       1403,
+       486,
+       383,
+       505,
+       493,
+       18183
+      ],
+      "free_share_in_extents_ge_4mib_lower_bound": 0.9924
+     },
+     "e2freefrag": {
+      "state": "measured (sudo -n)",
+      "text": "Device: /dev/root\nBlocksize: 4096 bytes\nTotal blocks: 262115579\nFree blocks: 153643008 (58.6%)\n\nMin. free extent: 4 KB \nMax. free extent: 2032512 KB\nAvg. free extent: 40836 KB\nNum. free extent: 15049\n\nHISTOGRAM OF FREE EXTENT SIZES:\nExtent Size Range :  Free extents   Free Blocks  Percent\n    4K...    8K-  :          2368          2368    0.00%\n    8K...   16K-  :          2076          5006    0.00%\n   16K...   32K-  :          2211         11828    0.01%\n   32K...   64K-  :          3193         35805    0.02%\n   64K...  128K-  :          1405         30095    0.02%\n  128K...  256K-  :           688         31274    0.02%\n  256K...  512K-  :           649         59203    0.04%\n  512K... 1024K-  :           409         73150    0.05%\n    1M...    2M-  :           833        263694    0.17%\n    2M...    4M-  :           129         91801    0.06%\n    4M...    8M-  :            43         58414    0.04%\n    8M...   16M-  :            29         77566    0.05%\n   16M...   32M-  :            39        222344    0.14%\n   32M...   64M-  :            60        701691    0.46%\n   64M...  128M-  :           307       6163776    4.01%\n  128M...  256M-  :           151       7171340    4.67%\n  256M...  512M-  :           123      11377722    7.41%\n  512M... 1024M-  :           105      19742258   12.85%\n    1G...    2G-  :           231     107523673   69.98%\n"
+     }
+    },
+    "diskstats": {
+     "state": "unavailable: root not in /proc/diskstats"
+    },
+    "psi_io": {
+     "state": "measured",
+     "text": "some avg10=0.00 avg60=0.47 avg300=0.64 total=329992979\nfull avg10=0.00 avg60=0.47 avg300=0.62 total=319621018"
+    }
+   },
+   "read_cost_s": 0.36
+  },
+  "leg_end": {
+   "phase": "leg_end",
+   "taken_utc": "2026-09-26T00:27:42Z",
+   "containers": {
+    "li_bal_0": {
+     "spool": {
+      "/tmp": {
+       "state": "measured",
+       "fs": "overlay",
+       "size_kb": 1016057248,
+       "used_kb": 401443608,
+       "avail_kb": 614597256,
+       "mounted_on": "/",
+       "du_kb": 11516,
+       "n_files": 5,
+       "mounts": [
+        "overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/2674/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/964/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/963/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/962/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/884/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/883/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/882/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/881/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/880/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/879/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/878/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/7/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/6/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/5/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/4/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/2675/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/2675/work,nouserxattr 0 0"
+       ],
+       "on_writable_layer": true
+      }
+     },
+     "cgroup": {
+      "memory_current": 1490923520,
+      "anon": 1465827328,
+      "file": 12763136
+     },
+     "procs": {
+      "n": 1,
+      "vmrss_kb": 1899420,
+      "rssanon_kb": 1431196,
+      "vmdata_kb": 2894236,
+      "vmsize_kb": 7513548,
+      "top_by_rss": [
+       {
+        "pid": 1,
+        "vmsize": 7513548,
+        "vmrss": 1899420,
+        "rssanon": 1431196,
+        "vmdata": 2894236,
+        "cmd": "python -m uvicorn li_video.service:app --host 0.0.0.0 --port 8802 --workers 1 --loop uvloop --http httptools --no-access-log --log-level warning --timeout-keep-"
+       }
+      ],
+      "state": "measured"
+     },
+     "exec_rc": 0,
+     "layer": {
+      "size": "11.8MB (virtual 9.1GB)",
+      "state": "measured"
+     },
+     "docker_mounts": [],
+     "graph_driver": null
+    }
+   },
+   "host": {
+    "df": {
+     "corpus": {
+      "path": "/home/ssm-user/parity-bench-video/corpus/ami/full",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 629364367360,
+      "avail_bytes": 629347590144,
+      "used_bytes": 411078254592,
+      "inodes_free": 128412870,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "host_tmp": {
+      "path": "/tmp",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 629364367360,
+      "avail_bytes": 629347590144,
+      "used_bytes": 411078254592,
+      "inodes_free": 128412870,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "out_dir": {
+      "path": "/home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b08",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 629364367360,
+      "avail_bytes": 629347590144,
+      "used_bytes": 411078254592,
+      "inodes_free": 128412870,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     },
+     "docker_root": {
+      "path": "/var/lib/docker",
+      "state": "measured",
+      "total_bytes": 1040442621952,
+      "free_bytes": 629364367360,
+      "avail_bytes": 629347590144,
+      "used_bytes": 411078254592,
+      "inodes_free": 128412870,
+      "inodes_total": 129024000,
+      "device": "/dev/root",
+      "fstype": "ext4",
+      "mount": "/"
+     }
+    },
+    "docker_root": "/var/lib/docker",
+    "frag": {
+     "device": "/dev/root",
+     "fstype": "ext4",
+     "mount": "/",
+     "proc_fs_ext4_entries": [
+      "nvme0n1p1"
+     ],
+     "mb_groups": {
+      "source": "/proc/fs/ext4/nvme0n1p1/mb_groups",
+      "state": "measured",
+      "groups": 8000,
+      "free_blocks": 153642416,
+      "free_fragments": 19441,
+      "avg_free_extent_kb": 31612.0,
+      "hist_by_order": [
+       10936,
+       8544,
+       6964,
+       5513,
+       3040,
+       2375,
+       1943,
+       1585,
+       1402,
+       486,
+       383,
+       509,
+       497,
+       18190
+      ],
+      "free_share_in_extents_ge_4mib_lower_bound": 0.9925
+     },
+     "e2freefrag": {
+      "state": "measured (sudo -n)",
+      "text": "Device: /dev/root\nBlocksize: 4096 bytes\nTotal blocks: 262115579\nFree blocks: 153642416 (58.6%)\n\nMin. free extent: 4 KB \nMax. free extent: 2032512 KB\nAvg. free extent: 40836 KB\nNum. free extent: 15049\n\nHISTOGRAM OF FREE EXTENT SIZES:\nExtent Size Range :  Free extents   Free Blocks  Percent\n    4K...    8K-  :          2369          2369    0.00%\n    8K...   16K-  :          2074          5001    0.00%\n   16K...   32K-  :          2212         11832    0.01%\n   32K...   64K-  :          3194         35813    0.02%\n   64K...  128K-  :          1405         30095    0.02%\n  128K...  256K-  :           688         31274    0.02%\n  256K...  512K-  :           647         59069    0.04%\n  512K... 1024K-  :           410         73358    0.05%\n    1M...    2M-  :           832        263407    0.17%\n    2M...    4M-  :           129         91801    0.06%\n    4M...    8M-  :            43         58414    0.04%\n    8M...   16M-  :            29         77566    0.05%\n   16M...   32M-  :            39        222344    0.14%\n   32M...   64M-  :            60        701691    0.46%\n   64M...  128M-  :           307       6163776    4.01%\n  128M...  256M-  :           151       7171340    4.67%\n  256M...  512M-  :           124      11477603    7.47%\n  512M... 1024M-  :           106      19924838   12.97%\n    1G...    2G-  :           230     107240825   69.80%\n"
+     }
+    },
+    "diskstats": {
+     "state": "unavailable: root not in /proc/diskstats"
+    },
+    "psi_io": {
+     "state": "measured",
+     "text": "some avg10=0.00 avg60=0.00 avg300=0.54 total=339173550\nfull avg10=0.00 avg60=0.00 avg300=0.50 total=328133693"
+    }
+   },
+   "read_cost_s": 0.36
+  },
+  "fs_stream": {
+   "basis": "statvfs of the host paths every period_s under the leg: used/avail bytes; summary = start/end/max used, min avail per path",
+   "period_s": 5.0,
+   "n": 110,
+   "path": "/home/ssm-user/parity-bench-p6/working/results/parity_p6_20260925T175225Z/p6b_li_b08/fsstream_llamaindex_video_workers_blast.jsonl",
+   "paths": {
+    "corpus": {
+     "state": "measured",
+     "start_used": 411075731456,
+     "end_used": 411458453504,
+     "max_used": 413203968000,
+     "min_avail": 627221876736,
+     "max_used_minus_start": 2128236544
+    },
+    "host_tmp": {
+     "state": "measured",
+     "start_used": 411075731456,
+     "end_used": 411458453504,
+     "max_used": 413203968000,
+     "min_avail": 627221876736,
+     "max_used_minus_start": 2128236544
+    },
+    "out_dir": {
+     "state": "measured",
+     "start_used": 411075731456,
+     "end_used": 411458453504,
+     "max_used": 413203968000,
+     "min_avail": 627221876736,
+     "max_used_minus_start": 2128236544
+    },
+    "docker_root": {
+     "state": "measured",
+     "start_used": 411075731456,
+     "end_used": 411458453504,
+     "max_used": 413203968000,
+     "min_avail": 627221876736,
+     "max_used_minus_start": 2128236544
+    }
+   }
+  },
+  "service_memory_trajectory": {
+   "state": "measured",
+   "basis": "collector role_tick rows for role=service: first 5 min mean -> last 5 min mean, max, time-quartile means, for rss / vms / cg_anon / cg_current / n_procs",
+   "n_ticks": 1103,
+   "span_s": 551.0,
+   "edge_s": 300.0,
+   "rss": {
+    "first_mean": 1902778245.1,
+    "last_mean": 1922369614.4,
+    "max": 2329722880,
+    "quartile_means": [
+     1915540305.0,
+     1888150602.2,
+     1913928095.5,
+     1932382237.7
+    ]
+   },
+   "vms": {
+    "first_mean": 7723439520.4,
+    "last_mean": 7632025630.7,
+    "max": 15290564608,
+    "quartile_means": [
+     7972903828.0,
+     7502904987.8,
+     7599195863.2,
+     7677108164.6
+    ]
+   },
+   "cg_anon": {
+    "first_mean": 1419138676.1,
+    "last_mean": 1442901327.7,
+    "max": 1713405952,
+    "quartile_means": [
+     1426968501.5,
+     1408686020.6,
+     1434460263.9,
+     1452912269.0
+    ]
+   },
+   "cg_current": {
+    "first_mean": 3429258007.9,
+    "last_mean": 3223953926.0,
+    "max": 3803168768,
+    "quartile_means": [
+     3383912485.2,
+     3477762686.1,
+     3378941610.7,
+     3035432069.6
+    ]
+   },
+   "n_procs": {
+    "first_mean": 1.3,
+    "last_mean": 1,
+    "max": 10,
+    "quartile_means": [
+     1.7,
+     1,
+     1,
+     1
+    ]
+   },
+   "cg_pids_tasks": {
+    "first_mean": 84.4,
+    "last_mean": 74.1,
+    "max": 786,
+    "quartile_means": [
+     109.0,
+     62.8,
+     71.3,
+     78.2
+    ]
+   }
+  }
+ },
+ "n_offered": 16,
+ "n_records": 16,
+ "n_errors": 0,
+ "leg_wall_s": 550.2,
+ "aborted_by_breaker": false,
+ "wall_s_order_stats": [
+  241.8,
+  495.6,
+  497.8,
+  498.9,
+  499.3,
+  501.8,
+  505.4,
+  508.9,
+  511.5,
+  513.7,
+  517.4,
+  521.1,
+  525.3,
+  528.9,
+  533.3,
+  536.9
+ ],
+ "latency_normalized": {
+  "wall_s_per_video_minute": [
+   14.79,
+   14.91,
+   15.0,
+   15.29,
+   15.43,
+   16.17,
+   16.99,
+   17.44,
+   17.49,
+   19.89,
+   20.67,
+   23.37,
+   29.35,
+   31.23,
+   31.85,
+   35.43
+  ],
+  "note": "raw per-video wall_s and video_s_manifest are in every record; this normalization keeps the 6x duration confound visible",
+  "p50": 17.49,
+  "max": 35.43,
+  "n": 16,
+  "percentile_policy": "p50/max/n only below n=50 (no dressed percentiles)"
+ },
+ "preleg_load1": 1.65,
+ "preleg_container_idle_cores": {
+  "li_bal_0": 0.006
+ },
+ "preleg_foreign_excess": 0.01,
+ "quiet_box_override": null,
+ "driver_cpu": {
+  "cpu_s": 5.1,
+  "share_of_box": 0.0003,
+  "over_1pct": false
+ },
+ "gates": {
+  "frames_census": {
+   "PASS": true,
+   "arm": "llamaindex_video",
+   "n_records": 16,
+   "missing_videos": null,
+   "rows": [
+    {
+     "video": "IS1009a.avi",
+     "PASS": true,
+     "frames": 55
+    },
+    {
+     "video": "IS1006a.avi",
+     "PASS": true,
+     "frames": 56
+    },
+    {
+     "video": "IS1007a.avi",
+     "PASS": true,
+     "frames": 64
+    },
+    {
+     "video": "IS1008a.avi",
+     "PASS": true,
+     "frames": 63
+    },
+    {
+     "video": "IS1005a.avi",
+     "PASS": true,
+     "frames": 68
+    },
+    {
+     "video": "IS1007b.avi",
+     "PASS": true,
+     "frames": 86
+    },
+    {
+     "video": "IS1008d.avi",
+     "PASS": true,
+     "frames": 98
+    },
+    {
+     "video": "IS1008c.avi",
+     "PASS": true,
+     "frames": 102
+    },
+    {
+     "video": "IS1008b.avi",
+     "PASS": true,
+     "frames": 117
+    },
+    {
+     "video": "IS1007d.avi",
+     "PASS": true,
+     "frames": 134
+    },
+    {
+     "video": "IS1006d.avi",
+     "PASS": true,
+     "frames": 122
+    },
+    {
+     "video": "IS1006c.avi",
+     "PASS": true,
+     "frames": 129
+    },
+    {
+     "video": "IS1007c.avi",
+     "PASS": true,
+     "frames": 140
+    },
+    {
+     "video": "IS1005c.avi",
+     "PASS": true,
+     "frames": 137
+    },
+    {
+     "video": "IS1006b.avi",
+     "PASS": true,
+     "frames": 143
+    },
+    {
+     "video": "IS1005b.avi",
+     "PASS": true,
+     "frames": 145
+    }
+   ]
+  },
+  "errors": {
+   "PASS": true,
+   "n_errors": 0
+  },
+  "self_duplication_any": {
+   "PASS": true,
+   "doubled_videos": null,
+   "indeterminate_videos": null,
+   "detector_rows": 16
+  },
+  "duplication_trigger": {
+   "PASS": true,
+   "n_trigger_eligible": 11,
+   "n_indeterminate": 0
+  },
+  "chunkid_monotone": {
+   "PASS": true,
+   "violations": null
+  },
+  "detection_liveness": {
+   "verdict": "NOT RUN",
+   "PASS": null,
+   "records": 0,
+   "offered": 16,
+   "reason": "--liveness-min-fraction not provided; value comes from probe data"
+  },
+  "embed_integrity": {
+   "PASS": true,
+   "n": 1500,
+   "expected_dim": 384,
+   "tol": 0.001,
+   "bad_dim_idx": null,
+   "bad_norm_idx": null
+  },
+  "determinism_repeat": {
+   "verdict": "NOT RUN",
+   "PASS": null,
+   "records": 0,
+   "offered": null,
+   "reason": "no ::repeat record in this leg (sequential legs produce one; blast legs report NOT RUN)"
+  }
+ },
+ "provenance_leela": {
+  "run_id": "20260926T002742Z-87989",
+  "timestamp_utc": "2026-09-26T00:27:42Z",
+  "git_commit": "8e4cf34a8eb4398fadd91a5cf342a6aacbf1b76d-dirty",
+  "image_digest": "sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95",
+  "framework_version": "0.14.23",
+  "instance_type": "c7i.8xlarge",
+  "architecture": "Linux/x86_64",
+  "cpu_count": 32,
+  "ram_gb": 61.8,
+  "corpus_manifest_sha256": "90ad4f5cc6a1df5252afedb0aaf57002a6c68b3c9df211edabb7ee7516549d1a",
+  "corpus_n_docs": 16,
+  "parser": "ffmpeg fps=1/15 + rfdetr(RF-DETR base, thr 0.3)",
+  "parser_config_hash": "f16cb645f66726de",
+  "chunk_config": {
+   "chunk_size": 4000,
+   "chunk_overlap": 0,
+   "splitter": "SentenceSplitter(native, char length function supplied)",
+   "input_transform": "text + '\\n'"
+  },
+  "rocketride_engine_version": "3.3.1",
+  "duplication_patch_applied": null,
+  "duplication_patch_id": null,
+  "duplication_patch_source": "not_applicable_no_engine",
+  "rocketride_sdk_version": "1.3.0",
+  "embedding_model": "sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+  "offered_concurrency": 16,
+  "configured_concurrency": 1,
+  "warmup_policy": "driver-side, 2 disjoint manifest warm rows, coverage proven per instance; LI sends concurrent in waves of max(2 x workers, leg concurrency) (Crossroad 40), RR tokens round-robin; per-send ledger in warmup_<stem>.json",
+  "timeout_s": 43200,
+  "mode": "blast"
+ },
+ "provenance_video": {
+  "pipe_sha256": "6330773fb63bf7f286563cc37b39a671e3b25c1874ae9bcfc4b936c9c2e5b911",
+  "manifest_sha256": "90ad4f5cc6a1df5252afedb0aaf57002a6c68b3c9df211edabb7ee7516549d1a",
+  "posture": {
+   "name": "workers",
+   "declared_workers": 1,
+   "threads_env_in_process_torch": 4,
+   "note": "LlamaIndex arm: uvicorn worker PROCESSES. No use(threads=) and no engine thread default exist here \u2014 the thread configuration is the six BLAS/OMP variables, read back in-process from every worker; threads_config/threads_note are RocketRide fields and are deliberately absent."
+  },
+  "identity_readback": {
+   "sdk": {
+    "skipped": "LI leg \u2014 the rocketride SDK is not on this path"
+   },
+   "li": {
+    "detect_impl": [
+     "rfdetr"
+    ],
+    "python_version": "3.12.13",
+    "versions": {
+     "rfdetr": "1.5.2",
+     "torch": "2.10.0+cu128",
+     "torchvision": "0.25.0+cu128",
+     "transformers": "4.53.3",
+     "supervision": "0.30.0",
+     "llama-index-core": "0.14.24",
+     "llama-index-embeddings-huggingface": "0.7.0",
+     "sentence-transformers": "5.7.0",
+     "imageio-ffmpeg": "0.6.0",
+     "fastapi": "0.141.1",
+     "uvicorn": "0.52.4"
+    },
+    "chunk_config_readback": {
+     "expected": {
+      "chunk_size": 4000,
+      "chunk_overlap": 0,
+      "split_unit": "chars"
+     },
+     "per_worker": {
+      "li_worker_8802_1": {
+       "chunk_size": 4000,
+       "chunk_overlap": 0,
+       "split_unit": "chars"
+      }
+     }
+    },
+    "rfdetr_checkpoint_md5_by_container": {
+     "li_bal_0": "b4d3ce46099eaed50626ede388caf979"
+    },
+    "rfdetr_checkpoint_md5_ok": true
+   }
+  },
+  "thread_pins_by_arm": {
+   "PASS": true,
+   "arms": {
+    "li": {
+     "within_arm": {
+      "PASS": true,
+      "readers": [
+       "li_worker_8802_1"
+      ],
+      "disagreements": null,
+      "values_agreed": {
+       "OMP_NUM_THREADS": "4",
+       "MKL_NUM_THREADS": "4",
+       "OPENBLAS_NUM_THREADS": "4",
+       "VECLIB_MAXIMUM_THREADS": "4",
+       "NUMEXPR_NUM_THREADS": "4",
+       "TORCH_NUM_THREADS": "4",
+       "torch_num_threads": 4
+      }
+     },
+     "declared": {
+      "OMP_NUM_THREADS": "4",
+      "MKL_NUM_THREADS": "4",
+      "OPENBLAS_NUM_THREADS": "4",
+      "VECLIB_MAXIMUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "TORCH_NUM_THREADS": "4"
+     },
+     "declared_vs_measured_mismatch": null
+    }
+   },
+   "cross_arm_values": {
+    "li": 4
+   },
+   "cross_arm_note": "MEASURED torch.get_num_threads() per arm, int; per-arm optima, difference recorded never failed (Crossroad 17)"
+  },
+  "task_census": null,
+  "p0": null,
+  "p1_sync": null,
+  "p2_nodebug_launch": false,
+  "network_mode": {
+   "li_bal_0": "host"
+  },
+  "image": {
+   "container": "li_bal_0",
+   "requested_tag": "li:video",
+   "image_id": "sha256:0a52afcbe9d4c560c0ad8067ba605e447cc6df97fdf6b8c58f8b4ea260dd7c95",
+   "rootfs_layer_count": 14,
+   "labels": "{}",
+   "lineage_declared": "li:video sha256:0a52afcb (P6-B p6b_li_b08, ONE instance, K=16, T=4)",
+   "lineage_is_declared": true,
+   "lineage_note": "a declared string, not a measurement \u2014 it states how this image was produced; the image_id and layer count are the measured facts it must be read against"
+  },
+  "container_lifetime": null,
+  "interval_s": 15,
+  "rr_write_path": null,
+  "frames_observed_method": "extractor-count",
+  "chunk_config_source": "measured from records (config literal never exported)"
+ }
+}

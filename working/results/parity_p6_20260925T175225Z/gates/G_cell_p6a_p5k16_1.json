@@ -1,0 +1,46 @@
+{
+ "gate": "G_cell_p6a_p5k16_1",
+ "decided_utc": "2026-09-25T18:55:35Z",
+ "leg": "p6a_p5k16_1",
+ "declared": {
+  "flavour": "p5",
+  "K": 16,
+  "T": 4,
+  "videos": 16,
+  "image_id": "sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd"
+ },
+ "read_back": {
+  "torch_num_threads": 4,
+  "OMP_NUM_THREADS": "4",
+  "OMP_WAIT_POLICY": "ABSENT",
+  "container_image_id": "sha256:b42c03b69f1749049d3a2e6334890347a22621e8d1adb0a8984780eab866d6bd",
+  "videos": 16,
+  "max_in_flight": 16,
+  "measured_frames": 3203,
+  "stamp_frame_rows": 3526,
+  "node": "p5-infer stamped",
+  "readback_thread": {
+   "name": "detect-infer",
+   "native_id": 173
+  },
+  "infer_tids": [
+   173
+  ]
+ },
+ "checks": {
+  "readback_present": true,
+  "torch_num_threads_eq_T": true,
+  "env_OMP_NUM_THREADS_eq_T": true,
+  "omp_wait_policy_absent": true,
+  "container_image_as_declared": true,
+  "videos_eq_n": true,
+  "max_in_flight_eq_K": true,
+  "stamps_cover_measured_frames": true,
+  "every_measured_frame_has_forward": true,
+  "node_is_p5_stamped": true,
+  "threads_read_on_the_inference_thread": true,
+  "one_inference_thread_ran_every_forward": true
+ },
+ "rule": "preregistration.json gates.G_cell",
+ "outcome": "PASS"
+}

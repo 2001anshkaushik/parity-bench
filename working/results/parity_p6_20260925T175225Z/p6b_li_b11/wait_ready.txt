@@ -1,0 +1,10 @@
+{
+ "network_mode": "host",
+ "ready": true,
+ "arm": "li",
+ "port": 8802,
+ "wall_s": 0.0,
+ "attempts": 1,
+ "warm_workers": 1,
+ "pid": 1
+}

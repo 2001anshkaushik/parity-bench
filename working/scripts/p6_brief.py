@@ -76,7 +76,7 @@ def main() -> int:
                  f"{b['per_arm']['li']['total_frames_per_s']:.3f} frames/s [P6_B.per_arm.*.total_frames_per_s], ratio {b['ratio_rr_over_li_totals']:.3f} "
                  f"[P6_B.ratio_rr_over_li_totals] against 0.95; per block {dist['min']:.3f} to {dist['max']:.3f} (median {dist['p50']:.3f}) "
                  f"[P6_B.per_block_ratio_distribution]; output vs the banked stock run: "
-                 f"{'identical on all ' + str(b['correctness_vs_p1d']['videos_compared']) if b['correctness_vs_p1d']['all_compared_identical'] else str(len(b['correctness_vs_p1d']['differ'])) + ' differ'} "
+                 f"{'identical on all ' + str(b['correctness_vs_p1d']['videos_compared']) if b['correctness_vs_p1d']['all_compared_identical'] else str(b['correctness_vs_p1d']['identical']) + ' of ' + str(b['correctness_vs_p1d']['videos_compared']) + ' identical; ' + ', '.join(x['video'] for x in b['correctness_vs_p1d']['differ']) + ' differ — cause not established (stock never replicated on them)'} "
                  "[P6_B.correctness_vs_p1d].")
     else:
         gf = camp / "gates" / "G_smoke_P6B.json"
@@ -87,6 +87,11 @@ def main() -> int:
         L.append(f"- **Out-of-box threads (T=16) with the single inference thread:** forward {rp['F_t16_over_F_t4']:.3f}x the T=4 forward "
                  f"[P6_C.readings.pooled.F_t16_over_F_t4] ({c['readings'].get('verdict_forward')}); frames/s vs one LlamaIndex instance at T=16 "
                  f"{rp['fps_p5_t16_over_li_t16']:.3f} [P6_C.readings.pooled.fps_p5_t16_over_li_t16] (reported against 0.95); cross-stage, not ABAB.")
+    elif c and c["correctness"]["gate_pass"] and (c.get("readings") or {}).get("round_1", {}).get("F_t16_over_F_t4") is not None:
+        r1 = c["readings"]["round_1"]
+        L.append(f"- **Out-of-box threads (T=16) with the single inference thread, one round (the second was cut by the budget):** forward "
+                 f"{r1['F_t16_over_F_t4']:.3f}x the T=4 forward [P6_C.readings.round_1.F_t16_over_F_t4] — slower, not faster; frames/s vs one LlamaIndex "
+                 f"instance at T=16 {r1['fps_p5_t16_over_li_t16']:.3f} [P6_C.readings.round_1.fps_p5_t16_over_li_t16]; T=4 remains the posture to use.")
     elif c and c["correctness"]["gate_pass"] is False:
         L.append("- **Out-of-box threads (T=16): OUTPUT-CHANGING** against the out-of-box reference — no speed reading [P6_C.correctness.gate_pass].")
     else:

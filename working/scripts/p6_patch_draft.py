@@ -64,7 +64,10 @@ def main() -> int:
          f"at K=16 and K=1, both rounds, and against an earlier session's stock K=1 leg [analysis_p5a.json correctness.gate_pass = {p5a['correctness']['gate_pass']}].",
          f"- P6: identical to stock on 16/16 in both rounds [analysis_p6.json P6_A.correctness.gate_pass = {a['correctness']['gate_pass']}]"
          + (f"; on the 168-video slice, {b['correctness_vs_p1d']['identical']} of {b['correctness_vs_p1d']['videos_compared']} videos identical to a banked stock run "
-            "[P6_B.correctness_vs_p1d]." if b else "; the 168-video confirmation did not run (see the P6 report)."),
+            "from another session [P6_B.correctness_vs_p1d]" + (": " + ", ".join(x["video"] for x in b["correctness_vs_p1d"]["differ"])
+            + " differ (chunk hashes and frame scores); whether the patch or run-to-run variation in stock causes it is NOT established — "
+              "stock was never replicated on those videos (register 65)." if b["correctness_vs_p1d"]["differ"] else ".") if b else
+            "; the 168-video confirmation did not run (see the P6 report)."),
          "", "## Mandate compliance", "",
          "- One engine process, one pipeline, ONE model instance: the worker calls the same `IGlobal.detector` object; the on-token D0 read "
          "exactly one LWDETR before and after every measured leg (P5, P6 gate records G_d0).",
@@ -83,7 +86,9 @@ def main() -> int:
           f"{d['p50_over_ref_minus_1']:+.1%}, p99 {d['p99_over_ref_minus_1']:+.1%}) [P6_A.descriptive_forward_degradation; the one-video reference is P5's "
           "session] — a tail of slow forwards while the other callers decode; its cause was not measured." if d else "- Not measured in P6."),
          "", "## What a reviewer should test", "",
-         "- Output identity against the current node on your own video set at the same thread count, at 1 and at many videos in flight.",
+         "- Output identity against the current node on your own video set at the same thread count, at 1 and at many videos in flight — "
+         "and, first, the current node against ITSELF on the same set (two runs), so a mismatch can be attributed"
+         + (f"; start with {', '.join(x['video'] for x in b['correctness_vs_p1d']['differ'])}, which differed here." if b and b["correctness_vs_p1d"]["differ"] else "."),
          "- Teardown: a pipeline stopped with frames queued ends cleanly (the worker fails pending frames and `endGlobal` returns).",
          "- Errors: a frame whose detect raises is dropped with the existing warning and the next frame is served.",
          "- Model-server (proxy) mode: `make_device_lock()` returned a no-op there; the worker still serialises calls — check throughput in that mode.",
